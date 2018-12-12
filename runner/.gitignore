@@ -1,0 +1,15 @@
+*.o
+*.swp
+*.out
+
+tags
+runners_to_boincserver.sh
+
+doc/
+bin/
+testground/
+.git/
+
+!testground/hashcatkernels1_7.zip
+!testground/hashcat64.bin
+!testground/hashcat64.exe

@@ -1,0 +1,5 @@
+|||name|String|18|normal task sample|||
+|||attack_mode|UInt|1|0|||
+|||attack_submode|UInt|1|0|||
+|||hash_type|UInt|1|0|||
+|||mode|String|1|n|||

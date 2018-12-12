@@ -1,0 +1,453 @@
+##
+## Author......: See docs/credits.txt
+## License.....: MIT
+##
+
+SHARED                  := 0
+DEBUG                   := 1
+PRODUCTION              := 0
+PRODUCTION_VERSION      := v4.1.1
+
+##
+## Detect Operating System
+##
+
+UNAME                   := $(shell uname -s)
+
+# we need to strip the windows version number to be able to build hashcat on cygwin hosts
+UNAME                   := $(patsubst CYGWIN_NT-%,CYGWIN,$(UNAME))
+
+# same for msys
+UNAME                   := $(patsubst MSYS_NT-%,MSYS2,$(UNAME))
+UNAME                   := $(patsubst MINGW32_NT-%,MSYS2,$(UNAME))
+UNAME                   := $(patsubst MINGW64_NT-%,MSYS2,$(UNAME))
+
+ifeq (,$(filter $(UNAME),Linux FreeBSD Darwin CYGWIN MSYS2))
+$(error "! Your Operating System ($(UNAME)) is not supported by this Makefile")
+endif
+
+ifeq ($(DEBUG),1)
+$(warning "## Detected Operating System : $(UNAME)")
+endif
+
+##
+## Makefile flags
+##
+
+MAKEFLAGS               += -l -j -rR --no-print-directory
+
+ifneq ($(findstring clean,$(MAKECMDGOALS)),)
+MAKEFLAGS               += -j 1
+endif
+
+##
+## Native compiler paths
+##
+
+CC                      := gcc
+FIND                    := find
+INSTALL                 := install
+RM                      := rm
+SED                     := sed
+SED_IN_PLACE            := -i
+
+ifeq ($(UNAME),Darwin)
+CC                      := clang
+# the sed -i option of macOS requires a parameter for the backup file (we just use "")
+SED                     := /usr/bin/sed
+SED_IN_PLACE            := -i ""
+PROD_VERS               := $(shell sw_vers -productVersion | cut -d. -f2)
+endif
+
+ifeq ($(UNAME),FreeBSD)
+CC                      := cc
+SED                     := gsed
+endif
+
+##
+## Version
+##
+
+ifeq ($(PRODUCTION),1)
+VERSION_TAG             := $(PRODUCTION_VERSION)
+else
+VERSION_TAG             := $(shell git describe --tags --dirty=+ || echo $(PRODUCTION_VERSION))
+endif # PRODUCTION
+
+VERSION_PURE            := $(shell echo "$(VERSION_TAG)" | $(SED) 's/.*v\([\.0-9]*\).*/\1/')
+
+##
+## Installation paths (Linux only)
+##
+
+DESTDIR                 ?=
+PREFIX                  ?= /usr/local
+
+INSTALL_FOLDER          ?= $(PREFIX)/bin
+SHARED_ROOT_FOLDER      ?= $(PREFIX)/share
+SHARED_FOLDER           ?= $(SHARED_ROOT_FOLDER)/hashcat
+DOCUMENT_FOLDER         ?= $(SHARED_ROOT_FOLDER)/doc/hashcat
+LIBRARY_FOLDER          ?= $(PREFIX)/lib
+LIBRARY_DEV_ROOT_FOLDER ?= $(PREFIX)/include
+LIBRARY_DEV_FOLDER      ?= $(LIBRARY_DEV_ROOT_FOLDER)/hashcat
+
+##
+## Filenames for library and frontend
+##
+
+HASHCAT_FRONTEND        := hashValidator
+HASHCAT_LIBRARY         := libhashcat.so.$(VERSION_PURE)
+
+ifeq ($(UNAME),CYGWIN)
+HASHCAT_FRONTEND        := hashValidator.exe
+HASHCAT_LIBRARY         := hashcat.dll
+endif # CYGWIN
+
+ifeq ($(UNAME),MSYS2)
+HASHCAT_FRONTEND        := hashValidator.exe
+HASHCAT_LIBRARY         := hashcat.dll
+endif # MSYS2
+
+##
+## Dependencies
+## You may ignore them if you're compiling only a native binary and
+## You have your own headers somewhere, for example: apt-get install opencl-headers
+##
+
+
+##
+## Cross compiler paths
+##
+
+CC_LINUX_32             := gcc
+CC_LINUX_64             := gcc
+
+CC_WIN_32               := i686-w64-mingw32-gcc
+CC_WIN_64               := x86_64-w64-mingw32-gcc
+
+## To compile win-iconv with mingw clone from here: https://github.com/win-iconv/win-iconv
+##
+## Then patch the makefile withe the patches from tools/win-iconv-*.diff and run make install
+##
+
+WIN_ICONV_32            := /opt/win-iconv-32
+WIN_ICONV_64            := /opt/win-iconv-64
+
+##
+## Misc stuff
+##
+
+COMPTIME                := $(shell date +%s)
+SYSTEM_LZMA_SDK         := 0
+
+LZMA_SDK_INCLUDE        := $(LIBRARY_DEV_ROOT_FOLDER)/lzma-sdk/C
+
+##
+## General compiler and linker options
+##
+
+CFLAGS                  += -pipe -std=gnu99 -Iinclude/ 
+
+ifeq ($(PRODUCTION),0)
+CFLAGS                  += -W
+CFLAGS                  += -Wfloat-equal
+CFLAGS                  += -Wundef
+CFLAGS                  += -Wshadow
+CFLAGS                  += -Wpointer-arith
+CFLAGS                  += -Waggregate-return
+CFLAGS                  += -Wswitch-enum
+CFLAGS                  += -Winit-self
+CFLAGS                  += -Werror-implicit-function-declaration
+CFLAGS                  += -Wformat
+CFLAGS                  += -ftrapv
+CFLAGS                  += -Wwrite-strings
+
+# the following compiler options produce warnings that should be fixed at some time
+
+CFLAGS                  += -Wno-cast-align
+CFLAGS                  += -Wno-cast-qual
+CFLAGS                  += -Wno-conversion
+CFLAGS                  += -Wno-padded
+CFLAGS                  += -Wno-pedantic
+CFLAGS                  += -Wno-sizeof-pointer-memaccess
+#CFLAGS                  += -Wno-reserved-id-macro      //clang specific
+#CFLAGS                  += -Wno-used-but-marked-unused //    ^^
+endif
+
+# default Linux and freebsd thread stack size is 2MB
+# default Windows thread stack size is 1MB
+# default macOS thread stack size is 512kB
+# unfortunately, this option isn't supported by older GCC and clang versions
+
+#CFLAGS                  += -Wstack-usage=524288
+
+ifeq ($(SYSTEM_LZMA_SDK),1)
+CFLAGS                  += $(LZMA_SDK_INCLUDE)
+LDFLAGS                 += -llzmasdk
+else
+CFLAGS                  +=-Iinclude/lzma_sdk/
+endif
+
+LFLAGS                  := $(LDFLAGS)
+
+ifeq ($(DEBUG),0)
+CFLAGS                  += -O2
+ifneq ($(UNAME),Darwin)
+LFLAGS                  += -s
+endif
+else
+ifeq ($(DEBUG),1)
+CFLAGS                  += -DDEBUG -Og -ggdb
+else
+ifeq ($(DEBUG),2)
+CFLAGS                  += -DDEBUG -Og -ggdb
+CFLAGS                  += -fsanitize=address -fno-omit-frame-pointer
+endif
+endif
+endif
+
+##
+## Native compilation target
+##
+
+ifeq ($(UNAME),Linux)
+CFLAGS_NATIVE           := $(CFLAGS)
+CFLAGS_NATIVE           += -DWITH_HWMON
+LFLAGS_NATIVE           := $(LFLAGS)
+LFLAGS_NATIVE           += -lpthread
+LFLAGS_NATIVE           += -ldl
+LFLAGS_NATIVE           += -lrt
+endif # Linux
+
+ifeq ($(UNAME),FreeBSD)
+ifndef PORTNAME
+CFLAGS_NATIVE           := $(CFLAGS)
+LFLAGS_NATIVE           := $(LFLAGS)
+LFLAGS_NATIVE           += -lpthread
+endif
+endif # FreeBSD
+
+ifeq ($(UNAME),Darwin)
+export MACOSX_DEPLOYMENT_TARGET=10.9
+CFLAGS_NATIVE           := $(CFLAGS)
+
+ifeq ($(shell test $(PROD_VERS) -le 11; echo $$?), 0)
+CFLAGS_NATIVE           += -DMISSING_CLOCK_GETTIME
+endif
+
+LFLAGS_NATIVE           := $(LFLAGS)
+LFLAGS_NATIVE           += -lpthread
+endif # Darwin
+
+ifeq ($(UNAME),CYGWIN)
+CFLAGS_NATIVE           := $(CFLAGS)
+CFLAGS_NATIVE           += -DWITH_HWMON
+LFLAGS_NATIVE           := $(LFLAGS)
+LFLAGS_NATIVE           += -Wl,--dynamicbase -Wl,--nxcompat
+LFLAGS_NATIVE           += -lpsapi
+endif # CYGWIN
+
+ifeq ($(UNAME),MSYS2)
+CFLAGS_NATIVE           := $(CFLAGS)
+CFLAGS_NATIVE           += -DWITH_HWMON
+LFLAGS_NATIVE           := $(LFLAGS)
+LFLAGS_NATIVE           += -Wl,--dynamicbase -Wl,--nxcompat
+LFLAGS_NATIVE           += -lpsapi
+endif # MSYS2
+
+##
+## Cross compilation targets
+##
+
+CFLAGS_CROSS_LINUX32    := $(CFLAGS)
+CFLAGS_CROSS_LINUX32    += -m32
+CFLAGS_CROSS_LINUX32    += -DWITH_HWMON
+CFLAGS_CROSS_LINUX64    := $(CFLAGS)
+CFLAGS_CROSS_LINUX64    += -m64
+CFLAGS_CROSS_LINUX64    += -DWITH_HWMON
+CFLAGS_CROSS_WIN32      := $(CFLAGS)
+CFLAGS_CROSS_WIN32      += -D__MINGW_USE_VC2005_COMPAT #hack to get 64-bit time_t
+CFLAGS_CROSS_WIN32      += -I$(WIN_ICONV_32)/include/
+CFLAGS_CROSS_WIN32      += -m32
+CFLAGS_CROSS_WIN32      += -DWITH_HWMON
+CFLAGS_CROSS_WIN64      := $(CFLAGS)
+CFLAGS_CROSS_WIN64      += -I$(WIN_ICONV_64)/include/
+CFLAGS_CROSS_WIN64      += -m64
+CFLAGS_CROSS_WIN64      += -DWITH_HWMON
+
+LFLAGS_CROSS_LINUX32    := $(LFLAGS)
+LFLAGS_CROSS_LINUX32    += -lpthread
+LFLAGS_CROSS_LINUX32    += -ldl
+LFLAGS_CROSS_LINUX64    := $(LFLAGS)
+LFLAGS_CROSS_LINUX64    += -lpthread
+LFLAGS_CROSS_LINUX64    += -ldl
+LFLAGS_CROSS_WIN32      := $(LFLAGS)
+LFLAGS_CROSS_WIN32      += -Wl,--dynamicbase -Wl,--nxcompat
+LFLAGS_CROSS_WIN32      += -lpsapi
+LFLAGS_CROSS_WIN64      := $(LFLAGS)
+LFLAGS_CROSS_WIN64      += -Wl,--dynamicbase -Wl,--nxcompat
+LFLAGS_CROSS_WIN64      += -lpsapi
+
+##
+## Objects
+##
+
+OBJS_ALL                := hashValidator   bitops  common convert  cpu_aes cpu_crc32 cpu_des cpu_md4 cpu_md5 cpu_sha1 cpu_sha256    dynloader event ext_ADL ext_nvapi ext_nvml  ext_sysfs  ext_lzma filehandling folder hashcat hashes hlfmt  interface    memory monitor         shared status   terminal thread timer  usage user_options 
+
+ifeq ($(SYSTEM_LZMA_SDK),0)
+OBJS_ALL += lzma_sdk/Alloc lzma_sdk/Lzma2Dec lzma_sdk/LzmaDec
+endif
+
+NATIVE_STATIC_OBJS      := $(foreach OBJ,$(OBJS_ALL),obj/$(OBJ).NATIVE.STATIC.o)
+NATIVE_SHARED_OBJS      := $(foreach OBJ,$(OBJS_ALL),obj/$(OBJ).NATIVE.SHARED.o)
+
+LINUX_32_OBJS           := $(foreach OBJ,$(OBJS_ALL),obj/$(OBJ).LINUX.32.o)
+LINUX_64_OBJS           := $(foreach OBJ,$(OBJS_ALL),obj/$(OBJ).LINUX.64.o)
+
+WIN_32_OBJS             := $(foreach OBJ,$(OBJS_ALL),obj/$(OBJ).WIN.32.o)
+WIN_64_OBJS             := $(foreach OBJ,$(OBJS_ALL),obj/$(OBJ).WIN.64.o)
+
+##
+## Targets: Native Compilation
+##
+
+default: $(HASHCAT_FRONTEND)
+
+clean:
+	$(RM) -f $(HASHCAT_FRONTEND)
+	$(RM) -f $(HASHCAT_LIBRARY)
+	$(RM) -f obj/lzma_sdk/*.o
+	$(RM) -f obj/*.o
+	$(RM) -f *.bin *.exe
+	$(RM) -f *.pid
+	$(RM) -f *.restore
+	$(RM) -f *.log
+	$(RM) -f core
+	$(RM) -rf *.induct
+	$(RM) -rf *.outfiles
+	$(RM) -rf *.dSYM
+	$(RM) -rf kernels
+
+distclean: clean
+	$(RM) -f *.restore *.pot *.out *.log
+
+##
+## Targets: Cross Compilation (for binary release version)
+##
+
+binaries: linux32 linux64 win32 win64
+
+linux32: hashValidator32.bin
+linux64: hashValidator64.bin
+
+win32: hashValidator32.exe
+win64: hashValidator64.exe
+
+##
+## Targets: Linux install
+##
+
+# allow (whitelist) "make install" only on unix-based systems (also disallow cygwin/msys)
+
+ifneq ($(findstring install,$(MAKECMDGOALS)),)
+  ifeq (,$(filter $(UNAME),Linux FreeBSD Darwin))
+    define ERROR_INSTALL_DISALLOWED
+! The 'install' target is not allowed on this operating system ($(UNAME)). \
+Only Linux, FreeBSD and Darwin can use the 'install' target
+    endef
+
+    $(error $(ERROR_INSTALL_DISALLOWED))
+  endif
+endif
+
+ifeq ($(SHARED),1)
+install: install_docs install_shared install_library install_library_dev install_hashcat
+else
+install: install_docs install_shared                                     install_hashcat
+endif
+
+# we need this extra target to make sure that for parallel builds (i.e. 2+ Makefile targets could possible run at the same time)
+# the root folder of the shared directory is created first (and is a dependency for the targets that depend on it)
+
+install_make_library_dev_root:
+	$(INSTALL) -m 755 -d                                                    $(DESTDIR)$(LIBRARY_DEV_ROOT_FOLDER)
+
+install_make_shared_root:
+	$(INSTALL) -m 755 -d                                                    $(DESTDIR)$(SHARED_ROOT_FOLDER)
+
+
+
+install_library: $(HASHCAT_LIBRARY)
+	$(INSTALL) -m 755 -d                                                    $(DESTDIR)$(LIBRARY_FOLDER)
+	$(INSTALL) -m 755 $(HASHCAT_LIBRARY)                                    $(DESTDIR)$(LIBRARY_FOLDER)/
+
+install_library_dev: install_make_library_dev_root
+	$(INSTALL) -m 755 -d                                                    $(DESTDIR)$(LIBRARY_DEV_FOLDER)
+	$(FIND) include/  -mindepth 1 -type d -execdir $(INSTALL) -m 755 -d     $(DESTDIR)$(LIBRARY_DEV_FOLDER)/{} \;
+	$(FIND) include/  -mindepth 1 -type f -execdir $(INSTALL) -m 644 {}     $(DESTDIR)$(LIBRARY_DEV_FOLDER)/{} \;
+
+install_hashcat: $(HASHCAT_FRONTEND)
+	$(INSTALL) -m 755 -d                                                    $(DESTDIR)$(INSTALL_FOLDER)
+	$(INSTALL) -m 755 $(HASHCAT_FRONTEND)                                   $(DESTDIR)$(INSTALL_FOLDER)/
+
+uninstall:
+	$(RM) -f  $(DESTDIR)$(INSTALL_FOLDER)/$(HASHCAT_FRONTEND)
+	$(RM) -f  $(DESTDIR)$(LIBRARY_FOLDER)/$(HASHCAT_LIBRARY)
+	$(RM) -rf $(DESTDIR)$(LIBRARY_DEV_FOLDER)
+	$(RM) -rf $(DESTDIR)$(SHARED_FOLDER)
+	$(RM) -rf $(DESTDIR)$(DOCUMENT_FOLDER)
+
+##
+## native compiled hashcat library and frontend
+##
+
+obj/%.NATIVE.STATIC.o: src/%.c
+	$(CC) -c $(CFLAGS_NATIVE) $< -o $@
+
+obj/%.NATIVE.SHARED.o: src/%.c
+	$(CC) -c $(CFLAGS_NATIVE) $< -o $@ -fpic
+
+$(HASHCAT_LIBRARY): $(NATIVE_SHARED_OBJS)
+	$(CC)                     $^ -o $@                    $(LFLAGS_NATIVE) -shared -Wl,-soname,$(HASHCAT_LIBRARY)
+
+ifeq ($(SHARED),1)
+$(HASHCAT_FRONTEND): src/main.c $(HASHCAT_LIBRARY)
+	$(CC)    $(CFLAGS_NATIVE) $^ -o $@ $(HASHCAT_LIBRARY) $(LFLAGS_NATIVE) -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\" -DINSTALL_FOLDER=\"$(INSTALL_FOLDER)\" -DSHARED_FOLDER=\"$(SHARED_FOLDER)\" -DDOCUMENT_FOLDER=\"$(DOCUMENT_FOLDER)\"
+else
+$(HASHCAT_FRONTEND): src/main.c $(NATIVE_STATIC_OBJS)
+	$(CC)    $(CFLAGS_NATIVE) $^ -o $@                    $(LFLAGS_NATIVE) -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\" -DINSTALL_FOLDER=\"$(INSTALL_FOLDER)\" -DSHARED_FOLDER=\"$(SHARED_FOLDER)\" -DDOCUMENT_FOLDER=\"$(DOCUMENT_FOLDER)\"
+endif
+
+##
+## cross compiled hashcat
+##
+
+obj/%.LINUX.32.o: src/%.c
+	$(CC_LINUX_32) $(CFLAGS_CROSS_LINUX32) -c -o $@ $<
+
+obj/%.LINUX.64.o: src/%.c
+	$(CC_LINUX_64) $(CFLAGS_CROSS_LINUX64) -c -o $@ $<
+
+obj/%.WIN.32.o:   src/%.c
+	$(CC_WIN_32)   $(CFLAGS_CROSS_WIN32)   -c -o $@ $<
+
+obj/%.WIN.64.o:   src/%.c
+	$(CC_WIN_64)   $(CFLAGS_CROSS_WIN64)   -c -o $@ $<
+
+hashcat32.bin: src/main.c $(LINUX_32_OBJS)
+	$(CC_LINUX_32) $(CFLAGS_CROSS_LINUX32)    -o $@ $^ $(LFLAGS_CROSS_LINUX32) -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\" -DINSTALL_FOLDER=\"$(INSTALL_FOLDER)\" -DSHARED_FOLDER=\"$(SHARED_FOLDER)\" -DDOCUMENT_FOLDER=\"$(DOCUMENT_FOLDER)\"
+
+hashcat64.bin: src/main.c $(LINUX_64_OBJS)
+	$(CC_LINUX_64) $(CFLAGS_CROSS_LINUX64)    -o $@ $^ $(LFLAGS_CROSS_LINUX64) -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\" -DINSTALL_FOLDER=\"$(INSTALL_FOLDER)\" -DSHARED_FOLDER=\"$(SHARED_FOLDER)\" -DDOCUMENT_FOLDER=\"$(DOCUMENT_FOLDER)\"
+
+hashcat32.exe: src/main.c $(WIN_32_OBJS) $(WIN_ICONV_32)/lib/libiconv.a
+	$(CC_WIN_32)   $(CFLAGS_CROSS_WIN32)      -o $@ $^ $(LFLAGS_CROSS_WIN32)   -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\"
+
+hashcat64.exe: src/main.c $(WIN_64_OBJS) $(WIN_ICONV_64)/lib/libiconv.a
+	$(CC_WIN_64)   $(CFLAGS_CROSS_WIN64)      -o $@ $^ $(LFLAGS_CROSS_WIN64)   -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\"
+
+hashcat32.dll: src/main.c $(WIN_32_OBJS)
+	$(CC_WIN_32)   $(CFLAGS_CROSS_WIN32)      -o $@ $^ $(LFLAGS_CROSS_WIN32)   -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\" -shared
+
+hashcat64.dll: src/main.c $(WIN_64_OBJS)
+	$(CC_WIN_64)   $(CFLAGS_CROSS_WIN64)      -o $@ $^ $(LFLAGS_CROSS_WIN64)   -DCOMPTIME=$(COMPTIME) -DVERSION_TAG=\"$(VERSION_TAG)\" -shared

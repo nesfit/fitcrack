@@ -1,0 +1,75 @@
+--- ../../../boinc/sched/Makefile.am	2018-09-01 18:20:09.575721500 +0200
++++ Makefile.fitcrack.am	2018-09-01 10:46:26.402558659 +0200
+@@ -124,7 +124,11 @@
+     trickle_credit \
+     trickle_deadline \
+     trickle_echo \
+-    update_stats
++    update_stats \
++    assimilator \
++    work_generator \
++    bitwise_validator \
++    trickler
+ 
+ schedcgi_PROGRAMS= \
+     cgi \
+@@ -307,6 +311,59 @@
+ sched_driver_SOURCES = sched_driver.cpp
+ sched_driver_LDADD = $(SERVERLIBS)
+ 
++# find . -name '*.h'
++# find . -name '*.cpp'
++fitcrack_sources = \
++    AttackBench.h \
++    AttackCombinator.h \
++    AttackDict.h \
++    AttackMarkov.h \
++    AttackMask.h \
++    AttackMode.h \
++    AttackRules.h \
++    Base64.h \
++    Config.h \
++    Dictionary.h \
++    Host.h \
++    Job.h \
++    Mask.h \
++    Package.h \
++    SqlLoader.h \
++    AbstractGenerator.h \
++    SimpleGenerator.h \
++    AttackBench.cpp \
++    AttackCombinator.cpp \
++    AttackDict.cpp \
++    AttackMarkov.cpp \
++    AttackMask.cpp \
++    AttackMode.cpp \
++    AttackRules.cpp \
++    Config.cpp \
++    Dictionary.cpp \
++    Host.cpp \
++    Job.cpp \
++    Mask.cpp \
++    Package.cpp \
++    SqlLoader.cpp \
++    AbstractGenerator.cpp \
++    SimpleGenerator.cpp
++
++assimilator_SOURCES = $(ASSIMILATOR_SOURCES) \
++	$(fitcrack_sources) \
++	work_assimilator.cpp
++assimilator_LDADD = $(SERVERLIBS)
++
++work_generator_SOURCES = $(fitcrack_sources) \ 
++	work_generator.cpp
++work_generator_LDADD = $(SERVERLIBS)
++
++bitwise_validator_SOURCES = $(VALIDATOR_SOURCES) \
++	sample_bitwise_validator.cpp
++bitwise_validator_LDADD = $(SERVERLIBS)
++
++trickler_SOURCES = trickler.cpp trickle_handler.cpp
++trickler_LDADD = $(SERVERLIBS)
++
+ if ENABLE_FCGI
+ 
+ schedcgi_PROGRAMS += fcgi fcgi_file_upload_handler

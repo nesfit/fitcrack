@@ -1,0 +1,21 @@
+# Handle line endings automatically for files detected as text
+# and leave all files detected as binary untouched.
+* text=auto eol=lf
+
+# Force the following filetypes to have unix eols, so Windows does not break
+# them
+*.* text eol=lf
+
+#
+## These files are binary and should be left untouched
+#
+
+# (binary is a macro for -text -diff)
+*.zip	    binary
+*.exe 	    binary
+*.bin 	    binary
+*.a   	    binary
+*.la  	    binary
+*.dll 	    binary
+*.hcstat2   binary
+*.hcstat    binary

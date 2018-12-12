@@ -1,0 +1,45 @@
+.idea
+*.py[co]
+*.DS_*
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+#Translations
+*.mo
+
+#Mr Developer
+venv
+*.pyc
+build
+/hashcat-4.0.1/
+.idea/dataSources.local.xml
+.idea/workspace.xml
+__pycache__/
+src/__pycache__/
+src/api/__pycache__/
+src/api/fitcrack/__pycache__/
+src/api/fitcrack/attacks/__pycache__/
+src/api/fitcrack/endpoints/__pycache__/
+src/api/fitcrack/endpoints/hashcat/__pycache__/
+src/api/fitcrack/endpoints/host/__pycache__/
+src/api/fitcrack/endpoints/package/__pycache__/
+src/api/fitcrack/endpoints/serverInfo/__pycache__/
+src/database/__pycache__/
+

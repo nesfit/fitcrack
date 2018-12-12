@@ -1,0 +1,3911 @@
+# BOINC manager localization template
+# Copyright (C) 2018 University of California
+# 
+# This file is distributed under the same license as BOINC.
+# 
+# Translators:
+# Can Demirel <aycandemirel@hotmail.com>, 2015-2017
+# Christian Beer <christian.beer@posteo.de>, 2018
+# Emre GÜN <thondras@gmail.com>, 2015
+# Faruk SARI <faruksari@hotmail.com>, 2015
+# ilkeryus <ilkeryus@gmail.com>, 2016-2018
+msgid ""
+msgstr ""
+"Project-Id-Version: BOINC\n"
+"Report-Msgid-Bugs-To: BOINC translation team <boinc_loc@ssl.berkeley.edu>\n"
+"POT-Creation-Date: 2018-09-20 18:11 UTC\n"
+"PO-Revision-Date: 2018-09-20 18:14+0000\n"
+"Last-Translator: Christian Beer <christian.beer@posteo.de>\n"
+"Language-Team: Turkish (http://www.transifex.com/boinc/boinc/language/tr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: clientgui/AccountInfoPage.cpp:353
+#, c-format
+msgid "Identify your account at %s"
+msgstr "%s için hesap bilgilerinizi girin"
+
+#: clientgui/AccountInfoPage.cpp:359
+msgid ""
+"Please enter your account information\n"
+"(to create an account, visit the project's web site)"
+msgstr "Lütfen hesap bilgilerinizi girin\n(bir hesap yaratmak için, projenin sitesini ziyaret edin)"
+
+#: clientgui/AccountInfoPage.cpp:363
+msgid ""
+"This project is not currently accepting new accounts.\n"
+"You can add it only if you already have an account."
+msgstr "Bu proje şu anda yeni hesapları kabul etmiyor.\nYalnızca, mevcut bir hesabınız varsa projeyi ekleyebilirsiniz."
+
+#: clientgui/AccountInfoPage.cpp:367
+msgid "Are you already running this project?"
+msgstr "Bu projeye daha önce üye oldunuz mu?"
+
+#: clientgui/AccountInfoPage.cpp:371
+msgid "&No, new user"
+msgstr "&Hayır, yeni kullanıcıyım"
+
+#: clientgui/AccountInfoPage.cpp:374
+msgid "&Yes, existing user"
+msgstr "&Evet, bilgilerimi gireceğim"
+
+#: clientgui/AccountInfoPage.cpp:379
+msgid ""
+"We were not able to set up your account information\n"
+"automatically.\n"
+"\n"
+"Please click on the 'Find login information' link\n"
+"below to find out what to put in the email address and\n"
+"password fields."
+msgstr "Hesap bilginizi otomatik olarak ayarlayamadık.\n\nLütfen, e-posta adresi ve parola bölümlerine ne yazılması\ngerektiğini bulmak için aşağıdaki 'Giriş bilgisini bul' \nbağlantısına tıklayın."
+
+#: clientgui/AccountInfoPage.cpp:382
+msgid "Find login information"
+msgstr "Giriş bilgilerini bul"
+
+#: clientgui/AccountInfoPage.cpp:402 clientgui/AccountInfoPage.cpp:624
+msgid "&Password:"
+msgstr "&Parola:"
+
+#: clientgui/AccountInfoPage.cpp:409 clientgui/AccountInfoPage.cpp:648
+msgid "Choose a &password:"
+msgstr "Bir &parola yazın:"
+
+#: clientgui/AccountInfoPage.cpp:412
+msgid "C&onfirm password:"
+msgstr "Parolayı &tekrar yazın:"
+
+#: clientgui/AccountInfoPage.cpp:419
+#, c-format
+msgid "Are you already running %s?"
+msgstr "Zaten %s projesini çalıştırıyor musunuz?"
+
+#: clientgui/AccountInfoPage.cpp:448
+msgid "&Username:"
+msgstr "&Kullanıcı adı:"
+
+#: clientgui/AccountInfoPage.cpp:477
+msgid "&Email address or LDAP ID:"
+msgstr "&E-posta adresi ya da LDAP ID:"
+
+#: clientgui/AccountInfoPage.cpp:481
+msgid "&Email address:"
+msgstr "&E-posta adresi:"
+
+#: clientgui/AccountInfoPage.cpp:489
+#, c-format
+msgid "minimum length %d"
+msgstr "en az %d karakter"
+
+#: clientgui/AccountInfoPage.cpp:496
+msgid "Forgot your password?"
+msgstr "Parolanızı mı unuttunuz?"
+
+#: clientgui/AccountInfoPage.cpp:503
+msgid ""
+"If you have not yet registered with this account manager,\n"
+"please do so before proceeding.  Click on the link below\n"
+"to register or to retrieve a forgotten password."
+msgstr "Eğer bu hesap yöneticisine henüz kayıtlı değilseniz, devam\netmeden önce kaydolun.  Lütfen kaydolmak ya da unuttuğunuz\nparolayı bulmak için aşağıdaki bağlantıya tıklayın."
+
+#: clientgui/AccountInfoPage.cpp:506
+msgid "Account manager web site"
+msgstr "Hesap Yöneticisi sitesi"
+
+#: clientgui/AccountInfoPage.cpp:548
+msgid "Add project"
+msgstr "Proje ekle"
+
+#: clientgui/AccountInfoPage.cpp:550
+msgid "Update account manager"
+msgstr "Hesap yöneticisini güncelle"
+
+#: clientgui/AccountInfoPage.cpp:552
+msgid "Use account manager"
+msgstr "Hesap yöneticisi kullan"
+
+#: clientgui/AccountInfoPage.cpp:559
+msgid "Please enter a user name."
+msgstr "Lütfen bir kullanıcı adı yazın."
+
+#: clientgui/AccountInfoPage.cpp:561
+msgid "Please enter an email address."
+msgstr "Lütfen bir e-posta adresi yazın."
+
+#: clientgui/AccountInfoPage.cpp:571
+#, c-format
+msgid "Please enter a password of at least %d characters."
+msgstr "Lütfen en az %d karakterden oluşan bir parola yazın."
+
+#: clientgui/AccountInfoPage.cpp:581
+msgid ""
+"The password and confirmation password do not match. Please type them again."
+msgstr "Parola ve parola doğrulaması birbirini tutmuyor. Lütfen tekrar yazın."
+
+#: clientgui/AccountManagerInfoPage.cpp:270
+msgid "Choose an account manager"
+msgstr "Bir hesap yöneticisi seçin"
+
+#: clientgui/AccountManagerInfoPage.cpp:273
+msgid ""
+"To choose an account manager, click its name or \n"
+"type its URL below."
+msgstr "Bir hesap yöneticisi seçmek için ismine tıklayın ya da \naşağıya internet adresini girin."
+
+#: clientgui/AccountManagerInfoPage.cpp:277
+msgid "Account manager details:"
+msgstr "Hesap Yöneticisi detayları:"
+
+#: clientgui/AccountManagerInfoPage.cpp:281
+msgid "Account manager &URL:"
+msgstr "Hesap Yöneticisi &adresi:"
+
+#: clientgui/AccountManagerInfoPage.cpp:285
+msgid "Open web page"
+msgstr "İnternet sitesini aç"
+
+#: clientgui/AccountManagerInfoPage.cpp:288
+msgid "Visit this account manager's web site"
+msgstr "Bu Hesap Yöneticisinin internet sitesini ziyaret edin"
+
+#. %s is the project name
+#. i.e. 'BOINC', 'GridRepublic'
+#: clientgui/AccountManagerProcessingPage.cpp:186
+#: clientgui/AccountManagerPropertiesPage.cpp:192
+#, c-format
+msgid "Communicating with %s."
+msgstr "%s ile bağlantı kuruluyor."
+
+#: clientgui/AccountManagerProcessingPage.cpp:193
+#: clientgui/AccountManagerPropertiesPage.cpp:199
+msgid "Communicating with server."
+msgstr "Sunucu ile bağlantı kuruluyor."
+
+#: clientgui/AccountManagerProcessingPage.cpp:198
+#: clientgui/AccountManagerPropertiesPage.cpp:204
+msgid "Please wait..."
+msgstr "Lütfen bekleyin..."
+
+#: clientgui/AccountManagerProcessingPage.cpp:325
+msgid "An internal server error has occurred.\n"
+msgstr "Sunucuda dahili bir hata meydana geldi.\n"
+
+#: clientgui/AdvancedFrame.cpp:102
+msgid "Connected"
+msgstr "Bağlandı"
+
+#: clientgui/AdvancedFrame.cpp:110
+msgid "Disconnected"
+msgstr "Bağlantı kesildi"
+
+#: clientgui/AdvancedFrame.cpp:332
+#, c-format
+msgid "New %s window..."
+msgstr "Yeni %s penceresi..."
+
+#: clientgui/AdvancedFrame.cpp:336
+#, c-format
+msgid "Open another %s window"
+msgstr "Başka bir %s penceresi açar."
+
+#: clientgui/AdvancedFrame.cpp:347
+msgid "Select computer...\tCtrl+Shift+I"
+msgstr "Bilgisayar seç...\tCtrl+Shift+I"
+
+#: clientgui/AdvancedFrame.cpp:348
+msgid "Connect to a BOINC client on another computer"
+msgstr "Başka bir bilgisayardaki BOINC istemcisine bağlanmayı sağlar."
+
+#: clientgui/AdvancedFrame.cpp:352
+msgid "Shut down connected client..."
+msgstr "Bağlı olan istemciyi kapat..."
+
+#: clientgui/AdvancedFrame.cpp:353
+msgid "Shut down the currently connected BOINC client"
+msgstr "Şu anda bağlı olunan BOINC istemcisini kapatır."
+
+#: clientgui/AdvancedFrame.cpp:358 clientgui/sg_BoincSimpleFrame.cpp:122
+#, c-format
+msgid "Close the %s window"
+msgstr "%s penceresini kapatır."
+
+#: clientgui/AdvancedFrame.cpp:361 clientgui/sg_BoincSimpleFrame.cpp:125
+msgid "&Close window"
+msgstr "&Pencereyi kapat"
+
+#: clientgui/AdvancedFrame.cpp:370 clientgui/AdvancedFrame.cpp:375
+#: clientgui/AdvancedFrame.cpp:380 clientgui/sg_BoincSimpleFrame.cpp:134
+#: clientgui/sg_BoincSimpleFrame.cpp:139
+#, c-format
+msgid "Exit %s"
+msgstr "%s'dan çık"
+
+#: clientgui/AdvancedFrame.cpp:394 clientgui/sg_BoincSimpleFrame.cpp:153
+msgid "Preferences..."
+msgstr "Tercihler..."
+
+#: clientgui/AdvancedFrame.cpp:403
+msgid "&Notices\tCtrl+Shift+N"
+msgstr "&Bildirimler\tCtrl+Shift+N"
+
+#: clientgui/AdvancedFrame.cpp:404
+msgid "Show notices"
+msgstr "Bildirimleri gösterir."
+
+#: clientgui/AdvancedFrame.cpp:409
+msgid "&Projects\tCtrl+Shift+P"
+msgstr "&Projeler\tCtrl+Shift+P"
+
+#: clientgui/AdvancedFrame.cpp:410
+msgid "Show projects"
+msgstr "Projeleri gösterir."
+
+#: clientgui/AdvancedFrame.cpp:415
+msgid "&Tasks\tCtrl+Shift+T"
+msgstr "İ&şler\tCtrl+Shift+T"
+
+#: clientgui/AdvancedFrame.cpp:416
+msgid "Show tasks"
+msgstr "İşleri gösterir."
+
+#: clientgui/AdvancedFrame.cpp:421
+msgid "Trans&fers\tCtrl+Shift+X"
+msgstr "&Aktarımlar\tCtrl+Shift+X"
+
+#: clientgui/AdvancedFrame.cpp:422
+msgid "Show file transfers"
+msgstr "Dosya Aktarımlarını gösterir."
+
+#: clientgui/AdvancedFrame.cpp:427
+msgid "&Statistics\tCtrl+Shift+S"
+msgstr "İ&statistikler\tCtrl+Shift+S"
+
+#: clientgui/AdvancedFrame.cpp:428
+msgid "Show statistics"
+msgstr "İstatistikleri gösterir."
+
+#: clientgui/AdvancedFrame.cpp:433
+msgid "&Disk\tCtrl+Shift+D"
+msgstr "&Disk\tCtrl+Shift+D"
+
+#: clientgui/AdvancedFrame.cpp:434
+msgid "Show disk usage"
+msgstr "Disk kullanımını gösterir."
+
+#: clientgui/AdvancedFrame.cpp:441
+msgid "Simple &View...\tCtrl+Shift+V"
+msgstr "&Basit görünüm...\tCtrl+Shift+V"
+
+#: clientgui/AdvancedFrame.cpp:442
+msgid "Switch to the Simple View"
+msgstr "BOINC Basit Görünümüne geçiş yapar."
+
+#: clientgui/AdvancedFrame.cpp:456 clientgui/AdvancedFrame.cpp:480
+#: clientgui/sg_BoincSimpleFrame.cpp:207
+msgid "&Add project..."
+msgstr "&Proje ekle..."
+
+#: clientgui/AdvancedFrame.cpp:457 clientgui/AdvancedFrame.cpp:481
+#: clientgui/sg_BoincSimpleFrame.cpp:208
+msgid "Add a project"
+msgstr "Bir proje eklemenizi sağlar."
+
+#: clientgui/AdvancedFrame.cpp:461
+msgid "&Use account manager..."
+msgstr "&Hesap yöneticisi kullan..."
+
+#: clientgui/AdvancedFrame.cpp:462
+msgid "Use an account manager to control this computer."
+msgstr "Bu bilgisayarı yönetmek için bir Hesap Yöneticisi kullanmanızı sağlar."
+
+#: clientgui/AdvancedFrame.cpp:466
+#, c-format
+msgid "&Synchronize with %s"
+msgstr "%s ile &eşitle"
+
+#: clientgui/AdvancedFrame.cpp:470
+#, c-format
+msgid "Get current settings from %s"
+msgstr "Güncel ayarları %s hesap yöneticisinden alır."
+
+#: clientgui/AdvancedFrame.cpp:484
+#, c-format
+msgid "S&top using %s..."
+msgstr "%s kullanmayı durdur..."
+
+#: clientgui/AdvancedFrame.cpp:490
+msgid "Remove this computer from account manager control."
+msgstr "Bu bilgisayarı hesap yöneticisi kontrolünden çıkarır."
+
+#: clientgui/AdvancedFrame.cpp:496
+msgid "Run CPU &benchmarks"
+msgstr "&İşlemci testlerini çalıştır"
+
+#: clientgui/AdvancedFrame.cpp:497
+msgid "Run tests that measure CPU speed"
+msgstr "CPU hızını belirleyecek testleri çalıştırır."
+
+#: clientgui/AdvancedFrame.cpp:501
+msgid "Retry pending transfers"
+msgstr "Bekleyen aktarımları yeniden dene"
+
+#: clientgui/AdvancedFrame.cpp:502
+msgid "Retry deferred file transfers and task requests"
+msgstr "Bekleyen dosya transferlerini ve iş isteklerini yeniden dener."
+
+#: clientgui/AdvancedFrame.cpp:507 clientgui/sg_BoincSimpleFrame.cpp:213
+msgid "Event Log...\tCtrl+Shift+E"
+msgstr "Olay günlüğü...\tCtrl+Shift+E"
+
+#: clientgui/AdvancedFrame.cpp:508
+msgid "Show diagnostic messages"
+msgstr "Tanılama mesajlarını görüntüler."
+
+#: clientgui/AdvancedFrame.cpp:516
+msgid "&Run always"
+msgstr "&Daima çalış"
+
+#: clientgui/AdvancedFrame.cpp:517
+msgid "Allow work regardless of preferences"
+msgstr "Ayarları göz önüne almadan işleri sürekli çalıştırır."
+
+#: clientgui/AdvancedFrame.cpp:521
+msgid "Run based on &preferences"
+msgstr "&Tercihlere göre çalış"
+
+#: clientgui/AdvancedFrame.cpp:522
+msgid "Allow work according to preferences"
+msgstr "İşleri tercihlerdeki ayarlarınıza göre çalıştırır."
+
+#: clientgui/AdvancedFrame.cpp:526
+msgid "&Suspend"
+msgstr "&Durdur"
+
+#: clientgui/AdvancedFrame.cpp:527
+msgid "Stop work regardless of preferences"
+msgstr "Ayarları göz önüne almadan işlerin çalışmasını durdurur."
+
+#: clientgui/AdvancedFrame.cpp:552
+msgid "Use GPU always"
+msgstr "GPU'yu &daima kullan"
+
+#: clientgui/AdvancedFrame.cpp:553
+msgid "Allow GPU work regardless of preferences"
+msgstr "Ayarları göz önüne almadan GPU'yu sürekli kullanır."
+
+#: clientgui/AdvancedFrame.cpp:557
+msgid "Use GPU based on preferences"
+msgstr "GPU'yu tercihlere göre kullan"
+
+#: clientgui/AdvancedFrame.cpp:558
+msgid "Allow GPU work according to preferences"
+msgstr "GPU'yu tercihlerdeki ayarlarınıza göre kullanır."
+
+#: clientgui/AdvancedFrame.cpp:562
+msgid "Suspend GPU"
+msgstr "GPU kullanımını durdur"
+
+#: clientgui/AdvancedFrame.cpp:563
+msgid "Stop GPU work regardless of preferences"
+msgstr "Ayarları göz önüne almadan GPU'nun kullanımını durdurur."
+
+#: clientgui/AdvancedFrame.cpp:587
+msgid "Network activity always"
+msgstr "Ağ iletişimi daima mümkün"
+
+#: clientgui/AdvancedFrame.cpp:588
+msgid "Allow network activity regardless of preferences"
+msgstr "Ayarları göz önüne almadan ağ iletişimine izin verir."
+
+#: clientgui/AdvancedFrame.cpp:592
+msgid "Network activity based on preferences"
+msgstr "Tercihlere göre ağ iletişimi"
+
+#: clientgui/AdvancedFrame.cpp:593
+msgid "Allow network activity according to preferences"
+msgstr "Tercihlerdeki ayarlara göre ağ iletişimi yapar."
+
+#: clientgui/AdvancedFrame.cpp:597
+msgid "Suspend network activity"
+msgstr "Ağ iletişimini durdur"
+
+#: clientgui/AdvancedFrame.cpp:598
+msgid "Stop network activity"
+msgstr "BOINC'in tüm ağ iletişimini durdurur."
+
+#: clientgui/AdvancedFrame.cpp:607 clientgui/sg_BoincSimpleFrame.cpp:193
+msgid "Computing &preferences..."
+msgstr "&Hesaplama tercihleri..."
+
+#: clientgui/AdvancedFrame.cpp:608 clientgui/sg_BoincSimpleFrame.cpp:194
+msgid "Configure computing preferences"
+msgstr "İşlerin çalışmasıyla ilgili bu bilgisayara ait tercihleri ayarlayabileceğiniz pencereyi açar."
+
+#: clientgui/AdvancedFrame.cpp:613
+msgid "Exclusive applications..."
+msgstr "Ayrıcalıklı uygulamalar..."
+
+#: clientgui/AdvancedFrame.cpp:614
+msgid "Configure exclusive applications"
+msgstr "Ayrıcalıklı uygulamaları yapılandıracağınız pencereyi açar."
+
+#: clientgui/AdvancedFrame.cpp:619
+msgid "Select columns..."
+msgstr "Sütunları seç..."
+
+#: clientgui/AdvancedFrame.cpp:620
+msgid "Select which columns to display"
+msgstr "Hangi sütunların görüntüleneceğini seçer."
+
+#: clientgui/AdvancedFrame.cpp:624
+msgid "Event Log options...\tCtrl+Shift+F"
+msgstr "Olay günlüğü seçenekleri...\tCtrl+Shift+E"
+
+#: clientgui/AdvancedFrame.cpp:625
+msgid "Enable or disable various diagnostic messages"
+msgstr "Çeşitli tanılama mesajlarını etkinleştirmenizi ya da devre dışı bırakmanızı sağlar."
+
+#: clientgui/AdvancedFrame.cpp:629 clientgui/sg_BoincSimpleFrame.cpp:199
+msgid "&Other options..."
+msgstr "&Diğer seçenekler..."
+
+#: clientgui/AdvancedFrame.cpp:630
+msgid "Configure display options and network settings"
+msgstr "Arayüz seçeneklerini ve ağ ayarlarını yapılandırabileceğiniz pencereyi açar."
+
+#: clientgui/AdvancedFrame.cpp:635
+msgid "Read config files"
+msgstr "Yapılandırma dosyalarını oku"
+
+#: clientgui/AdvancedFrame.cpp:636
+msgid ""
+"Read configuration info from cc_config.xml and any app_config.xml files"
+msgstr "Yapılandırma bilgisini cc_config.xml ve any app_config.xml dosyalarından okur."
+
+#: clientgui/AdvancedFrame.cpp:640
+msgid "Read local prefs file"
+msgstr "Yerel tercih dosyasını oku"
+
+#: clientgui/AdvancedFrame.cpp:641
+msgid "Read preferences from global_prefs_override.xml."
+msgstr "Yerel tercihleri global_prefs_override.xml dosyasından okur."
+
+#: clientgui/AdvancedFrame.cpp:649 clientgui/sg_BoincSimpleFrame.cpp:221
+#, c-format
+msgid "%s &help"
+msgstr "%s &yardım"
+
+#: clientgui/AdvancedFrame.cpp:653 clientgui/sg_BoincSimpleFrame.cpp:225
+#, c-format
+msgid "Show information about %s"
+msgstr "Gönüllü kullanıcılardan %s hakkında yardım almanızı sağlar."
+
+#: clientgui/AdvancedFrame.cpp:663 clientgui/sg_BoincSimpleFrame.cpp:235
+#, c-format
+msgid "&%s help"
+msgstr "&%s yardım"
+
+#: clientgui/AdvancedFrame.cpp:667 clientgui/sg_BoincSimpleFrame.cpp:239
+#, c-format
+msgid "Show information about the %s"
+msgstr "%s yardım sitesini açar."
+
+#: clientgui/AdvancedFrame.cpp:678 clientgui/sg_BoincSimpleFrame.cpp:249
+#, c-format
+msgid "%s &web site"
+msgstr "%s &internet sitesi"
+
+#: clientgui/AdvancedFrame.cpp:682
+#, c-format
+msgid "See more information about %s on the web"
+msgstr "%s hakkında internette daha fazla bilgi görün"
+
+#: clientgui/AdvancedFrame.cpp:693 clientgui/AdvancedFrame.cpp:697
+#: clientgui/sg_BoincSimpleFrame.cpp:264 clientgui/sg_BoincSimpleFrame.cpp:268
+#, c-format
+msgid "Check for new %s version"
+msgstr "Yeni %s versiyonu için kontrol et"
+
+#: clientgui/AdvancedFrame.cpp:708 clientgui/BOINCTaskBar.cpp:530
+#: clientgui/sg_BoincSimpleFrame.cpp:279
+#, c-format
+msgid "&About %s..."
+msgstr "&%s hakkında..."
+
+#: clientgui/AdvancedFrame.cpp:714 clientgui/sg_BoincSimpleFrame.cpp:285
+msgid "Licensing and copyright information."
+msgstr "Sürüm, lisans, telif hakkı ve çeviri bilgisini görüntüler."
+
+#: clientgui/AdvancedFrame.cpp:721 clientgui/sg_BoincSimpleFrame.cpp:292
+msgid "&File"
+msgstr "&Dosya"
+
+#: clientgui/AdvancedFrame.cpp:725 clientgui/sg_BoincSimpleFrame.cpp:296
+msgid "&View"
+msgstr "&Görünüm"
+
+#: clientgui/AdvancedFrame.cpp:729
+msgid "&Activity"
+msgstr "&Çalışma"
+
+#: clientgui/AdvancedFrame.cpp:733 clientgui/sg_BoincSimpleFrame.cpp:300
+msgid "&Options"
+msgstr "&Seçenekler"
+
+#: clientgui/AdvancedFrame.cpp:737 clientgui/sg_BoincSimpleFrame.cpp:304
+msgid "&Tools"
+msgstr "&Araçlar"
+
+#: clientgui/AdvancedFrame.cpp:741 clientgui/sg_BoincSimpleFrame.cpp:308
+#: clientgui/wizardex.cpp:383 clientgui/wizardex.cpp:390
+msgid "&Help"
+msgstr "&Yardım"
+
+#: clientgui/AdvancedFrame.cpp:1256
+#, c-format
+msgid "%s - Stop using %s"
+msgstr "%s - %s kullanmayı durdur"
+
+#: clientgui/AdvancedFrame.cpp:1261
+#, c-format
+msgid ""
+"If you stop using %s,\n"
+"you'll keep all your current projects,\n"
+"but you'll have to manage projects manually.\n"
+"\n"
+"Do you want to stop using %s?"
+msgstr "Eğer %s kullanmayı durdurursanız,\nmevcut tüm projeleriniz korunacak, fakat,\nprojeleri elle yönetmeniz gerekecek.\n\n%s kullanmayı durdurmak istiyor musunuz?"
+
+#: clientgui/AdvancedFrame.cpp:1475
+#, c-format
+msgid "%s - Shut down the current client..."
+msgstr "%s - Bağlı istemciyi kapat..."
+
+#: clientgui/AdvancedFrame.cpp:1484
+#, c-format
+msgid ""
+"%s will shut down the current client\n"
+"and prompt you for another host to connect to."
+msgstr "%s şu anda bağlı olan istemciyi kapatacak ve\nsizi başka birine bağlanmanız için uyaracak."
+
+#: clientgui/AdvancedFrame.cpp:1863 clientgui/DlgAbout.cpp:119
+#, c-format
+msgid "%s"
+msgstr "%s"
+
+#: clientgui/AdvancedFrame.cpp:1873
+#, c-format
+msgid "%s has successfully added %s"
+msgstr "%s başarıyla %s'e eklendi."
+
+#: clientgui/AdvancedFrame.cpp:2040
+#, c-format
+msgid "%s - (%s)"
+msgstr "%s - (%s)"
+
+#: clientgui/AdvancedFrame.cpp:2044
+#, c-format
+msgid "Connecting to %s"
+msgstr "%s istemcisine bağlanıyor"
+
+#: clientgui/AdvancedFrame.cpp:2047
+#, c-format
+msgid "Connected to %s (%s)"
+msgstr "%s istemcisine bağlı (%s)"
+
+#: clientgui/AlreadyExistsPage.cpp:184
+msgid "Username already in use"
+msgstr "Kullanıcı adı zaten kullanımda"
+
+#: clientgui/AlreadyExistsPage.cpp:187
+msgid ""
+"An account with that username already exists and has a\n"
+"different password than the one you entered.\n"
+"\n"
+"Please visit the project's web site and follow the instructions there."
+msgstr "Bu kullanıcı adıyla bir hesap var ve\ngirdiğinizden farklı bir parolaya sahip.\n\nLütfen projenin sitesini ziyaret edip, yönergeleri izleyin."
+
+#: clientgui/AlreadyExistsPage.cpp:191
+msgid "Email address already in use"
+msgstr "E-posta adresi zaten kullanımda"
+
+#: clientgui/AlreadyExistsPage.cpp:194
+msgid ""
+"An account with that email address already exists and has a\n"
+"different password than the one you entered.\n"
+"\n"
+"Please visit the project's web site and follow the instructions there."
+msgstr "Bu e-posta adresiyle bir hesap var ve\ngirdiğinizden farklı bir parolaya sahip.\n\nLütfen projenin sitesini ziyaret edip, yönergeleri izleyin."
+
+#: clientgui/AsyncRPC.cpp:1035
+msgid "Communicating with BOINC client.  Please wait ..."
+msgstr "BOINC istemcisine bağlanılıyor.  Lütfen bekleyin..."
+
+#: clientgui/AsyncRPC.cpp:1038
+#, c-format
+msgid "&Quit %s"
+msgstr "%s'den &ayrıl"
+
+#: clientgui/AsyncRPC.cpp:1040
+#, c-format
+msgid "E&xit %s"
+msgstr "%s'den &çık"
+
+#: clientgui/AsyncRPC.cpp:1044
+#, c-format
+msgid "%s - Communication"
+msgstr "%s - İletişim"
+
+#: clientgui/AsyncRPC.cpp:1060 clientgui/DlgAdvPreferencesBase.cpp:169
+#: clientgui/DlgDiagnosticLogFlags.cpp:128 clientgui/DlgExclusiveApps.cpp:151
+#: clientgui/DlgHiddenColumns.cpp:108 clientgui/sg_DlgPreferences.cpp:360
+msgid "Cancel"
+msgstr "İptal"
+
+#: clientgui/BOINCBaseFrame.cpp:492
+#, c-format
+msgid "%s - Connection Error"
+msgstr "%s - Bağlantı Hatası"
+
+#: clientgui/BOINCBaseFrame.cpp:501
+msgid ""
+"You currently are not authorized to manage the client.\n"
+"Please contact your administrator to add you to the 'boinc_users' local user group."
+msgstr "İstemciyi yönetmek için yetkili durumda değilsiniz.\nLüfen 'boinc_users' yerel kullanıcı grubuna dahil olmak için yöneticinizle temasa geçin."
+
+#: clientgui/BOINCBaseFrame.cpp:510
+msgid ""
+"Authorization failed connecting to running client.\n"
+"Make sure you start this program in the same directory as the client."
+msgstr "Çalışan istemciye bağlanmak için yetkilendirilme başarısız.\nBu programın istemciyle aynı klasörde çalıştırıldığından emin olun."
+
+#: clientgui/BOINCBaseFrame.cpp:512
+msgid "Authorization failed connecting to running client."
+msgstr "Çalışan istemciye bağlanmak için yetkilendirilme başarısız."
+
+#: clientgui/BOINCBaseFrame.cpp:520
+msgid "The password you have provided is incorrect, please try again."
+msgstr "Belirttiğiniz parola hatalı, lütfen tekrar deneyin."
+
+#: clientgui/BOINCBaseFrame.cpp:568
+#, c-format
+msgid "%s - Connection Failed"
+msgstr "%s - Bağlantı Başarısız"
+
+#: clientgui/BOINCBaseFrame.cpp:577
+#, c-format
+msgid ""
+"%s is not able to connect to a %s client.\n"
+"Would you like to try to connect again?"
+msgstr "%s, %s istemcisine bağlanamıyor.\nBağlanmayı yeniden denemek ister misiniz?"
+
+#: clientgui/BOINCBaseFrame.cpp:613
+#, c-format
+msgid "%s - Daemon Start Failed"
+msgstr "%s - Hizmet İşlemi Başlatılamadı"
+
+#: clientgui/BOINCBaseFrame.cpp:623
+#, c-format
+msgid ""
+"%s is not able to start a %s client.\n"
+"Please launch the Control Panel->Administative Tools->Services applet and start the BOINC service."
+msgstr "%s, %s istemcisini başlatamıyor.\nLütfen, Denetim Masası->Yönetimsel Araçlar->Hizmetler bölümüne gidip, BOINC Hizmeti'ni başlatın."
+
+#: clientgui/BOINCBaseFrame.cpp:629
+#, c-format
+msgid ""
+"%s is not able to start a %s client.\n"
+"Please run the client and try again."
+msgstr "%s bir %s istemcisini başlatamaz.\nLütfen istemciyi çalıştırın ve yeniden deneyin."
+
+#: clientgui/BOINCBaseFrame.cpp:680
+#, c-format
+msgid "%s - Connection Status"
+msgstr "%s - Bağlantı Durumu"
+
+#: clientgui/BOINCBaseFrame.cpp:691
+#, c-format
+msgid ""
+"%s is not currently connected to a %s client.\n"
+"Please use the 'Advanced\\Select Computer...' menu option to connect up to a %s client.\n"
+"To connect up to your local computer please use 'localhost' as the host name."
+msgstr "%s şu anda bir %s istemcisine bağlı değil.\nLütfen 'Gelişmiş\\Bilgisayar seç ve bağlan...' menüsünden bir %s istemcisine bağlanın.\nKendi bilgisayarınıza bağlanmak için lütfen bigisayar adı olarak 'localhost' yazın."
+
+#. Create the web sites task group
+#: clientgui/BOINCBaseView.cpp:776
+msgid "Project web pages"
+msgstr "Proje internet sayfaları"
+
+#: clientgui/BOINCClientManager.cpp:530
+#, c-format
+msgid "%s - Unexpected Exit"
+msgstr "%s - Beklenmedik Kapanma"
+
+#: clientgui/BOINCClientManager.cpp:540
+#, c-format
+msgid ""
+"The %s client has exited unexpectedly 3 times within the last %d minutes.\n"
+"Would you like to restart it again?"
+msgstr "%s istemcisi son %d dakika içinde beklenmedik şekilde 3 kez kapandı.\nYeniden başlatmak istiyor musunuz?"
+
+#: clientgui/BOINCDialupManager.cpp:61
+#, c-format
+msgid "%s - Network Status"
+msgstr "%s - Ağ Durumu"
+
+#: clientgui/BOINCDialupManager.cpp:240
+#, c-format
+msgid ""
+"%s needs to connect to the Internet.\n"
+"May it do so now?"
+msgstr "%s İnternete bağlanmaya ihtiyaç duyuyor.\nBunu şimdi yapabilir mi?"
+
+#: clientgui/BOINCDialupManager.cpp:253
+#, c-format
+msgid "%s is connecting to the Internet."
+msgstr "%s internete bağlanıyor."
+
+#: clientgui/BOINCDialupManager.cpp:302
+#, c-format
+msgid "%s has successfully connected to the Internet."
+msgstr "%s başarıyla internete bağlandı."
+
+#: clientgui/BOINCDialupManager.cpp:330
+#, c-format
+msgid "%s failed to connect to the Internet."
+msgstr "%s internete bağlanırken başarısız oldu."
+
+#: clientgui/BOINCDialupManager.cpp:371
+#, c-format
+msgid ""
+"%s has detected it is now connected to the Internet.\n"
+"Updating all projects and retrying all transfers."
+msgstr "%s şu anda internete bağlı olduğunuzu belirledi.\nTüm projeler güncelleniyor ve aktarımlar gerçekleştiriliyor."
+
+#: clientgui/BOINCDialupManager.cpp:416
+#, c-format
+msgid "%s has successfully disconnected from the Internet."
+msgstr "%s başarıyla internet bağlantısını kesti."
+
+#: clientgui/BOINCDialupManager.cpp:432
+#, c-format
+msgid "%s failed to disconnected from the Internet."
+msgstr "%s internet bağlantısını keserken başarısız oldu."
+
+#: clientgui/BOINCGUIApp.cpp:337
+#, c-format
+msgid ""
+"You currently are not authorized to manage %s.\n"
+"\n"
+"To run %s as this user, please:\n"
+"- reinstall %s answering \"Yes\" to the question about non-administrative users\n"
+" or\n"
+"- contact your administrator to add you to the 'boinc_master' user group."
+msgstr "%s yönetmek için yetkilendirilmemişsiniz.\n\nBu kullanıcıyla %s çalıştırabilmek için, lütfen:\n- %s'i, bilgisayar yöneticisi olmayan kullanıcıların da çalıştırabilmesi hakkındaki soruya \"Evet\" yanıtını vererek yeniden kurun\nya da\n- sizi 'boinc_master' kullanıcı grubuna dahil etmesi için yöneticinizle temasa geçin."
+
+#: clientgui/BOINCGUIApp.cpp:345
+#, c-format
+msgid ""
+"%s ownership or permissions are not set properly; please reinstall %s.\n"
+"(Error code %d"
+msgstr "%s sahipliği ya da izinleri doğru olarak ayarlanmamış; lütfen %s'i yeniden kurun.\n(Hata kodu %d"
+
+#: clientgui/BOINCGUIApp.cpp:351
+msgid " at "
+msgstr " at "
+
+#: clientgui/BOINCGUIApp.cpp:354 clientgui/MainDocument.cpp:2512
+#: clientgui/MainDocument.cpp:2571 clientgui/ViewTransfers.cpp:871
+msgid ")"
+msgstr ")"
+
+#: clientgui/BOINCGUIApp.cpp:384
+msgid ""
+"A reboot is required in order for BOINC to run properly.\n"
+"Please reboot your computer and try again."
+msgstr "BOINC'in doğru çalışması için yeniden başlatma gerekiyor.\nBilgisayarınızı yeniden başlatın ve yeniden deneyin."
+
+#: clientgui/BOINCGUIApp.cpp:385 clientgui/DlgAbout.cpp:156
+msgid "BOINC Manager"
+msgstr "BOINC Manager"
+
+#: clientgui/BOINCGUIApp.cpp:598
+msgid "BOINC Manager was started by the operating system automatically"
+msgstr "BOINC Manager, işletim sistemi tarafından otomatik başlatılacak"
+
+#: clientgui/BOINCGUIApp.cpp:600
+msgid "Startup BOINC so only the system tray icon is visible"
+msgstr "BOINC'i sadece sistem tepsisi simgesi görünecek şekilde başlat"
+
+#: clientgui/BOINCGUIApp.cpp:602
+msgid "Directory containing the BOINC Client executable"
+msgstr "Klasör, BOINC İstemcisi çalıştırılabilir dosyalarını içerir"
+
+#: clientgui/BOINCGUIApp.cpp:603
+msgid "BOINC data directory"
+msgstr "BOINC veri klasörü"
+
+#: clientgui/BOINCGUIApp.cpp:605
+msgid "Host name or IP address"
+msgstr "Sunucu adı ya da IP adresi"
+
+#: clientgui/BOINCGUIApp.cpp:606
+msgid "GUI RPC port number"
+msgstr "GUI RPC bağlantı noktası numarası"
+
+#: clientgui/BOINCGUIApp.cpp:607
+msgid "Password"
+msgstr "Parola"
+
+#: clientgui/BOINCGUIApp.cpp:608
+msgid "Startup BOINC with these optional arguments"
+msgstr "BOINC'i bu isteğe bağlı parametrelerle çalıştır"
+
+#: clientgui/BOINCGUIApp.cpp:609
+msgid "disable BOINC security users and permissions"
+msgstr "BOINC güvenlik kullanıcılarını ve izinlerini devre dışı bırak"
+
+#: clientgui/BOINCGUIApp.cpp:610
+msgid "set skin debugging mode to enable skin manager error messages"
+msgstr "görünüm yöneticisi hata mesajları için, görünüm hata ayıklama moduna geçin"
+
+#: clientgui/BOINCGUIApp.cpp:611
+msgid "multiple instances of BOINC Manager allowed"
+msgstr "BOINC Manager'ın birden çok kopyasına izin verildi"
+
+#: clientgui/BOINCGUIApp.cpp:613
+msgid "Not used: workaround for bug in XCode 4.2"
+msgstr "Kullanılmadı: XCode 4.2'deki hata için geçici çözüm"
+
+#: clientgui/BOINCGUIApp.cpp:615
+msgid "Don't run the client"
+msgstr "İstemciyi çalıştırma"
+
+#. These are just special tags so deal with them in a special way
+#: clientgui/BOINCGUIApp.cpp:883
+msgid "(Automatic Detection)"
+msgstr "(Otomatik Belirleme)"
+
+#: clientgui/BOINCGUIApp.cpp:884
+msgid "(Unknown)"
+msgstr "(Bilinmiyor)"
+
+#: clientgui/BOINCGUIApp.cpp:885
+msgid "(User Defined)"
+msgstr "(Kullanıcı Tanımlı)"
+
+#: clientgui/BOINCTaskBar.cpp:508
+#, c-format
+msgid "Open %s Web..."
+msgstr "%s Sitesini Aç..."
+
+#: clientgui/BOINCTaskBar.cpp:515
+#, c-format
+msgid "Open %s..."
+msgstr "%s'ı Aç..."
+
+#: clientgui/BOINCTaskBar.cpp:522 clientgui/BOINCTaskBar.cpp:620
+#: clientgui/BOINCTaskBar.cpp:625
+msgid "Snooze"
+msgstr "Hesaplamayı bir süre ertele"
+
+#: clientgui/BOINCTaskBar.cpp:524 clientgui/BOINCTaskBar.cpp:639
+#: clientgui/BOINCTaskBar.cpp:644
+msgid "Snooze GPU"
+msgstr "GPU ile hesaplamayı bir süre ertele"
+
+#: clientgui/BOINCTaskBar.cpp:542
+msgid "E&xit"
+msgstr "&Çık"
+
+#: clientgui/BOINCTaskBar.cpp:615 clientgui/sg_BoincSimpleFrame.cpp:935
+#: clientgui/sg_ProjectCommandPopup.cpp:125
+#: clientgui/sg_TaskCommandPopup.cpp:118 clientgui/ViewProjects.cpp:788
+#: clientgui/ViewWork.cpp:872
+msgid "Resume"
+msgstr "Sürdür"
+
+#: clientgui/BOINCTaskBar.cpp:635
+msgid "Resume GPU"
+msgstr "GPU ile hesaplamayı sürdür"
+
+#: clientgui/BOINCTaskBar.cpp:706
+msgid "Computing is enabled"
+msgstr "Hesaplama devrede"
+
+#: clientgui/BOINCTaskBar.cpp:710
+msgid "Computing is suspended - "
+msgstr "Hesaplama durakladı - "
+
+#: clientgui/BOINCTaskBar.cpp:720
+msgid "GPU computing is enabled"
+msgstr "GPU ile hesaplama devrede"
+
+#: clientgui/BOINCTaskBar.cpp:723
+msgid "GPU computing is suspended - "
+msgstr "GPU ile hesaplama durakladı - "
+
+#: clientgui/BOINCTaskBar.cpp:732
+msgid "Network is enabled"
+msgstr "Ağ iletişimi devrede"
+
+#: clientgui/BOINCTaskBar.cpp:735
+msgid "Network is suspended - "
+msgstr "Ağ iletişimi durakladı - "
+
+#: clientgui/BOINCTaskBar.cpp:743
+msgid "Reconnecting to client."
+msgstr "İstemciye yeniden bağlanılıyor."
+
+#: clientgui/BOINCTaskBar.cpp:745
+msgid "Not connected to a client."
+msgstr "Bir istemciye bağlanmadı."
+
+#: clientgui/BOINCTaskBar.cpp:798
+#, c-format
+msgid "%s Notices"
+msgstr "%s Bildirimleri"
+
+#: clientgui/BOINCTaskBar.cpp:804
+msgid "There are new notices - click to view."
+msgstr "Yeni bildirimler var. Görmek için tıklayın."
+
+#: clientgui/CompletionErrorPage.cpp:199
+msgid "Failed to add project"
+msgstr "Projeyi ekleme başarısız oldu"
+
+#: clientgui/CompletionErrorPage.cpp:204
+msgid "Failed to update account manager"
+msgstr "Hesap yöneticisini güncelleme başarısız oldu"
+
+#: clientgui/CompletionErrorPage.cpp:208
+msgid "Failed to remove account manager"
+msgstr "Hesap yöneticisini kaldırma başarısız oldu"
+
+#: clientgui/CompletionErrorPage.cpp:212
+msgid "Failed to add account manager"
+msgstr "Hesap yöneticisini ekleme başarısız oldu"
+
+#: clientgui/CompletionErrorPage.cpp:221
+msgid ""
+"Please try again later.\n"
+"\n"
+"Click Finish to close."
+msgstr "Lütfen daha sonra tekrar deneyin.\n\nKapatmak için Son'u tıklayın."
+
+#: clientgui/CompletionErrorPage.cpp:225 clientgui/CompletionPage.cpp:215
+#: clientgui/CompletionPage.cpp:235 clientgui/CompletionPage.cpp:266
+msgid "Click Finish to close."
+msgstr "Kapatmak için Son'u tıklayın."
+
+#: clientgui/CompletionErrorPage.cpp:234
+msgid "Messages from server:"
+msgstr "Sunucudan mesajlar:"
+
+#: clientgui/CompletionPage.cpp:200
+msgid "Project added"
+msgstr "Proje eklendi"
+
+#: clientgui/CompletionPage.cpp:206
+msgid "This project has been successfully added."
+msgstr "Bu proje başarıyla eklendi."
+
+#: clientgui/CompletionPage.cpp:211
+msgid ""
+"When you click Finish, your web browser will go to a page where\n"
+"you can set your account name and preferences."
+msgstr "Son'u tıkladığınızda, internet tarayıcınız kullanıcı adı ve\ntercihlerinizi belirleyebileceğiniz siteyi açacak."
+
+#: clientgui/CompletionPage.cpp:225
+#, c-format
+msgid "Update from %s completed."
+msgstr "%s'den güncelleme tamamlandı."
+
+#: clientgui/CompletionPage.cpp:229
+msgid "Update completed."
+msgstr "Güncelleme tamamlandı."
+
+#. Attach Completed
+#: clientgui/CompletionPage.cpp:240
+msgid "Now using account manager"
+msgstr "Şu anda hesap yöneticisi kullanılıyor"
+
+#: clientgui/CompletionPage.cpp:245
+#, c-format
+msgid "Welcome to %s!"
+msgstr "%s'e hoş geldiniz!"
+
+#: clientgui/CompletionPage.cpp:256
+#, c-format
+msgid "You are now using %s to manage accounts."
+msgstr "Şu anda hesapları yönetmek için %s kullanıyorsunuz."
+
+#: clientgui/CompletionPage.cpp:260
+msgid "You are now using this account manager."
+msgstr "Şu anda bu hesap yöneticisini kullanıyorsunuz."
+
+#: clientgui/DlgAbout.cpp:113
+#, c-format
+msgid "About %s"
+msgstr "%s Hakkında"
+
+#: clientgui/DlgAbout.cpp:175
+msgid "Version:"
+msgstr "Sürüm:"
+
+#: clientgui/DlgAbout.cpp:183
+msgid "wxWidgets Version:"
+msgstr "wxWidgets sürümü:"
+
+#: clientgui/DlgAbout.cpp:191
+msgid "Copyright:"
+msgstr "Telif hakkı:"
+
+#: clientgui/DlgAbout.cpp:195
+msgid ""
+"(C) 2003-2018 University of California, Berkeley.\n"
+"All Rights Reserved."
+msgstr "(C) 2003-2018 University of California, Berkeley.\nTüm Hakları Saklıdır."
+
+#: clientgui/DlgAbout.cpp:200
+#, c-format
+msgid "%s is distributed under the GNU Lesser General Public License v3.0."
+msgstr ""
+
+#: clientgui/DlgAbout.cpp:212
+msgid "For more information, visit "
+msgstr "Daha fazla bilgi için ziyaret edin:"
+
+#: clientgui/DlgAbout.cpp:224 clientgui/DlgExitMessage.cpp:173
+#: clientgui/DlgGenericMessage.cpp:120 clientgui/DlgSelectComputer.cpp:163
+msgid "&OK"
+msgstr "&Tamam"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:54
+#, c-format
+msgid "%s - Computing preferences"
+msgstr "%s - Hesaplama tercihleri"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:82 clientgui/sg_DlgPreferences.cpp:163
+msgid ""
+"Using local preferences.\n"
+"Click \"Use web prefs\" to use web-based preferences from"
+msgstr "Yerel tercihler kullanılıyor.\nBuradaki Web-tabanlı tercihleri kullanmak için \"Web-tabanlı tercihleri kullan\"a tıklayın:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:90 clientgui/sg_DlgPreferences.cpp:171
+msgid "Using web-based preferences from"
+msgstr "Buradaki web-tabanlı tercihleri kullanılıyor: "
+
+#: clientgui/DlgAdvPreferencesBase.cpp:107 clientgui/sg_DlgPreferences.cpp:189
+msgid "Set values and click Save to use local preferences instead."
+msgstr "Değerleri ayarlayın ve yerel tercihlerin yerine kullanmak için Kaydet'i tıklayın."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:115 clientgui/sg_DlgPreferences.cpp:217
+msgid "Use web prefs"
+msgstr "Web tercihlerini kullan"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:116 clientgui/sg_DlgPreferences.cpp:218
+msgid "Restore web-based preferences and close the dialog."
+msgstr "Web-tabanlı tercihleri geri getir ve iletişim kutusunu kapat."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:140
+#: clientgui/DlgAdvPreferencesBase.cpp:687
+msgid "Computing"
+msgstr "Hesaplama"
+
+#. Network schedule
+#: clientgui/DlgAdvPreferencesBase.cpp:143
+#: clientgui/DlgAdvPreferencesBase.cpp:889
+msgid "Network"
+msgstr "Ağ-İnternet"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:146
+msgid "Disk and memory"
+msgstr "Disk ve bellek"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:149
+msgid "Daily schedules"
+msgstr "Günlük zamanlamalar"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:162
+#: clientgui/DlgDiagnosticLogFlags.cpp:120 clientgui/DlgExclusiveApps.cpp:146
+#: clientgui/DlgHiddenColumns.cpp:100 clientgui/sg_DlgPreferences.cpp:353
+msgid "Save"
+msgstr "Kaydet"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:163 clientgui/sg_DlgPreferences.cpp:354
+msgid "Save all values and close the dialog."
+msgstr "Tüm değişiklikleri kaydet ve pencereyi kapat."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:170 clientgui/sg_DlgPreferences.cpp:361
+msgid "Close the dialog without saving."
+msgstr "Değişiklikleri kaydetmeden pencereyi kapat."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:176 clientgui/DlgExclusiveApps.cpp:157
+#: clientgui/Localization.cpp:35 clientgui/Localization.cpp:121
+#: clientgui/Localization.cpp:139 clientgui/sg_BoincSimpleFrame.cpp:971
+#: clientgui/sg_DlgPreferences.cpp:370
+msgid "Help"
+msgstr "Yardım"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:177
+msgid "Shows the preferences web page."
+msgstr "Tercihler internet sayfasını görüntüle."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:239
+#: clientgui/DlgAdvPreferencesBase.cpp:466
+msgid "Usage limits"
+msgstr "Kullanım sınırlamaları"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:244
+#, no-c-format
+msgid ""
+"Keep some CPUs free for other applications. Example: 75% means use 6 cores "
+"on an 8-core CPU."
+msgstr "Bazı CPU (işlemci) çekirdeklerini diğer uygulamalar için boşta tut. Örneğin %75, 8 çekirdekli işlemcinin 6 çekirdeğinin kullanılmasını sağlar."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:246
+#: clientgui/DlgAdvPreferencesBase.cpp:258 clientgui/sg_DlgPreferences.cpp:286
+msgid "Use at most"
+msgstr "En çok"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:251
+#, no-c-format
+msgid "% of the CPUs"
+msgstr "% kadar CPU çekirdeği kullan"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:256 clientgui/sg_DlgPreferences.cpp:284
+#, no-c-format
+msgid ""
+"Suspend/resume computing every few seconds to reduce CPU temperature and "
+"energy usage. Example: 75% means compute for 3 seconds, wait for 1 second, "
+"and repeat."
+msgstr "Her birkaç saniyede bir hesaplamayı durdurmak/sürdürmek, CPU (işlemci) sıcaklığını ve enerji kullanımını azaltır. Örneğin %75, 3 saniye hesaplama, 1 saniye bekleme ve bunu tekrarlama demektir."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:263 clientgui/sg_DlgPreferences.cpp:291
+#, no-c-format
+msgid "% of CPU time"
+msgstr "% kadar CPU gücü kullan"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:270
+msgid "When to suspend"
+msgstr "Duraklatma"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:276 clientgui/sg_DlgPreferences.cpp:239
+msgid "Suspend when computer is on battery"
+msgstr "Bilgisayar pil gücünde olduğunda duraklat"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:279 clientgui/sg_DlgPreferences.cpp:235
+msgid ""
+"Check this to suspend computing on portables when running on battery power."
+msgstr "Taşınabilir cihazlar pil gücünde olduğunda hesaplamayı duraklatmak için işaretleyin."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:285 clientgui/sg_DlgPreferences.cpp:253
+msgid "Suspend when computer is in use"
+msgstr "Bilgisayar kullanımda olduğunda duraklat"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:288 clientgui/sg_DlgPreferences.cpp:249
+msgid ""
+"Check this to suspend computing and file transfers when you're using the "
+"computer."
+msgstr "Bilgisayarınızı kullandığınız sırada hesaplamanın ve dosya aktarımının duraklatılması için işaretleyin."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:294
+msgid "Suspend GPU computing when computer is in use"
+msgstr "Bilgisayar kullanımda olduğunda GPU ile hesaplamayı duraklat"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:297
+msgid "Check this to suspend GPU computing when you're using the computer."
+msgstr "Bilgisayarınızı kullandığınız sırada GPU ile (ekran kartı) hesaplamanın duraklatılması için işaretleyin."
+
+#. min idle time
+#: clientgui/DlgAdvPreferencesBase.cpp:302 clientgui/sg_DlgPreferences.cpp:264
+msgid "This determines when the computer is considered 'in use'."
+msgstr "Bu, bilgisayarın ne zaman 'kullanımda' kabul edildiğini belirler."
+
+#. context: 'In use' means mouse/keyboard input in last ___ minutes
+#: clientgui/DlgAdvPreferencesBase.cpp:307 clientgui/sg_DlgPreferences.cpp:268
+msgid "'In use' means mouse/keyboard input in last"
+msgstr "'Kullanımda', en son bu kadar süre önce fare/klavye kullanıldı demektir:"
+
+#. context: 'In use' means mouse/keyboard input in last ___ minutes
+#. context: Switch between tasks every ___ minutes
+#: clientgui/DlgAdvPreferencesBase.cpp:318
+#: clientgui/DlgAdvPreferencesBase.cpp:416 clientgui/sg_DlgPreferences.cpp:276
+msgid "minutes"
+msgstr "dakika"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:326
+msgid "Suspend when non-BOINC CPU usage is above"
+msgstr "BOINC harici CPU kullanımı bunu aşarsa duraklat:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:328
+msgid "Suspend computing when your computer is busy running other programs."
+msgstr "Bilgisayarınız diğer uygulamaları çalıştırmakla meşgulse hesaplama duraklatılır."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:342
+msgid "To suspend by time of day, see the \"Daily Schedules\" section."
+msgstr "Günün belli saatlerinde duraklatmak için \"Günlük zamanlamalar\" kısmına bakın."
+
+#. Context: heading for a group of miscellaneous preferences
+#: clientgui/DlgAdvPreferencesBase.cpp:352
+#: clientgui/DlgAdvPreferencesBase.cpp:519
+msgid "Other"
+msgstr "Diğer"
+
+#. buffer sizes
+#: clientgui/DlgAdvPreferencesBase.cpp:358
+msgid "Store at least enough tasks to keep the computer busy for this long."
+msgstr "En azından bilgisayarı  bu kadar süre boyunca meşgul tutmaya yetecek miktarda iş depolanır."
+
+#. context: Store at least ___ days of work
+#: clientgui/DlgAdvPreferencesBase.cpp:362
+msgid "Store at least"
+msgstr "En az"
+
+#. context: Store at least ___ days of work
+#. context: Store up to an additional ___ days of work
+#: clientgui/DlgAdvPreferencesBase.cpp:373
+#: clientgui/DlgAdvPreferencesBase.cpp:395
+msgid "days of work"
+msgstr "günlük iş depola"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:379
+msgid ""
+"Store additional tasks above the minimum level.  Determines how much work is"
+" requested when contacting a project."
+msgstr "Asgari düzeyin üzerinde ek işler depolayın. Bir proje ile iletişime geçildiğinde ne kadar iş talep edileceğini belirler."
+
+#. context: Store up to an additional ___ days of work
+#: clientgui/DlgAdvPreferencesBase.cpp:383
+msgid "Store up to an additional"
+msgstr "Ek olarak da depoda"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:402
+#, c-format
+msgid "If you run several projects, %s may switch between them this often."
+msgstr "Birden fazla proje çalıştırıyorsanız, %s bu kadar sürede bir çalışan projenin işini durdurup, başka bir işi çalıştıracaktır."
+
+#. context: Switch between tasks every ___ minutes
+#: clientgui/DlgAdvPreferencesBase.cpp:407
+msgid "Switch between tasks every"
+msgstr "Çalışan uygulamayı değiştirme aralığı"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:422
+msgid ""
+"This controls how often tasks save their state to disk, so that they later "
+"can be continued from that point."
+msgstr "Bu denetim, işlerin durumlarını ne sıklıkta diske kaydedeceğini belirler, böylece işler daha sonra bu noktadan başlayarak devam edebilirler. "
+
+#. context: Request tasks to checkpoint at most every ___ seconds
+#: clientgui/DlgAdvPreferencesBase.cpp:426
+msgid "Request tasks to checkpoint at most every"
+msgstr "İşlerin, kontrol noktasını diske yazma aralığı"
+
+#. context: Request tasks to checkpoint at most every ___ seconds
+#: clientgui/DlgAdvPreferencesBase.cpp:435
+msgid "seconds"
+msgstr "saniye"
+
+#. upload/download rates
+#: clientgui/DlgAdvPreferencesBase.cpp:472
+msgid "Limit the download rate of file transfers."
+msgstr "Dosya transferlerinde indirme hızı bununla sınırlanır."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:473
+msgid "Limit download rate to"
+msgstr "İndirme hızını bununla sınırla:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:477
+#: clientgui/DlgAdvPreferencesBase.cpp:486
+msgid "KB/second"
+msgstr "KB/saniye"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:481
+msgid "Limit the upload rate of file transfers."
+msgstr "Dosya transferlerinde gönderme hızı bununla sınırlanır."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:482
+msgid "Limit upload rate to"
+msgstr "Gönderme hızını bunula sınırla:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:493
+#, c-format
+msgid "Example: %s should transfer at most 2000 MB of data every 30 days."
+msgstr "Örneğin, %s son 30 günde en fazla 2000 MB veri aktarımı yapabilecektir."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:495
+msgid "Limit usage to"
+msgstr "Kullanımı bunula sınırla:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:499
+msgid "MB every"
+msgstr "MB, son"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:503
+msgid "days"
+msgstr "gün için"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:508
+msgid "To limit transfers by time of day, see the \"Daily Schedules\" section."
+msgstr "Günün belli saatlerinde sınırlamak için \"Günlük zamanlamalar\" kısmına bakın."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:525
+#, c-format
+msgid ""
+"Check this only if your Internet provider modifies image files. Skipping "
+"verification reduces the security of %s."
+msgstr "İnternet servis sağlayıcınız görüntü dosyalarını değiştiriyorsa bunu işaretleyin. Doğrulamayı atlamak, %s'in güvenliğini zayıflatacaktır."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:527
+msgid "Skip data verification for image files"
+msgstr "Görüntü dosyaları için veri doğrulamasını atla"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:531
+msgid "Confirm before connecting to Internet"
+msgstr "İnternete bağlanmadan önce onay iste"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:532
+#: clientgui/DlgAdvPreferencesBase.cpp:536
+msgid "Useful only if you have a modem, ISDN or VPN connection."
+msgstr "Bir modem, ISDN ya da VPN bağlantısına sahipseniz kullanışlı olabilir."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:535
+msgid "Disconnect when done"
+msgstr "Tamamlandığında bağlantıyı kes"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:562 clientgui/ViewResources.cpp:116
+msgid "Disk"
+msgstr "Disk"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:567
+#, c-format
+msgid "%s will use the most restrictive of these settings:"
+msgstr "%s bu ayarları en üst sınır olarak kullanacak:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:573 clientgui/sg_DlgPreferences.cpp:335
+#, c-format
+msgid "Limit the total amount of disk space used by %s."
+msgstr "%s tarafından kullanılabilecek toplam disk alanını sınırlandırın."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:576
+#: clientgui/DlgAdvPreferencesBase.cpp:600 clientgui/sg_DlgPreferences.cpp:338
+msgid "Use no more than"
+msgstr "Bundan fazlasını kullanma:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:580
+msgid "GB"
+msgstr "GB"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:585
+#, c-format
+msgid ""
+"Limit disk usage to leave this much free space on the volume where %s stores"
+" data."
+msgstr "%s'in verilerini depoladığı diskte en az bu kadar boş alan kalacak şekilde disk kullanımını sınırla."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:588
+msgid "Leave at least"
+msgstr "En az bu kadar bırak:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:592
+msgid "GB free"
+msgstr "GB boş alan"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:597
+#, c-format
+msgid ""
+"Limit the percentage of disk space used by %s on the volume where it stores "
+"data."
+msgstr "%s'in verilerini depoladığı diskin en fazla bu kadar yüzdesi kullanılacak şekilde disk kullanımını sınırla."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:605
+#, no-c-format
+msgid "% of total"
+msgstr "% kadar disk alanı"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:612
+msgid "Memory"
+msgstr "Bellek (RAM)"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:617
+#, c-format
+msgid "Limit the memory used by %s when you're using the computer."
+msgstr "Bilgisayarınızı kullandığınız sırada %s tarafından kullanılabilecek belek miktarını sınırlayın."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:619
+msgid "When computer is in use, use at most"
+msgstr "Bilgisayar kullanımdayken , en fazla bu kadar kullan:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:625
+#: clientgui/DlgAdvPreferencesBase.cpp:637
+#: clientgui/DlgAdvPreferencesBase.cpp:653
+#, no-c-format
+msgid "%"
+msgstr "%"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:630
+#, c-format
+msgid "Limit the memory used by %s when you're not using the computer."
+msgstr "Bilgisayarınız boştayken %s tarafından kullanılabilecek belek miktarını sınırlayın."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:632
+msgid "When computer is not in use, use at most"
+msgstr "Bilgisayar boştayken, en fazla bu kadar kullan:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:641
+msgid "Leave non-GPU tasks in memory while suspended"
+msgstr "Durakladığında GPU-olmayan işleri bellekte bırak"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:642
+msgid ""
+"If checked, suspended tasks stay in memory, and resume with no work lost. If"
+" unchecked, suspended tasks are removed from memory, and resume from their "
+"last checkpoint."
+msgstr "İşaretliyse, duraklatılan görevler bellekte kalır ve hiçbir kayıp yaşanmadan çalışmaya devam eder. İşaretlenmezse, duraklatılan görevler bellekten kaldırılır ve son kontrol noktasından devam eder."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:646
+#, c-format
+msgid "Limit the swap space (page file) used by %s."
+msgstr "%s'in Disk belleği (swap dosyası) kullanımını sınırlandırır."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:648
+msgid "Page/swap file: use at most"
+msgstr "Disk belleği/swap dosyasını en fazla bu kadar kullan:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:673 clientgui/sg_DlgPreferences.cpp:295
+msgid "and"
+msgstr "ve"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:674
+msgid "to"
+msgstr "-"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:694 clientgui/sg_DlgPreferences.cpp:296
+msgid "Compute only during a particular period each day."
+msgstr "Hesaplama her gün sadece belirli saatler arasında yapılır."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:697 clientgui/sg_DlgPreferences.cpp:299
+msgid "Compute only between"
+msgstr "Yalnızca bu saatler arasında hesapla"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:721
+#: clientgui/DlgAdvPreferencesBase.cpp:905
+msgid "Day-of-week override"
+msgstr "Haftanın günlerinde sınırlamalar"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:730
+#: clientgui/DlgAdvPreferencesBase.cpp:909
+msgid "Override the times above on the selected days:"
+msgstr "Seçilen günlerde yukarıdaki zamanlamayı geçersiz kıl:"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:753
+#: clientgui/DlgAdvPreferencesBase.cpp:926
+msgid "Monday"
+msgstr "Pazartesi"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:780
+#: clientgui/DlgAdvPreferencesBase.cpp:941
+msgid "Friday"
+msgstr "Cuma"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:795
+#: clientgui/DlgAdvPreferencesBase.cpp:954
+msgid "Tuesday"
+msgstr "Salı"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:810
+#: clientgui/DlgAdvPreferencesBase.cpp:969
+msgid "Saturday"
+msgstr "Cumartesi"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:823
+#: clientgui/DlgAdvPreferencesBase.cpp:982
+msgid "Wednesday"
+msgstr "Çarşamba"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:838
+#: clientgui/DlgAdvPreferencesBase.cpp:997
+msgid "Sunday"
+msgstr "Pazar"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:851
+#: clientgui/DlgAdvPreferencesBase.cpp:1010
+msgid "Thursday"
+msgstr "Perşembe"
+
+#: clientgui/DlgAdvPreferencesBase.cpp:893 clientgui/sg_DlgPreferences.cpp:317
+msgid "Transfer files only during a particular period each day."
+msgstr "Dosyalar her gün sadece belirli saatler arasında aktarılır."
+
+#: clientgui/DlgAdvPreferencesBase.cpp:895 clientgui/sg_DlgPreferences.cpp:319
+msgid "Transfer files only between"
+msgstr "Dosyaları bu saatler arasında aktar"
+
+#: clientgui/DlgAdvPreferences.cpp:684 clientgui/sg_DlgPreferences.cpp:787
+msgid "Invalid number"
+msgstr "Geçersiz sayı"
+
+#: clientgui/DlgAdvPreferences.cpp:685 clientgui/sg_DlgPreferences.cpp:788
+msgid "Invalid time, value must be between 0:00 and 24:00, format is HH:MM"
+msgstr "Geçersiz zaman, değer 0:00 ve 24:00 arasında olmalı, format SS:DD şeklindedir"
+
+#: clientgui/DlgAdvPreferences.cpp:686 clientgui/sg_DlgPreferences.cpp:789
+msgid "Start time must be different from end time"
+msgstr "Başlangıç zamanı, bitiş zamanından farklı olmalı"
+
+#: clientgui/DlgAdvPreferences.cpp:687
+msgid "Number must be between 0 and 10"
+msgstr "Sayı 0 ile 10 arasında olmalı"
+
+#: clientgui/DlgAdvPreferences.cpp:688 clientgui/sg_DlgPreferences.cpp:790
+msgid "Number must be between 0 and 100"
+msgstr "Sayı 0 ile 100 arasında olmalı"
+
+#: clientgui/DlgAdvPreferences.cpp:689
+msgid "Number must be between 1 and 100"
+msgstr "1 ve 100 arasında bir sayı olmalı"
+
+#: clientgui/DlgAdvPreferences.cpp:947 clientgui/sg_DlgPreferences.cpp:861
+msgid "invalid input value detected"
+msgstr "geçersiz giriş değeri belirlendi"
+
+#: clientgui/DlgAdvPreferences.cpp:959 clientgui/sg_DlgPreferences.cpp:873
+msgid "Validation Error"
+msgstr "Doğrulama Hatası"
+
+#: clientgui/DlgAdvPreferences.cpp:1143 clientgui/sg_DlgPreferences.cpp:1207
+msgid ""
+"Changing to use the local preferences defined on this page. This will "
+"override your web-based preferences, even if you subsequently make changes "
+"there. Do you want to proceed?"
+msgstr ""
+
+#: clientgui/DlgAdvPreferences.cpp:1147 clientgui/DlgAdvPreferences.cpp:1188
+#: clientgui/sg_DlgPreferences.cpp:1199 clientgui/sg_DlgPreferences.cpp:1211
+msgid "Confirmation"
+msgstr "Onaylama"
+
+#: clientgui/DlgAdvPreferences.cpp:1187
+msgid "Discard local preferences and use web-based preferences?"
+msgstr "Yerel tercihler silinsin ve web-tabanlı tercihler mi kullanılsın?"
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:66
+#, c-format
+msgid "%s Diagnostic Log Flags"
+msgstr "%s Tanılama Günlüğü Bayrakları"
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:84
+msgid ""
+"These flags enable various types of diagnostic messages in the Event Log."
+msgstr "Bu bayraklar, Tanılama Günlüğü'nde çeşitli tiplerdeki tanılama mesajlarını etkinleştirir."
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:100
+msgid "More info ..."
+msgstr "Daha fazla bilgi..."
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:121 clientgui/DlgHiddenColumns.cpp:101
+msgid "Save all values and close the dialog"
+msgstr "Tüm değerleri kaydet ve pencereyi kapat"
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:124 clientgui/DlgHiddenColumns.cpp:104
+msgid "Defaults"
+msgstr "Varsayılanlar"
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:125 clientgui/DlgHiddenColumns.cpp:105
+msgid "Restore default settings"
+msgstr "Varsayılan değerler sıfırla"
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:129 clientgui/DlgHiddenColumns.cpp:109
+msgid "Close the dialog without saving"
+msgstr "Değişiklikleri kaydetmeden pencereyi kapat"
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:132
+msgid "Apply"
+msgstr "Uygula"
+
+#: clientgui/DlgDiagnosticLogFlags.cpp:133
+msgid "Save all values"
+msgstr "Tüm değerleri kaydet"
+
+#: clientgui/DlgEventLog.cpp:227
+#, c-format
+msgid "%s - Event Log"
+msgstr "%s - Olay Günlüğü"
+
+#. Create List Pane Items
+#: clientgui/DlgEventLog.cpp:237 clientgui/ViewMessages.cpp:117
+#: clientgui/ViewProjects.cpp:251 clientgui/ViewStatistics.cpp:411
+#: clientgui/ViewStatistics.cpp:1986 clientgui/ViewTransfers.cpp:209
+#: clientgui/ViewWork.cpp:260
+msgid "Project"
+msgstr "Proje"
+
+#: clientgui/DlgEventLog.cpp:238 clientgui/ViewMessages.cpp:118
+msgid "Time"
+msgstr "Zaman"
+
+#: clientgui/DlgEventLog.cpp:239 clientgui/ViewMessages.cpp:119
+msgid "Message"
+msgstr "Mesaj"
+
+#: clientgui/DlgEventLog.cpp:330 clientgui/DlgEventLog.cpp:380
+msgid "&Show only this project"
+msgstr "&Yalnızca bu projeyi göster"
+
+#: clientgui/DlgEventLog.cpp:334 clientgui/DlgItemProperties.cpp:74
+msgid "Copy &All"
+msgstr "&Tümünü kopyala"
+
+#: clientgui/DlgEventLog.cpp:336 clientgui/DlgEventLog.cpp:340
+#: clientgui/ViewMessages.cpp:89
+msgid "Copy all the messages to the clipboard."
+msgstr "Tüm mesajları panoya kopyalar."
+
+#: clientgui/DlgEventLog.cpp:345 clientgui/DlgItemProperties.cpp:77
+msgid "Copy &Selected"
+msgstr "&Seçili mesajları kopyala"
+
+#: clientgui/DlgEventLog.cpp:348 clientgui/DlgEventLog.cpp:356
+#: clientgui/ViewMessages.cpp:97
+msgid ""
+"Copy the selected messages to the clipboard. You can select multiple "
+"messages by holding down the shift or command key while clicking on "
+"messages."
+msgstr "Seçili mesajları panoya kopyalar. Shift ya da komut düğmelerine basıp\nmesajların üzerine tıklayarak, çok sayıda mesajı seçebilirsiniz."
+
+#: clientgui/DlgEventLog.cpp:350 clientgui/DlgEventLog.cpp:358
+#: clientgui/ViewMessages.cpp:99
+msgid ""
+"Copy the selected messages to the clipboard. You can select multiple "
+"messages by holding down the shift or control key while clicking on "
+"messages."
+msgstr "Seçili mesajları panoya kopyalar. Shift ya da Ctrl düğmelerine basıp\nmesajların üzerine tıklayarak, çok sayıda mesajı seçebilirsiniz."
+
+#: clientgui/DlgEventLog.cpp:365 clientgui/DlgItemProperties.cpp:81
+msgid "&Close"
+msgstr "&Kapat"
+
+#: clientgui/DlgEventLog.cpp:374
+msgid "Show all &messages"
+msgstr "&Tüm mesajları göster"
+
+#: clientgui/DlgEventLog.cpp:375 clientgui/DlgEventLog.cpp:377
+msgid "Show messages for all projects"
+msgstr "Tüm projelere ait mesajları gösterir."
+
+#: clientgui/DlgEventLog.cpp:381 clientgui/DlgEventLog.cpp:383
+msgid "Show only the messages for the selected project"
+msgstr "Yalnızca şu anda seçili projeye ait mesajları ve BOINC'in genel mesajlarını görüntüler."
+
+#: clientgui/DlgExclusiveApps.cpp:60
+#, c-format
+msgid "%s - Exclusive Applications"
+msgstr "%s - Ayrıcalıklı Uygulamalar"
+
+#: clientgui/DlgExclusiveApps.cpp:72
+msgid ""
+"Suspend processor and network usage when these applications are running:"
+msgstr "Bu uygulamalar çalışırken, işlemci ve ağ kullanımı duraklatılacak:"
+
+#: clientgui/DlgExclusiveApps.cpp:80 clientgui/DlgExclusiveApps.cpp:104
+msgid "Add..."
+msgstr "Ekle..."
+
+#: clientgui/DlgExclusiveApps.cpp:81 clientgui/DlgExclusiveApps.cpp:105
+msgid "Add an application to this list"
+msgstr "Bu listeye bir uygulama ekle"
+
+#: clientgui/DlgExclusiveApps.cpp:86 clientgui/DlgExclusiveApps.cpp:110
+#: clientgui/sg_ProjectCommandPopup.cpp:90 clientgui/ViewProjects.cpp:230
+msgid "Remove"
+msgstr "Kaldır"
+
+#: clientgui/DlgExclusiveApps.cpp:87 clientgui/DlgExclusiveApps.cpp:111
+msgid "Remove an application from this list"
+msgstr "Bu listeden bir uygulama kaldır"
+
+#: clientgui/DlgExclusiveApps.cpp:96
+msgid "Suspend GPU usage when these applications are running:"
+msgstr "Bu uygulamalar çalışırken, GPU (ekran kartı) kullanımı duraklatılacak:"
+
+#: clientgui/DlgExclusiveApps.cpp:122
+msgid "For advanced options, refer to "
+msgstr "Gelişmiş seçenekler için, lütfen ziyaret edin:  "
+
+#: clientgui/DlgExclusiveApps.cpp:147
+msgid "save all values and close the dialog"
+msgstr "tüm değişiklikleri kaydeder ve pencereyi kapatır"
+
+#: clientgui/DlgExclusiveApps.cpp:152
+msgid "close the dialog without saving"
+msgstr "değişiklikleri kaydetmeden pencereyi kapatır"
+
+#: clientgui/DlgExclusiveApps.cpp:158
+msgid "shows the preferences web page"
+msgstr "Tercihler internet sayfasını görüntüler"
+
+#. TODO: fill in the default directory for MSW
+#. TODO: fill in the default directory for Linux
+#: clientgui/DlgExclusiveApps.cpp:303 clientgui/DlgExclusiveApps.cpp:309
+#: clientgui/DlgExclusiveApps.cpp:315
+msgid "Applications to add"
+msgstr "Uygulama ekle"
+
+#: clientgui/DlgExclusiveApps.cpp:332
+#, c-format
+msgid "'%s' is not an executable application."
+msgstr "'%s' çalıştırılabilir bir uygulama değil."
+
+#: clientgui/DlgExclusiveApps.cpp:333 clientgui/DlgExclusiveApps.cpp:380
+#: clientgui/DlgExclusiveApps.cpp:404
+msgid "Add Exclusive App"
+msgstr "Ayrıcalıklı Uygulama Ekle"
+
+#: clientgui/DlgExclusiveApps.cpp:345
+msgid "Name of application to add?"
+msgstr "Eklenecek uygulamanın ismi?"
+
+#: clientgui/DlgExclusiveApps.cpp:345
+msgid "Add exclusive app"
+msgstr "Ayrıcalıklı uygulama ekle"
+
+#: clientgui/DlgExclusiveApps.cpp:379
+#, c-format
+msgid "Application names must end with '%s'"
+msgstr "Uygulama isimleri mutlaka '%s' ile bitmelidir"
+
+#: clientgui/DlgExclusiveApps.cpp:403
+#, c-format
+msgid "'%s' is already in the list."
+msgstr "'%s' zaten listede."
+
+#: clientgui/DlgExitMessage.cpp:82
+#, c-format
+msgid "%s - Exit Confirmation"
+msgstr "%s - Çıkış Onaylama"
+
+#: clientgui/DlgExitMessage.cpp:130
+#, c-format
+msgid ""
+"You have requested to exit the %s,\n"
+"which allows you to view and manage\n"
+"the tasks running on your computer.\n"
+"\n"
+"If you also want to stop running the tasks,\n"
+"choose from the following options:"
+msgstr "%s'dan çıkmak istediniz.\nBu program, bilgisayarınızda çalışan bilimsel\nuygulamaları görmenizi ve yönetmenizi sağlar.\n\nÇıktığınızda bilimsel uygulamaların da kapanmasını\nistiyorsanız, aşağıdaki seçenekleri işaretleyin:"
+
+#: clientgui/DlgExitMessage.cpp:135
+#, c-format
+msgid ""
+"This will shut down %s and its tasks until either the\n"
+"%s or the %s screen saver is run again.\n"
+"\n"
+"In most cases, it is better just to close the %s window\n"
+"rather than to exit the application; that will allow %s to run its\n"
+"tasks at the times you selected in your preferences."
+msgstr "Bu işlem, %s'ı ve işlerini kapatır. %s uygulaması\nya da %s ekran koruyucusu tekrar çalışana kadar da kapalı kalır.\n\nBir çok durumda sadece %s penceresini kapatmak,\nuygulamayı kapatmaktan iyidir. Böylece %s,\nişleri ve zamanlanmış görevleri tercihlerinizde belirlediğiniz\nşekilde çalıştırabilir."
+
+#: clientgui/DlgExitMessage.cpp:153
+#, c-format
+msgid "Stop running tasks when exiting the %s"
+msgstr "%s'dan çıkarken, çalışan bilimsel uygulamaları da durdur"
+
+#: clientgui/DlgExitMessage.cpp:165
+msgid "Remember this decision and do not show this dialog."
+msgstr "Seçimimi hatırla ve tekrar sorma"
+
+#: clientgui/DlgExitMessage.cpp:178 clientgui/DlgGenericMessage.cpp:125
+#: clientgui/DlgOptions.cpp:414 clientgui/DlgSelectComputer.cpp:168
+#: clientgui/wizardex.cpp:387
+msgid "&Cancel"
+msgstr "&İptal"
+
+#: clientgui/DlgGenericMessage.cpp:112
+msgid "Don't show this dialog again."
+msgstr "Bu pencereyi tekrar gösterme."
+
+#: clientgui/DlgHiddenColumns.cpp:64
+#, c-format
+msgid "%s Column Selection"
+msgstr "%s - Sütun Seçimi"
+
+#: clientgui/DlgHiddenColumns.cpp:77
+#, c-format
+msgid "Select which columns %s should show."
+msgstr "%s'in hangi sütunları görüntüleyeceğini seçin."
+
+#: clientgui/DlgHiddenColumns.cpp:357
+msgid ""
+"Are you sure you want to reset all list columns to the default "
+"configurations?"
+msgstr "Tüm liste sütunlarını varsayılan yapılandırmaya sıfırlamak istediğinizden emin misiniz?"
+
+#: clientgui/DlgHiddenColumns.cpp:358
+msgid "Confirm defaults"
+msgstr "Varsayılanları onayla"
+
+#: clientgui/DlgItemProperties.cpp:206 clientgui/DlgItemProperties.cpp:209
+#: clientgui/DlgItemProperties.cpp:212 clientgui/DlgItemProperties.cpp:215
+msgid "Don't request tasks for "
+msgstr "Bunun için iş indirme: "
+
+#: clientgui/DlgItemProperties.cpp:206
+msgid "Project preference"
+msgstr "Proje tercihleri"
+
+#: clientgui/DlgItemProperties.cpp:209
+msgid "Account manager preference"
+msgstr "Hesap yöneticisi tercihi"
+
+#: clientgui/DlgItemProperties.cpp:212
+msgid "Project has no apps for "
+msgstr "Projenin bunun için uygulaması bulunmuyor: "
+
+#: clientgui/DlgItemProperties.cpp:215
+msgid "Client configuration excludes "
+msgstr "İstemci yapılandırması bunu içermez: "
+
+#: clientgui/DlgItemProperties.cpp:221
+#, c-format
+msgid "%s task request deferred for"
+msgstr "%s iş indirme ertelendi"
+
+#: clientgui/DlgItemProperties.cpp:225
+#, c-format
+msgid "%s task request deferral interval"
+msgstr "%s iş indirme erteleme aralığı"
+
+#. set dialog title
+#: clientgui/DlgItemProperties.cpp:259
+msgid "Properties of project "
+msgstr "Projenin özellikleri: "
+
+#. layout controls
+#: clientgui/DlgItemProperties.cpp:263 clientgui/DlgOptions.cpp:232
+msgid "General"
+msgstr "Genel"
+
+#: clientgui/DlgItemProperties.cpp:264
+msgid "URL"
+msgstr "Adres"
+
+#: clientgui/DlgItemProperties.cpp:265
+msgid "User name"
+msgstr "Kullanıcı adı"
+
+#: clientgui/DlgItemProperties.cpp:266
+msgid "Team name"
+msgstr "Takım adı"
+
+#: clientgui/DlgItemProperties.cpp:267 clientgui/ViewProjects.cpp:256
+msgid "Resource share"
+msgstr "Kaynak paylaşımı"
+
+#: clientgui/DlgItemProperties.cpp:269
+msgid "Scheduler RPC deferred for"
+msgstr "Zamanlanmış RPC ertelendi"
+
+#: clientgui/DlgItemProperties.cpp:272
+msgid "File downloads deferred for"
+msgstr "Dosya indirmeler ertelendi"
+
+#: clientgui/DlgItemProperties.cpp:275
+msgid "File uploads deferred for"
+msgstr "Dosya göndermeler ertelendi"
+
+#: clientgui/DlgItemProperties.cpp:277
+msgid "Disk usage"
+msgstr "Disk kullanımı"
+
+#: clientgui/DlgItemProperties.cpp:278
+msgid "Computer ID"
+msgstr "Bilgisayar ID"
+
+#: clientgui/DlgItemProperties.cpp:280
+msgid "Non CPU intensive"
+msgstr "CPU-yoğun değil"
+
+#: clientgui/DlgItemProperties.cpp:280 clientgui/DlgItemProperties.cpp:282
+#: clientgui/DlgItemProperties.cpp:283 clientgui/DlgItemProperties.cpp:285
+#: clientgui/DlgItemProperties.cpp:288 clientgui/DlgItemProperties.cpp:297
+#: clientgui/DlgItemProperties.cpp:300 clientgui/DlgItemProperties.cpp:303
+msgid "yes"
+msgstr "evet"
+
+#: clientgui/DlgItemProperties.cpp:282
+msgid "Suspended via GUI"
+msgstr "Grafik arabirimi (GUI) ile durduruldu"
+
+#: clientgui/DlgItemProperties.cpp:282 clientgui/DlgItemProperties.cpp:283
+msgid "no"
+msgstr "hayır"
+
+#: clientgui/DlgItemProperties.cpp:283
+msgid "Don't request tasks"
+msgstr "Bunun için iş indirme: "
+
+#: clientgui/DlgItemProperties.cpp:285
+msgid "Scheduler call in progress"
+msgstr "Zamanlanmış çağrı sürmekte"
+
+#: clientgui/DlgItemProperties.cpp:288
+msgid "Trickle-up pending"
+msgstr "İş ilerleme kuyruğu"
+
+#: clientgui/DlgItemProperties.cpp:291 clientgui/DlgItemProperties.cpp:293
+msgid "Host location"
+msgstr "Sunucu konumu"
+
+#: clientgui/DlgItemProperties.cpp:293
+msgid "default"
+msgstr "varsayılan"
+
+#: clientgui/DlgItemProperties.cpp:297
+msgid "Added via account manager"
+msgstr "Hesap yöneticisi aracılığıyla eklendi"
+
+#: clientgui/DlgItemProperties.cpp:300
+msgid "Remove when tasks done"
+msgstr "İşler tamamlandığında kaldır"
+
+#: clientgui/DlgItemProperties.cpp:303
+msgid "Ended"
+msgstr "Sonlandı"
+
+#: clientgui/DlgItemProperties.cpp:305
+msgid "Tasks completed"
+msgstr "İşler tamamlandı."
+
+#: clientgui/DlgItemProperties.cpp:306
+msgid "Tasks failed"
+msgstr "İşler başarısız"
+
+#: clientgui/DlgItemProperties.cpp:308
+msgid "Credit"
+msgstr "Kredi"
+
+#: clientgui/DlgItemProperties.cpp:309
+msgid "User"
+msgstr "Kullanıcı"
+
+#: clientgui/DlgItemProperties.cpp:312 clientgui/DlgItemProperties.cpp:320
+#, c-format
+msgid "%s total, %s average"
+msgstr "%s toplam, %s ortalama"
+
+#: clientgui/DlgItemProperties.cpp:317
+msgid "Host"
+msgstr "Bilgisayar"
+
+#: clientgui/DlgItemProperties.cpp:327
+msgid "Scheduling"
+msgstr "Zamanlama"
+
+#: clientgui/DlgItemProperties.cpp:328
+msgid "Scheduling priority"
+msgstr "Zamanlama önceliği"
+
+#: clientgui/DlgItemProperties.cpp:329
+msgid "CPU"
+msgstr "CPU"
+
+#: clientgui/DlgItemProperties.cpp:353
+msgid "Duration correction factor"
+msgstr "Süre düzeltme faktörü"
+
+#: clientgui/DlgItemProperties.cpp:361
+msgid "Last scheduler reply"
+msgstr "Son zamanlayıcı yanıtı"
+
+#: clientgui/DlgItemProperties.cpp:371
+msgid "Properties of task "
+msgstr "İşin özellikleri: "
+
+#: clientgui/DlgItemProperties.cpp:383 clientgui/ViewWork.cpp:266
+msgid "Application"
+msgstr "Uygulama"
+
+#: clientgui/DlgItemProperties.cpp:384 clientgui/ViewWork.cpp:267
+msgid "Name"
+msgstr "İsim"
+
+#: clientgui/DlgItemProperties.cpp:385
+msgid "State"
+msgstr "Durum"
+
+#: clientgui/DlgItemProperties.cpp:388
+msgid "Received"
+msgstr "Alınma zamanı"
+
+#: clientgui/DlgItemProperties.cpp:391
+msgid "Report deadline"
+msgstr "Son teslim zamanı"
+
+#: clientgui/DlgItemProperties.cpp:393
+msgid "Resources"
+msgstr "Kullandığı kaynaklar"
+
+#: clientgui/DlgItemProperties.cpp:396
+msgid "Estimated computation size"
+msgstr "Tahmini hesaplama miktarı"
+
+#: clientgui/DlgItemProperties.cpp:411
+msgid "Keywords"
+msgstr "Anahtar kelimeler"
+
+#: clientgui/DlgItemProperties.cpp:417 clientgui/DlgItemProperties.cpp:444
+msgid "CPU time"
+msgstr "CPU zamanı"
+
+#: clientgui/DlgItemProperties.cpp:418
+msgid "CPU time since checkpoint"
+msgstr "Denetim noktasından bu yana CPU zamanı"
+
+#: clientgui/DlgItemProperties.cpp:420 clientgui/DlgItemProperties.cpp:445
+msgid "Elapsed time"
+msgstr "Geçen süre"
+
+#: clientgui/DlgItemProperties.cpp:422
+msgid "Estimated time remaining"
+msgstr "Tahmini kalan süre"
+
+#: clientgui/DlgItemProperties.cpp:423
+msgid "Fraction done"
+msgstr "Tamamlanan bölüm"
+
+#: clientgui/DlgItemProperties.cpp:424
+msgid "Virtual memory size"
+msgstr "Sanal bellek kullanımı"
+
+#: clientgui/DlgItemProperties.cpp:425
+msgid "Working set size"
+msgstr "Fiziksel bellek kullanımı"
+
+#: clientgui/DlgItemProperties.cpp:427
+msgid "Directory"
+msgstr "Bulunduğu klasör"
+
+#: clientgui/DlgItemProperties.cpp:430
+msgid "Process ID"
+msgstr "İşlem ID"
+
+#: clientgui/DlgItemProperties.cpp:436 clientgui/DlgItemProperties.cpp:438
+#: clientgui/DlgItemProperties.cpp:440
+msgid "Progress rate"
+msgstr "İlerleme oranı"
+
+#: clientgui/DlgItemProperties.cpp:436
+msgid "per hour"
+msgstr "her saat"
+
+#: clientgui/DlgItemProperties.cpp:438
+msgid "per minute"
+msgstr "her dakika"
+
+#: clientgui/DlgItemProperties.cpp:440
+msgid "per second"
+msgstr "her saniye"
+
+#: clientgui/DlgItemProperties.cpp:448
+msgid "Executable"
+msgstr "Çalıştırılabilir"
+
+#: clientgui/DlgItemProperties.cpp:513 clientgui/sg_TaskPanel.cpp:824
+#: clientgui/ViewWork.cpp:1115
+msgid "Local: "
+msgstr "Yerel:"
+
+#: clientgui/DlgOptions.cpp:130 clientgui/DlgOptions.cpp:136
+msgid "Options"
+msgstr "Seçenekler"
+
+#: clientgui/DlgOptions.cpp:179
+msgid "Language:"
+msgstr "Dil:"
+
+#: clientgui/DlgOptions.cpp:186
+msgid "What language should BOINC use?"
+msgstr "BOINC Manager'ı hangi dilde kullanmak istediğinizi seçin."
+
+#: clientgui/DlgOptions.cpp:190
+msgid "Notice reminder interval:"
+msgstr "Bildirim hatırlatma sıklığı:"
+
+#: clientgui/DlgOptions.cpp:197
+msgid "How often should BOINC remind you of new notices?"
+msgstr "BOINC Manager'ın, yeni bildirimler olduğunu size ne kadar sürede bir hatırlatmasını istediğinizi belirleyin."
+
+#: clientgui/DlgOptions.cpp:202
+msgid "Run Manager at login?"
+msgstr "Açılışta BOINC Manager'ı çalıştır"
+
+#: clientgui/DlgOptions.cpp:208
+msgid "Run the BOINC Manager when you log on."
+msgstr "İşaretlerseniz, bilgisayarda oturum açtığınızda BOINC Manager otomatik olarak çalışır."
+
+#: clientgui/DlgOptions.cpp:213
+msgid "Run the client?"
+msgstr "İstemciyi çalıştır?"
+
+#: clientgui/DlgOptions.cpp:219
+msgid "Run the client when launching the Manager."
+msgstr "Yönetici başlatılırken istemciyi çalıştır."
+
+#: clientgui/DlgOptions.cpp:223
+msgid "Enable Manager exit dialog?"
+msgstr "BOINC Manager'dan çıkarken sor"
+
+#: clientgui/DlgOptions.cpp:229
+msgid "Display the exit dialog when shutting down the Manager."
+msgstr "İşaretlerseniz, BOINC Manager'ı kapatırken bunu onaylamanızı isteyen bir pencere belirir."
+
+#: clientgui/DlgOptions.cpp:240
+msgid "Dial-up and Virtual Private Network settings"
+msgstr "Çevirmeli bağlantı ve Sanal Özel Ağ (VPN) ayarları"
+
+#: clientgui/DlgOptions.cpp:254
+msgid "&Set Default"
+msgstr "&Varsayılan Yap"
+
+#: clientgui/DlgOptions.cpp:259
+msgid "&Clear Default"
+msgstr "&Varsayılanı Kaldır"
+
+#: clientgui/DlgOptions.cpp:266
+msgid "Default Connection:"
+msgstr "Varsayılan Bağlantı:"
+
+#: clientgui/DlgOptions.cpp:273
+msgid "Connections"
+msgstr "Bağlantılar"
+
+#: clientgui/DlgOptions.cpp:282
+msgid "Connect via HTTP proxy server"
+msgstr "HTTP vekil sunucu (proxy) aracılığıyla bağlan"
+
+#: clientgui/DlgOptions.cpp:286
+msgid "HTTP Proxy Server Configuration"
+msgstr "HTTP Vekil Sunucu Yapılandırması"
+
+#: clientgui/DlgOptions.cpp:294 clientgui/DlgOptions.cpp:358
+msgid "Address:"
+msgstr "Adres:"
+
+#: clientgui/DlgOptions.cpp:302 clientgui/DlgOptions.cpp:366
+#: clientgui/ProxyPage.cpp:340 clientgui/ProxyPage.cpp:360
+msgid "Port:"
+msgstr "Bağlantı noktası:"
+
+#: clientgui/DlgOptions.cpp:310 clientgui/DlgOptions.cpp:374
+msgid "Don't use proxy for:"
+msgstr "Burası için vekil sunucu kullanma:"
+
+#: clientgui/DlgOptions.cpp:317 clientgui/DlgOptions.cpp:381
+msgid "Leave these blank if not needed"
+msgstr "Gerekli değilse bu bölümü boş bırakın"
+
+#: clientgui/DlgOptions.cpp:323 clientgui/DlgOptions.cpp:387
+#: clientgui/ProxyPage.cpp:343 clientgui/ProxyPage.cpp:363
+msgid "User Name:"
+msgstr "Kullanıcı adı:"
+
+#: clientgui/DlgOptions.cpp:331 clientgui/DlgOptions.cpp:395
+#: clientgui/DlgSelectComputer.cpp:152 clientgui/ProxyPage.cpp:346
+#: clientgui/ProxyPage.cpp:366
+msgid "Password:"
+msgstr "Parola:"
+
+#: clientgui/DlgOptions.cpp:338
+msgid "HTTP Proxy"
+msgstr "HTTP Proxy"
+
+#: clientgui/DlgOptions.cpp:346
+msgid "Connect via SOCKS proxy server"
+msgstr "SOCKS vekil sunucu (proxy) aracılığıyla bağlan"
+
+#: clientgui/DlgOptions.cpp:350
+msgid "SOCKS Proxy Server Configuration"
+msgstr "SOCKS Vekil Sunucu Yapılandırması"
+
+#: clientgui/DlgOptions.cpp:402
+msgid "SOCKS Proxy"
+msgstr "SOCKS Proxy"
+
+#: clientgui/DlgOptions.cpp:410
+msgid "&Save"
+msgstr "&Kaydet"
+
+#: clientgui/DlgOptions.cpp:600
+msgid "always"
+msgstr "her zaman"
+
+#: clientgui/DlgOptions.cpp:601
+msgid "1 hour"
+msgstr "her saat"
+
+#: clientgui/DlgOptions.cpp:602
+msgid "6 hours"
+msgstr "6 saatte bir"
+
+#: clientgui/DlgOptions.cpp:603
+msgid "1 day"
+msgstr "günde bir"
+
+#: clientgui/DlgOptions.cpp:604
+msgid "1 week"
+msgstr "haftada bir"
+
+#: clientgui/DlgOptions.cpp:605
+msgid "never"
+msgstr "asla"
+
+#: clientgui/DlgOptions.cpp:703
+#, c-format
+msgid "%s - Language Selection"
+msgstr "%s - Dil Seçimi"
+
+#: clientgui/DlgOptions.cpp:710
+#, c-format
+msgid ""
+"The %s's language has been changed.  In order for this change to take "
+"effect, you must restart the %s."
+msgstr "%s'ın varsayılan dili değişti.  Değişikliğin etkili olması için %s yeniden başlatılmalı."
+
+#: clientgui/DlgSelectComputer.cpp:91
+#, c-format
+msgid "%s - Select Computer"
+msgstr "%s - Bilgisayar Seç ve Bağlan"
+
+#: clientgui/DlgSelectComputer.cpp:125
+#, c-format
+msgid ""
+"Another instance of %s is already running \n"
+"on this computer.  Please select a client to monitor."
+msgstr "%s'ın başka bir kopyası şu anda bu bilgisayarda\nzaten çalışıyor.  Lütfen izlemek için bir istemci seçin."
+
+#: clientgui/DlgSelectComputer.cpp:143
+msgid "Host name:"
+msgstr "Sunucu adı:"
+
+#: clientgui/Localization.cpp:31 clientgui/Localization.cpp:69
+msgid "Message boards"
+msgstr "Forum sayfaları"
+
+#: clientgui/Localization.cpp:33
+msgid "Correspond with other users on the SETI@home message boards"
+msgstr "Diğer kullanıcılarla SETI@home forum sayfaları aracılığıyla iletişim kurun"
+
+#: clientgui/Localization.cpp:37
+msgid "Ask questions and report problems"
+msgstr "Sorular sorun ve problemleri bildirin"
+
+#: clientgui/Localization.cpp:39 clientgui/Localization.cpp:81
+#: clientgui/Localization.cpp:111 clientgui/Localization.cpp:129
+msgid "Your account"
+msgstr "Hesabınız"
+
+#: clientgui/Localization.cpp:41 clientgui/Localization.cpp:87
+#: clientgui/Localization.cpp:113
+msgid "View your account information and credit totals"
+msgstr "Hesap bilgilerinizi ve toplam kredinizi görüntüleyin"
+
+#: clientgui/Localization.cpp:43
+msgid "Your preferences"
+msgstr "Tercihleriniz"
+
+#: clientgui/Localization.cpp:45
+msgid "View and modify your SETI@home account profile and preferences"
+msgstr "SETI@home hesap profili ve tercihlerini görüp değiştirin"
+
+#: clientgui/Localization.cpp:47 clientgui/Localization.cpp:89
+msgid "Your results"
+msgstr "Sonuçlarınız"
+
+#: clientgui/Localization.cpp:49 clientgui/Localization.cpp:91
+msgid "View your last week (or more) of computational results and work"
+msgstr "Son haftaya ait (ya da daha eski) hesaplama sonuçlarınızı ve işlerinizi görüntüleyin"
+
+#: clientgui/Localization.cpp:51 clientgui/Localization.cpp:93
+msgid "Your computers"
+msgstr "Bilgisayarlarınız"
+
+#: clientgui/Localization.cpp:53
+msgid "View a listing of all the computers on which you are running SETI@Home"
+msgstr "SETI@Home çalıştırdığınız tüm bilgisayarların listesini görün"
+
+#: clientgui/Localization.cpp:55 clientgui/Localization.cpp:97
+msgid "Your team"
+msgstr "Takımınız"
+
+#: clientgui/Localization.cpp:57 clientgui/Localization.cpp:99
+msgid "View information about your team"
+msgstr "Takımınız hakkındaki bilgileri görüntüleyin"
+
+#: clientgui/Localization.cpp:61
+msgid "Common questions"
+msgstr "Çeşitli sorular"
+
+#: clientgui/Localization.cpp:63
+msgid "Read the Einstein@Home Frequently Asked Question list"
+msgstr "Einstein@Home Sık Sorulan Sorular listesini okuyun"
+
+#: clientgui/Localization.cpp:65
+msgid "Screensaver info"
+msgstr "Ekran koruyucu bilgisi"
+
+#: clientgui/Localization.cpp:67
+msgid "Read a detailed description of the Einstein@Home screensaver"
+msgstr "Einstein@Home ekran koruyucusunun detaylı açıklamalarını okuyun"
+
+#: clientgui/Localization.cpp:71
+msgid ""
+"Correspond with admins and other users on the Einstein@Home message boards"
+msgstr "Yöneticiler ve başka kullanıcılarla Einstein@Home forumlarında mesajlaşın"
+
+#: clientgui/Localization.cpp:73
+msgid "Einstein status"
+msgstr "Einstein durumu"
+
+#: clientgui/Localization.cpp:75
+msgid "Current status of the Einstein@Home server"
+msgstr "Einstein@Home sunucusunun şu anki durumu"
+
+#: clientgui/Localization.cpp:77
+msgid "Report problems"
+msgstr "Sorunları bildir"
+
+#: clientgui/Localization.cpp:79
+msgid "A link to the Einstein@Home problems and bug reports message board"
+msgstr "Einstein@Home problemleri ve hata raporları forumuna kısa yol"
+
+#: clientgui/Localization.cpp:83
+msgid "View and modify your Einstein@Home account profile and preferences"
+msgstr "Einstein@Home hesap profilinizi ve tercihlerinizi görün ve değiştirin"
+
+#: clientgui/Localization.cpp:85
+msgid "Account summary"
+msgstr "Hesap özeti"
+
+#: clientgui/Localization.cpp:95
+msgid ""
+"View a listing of all the computers on which you are running Einstein@Home"
+msgstr "Einstein@Home çalıştırdığınız tüm bilgisayarların bir listesini görün"
+
+#: clientgui/Localization.cpp:101
+msgid "LIGO project"
+msgstr "LIGO projesi"
+
+#: clientgui/Localization.cpp:103
+msgid ""
+"The home page of the Laser Interferometer Gravitational-wave Observatory "
+"(LIGO) project"
+msgstr "Laser Interferometer Gravitational-wave Observatory (LIGO) projesinin ana sayfası"
+
+#: clientgui/Localization.cpp:105
+msgid "GEO-600 project"
+msgstr "GEO-600 projesi"
+
+#: clientgui/Localization.cpp:107
+msgid "The home page of the GEO-600 project"
+msgstr "GEO-600 projesinin ana sayfası"
+
+#: clientgui/Localization.cpp:115 clientgui/Localization.cpp:133
+#: clientgui/ViewProjects.cpp:253 clientgui/ViewStatistics.cpp:441
+msgid "Team"
+msgstr "Takım"
+
+#: clientgui/Localization.cpp:117
+msgid "Info about your Team"
+msgstr "Takımınız hakkında bilgi"
+
+#: clientgui/Localization.cpp:123
+msgid "Get help for climateprediction.net"
+msgstr "climateprediction.net için yardım al"
+
+#: clientgui/Localization.cpp:125
+msgid "News"
+msgstr "Haberler"
+
+#: clientgui/Localization.cpp:127
+msgid "climateprediction.net News"
+msgstr "climateprediction.net Haberleri"
+
+#: clientgui/Localization.cpp:131
+msgid "View your account information, credits, and trickles"
+msgstr "Hesap bilgilerinizi, kredilerinizi ve iş ilerleme raporlarını görün"
+
+#: clientgui/Localization.cpp:135
+msgid "Info about your team"
+msgstr "Takımınız hakkında bilgi"
+
+#: clientgui/Localization.cpp:141
+msgid "Search for help in our help system"
+msgstr "Yardım sistemimizde arama yapın"
+
+#: clientgui/Localization.cpp:143
+msgid "Global Statistics"
+msgstr "Global İstatistikler"
+
+#: clientgui/Localization.cpp:145
+msgid "Summary statistics for World Community Grid"
+msgstr "World Community Grid için genel istatistikler"
+
+#: clientgui/Localization.cpp:147
+msgid "My Grid"
+msgstr "Grid'im"
+
+#: clientgui/Localization.cpp:149
+msgid "Your statistics and settings"
+msgstr "İstatistikleriniz ve ayarlarınız"
+
+#: clientgui/Localization.cpp:151
+msgid "Device Profiles"
+msgstr "Aygıt Profilleri"
+
+#: clientgui/Localization.cpp:153
+msgid "Update your device settings"
+msgstr "Bilgisayarlarınız için tercihleri inceleyin ve düzenleyin"
+
+#: clientgui/Localization.cpp:155
+msgid "Research"
+msgstr "Araştırma"
+
+#: clientgui/Localization.cpp:157
+msgid "Learn about the projects hosted at World Community Grid"
+msgstr "World Community Grid tarafından barındırılan projeler hakkında bilgi edinin"
+
+#: clientgui/MainDocument.cpp:1295
+msgid "Version Update"
+msgstr "Sürüm Güncellemesi"
+
+#: clientgui/MainDocument.cpp:1304
+#, c-format
+msgid "A new version of %s is available. You can download it here: %s"
+msgstr "Yeni bir %s sürümü mevcut. Buradan indirebilirsiniz: %s"
+
+#: clientgui/MainDocument.cpp:1307
+#, c-format
+msgid "There is no new version of %s available for download."
+msgstr "İndirmek için yeni bir %s sürümü mevcut değil."
+
+#: clientgui/MainDocument.cpp:1311
+#, c-format
+msgid "%s is not connected to the client"
+msgstr "%s istemciyle bağlantı kuramadı"
+
+#: clientgui/MainDocument.cpp:1851
+msgid "Missing application"
+msgstr "Uygulama bulunamadı"
+
+#: clientgui/MainDocument.cpp:1852
+msgid ""
+"Please download and install the CoRD application from "
+"http://cord.sourceforge.net"
+msgstr "Lütfen CoRD uygulamasını buradan indirin ve kurun: http://cord.sourceforge.net"
+
+#: clientgui/MainDocument.cpp:2460
+msgid "on batteries"
+msgstr "pil gücünde"
+
+#: clientgui/MainDocument.cpp:2461
+msgid "computer is in use"
+msgstr "bilgisayar kullanımda"
+
+#: clientgui/MainDocument.cpp:2462
+msgid "user request"
+msgstr "kullanıcı talebi"
+
+#: clientgui/MainDocument.cpp:2463
+msgid "time of day"
+msgstr "günlük zamanlama"
+
+#: clientgui/MainDocument.cpp:2464
+msgid "CPU benchmarks in progress"
+msgstr "İşlemci testleri sürüyor"
+
+#: clientgui/MainDocument.cpp:2465
+msgid "need disk space - check preferences"
+msgstr "disk alanı gerekiyor - tercihleri kontrol edin"
+
+#: clientgui/MainDocument.cpp:2466
+msgid "computer is not in use"
+msgstr "bilgisayar kullanımda değil"
+
+#: clientgui/MainDocument.cpp:2467
+msgid "starting up"
+msgstr "başlıyor"
+
+#: clientgui/MainDocument.cpp:2468
+msgid "an exclusive app is running"
+msgstr "ayrıcalıklı bir uygulama çalışıyor"
+
+#: clientgui/MainDocument.cpp:2469
+msgid "CPU is busy"
+msgstr "İşlemci meşgul"
+
+#: clientgui/MainDocument.cpp:2470
+msgid "network bandwidth limit exceeded"
+msgstr "ağ kullanım kotası doldu"
+
+#: clientgui/MainDocument.cpp:2471
+msgid "requested by operating system"
+msgstr "işletim sistemi tarafından istendi"
+
+#: clientgui/MainDocument.cpp:2473
+msgid "unknown reason"
+msgstr "bilinmeyen sebep"
+
+#: clientgui/MainDocument.cpp:2495
+msgid "GPU missing, "
+msgstr "GPU mevcut değil, "
+
+#: clientgui/MainDocument.cpp:2502
+msgid "New"
+msgstr "Yeni"
+
+#: clientgui/MainDocument.cpp:2506
+msgid "Download failed"
+msgstr "İndirme başarısız"
+
+#: clientgui/MainDocument.cpp:2508
+msgid "Downloading"
+msgstr "İndiriliyor"
+
+#: clientgui/MainDocument.cpp:2510 clientgui/MainDocument.cpp:2569
+msgid " (suspended - "
+msgstr " (durakladı - "
+
+#: clientgui/MainDocument.cpp:2518
+msgid "Project suspended by user"
+msgstr "Kullanıcı projeyi durdurdu"
+
+#: clientgui/MainDocument.cpp:2520
+msgid "Task suspended by user"
+msgstr "Kullanıcı işi durdurdu"
+
+#. an NCI process can be running even though computation is suspended
+#. (because of <dont_suspend_nci>
+#: clientgui/MainDocument.cpp:2525
+msgid "Suspended - "
+msgstr "Durakladı - "
+
+#: clientgui/MainDocument.cpp:2528
+msgid "GPU suspended - "
+msgstr "GPU durakladı - "
+
+#: clientgui/MainDocument.cpp:2532
+msgid "Waiting for memory"
+msgstr "Bellek için bekleniyor"
+
+#: clientgui/MainDocument.cpp:2534
+msgid "Waiting for shared memory"
+msgstr "Paylaşılan bellek için bekleniyor"
+
+#: clientgui/MainDocument.cpp:2536
+msgid "Running"
+msgstr "Çalışıyor"
+
+#: clientgui/MainDocument.cpp:2538
+msgid " (non-CPU-intensive)"
+msgstr " (CPU-yoğun-değil)"
+
+#: clientgui/MainDocument.cpp:2541
+msgid "Waiting to run"
+msgstr "Çalışmayı bekliyor"
+
+#: clientgui/MainDocument.cpp:2543 clientgui/MainDocument.cpp:2546
+msgid "Ready to start"
+msgstr "Başlamaya hazır"
+
+#: clientgui/MainDocument.cpp:2550
+msgid "Postponed: "
+msgstr "Ertelendi:"
+
+#: clientgui/MainDocument.cpp:2553
+msgid "Postponed"
+msgstr "Ertelendi"
+
+#: clientgui/MainDocument.cpp:2557
+msgid "Waiting for network access"
+msgstr "Ağ erişimi için bekleniyor"
+
+#: clientgui/MainDocument.cpp:2561
+msgid "Computation error"
+msgstr "Hesaplama hatası"
+
+#: clientgui/MainDocument.cpp:2565
+msgid "Upload failed"
+msgstr "Gönderme başarısız"
+
+#: clientgui/MainDocument.cpp:2567
+msgid "Uploading"
+msgstr "Gönderiliyor"
+
+#: clientgui/MainDocument.cpp:2578
+msgid "Aborted by user"
+msgstr "Kullanıcı tarafından iptal edildi"
+
+#: clientgui/MainDocument.cpp:2581
+msgid "Aborted by project"
+msgstr "Proje tarafından iptal edildi"
+
+#: clientgui/MainDocument.cpp:2584
+msgid "Aborted: not started by deadline"
+msgstr "İptal edildi: Son teslim zamanı nedeniyle başlamadı"
+
+#: clientgui/MainDocument.cpp:2587
+msgid "Aborted: task disk limit exceeded"
+msgstr "İptal edildi: İş disk sınırlaması aşıldı"
+
+#: clientgui/MainDocument.cpp:2590
+msgid "Aborted: run time limit exceeded"
+msgstr "İptal edildi: Çalışma zamanı sınırlaması aşıldı"
+
+#: clientgui/MainDocument.cpp:2593
+msgid "Aborted: memory limit exceeded"
+msgstr "İptal edildi: Bellek sınırlaması aşıldı"
+
+#: clientgui/MainDocument.cpp:2596
+msgid "Aborted"
+msgstr "İptal edildi"
+
+#: clientgui/MainDocument.cpp:2601
+msgid "Acknowledged"
+msgstr "Kabul edildi"
+
+#: clientgui/MainDocument.cpp:2603
+msgid "Ready to report"
+msgstr "Raporlanmaya hazır"
+
+#: clientgui/MainDocument.cpp:2605
+#, c-format
+msgid "Error: invalid state '%d'"
+msgstr "Hata: Geçersiz durum '%d'"
+
+#: clientgui/NoInternetConnectionPage.cpp:179
+msgid "No Internet connection"
+msgstr "İnternet bağlantısı yok"
+
+#: clientgui/NoInternetConnectionPage.cpp:182
+msgid "Please connect to the Internet and try again."
+msgstr "Lütfen internete bağlanıp, tekrar deneyin."
+
+#: clientgui/NotDetectedPage.cpp:181
+msgid "Project not found"
+msgstr "Proje bulunamadı"
+
+#: clientgui/NotDetectedPage.cpp:184
+msgid ""
+"The URL you supplied is not that of a BOINC-based project.\n"
+"\n"
+"Please check the URL and try again."
+msgstr "Belirttiğiniz adreste bir BOINC projesi bulunmuyor.\n\nAdresi kontrol edip tekrar deneyin."
+
+#: clientgui/NotDetectedPage.cpp:188
+msgid "Account manager not found"
+msgstr "Hesap yöneticisi bulunamadı"
+
+#: clientgui/NotDetectedPage.cpp:191
+msgid ""
+"The URL you supplied is not that of a BOINC-based account\n"
+"manager.\n"
+"\n"
+"Please check the URL and try again."
+msgstr "Belirttiğiniz adreste bir BOINC hesap yöneticisi bulunmuyor.\n\nAdresi kontrol edip tekrar deneyin."
+
+#: clientgui/NotFoundPage.cpp:181
+msgid "Login Failed."
+msgstr "Giriş başarısız."
+
+#: clientgui/NotFoundPage.cpp:185
+msgid "Check the username and password, and try again."
+msgstr "Kullanıcı adı ve parolayı kontrol edip, tekrar deneyin."
+
+#: clientgui/NotFoundPage.cpp:189
+msgid "Check the email address and password, and try again."
+msgstr "E-posta, kullanıcı adı ve parolayı kontrol edip, tekrar deneyin."
+
+#: clientgui/NoticeListCtrl.cpp:236
+msgid "more..."
+msgstr "devamı..."
+
+#: clientgui/ProjectInfoPage.cpp:230
+msgid "Choose a project"
+msgstr "Bir proje seçin"
+
+#: clientgui/ProjectInfoPage.cpp:235
+msgid "To choose a project, click its name or type its URL below."
+msgstr "Bir proje seçmek için, ismine tıklayın ya da aşağıya adresini girin."
+
+#: clientgui/ProjectInfoPage.cpp:251
+msgid "Categories:"
+msgstr "Kategoriler:"
+
+#: clientgui/ProjectInfoPage.cpp:271 clientgui/sg_ProjectPanel.cpp:90
+msgid "Projects:"
+msgstr "Projeler:"
+
+#: clientgui/ProjectInfoPage.cpp:283
+msgid "Project details"
+msgstr "Proje detayları"
+
+#: clientgui/ProjectInfoPage.cpp:293
+msgid "Research area:"
+msgstr "Araştırma alanı:"
+
+#: clientgui/ProjectInfoPage.cpp:303
+msgid "Organization:"
+msgstr "Organizasyon:"
+
+#: clientgui/ProjectInfoPage.cpp:313
+msgid "Web site:"
+msgstr "İnternet sitesi:"
+
+#: clientgui/ProjectInfoPage.cpp:324
+msgid "Supported systems:"
+msgstr "Desteklenen sistemler:"
+
+#: clientgui/ProjectInfoPage.cpp:331
+msgid "Supports Microsoft Windows"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:335
+msgid "Supports Mac OS X"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:339
+msgid "Supports Linux on Intel"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:343
+msgid "Supports Android"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:347
+msgid "Supports FreeBSD"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:351
+msgid "Supports Linux on ARM (e.g. Raspberry Pi)"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:355
+msgid "Supports NVIDIA GPUs"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:359
+msgid "Supports AMD GPUs"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:363
+msgid "Supports Intel GPUs"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:367
+msgid "Supports VirtualBox"
+msgstr ""
+
+#: clientgui/ProjectInfoPage.cpp:377
+msgid "Project URL:"
+msgstr "Proje adresi:"
+
+#: clientgui/ProjectInfoPage.cpp:521 clientgui/ProjectInfoPage.cpp:755
+#: clientgui/ProjectInfoPage.cpp:759
+msgid "All"
+msgstr "Tümü"
+
+#: clientgui/ProjectInfoPage.cpp:804
+msgid ""
+"This project may not have work for your type of computer.  Do you want to "
+"add it anyway?"
+msgstr "Bu proje bilgisayarınızın özelliklerine uygun işe sahip olmayabilir.  Yine de eklemek istediğinize emin misiniz?"
+
+#: clientgui/ProjectInfoPage.cpp:836
+msgid "You already added this project. Please choose a different project."
+msgstr "Bu projeyi zaten eklemiş durumdasınız. Lütfen farklı bir proje seçin."
+
+#: clientgui/ProjectProcessingPage.cpp:321
+#: clientgui/ProjectPropertiesPage.cpp:334
+msgid ""
+"Communicating with project\n"
+"Please wait..."
+msgstr "Projeye bağlanılıyor\nLütfen bekleyin..."
+
+#: clientgui/ProjectProcessingPage.cpp:521
+msgid "Required files not found on the server."
+msgstr "Gerekli dosyalar sunucu üzerinde bulunamadı."
+
+#: clientgui/ProjectProcessingPage.cpp:524
+#: clientgui/ProjectProcessingPage.cpp:597
+msgid "An internal server error has occurred."
+msgstr "Sunucuda dahili bir hata meydana geldi."
+
+#: clientgui/ProjectWelcomePage.cpp:251
+#, c-format
+msgid "Welcome to %s."
+msgstr "%s'e hoş geldiniz."
+
+#: clientgui/ProjectWelcomePage.cpp:254
+msgid "You have volunteered to compute for this project:"
+msgstr "Bu projede hesaplamak için gönüllü oldunuz:"
+
+#: clientgui/ProjectWelcomePage.cpp:255
+msgid "Name:"
+msgstr "İsim:"
+
+#: clientgui/ProjectWelcomePage.cpp:258
+msgid "Home:"
+msgstr "Sahibi:"
+
+#: clientgui/ProjectWelcomePage.cpp:262
+msgid "Description:"
+msgstr "Açıklama:"
+
+#: clientgui/ProjectWelcomePage.cpp:265
+msgid "URL:"
+msgstr "Adres:"
+
+#: clientgui/ProjectWelcomePage.cpp:268
+msgid "User:"
+msgstr "Kullanıcı:"
+
+#: clientgui/ProjectWelcomePage.cpp:273
+msgid ""
+"WARNING: This project is not registered with BOINC.  Make sure you trust it "
+"before continuing."
+msgstr "UYARI: Bu proje BOINC'e kayıtlı değil. Devam etmeden önce güvendiğinize emin olun."
+
+#: clientgui/ProjectWelcomePage.cpp:277
+msgid "To continue, click Next."
+msgstr "Devam etmek için, İleri'yi tıklayın."
+
+#: clientgui/ProxyInfoPage.cpp:195
+msgid "Network communication failure"
+msgstr "Ağ bağlantısı başarısız"
+
+#: clientgui/ProxyInfoPage.cpp:199
+msgid ""
+"The World Community Grid - BOINC software failed to communicate\n"
+"over the Internet. The most likely reasons are:\n"
+"\n"
+"1) Connectivity problem.  Check your network or modem connection\n"
+"and then click Back to try again.\n"
+"\n"
+"2) Personal firewall software is blocking the World Community\n"
+"Grid - BOINC software.  Configure your personal firewall to let\n"
+"BOINC and BOINC Manager communicate on port 80 and port 443,\n"
+"then click Back to try again.\n"
+"\n"
+"3) You are using a proxy server.\n"
+"Click Next to configure BOINC's proxy settings."
+msgstr "The World Community Grid - BOINC yazılımı İnternet üzerinden\nbağlantı gerçekleştiremedi. Sıkça karşılaşılan sorunlar:\n\n1) Bağlantı problemi. Ağ ve modem bağlantılarınızı kontrol edin ve\ntekrar denemek için Geri'yi tıklayın.\n\n2) Kişisel güvenlik duvarı yazılımı World Community Grid - BOINC\nyazılımını engelliyor. Kişisel güvenlik duvarınızı, BOINC ve BOINC\nManager'ın bağlantı noktaları (port) 80 ve 443 üzerinden haberleşmesine\nizin verecek şekilde yapılandırın ve yeniden denemek için Geri'yi tıklayın.\n\n3) Bir vekil sunucu (proxy) kullanıyorsunuz.\nBOINC'in vekil sunucu ayarlarını yapmak için İleri'yi tıklayın."
+
+#: clientgui/ProxyInfoPage.cpp:203
+msgid ""
+"BOINC failed to communicate on the Internet.\n"
+"The most likely reasons are:\n"
+"\n"
+"1) Connectivity problem.  Check your network\n"
+"or modem connection and then click Back to try again.\n"
+"\n"
+"2) Personal firewall software is blocking BOINC.\n"
+"Configure your personal firewall to let BOINC and\n"
+"BOINC Manager communicate on port 80,\n"
+"then click Back to try again.\n"
+"\n"
+"3) You are using a proxy server.\n"
+"Click Next to configure BOINC's proxy settings."
+msgstr "BOINC yazılımı İnternet üzerinden bağlantı gerçekleştiremedi.\nSıkça karşılaşılan sorunlar:\n\n1) Bağlantı problemi. Ağ ve modem bağlantılarınızı kontrol edin ve\ntekrar denemek için Geri'yi tıklayın.\n\n2) Kişisel güvenlik duvarı yazılımı BOINC'i engelliyor. Kişisel güvenlik\nduvarınızı, BOINC ve BOINC Manager'ın bağlantı noktaları 80 ve 443\nüzerinden haberleşmesine izin verecek şekilde yapılandırın ve yeniden\ndenemek için Geri'yi tıklayın.\n\n3) Bir vekil sunucu (proxy) kullanıyorsunuz.\nBOINC'in vekil sunucu ayarlarını yapmak için İleri'yi tıklayın."
+
+#: clientgui/ProxyPage.cpp:331
+msgid "Proxy configuration"
+msgstr "Proxy yapılandırması"
+
+#: clientgui/ProxyPage.cpp:334
+msgid "HTTP proxy"
+msgstr "HTTP proxy"
+
+#: clientgui/ProxyPage.cpp:337 clientgui/ProxyPage.cpp:357
+msgid "Server:"
+msgstr "Sunucu:"
+
+#: clientgui/ProxyPage.cpp:350
+msgid "Autodetect"
+msgstr "Otomatik belirle"
+
+#: clientgui/ProxyPage.cpp:354
+msgid "SOCKS proxy"
+msgstr "SOCKS proxy"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:171
+msgid "Skin"
+msgstr "Kaplama"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:173
+msgid "Select the appearance of the user interface."
+msgstr "Kullanıcı arayüzünün görünümünü seçin."
+
+#: clientgui/sg_BoincSimpleFrame.cpp:183
+msgid "Advanced View...\tCtrl+Shift+A"
+msgstr "Gelişmiş görünüm...\tCtrl+Shift+A"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:184
+msgid "Display the advanced graphical interface."
+msgstr "Gelişmiş grafiksel arayüzü görüntüler."
+
+#: clientgui/sg_BoincSimpleFrame.cpp:200
+msgid "Configure display options and proxy settings"
+msgstr "Arayüz seçeneklerini ve vekil sunucu ayarlarını yapılandırabileceğiniz pencereyi açar."
+
+#: clientgui/sg_BoincSimpleFrame.cpp:214
+msgid "Display diagnostic messages."
+msgstr "Tanılama mesajlarını görüntüler."
+
+#: clientgui/sg_BoincSimpleFrame.cpp:253
+#, c-format
+msgid "Show information about BOINC and %s"
+msgstr "BOINC ve %s resmi internet sitesini açar."
+
+#: clientgui/sg_BoincSimpleFrame.cpp:468
+msgid "Default"
+msgstr "Varsayılan"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:934
+#: clientgui/sg_ProjectCommandPopup.cpp:72
+#: clientgui/sg_ProjectCommandPopup.cpp:128
+#: clientgui/sg_TaskCommandPopup.cpp:72 clientgui/sg_TaskCommandPopup.cpp:122
+#: clientgui/ViewProjects.cpp:209 clientgui/ViewProjects.cpp:792
+#: clientgui/ViewWork.cpp:232 clientgui/ViewWork.cpp:878
+msgid "Suspend"
+msgstr "Duraklat"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:936
+msgid "Suspend Computing"
+msgstr "Hesaplamayı duraklatır"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:937
+msgid "Resume Computing"
+msgstr "Hesaplamayı sürdürür"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:953 clientgui/ViewNotices.cpp:99
+msgid "Notices"
+msgstr "Bildirimler"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:954
+msgid "Open a window to view notices from projects or BOINC"
+msgstr "Projelerden ya da BOINC'ten gelen bildirimleri gösterir"
+
+#: clientgui/sg_BoincSimpleFrame.cpp:975 clientgui/sg_DlgPreferences.cpp:373
+#, c-format
+msgid "Get help with %s"
+msgstr "%s ile yardım alın"
+
+#: clientgui/sg_DlgMessages.cpp:124 clientgui/ViewNotices.cpp:58
+msgid "Fetching notices; please wait..."
+msgstr "Bildirimler alınıyor; lütfen bekleyin..."
+
+#: clientgui/sg_DlgMessages.cpp:132 clientgui/ViewNotices.cpp:65
+msgid "There are no notices at this time."
+msgstr "Şu anda görüntülenecek bildirim yok."
+
+#: clientgui/sg_DlgMessages.cpp:146
+msgid "Close"
+msgstr "Kapat"
+
+#: clientgui/sg_DlgMessages.cpp:394
+#, c-format
+msgid "%s - Notices"
+msgstr "%s  - Bildirimler"
+
+#: clientgui/sg_DlgPreferences.cpp:208
+msgid ""
+"For additional settings, select Computing Preferences in the Advanced View."
+msgstr "Ek ayarlar için, 'Gelişmiş görünüm'de 'Hesaplama tercihleri' seçeneğini seçin."
+
+#: clientgui/sg_DlgPreferences.cpp:346
+msgid "GB of disk space"
+msgstr "GB disk alanı"
+
+#: clientgui/sg_DlgPreferences.cpp:1117
+#, c-format
+msgid "%s - Computing Preferences"
+msgstr "%s - Hesaplama Tercihleri"
+
+#: clientgui/sg_DlgPreferences.cpp:1198
+msgid "Discard all local preferences and use web-based preferences?"
+msgstr "Tüm yerel tercihler temizlensin ve web-tabanlı tercihler mi kullanılsın?"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:66 clientgui/ViewProjects.cpp:202
+msgid "Update"
+msgstr "Güncelle"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:67 clientgui/ViewProjects.cpp:203
+msgid ""
+"Report all completed tasks, get latest credit, get latest preferences, and "
+"possibly get more tasks."
+msgstr "Tamamlanan işleri raporlar, güncel kredi bigilerini ve tercih ayarlarını alır ve gerekiyorsa daha fazla iş indirir."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:73
+#: clientgui/sg_ProjectCommandPopup.cpp:129 clientgui/ViewProjects.cpp:210
+#: clientgui/ViewProjects.cpp:792
+msgid "Suspend tasks for this project."
+msgstr "Bu projenin işlerini durdurur."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:78
+#: clientgui/sg_ProjectCommandPopup.cpp:136 clientgui/ViewProjects.cpp:216
+#: clientgui/ViewProjects.cpp:811
+msgid "No new tasks"
+msgstr "Yeni işler indirme"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:79 clientgui/ViewProjects.cpp:217
+msgid "Don't get new tasks for this project."
+msgstr "Bu proje artık yeni işler indirmez."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:84 clientgui/ViewProjects.cpp:223
+msgid "Reset project"
+msgstr "Projeyi sıfırla"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:85 clientgui/ViewProjects.cpp:224
+msgid ""
+"Delete all files and tasks associated with this project, and get new tasks."
+"  You can update the project first to report any completed tasks."
+msgstr "Bu projeye ilişkin tüm dosyalar ile işleri siler ve yeni işler alır.  Tamamlanmış işler varsa sonuçları raporlamak için önce projeyi güncelleyebilirsiniz."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:91 clientgui/ViewProjects.cpp:231
+msgid ""
+"Remove this project.  Tasks in progress will be lost (use 'Update' first to "
+"report any completed tasks)."
+msgstr "Bu bilgisayardan bu projeyi kaldırır.  Sürmekte olan işler kaybedilir (tamamlanmış işlerin sonuçlarını göndermek için önce 'Güncelle' komutunu kullanın)."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:96
+#: clientgui/sg_TaskCommandPopup.cpp:84 clientgui/ViewProjects.cpp:237
+#: clientgui/ViewWork.cpp:246
+msgid "Properties"
+msgstr "Özellikler"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:97 clientgui/ViewProjects.cpp:238
+msgid "Show project details."
+msgstr "Proje detaylarını görüntüler."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:126 clientgui/ViewProjects.cpp:788
+msgid "Resume tasks for this project."
+msgstr "Bu projenin işleri yeniden çalıştırılır."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:133 clientgui/ViewProjects.cpp:807
+msgid "Allow new tasks"
+msgstr "Yeni işler indir"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:134 clientgui/ViewProjects.cpp:807
+msgid "Allow fetching new tasks for this project."
+msgstr "Bu projenin yeni işler indirmesine izin verir."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:137 clientgui/ViewProjects.cpp:811
+msgid "Don't fetch new tasks for this project."
+msgstr "Bu projeye artık yeni işler alınmaz."
+
+#: clientgui/sg_ProjectCommandPopup.cpp:229 clientgui/ViewProjects.cpp:517
+#, c-format
+msgid "Are you sure you want to reset project '%s'?"
+msgstr "'%s' projesini sıfırlamak istediğinize emin misiniz?"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:235 clientgui/ViewProjects.cpp:523
+msgid "Reset Project"
+msgstr "Projeyi sıfırla"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:266 clientgui/ViewProjects.cpp:571
+#, c-format
+msgid "Are you sure you want to remove project '%s'?"
+msgstr "'%s' projesini kaldırmak istediğinize emin misiniz?"
+
+#: clientgui/sg_ProjectCommandPopup.cpp:272 clientgui/ViewProjects.cpp:577
+msgid "Remove Project"
+msgstr "Projeyi kaldır"
+
+#: clientgui/sg_ProjectPanel.cpp:73
+msgid "Add Project"
+msgstr "Proje ekle"
+
+#: clientgui/sg_ProjectPanel.cpp:74
+msgid "Synchronize"
+msgstr "Eşitle"
+
+#: clientgui/sg_ProjectPanel.cpp:75
+msgid "Work done for this project"
+msgstr "Bu projede elde ettiğiniz toplam kredi"
+
+#: clientgui/sg_ProjectPanel.cpp:77
+msgid "Volunteer for any or all of 30+ projects in many areas of science"
+msgstr "Bilimin pek çok alanından 30'dan fazla projeden birisi için gönüllü olun"
+
+#: clientgui/sg_ProjectPanel.cpp:78
+msgid "Synchronize projects with account manager system"
+msgstr "Projeleri hesap yöneticisi sistemiyle senkronize eder"
+
+#. TODO: Might want better wording for Project Selection Combo Box tooltip
+#: clientgui/sg_ProjectPanel.cpp:125
+msgid "Select a project to access with the controls below"
+msgstr "Aşağıdaki kontrollere erişimek için bir proje seçin"
+
+#: clientgui/sg_ProjectPanel.cpp:146
+msgid "Project Web Pages"
+msgstr "Proje internet sayfaları"
+
+#: clientgui/sg_ProjectPanel.cpp:150
+msgid "Project Commands"
+msgstr "Proje komutları"
+
+#: clientgui/sg_ProjectPanel.cpp:279
+#, c-format
+msgid "Pop up a menu of web sites for project %s"
+msgstr "%s projesinin internet sayfaları için bir menü açar"
+
+#: clientgui/sg_ProjectPanel.cpp:281
+#, c-format
+msgid "Pop up a menu of commands to apply to project %s"
+msgstr "%s projesine verilebilecek komutları gösterir"
+
+#: clientgui/sg_TaskCommandPopup.cpp:66 clientgui/ViewWork.cpp:218
+msgid "Show graphics"
+msgstr "Grafikleri göster"
+
+#: clientgui/sg_TaskCommandPopup.cpp:67 clientgui/ViewWork.cpp:219
+msgid "Show application graphics in a window."
+msgstr "Uygulama grafiklerini bir pencerede gösterir."
+
+#: clientgui/sg_TaskCommandPopup.cpp:73
+msgid "Suspend this task."
+msgstr "Bu işi duraklat."
+
+#: clientgui/sg_TaskCommandPopup.cpp:78 clientgui/ViewWork.cpp:239
+msgid "Abort"
+msgstr "İptal"
+
+#: clientgui/sg_TaskCommandPopup.cpp:79
+msgid "Abandon this task. You will get no credit for it."
+msgstr "Bu işi iptal eder. Bu iş için kredi alamayacaksanız."
+
+#: clientgui/sg_TaskCommandPopup.cpp:85 clientgui/ViewWork.cpp:247
+msgid "Show task details."
+msgstr "Seçili işin detaylı bilgilerini gösterir."
+
+#: clientgui/sg_TaskCommandPopup.cpp:119 clientgui/ViewWork.cpp:873
+msgid "Resume work for this task."
+msgstr "Seçili işlerin çalışmasını sürdürür."
+
+#: clientgui/sg_TaskCommandPopup.cpp:123 clientgui/ViewWork.cpp:879
+msgid "Suspend work for this task."
+msgstr "Seçili işlerin çalışmasını durdurur."
+
+#: clientgui/sg_TaskCommandPopup.cpp:267
+#, c-format
+msgid ""
+"Are you sure you want to abort this task '%s'?\n"
+"(Progress: %.1lf%%, Status: %s)"
+msgstr "'%s'\nadlı işi iptal etmek istediğinize emin misiniz?\n(İlerleme: %%%.1lf, Durum: %s)"
+
+#: clientgui/sg_TaskCommandPopup.cpp:272 clientgui/ViewWork.cpp:575
+msgid "Abort task"
+msgstr "İşi iptal et"
+
+#: clientgui/sg_TaskPanel.cpp:464
+msgid "You don't have any projects.  Please Add a Project."
+msgstr "Katıldığınız bir proje bulunmuyor.  Lütfen bir proje ekleyin."
+
+#: clientgui/sg_TaskPanel.cpp:465
+msgid "Not available"
+msgstr "Mevcut değil"
+
+#: clientgui/sg_TaskPanel.cpp:476
+msgid "Tasks:"
+msgstr "İşler:"
+
+#. TODO: Might want better wording for Task Selection Combo Box tooltip
+#: clientgui/sg_TaskPanel.cpp:482
+msgid "Select a task to access"
+msgstr "Erişim için bir iş seçin"
+
+#. what project the task is from, e.g. "From: SETI@home"
+#: clientgui/sg_TaskPanel.cpp:494
+msgid "From:"
+msgstr "Sahibi:"
+
+#: clientgui/sg_TaskPanel.cpp:548
+msgid "This task's progress"
+msgstr "Bu işin ilerleme oranı"
+
+#: clientgui/sg_TaskPanel.cpp:566
+msgid "Task Commands"
+msgstr "İş komutları"
+
+#: clientgui/sg_TaskPanel.cpp:567
+msgid "Pop up a menu of commands to apply to this task"
+msgstr "Bu işe verilebilecek komutları gösterir"
+
+#: clientgui/sg_TaskPanel.cpp:702
+#, c-format
+msgid "Application: %s"
+msgstr "Uygulama: %s"
+
+#: clientgui/sg_TaskPanel.cpp:725
+#, c-format
+msgid "%.3f%%"
+msgstr "%%%.3f"
+
+#: clientgui/sg_TaskPanel.cpp:733
+msgid "Application: Not available"
+msgstr "Uygulama: Mevcut değil"
+
+#: clientgui/sg_TaskPanel.cpp:833
+msgid "Not Available"
+msgstr "Mevcut değil"
+
+#: clientgui/sg_TaskPanel.cpp:848
+#, c-format
+msgid "Elapsed: %s"
+msgstr "Geçen süre: %s"
+
+#: clientgui/sg_TaskPanel.cpp:862
+#, c-format
+msgid "Remaining (estimated): %s"
+msgstr "Kalan süre (tahmini): %s"
+
+#: clientgui/sg_TaskPanel.cpp:877
+#, c-format
+msgid "Status: %s"
+msgstr "Durum: %s"
+
+#: clientgui/sg_TaskPanel.cpp:1211
+msgid "Retrieving current status."
+msgstr "Mevcut durum bilgisi alınıyor..."
+
+#: clientgui/sg_TaskPanel.cpp:1217
+msgid "Downloading work from the server."
+msgstr "İş sunucudan indiriliyor"
+
+#: clientgui/sg_TaskPanel.cpp:1222
+msgid "Processing Suspended:  Running On Batteries."
+msgstr "Çalışma Durdu:  Pil Gücünde Çalışıyor."
+
+#: clientgui/sg_TaskPanel.cpp:1224
+msgid "Processing Suspended:  User Active."
+msgstr "Çalışma Durdu:  Kullanıcı Faal."
+
+#: clientgui/sg_TaskPanel.cpp:1226
+msgid "Processing Suspended:  User paused processing."
+msgstr "Çalışma Durdu:  Kullanıcı Çalışmayı Duraklattı."
+
+#: clientgui/sg_TaskPanel.cpp:1228
+msgid "Processing Suspended:  Time of Day."
+msgstr "Çalışma Durdu:  Günlük Zamanlama"
+
+#: clientgui/sg_TaskPanel.cpp:1230
+msgid "Processing Suspended:  Benchmarks Running."
+msgstr "Çalışma Durdu:  Testler Çalışıyor."
+
+#: clientgui/sg_TaskPanel.cpp:1232
+msgid "Processing Suspended:  need disk space."
+msgstr "Çalışma Durdu: Disk alanı gerekiyor."
+
+#: clientgui/sg_TaskPanel.cpp:1234
+msgid "Processing Suspended."
+msgstr "Çalışma Durdu."
+
+#: clientgui/sg_TaskPanel.cpp:1238
+msgid "Waiting to contact project servers."
+msgstr "Proje sunucularına bağlanılması için bekleniyor."
+
+#: clientgui/sg_TaskPanel.cpp:1242 clientgui/sg_TaskPanel.cpp:1251
+msgid "Retrieving current status"
+msgstr "Mevcut durum bilgisi alınıyor"
+
+#: clientgui/sg_TaskPanel.cpp:1246
+msgid "No work available to process"
+msgstr "Çalıştırılacak iş bulunmuyor"
+
+#: clientgui/sg_TaskPanel.cpp:1248
+msgid "Unable to connect to the core client"
+msgstr "Çekirdek istemciyle bağlantı kurulamadı"
+
+#: clientgui/TermsOfUsePage.cpp:233
+msgid "Terms of Use"
+msgstr "Kullanım Koşulları"
+
+#: clientgui/TermsOfUsePage.cpp:237
+msgid "Please read the following terms of use:"
+msgstr "Lütfen aşağıdaki kullanım koşullarını okuyun:"
+
+#: clientgui/TermsOfUsePage.cpp:251
+msgid "I agree to the terms of use."
+msgstr "Kullanım koşullarını kabul ediyorum."
+
+#: clientgui/TermsOfUsePage.cpp:257
+msgid "I do not agree to the terms of use."
+msgstr "Kullanım koşullarını kabul etmiyorum."
+
+#: clientgui/UnavailablePage.cpp:183
+msgid "Project temporarily unavailable"
+msgstr "Proje geçiçi olarak kullanılamaz durumda"
+
+#: clientgui/UnavailablePage.cpp:186
+msgid ""
+"The project is temporarily unavailable.\n"
+"\n"
+"Please try again later."
+msgstr "Proje geçiçi olarak kullanılamaz durumda.\n\nLütfen daha sonra tekrar deneyin."
+
+#: clientgui/UnavailablePage.cpp:190
+msgid "Account manager temporarily unavailable"
+msgstr "Hesap yöneticisi geçici olarak devre dışı."
+
+#: clientgui/UnavailablePage.cpp:193
+msgid ""
+"The account manager is temporarily unavailable.\n"
+"\n"
+"Please try again later."
+msgstr "Hesap yöneticisi geçici olarak devre dışı.\n\nLütfen daha sonra tekrar deneyin."
+
+#: clientgui/ValidateAccountKey.cpp:68
+msgid "Please specify an account key to continue."
+msgstr "Lütfen devam etmek için bir hesap anahtarı belirtin."
+
+#: clientgui/ValidateAccountKey.cpp:71
+msgid "Invalid Account Key; please enter a valid Account Key"
+msgstr "Geçersiz hesap anahtarı; lütfen geçerli bir hesap anahtarı girin."
+
+#: clientgui/ValidateAccountKey.cpp:82 clientgui/ValidateEmailAddress.cpp:86
+msgid "Validation conflict"
+msgstr "Doğrulama tutmuyor"
+
+#: clientgui/ValidateEmailAddress.cpp:72
+msgid "Please specify an email address"
+msgstr "Lütfen bir e-posta adresi belirtin."
+
+#: clientgui/ValidateEmailAddress.cpp:75
+msgid "Invalid email address; please enter a valid email address"
+msgstr "Geçersiz e-posta adresi; lütfen geçerli bir e-posta adresi girin."
+
+#: clientgui/ValidateURL.cpp:69
+msgid "Missing URL"
+msgstr "Eksik adres"
+
+#: clientgui/ValidateURL.cpp:70
+msgid ""
+"Please specify a URL.\n"
+"For example:\n"
+"http://www.example.com/"
+msgstr "Lütfen bir internet adresi belirtin.\nÖrneğin:\nhttp://www.ornek.com/"
+
+#: clientgui/ValidateURL.cpp:83 clientgui/ValidateURL.cpp:87
+#: clientgui/ValidateURL.cpp:91 clientgui/ValidateURL.cpp:103
+#: clientgui/ValidateURL.cpp:107 clientgui/ValidateURL.cpp:110
+msgid "Invalid URL"
+msgstr "Geçersiz adres"
+
+#: clientgui/ValidateURL.cpp:84 clientgui/ValidateURL.cpp:88
+#: clientgui/ValidateURL.cpp:92
+msgid ""
+"Please specify a valid URL.\n"
+"For example:\n"
+"http://boincproject.example.com"
+msgstr "Lütfen geçerli bir internet adresi belirtin.\nÖrneğin:\nhttp:/boincproject.ornek.com"
+
+#: clientgui/ValidateURL.cpp:104 clientgui/ValidateURL.cpp:108
+#, c-format
+msgid "'%s' does not contain a valid host name."
+msgstr "'%s' geçerli bir bilgisayar adı içermiyor."
+
+#: clientgui/ValidateURL.cpp:111
+#, c-format
+msgid "'%s' does not contain a valid path."
+msgstr "'%s' geçerli bir yol içermiyor."
+
+#. Setup View
+#: clientgui/ViewMessages.cpp:84 clientgui/ViewProjects.cpp:198
+#: clientgui/ViewStatistics.cpp:1955 clientgui/ViewTransfers.cpp:183
+#: clientgui/ViewWork.cpp:207
+msgid "Commands"
+msgstr "Komutlar"
+
+#: clientgui/ViewMessages.cpp:88
+msgid "Copy all messages"
+msgstr "Tüm mesajları kopyala"
+
+#: clientgui/ViewMessages.cpp:95
+msgid "Copy selected messages"
+msgstr "Seçili mesajları kopyala"
+
+#: clientgui/ViewMessages.cpp:106 clientgui/ViewMessages.cpp:502
+msgid "Show only this project"
+msgstr "Yalnızca bu projeyi göster"
+
+#: clientgui/ViewMessages.cpp:107 clientgui/ViewMessages.cpp:503
+msgid "Show only the messages for the selected project."
+msgstr "Yalnızca şu anda seçili projeye ait mesajları ve BOINC'in genel mesajlarını görüntüler."
+
+#: clientgui/ViewMessages.cpp:164
+msgid "Messages"
+msgstr "Mesajlar"
+
+#: clientgui/ViewMessages.cpp:187
+msgid "Copying all messages to the clipboard..."
+msgstr "Tüm mesajlar panoya kopyalanıyor..."
+
+#: clientgui/ViewMessages.cpp:223
+msgid "Copying selected messages to the clipboard..."
+msgstr "Seçili mesajlar panoya kopyalanıyor..."
+
+#: clientgui/ViewMessages.cpp:286
+msgid "Filtering messages..."
+msgstr "Mesajlar filtreleniyor...."
+
+#: clientgui/ViewMessages.cpp:494
+msgid "Show all messages"
+msgstr "Tüm mesajları göster"
+
+#: clientgui/ViewMessages.cpp:495
+msgid "Show messages for all projects."
+msgstr "Tüm projeler için mesajları gösterir."
+
+#: clientgui/ViewProjects.cpp:252 clientgui/ViewStatistics.cpp:426
+msgid "Account"
+msgstr "Hesap"
+
+#: clientgui/ViewProjects.cpp:254
+msgid "Work done"
+msgstr "Kredi"
+
+#: clientgui/ViewProjects.cpp:255
+msgid "Avg. work done"
+msgstr "Günlük ortalama kredi"
+
+#: clientgui/ViewProjects.cpp:257 clientgui/ViewTransfers.cpp:215
+#: clientgui/ViewWork.cpp:262
+msgid "Status"
+msgstr "Durum"
+
+#: clientgui/ViewProjects.cpp:336
+msgid "Projects"
+msgstr "Projeler"
+
+#: clientgui/ViewProjects.cpp:1115
+msgid "Requested by user"
+msgstr "Kullanıcı tarafından istendi"
+
+#: clientgui/ViewProjects.cpp:1116
+msgid "To fetch work"
+msgstr "İş indiriliyor"
+
+#: clientgui/ViewProjects.cpp:1117
+msgid "To report completed tasks"
+msgstr "Tamamlanan işler raporlanıyor"
+
+#: clientgui/ViewProjects.cpp:1118
+msgid "To send trickle-up message"
+msgstr "İş ilerleme mesajı gönderimi"
+
+#: clientgui/ViewProjects.cpp:1119
+msgid "Requested by account manager"
+msgstr "Hesap yöneticisi tarafından istendi"
+
+#: clientgui/ViewProjects.cpp:1120
+msgid "Project initialization"
+msgstr "Proje başlatılıyor"
+
+#: clientgui/ViewProjects.cpp:1121
+msgid "Requested by project"
+msgstr "Proje tarafından istendi"
+
+#: clientgui/ViewProjects.cpp:1122
+msgid "Unknown reason"
+msgstr "Bilinmeyen sebep"
+
+#: clientgui/ViewProjects.cpp:1136
+msgid "Suspended by user"
+msgstr "Kullanıcı tarafından durduruldu"
+
+#: clientgui/ViewProjects.cpp:1139
+msgid "Won't get new tasks"
+msgstr "Yeni işler alınmayacak"
+
+#: clientgui/ViewProjects.cpp:1142
+msgid "Project ended - OK to remove"
+msgstr "Proje sona erdi - Kaldırmak için Tamam'a tıklayın"
+
+#: clientgui/ViewProjects.cpp:1145
+msgid "Will remove when tasks done"
+msgstr "İşler tamamlandığında kaldırılacak"
+
+#: clientgui/ViewProjects.cpp:1148
+msgid "Scheduler request pending"
+msgstr "Zamanlanmış istek kuyrukta"
+
+#: clientgui/ViewProjects.cpp:1154
+msgid "Scheduler request in progress"
+msgstr "Zamanlanmış istek gerçekleştiriliyor"
+
+#: clientgui/ViewProjects.cpp:1157
+msgid "Trickle up message pending"
+msgstr "İş ilerleme mesajı kuyrukta"
+
+#: clientgui/ViewProjects.cpp:1163
+msgid "Communication deferred"
+msgstr "İletişim ertelendi"
+
+#: clientgui/ViewResources.cpp:62
+msgid "Total disk usage"
+msgstr "Toplam disk kullanımı"
+
+#: clientgui/ViewResources.cpp:83
+msgid "Disk usage by BOINC projects"
+msgstr "BOINC projelerinin disk kullanımı"
+
+#: clientgui/ViewResources.cpp:225
+msgid "no projects: 0 bytes used"
+msgstr "proje yok: 0 bayt kullanılıyor"
+
+#: clientgui/ViewResources.cpp:259
+msgid "used by BOINC: "
+msgstr "BOINC tarafından kullanılan: "
+
+#: clientgui/ViewResources.cpp:269
+msgid "free, available to BOINC: "
+msgstr "boş ve BOINC tarafından kullanılabilir: "
+
+#: clientgui/ViewResources.cpp:277
+msgid "free, not available to BOINC: "
+msgstr "boş ancak BOINC tarafından kullanılamaz: "
+
+#: clientgui/ViewResources.cpp:287
+msgid "free: "
+msgstr "boş: "
+
+#: clientgui/ViewResources.cpp:296
+msgid "used by other programs: "
+msgstr "başka programlarca kullanılan: "
+
+#: clientgui/ViewStatistics.cpp:1184
+msgid "User Total"
+msgstr "Toplam Krediniz"
+
+#: clientgui/ViewStatistics.cpp:1185
+msgid "User Average"
+msgstr "Günlük Ortalama Krediniz"
+
+#: clientgui/ViewStatistics.cpp:1186
+msgid "Host Total"
+msgstr "Bilgisayarınızın Toplam Kredisi"
+
+#: clientgui/ViewStatistics.cpp:1187
+msgid "Host Average"
+msgstr "Bilgisayarınızın Günlük Ortalama Kredisi"
+
+#: clientgui/ViewStatistics.cpp:1334
+#, c-format
+msgid "Last update: %.0f days ago"
+msgstr "Son güncelleme: %.0f gün önce"
+
+#: clientgui/ViewStatistics.cpp:1959
+msgid "Show user total"
+msgstr "Toplam kredim"
+
+#: clientgui/ViewStatistics.cpp:1960
+msgid "Show total credit for user"
+msgstr "Toplam kredinizi görüntüler"
+
+#: clientgui/ViewStatistics.cpp:1966
+msgid "Show user average"
+msgstr "Günlük ortalama kredim"
+
+#: clientgui/ViewStatistics.cpp:1967
+msgid "Show average credit for user"
+msgstr "Günlük üretilen ortalama kredinizi görüntüler"
+
+#: clientgui/ViewStatistics.cpp:1973
+msgid "Show host total"
+msgstr "Bilgisayarımın toplam kredisi"
+
+#: clientgui/ViewStatistics.cpp:1974
+msgid "Show total credit for host"
+msgstr "Bu bilgisayarınızın toplam kredisini görüntüler"
+
+#: clientgui/ViewStatistics.cpp:1980
+msgid "Show host average"
+msgstr "Bilgisayarımın ortalama kredisi"
+
+#: clientgui/ViewStatistics.cpp:1981
+msgid "Show average credit for host"
+msgstr "Bu bilgisayarınızın ortalama kredisini görüntüler"
+
+#: clientgui/ViewStatistics.cpp:1990
+msgid "< &Previous project"
+msgstr "< &Önceki proje"
+
+#: clientgui/ViewStatistics.cpp:1991
+msgid "Show chart for previous project"
+msgstr "Önceki proje için çizelge"
+
+#: clientgui/ViewStatistics.cpp:1996
+msgid "&Next project >"
+msgstr "&Sonraki proje >"
+
+#: clientgui/ViewStatistics.cpp:1997
+msgid "Show chart for next project"
+msgstr "Sonraki proje için çizelge"
+
+#: clientgui/ViewStatistics.cpp:2003 clientgui/ViewStatistics.cpp:2373
+msgid "Hide project list"
+msgstr "Proje listesini gizle"
+
+#: clientgui/ViewStatistics.cpp:2004 clientgui/ViewStatistics.cpp:2373
+msgid "Use entire area for graphs"
+msgstr "Tüm alan grafikler için kullanılır"
+
+#: clientgui/ViewStatistics.cpp:2009
+msgid "Mode view"
+msgstr "Görünüm kipi"
+
+#: clientgui/ViewStatistics.cpp:2013
+msgid "One project"
+msgstr "Tek proje"
+
+#: clientgui/ViewStatistics.cpp:2014
+msgid "Show one chart with selected project"
+msgstr "Seçilen projeyi tek çizelgede göster"
+
+#: clientgui/ViewStatistics.cpp:2020
+msgid "All projects (separate)"
+msgstr "Tüm projeler (ayrı)"
+
+#: clientgui/ViewStatistics.cpp:2021
+msgid "Show all projects, one chart per project"
+msgstr "Tüm projeleri göster, her biri için ayrı çizelge"
+
+#: clientgui/ViewStatistics.cpp:2027
+msgid "All projects (together)"
+msgstr "Tüm projeler (birlikte)"
+
+#: clientgui/ViewStatistics.cpp:2028
+msgid "Show one chart with all projects"
+msgstr "Tüm projelerin bulunduğu tek çizelge göster"
+
+#: clientgui/ViewStatistics.cpp:2034
+msgid "All projects (sum)"
+msgstr "Tüm projeler (özet)"
+
+#: clientgui/ViewStatistics.cpp:2035
+msgid "Show one chart with sum of projects"
+msgstr "Tüm projelerin özetinin bulunduğu tek çizelge göster"
+
+#: clientgui/ViewStatistics.cpp:2056
+msgid "Statistics"
+msgstr "İstatistikler"
+
+#: clientgui/ViewStatistics.cpp:2377
+msgid "Show project list"
+msgstr "Proje listesini göster"
+
+#: clientgui/ViewStatistics.cpp:2377
+msgid "Uses smaller area for graphs"
+msgstr "Grafikler için daha küçük bir alan kullanılır"
+
+#: clientgui/ViewTransfers.cpp:187
+msgid "Retry Now"
+msgstr "Şimdi dene"
+
+#: clientgui/ViewTransfers.cpp:188
+msgid "Retry the file transfer now"
+msgstr "Dosya transferini şimdi yeniden dener"
+
+#: clientgui/ViewTransfers.cpp:194
+msgid "Abort Transfer"
+msgstr "Aktarımı iptal et"
+
+#: clientgui/ViewTransfers.cpp:195
+msgid "Abort this file transfer.  You won't get credit for the task."
+msgstr "Bu dosya aktarımını iptal eder. Bu iş için kredi alamazsınız."
+
+#: clientgui/ViewTransfers.cpp:210
+msgid "File"
+msgstr "Dosya"
+
+#: clientgui/ViewTransfers.cpp:211 clientgui/ViewWork.cpp:261
+msgid "Progress"
+msgstr "İlerleme"
+
+#: clientgui/ViewTransfers.cpp:212
+msgid "Size"
+msgstr "Boyut"
+
+#: clientgui/ViewTransfers.cpp:213 clientgui/ViewWork.cpp:263
+msgid "Elapsed"
+msgstr "Geçen"
+
+#: clientgui/ViewTransfers.cpp:214
+msgid "Speed"
+msgstr "Hız"
+
+#: clientgui/ViewTransfers.cpp:295
+msgid "Transfers"
+msgstr "Aktarımlar"
+
+#: clientgui/ViewTransfers.cpp:372
+msgid "Network activity is suspended - "
+msgstr "Ağ faaliyeti durakladı - "
+
+#: clientgui/ViewTransfers.cpp:374
+msgid ""
+".\n"
+"You can enable it using the Activity menu."
+msgstr ".\nÇalışma menüsünü kullanarak yeniden sürdürebilirsiniz."
+
+#: clientgui/ViewTransfers.cpp:377
+msgid "BOINC"
+msgstr "BOINC"
+
+#: clientgui/ViewTransfers.cpp:431
+#, c-format
+msgid ""
+"Are you sure you want to abort this file transfer '%s'?\n"
+"NOTE: Aborting a transfer will invalidate a task and you\n"
+"will not receive credit for it."
+msgstr "'%s'\nadlı dosyayı aktarımı iptal etmek istediğinize emin misiniz?\nNOT: Bir aktarımı durdurmak, işi geçersiz kılar ve kredi alamazsınız."
+
+#: clientgui/ViewTransfers.cpp:437
+msgid "Abort File Transfer"
+msgstr "Dosya Aktarımını İptal Et"
+
+#: clientgui/ViewTransfers.cpp:849
+msgid "Upload"
+msgstr "Gönderme"
+
+#: clientgui/ViewTransfers.cpp:849
+msgid "Download"
+msgstr "İndirme"
+
+#: clientgui/ViewTransfers.cpp:853
+msgid "retry in "
+msgstr "yeniden denenecek "
+
+#: clientgui/ViewTransfers.cpp:855
+msgid "failed"
+msgstr "başarısız"
+
+#: clientgui/ViewTransfers.cpp:858
+msgid "suspended"
+msgstr "durakladı"
+
+#: clientgui/ViewTransfers.cpp:863
+msgid "active"
+msgstr "sürüyor"
+
+#: clientgui/ViewTransfers.cpp:865
+msgid "pending"
+msgstr "kuyrukta"
+
+#: clientgui/ViewTransfers.cpp:871
+msgid " (project backoff: "
+msgstr " (proje ertelendi: "
+
+#: clientgui/ViewWork.cpp:211 clientgui/ViewWork.cpp:854
+msgid "Show active tasks"
+msgstr "Süren işleri göster"
+
+#: clientgui/ViewWork.cpp:212 clientgui/ViewWork.cpp:855
+msgid "Show only active tasks."
+msgstr "Yalnızca çalışmakta olan işleri gösterir."
+
+#: clientgui/ViewWork.cpp:225
+msgid "Show VM Console"
+msgstr "VM Konsolu'nu görüntüle"
+
+#: clientgui/ViewWork.cpp:226
+msgid "Show VM Console in a window."
+msgstr "VM Konsolu'nu bir pencerede gösterir."
+
+#: clientgui/ViewWork.cpp:233
+msgid "Suspend work for this result."
+msgstr "Seçili işlerin çalışmasını durdurur."
+
+#: clientgui/ViewWork.cpp:240
+msgid "Abandon work on the result. You will get no credit for it."
+msgstr "Seçili işleri iptal eder (işten kredi alamazsınız)."
+
+#: clientgui/ViewWork.cpp:264
+msgid "Remaining (estimated)"
+msgstr "Kalan (tahmini)"
+
+#: clientgui/ViewWork.cpp:265
+msgid "Deadline"
+msgstr "Son teslim zamanı"
+
+#: clientgui/ViewWork.cpp:351
+msgid "Tasks"
+msgstr "İşler"
+
+#: clientgui/ViewWork.cpp:564
+#, c-format
+msgid ""
+"Are you sure you want to abort this task '%s'?\n"
+"(Progress: %s, Status: %s)"
+msgstr "'%s'\nadlı işi iptal etmek istediğinize emin misiniz?\n(İlerleme: %s, Durum: %s)"
+
+#: clientgui/ViewWork.cpp:570
+#, c-format
+msgid "Are you sure you want to abort these %d tasks?"
+msgstr "Bu %d işi iptal etmek istediğinize emin miziniz?"
+
+#: clientgui/ViewWork.cpp:848
+msgid "Show all tasks"
+msgstr "Tüm işleri göster"
+
+#: clientgui/ViewWork.cpp:849
+msgid "Show all tasks."
+msgstr "Çalışan, bekleyen ve durdurulmuş tüm işleri gösterir."
+
+#: clientgui/WizardAttach.cpp:606
+msgid "Do you really want to cancel?"
+msgstr "İptal etmek istediğinize emin misiniz?"
+
+#: clientgui/WizardAttach.cpp:607
+msgid "Question"
+msgstr "Soru"
+
+#: clientgui/wizardex.cpp:386 clientgui/wizardex.cpp:559
+msgid "&Next >"
+msgstr "&İleri >"
+
+#: clientgui/wizardex.cpp:392
+msgid "< &Back"
+msgstr "< &Geri"
+
+#: clientgui/wizardex.cpp:559
+msgid "&Finish"
+msgstr "&Son"
+
+#: clientgui/mac/Mac_GUI.cpp:35
+msgid "Services"
+msgstr "Servisler"
+
+#: clientgui/mac/Mac_GUI.cpp:36
+#, c-format
+msgid "Hide %s"
+msgstr "%s gizle"
+
+#: clientgui/mac/Mac_GUI.cpp:37
+msgid "Hide Others"
+msgstr "Diğerlerini gizle"
+
+#: clientgui/mac/Mac_GUI.cpp:38
+msgid "Show All"
+msgstr "Tümünü Göster"
+
+#: clientgui/mac/Mac_GUI.cpp:39
+#, c-format
+msgid "Quit %s"
+msgstr "%s'den ayrıl"

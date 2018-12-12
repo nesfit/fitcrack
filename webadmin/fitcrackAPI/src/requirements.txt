@@ -1,0 +1,7 @@
+flask-restplus
+Flask-SQLAlchemy
+pymysql
+flask-cors
+flask-login
+flask-migrate
+flask_script

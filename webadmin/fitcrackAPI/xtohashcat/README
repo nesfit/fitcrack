@@ -1,0 +1,78 @@
+ ______________________________________________________________
+|                                                              |
+| XtoHashcat - Automated tool for hascat inputs extraction     |
+| Last update: 08/27/2018, Lukas Zobal (izobal@fit.vutbr.cz)   |
+|______________________________________________________________|
+
+
+1) PREREQUISITES
+
+  a) Instal following
+
+sudo apt-get install python3 perl liblzma-dev zlib
+sudo cpan -i Compress::Raw::Zlib
+sudo cpan -i Compress::Raw::Lzma
+
+  b) and set privileges for scripts
+
+chmod +x scripts/*
+chmod +x XtoHashcat.py
+
+
+2) USAGE
+
+./XtoHashcat.py <PathToFile> [-f <Mode>]
+
+where:
+  <PathToFile> is the file you want to extract hash from
+  -f <Mode> is optional argument, which sets manually file format
+    There are following <Modes>:
+      Microsoft Office documents versions 97-2016 (-f 9400-9800)
+      PDF documents (-f 10400-10700)
+      RAR archives (-f 12500/13000)
+      ZIP archives (-f 13600)
+      7-Zip archives (-f 11600)
+
+Note that there is a single script for each type of document, so
+it makes no difference if you set mode to 9400 or 9700. The 
+script will detect the correct version itself and output it on
+a new line, after the hashcat input.
+
+When the extraction is successful, the script returns value 0.
+Otherwise, it returns value 1 with coresponding error message.
+
+
+3) HOW TO ADD A NEW FORMAT
+
+  a) Append its name to SupportedFormats array, together with array
+     of corresponding hashcat --hash-types.
+  b) Append it to extractorFormats array in __init__ function 
+     of Extractor class with incremnted index and appropriate info
+     ([extension(s)], [signature(s)], [scriptPath], [interpreter])
+  c) Update the 'getHashType' function to return the correct 
+     --hash-type of the newly added fromat with according ID
+  d) Update the 'setFormat' function, to set correct activeFormat ID.
+  e) Most importantly, update the help message and README!
+
+
+4) TESTING SUITE
+
+XtoHashcat functionality can be verified using automatic testing
+script - 'test.sh'. To run the test, you have to set executable 
+privileges for 'test.sh' and 'tests/create_ref_files.sh' scripts.
+
+Input files for tests are places in 'tests/test_in' in appropriate
+directories. The test script will create the reference output 
+automatically using the extraction scripts placed in 'scripts/'
+folder.
+
+To run the tests, simply use './test.sh' and watch the magic happen.
+If there are no errors, all the tests should turn green.
+
+
+5) POSSIBLE PROBLEMS
+
+rar2john and zip2john are present as binaries, compiled on 64b
+Ubuntu. If there are any problems with ZIP/RAR format, you should
+recompile john on your system and replace these binaries.
+

@@ -1,0 +1,60 @@
+* v1.8 -> v1.9
+
+- Switched C standard from c99 to gnu99
+- Removed unused -lm requirement from hcstatgen
+- Increased maximum password length for hcstatgen from 64 to 256
+- Switched some datatypes and cleaned up in hcstatgen.c
+- Switched some datatypes and cleaned up in utils.c
+- Added hcstat2gen.c which is like hcstatgen but supports a maximum password length up to 256 and header
+- Fixed prioritized bssid-to-essid database ordering
+
+* v1.7 -> v1.8
+
+- Fix radiotap header parsing in cap2hccapx.c
+- Check for zero timestamp and abort if detected in cap2hccapx.c
+- Decrease EAPOL timeout from 2 to 1 in cap2hccapx.c
+- Disable check for matching replay count in cap2hccap.c (can be reenabled by setting TEST_REPLAYCOUNT to 1)
+- Set 0x80 to hccapx.message_pair in case TEST_REPLAYCOUNT is set to 1 in cap2hccapx.c
+- Add support for ppi header in cap2hccapx.c
+- Add support for extracting essid from assoc and reassoc requests in cap2hccapx.c
+- Prioritized bssid-to-essid database in cap2hccapx.c, see #27
+
+* v1.6 -> v1.7
+
+- Skip essid if it's length 0 or if first by is zero-byte (hidden network)
+- Allow reading broken .cap files even it has been cut short in the middle of a packet
+- Allow Message-Pair 1+2, 1+4, 2+3 and 3+4 in cap2hccapx.c
+- Update cap2hccapx format to version 4
+
+* v1.5 -> v1.6
+
+- Added support to read prism header with cap2hccapx
+- Fixed timestamp handling in cap2hccapx
+
+* v1.4 -> v1.5
+
+- Added support to read radiotap header with cap2hccapx
+- Fixed packet handling for cap2hccapx on windows
+
+* v1.3 -> v1.4
+
+- Add pragma to cap2hccapx.c to workaround broken packed handling on mingw
+
+* v1.2 -> v1.3
+
+- Added cap2hccapx.c
+- Added ct3_to_ntlm.c
+- Added deskey_to_ntlm.pl
+- Added tmesis.pl
+- Added release makefile target: move binaries from src folder into bin folder
+- cleanup-rules: fixes #12, allow @X (purge) rule for the rule-engine on GPU
+
+* v1.1 -> v1.2
+
+- Open Source the project
+- License is MIT
+- Moved repository to github: https://github.com/hashcat/hashcat-utils
+- Added CHANGES
+- Added LICENSE
+- Added README.md
+

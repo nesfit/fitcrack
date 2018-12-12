@@ -1,0 +1,116 @@
+# BOINC setup localization template
+# Copyright (C) 2018 University of California
+# 
+# This file is distributed under the same license as BOINC.
+# 
+# Translators:
+# Atis Kozulis <boinc.at.latvia@gmail.com>, 2015,2017
+msgid ""
+msgstr ""
+"Project-Id-Version: BOINC\n"
+"Report-Msgid-Bugs-To: BOINC translation team <boinc_loc@ssl.berkeley.edu>\n"
+"POT-Creation-Date: 2018-01-17 16:06 UTC\n"
+"PO-Revision-Date: 2017-09-23 20:48+0000\n"
+"Last-Translator: Atis Kozulis <boinc.at.latvia@gmail.com>\n"
+"Language-Team: Latvian (http://www.transifex.com/boinc/boinc/language/lv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lv\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: mac_installer/Installer.cpp:93 mac_installer/PostInstall.cpp:230
+msgid "Could not get user login name"
+msgstr "Nevarēja iegūt lietotājvārdu"
+
+#: mac_installer/Installer.cpp:199
+#, c-format
+msgid "Sorry, this version of %s requires system 10.6 or higher."
+msgstr "Atvainojiet, šī %s versija pieprasa vismaz sistēmas 10.6 versiju."
+
+#: mac_installer/PostInstall.cpp:139 mac_installer/PostInstall.cpp:1215
+#: mac_installer/uninstall.cpp:1512
+msgid "Yes"
+msgstr "Jā"
+
+#: mac_installer/PostInstall.cpp:140 mac_installer/PostInstall.cpp:1216
+#: mac_installer/uninstall.cpp:1513
+msgid "No"
+msgstr "Nē"
+
+#. Future feature
+#: mac_installer/PostInstall.cpp:142
+msgid "Should BOINC run even when no user is logged in?"
+msgstr "Vai BOINC ir jādarbojas pat, ja neviens nav pieslēdzies sistēmai?"
+
+#: mac_installer/PostInstall.cpp:1501
+#, c-format
+msgid ""
+"Users who are permitted to administer this computer will automatically be allowed to run and control %s.\n"
+"\n"
+"Do you also want non-administrative users to be able to run and control %s on this Mac?"
+msgstr "Lietotāji, kuriem ir ļauts administrēt šo datoru automātiski būs tiesīgi palaist un kontrolēt %s.\n\nVai vēlaties, lai arī ne-administratīvie lietotāji spētu palaist un kontrolēt %s uz šī Mac?"
+
+#: mac_installer/PostInstall.cpp:1529
+#, c-format
+msgid "Do you want to set %s as the screensaver for all %s users on this Mac?"
+msgstr "Vai vēlaties iestatīt %s kā ekrānsaudzētāju priekš visiem %s lietotājiem uz šī Mac?"
+
+#: mac_installer/uninstall.cpp:84
+msgid "OK"
+msgstr "Labi"
+
+#. Confirm that we are running as root
+#: mac_installer/uninstall.cpp:144
+msgid "Permission error after relaunch"
+msgstr "Tiesību kļūda pēc atkārtotas palaišanas"
+
+#: mac_installer/uninstall.cpp:149
+msgid ""
+"Removal may take several minutes.\n"
+"Please be patient."
+msgstr "Noņemšana var prasīt dažas minūtes.\nLūdzu, esat pacietīgi."
+
+#: mac_installer/uninstall.cpp:164
+#, c-format
+msgid ""
+"Are you sure you want to completely remove %s from your computer?\n"
+"\n"
+"This will remove the executables but will not touch %s data files."
+msgstr "Vai esat pārliecināti, ka vēlaties pilnībā noņemt %s no jūsu datora?\n\nTas noņems visus izpildāmos failus, bet neaiztiks %s datu failus."
+
+#: mac_installer/uninstall.cpp:179
+#, c-format
+msgid "Canceled: %s has not been touched."
+msgstr "Atcelts: %s netika aiztikts."
+
+#: mac_installer/uninstall.cpp:243
+msgid "name  of user"
+msgstr "lietotāja vārds"
+
+#: mac_installer/uninstall.cpp:296
+msgid ""
+"Do you also want to remove VirtualBox from your computer?\n"
+"(VirtualBox was installed along with BOINC.)"
+msgstr "Vai vēlaties noņemt arī VirtualBox no jūsu datora?\n(VirtualBox tika uzstādīts kopā ar BOINC.)"
+
+#: mac_installer/uninstall.cpp:334
+#, c-format
+msgid ""
+"Removal completed.\n"
+"\n"
+" You may want to remove the following remaining items using the Finder: \n"
+"the directory \"%s\"\n"
+"\n"
+"for each user, the file\n"
+"\"%s\"."
+msgstr "Noņemšana pabeigta.\n\nJūs varētu gribēt noņemt sekojošos vienumus, izmantojot Finder: \nkatalogu \"%s\"\n\nkatram lietotājam, failu\n\"%s\"."
+
+#: mac_installer/uninstall.cpp:1510
+msgid "Cancel"
+msgstr "Atcelt"
+
+#: mac_installer/uninstall.cpp:1511
+msgid "Continue..."
+msgstr "Turpināt..."

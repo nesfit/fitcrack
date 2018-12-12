@@ -1,0 +1,8 @@
+<version>
+	<file><physical_name>hashcat64_v421_1.bin</physical_name><copy_file/></file>
+	<file><physical_name>hashcat_files_v421_1.zip</physical_name><copy_file/></file>
+	<file><physical_name>runner1.bin</physical_name>
+	    <copy_file/>
+	    <main_program/>
+	</file>
+</version>
