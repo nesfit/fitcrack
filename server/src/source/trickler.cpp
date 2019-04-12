@@ -95,7 +95,7 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     }
 
     /** Update workunit progress in DB */
-    snprintf(buf, SQL_BUF_SIZE, "UPDATE `fc_job` SET `progress` = %f WHERE `progress` < %f AND `workunit_id` IN (SELECT id FROM workunit WHERE name = '%s') LIMIT 1 ;",
+    snprintf(buf, SQL_BUF_SIZE, "UPDATE `fc_workunit` SET `progress` = %f WHERE `progress` < %f AND `workunit_id` IN (SELECT id FROM workunit WHERE name = '%s') LIMIT 1 ;",
              progress, progress, wu_name);
 
     int retval = boinc_db.do_query(buf);
