@@ -126,16 +126,25 @@
                     Added:
                   </v-list-tile-action>
                   <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{ $moment(data.time).format('DD.MM.YYYY HH:mm') }}</v-list-tile-title>
+                    <v-list-tile-title class="text-xs-right">{{ $moment(data.time).calendar() }}</v-list-tile-title>
                   </v-list-tile-content>
                 </v-list-tile>
                 <v-divider></v-divider>
                 <v-list-tile class="px-2 py-1">
                   <v-list-tile-action class="pr-3 key">
-                    Cracking time:
+                    Workunit sum time:
                   </v-list-tile-action>
                   <v-list-tile-content>
                     <v-list-tile-title class="text-xs-right">{{data.cracking_time_str}}</v-list-tile-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+                <v-divider></v-divider>
+                <v-list-tile class="px-2 py-1">
+                  <v-list-tile-action class="pr-3 key">
+                    Job cracking time:
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    <v-list-tile-title class="text-xs-right">{{ $moment.utc($moment(data.time_end).diff($moment(data.time_start))).format("HH:mm:ss") }}</v-list-tile-title>
                   </v-list-tile-content>
                 </v-list-tile>
                 <v-divider></v-divider>

@@ -166,13 +166,22 @@
                       :canRemoveLine="true "
                     >
                       <div class="hashCeckContainer pl-1 pt-2"  slot="after">
-                        <p class="pa-0 ma-0" v-for="hashObj in validatedHashes" >
-                          <v-icon small v-if="hashObj.result === 'OK'" color="success">check_circle_outline</v-icon>
-                          <v-tooltip left v-else>
-                            <v-icon small slot="activator" color="error" class="clickable">error_circle_outline</v-icon>
-                            <span>{{hashObj.result}}</span>
-                          </v-tooltip>
-                        </p>
+                        <v-layout row justify-end class="pa-0 ma-0" v-for="hashObj in validatedHashes" >
+                          <v-flex xs6>
+                            <v-icon small v-if="hashObj.result === 'OK'" color="success">check_circle_outline</v-icon>
+                            <v-tooltip left v-else>
+                              <v-icon small slot="activator" color="error" class="clickable">error_circle_outline</v-icon>
+                              <span>{{hashObj.result}}</span>
+                            </v-tooltip>
+                          </v-flex>
+
+                          <v-flex xs6>
+                            <v-tooltip  left v-if="hashObj.isInCache">
+                              <v-icon small slot="activator" color="warning" class="clickable">error_circle_outline</v-icon>
+                              <span>hash already in hashcache</span>
+                            </v-tooltip>
+                          </v-flex>
+                        </v-layout>
                       </div>
                     </fc-textarea>
                   </v-flex>
@@ -483,9 +492,7 @@
       },
       uploadComplete: function (data) {
         this.$success("Successfully extracted hash form file.")
-        this.hashtype = this.hashTypes.find( hashtype => {
-          return hashtype.code === data['hash_type'];
-        })
+        this.hashtype = data['hash_type']
         this.addHash(data['hash'])
         this.validateHashes(null)
       },
@@ -721,7 +728,7 @@
 
   .hashCeckContainer {
     display: block;
-    max-width: 20px;
+    max-width: 35px;
     overflow: hidden;
   }
 
@@ -731,6 +738,9 @@
     background: white !important;
   }
 
+  .width15 {
+    width: 15px;
+  }
 </style>
 
 <style>
