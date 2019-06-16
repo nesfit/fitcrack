@@ -119,6 +119,7 @@ class CPackage {
         std::string m_markov;
         uint32_t    m_markovThreshold;
         uint32_t    m_replicateFactor;
+        bool        m_killFlag;
 
         /**
          * @section Other member variables
@@ -160,6 +161,7 @@ class CPackage {
         const std::string & getMarkov() const;
         uint32_t getMarkovThreshold() const;
         uint32_t getReplicateFactor() const;
+        bool getKillFlag() const;
 
     /**
      * @section Getters/Setters for other member variables

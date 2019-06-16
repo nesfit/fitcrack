@@ -279,6 +279,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `markov_threshold` int(20) NOT NULL DEFAULT '0',
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `kill` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 

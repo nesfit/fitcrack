@@ -36,6 +36,7 @@ CPackage::CPackage(DbMap &packageMap, CSqlLoader * sqlLoader)
         this->m_markov = packageMap["markov_hcstat"];
         this->m_markovThreshold = std::stoul(packageMap["markov_threshold"]);
         this->m_replicateFactor = std::stoul(packageMap["replicate_factor"]);
+        this->m_killFlag = std::stoul(packageMap["kill"]) != 0;
 
         /** Check for valid values */
         if (this->m_secondsPerWorkunit < Config::minSeconds)
@@ -308,6 +309,12 @@ const std::string & CPackage::getMarkov() const
 uint32_t CPackage::getReplicateFactor() const
 {
     return m_replicateFactor;
+}
+
+
+bool CPackage::getKillFlag() const
+{
+    return m_killFlag;
 }
 
 
