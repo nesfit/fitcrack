@@ -204,6 +204,7 @@ class FcJob(Base):
     markov_threshold = Column(Integer, nullable=False, server_default=text("'0'"))
     replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
+    kill = Column(Integer, nullable=False, server_default=text("'0'"))
 
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')

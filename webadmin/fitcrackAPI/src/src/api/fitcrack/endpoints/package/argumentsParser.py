@@ -208,7 +208,7 @@ addPackage_model = api.schema_model('addPackage', {
 
 packageOperation = reqparse.RequestParser()
 packageOperation.add_argument('operation', type=str, required=True,  help='operácia s package',
-                       choices=["start", "stop", "restart"])
+                       choices=["start", "stop", "restart", "kill"])
 
 editHostMapping_argument = reqparse.RequestParser()
 editHostMapping_argument.add_argument('newHost_ids', type=list, required=True, location='json')
