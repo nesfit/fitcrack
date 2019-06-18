@@ -173,6 +173,8 @@ class OperationWithPackage(Resource):
             for item in graphData:
                 db.session.delete(item)
             db.session.add(FcJobGraph(progress=0, job_id=package.id))
+        elif action == 'kill':
+            package.kill = True
         else:
             abort(401, 'Bad operation with job!')
 
