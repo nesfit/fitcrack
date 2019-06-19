@@ -63,10 +63,10 @@
                           <span>Stop job</span>
                         </v-tooltip>
                         <v-tooltip top>
-                          <v-btn icon class="mx-0" :disabled="data.status !== '10'" slot="activator" @click="operateJob('kill')">
+                          <v-btn icon class="mx-0" slot="activator" @click="operateJob('kill')">
                             <v-icon color="error">cancel</v-icon>
                           </v-btn>
-                          <span>Kill job</span>
+                          <span>Purge job</span>
                         </v-tooltip>
                       </div>
                     </v-list-tile-title>
