@@ -174,7 +174,31 @@ class OperationWithPackage(Resource):
                 db.session.delete(item)
             db.session.add(FcJobGraph(progress=0, job_id=package.id))
         elif action == 'kill':
+            package.status = 10
+            package.indexes_verified = 0
+            package.current_index = 0
+            package.cracking_time = 0
+            package.time_end = None
+            if package.attack_mode == 3:
+                masks = FcMask.query.filter(FcMask.job_id == id).all()
+                for mask in masks:
+                    mask.current_index = 0
+            elif package.attack_mode == 0 or package.attack_mode == 1:
+                dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
+                for dictionary in dictionaries:
+                    dictionary.current_index = 0
+            hosts = FcHostActivity.query.filter(FcHostActivity.job_id == id).all()
+            for host in hosts:
+                host.status = 0
+            graphData = FcJobGraph.query.filter(FcJobGraph.job_id == id).all()
+            for item in graphData:
+                db.session.delete(item)
+
+            workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
+            for item in workunits:
+                db.session.delete(item)
             package.kill = True
+
         else:
             abort(401, 'Bad operation with job!')
 
