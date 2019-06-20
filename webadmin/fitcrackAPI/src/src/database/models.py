@@ -396,7 +396,7 @@ class FcWorkunit(Base):
 
     id = Column(BigInteger, primary_key=True)
     job_id = Column(BigInteger, ForeignKey('fc_job.id'), nullable=False)
-    workunit_id = Column(BigInteger, nullable=False)
+    workunit_id = Column(BigInteger, ForeignKey('result.workunitid', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     host_id = Column(BigInteger, ForeignKey('fc_host.id'), nullable=False)
     boinc_host_id = Column(Integer, ForeignKey('host.id'), nullable=False)
     start_index = Column(BigInteger, nullable=False)
@@ -416,7 +416,7 @@ class FcWorkunit(Base):
     # host = relationship("FcHost", back_populates="workunits")
     host = relationship("Host", back_populates="workunits")
 
-    result = relationship('Result',  uselist=False)
+    result = relationship('Result',  uselist=False, primaryjoin="FcWorkunit.workunit_id==Result.workunitid", viewonly=True)
 
     def as_graph(self):
         return {
@@ -654,7 +654,7 @@ class Result(Base):
 
     id = Column(Integer, primary_key=True)
     create_time = Column(Integer, nullable=False)
-    workunitid = Column(Integer, ForeignKey('fc_workunit.workunit_id'))
+    workunitid = Column(Integer, nullable=True)
     server_state = Column(Integer, nullable=False)
     outcome = Column(Integer, nullable=False)
     client_state = Column(Integer, nullable=False)
