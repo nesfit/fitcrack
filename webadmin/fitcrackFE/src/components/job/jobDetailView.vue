@@ -724,6 +724,19 @@
         }).then((response) => {
           console.log(response.data);
           this.loadData()
+          if (operation === "kill") {
+            this.axios.get(this.$serverAddr + '/graph/packagesProgress/' + this.$route.params.id).then((response) => {
+              this.progressGraph = response.data
+            });
+
+            this.axios.get(this.$serverAddr + '/graph/hostsComputing/' + this.$route.params.id).then((response) => {
+              this.hostGraph = response.data
+            });
+
+            this.axios.get(this.$serverAddr + '/graph/hostPercentage/' + this.$route.params.id).then((response) => {
+              this.hostPercentageGraph = response.data
+            });
+          }
         })
       }
     }
