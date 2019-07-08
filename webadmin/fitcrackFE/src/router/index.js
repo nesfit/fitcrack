@@ -17,6 +17,8 @@ import hosts from '@/components/host/hostsView'
 import hashes from '@/components/hashcache/hashCacheView'
 import dictionaries from '@/components/dictionary/dictionariesView'
 import dictionaryDetail from '@/components/dictionary/dictionaryDetailView'
+import pcfg from '@/components/pcfg/pcfgView.vue'
+import pcfgDetail from '@/components/pcfg/pcfgDetailView.vue'
 import manageUsers from '@/components/user/manageUsersView'
 import hostDetail from '@/components/host/hostDetailView'
 import rules from '@/components/rule/rulesView'
@@ -104,6 +106,11 @@ export default new Router({
           path: '/dictionaries/:id',
           name: 'dictionaryDetail',
           component: dictionaryDetail
+        },
+        {
+          path: '/pcfg',
+          name: 'pcfg',
+          component: pcfg
         },
         {
           path: '/rules',

@@ -8,7 +8,7 @@
       <v-layout row wrap>
         <v-flex xs12>
           <test-element>
-
+            test
           </test-element>
         </v-flex>
       </v-layout>

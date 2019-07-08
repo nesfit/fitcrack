@@ -21,6 +21,7 @@ from src.api.fitcrack.endpoints.serverInfo.server import ns as server_namespace
 from src.api.fitcrack.endpoints.user.user import login_manager
 from src.api.fitcrack.endpoints.user.user import ns as user_namespace
 from src.api.fitcrack.endpoints.dictionary.dictionary import ns as dictionary_namespace
+from src.api.fitcrack.endpoints.pcfg.pcfg import ns as pcfg_namespace
 from src.api.fitcrack.endpoints.markov.markov import ns as markov_namespace
 from src.api.fitcrack.endpoints.masks.masks import ns as masks_namespace
 from src.api.fitcrack.endpoints.rule.rule import ns as rule_namespace
@@ -59,6 +60,7 @@ def initialize_app(flask_app):
     api.add_namespace(user_namespace)
     api.add_namespace(notifications_namespace)
     api.add_namespace(dictionary_namespace)
+    api.add_namespace(pcfg_namespace)
     api.add_namespace(markov_namespace)
     api.add_namespace(masks_namespace)
     api.add_namespace(rule_namespace)
@@ -107,8 +109,3 @@ db.init_app(app)
 
 if __name__ == "__main__":
     main()
-
-
-
-
-

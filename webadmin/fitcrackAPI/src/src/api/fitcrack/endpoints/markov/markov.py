@@ -95,7 +95,7 @@ class markov(Resource):
         db.session.commit()
         return {
             'status': True,
-            'message': 'Markov file sucesfully deleted.'
+            'message': 'zadek.'
         }, 200
 
 

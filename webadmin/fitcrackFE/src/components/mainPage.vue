@@ -27,7 +27,7 @@
             <v-icon>home</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Home</v-list-tile-title>
+            <v-list-tile-title>Homer</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-group :value="true">
@@ -91,6 +91,16 @@
             <v-list-tile-title>Dictionaries</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+
+        <v-list-tile :to="{ name: 'pcfg'}">
+          <v-list-tile-action>
+            <v-icon>linear_scale</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Pcfg</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+
         <v-list-tile :to="{ name: 'rules'}">
           <v-list-tile-action>
             <v-icon>gavel</v-icon>

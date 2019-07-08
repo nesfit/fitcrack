@@ -117,10 +117,10 @@
               <div class="text-xs-right pa-3">
                 <v-btn class="d-inline-block"
                        color="primary"
-                       flat
+
                        outline
-                       @click="makeHcStatFromDictionary"
-                       :disabled="selectedDictId === null || newName === ''">
+                       @click="makeHcStatFromDictionary()"
+                       :disabled="selectedDictId === null && newName === ''">
                   Make from dictionary
                 </v-btn>
               </div>
@@ -173,7 +173,7 @@
           "dictionary_id": this.selectedDictId,
           "name": this.newName
         }).then((response) => {
-          this.adding = false
+          this.adding = true
           this.dialog = false
           this.loadMarkovChains()
         }).catch((error) => {
@@ -181,7 +181,7 @@
         })
       },
       deleteMarkov: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+        this.$root.$confirm('Delete', 'Are you sure?').then((confirm) => {
           this.loading = true;
           this.axios.delete(this.$serverAddr + '/markovChains/' + id).then((response) => {
             this.loadMarkovChains()

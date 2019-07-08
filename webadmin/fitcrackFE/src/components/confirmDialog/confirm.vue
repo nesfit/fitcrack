@@ -68,12 +68,14 @@
       },
       agree() {
         this.resolve(true);
+        this.reject(false);
         this.dialog = false;
       },
       cancel() {
-        this.resolve(false);
+        this.resolve(false)
+        this.reject(true);
         this.dialog = false;
-      },
-    },
+      }
+    }
   }
 </script>

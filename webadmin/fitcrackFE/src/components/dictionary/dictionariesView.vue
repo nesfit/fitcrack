@@ -6,6 +6,9 @@
 <template>
   <v-container class="max500">
     <fc-tile title="Dictionaries" class="ma-2">
+      <v-alert :value="true" type="warning" class="mt-2 mb-0" >
+        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is through SFTP server.
+      </v-alert>
       <v-data-table
         :headers="headers"
         :items="dictionaries.items"
@@ -34,9 +37,7 @@
       <div class="text-xs-right px-2 ">
         <v-btn class="d-inline-block" color="primary" flat outline @click.native.stop="dialog = true">Select from drive</v-btn>
       </div>
-      <v-alert :value="true" type="warning" class="mt-2 mb-0" >
-        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is through SFTP server.
-      </v-alert>
+
       <file-uploader :url="this.$serverAddr + '/dictionary/add'" @uploadComplete="loadDictionaries"></file-uploader>
     </fc-tile>
 
