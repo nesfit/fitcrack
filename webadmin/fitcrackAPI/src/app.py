@@ -1,5 +1,5 @@
 '''
-   * Author : see AUTHORS
+   * Author : see AUTHORSs
    * Licence: MIT, see LICENSE
 '''
 
