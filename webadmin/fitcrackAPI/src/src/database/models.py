@@ -377,6 +377,11 @@ class Host(Base):
 
     last_active = relationship("FcHostStatus", uselist=False)
 
+    jobs = relationship("FcJob", secondary="fc_host_activity",
+                        primaryjoin="Host.id == FcHostActivity.boinc_host_id",
+                        secondaryjoin="FcHostActivity.job_id == FcJob.id",
+                        viewonly=True)
+
     #job = relationship("FcWorkunit", back_populates="hosts")
 
     @hybrid_property
