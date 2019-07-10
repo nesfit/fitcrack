@@ -42,6 +42,12 @@ boincHostActivity_model = api.model('Host activity', {
     'online': fields.Boolean()
 })
 
+package_nano_model = api.model('Package nano', {
+    'id': fields.Integer(readOnly=True, required=False, description='id ukolu'),
+    'name': fields.String(required=True, description='nazev ukolu'),
+    'status': fields.Integer(readOnly=True, required=False, description='stav ukolu'),
+})
+
 boincHost_model = api.model('Host boinc', {
     'id': fields.Integer(readOnly=True, required=False),
     'domain_name': fields.String(),
@@ -50,7 +56,8 @@ boincHost_model = api.model('Host boinc', {
     'os_name': fields.String(),
     'user': fields.Nested(user_model),
     'last_active': fields.Nested(boincHostActivity_model),
-    'deleted': fields.Boolean()
+    'deleted': fields.Boolean(),
+    'jobs': fields.Nested(package_nano_model)
 })
 
 package_short_model = api.model('Package short', {

@@ -39,6 +39,7 @@
         <td class="text-xs-right">{{ props.item.ip_address }}</td>
         <td class="text-xs-right">{{ props.item.os_name }}</td>
         <td class="text-xs-right oneline" :title="props.item.p_model">{{ props.item.p_model }}</td>
+        <td class="text-xs-right">{{ props.item.jobs.map(j => j.status === 10 ? 1 : 0).reduce((a, b) => a + b) }}</td>
         <td class="text-xs-right"  v-bind:class="{
           'error--text': props.item.last_active.seconds_delta > 61,
           'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
@@ -141,6 +142,7 @@
           {text: 'IP address', value: 'ip_adress', align: 'right', sortable: false},
           {text: 'Operating system', value: 'os_name', align: 'right', sortable: false},
           {text: 'Processor', value: 'p_model', align: 'right', width: '200', sortable: false},
+          {text: 'Active jobs', value: 'jobs', align: 'right', sortable: false},
           {text: 'Online', value: 'last_seen', align: 'right', sortable: false},
           {text: 'Hide', value: 'name', sortable: false, align: 'right', width: "1"}
         ],
