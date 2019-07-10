@@ -74,6 +74,7 @@ namespace Config {
     extern char * inTemplatePathDict;
     extern char * inTemplatePathCombinator;
     extern char * inTemplatePathRule;
+    extern char * inTemplatePathPcfg;
     extern DB_APP * app;
     extern int startTime;
     extern int seqNo;
@@ -102,7 +103,8 @@ namespace Config {
     enum AttackMode {
         AttackDict = 0,
         AttackCombinator = 1,
-        AttackMask = 3
+        AttackMask = 3,
+        AttackPcfg = 9
     };
 
     /** Types of debug output */
