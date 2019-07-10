@@ -30,6 +30,7 @@ from src.api.fitcrack.endpoints.protectedFile.protectedFile import ns as protect
 from src.api.fitcrack.endpoints.hashCache.hashes import ns as hashes_ns
 from src.api.fitcrack.endpoints.jobTemplate.template import ns as template_ns
 from src.api.fitcrack.endpoints.logs.logs import ns as logs_ns
+from src.api.fitcrack.endpoints.status.status import ns as status_ns
 from src.database import db
 
 app = Flask(__name__)
@@ -68,6 +69,7 @@ def initialize_app(flask_app):
     api.add_namespace(hashes_ns)
     api.add_namespace(template_ns)
     api.add_namespace(logs_ns)
+    api.add_namespace(status_ns)
 
     flask_app.register_blueprint(blueprint)
 

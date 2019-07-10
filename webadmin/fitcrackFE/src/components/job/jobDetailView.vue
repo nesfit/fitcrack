@@ -335,6 +335,34 @@
               </fc-graph>
             </v-layout>
 
+            <v-layout row wrap class="mt-3 mb-5 elevation-2 white">
+              <v-toolbar color="primary" dark card>
+                <v-toolbar-title>Status history</v-toolbar-title>
+              </v-toolbar>
+              <v-list single-line class="width100">
+                <v-data-table
+                        :headers="statusHeaders"
+                        :items="statusHistory"
+                        :rows-per-page-items='[5,10,15,{"text":"All","value":-1}]'
+                >
+                  <template slot="items" slot-scope="props">
+                    <td class="text-xs-left">{{ $moment(props.item.time).format('DD.MM.YYYY HH:mm')
+                      }}
+                    </td>
+                    <td class="text-xs-right text-xs-right fw500"
+                        v-bind:class="props.item.status_type + '--text'">
+                      <v-tooltip top>
+                                                <span slot="activator">
+                                                    {{ props.item.status_text }}
+                                                </span>
+                        <span>{{ props.item.status_tooltip }}</span>
+                      </v-tooltip>
+                    </td>
+                  </template>
+                </v-data-table>
+              </v-list>
+            </v-layout>
+
           </div>
         </v-layout>
         <div class=" mx-3">
@@ -580,6 +608,10 @@
         progressGraph: null,
         hostGraph: null,
         hostPercentageGraph: null,
+        statusHeaders: [
+          {text: 'Time', value: 'time', align: 'left'},
+          {text: 'Status', value: 'status', align: 'right'},
+        ],
         statusHistory: [],
         hostheaders: [
           {
@@ -712,6 +744,14 @@
             });
           }
         });
+
+        this.axios.get(this.$serverAddr + '/status/' + this.$route.params.id)
+                .then((result) => {
+                  this.statusHistory = result.data.items;
+                })
+                .catch((reason => {
+                  console.log("An error ocurred while fetching status", reason);
+                }));
 
         // if package is finished, we dont need to send this stuffs...
         if (this.data !== null && parseInt(this.data.status) < 5)
