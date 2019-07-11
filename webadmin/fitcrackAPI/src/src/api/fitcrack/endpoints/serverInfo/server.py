@@ -14,7 +14,7 @@ from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
 from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument
 from src.api.fitcrack.endpoints.graph.argumentsParser import package_graph_arguments
 from src.api.fitcrack.functions import shellExec
-
+from src.database import db
 from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
 import platform
