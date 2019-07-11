@@ -147,6 +147,14 @@
             <v-list-tile-title>Manage users</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile :to="{ name: 'server'}" v-if="$userCanManageUsers()">
+          <v-list-tile-action>
+            <v-icon>storage</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Server</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile @click="logout">
           <v-list-tile-action>
             <v-icon>exit_to_app</v-icon>
