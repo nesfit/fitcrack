@@ -24,12 +24,12 @@ from src.api.fitcrack.endpoints.package.argumentsParser import packageList_parse
 from src.api.fitcrack.endpoints.package.functions import delete_package, verifyHashFormat, create_package, \
     computeCrackingTime
 from src.api.fitcrack.endpoints.package.responseModels import page_of_packages_model, page_of_jobs_model, \
-    verifyHash_model, crackingTime_model, newPackage_model, package_model, verifyHashes_model
+    verifyHash_model, crackingTime_model, newPackage_model, package_model, verifyHashes_model, package_nano_list_model
 from src.api.fitcrack.functions import shellExec
 from src.api.fitcrack.lang import statuses, package_status_text_to_code_dict
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary
+from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcJobStatus
 
 log = logging.getLogger(__name__)
 
@@ -350,3 +350,29 @@ class jobsInfo(Resource):
                 }
             )
         return result
+
+
+@ns.route('/lastJobs')
+class lastJobs(Resource):
+
+    @api.marshal_with(package_nano_list_model)
+    def get(self):
+        """
+        Vrati posledni ukoly, ve kterych byla zmena stavu
+        """
+
+        states = FcJobStatus.query.order_by(FcJobStatus.time.desc()).all()
+
+        ids = []
+        jobs_to_return = []
+
+        for jobStatus in states:
+            if not ids.__contains__(jobStatus.job_id) and len(ids) != 6:
+                ids.append(jobStatus.job_id)
+
+        for jobId in ids:
+            job = FcJob.query.filter(FcJob.id == jobId).one()
+            if job.deleted == 0:
+                jobs_to_return.append(job)
+
+        return {'items': jobs_to_return}

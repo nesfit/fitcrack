@@ -152,3 +152,17 @@ package_model = api.model('Package', {
     'left_dictionaries': fields.List(fields.Nested(dictionary_package_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_package_model))
 })
+
+package_nano_model = api.model('Package nano', {
+    'id': fields.Integer(readOnly=True, required=False, description='id package'),
+    'name': fields.String(required=True, description='meno package'),
+    'status': fields.String(required=False),
+    'status_text': fields.String(required=False),
+    'status_tooltip': fields.String(required=False),
+    'status_type': fields.String(),
+    'progress': fields.Float(required=False),
+})
+
+package_nano_list_model = api.inherit('Package nano list', {
+    'items': fields.List(fields.Nested(package_nano_model))
+})
