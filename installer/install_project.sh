@@ -44,6 +44,9 @@ cp -Rf boinc/sched/assimilator $BOINC_PROJECT_DIR/bin/
 cp -Rf boinc/sched/bitwise_validator $BOINC_PROJECT_DIR/bin/
 cp -Rf boinc/sched/trickler $BOINC_PROJECT_DIR/bin/
 
+# Copy server measure script
+cp -f server/server_bin/measureUsage.py $BOINC_PROJECT_DIR/bin/
+
 # Copy client binaries
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack/1
