@@ -277,6 +277,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `rule_right` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_hcstat` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_threshold` int(20) NOT NULL DEFAULT '0',
+  `grammar_id` bigint(20) unsigned DEFAULT NULL,
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
@@ -346,6 +347,37 @@ CREATE TABLE IF NOT EXISTS `fc_rule` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_pcfg_preterminals`
+--
+
+CREATE TABLE `fc_pcfg_preterminals` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `job_id` bigint(20) unsigned NOT NULL,
+  `workunit_id` bigint(20) unsigned NOT NULL,
+  `preterminals` blob DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_pcfg_grammar`
+--
+
+CREATE TABLE `fc_pcfg_grammar` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `path` varchar(400) NOT NULL,
+  `keyspace` bigint(20) unsigned NOT NULL,
+  `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
 
 -- --------------------------------------------------------
 
