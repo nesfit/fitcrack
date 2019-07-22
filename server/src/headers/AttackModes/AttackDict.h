@@ -15,7 +15,7 @@
 class CAttackDict : public AttackMode {
     public:
         /**
-         * @brief Constructor for Combinator Attack
+         * @brief Constructor for Dictionary Attack
          * @param package [in] Instance of CPackage which is parent of this attack instance
          * @param host [in] Instance of CHost which this attack belongs to
          * @param seconds [in] Number of seconds this instance of attack should take

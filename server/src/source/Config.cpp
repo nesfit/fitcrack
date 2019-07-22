@@ -45,6 +45,7 @@ namespace Config {
     std::string inTemplateFileDict =       "dict_in";
     std::string inTemplateFileCombinator = "combinator_in";
     std::string inTemplateFileRule =       "rule_in";
+    std::string inTemplateFilePcfg =       "pcfg_in";
     std::string outTemplateFile =          "app_out";
 
     /** Some default values */

@@ -155,6 +155,10 @@ void CSimpleGenerator::createRegularJob(PtrPackage & package, PtrHost & host)
                 attack = new CAttackMarkov(package, host, duration, m_sqlLoader);
             break;
 
+        case Config::AttackMode::AttackPcfg:
+            attack = new CAttackPcfg(job, host, duration, m_sqlLoader);
+            break;
+
         default:
             Tools::printDebugHost(Config::DebugType::Error, packageId, hostBoincId,
                     "Attack mode not recognized (%d). Setting package to malformed.\n", package->getAttackMode());
