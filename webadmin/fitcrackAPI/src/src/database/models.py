@@ -41,6 +41,7 @@ class FcBenchmark(Base):
             'last_update': getattr(self, 'last_update').isoformat()
         }
 
+
 class FcHashcache(Base):
     __tablename__ = 'fc_hashcache'
 
@@ -60,6 +61,7 @@ class FcHashcache(Base):
            return base64.b64decode(self.result).decode("utf-8")
        return None
 
+
 class FcHost(Base):
     __tablename__ = 'fc_host'
 
@@ -77,7 +79,6 @@ class FcHost(Base):
     #job = relationship("FcWorkunit", back_populates="hosts")
     # workunits = relationship("FcWorkunit", back_populates="host")
     boinc_host = relationship("Host", uselist=False)
-
 
 
 class FcMask(Base):
@@ -111,6 +112,33 @@ class FcDictionary(Base):
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+
+class FcPcfg(Base):
+    __tablename__ = 'fc_pcfg_grammar'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    path = Column(String(400), nullable=False)
+    keyspace = Column(BigInteger, nullable=False)
+    time_added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    deleted = Column(Integer, nullable=False, server_default=text("'0'"))
+    modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+
+"""
+    CREATE TABLE `fc_pcfg_grammar` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `path` varchar(400) NOT NULL,
+  `keyspace` bigint(20) unsigned NOT NULL,
+  `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+"""
 
 
 class FcHcstat(Base):
@@ -153,7 +181,6 @@ class FcRule(Base):
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
 
 
-
 class FcJobDictionary(Base):
     __tablename__ = 'fc_job_dictionary'
 
@@ -163,7 +190,6 @@ class FcJobDictionary(Base):
     current_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
     is_left = Column(Integer, nullable=False, server_default=text("'1'"))
     dictionary = relationship("FcDictionary")
-
 
 
 class FcJob(Base):
@@ -209,7 +235,6 @@ class FcJob(Base):
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')
 
-
     charSet1 = relationship("FcCharset",
                             primaryjoin="FcJob.charset1==FcCharset.name")
     charSet2 = relationship("FcCharset",
@@ -224,8 +249,6 @@ class FcJob(Base):
 
     markov = relationship("FcHcstat",
                           primaryjoin="FcJob.markov_hcstat==FcHcstat.name")
-
-
 
     hosts = relationship("Host", secondary="fc_host_activity",
                          primaryjoin="FcJob.id == FcHostActivity.job_id",
@@ -245,7 +268,6 @@ class FcJob(Base):
             return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
         except OverflowError:
             return 'really long'
-
 
     @hybrid_property
     def progress(self):
@@ -285,6 +307,7 @@ class FcJob(Base):
 
     hashes = relationship("FcHash", back_populates="job")
 
+
 class FcSetting(Base):
     __tablename__ = 'fc_settings'
 
@@ -296,6 +319,7 @@ class FcSetting(Base):
     default_check_hashcache = Column(Integer, nullable=False, server_default=text("'1'"))
     default_workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
     default_bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
+
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
@@ -385,7 +409,6 @@ class Host(Base):
             FcHostStatus.query.filter(FcHostStatus.boinc_host_id == self.id, FcHostStatus.deleted == True).first() \
             else False
 
-
     @deleted.expression
     def deleted(cls):
         return select([FcHostStatus.deleted]).where(and_(cls.id == FcHostStatus.boinc_host_id, FcHostStatus.deleted == 1)).as_scalar()
@@ -430,7 +453,6 @@ class FcWorkunit(Base):
         return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
 
 
-
 class FcHostActivity(Base):
     __tablename__ = 'fc_host_activity'
 
@@ -443,8 +465,6 @@ class FcHostActivity(Base):
     @hybrid_property
     def host(self):
         return self.boinc_host.fc_host
-
-
 
 
 class FcNotification(Base):
@@ -584,7 +604,6 @@ class FcEncryptedFile(Base):
         return getHashById(str(self.hash_type))['name']
 
 
-
 class FcHostStatus(Base):
     __tablename__ = 'fc_host_status'
 
@@ -611,7 +630,6 @@ class FcHostStatus(Base):
         return True if total_seconds <= 60 else False
 
 
-
 class FcHash(Base):
     __tablename__ = 'fc_hash'
 
@@ -624,7 +642,6 @@ class FcHash(Base):
     time_cracked = Column(DateTime)
 
     job = relationship("FcJob", back_populates="hashes")
-
 
     @hybrid_property
     def hashText(self):
@@ -650,7 +667,6 @@ class FcHash(Base):
 
 class Result(Base):
     __tablename__ = 'result'
-
 
     id = Column(Integer, primary_key=True)
     create_time = Column(Integer, nullable=False)
@@ -696,5 +712,3 @@ class Result(Base):
             return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' )
         except:
             return self.stderr_out.decode("utf-8")
-
-

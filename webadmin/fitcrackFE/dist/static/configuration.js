@@ -2,7 +2,9 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 */
-
+/*
+window.serverAddress = 'http://localhost:5001'
+*/
 window.serverAddress = 'http://localhost:5000'
 
 window.theme = {
@@ -16,4 +18,3 @@ window.theme = {
   gradient: '305deg, rgb(161, 21, 68) 40%, rgb(237, 110, 24)',
   project: 'fitcrack'
 }
-

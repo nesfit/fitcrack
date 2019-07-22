@@ -31,9 +31,11 @@ from src.api.fitcrack.endpoints.protectedFile.protectedFile import ns as protect
 from src.api.fitcrack.endpoints.hashCache.hashes import ns as hashes_ns
 from src.api.fitcrack.endpoints.jobTemplate.template import ns as template_ns
 from src.api.fitcrack.endpoints.logs.logs import ns as logs_ns
+from src.api.fitcrack.endpoints.pcfg.pcfg import ns as pcfg_ns
 from src.database import db
 
 app = Flask(__name__)
+
 
 def configure_app(flask_app):
     flask_app.config['SECRET_KEY'] = 'fitcrack456152'
@@ -45,6 +47,7 @@ def configure_app(flask_app):
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
     flask_app.config['ERROR_404_HELP'] = settings.RESTPLUS_ERROR_404_HELP
+    # flask_app.config['DEBUG'] = True
 
 
 def initialize_app(flask_app):
@@ -70,12 +73,12 @@ def initialize_app(flask_app):
     api.add_namespace(hashes_ns)
     api.add_namespace(template_ns)
     api.add_namespace(logs_ns)
+    api.add_namespace(pcfg_ns)
 
     flask_app.register_blueprint(blueprint)
 
     CORS(app, supports_credentials=True)
     return flask_app
-
 
 
 @app.before_request
@@ -94,11 +97,7 @@ def check_valid_login():
 
 
 def main():
-    app.run(host='0.0.0.0', port=5000, threaded=True)
-
-
-
-
+    app.run(host='0.0.0.0', port=5001, threaded=False)
 
 
 initialize_app(app)
