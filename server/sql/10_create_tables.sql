@@ -374,6 +374,7 @@ CREATE TABLE `fc_pcfg_grammar` (
   `path` varchar(400) NOT NULL,
   `keyspace` bigint(20) unsigned NOT NULL,
   `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
