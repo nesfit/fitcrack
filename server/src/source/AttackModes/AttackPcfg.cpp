@@ -143,11 +143,23 @@ bool CAttackPcfg::makeJob()
     /********/
     /** TODO: Load grammar path from DB and dump it to BOINC input file  */
     /********/
+    /*
+    std::ifstream grammarFile;
+    grammarFile.open((Config::pcfgDir + grammar->getGrammarFileName() + "/grammar.bin").c_str());
+    if (!grammarFile) {
+        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+                              "Failed to open dictionary file! Setting package to malformed.\n");
+        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        return false;
+    }
+
+    f << grammarFile.rdbuf();
+    dictFile.close();
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Done\n");
     f.close();
-
+    */
 
     /** Fill in the job parameters */
     wu.clear();

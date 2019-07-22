@@ -56,6 +56,7 @@ namespace Config {
     extern std::string dictDir;
     extern std::string markovDir;
     extern std::string rulesDir;
+    extern std::string pcfgDir;
     extern std::string projectDir;
 
     /** Template names */
