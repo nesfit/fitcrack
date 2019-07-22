@@ -191,5 +191,3 @@ class dictionary(Resource):
             'message': 'Dictionaries successfuly uploaded.',
             'status': True
         }
-
-

@@ -14,6 +14,7 @@ HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
 MASK_PROCESSOR_PATH = ROOT_DIR + '/../maskprocessor/mp64.bin'
 EXE_OR_BIN = 'bin'
 DICTIONARY_DIR = '/usr/share/collections/dictionaries'
+PCFG_DIR = '/usr/share/collections/pcfg'
 HCSTATS_DIR = '/usr/share/collections/markov'
 MASKS_DIR = '/usr/share/collections/masks'
 CHARSET_DIR = '/usr/share/collections/charsets'
@@ -45,7 +46,9 @@ RESTPLUS_MASK_SWAGGER = True
 RESTPLUS_ERROR_404_HELP = False
 
 # SQLAlchemy settings
+#SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://fitcrack:mypassword@localhost/fitcrack'
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/fitcrack'
+
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 BOINC_SERVER_URI = 'http://localhost'
