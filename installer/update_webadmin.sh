@@ -17,7 +17,12 @@ if [ -d "$APACHE_DOCUMENT_ROOT/fitcrackFE" ]; then
   echo "WebAdmin front-end is installed in $APACHE_DOCUMENT_ROOT/fitcrackFE."
   read -e -p "Update front-end? [y/N] (default: y): " UPDATE_FRONTEND
   UPDATE_FRONTEND=${UPDATE_FRONTEND:-y}
+
   if [ $UPDATE_FRONTEND = "y" ]; then
+    # Backup original frontend config
+    BACKEND_URI=`cat $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js | grep "serverAddress" | cut -d"'" -f2`
+
+    # Delete old frontend
     rm -Rf $APACHE_DOCUMENT_ROOT/fitcrackFE
     INSTALL_FRONTEND="y"
   fi
@@ -40,7 +45,7 @@ if [ $INSTALL_FRONTEND = "y" ]; then
   echo "Configuring updated front-end..."
 
   # Set port to backend
-  sed -i "s|http://localhost:5000|http://localhost:$BACKEND_PORT|g" $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js
+  sed -i "s|http://localhost:5000|$BACKEND_URI|g" $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js
   echo "Done."
 
   echo "Updated front-end in $APACHE_DOCUMENT_ROOT/fitcrackFE."
