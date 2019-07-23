@@ -35,6 +35,10 @@ if ! [ -d "/usr/share/collections/rules" ]; then
   cp -R collections/rules /usr/share/collections/
 fi
 
+if ! [ -d "/usr/share/collections/pcfg" ]; then
+  cp -R collections/pcfg /usr/share/collections/
+fi
+
 # Set ownership and permissions
 chown -R $APACHE_USER:$APACHE_GROUP /usr/share/collections
 chmod -R 777 /usr/share/collections
