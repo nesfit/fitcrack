@@ -5,20 +5,20 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0"><h2>Select dictionary<span class="required primary--text"> *</span></h2></v-card-title>
-    <dict-selector v-model="dictionaries" @input="checkValid"></dict-selector>
+    <v-card-title class="pb-0"><h2>Select pcfg<span class="required primary--text"> *</span></h2></v-card-title>
+    <pcfg-selector v-model="pcfg" @input="checkValid"></pcfg-selector>
 
     <v-divider></v-divider>
-    <v-card-title class="pb-0"><h2>Select pcfg file</h2></v-card-title>
-    <pcfg-selector v-model="pcfg" @input="checkValid"></pcfg-selector>
+    <v-card-title class="pb-0"><h2>Select rule file</h2></v-card-title>
+    <rules-selector v-model="rules" @input="checkValid"></rules-selector>
   </div>
 </template>
 
 <script>
-  import dictSelector from '@/components/selector/dictionarySelector'
   import pcfgSelector from '@/components/selector/pcfgSelector'
+  import ruleSelector from '@/components/selector/rulesSelector'
   export default {
-    name: "dictionary",
+    name: "pcfg",
     props: {
       value: {
         type: [Boolean, Object],
@@ -27,29 +27,29 @@
     },
     watch:{
       value: function(){
-        if (this.value.left_dictionaries)
-          this.dictionaries = this.value.left_dictionaries
         if (this.value.pcfg)
           this.pcfg = this.value.pcfg
+        if (this.value.rules)
+          this.rules = this.value.rules
       }
     },
     components: {
-      'dict-selector': dictSelector,
-      'pcfg-selector': pcfgSelector
+      'pcfg-selector': pcfgSelector,
+      'rules-selector': ruleSelector
     },
     methods: {
-      checkValid: function () {
-        if (this.dictionaries.length > 0) {
+      /*checkValid: function () {
+        if (this.pcfg.length > 0) {
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
-            'rules': this.pcfg,
-            'left_dictionaries': this.dictionaries
+            'rules': this.rules,
+            'pcfg': this.pcfg
           })
           return true
         }
         return false
-      }
+      }*/
     },
     data: function () {
       return {
@@ -57,7 +57,7 @@
         attackName: 'pcfg',
         valid: false,
 
-        dictionaries: [],
+        pcfg: [],
         rules: null,
       }
     }
