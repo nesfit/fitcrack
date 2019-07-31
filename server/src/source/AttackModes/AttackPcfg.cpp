@@ -50,10 +50,11 @@ class PretermClient {
             if (status.ok()) {
                 keyspace = reply.terminalscount();
 
-                Tools::printDebug("gRPC Succeeded: Real keyspace %" PRIu64 "\n", keyspace);
+                Tools::printDebug("LOG: gRPC Succeeded: Real keyspace %" PRIu64 "\n", keyspace);
 
                 std::string result;
                 reply.SerializeToString(&result);
+
                 return result;
             } else {
                 std::string details(status.error_details());
@@ -71,11 +72,11 @@ class PretermClient {
             Status status = stub_->Connect(&context, request, &reply);
 
             if (status.ok()) {
-                Tools::printDebug("gRPC Connected!\n");
+                Tools::printDebug("LOG: gRPC Connected!\n");
                 return true;
             }
             else {
-                Tools::printDebug("gRPC could not connect!\n");
+                Tools::printDebug("LOG: gRPC could not connect!\n");
                 return false;
             }
         }
@@ -174,8 +175,8 @@ bool CAttackPcfg::makeJob()
         return false;
     }
 
-    f.open(path);
-    if (!f)
+    std::ofstream outfile(path, std::ofstream::binary);
+    if (!outfile)
     {
         Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
                               "Failed to open dict1 BOINC input file! Setting package to malformed.\n");
@@ -201,10 +202,8 @@ bool CAttackPcfg::makeJob()
     m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
     m_job->setHcKeyspace(newKeyspace);
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                          "Done\n");
-    f.close();
-
+    outfile.write(preterminals.c_str(), sizeof(char) * preterminals.size());
+    outfile.close();
 
     /** Create grammar sticky file. */
     retval = config.download_path(name4, path);
@@ -239,9 +238,6 @@ bool CAttackPcfg::makeJob()
 
     f << grammarFile.rdbuf();
     grammarFile.close();
-
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                          "Done\n");
     f.close();
 
 
