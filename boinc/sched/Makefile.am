@@ -348,16 +348,20 @@ fitcrack_sources = \
     Package.cpp \
     SqlLoader.cpp \
     AbstractGenerator.cpp \
-    SimpleGenerator.cpp
+    SimpleGenerator.cpp \
+    protocol.grpc.pb.h \
+    protocol.grpc.pb.cc \
+    protocol.pb.h \
+    protocol.pb.cc
 
 assimilator_SOURCES = $(ASSIMILATOR_SOURCES) \
 	$(fitcrack_sources) \
 	work_assimilator.cpp
-assimilator_LDADD = $(SERVERLIBS)
+assimilator_LDADD = $(SERVERLIBS) -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection
 
 work_generator_SOURCES = $(fitcrack_sources) \
 	work_generator.cpp
-work_generator_LDADD = $(SERVERLIBS)
+work_generator_LDADD = $(SERVERLIBS) -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection
 
 bitwise_validator_SOURCES = $(VALIDATOR_SOURCES) \
 	sample_bitwise_validator.cpp

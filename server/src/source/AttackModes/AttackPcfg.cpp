@@ -7,7 +7,60 @@
  */
 
 #include <AttackPcfg.h>
+#include <protocol.pb.h>
+#include <protocol.grpc.pb.h>
+#include <grpcpp/grpcpp.h>
 
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::Status;
+
+using proto::PCFG;
+using proto::Items;
+using proto::NextRequest;
+
+
+/** Class for gRPC calls */
+class PretermClient {
+    public:
+        PretermClient(std::shared_ptr<Channel> channel)
+                : stub_(PCFG::NewStub(channel)) {}
+
+        // Assembles the client's payload, sends it and presents the response back
+        // from the server.
+        std::string GetNextItems(uint64_t * keyspace) {
+            // Data we are sending to the server.
+            NextRequest request;
+            request.set_terminals(*keyspace);
+
+            // Container for the data we expect from the server.
+            Items reply;
+
+            // Context for the client. It could be used to convey extra information to
+            // the server and/or tweak certain RPC behaviors.
+            ClientContext context;
+
+            // The actual RPC.
+            Status status = stub_->GetNextItems(&context, request, &reply);
+
+            // Act upon its status.
+            if (status.ok()) {
+                *keyspace = reply.terminalscount();
+
+                Tools::printDebug("gRPC Succeeded: Real keyspace %" PRIu64 "", *keyspace);
+
+                std::string result;
+                reply.SerializeToString(&result);
+                return result;
+            } else {
+                Tools::printDebug("gRPC call failed!");
+                return std::string();
+            }
+        }
+
+    private:
+        std::unique_ptr<PCFG::Stub> stub_;
+};
 
 
 CAttackPcfg::CAttackPcfg(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader)
@@ -242,11 +295,10 @@ bool CAttackPcfg::generateJob()
 
 void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
 {
-    /********/
-    /** TODO: Call and parse the gRPC reply */
-    /********/
+    PretermClient client(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
+    uint64_t result = 0;
+    preterminals = client.GetNextItems(&result);
 
-    preterminals = "0,0,[[3,1,[4,1,[]],[1,0,[]]]]";
-    realKeyspace = 42;
+    realKeyspace = result;
 }
 
