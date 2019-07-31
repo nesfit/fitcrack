@@ -24,7 +24,7 @@
         </td>
         <td>{{ props.item.name }}</td>
         <td class="text-xs-right">{{ props.item.keyspace }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
+        <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
         <td class="text-xs-right">
           <v-tooltip top>
             <v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.id}}" slot="activator">

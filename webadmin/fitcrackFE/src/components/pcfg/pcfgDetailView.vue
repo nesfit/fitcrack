@@ -35,7 +35,7 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title class="text-xs-right">
-                  {{ $moment(data.time).format('DD.MM.YYYY HH:mm') }}
+                  {{ $moment(data.time_added).format('DD.MM.YYYY HH:mm') }}
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
