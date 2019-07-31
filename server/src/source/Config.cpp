@@ -37,6 +37,7 @@ namespace Config {
     std::string dictDir = "/usr/share/collections/dictionaries/";
     std::string markovDir = "/usr/share/collections/markov/";
     std::string rulesDir = "/usr/share/collections/rules/";
+    std::string pcfgDir = "/usr/share/collections/pcfg/";
 
     /** Template names*/
     std::string inTemplateFileBench =      "bench_in";
@@ -53,6 +54,7 @@ namespace Config {
     char * inTemplatePathMask = nullptr;
     char * inTemplatePathMarkov = nullptr;
     char * inTemplatePathDict = nullptr;
+    char * inTemplatePathPcfg = nullptr;
     char * inTemplatePathCombinator = nullptr;
     char * inTemplatePathRule = nullptr;
     DB_APP * app = nullptr;

@@ -109,11 +109,22 @@ bool CAttackPcfg::makeJob()
     }
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                          "Asking for preterminals fragment\n");
+                          "Asking for preterminals fragment ...\n");
 
-    /*******/
-    /** TODO: gRPC call to collect preterminals and update current index + keyspace */
-    /*******/
+    /** gRPC call to collect preterminals and update current index + keyspace */
+    std::string preterminals;
+    uint64_t newKeyspace = 0;
+    loadNextPreterminals(preterminals, newKeyspace);
+
+    if (preterminals.empty() || newKeyspace == 0)
+    {
+        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+                              "Failed to fetch response from PCFG Manager!.\n");
+        return true;
+    }
+
+    m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
+    m_job->setHcKeyspace(newKeyspace);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Done\n");
@@ -140,9 +151,19 @@ bool CAttackPcfg::makeJob()
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Creating grammar file\n");
 
-    /********/
-    /** TODO: Load grammar path from DB and dump it to BOINC input file  */
-    /********/
+
+    /** Load grammar path from DB and dump it to BOINC input file  */
+    std::ifstream grammarFile;
+    grammarFile.open((Config::pcfgDir + m_package->getGrammar() + "/grammar.bin").c_str());
+    if (!grammarFile) {
+        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+                              "Failed to open dictionary file! Setting package to malformed.\n");
+        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        return false;
+    }
+
+    f << grammarFile.rdbuf();
+    grammarFile.close();
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Done\n");
@@ -207,29 +228,25 @@ bool CAttackPcfg::generateJob()
         passCount = Config::minPassCount;
     }
 
-    /*********/
-    /** TODO: Send grammar index to makeJob (in CJob) */
-    /*********/
-
     /** Create the job */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex, 0, passCount, 0,
-                         currentDict->getId(), false, 0, false);
+    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
+                         false, 0, false);
 
     /**
-     * @warning Index and WU-Keyspace updating must be done later, after reply from PCFG Manager
+     * @warning Index and WU-Keyspace updating must be done later, after the response from PCFG Manager
      */
 
     return true;
 }
 
 
-void CAttackPcfg::loadNextPreterminals(std::vector<std::string> & preterminals, uint64_t & realKeyspace)
+void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
 {
     /********/
     /** TODO: Call and parse the gRPC reply */
     /********/
 
-    preterminals.push_down("0,0,[[3,1,[4,1,[]],[1,0,[]]]]");
+    preterminals = "0,0,[[3,1,[4,1,[]],[1,0,[]]]]";
     realKeyspace = 42;
 }
 

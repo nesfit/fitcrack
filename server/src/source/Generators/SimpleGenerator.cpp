@@ -16,7 +16,7 @@
 #include <AttackMask.h>
 #include <AttackMarkov.h>
 #include <AttackRules.h>
-
+#include <AttackPcfg.h>
 
 
 CSimpleGenerator::CSimpleGenerator()
@@ -156,7 +156,7 @@ void CSimpleGenerator::createRegularJob(PtrPackage & package, PtrHost & host)
             break;
 
         case Config::AttackMode::AttackPcfg:
-            attack = new CAttackPcfg(job, host, duration, m_sqlLoader);
+            attack = new CAttackPcfg(package, host, duration, m_sqlLoader);
             break;
 
         default:

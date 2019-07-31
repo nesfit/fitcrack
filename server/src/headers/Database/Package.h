@@ -116,6 +116,7 @@ class CPackage {
         std::string m_dict1;
         std::string m_dict2;
         std::string m_rules;
+        std::string m_grammar;
         std::string m_markov;
         uint32_t    m_markovThreshold;
         uint32_t    m_replicateFactor;
@@ -158,6 +159,7 @@ class CPackage {
         const std::string & getDict1() const;
         const std::string & getDict2() const;
         const std::string & getRules() const;
+        const std::string & getGrammar() const;
         const std::string & getMarkov() const;
         uint32_t getMarkovThreshold() const;
         uint32_t getReplicateFactor() const;

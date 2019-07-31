@@ -56,6 +56,7 @@ namespace Config {
     extern std::string dictDir;
     extern std::string markovDir;
     extern std::string rulesDir;
+    extern std::string pcfgDir;
     extern std::string projectDir;
 
     /** Template names */
@@ -65,6 +66,7 @@ namespace Config {
     extern std::string inTemplateFileDict;
     extern std::string inTemplateFileCombinator;
     extern std::string inTemplateFileRule;
+    extern std::string inTemplateFilePcfg;
     extern std::string outTemplateFile;
 
     /** Other parameters filled by BOINC arg parsing */

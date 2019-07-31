@@ -321,6 +321,7 @@ fitcrack_sources = \
     AttackMask.h \
     AttackMode.h \
     AttackRules.h \
+    AttackPcfg.h \
     Base64.h \
     Config.h \
     Dictionary.h \
@@ -338,6 +339,7 @@ fitcrack_sources = \
     AttackMask.cpp \
     AttackMode.cpp \
     AttackRules.cpp \
+    AttackPcfg.cpp \
     Config.cpp \
     Dictionary.cpp \
     Host.cpp \
