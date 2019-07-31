@@ -15,6 +15,8 @@ cp -f server/src/source/*.cpp             boinc/sched/
 cp -f server/src/source/AttackModes/*.cpp boinc/sched/
 cp -f server/src/source/Generators/*.cpp  boinc/sched/
 cp -f server/src/source/Database/*.cpp    boinc/sched/
+cp -f server/src/headers/protocol/*.cc    boinc/sched/
+cp -f server/src/headers/protocol/*.h     boinc/sched/
 
 rm -f tmp/built 2>/dev/null
 
