@@ -54,6 +54,7 @@ namespace Config {
     char * inTemplatePathMask = nullptr;
     char * inTemplatePathMarkov = nullptr;
     char * inTemplatePathDict = nullptr;
+    char * inTemplatePathPcfg = nullptr;
     char * inTemplatePathCombinator = nullptr;
     char * inTemplatePathRule = nullptr;
     DB_APP * app = nullptr;

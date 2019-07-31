@@ -44,10 +44,10 @@ class CAttackPcfg : public AttackMode {
 
         /**
          * @brief Calls gRPC request to PCFG Manager which asks for new preterminals
-         * @param preterminals List of preterminals
+         * @param preterminals List of preterminals as a single string
          * @param realKeyspace Number of passwords that are represented by those preterminals
          */
-        void loadNextPreterminals(std::vector<std::string> & preterminals, uint64_t & realKeyspace);
+        void loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace);
 };
 
 #endif //WORKGENERATOR_ATTACKPCFG_H

@@ -66,6 +66,7 @@ namespace Config {
     extern std::string inTemplateFileDict;
     extern std::string inTemplateFileCombinator;
     extern std::string inTemplateFileRule;
+    extern std::string inTemplateFilePcfg;
     extern std::string outTemplateFile;
 
     /** Other parameters filled by BOINC arg parsing */
