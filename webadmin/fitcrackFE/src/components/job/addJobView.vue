@@ -244,6 +244,14 @@
                       <hybridMaskWordlist v-model="attackSettings" ref="HybridMaskWordAttack"></hybridMaskWordlist>
                     </v-card>
                   </v-tab-item>
+                  <v-tab :ripple="false" @click="attackTabChanged($refs.pcfg)">
+                    PCFG
+                  </v-tab>
+                  <v-tab-item lazy>
+                    <v-card flat>
+                      <pcfg v-model="attackSettings" ref="pcfg"></pcfg>
+                    </v-card>
+                  </v-tab-item>
                 </v-tabs>
               </v-layout>
             </fc-tile>
@@ -342,6 +350,7 @@
   import dictionary from '@/components/job/attacks/dictionary'
   import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist'
   import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask'
+  import pcfg from '@/components/job/attacks/pcfg'
   import tile from '@/components/tile/fc_tile'
   import FileUploader from "@/components/fileUploader/fileUploader";
   import fcTextarea from '@/components/textarea/fc_textarea'
@@ -357,6 +366,7 @@
       'dictionary': dictionary,
       'hybridMaskWordlist': hybridMaskWordlist,
       'hybridWordlistMask': hybridWordlistMask,
+      'pcfg': pcfg,
       'fc-textarea': fcTextarea,
       'host-selector': hostSelector,
       'template-modal': templateModal
