@@ -19,7 +19,7 @@
       >
         <template slot="items" slot-scope="props">
           <td><router-link :to="{name: 'pcfgDetail', params: { id: props.item.id}}">{{ props.item.name }}</router-link></td>
-          <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
+          <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
           <td class="text-xs-right">
             <a :href="$serverAddr + '/pcfg/' + props.item.id + '/download'" target="_blank">
               <v-btn outline fab small color="primary">

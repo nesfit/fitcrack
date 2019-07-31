@@ -72,8 +72,6 @@
         this.dialog = false;
       },
       cancel() {
-        this.resolve(false)
-        this.reject(true);
         this.dialog = false;
       }
     }
