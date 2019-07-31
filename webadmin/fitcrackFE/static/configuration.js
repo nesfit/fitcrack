@@ -2,9 +2,8 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 */
-window.serverAddress = 'http://localhost:5001'
 
-/* window.serverAddress = 'http://localhost:5000' */
+window.serverAddress = 'http://localhost:5000'
 
 window.theme = {
   primary: '#ab2a4c',
