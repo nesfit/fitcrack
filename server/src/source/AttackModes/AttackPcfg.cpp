@@ -18,6 +18,8 @@ using grpc::Status;
 using proto::PCFG;
 using proto::Items;
 using proto::NextRequest;
+using proto::Empty;
+using proto::ConnectResponse;
 
 
 /** Class for gRPC calls */
@@ -28,10 +30,11 @@ class PretermClient {
 
         // Assembles the client's payload, sends it and presents the response back
         // from the server.
-        std::string GetNextItems(uint64_t * keyspace) {
+        std::string GetNextItems(uint64_t & keyspace)
+        {
             // Data we are sending to the server.
             NextRequest request;
-            request.set_terminals(*keyspace);
+            request.set_terminals(keyspace);
 
             // Container for the data we expect from the server.
             Items reply;
@@ -45,16 +48,35 @@ class PretermClient {
 
             // Act upon its status.
             if (status.ok()) {
-                *keyspace = reply.terminalscount();
+                keyspace = reply.terminalscount();
 
-                Tools::printDebug("gRPC Succeeded: Real keyspace %" PRIu64 "", *keyspace);
+                Tools::printDebug("gRPC Succeeded: Real keyspace %" PRIu64 "\n", keyspace);
 
                 std::string result;
                 reply.SerializeToString(&result);
                 return result;
             } else {
-                Tools::printDebug("gRPC call failed!");
+                std::string details(status.error_details());
+                std::string msg(status.error_message());
+                Tools::printDebug("LOG: gRPC call failed! Code: %d, %s, %s\n", status.error_code(), details.c_str(), msg.c_str());
                 return std::string();
+            }
+        }
+
+        bool Connect()
+        {
+            Empty request;
+            ConnectResponse reply;
+            ClientContext context;
+            Status status = stub_->Connect(&context, request, &reply);
+
+            if (status.ok()) {
+                Tools::printDebug("gRPC Connected!\n");
+                return true;
+            }
+            else {
+                Tools::printDebug("gRPC could not connect!\n");
+                return false;
             }
         }
 
@@ -167,12 +189,12 @@ bool CAttackPcfg::makeJob()
     /** gRPC call to collect preterminals and update current index + keyspace */
     std::string preterminals;
     uint64_t newKeyspace = 0;
-    loadNextPreterminals(preterminals, newKeyspace);
+    loadNextPreterminals(preterminals, newKeyspace, m_package->getCurrentIndex());
 
     if (preterminals.empty() || newKeyspace == 0)
     {
         Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to fetch response from PCFG Manager!.\n");
+                              "Failed to fetch response from PCFG Manager!\n");
         return true;
     }
 
@@ -293,12 +315,12 @@ bool CAttackPcfg::generateJob()
 }
 
 
-void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
+void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace, uint64_t currentIndex)
 {
     PretermClient client(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
-    uint64_t result = 0;
-    preterminals = client.GetNextItems(&result);
+    if (currentIndex == 0 && !client.Connect())
+        return;
 
-    realKeyspace = result;
+    preterminals = client.GetNextItems(realKeyspace);
 }
 

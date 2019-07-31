@@ -47,7 +47,7 @@ class CAttackPcfg : public AttackMode {
          * @param preterminals List of preterminals as a single string
          * @param realKeyspace Number of passwords that are represented by those preterminals
          */
-        void loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace);
+        void loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace, uint64_t currentIndex);
 };
 
 #endif //WORKGENERATOR_ATTACKPCFG_H
