@@ -34,31 +34,17 @@ OPS_PW=${OPS_PW:-mypassword}
 
 htpasswd -cb $BOINC_PROJECT_DIR/html/ops/.htpasswd "$OPS_LOGIN" "$OPS_PW"
 
-####################################
-# Copy Fitcrack apps and templates #
-####################################
-
-# Copy server daemon binaries
-cp -Rf boinc/sched/work_generator $BOINC_PROJECT_DIR/bin/
-cp -Rf boinc/sched/assimilator $BOINC_PROJECT_DIR/bin/
-cp -Rf boinc/sched/bitwise_validator $BOINC_PROJECT_DIR/bin/
-cp -Rf boinc/sched/trickler $BOINC_PROJECT_DIR/bin/
+##################################
+# Copy Fitcrack apps and daemons #
+##################################
 
 # Copy client binaries
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack/1
 cp -Rf server/client_bin/* $BOINC_PROJECT_DIR/apps/fitcrack/1/
 
-# Copy Fitcrack communication templates
-cp -Rf server/templates/* $BOINC_PROJECT_DIR/templates/
-
-
-#####################
-# !!! IMPORTANT !!! #
-#####################
-# Set permissions for BOINC user and BOINC group
-chmod -R g+rwx $BOINC_HOME
-chown -R $BOINC_USER:$BOINC_GROUP $BOINC_HOME/projects
+# Install server daemons
+source installer/install_daemons.sh
 
 # Add app app_versions
 MYDIR=$(pwd)

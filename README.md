@@ -36,6 +36,7 @@ Once installed, see how to [Operate the server](#oper)
   * rewrite
 * PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
+* gRPC + protocol buffers (3.7+)
 
 ### Installation
 Create a user for running BOINC server

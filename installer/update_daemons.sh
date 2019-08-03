@@ -38,20 +38,8 @@ if [ $BUILD_SERVER = "y" ]; then
   # Rebuild server
   source installer/build_server.sh
 
-  # Copy server daemon binaries
-  echo "Copying newly-built daemons..."
-  cp -Rf boinc/sched/work_generator $BOINC_PROJECT_DIR/bin/
-  cp -Rf boinc/sched/assimilator $BOINC_PROJECT_DIR/bin/
-  cp -Rf boinc/sched/bitwise_validator $BOINC_PROJECT_DIR/bin/
-  cp -Rf boinc/sched/trickler $BOINC_PROJECT_DIR/bin/
-
-  #####################
-  # !!! IMPORTANT !!! #
-  #####################
-  # Set permissions for BOINC user and BOINC group
-  echo "Updating permissions..."
-  chmod -R g+rwx $BOINC_HOME
-  chown -R $BOINC_USER:$BOINC_GROUP $BOINC_HOME/projects
+  # Reinstall daemons
+  source installer/install_daemons.sh
 
   echo "Starting Fitcrack server again..."
   MYDIR=$(pwd)

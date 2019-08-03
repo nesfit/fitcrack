@@ -4,6 +4,30 @@
 # This file is part of Fitcrack installer
 # Author: Radek Hranicky (ihranicky@fit.vutbr.cz)
 
+# Install gRPC and protocol buffers
+if ! [ -d "grpc" ]; then
+  echo "Installing gRPC and protocol buffers"
+
+  # Clone, build and install gRPC
+  git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
+  cd grpc
+  git submodule update --init
+  make
+  make install
+
+  # Install prtocol buffers
+  cd third_party/protobuf
+  make install
+
+  cd $INSTALLER_ROOT
+fi
+
+# Rebuiding
+echo "Rebuilding gRPC protocol..."
+cd server/src/headers
+./regenerate_protocol.sh
+cd $INSTALLER_ROOT
+
 echo "Building Fitcrack server..."
 
 # Copy server files to BOINC server Root

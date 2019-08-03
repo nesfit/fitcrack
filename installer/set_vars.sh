@@ -4,6 +4,9 @@
 # This file is part of Fitcrack installer
 # Author: Radek Hranicky (ihranicky@fit.vutbr.cz)
 
+# Save installer root
+INSTALLER_ROOT=$(pwd)
+
 #############
 # BOINC user
 #############

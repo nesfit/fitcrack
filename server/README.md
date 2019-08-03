@@ -24,6 +24,7 @@ We **highly recommend** to use the [installer](../README.md) instead.
   * rewrite
 * PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
+* gRPC + protocol buffers (3.7+)
 
 Or use the distro-specific packages below...
 
