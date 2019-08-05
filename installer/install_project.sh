@@ -98,3 +98,26 @@ if [[ $? != 0 ]]; then
   exit
 fi
 echo "Initial data inserted."
+
+# Install startup scripts
+echo "Adding Fitcrack as a service runs the daemons automatically on startup."
+read -e -p "Add Fitcrack as a system service? [y/N] (default: y)" SERVICE_INSTALL
+SERVICE_INSTALL=${SERVICE_INSTALL:-y}
+
+if [ $SERVICE_INSTALL = "y" ]; then
+  # Add startup script
+  cp -f installer/init/fitcrack /etc/init.d/fitcrack
+  chmod +x /etc/init.d/fitcrack
+  # Add runlevel symlinks
+  case $DISTRO_ID in
+    debian|ubuntu)
+      update-rc.d fitcrack defaults
+    ;;
+    centos|redhat)
+      chkconfig --add fitcrack
+      chkconfig --level 2345 fitcrack on
+    ;;
+    suse|linux)
+    ;;
+  esac
+fi

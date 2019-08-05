@@ -39,6 +39,25 @@ if [ -d "$BOINC_PROJECT_DIR" ]; then
     fi
   fi
 
+  # Remove startup scripts (if exist)
+  if [ -f "/etc/init.d/fitcrack" ]; then
+    echo "Removing fitcrack system service..."
+    # Remove runlevel symlinks
+    case $DISTRO_ID in
+      debian|ubuntu)
+        update-rc.d fitcrack remove
+      ;;
+      centos|redhat)
+        chkconfig --level 2345 fitcrack off
+        chkconfig --del fitcrack
+      ;;
+      suse|linux)
+      ;;
+    esac
+    # Remove startup script
+    rm -f /etc/init.d/fitcrack
+  fi
+
 fi
 
 ####################
