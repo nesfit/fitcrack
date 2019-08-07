@@ -313,7 +313,12 @@ bool CAttackPcfg::generateJob()
 
 void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace, uint64_t currentIndex)
 {
-    PretermClient client(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
+    /** Compute port used for this job */
+    uint64_t pcfgPort = 50050 + (m_package->getId() % 1000);
+    std::string pcfgAddress = "localhost:" + std::to_string(pcfgPort);
+
+    /** Run gRPC query to get preterminals */
+    PretermClient client(grpc::CreateChannel(pcfgAddress, grpc::InsecureChannelCredentials()));
     if (currentIndex == 0 && !client.Connect())
         return;
 

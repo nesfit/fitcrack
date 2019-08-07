@@ -51,6 +51,7 @@ namespace Config {
     extern std::string tableNameDictionary;
     extern std::string tableNamePckgDictionary;
     extern std::string tableNameHash;
+    extern std::string tableNamePcfgGrammar;
 
     /** Path to dictionaries/markov/rules */
     extern std::string dictDir;

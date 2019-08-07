@@ -58,6 +58,10 @@ void CSimpleGenerator::run()
             /** Update start_time of package */
             package->updateStartTime();
 
+            /** Load separate grammar name */
+            if (package->getAttackMode() == Config::AttackMode::AttackPcfg)
+                package->setGrammar(m_sqlLoader->loadGrammarName(package->getGrammarId()));
+
             /** Generate job for each host */
             std::vector<PtrHost> activeHosts = m_sqlLoader->loadActiveHosts(packageId);
             for (PtrHost & host : activeHosts)

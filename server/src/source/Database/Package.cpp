@@ -33,7 +33,7 @@ CPackage::CPackage(DbMap &packageMap, CSqlLoader * sqlLoader)
         this->m_dict1 = packageMap["dict1"];
         this->m_dict2 = packageMap["dict2"];
         this->m_rules = packageMap["rules"];
-        this->m_grammar = packageMap["grammar"];
+        this->m_grammar_id = std::stoull(packageMap["grammar_id"]);
         this->m_markov = packageMap["markov_hcstat"];
         this->m_markovThreshold = std::stoul(packageMap["markov_threshold"]);
         this->m_replicateFactor = std::stoul(packageMap["replicate_factor"]);
@@ -306,6 +306,10 @@ const std::string & CPackage::getGrammar() const
     return m_grammar;
 }
 
+uint64_t CPackage::getGrammarId() const
+{
+    return m_grammar_id;
+}
 
 const std::string & CPackage::getMarkov() const
 {
@@ -406,4 +410,10 @@ unsigned int CPackage::getTimeoutFactor() const
 uint32_t CPackage::getMarkovThreshold() const
 {
     return m_markovThreshold;
+}
+
+
+void CPackage::setGrammar(const std::string & grammar)
+{
+    m_grammar = grammar;
 }

@@ -117,6 +117,7 @@ class CPackage {
         std::string m_dict2;
         std::string m_rules;
         std::string m_grammar;
+        uint64_t    m_grammar_id;
         std::string m_markov;
         uint32_t    m_markovThreshold;
         uint32_t    m_replicateFactor;
@@ -159,11 +160,13 @@ class CPackage {
         const std::string & getDict1() const;
         const std::string & getDict2() const;
         const std::string & getRules() const;
-        const std::string & getGrammar() const;
+        uint64_t getGrammarId() const;
         const std::string & getMarkov() const;
         uint32_t getMarkovThreshold() const;
         uint32_t getReplicateFactor() const;
         bool getKillFlag() const;
+
+        void setGrammar(const std::string & grammar);
 
     /**
      * @section Getters/Setters for other member variables
@@ -183,6 +186,8 @@ class CPackage {
         uint64_t getMaxSeconds() const;
         uint64_t getCombSecDictSize() const;
         unsigned int getTimeoutFactor() const;
+
+        const std::string & getGrammar() const;
 };
 
 #endif //WORKGENERATOR_PACKAGE_H

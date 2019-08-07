@@ -295,6 +295,37 @@ Config::Ptr<CPackage> CSqlLoader::loadPackage(uint64_t packageId)
 }
 
 
+std::string CSqlLoader::loadGrammarName(uint64_t grammarId)
+{
+    std::string result;
+    updateSql(formatQuery("SELECT name FROM `%s` WHERE `id` = %" PRIu64 " LIMIT 1 ;",
+                          Config::tableNamePcfgGrammar.c_str(), grammarId));
+
+    MYSQL_RES* sqlResult;
+    sqlResult = mysql_store_result(boinc_db.mysql);
+    if (!sqlResult)
+    {
+        Tools::printDebugTimestamp("Problem with DB query.\nShutting down now.\n");
+        boinc_db.close();
+        exit(1);
+    }
+
+    MYSQL_ROW row;
+    if ((row = mysql_fetch_row(sqlResult)))
+    {
+        if (row[0])
+        {
+            std::string grammar_name(row[0]);
+            result = grammar_name;
+            Tools::printDebug("LOG: Loaded grammar name: %s\n", result.c_str());
+        }
+    }
+
+    mysql_free_result(sqlResult);
+    return result;
+}
+
+
 uint64_t CSqlLoader::getTotalPower(uint64_t packageId)
 {
     return getSqlNumber(formatQuery(

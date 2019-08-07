@@ -32,6 +32,7 @@ namespace Config {
     std::string tableNameDictionary =   "fc_dictionary";
     std::string tableNamePckgDictionary = "fc_job_dictionary";
     std::string tableNameHash =         "fc_hash";
+    std::string tableNamePcfgGrammar =  "fc_pcfg_grammar";
 
     /** Path to dictionaries */
     std::string dictDir = "/usr/share/collections/dictionaries/";

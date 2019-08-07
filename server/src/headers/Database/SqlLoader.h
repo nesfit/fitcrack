@@ -229,6 +229,13 @@ class CSqlLoader {
         Config::Ptr<CPackage> loadPackage(uint64_t packageId);
 
         /**
+         * @brief Sets grammar object from database with supplied ID
+         * @param grammarId ID of the grammar in DB
+         * @return True if grammar was set
+         */
+        std::string loadGrammarName(uint64_t grammarId);
+
+        /**
          * @brief Returns number of seconds between time_start column and now()
          * @param packageId ID of package from fc_package
          * @return Number of seconds

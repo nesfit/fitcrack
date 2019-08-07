@@ -277,7 +277,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `rule_right` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_hcstat` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_threshold` int(20) NOT NULL DEFAULT '0',
-  `grammar` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `grammar_id` bigint(20) unsigned DEFAULT NULL,
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
