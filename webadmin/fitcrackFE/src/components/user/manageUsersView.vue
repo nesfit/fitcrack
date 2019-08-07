@@ -29,6 +29,11 @@
                 ></v-select>
               </v-list-tile-action>
               <v-list-tile-action>
+                <div class="addBtnCont">
+                  <v-btn color="primary" class="addBtn" flat @click="editDialog=true">Edit</v-btn>
+                </div>
+              </v-list-tile-action>
+              <v-list-tile-action>
                 <v-tooltip top>
                   <v-btn icon class="mx-0" @click="deleteUser(item.id)" slot="activator">
                     <v-icon color="error">close</v-icon>
@@ -104,6 +109,71 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="editDialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <h2>Edit user</h2>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form" lazy-validation>
+            <v-text-field
+              label="Username"
+              v-model="newUsername"
+              :counter="10"
+              required
+            ></v-text-field>
+            <v-text-field
+              label="E-mail"
+              v-model="newEmail"
+              :rules="emailRules"
+              required
+            ></v-text-field>
+            <v-text-field
+              type="password"
+              label="Old password"
+              v-model="oldPassword"
+              required
+            ></v-text-field>
+            <v-text-field
+              type="password"
+              label="New password"
+              v-model="newPassword0"
+              required
+            ></v-text-field>
+            <v-text-field
+              type="password"
+              label="New password"
+              v-model="newPassword1"
+              :rules="newPasswordRules"
+              required
+            ></v-text-field>
+            <v-select
+              label="User role"
+              v-model="newUserRoleID"
+              item-text="name"
+              item-value="id"
+              :items="userRoles"
+              :rules="[v => !!v || 'Item is required']"
+              required
+            ></v-select>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat @click.stop="editDialog=false">Cancel</v-btn>
+          <v-btn color="primary" flat @click.stop="editUser" :disabled="!validEditUserForm">Edit</v-btn>
+        </v-card-actions>
+        <div class="loadingOver" v-if="editingUser">
+          <v-progress-circular
+            size="50"
+            :width="3"
+            class="progress"
+            indeterminate
+            color="primary">
+          </v-progress-circular>
+        </div>
+      </v-card>
+    </v-dialog>
 
     <v-dialog v-model="userDialog" max-width="500px">
       <v-card>
@@ -157,6 +227,8 @@
         </div>
       </v-card>
     </v-dialog>
+
+
 
   </v-container>
 </template>
@@ -235,6 +307,24 @@
           this.newUserRoleID = ''
         })
       },
+      editUser() {
+        this.editingUser = true;
+        this.axios.post(this.$serverAddr + '/user/', {
+          username: this.newUsername,
+          mail: this.newEmail,
+          password: this.newPassword,
+          role_id: this.role_id //insert anything with the same ID => rewrite row
+        }).then((response) => {
+          console.log(response.data);
+          this.loadUsers();
+          this.editDialog = false;
+          this.edittingUser = false;
+          this.newUsername = '';
+          this.newEmail = '';
+          this.newPassword = '';
+          this.newUserRoleID = ''
+        })
+      },
       deleteUser(id) {
         this.axios.delete(this.$serverAddr + '/user/' + id).then((response) => {
           console.log(response.data);
@@ -251,8 +341,13 @@
         newUsername: null,
         newUserRoleID: null,
         newEmail: null,
+        editingUser: false,
+        editDialog: false,
         addingUser: false,
         userDialog: false,
+        oldPassword: null,
+        newPassword0: null,
+        newpassword1: null,
         users: [],
         totalItems: 0,
         pagination: {},
@@ -267,10 +362,15 @@
           {text: '', value: 'id', align: 'right'}
         ],
         userRoles: [],
+        validEditUserForm: true,
         validNewUserForm: true,
         emailRules: [
           v => !!v || 'E-mail is required',
           v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+        ],
+        newPasswordRules: [
+          v => !!v || 'Repeat new password',
+          v => this.newPassword0 != this.newPassword1 || 'match!'
         ]
       }
     }

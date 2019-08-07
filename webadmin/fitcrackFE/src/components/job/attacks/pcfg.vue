@@ -5,7 +5,7 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0"><h2>Select pcfg<span class="required primary--text"> *</span></h2></v-card-title>
+    <v-card-title class="pb-0"><h2>Select PCFG<span class="required primary--text"> *</span></h2></v-card-title>
     <pcfg-selector v-model="pcfg" @input="checkValid"></pcfg-selector>
 
     <v-divider></v-divider>
