@@ -38,3 +38,7 @@ isLoggedIn_model = api.model('isLoggedIn', {
     'user': fields.Nested(fc_user_model),
     'loggedIn': fields.Boolean()
 })
+
+#password_changed_model = api.model('passwordChanged', {
+
+#})

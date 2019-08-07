@@ -12,7 +12,7 @@ from sqlalchemy import exc
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.user.argumentsParser import user_login_arguments, change_user_role_arguments, \
-    change_role_arguments, new_role_arguments, new_user_arguments
+    change_role_arguments, new_role_arguments, new_user_arguments, user_change_password_arguments
 from src.api.fitcrack.endpoints.user.responseModels import fc_user_model, isLoggedIn_model, role_list_model, \
     user_list_model
 from src.api.fitcrack.responseModels import simpleResponse
@@ -152,6 +152,45 @@ class roleNew(Resource):
             'status': True,
             'message': 'Role added.'
         }
+
+@ns.route('/password/change_my_password')
+class change_my_password(Resource):
+
+    is_public = True
+
+    @api.expect(user_change_password_arguments)
+    @api.marshal_with(fc_user_model)
+    def post(self):
+        """
+        Zmena hesla uzivatela
+        """
+        print("\nOK\n")
+        print(request)
+        print(request.get_json())
+        print(request.form)
+
+        args = user_change_password_arguments.parse_args(request)
+
+        print("\n" + args['new_password'] + "\n")
+
+        if not (current_user.check_password(args['old_password'])):
+            abort(400, 'Password incorrect')
+
+        else:
+            #print("\n" + args['new_password'] + "\n")
+
+            #print(current_user.id)
+
+            #user = FcUser.query.filter_by(id=current_user.id).one()
+
+            #print(str(user.password))
+            current_user.set_password(args['new_password'])
+            db.session.commit()
+            return {
+                'status': True,
+                'message': 'User role updated.'
+            }
+
 
 
 @ns.route('/login')
