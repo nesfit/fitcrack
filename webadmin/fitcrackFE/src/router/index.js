@@ -20,6 +20,7 @@ import dictionaryDetail from '@/components/dictionary/dictionaryDetailView'
 import pcfg from '@/components/pcfg/pcfgView.vue'
 import pcfgDetail from '@/components/pcfg/pcfgDetailView.vue'
 import manageUsers from '@/components/user/manageUsersView'
+import myAccount from '@/components/myAccount/myAccountView'
 import hostDetail from '@/components/host/hostDetailView'
 import rules from '@/components/rule/rulesView'
 import ruleDetail from '@/components/rule/ruleDetailView'
@@ -161,6 +162,11 @@ export default new Router({
           path: '/user/manageUsers',
           name: 'manageUsers',
           component: manageUsers
+        },
+        {
+          path: '/myAccount',
+          name: 'myAccount',
+          component: myAccount
         },
         {
           path: '/server',

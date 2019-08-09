@@ -66,6 +66,10 @@
             <v-checkbox @change="roleChange($event, props.item.id, 'ADD_NEW_JOB')"
                         v-model="props.item.ADD_NEW_JOB"></v-checkbox>
           </td>
+          <td>
+            <v-checkbox @change="roleChange($event, props.item.id, 'MANAGE_USERS')"
+                        v-model="props.item.MANAGE_USERS"></v-checkbox>
+          </td>
           <td class="text-xs-right">
             <v-tooltip top>
               <v-btn icon class="mx-0" @click="deleteRole(props.item.id)" slot="activator">
@@ -359,6 +363,7 @@
             value: 'name'
           },
           {text: 'Add new job', value: 'ADD_NEW_JOB', align: 'left'},
+          {text: 'Manage users', value: 'MANAGE_USERS', align: 'left'},
           {text: '', value: 'id', align: 'right'}
         ],
         userRoles: [],
