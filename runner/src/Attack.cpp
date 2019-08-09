@@ -24,8 +24,7 @@ AttackBase* Attack::create(const ConfigTask& task_config, Directory& directory) 
                 return new AttackMask(task_config, directory);
                 break;
             case '9':
-                //open pipeline?
-                return new AttackPCFG(task_config, directory); //close pipeline at the end?
+                return new AttackPCFG(task_config, directory);
                 break;
             default:
                 RunnerUtils::runtimeException("Invalid attack mode");
