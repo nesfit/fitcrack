@@ -29,7 +29,7 @@ void AttackPCFG::addSpecificArguments() {
     printf("after\n");
     //+manager arguments
 
-    addPCFGArgument("--preterminal-file"); //Add PCFG-Manager preterminals argument
+    addPCFGArgument("--preterminals-file"); //Add PCFG-Manager preterminals argument
     addPCFGRequiredFile("preterminals"); //Add file with preterminals to the PCFG-Manager pipeline
 
     addPCFGArgument("--grammar-file"); //Add PCFG-Manager grammar file

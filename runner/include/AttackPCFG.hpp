@@ -20,8 +20,6 @@ class AttackPCFG: public AttackCrackingBase {
         void addPCFGArgument(std::string argument);
         void addPCFGRequiredFile(const std::string& file_name);
 
-        std::vector<char*> PCFG_arguments_;	
-
     public:
 
         /**

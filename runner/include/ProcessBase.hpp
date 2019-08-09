@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef PROCESSBASE_HPP 
+#ifndef PROCESSBASE_HPP
 #define PROCESSBASE_HPP
 
 #include "PipeBase.hpp"
@@ -18,7 +18,7 @@
  */
 class ProcessBase {
 
-    protected:	
+    protected:
 
         PipeBase *out_pipe_; /**< Stdout pipe */
         PipeBase *err_pipe_; /**< Stderr pipe */
@@ -49,7 +49,7 @@ class ProcessBase {
         /**
          * @brief   Reads all lines from the pipe
          * @param   pipe [in] Pipe to read from
-         * @return  All lines written to the pipe 
+         * @return  All lines written to the pipe
          */
         std::string readPipeAvailableLines(PipeBase* pipe);
 
@@ -65,44 +65,44 @@ class ProcessBase {
 
         /**
          * @brief   Pure virtual function converting status to exit code
-         * @return  Exit code of child process 
+         * @return  Exit code of child process
          */
         virtual int getExitCode() const = 0;
 
         /**
          * @brief   Makes readable string of command to be executed out of arguments_ vector
-         * @return  Excutable command 
+         * @return  Excutable command
          */
         std::string getReadableArguments();
 
         /**
          * @brief   Reads all lines unread available and from the stdout pipe of the process
-         * @return  All unread lines written to stdout 
+         * @return  All unread lines written to stdout
          */
         std::string readErrPipeAvailableLines();
 
         /**
          * @brief   Reads a line from stderr of process
-         * @return  Line from the stderr 
+         * @return  Line from the stderr
          */
         std::string readErrPipeLine();
 
         /**
          * @brief   Reads all lines unread available and from the stdout pipe of the process
-         * @return  All unread lines written to stdout 
+         * @return  All unread lines written to stdout
          */
         std::string readOutPipeAvailableLines();
 
         /**
          * @brief   Reads a line from stdout of process
-         * @return  Line from the stdout 
+         * @return  Line from the stdout
          */
         std::string readOutPipeLine();
 
         /**
          * @brief   Computes run time of the launched process after it has
          *	    finished
-         * @return  Seconds elapsed 
+         * @return  Seconds elapsed
          */
         double getExecutionTime() const;
 
@@ -114,12 +114,12 @@ class ProcessBase {
 
         /**
          * @brief   Pure virtual function checking if process is still running
-         *	    
+         *
          */
         virtual bool isRunning() = 0;
 
         /**
-         * @brief   Sets executable which will be executed by the process 
+         * @brief   Sets executable which will be executed by the process
          * @param   exec_name [in] Path to the executable / shell command
          */
         void setExecutable(const std::string& exec_name);

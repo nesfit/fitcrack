@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKBASE_HPP 
+#ifndef ATTACKBASE_HPP
 #define ATTACKBASE_HPP
 
 #include "ConfigHost.hpp"
@@ -28,11 +28,13 @@ class AttackBase {
         void initializeArguments();
 
     protected:
-    
+
         std::string attack_mode_;		/**< AttackBase mode from the TLV */
         std::string output_file_;		/**< Name/path to hashcat result file */
 
         std::vector<char*> arguments_;		/**< Hashcat arguments based on the config */
+
+        std::vector<char*> PCFG_arguments_; /**< PCFG-manager arguments based on the config */
 
         const ConfigTask& config_;              /**< Representer of configuration file */
 
@@ -92,7 +94,7 @@ class AttackBase {
          */
         void findAndAddRequired(const std::string& key, const std::string& argument);
 
-    public: 
+    public:
 
         /**
          * @brief   Basic constructor
@@ -101,14 +103,15 @@ class AttackBase {
         AttackBase(const ConfigTask& config);
 
         /**
-         * @brief  Getter of arguments_ 
-         * @return Copy of arguments_ vector 
+         * @brief  Getter of arguments_
+         * @return Copy of arguments_ vector
          */
         std::vector<char*>& getArguments();
 
+        std::vector<char*>& getPCFGArguments();
         /**
          * @brief   Getter of arguments_ size
-         * @return  Size of the arguments_ 
+         * @return  Size of the arguments_
          */
         size_t getArgumentsSize();
 
