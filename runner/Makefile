@@ -18,7 +18,7 @@ SRCS=$(shell find $(SRCDIR) -name *.cpp)
 OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))
 
 linux: TARGET=runner.bin
-linux: CXX=g++-4.8
+linux: CXX=g++
 linux: CXXPATHS+=-L'./lib/x86_64_linux'
 linux: ARCH=-m64
 linux: $(OBJDIR) $(BINDIR) runner
