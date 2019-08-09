@@ -97,7 +97,7 @@
             <v-icon>linear_scale</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Pcfg</v-list-tile-title>
+            <v-list-tile-title>PCFG</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
 
@@ -151,10 +151,18 @@
         <!--</v-list-tile>-->
         <v-list-tile :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">
           <v-list-tile-action>
-            <v-icon>group</v-icon>
+            <v-icon>settings</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Manage users</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile :to="{ name: 'myAccount'}">
+          <v-list-tile-action>
+            <v-icon>group</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>My account</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile @click="logout">

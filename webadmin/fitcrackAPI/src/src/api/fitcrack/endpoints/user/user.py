@@ -188,7 +188,7 @@ class change_my_password(Resource):
             db.session.commit()
             return {
                 'status': True,
-                'message': 'User role updated.'
+                'message': 'User password updated.'
             }
 
 
