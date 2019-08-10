@@ -4,7 +4,7 @@
  */
 
 
-#ifndef TASKCOMPUTEBASE_HPP 
+#ifndef TASKCOMPUTEBASE_HPP
 #define TASKCOMPUTEBASE_HPP
 
 #include "Attack.hpp"
@@ -12,10 +12,11 @@
 #include "TaskBase.hpp"
 
 #include "Process.hpp"
+#include "ProcessPCFG.hpp"
 
 /** Class representing base of the computation tasks */
 class TaskComputeBase: public TaskBase {
-    
+
     protected:
 
 	AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
@@ -23,6 +24,7 @@ class TaskComputeBase: public TaskBase {
         ProcessBase *process_;          /**< Pointer to process executing the task */
 
         std::vector<char*> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
+        std::vector<char*> PCFGmanager_arguments_;
 
         /**
          * @brief   Merges vectors with arguments from the member objects
@@ -32,17 +34,17 @@ class TaskComputeBase: public TaskBase {
     public:
 
         /**
-         * @brief   Constructor 
+         * @brief   Constructor
 	 * @param   directory [in] Working directory object
          * @param   task_config [in] Task configuration file object
-         * @param   host_config [in] Path to the host based configuration file 
+         * @param   host_config [in] Path to the host based configuration file
          * @param   output_file [in] Name of the hashcat output file
          * @param   workunit_name [in] Name of the BOINC project workunit
          */
         TaskComputeBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name);
 
         /**
-         * @brief   Constructor 
+         * @brief   Constructor
 	 * @param   directory [in] Working directory object
          * @param   task_config [in] Task configuration file object
          * @param   host_config [in] Host configuration file object
@@ -65,7 +67,7 @@ class TaskComputeBase: public TaskBase {
 
 	/**
 	 * @brief   Getter of elapsed time when process was running
-	 * @return  Time in seconds 
+	 * @return  Time in seconds
 	 */
 	double getRunTime() const;
 
@@ -77,7 +79,7 @@ class TaskComputeBase: public TaskBase {
 	int finish();
 
 	/**
-	 * @brief  Initializes Task -> creates Attack, Process etc 
+	 * @brief  Initializes Task -> creates Attack, Process etc
 	 */
 	void initialize();
 
@@ -87,7 +89,7 @@ class TaskComputeBase: public TaskBase {
 	 * @return  True when line wasn't empty, False when it was empty
          */
         virtual bool parseHashcatOutputLine(std::string& output_line) = 0;
- 
+
         /**
          * @brief   Prints available lines from process's stdout
          */

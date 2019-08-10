@@ -5,7 +5,7 @@
 
 #include "AttackBase.hpp"
 
-/* Private */ 
+/* Private */
 
 bool AttackBase::findAndAdd(const std::string& key, const std::string& argument) {
     std::string value;
@@ -38,7 +38,7 @@ void AttackBase::initializeArguments() {
 //    addArgument("--force");
 }
 
-/* Protected */ 
+/* Protected */
 
 void AttackBase::addArgument(std::string argument){
     std::string *new_argument = new std::string(argument);
@@ -72,6 +72,10 @@ AttackBase::AttackBase(const ConfigTask& config) : config_(config), output_file_
 
 std::vector<char*>& AttackBase::getArguments() {
     return arguments_;
+}
+
+std::vector<char*>& AttackBase::getPCFGArguments() {
+    return PCFG_arguments_;
 }
 
 size_t AttackBase::getArgumentsSize() {

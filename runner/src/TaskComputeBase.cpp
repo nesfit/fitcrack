@@ -9,11 +9,18 @@
 void TaskComputeBase::getAllArguments() {
 
     hashcat_arguments_ = attack_->getArguments();
+
+    //if PCFG
+    PCFGmanager_arguments_ = attack_->getPCFGArguments();
+
     host_config_.read();
 
     host_config_.print();
 
     host_config_.parseArguments(hashcat_arguments_);
+
+    //if PCFG
+    //host_config_.parseArguments(PCFGmanager_arguments_);
 }
 
 /* Public */
@@ -33,6 +40,10 @@ TaskComputeBase::~TaskComputeBase() {
     }
 
     for (std::vector<char*>::iterator it = hashcat_arguments_.begin(); it != hashcat_arguments_.end(); it++) {
+        delete []*it;
+    }
+    //if PCFG
+    for (std::vector<char*>::iterator it = PCFGmanager_arguments_.begin(); it != PCFGmanager_arguments_.end(); it++) {
         delete []*it;
     }
 }
@@ -76,6 +87,14 @@ void TaskComputeBase::initialize() {
     }
 
     if (process_ == nullptr) {
+      if(PCFGflag){
+        process_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
+        TaskComputeBase::startComputation();
+        //Přesměrovat výstup na pajpu, spustit hashcat, přečíst pajpu
+        process_ = nullptr;
+      }
+        printf("started\n");
+
         process_ = Process::create(hashcat_arguments_, directory_);
     }
 }
@@ -98,4 +117,3 @@ void TaskComputeBase::startComputation() {
 	Logging::debugPrint(Logging::Detail::GeneralInfo, "Process has started.");
     }
 }
-

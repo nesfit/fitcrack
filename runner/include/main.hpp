@@ -20,6 +20,6 @@
 
 #include "boinc_api.h"
 
-#define RUNNER_VERSION "3.1.0"
+#define RUNNER_VERSION "3.1.1"
 
 #endif // MAIN_HPP

@@ -20,7 +20,9 @@ void ProcessLinux::launchSubprocess() {
     err_pipe_->closeRead();
 
     /** Redirect childs stdout and stderr to the pipes */
-    reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
+    if(!PCFGflag){
+      reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
+    }
     reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));
 
     /** Execute application */
@@ -69,7 +71,7 @@ int ProcessLinux::run() {
         } catch (std::exception& e) {
             std::cerr << "Child process failed with std::runtime_error:\n what() : " << e.what() << std::endl;
             /** Exit child process on any exception, don't let child exception to be
-             *  caught by the code that should be executed only by parent 
+             *  caught by the code that should be executed only by parent
              */
             exit(errno);
         }

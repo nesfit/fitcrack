@@ -6,7 +6,7 @@
 #include "ProcessBase.hpp"
 
 ProcessBase::ProcessBase(const std::string& exec_name, std::vector<char*>& exec_args) :
-    start_time_(0), stop_time_(0) { 
+    start_time_(0), stop_time_(0) {
 
 	setExecutable(exec_name);
 
@@ -67,7 +67,7 @@ std::string ProcessBase::readPipeAvailableLines(PipeBase* pipe) {
 
 int ProcessBase::finish() {
     while (isRunning());
-    setStopTime(); 
+    setStopTime();
     return getExitCode();
 }
 

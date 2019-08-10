@@ -14,14 +14,17 @@ AttackBase* Attack::create(const ConfigTask& task_config, Directory& directory) 
 
     if (mode == "n") {
         switch (attack_mode[0]) {
-            case '0': 
+            case '0':
                 return new AttackDictionary(task_config, directory);
                 break;
-            case '1': 
+            case '1':
                 return new AttackCombinator(task_config, directory);
                 break;
-            case '3': 
+            case '3':
                 return new AttackMask(task_config, directory);
+                break;
+            case '9':
+                return new AttackPCFG(task_config, directory);
                 break;
             default:
                 RunnerUtils::runtimeException("Invalid attack mode");

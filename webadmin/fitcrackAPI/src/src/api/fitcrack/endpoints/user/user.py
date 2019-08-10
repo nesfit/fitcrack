@@ -173,7 +173,11 @@ class change_my_password(Resource):
             db.session.commit()
             return {
                 'status': True,
+<<<<<<< HEAD
                 'message': 'User password changed.'
+=======
+                'message': 'User password updated.'
+>>>>>>> 79f35c8676ba584eae97455b41cfecc76642b880
             }
 
 

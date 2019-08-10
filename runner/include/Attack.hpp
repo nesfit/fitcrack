@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACK_HPP 
+#ifndef ATTACK_HPP
 #define ATTACK_HPP
 
 #include "AttackBase.hpp"
@@ -11,6 +11,7 @@
 #include "AttackCombinator.hpp"
 #include "AttackDictionary.hpp"
 #include "AttackMask.hpp"
+#include "AttackPCFG.hpp"
 
 #include "ConfigTask.hpp"
 
@@ -21,7 +22,7 @@
 /** Namespace with function for creating new attack */
 namespace Attack {
     /**
-     * @brief	Creates new config based attack	
+     * @brief	Creates new config based attack
      * @param   config [in] Structure with sent parameters
      * @param   directory [in] Working directory with found files
      * @return  Specific type of attack object base on config parameters
