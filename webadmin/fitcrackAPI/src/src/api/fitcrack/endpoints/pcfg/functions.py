@@ -43,3 +43,6 @@ def deleteUnzipedFolderDirectory(pcfgZipFilePath):
 
     else:
         print("Does not exist.")
+
+def create_pcfg_grammar_bin(path):
+    print("done")

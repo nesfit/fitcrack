@@ -79,6 +79,25 @@ addPackage_model = api.schema_model('addPackage', {
                 'attack_name': {
                     'type': 'string'
                 },
+                'pcfg_grammar': {
+                    'description': 'PCFG Grammar',
+                    'type': 'object',
+                    "properties": {
+                        'id': {
+                            'type': 'integer'
+                        },
+                        'keyspace': {
+                            'type': 'integer'
+                        },
+                        'name': {
+                            'type': 'string'
+                        },
+                        'time': {
+                            "format": "date-time",
+                            "type": "string"
+                        },
+                    },
+                },
                 'left_dictionaries': {
                     'description': 'array of left dictionaries',
                     'type': 'array',

@@ -18,7 +18,7 @@ import os
 from flask_restplus import abort
 from sqlalchemy import exc
 
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR
+from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR
 from src.api.fitcrack.attacks import processPackage as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, coun_file_lines
 from src.api.fitcrack.functions import shellExec, lenStr
@@ -97,8 +97,11 @@ def create_package(data):
         cracking_time='0',
         seconds_per_workunit=package['seconds_per_job'] if package['seconds_per_job'] > 60 else 60,
         config=package['config'],
+        #TODO odstrániť dict1, dict2
         dict1=package['dict1'] if package.get('dict1') else '',
         dict2=package['dict2'] if package.get('dict2') else '',
+
+        #TODO možno odstrániť charset
         charset1=package['charset1'] if package.get('charset1') else '',
         charset2=package['charset2'] if package.get('charset2') else '',
         charset3=package['charset3'] if package.get('charset3') else '',
@@ -109,9 +112,9 @@ def create_package(data):
         markov_hcstat=package['markov_hcstat'] if package.get('markov_hcstat') else '',
         markov_threshold=package['markov_threshold'] if package.get('markov_threshold') else 0,
         replicate_factor=1,
-        deleted=False
-    )
-
+        deleted=False,
+        #pcfg_grammar=package['pcfg_grammar'] if package.get('pcfg_grammar') else ''
+        )
 
     try:
         db.session.add(db_package)
@@ -178,7 +181,7 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
             abort(500, 'Hash ' + hashArr[0] + ' has wrong format (' + hashArr[1] + ' exception).')
         if binaryHash:
             hashArr[0] = binaryHash
-            
+
         if hashArr[0] == '':
             hashesArr.append({
                 'hash': hashArr[0],
@@ -257,6 +260,10 @@ def computeCrackingTime(data):
             dictsKeyspace += dict['keyspace']
         keyspace = compute_keyspace_from_mask(attackSettings['mask']) * dictsKeyspace
 
+    # TODO Calculate PCFG keyspace
+    elif attackSettings['attack_mode'] == 9:
+        keyspace = compute_keyspace_from_pcfg("atom")
+
 
     display_time = None
     if (total_power > 0):
@@ -275,3 +282,6 @@ def computeCrackingTime(data):
     }
 
     return result
+
+def compute_keyspace_from_pcfg(pcfg_name):
+    return 0

@@ -279,5 +279,21 @@ def post_process_package_7(data, db_package):
         packageDict = FcJobDictionary(job_id=db_package.id, dictionary_id=dict['id'], is_left=False)
         db.session.add(packageDict)
 
+# pcfg attack
+def process_package_9(package):
+    package['attack_settings']['attack_submode'] = 9
+
+    print("PCFG")
+
+    return package
 
 
+def post_process_package_9(data, db_package):
+
+    for dict in data['attack_settings']['left_dictionaries']:
+        packageDict = FcJobDictionary(job_id=db_package.id, dictionary_id=dict.id)
+        db.session.add(packageDict)
+
+    for dict in data['attack_settings']['right_dictionaries']:
+        packageDict = FcJobDictionary(job_id=db_package.id, dictionary_id=dict['id'], is_left=False)
+        db.session.add(packageDict)

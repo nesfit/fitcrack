@@ -151,4 +151,5 @@ package_model = api.model('Package', {
     'hashes': fields.List(fields.Nested(hash_model)),
     'left_dictionaries': fields.List(fields.Nested(dictionary_package_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_package_model))
+#    'pcfg_folder':
 })

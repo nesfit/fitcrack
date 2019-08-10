@@ -164,31 +164,16 @@ class change_my_password(Resource):
         """
         Zmena hesla uzivatela
         """
-        print("\nOK\n")
-        print(request)
-        print(request.get_json())
-        print(request.form)
-
         args = user_change_password_arguments.parse_args(request)
-
-        print("\n" + args['new_password'] + "\n")
-
         if not (current_user.check_password(args['old_password'])):
             abort(400, 'Password incorrect')
 
         else:
-            #print("\n" + args['new_password'] + "\n")
-
-            #print(current_user.id)
-
-            #user = FcUser.query.filter_by(id=current_user.id).one()
-
-            #print(str(user.password))
             current_user.set_password(args['new_password'])
             db.session.commit()
             return {
                 'status': True,
-                'message': 'User role updated.'
+                'message': 'User password changed.'
             }
 
 
