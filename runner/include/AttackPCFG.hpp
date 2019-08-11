@@ -27,7 +27,7 @@ class AttackPCFG: public AttackCrackingBase {
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackPCFG(const ConfigTask& config, Directory& directory);
+        AttackPCFG(const ConfigTask& config, Directory& directory, bool& isPCFG);
 
 };
 #endif // ATTACKPCFG_HPP

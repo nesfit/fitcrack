@@ -34,7 +34,7 @@ class ProcessBase {
          * @brief   Pure virtual function containing steps leading to execution
          *	        of executable with appropiate arguments.
          */
-        virtual void launchSubprocess() = 0;
+        virtual void launchSubprocess(bool &isPCFG) = 0;
 
         /**
          * @brief   Sets start_time_ with now timestamp
@@ -127,7 +127,7 @@ class ProcessBase {
         /**
          * @brief   Pure virtual function launching process and filling star time
          */
-        virtual int run() = 0;
+        virtual int run(bool& isPCFG) = 0;
 
 };  // end of class ProcessBase
 

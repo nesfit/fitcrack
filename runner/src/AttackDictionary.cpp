@@ -5,7 +5,7 @@
 
 #include "AttackDictionary.hpp"
 
-AttackDictionary::AttackDictionary(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory) {
+AttackDictionary::AttackDictionary(const ConfigTask& config, Directory& directory, bool& isPCFG) : AttackCrackingBase(config, directory, isPCFG) {
     addSpecificArguments();
 }
 

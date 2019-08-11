@@ -19,6 +19,8 @@
 
 #include "File.hpp"
 
+//bool isPCFG = false;
+
 /** Namespace with function for creating new attack */
 namespace Attack {
     /**
@@ -27,7 +29,7 @@ namespace Attack {
      * @param   directory [in] Working directory with found files
      * @return  Specific type of attack object base on config parameters
      */
-    AttackBase* create(const ConfigTask& config, Directory& directory);
+    AttackBase* create(const ConfigTask& config, Directory& directory, bool& isPCFG);
 };
 
 #endif // ATTACK_HPP

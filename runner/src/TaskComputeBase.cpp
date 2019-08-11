@@ -4,6 +4,7 @@
  */
 
 #include "TaskComputeBase.hpp"
+#include "PCFGpipe.hpp"
 
 /* Protected */
 void TaskComputeBase::getAllArguments() {
@@ -11,7 +12,9 @@ void TaskComputeBase::getAllArguments() {
     hashcat_arguments_ = attack_->getArguments();
 
     //if PCFG
-    PCFGmanager_arguments_ = attack_->getPCFGArguments();
+    if(isPCFG_){
+      PCFGmanager_arguments_ = attack_->getPCFGArguments();
+    }
 
     host_config_.read();
 
@@ -19,7 +22,6 @@ void TaskComputeBase::getAllArguments() {
 
     host_config_.parseArguments(hashcat_arguments_);
 
-    //if PCFG
     //host_config_.parseArguments(PCFGmanager_arguments_);
 }
 
@@ -43,8 +45,10 @@ TaskComputeBase::~TaskComputeBase() {
         delete []*it;
     }
     //if PCFG
-    for (std::vector<char*>::iterator it = PCFGmanager_arguments_.begin(); it != PCFGmanager_arguments_.end(); it++) {
-        delete []*it;
+    if(isPCFG_){
+      for (std::vector<char*>::iterator it = PCFGmanager_arguments_.begin(); it != PCFGmanager_arguments_.end(); it++) {
+          delete []*it;
+        }
     }
 }
 
@@ -81,21 +85,40 @@ void TaskComputeBase::initialize() {
     directory_.printDirectories();
     directory_.printFiles();
 
+    int pipefd;
+
     if (attack_ == nullptr) {
-        attack_ = Attack::create(task_config_, directory_);
+
+        //create a named pipe with a name "termspipe" where stdout will be redirected
+        pipefd = PCFGpipe::createNamedPipe("termspipe");
+
+        attack_ = Attack::create(task_config_, directory_, isPCFG_);
+        //isPCFG_ = attack_->checkPCFG();
+        if(!isPCFG_){
+          //if attack is not PCFG, there's no need for open pipeline
+          printf("closing the pipe\n");
+          PCFGpipe::closeNamedPipe(pipefd);
+        }
         getAllArguments();
     }
 
     if (process_ == nullptr) {
-      if(PCFGflag){
+      if(isPCFG_){
         process_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
         TaskComputeBase::startComputation();
-        //Přesměrovat výstup na pajpu, spustit hashcat, přečíst pajpu
+
+        //after pcfg-manager ends, delete process pointer
+        //close pipe for writing (from stdout)
+        //closeNamedPipeWrite("termspipe");
         process_ = nullptr;
-      }
-        printf("started\n");
+      };
 
         process_ = Process::create(hashcat_arguments_, directory_);
+
+        if(isPCFG_){
+          //should end after hashcat ends
+          PCFGpipe::closeNamedPipe(pipefd);
+        }
     }
 }
 
@@ -113,7 +136,7 @@ void TaskComputeBase::printProcessErr() {
 
 void TaskComputeBase::startComputation() {
     if (!process_->isRunning()) {
-        process_->run();
+        process_->run(isPCFG_);
 	Logging::debugPrint(Logging::Detail::GeneralInfo, "Process has started.");
     }
 }

@@ -9,7 +9,7 @@
 
 /* Private */
 
-void ProcessLinux::launchSubprocess() {
+void ProcessLinux::launchSubprocess(bool& isPCFG) {
 
     /** Execute application - print it before redirection so that it goes to
      * stderr.txt */
@@ -20,7 +20,11 @@ void ProcessLinux::launchSubprocess() {
     err_pipe_->closeRead();
 
     /** Redirect childs stdout and stderr to the pipes */
-    if(!PCFGflag){
+    if(isPCFG){
+      //vytvořit pajpu jménem "terms"
+      //reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
+    }
+    else{
       reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
     }
     reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));
@@ -57,7 +61,7 @@ bool ProcessLinux::isRunning() {
     return (waitpid(process_identifier_, &status_, WNOHANG) == 0);
 }
 
-int ProcessLinux::run() {
+int ProcessLinux::run(bool& isPCFG) {
     setStartTime();
     process_identifier_ = fork();
 
@@ -66,7 +70,7 @@ int ProcessLinux::run() {
     } else if (process_identifier_ == 0){
         try {
 
-            launchSubprocess();
+            launchSubprocess(isPCFG);
 
         } catch (std::exception& e) {
             std::cerr << "Child process failed with std::runtime_error:\n what() : " << e.what() << std::endl;

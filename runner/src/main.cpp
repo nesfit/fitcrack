@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     TaskBase *task = nullptr;
 
     try {
-	Logging::debugPrint(Logging::Detail::Important, "Runner " RUNNER_VERSION);
+	      Logging::debugPrint(Logging::Detail::Important, "Runner " RUNNER_VERSION);
 
         Directory directory(".");
         File file;
@@ -27,12 +27,12 @@ int main(int argc, char **argv) {
 
         directory.findVersionedFile("hashcat_files", "zip", file);
 
-	unsigned long long extraction_start = RunnerUtils::timeInMs();
+	      unsigned long long extraction_start = RunnerUtils::timeInMs();
         FileZip hashcatkernels(file);
         hashcatkernels.extract();
-	unsigned long long extraction_end = RunnerUtils::timeInMs();
+	      unsigned long long extraction_end = RunnerUtils::timeInMs();
 
-	Logging::debugPrint(Logging::Detail::DevelDebug, " whole EXTRACTION took: " + RunnerUtils::toString(extraction_end - extraction_start) + "ms");
+	      Logging::debugPrint(Logging::Detail::DevelDebug, " whole EXTRACTION took: " + RunnerUtils::toString(extraction_end - extraction_start) + "ms");
 
         directory.scanForEntities();
 
@@ -42,26 +42,27 @@ int main(int argc, char **argv) {
 
         task->initialize();
         task->startComputation();
-	task->progress();
+	      task->progress();
 
-	if (task != nullptr) {
-	    error_value = task->saveAndFinish();
-	    error_value = (error_value == 1 ? 0 : error_value);
-	}
+      	if (task != nullptr) {
+      	    error_value = task->saveAndFinish();
+      	    error_value = (error_value == 1 ? 0 : error_value);
+      	}
 
-    } catch (std::runtime_error& e) {
+  }
+  catch (std::runtime_error& e) {
         exception_message = e.what();
-	Logging::debugPrint(Logging::Detail::Important, "Runner failed with std::runtime_error: \n what() : " + exception_message);
-    }
+	      Logging::debugPrint(Logging::Detail::Important, "Runner failed with std::runtime_error: \n what() : " + exception_message);
+  }
 
-    if (RunnerUtils::isStandalone()) {
-	Logging::debugPrint(Logging::Detail::Important, "Results and run outputs are stored in 'out' and 'stderr.txt' files.");
-    }
+  if (RunnerUtils::isStandalone()) {
+	   Logging::debugPrint(Logging::Detail::Important, "Results and run outputs are stored in 'out' and 'stderr.txt' files.");
+  }
 
-    if (!exception_message.empty()) {
-        boinc_finish_message(error_value, exception_message.c_str(), false); //exit(0);
-    } else {
-        boinc_finish(error_value); //exit(0);
-    }
+  if (!exception_message.empty()) {
+     boinc_finish_message(error_value, exception_message.c_str(), false); //exit(0);
+  }
+  else {
+     boinc_finish(error_value); //exit(0);
+  }
 }
-

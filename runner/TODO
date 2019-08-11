@@ -1,0 +1,8 @@
+1. Nastavit věci co se maj spouštět jen s PCFG útokem na flag || viz 5.
+2. Výstup z manageru přesměrovat do pajpy, která bude vstupovat do hashcatu. || IN PROGRESS, viz 2.1
+2.1 Nastudovat si, jak fungujou ty pajpy, co tam teď jsou, a využít je || IN PROGRESS
+3. Krásnější kód || IN PROGRESS
+4. Opravit kód 9 na kód 0 (-a 0 místo -a 9) ||  XX DONE
+5. ProcessLinux -> Dostat tam ten PCFGflag || ALMOST DONE, viz 6.
+6. bod 1. a 5. kinda done, opravit v benchmark_all občasné náhodné spouštění manageru - jebe flag?  ||  WORKIN ON
+7. Zrušit rouru, když něco spadne 

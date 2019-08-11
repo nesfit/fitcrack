@@ -5,14 +5,14 @@
 
 #include "AttackPCFG.hpp"
 
-AttackPCFG::AttackPCFG(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory) {
+AttackPCFG::AttackPCFG(const ConfigTask& config, Directory& directory, bool& isPCFG) : AttackCrackingBase(config, directory, isPCFG) {
     addSpecificArguments();
 }
 
 void AttackPCFG::addSpecificArguments() {
 
     if (attack_submode_ == "0"){
-      printf("in 9,0\n");
+
         // Do nothing, just at the end add grammar and preterminal files
 
     }
@@ -26,16 +26,14 @@ void AttackPCFG::addSpecificArguments() {
         RunnerUtils::runtimeException("Unsupported attack_submode = " + attack_submode_ + " attack_mode = " + attack_mode_ + " has no such attack_submode");
     }
 
-    printf("after\n");
-    //+manager arguments
-
     addPCFGArgument("--preterminals-file"); //Add PCFG-Manager preterminals argument
     addPCFGRequiredFile("preterminals"); //Add file with preterminals to the PCFG-Manager pipeline
 
     addPCFGArgument("--grammar-file"); //Add PCFG-Manager grammar file
     addPCFGRequiredFile("grammar"); //Add grammar as stickyfile
 
-    printf("arguments and files added \n");
+    //Jméno "pajpy", prozatím odkaz na managerem vygenerovaný soubor.
+    addRequiredFile("termspipe");
 
 }
 

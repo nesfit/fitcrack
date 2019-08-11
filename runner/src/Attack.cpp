@@ -5,7 +5,7 @@
 
 #include "Attack.hpp"
 
-AttackBase* Attack::create(const ConfigTask& task_config, Directory& directory) {
+AttackBase* Attack::create(const ConfigTask& task_config, Directory& directory, bool &isPCFG) {
 
     std::string mode, attack_mode;
 
@@ -15,16 +15,20 @@ AttackBase* Attack::create(const ConfigTask& task_config, Directory& directory) 
     if (mode == "n") {
         switch (attack_mode[0]) {
             case '0':
-                return new AttackDictionary(task_config, directory);
+                isPCFG = false;
+                return new AttackDictionary(task_config, directory, isPCFG);
                 break;
             case '1':
-                return new AttackCombinator(task_config, directory);
+                isPCFG = false;
+                return new AttackCombinator(task_config, directory, isPCFG);
                 break;
             case '3':
-                return new AttackMask(task_config, directory);
+                isPCFG = false;
+                return new AttackMask(task_config, directory, isPCFG);
                 break;
             case '9':
-                return new AttackPCFG(task_config, directory);
+                isPCFG = true;
+                return new AttackPCFG(task_config, directory, isPCFG);
                 break;
             default:
                 RunnerUtils::runtimeException("Invalid attack mode");

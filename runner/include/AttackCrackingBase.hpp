@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKCRACKINGBASE_HPP 
+#ifndef ATTACKCRACKINGBASE_HPP
 #define ATTACKCRACKINGBASE_HPP
 
 #include "AttackBase.hpp"
@@ -39,14 +39,14 @@ class AttackCrackingBase: public AttackBase {
         void addOptionalFile(const std::string& file_name, const std::string& argument);
 
 
-    public: 
+    public:
 
         /**
          * @brief   Basic constructor
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackCrackingBase(const ConfigTask& config, Directory& directory);
+        AttackCrackingBase(const ConfigTask& config, Directory& directory, bool& isPCFG);
 
 };
 
