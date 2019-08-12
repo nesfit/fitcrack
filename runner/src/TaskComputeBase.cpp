@@ -30,13 +30,13 @@ TaskComputeBase::TaskComputeBase (Directory& directory, ConfigTask& task_config,
 
 TaskComputeBase::~TaskComputeBase() {
     if (attack_ != nullptr) {
-	delete attack_;
-	attack_ = nullptr;
+	    delete attack_;
+      attack_ = nullptr;
     }
 
     if (process_ != nullptr) {
-	delete process_;
-	process_ = nullptr;
+	    delete process_;
+	    process_ = nullptr;
     }
 
     if(process_PCFGmanager_ != nullptr){
@@ -97,24 +97,23 @@ void TaskComputeBase::initialize() {
 
     if (process_ == nullptr) {
       if(isPCFG_){
-        printf("Pre-manager process creation\n");
-        process_PCFGmanager_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
-        manager_pipeout = process_PCFGmanager_->GetPipeOut();
-        printf("Post-manager process creation\n");
-        startComputation();
-        printf("Computing started\n");
-        // HAHA ZKOUSKA
-        std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
-        std::cout << "Pajpa: " << manager_pipeout << std::endl;
-        //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
-        //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
-        std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
+        if(process_PCFGmanager_ == nullptr){
+          process_PCFGmanager_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
+          manager_pipeout = process_PCFGmanager_->GetPipeOut();
 
+          // HAHA ZKOUSKA
+          //std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
+          //std::cout << "Pajpa: " << manager_pipeout << std::endl;
+          //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
+          //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
+          //std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
+        }
       }
 
-      //process_ = Process::create(hashcat_arguments_, directory_);
+      process_ = Process::create(hashcat_arguments_, directory_);
       if(isPCFG_){
-        //  process_->setInputFromPipe(manager_pipeout);
+          process_->initInPipe();
+          process_->setInPipe(manager_pipeout);
       }
     }
 }
@@ -135,11 +134,11 @@ void TaskComputeBase::startComputation() {
     if(isPCFG_){
       if(!process_PCFGmanager_->isRunning()){
         process_PCFGmanager_->run();
+         Logging::debugPrint(Logging::Detail::GeneralInfo, "Manager process has started.");
       }
     }
-    /*if (!process_->isRunning()) {
+    if (!process_->isRunning()) {
           process_->run();
-    }*/
-	  Logging::debugPrint(Logging::Detail::GeneralInfo, "Process has started.");
-
+           Logging::debugPrint(Logging::Detail::GeneralInfo, "Hashcat process has started.");
+    }
 }

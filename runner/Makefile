@@ -12,7 +12,7 @@ CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'
 ## Release
 LDXXFLAGS=-O3 -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 ## Debug
-# LDXXFLAGS=-pg -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+#LDXXFLAGS=-pg -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 
 SRCS=$(shell find $(SRCDIR) -name *.cpp)
 OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))

@@ -13,10 +13,10 @@ void TaskBase::actualizeComputedHashes(const unsigned long long newly_computed_h
 
 /* Public */
 
-TaskBase::TaskBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : directory_(directory), task_config_(task_config), host_config_(host_config), output_file_(output_file), computed_hashes_(0), total_hashes_(0), workunit_name_(workunit_name) {  
+TaskBase::TaskBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : directory_(directory), task_config_(task_config), host_config_(host_config), output_file_(output_file), computed_hashes_(0), total_hashes_(0), workunit_name_(workunit_name) {
 }
 
-TaskBase::TaskBase (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : directory_(directory), task_config_(task_config), host_config_(host_config), output_file_(output_file), computed_hashes_(0), total_hashes_(0), workunit_name_(workunit_name) {  
+TaskBase::TaskBase (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : directory_(directory), task_config_(task_config), host_config_(host_config), output_file_(output_file), computed_hashes_(0), total_hashes_(0), workunit_name_(workunit_name) {
 }
 
 double TaskBase::fractionDone() {
@@ -51,7 +51,7 @@ void TaskBase::reportProgress() {
     double fraction_done, percent_done;
     fraction_done = fractionDone();
     percent_done = fraction_done * 100.0;
-    
+
     Logging::debugPrint(Logging::Detail::DevelDebug, "Progress : " + RunnerUtils::toString(fraction_done) + " percent done : " + RunnerUtils::toString(percent_done) + " rinted : " + RunnerUtils::toString(::rint(percent_done)));
 
     // Add call of the trickler progress message
@@ -65,8 +65,8 @@ void TaskBase::reportProgress() {
 	Logging::debugPrint(Logging::Detail::DevelDebug, " trickle daemon name :" + BoincConstants::TrickleDeamonName);
 	Logging::debugPrint(Logging::Detail::ObjectContentRevision, " generated trickle message :" + trickle_message);
 	boinc_fraction_done(fraction_done); // progress to BOINC manager
-    } 
-    std::cout << "Progress : " << 
+    }
+    std::cout << "Progress : " <<
 	    RunnerUtils::toString(computed_hashes_) << "/" << RunnerUtils::toString(total_hashes_) << " : " <<
 	    RunnerUtils::toString(percent_done) << "%" << std::endl;
 }
@@ -82,7 +82,7 @@ int TaskBase::saveAndFinish() {
 
 void TaskBase::saveResult() {
     std::string output_message;
-    
+
     PRINT_POSITION_IN_CODE();
     output_message = generateOutputMessage();
     PRINT_POSITION_IN_CODE();
@@ -91,4 +91,3 @@ void TaskBase::saveResult() {
 
     writeOutputFile(output_message);
 }
-

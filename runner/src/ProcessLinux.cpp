@@ -18,15 +18,21 @@ void ProcessLinux::launchSubprocess() {
     /** Child doesn't read from the pipes */
     out_pipe_->closeRead();
     err_pipe_->closeRead();
-    printf("Pipes are closed for read.\n");
+
     /** Redirect childs stdout and stderr to the pipes */
     reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
     reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));
 
-    printf("Executing program\n");
+    printf("b4 inpipe\n");
+    if (in_pipe_ != nullptr) {
+      printf("in pipe\n");
+      reinterpret_cast<PipeLinux*>(in_pipe_)->redirectRead(fileno(stdin));
+    }
+
+
     /** Execute application */
     execv(arguments_[0], &arguments_[0]);
-    printf("Program has been executed\n");
+
     /** This shouldn't be ever executed but if it does, throw error exception */
     RunnerUtils::runtimeException("execv() failed with", errno);
 }
@@ -36,6 +42,7 @@ void ProcessLinux::launchSubprocess() {
 ProcessLinux::ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args) : ProcessBase(exec_name, exec_args) {
     out_pipe_ = new PipeLinux;
     err_pipe_ = new PipeLinux;
+    in_pipe_ = nullptr;
 }
 
 ProcessLinux::~ProcessLinux() {
@@ -57,15 +64,15 @@ bool ProcessLinux::isRunning() {
 }
 
 int ProcessLinux::run() {
-    printf("Forking\n");
+
     setStartTime();
     process_identifier_ = fork();
-    printf("Forked\n");
+
     if (getProcessIdentifier() == -1) {
         RunnerUtils::runtimeException("fork() failed with", errno);
     } else if (process_identifier_ == 0){
         try {
-            printf("In child - launching subprocess\n");
+
             launchSubprocess();
 
         } catch (std::exception& e) {
@@ -76,7 +83,6 @@ int ProcessLinux::run() {
             exit(errno);
         }
     } else {
-        printf("In parent - closing write and goin out.\n");
         /** Parrent doesn't write to pipes */
         out_pipe_->closeWrite();
         err_pipe_->closeWrite();

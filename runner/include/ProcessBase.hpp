@@ -22,6 +22,7 @@ class ProcessBase {
 
         PipeBase *out_pipe_; /**< Stdout pipe */
         PipeBase *err_pipe_; /**< Stderr pipe */
+        PipeBase *in_pipe_; /**< Stdin pipe (pointer only) */
 
         unsigned long long start_time_;      /**< Start time of process */
         unsigned long long stop_time_;       /**< End time of process */
@@ -129,11 +130,9 @@ class ProcessBase {
          */
         virtual int run() = 0;
 
+        void initInPipe();
 
-        /**
-        * @brief Pure virtual function for getting an out (read) file descriptor
-        */
-        //virtual int getPipeFDOut();
+        void setInPipe(PipeBase *in_pipe);
 
         /**
         * @brief Pure virtual function for getting an out (read) file descriptor
