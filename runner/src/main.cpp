@@ -41,8 +41,8 @@ int main(int argc, char **argv) {
         task = Task::create(directory);
 
         task->initialize();
-        task->startComputation();
-	      task->progress();
+        //task->startComputation();
+	      //task->progress();
 
       	if (task != nullptr) {
       	    error_value = task->saveAndFinish();

@@ -4,7 +4,6 @@
  */
 
 #include "TaskComputeBase.hpp"
-#include "PCFGpipe.hpp"
 
 /* Protected */
 void TaskComputeBase::getAllArguments() {
@@ -21,14 +20,13 @@ void TaskComputeBase::getAllArguments() {
     host_config_.print();
 
     host_config_.parseArguments(hashcat_arguments_);
-
     //host_config_.parseArguments(PCFGmanager_arguments_);
 }
 
 /* Public */
-TaskComputeBase::TaskComputeBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskBase(directory, task_config, host_config, output_file, workunit_name), attack_(nullptr), process_(nullptr) {  }
+TaskComputeBase::TaskComputeBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskBase(directory, task_config, host_config, output_file, workunit_name), attack_(nullptr), process_(nullptr), process_PCFGmanager_(nullptr) {  }
 
-TaskComputeBase::TaskComputeBase (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskBase(directory, task_config, host_config, output_file, workunit_name), attack_(nullptr), process_(nullptr) {  }
+TaskComputeBase::TaskComputeBase (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskBase(directory, task_config, host_config, output_file, workunit_name), attack_(nullptr), process_(nullptr), process_PCFGmanager_(nullptr) {  }
 
 TaskComputeBase::~TaskComputeBase() {
     if (attack_ != nullptr) {
@@ -39,6 +37,11 @@ TaskComputeBase::~TaskComputeBase() {
     if (process_ != nullptr) {
 	delete process_;
 	process_ = nullptr;
+    }
+
+    if(process_PCFGmanager_ != nullptr){
+      delete process_PCFGmanager_;
+      process_PCFGmanager_ = nullptr;
     }
 
     for (std::vector<char*>::iterator it = hashcat_arguments_.begin(); it != hashcat_arguments_.end(); it++) {
@@ -85,40 +88,34 @@ void TaskComputeBase::initialize() {
     directory_.printDirectories();
     directory_.printFiles();
 
-    int pipefd;
+    PipeBase* manager_pipeout;
 
     if (attack_ == nullptr) {
-
-        //create a named pipe with a name "termspipe" where stdout will be redirected
-        pipefd = PCFGpipe::createNamedPipe("termspipe");
-
         attack_ = Attack::create(task_config_, directory_, isPCFG_);
-        //isPCFG_ = attack_->checkPCFG();
-        if(!isPCFG_){
-          //if attack is not PCFG, there's no need for open pipeline
-          printf("closing the pipe\n");
-          PCFGpipe::closeNamedPipe(pipefd);
-        }
         getAllArguments();
     }
 
     if (process_ == nullptr) {
       if(isPCFG_){
-        process_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
-        TaskComputeBase::startComputation();
+        printf("Pre-manager process creation\n");
+        process_PCFGmanager_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
+        manager_pipeout = process_PCFGmanager_->GetPipeOut();
+        printf("Post-manager process creation\n");
+        startComputation();
+        printf("Computing started\n");
+        // HAHA ZKOUSKA
+        std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
+        std::cout << "Pajpa: " << manager_pipeout << std::endl;
+        //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
+        //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
+        std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
 
-        //after pcfg-manager ends, delete process pointer
-        //close pipe for writing (from stdout)
-        //closeNamedPipeWrite("termspipe");
-        process_ = nullptr;
-      };
+      }
 
-        process_ = Process::create(hashcat_arguments_, directory_);
-
-        if(isPCFG_){
-          //should end after hashcat ends
-          PCFGpipe::closeNamedPipe(pipefd);
-        }
+      //process_ = Process::create(hashcat_arguments_, directory_);
+      if(isPCFG_){
+        //  process_->setInputFromPipe(manager_pipeout);
+      }
     }
 }
 
@@ -135,8 +132,14 @@ void TaskComputeBase::printProcessErr() {
 }
 
 void TaskComputeBase::startComputation() {
-    if (!process_->isRunning()) {
-        process_->run(isPCFG_);
-	Logging::debugPrint(Logging::Detail::GeneralInfo, "Process has started.");
+    if(isPCFG_){
+      if(!process_PCFGmanager_->isRunning()){
+        process_PCFGmanager_->run();
+      }
     }
+    /*if (!process_->isRunning()) {
+          process_->run();
+    }*/
+	  Logging::debugPrint(Logging::Detail::GeneralInfo, "Process has started.");
+
 }

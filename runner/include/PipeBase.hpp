@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef NAMEDPIPEBASE_HPP 
+#ifndef NAMEDPIPEBASE_HPP
 #define NAMEDPIPEBASE_HPP
 
 #include "Constants.hpp"
@@ -38,25 +38,25 @@ class PipeBase {
 	/**
 	 * @brief   Pure virtual function stating whether it is possible to read
 	 *	    from pipe
-	 * @return  True when possible, False otherwise 
+	 * @return  True when possible, False otherwise
 	 */
 	virtual bool canRead() const = 0;
 
         /**
          * @brief   Pure virtual function closing all ends of pipe using function from subclasses
-         * @return  0 or error number of system close operation 
+         * @return  0 or error number of system close operation
          */
         int closeAll();
 
         /**
          * @brief   Pure virtual function closing read-end of the pipe
-         * @return  0 or error number of system close operation 
+         * @return  0 or error number of system close operation
          */
         virtual int closeRead() = 0;
 
         /**
          * @brief   Pure virtual function closing write-end of the pipe
-         * @return  0 or error number of system close operation 
+         * @return  0 or error number of system close operation
          */
         virtual int closeWrite() = 0;
 

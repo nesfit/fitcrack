@@ -106,7 +106,7 @@ void TaskNormal::setTotalHahsesFromProgressLine(const std::string& progress_line
     found_at = progress_line.find("PROGRESS", last);    // Find position of PROGRESS
 
     if (last == std::string::npos) {
-	return; 
+	return;
     }
 
     last = found_at +1;
@@ -140,7 +140,7 @@ void TaskNormal::readPasswordsFromFile() {
 
 	/** Preallocates size of the string (performance) and saves whole file into
 	 * string */
-	passwords_stream.seekg(0, std::ios::end);   
+	passwords_stream.seekg(0, std::ios::end);
 	passwords_.reserve(passwords_stream.tellg());
 	passwords_stream.seekg(0, std::ios::beg);
 
@@ -171,11 +171,11 @@ std::string TaskNormal::generateOutputMessage() {
     exit_code_ = process_->getExitCode();
     readPasswordsFromFile();
 
-    output_info += mode_ + "\n"; 
+    output_info += mode_ + "\n";
 
     /* Succeded is returned when passwords to all hashes are found otherwise
      * Exhausted is retuned and we have to check what passwords were found and
-     * report them to server 
+     * report them to server
      */
     if (exit_code_ == HashcatConstant::Succeded || !passwords_.empty()) {
 
@@ -190,11 +190,11 @@ std::string TaskNormal::generateOutputMessage() {
 
     } else {
 
-	output_info += ProjectConstants::TaskFinalStatus::Error + "\n"; 
+	output_info += ProjectConstants::TaskFinalStatus::Error + "\n";
 	output_info += RunnerUtils::toString(exit_code_) + "\n";
-	output_info += process_->readErrPipeAvailableLines() + "\n"; 
+	output_info += process_->readErrPipeAvailableLines() + "\n";
 
-    /* 
+    /*
        } else if (exit_code == 4) {
     // TODO: similar to 3 but different errors
     */
@@ -211,7 +211,7 @@ void TaskNormal::initializeTotalHashes() {
     // --limit or total keyspace of mask
     if (task_config_.find("hc_keyspace", total_hc_keyspace) ||
 	    task_config_.find("dict_hc_keyspace", total_hc_keyspace) ||
-	    task_config_.find("maks_hc_keyspace", total_hc_keyspace)) { 
+	    task_config_.find("maks_hc_keyspace", total_hc_keyspace)) {
 
 	parse_curku_ = true;
 	total_hashes_ = RunnerUtils::stoull(total_hc_keyspace);
@@ -234,16 +234,14 @@ void TaskNormal::initializeTotalHashes() {
 }
 
 bool TaskNormal::parseHashcatOutputLine(std::string& output_line) {
+  if (!output_line.empty()) {
+	   Logging::debugPrint(Logging::Detail::CustomOutput, "Hashcat line: " + output_line);
+  } else {
+	   return false;
+  }
 
-    if (!output_line.empty()) {
-	Logging::debugPrint(Logging::Detail::CustomOutput, "Hashcat line: " + output_line);
-    } else {
-	return false;
-    }
-
-    parseHashcatProgress(output_line);
-
-    return true;
+  parseHashcatProgress(output_line);
+  return true;
 }
 
 void TaskNormal::progress() {
@@ -253,14 +251,14 @@ void TaskNormal::progress() {
 
     while (process_->isRunning()) {
 
-	PRINT_POSITION_IN_CODE();
+    	PRINT_POSITION_IN_CODE();
 
-	line = process_->readOutPipeLine();
+    	line = process_->readOutPipeLine();
 
-	PRINT_POSITION_IN_CODE();
-	if (parseHashcatOutputLine(line)) {
-	    reportProgress();
-	}
+    	PRINT_POSITION_IN_CODE();
+    	if (parseHashcatOutputLine(line)) {
+    	    reportProgress();
+    	}
     }
 
     PRINT_POSITION_IN_CODE();

@@ -5,7 +5,7 @@
 
 #ifdef __linux__
 
-#ifndef NAMEDPIPELINUX_HPP 
+#ifndef NAMEDPIPELINUX_HPP
 #define NAMEDPIPELINUX_HPP
 
 #include "PipeBase.hpp"
@@ -70,19 +70,19 @@ class PipeLinux : public PipeBase {
 
 	/**
 	 * @brief   States whether we can read from the pipe
-	 * @return  True when we can, False otherwise 
+	 * @return  True when we can, False otherwise
 	 */
 	bool canRead() const;
 
         /**
          * @brief   Closes read-end of pipe
-         * @return  0 or error number of system close operation 
+         * @return  0 or error number of system close operation
          */
         int closeRead();
 
         /**
          * @brief   Closes write-end of pipe
-         * @return  0 or error number of system close operation 
+         * @return  0 or error number of system close operation
          */
         int closeWrite();
 
@@ -116,6 +116,8 @@ class PipeLinux : public PipeBase {
          * @return  Number of written characters
          */
         int writeMessage(std::string& message);
+
+
 };
 #endif // NAMEDPIPELINUX_HPP
 

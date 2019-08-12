@@ -9,7 +9,7 @@
 
 /* Private */
 
-void ProcessLinux::launchSubprocess(bool& isPCFG) {
+void ProcessLinux::launchSubprocess() {
 
     /** Execute application - print it before redirection so that it goes to
      * stderr.txt */
@@ -18,20 +18,15 @@ void ProcessLinux::launchSubprocess(bool& isPCFG) {
     /** Child doesn't read from the pipes */
     out_pipe_->closeRead();
     err_pipe_->closeRead();
-
+    printf("Pipes are closed for read.\n");
     /** Redirect childs stdout and stderr to the pipes */
-    if(isPCFG){
-      //vytvořit pajpu jménem "terms"
-      //reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
-    }
-    else{
-      reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
-    }
+    reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
     reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));
 
+    printf("Executing program\n");
     /** Execute application */
     execv(arguments_[0], &arguments_[0]);
-
+    printf("Program has been executed\n");
     /** This shouldn't be ever executed but if it does, throw error exception */
     RunnerUtils::runtimeException("execv() failed with", errno);
 }
@@ -61,16 +56,17 @@ bool ProcessLinux::isRunning() {
     return (waitpid(process_identifier_, &status_, WNOHANG) == 0);
 }
 
-int ProcessLinux::run(bool& isPCFG) {
+int ProcessLinux::run() {
+    printf("Forking\n");
     setStartTime();
     process_identifier_ = fork();
-
+    printf("Forked\n");
     if (getProcessIdentifier() == -1) {
         RunnerUtils::runtimeException("fork() failed with", errno);
     } else if (process_identifier_ == 0){
         try {
-
-            launchSubprocess(isPCFG);
+            printf("In child - launching subprocess\n");
+            launchSubprocess();
 
         } catch (std::exception& e) {
             std::cerr << "Child process failed with std::runtime_error:\n what() : " << e.what() << std::endl;
@@ -80,7 +76,7 @@ int ProcessLinux::run(bool& isPCFG) {
             exit(errno);
         }
     } else {
-
+        printf("In parent - closing write and goin out.\n");
         /** Parrent doesn't write to pipes */
         out_pipe_->closeWrite();
         err_pipe_->closeWrite();
@@ -88,5 +84,7 @@ int ProcessLinux::run(bool& isPCFG) {
 
     return 0;
 }
+
+
 
 #endif // __linux__

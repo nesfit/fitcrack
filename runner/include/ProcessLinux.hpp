@@ -29,7 +29,7 @@ class ProcessLinux : public ProcessBase {
          * @brief   Function executing another binary in new process, predefined
          *          to execute saved executable with arguments
          */
-        void launchSubprocess(bool &isPCFG);
+        void launchSubprocess();
 
     public:
 
@@ -75,7 +75,8 @@ class ProcessLinux : public ProcessBase {
          *          with arguments set in constructor
          * @return  0 when proceess spawns correctly
          */
-        int run(bool& isPCFG);
+        int run();
+
 };
 #endif // PROCESSLINUX_HPP
 

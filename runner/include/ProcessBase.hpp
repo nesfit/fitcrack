@@ -34,7 +34,7 @@ class ProcessBase {
          * @brief   Pure virtual function containing steps leading to execution
          *	        of executable with appropiate arguments.
          */
-        virtual void launchSubprocess(bool &isPCFG) = 0;
+        virtual void launchSubprocess() = 0;
 
         /**
          * @brief   Sets start_time_ with now timestamp
@@ -127,8 +127,18 @@ class ProcessBase {
         /**
          * @brief   Pure virtual function launching process and filling star time
          */
-        virtual int run(bool& isPCFG) = 0;
+        virtual int run() = 0;
 
+
+        /**
+        * @brief Pure virtual function for getting an out (read) file descriptor
+        */
+        //virtual int getPipeFDOut();
+
+        /**
+        * @brief Pure virtual function for getting an out (read) file descriptor
+        */
+        virtual PipeBase* GetPipeOut();
 };  // end of class ProcessBase
 
 #endif // PROCESSBASE_HPP

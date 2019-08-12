@@ -32,9 +32,6 @@ void AttackPCFG::addSpecificArguments() {
     addPCFGArgument("--grammar-file"); //Add PCFG-Manager grammar file
     addPCFGRequiredFile("grammar"); //Add grammar as stickyfile
 
-    //Jméno "pajpy", prozatím odkaz na managerem vygenerovaný soubor.
-    addRequiredFile("termspipe");
-
 }
 
 //
