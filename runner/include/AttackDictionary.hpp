@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKDICTIONARY_HPP 
+#ifndef ATTACKDICTIONARY_HPP
 #define ATTACKDICTIONARY_HPP
 
 #include "AttackCrackingBase.hpp"
@@ -12,20 +12,20 @@
 class AttackDictionary: public AttackCrackingBase {
 
     protected:
-    
+
         /**
          * @brief   Adds all attack specific arguments
          */
         void addSpecificArguments();
 
-    public: 
+    public:
 
         /**
          * @brief   Basic constructor
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackDictionary(const ConfigTask& config, Directory& directory);
+        AttackDictionary(const ConfigTask& config, Directory& directory, bool& isPCFG);
 
 };
 #endif // ATTACKDICTIONARY_HPP

@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKCOMBINATOR_HPP 
+#ifndef ATTACKCOMBINATOR_HPP
 #define ATTACKCOMBINATOR_HPP
 
 #include "AttackCrackingBase.hpp"
@@ -18,14 +18,14 @@ class AttackCombinator: public AttackCrackingBase {
          */
         void addSpecificArguments();
 
-    public: 
+    public:
 
         /**
          * @brief   Basic constructor
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackCombinator(const ConfigTask& config, Directory& directory);
+        AttackCombinator(const ConfigTask& config, Directory& directory, bool &isPCFG);
 
 };
 

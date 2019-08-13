@@ -18,4 +18,3 @@ ProcessBase* Process::create(std::vector<char*>& arguments, Directory& directory
   #error "No viable Process implementation. This is caused by your target platfrom. Supported platforms are __linux__, _WIN32."
 #endif
 }
-

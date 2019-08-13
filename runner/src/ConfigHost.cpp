@@ -27,26 +27,24 @@ void ConfigHost::parseArguments(std::vector<char*>& arguments) {
     std::string *argument;
 
     if (content_.empty()) {
-
-	Logging::debugPrint(Logging::Detail::Important, "File wasn't read therefore its content can't be parsed.");
-        return;
+	     Logging::debugPrint(Logging::Detail::Important, "File wasn't read therefore its content can't be parsed.");
+       return;
     }
 
     while (last != std::string::npos) {
         next = content_.find(delimeter, last);
-        argument = new std::string(); 
+        argument = new std::string();
         *argument = content_.substr(last, next - last);
 
-	if (!argument->empty()) {
-            arguments.push_back(TOCSTRING(argument->c_str()));
-
-	    Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding argument : '" + *argument + "'");
-	}
+        if (!argument->empty()) {
+          arguments.push_back(TOCSTRING(argument->c_str()));
+          Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding argument : '" + *argument + "'");
+        }
 
         if (next != std::string::npos) {
-            last = next + 1;
+          last = next + 1;
         } else {
-            last = next;
+          last = next;
         }
     }
 }
@@ -59,7 +57,7 @@ void ConfigHost::read() {
     std::fstream file;
 
     if (File::exists(path_)) {
-        File::openReadStream(file, path_); 
+        File::openReadStream(file, path_);
 
         File::readLine(file, content_);
         /** Cover the case when there is just empty line in the host config */

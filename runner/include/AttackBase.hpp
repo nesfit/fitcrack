@@ -64,6 +64,8 @@ class AttackBase {
          */
         bool findAndAdd(const std::string& key, const std::string& argument);
 
+
+        bool findAndAdd(const std::string& key, const std::string& argument, bool& isPCFG);
         /**
          * @brief   Searches for key in config_, if found adds argument and its value to arguments_,
          *          else throws exception
@@ -94,6 +96,7 @@ class AttackBase {
          */
         void findAndAddRequired(const std::string& key, const std::string& argument);
 
+        void findAndAddRequired(const std::string& key, const std::string& argument, bool& isPCFG);
     public:
 
         /**

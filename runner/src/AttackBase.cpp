@@ -18,6 +18,22 @@ bool AttackBase::findAndAdd(const std::string& key, const std::string& argument)
     return false;
 }
 
+bool AttackBase::findAndAdd(const std::string& key, const std::string& argument, bool& isPCFG) {
+    std::string value;
+
+    if (config_.find(key, value)) {
+        addArgument(argument);
+        if(isPCFG){
+          addArgument("0");
+        }
+        else{
+          addArgument(value);
+        }
+        return true;
+    }
+    return false;
+}
+
 bool AttackBase::findAndAdd(const std::string& key) {
     std::string value;
 
@@ -64,6 +80,11 @@ void AttackBase::findAndAddRequired(const std::string& key, const std::string& a
         RunnerUtils::runtimeException(key + "is missing in config");
 }
 
+void AttackBase::findAndAddRequired(const std::string& key, const std::string& argument, bool& isPCFG) {
+    if (!findAndAdd(key, argument, isPCFG))
+        RunnerUtils::runtimeException(key + "is missing in config");
+}
+
 /* Public */
 
 AttackBase::AttackBase(const ConfigTask& config) : config_(config), output_file_(HashcatConstant::OutputFile), success_exit_code_(HashcatConstant::Succeded) {
@@ -77,6 +98,7 @@ std::vector<char*>& AttackBase::getArguments() {
 std::vector<char*>& AttackBase::getPCFGArguments() {
     return PCFG_arguments_;
 }
+
 
 size_t AttackBase::getArgumentsSize() {
     return arguments_.size();

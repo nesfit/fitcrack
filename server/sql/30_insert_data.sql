@@ -6557,7 +6557,7 @@ INSERT INTO `fc_hash` (`id`, `job_id`, `hash_type`, `hash`, `result`, `added`, `
 --
 
 INSERT INTO `fc_hcstats` (`id`, `name`, `path`, `time`, `deleted`) VALUES
-(1,	'hashcat.hcstat',	'hashcat.hcstat',	'2018-08-18 12:00:00',	0);
+(1,	'hashcat.hcstat2',	'hashcat.hcstat2',	'2018-08-18 12:00:00',	0);
 
 
 --

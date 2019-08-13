@@ -20,10 +20,15 @@ void ProcessLinux::launchSubprocess() {
     err_pipe_->closeRead();
 
     /** Redirect childs stdout and stderr to the pipes */
-    if(!PCFGflag){
-      reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
-    }
+    reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
     reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));
+
+    printf("b4 inpipe\n");
+    if (in_pipe_ != nullptr) {
+      printf("in pipe\n");
+      reinterpret_cast<PipeLinux*>(in_pipe_)->redirectRead(fileno(stdin));
+    }
+
 
     /** Execute application */
     execv(arguments_[0], &arguments_[0]);
@@ -37,6 +42,7 @@ void ProcessLinux::launchSubprocess() {
 ProcessLinux::ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args) : ProcessBase(exec_name, exec_args) {
     out_pipe_ = new PipeLinux;
     err_pipe_ = new PipeLinux;
+    in_pipe_ = nullptr;
 }
 
 ProcessLinux::~ProcessLinux() {
@@ -58,6 +64,7 @@ bool ProcessLinux::isRunning() {
 }
 
 int ProcessLinux::run() {
+
     setStartTime();
     process_identifier_ = fork();
 
@@ -76,7 +83,6 @@ int ProcessLinux::run() {
             exit(errno);
         }
     } else {
-
         /** Parrent doesn't write to pipes */
         out_pipe_->closeWrite();
         err_pipe_->closeWrite();
@@ -84,5 +90,7 @@ int ProcessLinux::run() {
 
     return 0;
 }
+
+
 
 #endif // __linux__

@@ -33,7 +33,8 @@ CPackage::CPackage(DbMap &packageMap, CSqlLoader * sqlLoader)
         this->m_dict1 = packageMap["dict1"];
         this->m_dict2 = packageMap["dict2"];
         this->m_rules = packageMap["rules"];
-        this->m_grammar_id = std::stoull(packageMap["grammar_id"]);
+        if (!packageMap["grammar_id"].empty())
+            this->m_grammar_id = std::stoull(packageMap["grammar_id"]);
         this->m_markov = packageMap["markov_hcstat"];
         this->m_markovThreshold = std::stoul(packageMap["markov_threshold"]);
         this->m_replicateFactor = std::stoul(packageMap["replicate_factor"]);

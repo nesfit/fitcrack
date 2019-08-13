@@ -14,17 +14,21 @@
 #include "Process.hpp"
 #include "ProcessPCFG.hpp"
 
+
 /** Class representing base of the computation tasks */
 class TaskComputeBase: public TaskBase {
 
     protected:
 
-	AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
+	      AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
 
         ProcessBase *process_;          /**< Pointer to process executing the task */
+        ProcessBase *process_PCFGmanager_; /** < Pointer to pcfg manager process executing the task */
+
+        bool isPCFG_;
 
         std::vector<char*> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
-        std::vector<char*> PCFGmanager_arguments_;
+        std::vector<char*> PCFGmanager_arguments_; /**<Merge pcfg-manager arguments from Attack, ConfigTask, ConfigHost */
 
         /**
          * @brief   Merges vectors with arguments from the member objects
@@ -32,6 +36,7 @@ class TaskComputeBase: public TaskBase {
         void getAllArguments();
 
     public:
+
 
         /**
          * @brief   Constructor

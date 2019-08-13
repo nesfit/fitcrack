@@ -5,11 +5,11 @@
 
 #include "AttackCrackingBase.hpp"
 
-AttackCrackingBase::AttackCrackingBase(const ConfigTask& config, Directory& directory) : AttackBase(config), directory_(directory) {
+AttackCrackingBase::AttackCrackingBase(const ConfigTask& config, Directory& directory, bool &isPCFG) : AttackBase(config), directory_(directory) {
 
     /** For benchmark only allowed attack_mode value is 3 */
-    findAndAddRequired("attack_mode", "-a");
-    
+    findAndAddRequired("attack_mode", "-a", isPCFG);
+
     if (!config_.find("attack_submode", attack_submode_))
         RunnerUtils::runtimeException("attack_submode is missing in config");
     addSpecificArguments();
@@ -21,7 +21,7 @@ void AttackCrackingBase::addSpecificArguments() {
 
     findAndAddOptional("start_index", "-s");
     findAndAddOptional("hc_keyspace", "-l");
-    
+
     addArgument("--status-timer="+RunnerUtils::toString(HashcatConstant::ProgressPeriod));
 
     addArgument("--outfile");

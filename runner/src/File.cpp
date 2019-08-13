@@ -9,7 +9,7 @@
 void File::init() {
     /** Create file when it doesn't exist */
     if (!exists(relative_path_)) {
-	createNew(relative_path_);
+	     createNew(relative_path_);
     } else {
 	relative_path_ = resolveSoftlink();
     }
@@ -17,7 +17,7 @@ void File::init() {
     if (!isFile(relative_path_)) {
 	RunnerUtils::runtimeException(relative_path_ + " is not file");
     }
-    
+
     FilesysBase::init();
 }
 
@@ -157,4 +157,3 @@ void File::setExecutableMode() {
     }
 }
 #endif // __linux__
-

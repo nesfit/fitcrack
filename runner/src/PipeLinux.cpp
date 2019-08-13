@@ -32,7 +32,7 @@ int PipeLinux::closeEnd(int pipe_end) {
 void PipeLinux::createPipe() {
     /** Prevent replacement of active pipe byt new one */
     if (read_ == 0 && write_ == 0) {
-        std::vector<int> file_descriptor(2); 
+        std::vector<int> file_descriptor(2);
 
         /** Create new pipe */
         if (pipe(file_descriptor.data()) < 0) {
@@ -42,7 +42,7 @@ void PipeLinux::createPipe() {
         /** Set pipe to non-blocking state */
         if (fcntl(file_descriptor[0], F_SETFL, fcntl(file_descriptor[0], F_GETFL) | O_NONBLOCK) < 0) {
             RunnerUtils::runtimeException("fcntl failed", errno);
-        } 
+        }
 
         /** Save values into object member properties */
         read_ = file_descriptor[0];
@@ -50,10 +50,15 @@ void PipeLinux::createPipe() {
     }
 }
 
+
 bool PipeLinux::isReadOpen() const {
     return isEndOpen(read_);
 }
 
+/*int PipeLinux::getReadFD(){
+    return read_;
+}
+*/
 bool PipeLinux::isWriteOpen() const {
     return isEndOpen(write_);
 }
@@ -67,7 +72,7 @@ int PipeLinux::readChar(char& c) {
     std::vector<char> ch(read_size);
 
     n_read_chars = read(read_, ch.data(), read_size);
-    
+
     switch (n_read_chars) {
         case -1:
 	    /* Nothing new to read from pipe */

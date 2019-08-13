@@ -107,6 +107,18 @@ std::string ProcessBase::readOutPipeLine() {
     return "";
 }
 
+PipeBase* ProcessBase::GetPipeOut(){
+  return out_pipe_;
+}
+
+void ProcessBase::initInPipe(){
+  this->in_pipe_ = nullptr;
+}
+
+void ProcessBase::setInPipe(PipeBase *in_pipe){
+  this->in_pipe_ = in_pipe;
+}
+
 void ProcessBase::setExecutable(const std::string& exec_name) {
     executable_ = exec_name;
 
