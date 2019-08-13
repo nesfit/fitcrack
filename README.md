@@ -36,6 +36,7 @@ Once installed, see how to [Operate the server](#oper)
   * rewrite
 * PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
+* Curl
 * gRPC + protocol buffers (3.7+)
 
 ### Installation
@@ -74,7 +75,7 @@ Otherwise, in the prerequisities below, you have to choose **libmariadb-dev**, i
 
 ### Install prerequisities
 ```
-apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev
+apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev curl
 
 mysql_secure_installation # Set MySQL root password
 
