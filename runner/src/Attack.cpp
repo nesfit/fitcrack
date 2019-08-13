@@ -15,15 +15,12 @@ AttackBase* Attack::create(const ConfigTask& task_config, Directory& directory, 
     if (mode == "n") {
         switch (attack_mode[0]) {
             case '0':
-                isPCFG = false;
                 return new AttackDictionary(task_config, directory, isPCFG);
                 break;
             case '1':
-                isPCFG = false;
                 return new AttackCombinator(task_config, directory, isPCFG);
                 break;
             case '3':
-                isPCFG = false;
                 return new AttackMask(task_config, directory, isPCFG);
                 break;
             case '9':

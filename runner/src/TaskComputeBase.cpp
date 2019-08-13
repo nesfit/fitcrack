@@ -90,6 +90,8 @@ void TaskComputeBase::initialize() {
 
     PipeBase* manager_pipeout;
 
+    isPCFG_ = false;
+
     if (attack_ == nullptr) {
         attack_ = Attack::create(task_config_, directory_, isPCFG_);
         getAllArguments();
@@ -100,22 +102,17 @@ void TaskComputeBase::initialize() {
         if(process_PCFGmanager_ == nullptr){
           process_PCFGmanager_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
           manager_pipeout = process_PCFGmanager_->GetPipeOut();
-
-          // HAHA ZKOUSKA
-          //std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
-          //std::cout << "Pajpa: " << manager_pipeout << std::endl;
-          //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
-          //std::cout << process_PCFGmanager_->readOutPipeLine() << std::endl;
-          //std::cout << "======= VYSTUPNI PAJPA MANAGERU ========" << std::endl;
         }
       }
 
       process_ = Process::create(hashcat_arguments_, directory_);
+
       if(isPCFG_){
           process_->initInPipe();
           process_->setInPipe(manager_pipeout);
       }
     }
+
 }
 
 void TaskComputeBase::printProcessOut() {

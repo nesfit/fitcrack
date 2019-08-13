@@ -9,7 +9,6 @@
 void File::init() {
     /** Create file when it doesn't exist */
     if (!exists(relative_path_)) {
-       printf("creating file name: %s\n",relative_path_.c_str());
 	     createNew(relative_path_);
     } else {
 	relative_path_ = resolveSoftlink();
