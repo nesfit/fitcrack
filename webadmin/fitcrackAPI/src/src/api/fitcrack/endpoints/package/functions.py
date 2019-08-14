@@ -18,7 +18,7 @@ import os
 
 from flask_restplus import abort
 from sqlalchemy import exc
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR
+from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
 from src.api.fitcrack.attacks import processPackage as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, coun_file_lines
 from src.api.fitcrack.functions import shellExec, lenStr
@@ -87,8 +87,7 @@ def create_package(data):
         hash='check hashlist',
         status='0',
         result=None,
-        keyspace=package['attack_settings']['pcfg_grammar']['keyspace'],
-        #keyspace=package['keyspace'],
+        keyspace=package['keyspace'],
         hc_keyspace=package['hc_keyspace'],
         indexes_verified='0',
         current_index='0',
@@ -304,6 +303,6 @@ def start_pcfg_manager(job_id, grammar_name):
     manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
     print("\n")
     print(manager)
-    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--hashlist", "/home/eisner/git/fitcrack/webadmin/fitcrackAPI/src/src/api/fitcrack/endpoints/pcfg/pcfg_manager/README.md", "-r", PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)])
+    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)])
 
     print('started')
