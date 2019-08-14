@@ -24,6 +24,8 @@ from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, coun_
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash
+from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
+
 
 
 def create_package(data):
@@ -299,8 +301,9 @@ def start_pcfg_manager(job_id, grammar_name):
 
     #./pcfg-manager server -p 50055 -r /fitcrack --hashlist README.md
 
-    manager = PCFG_MANAGER_DIR + " server -p " + calculate_port_number(job_id) + " --hashlist README.md" + " -r " + PCFG_DIR + grammar_name
+    manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
+    print("\n")
     print(manager)
-    #process = subprocess.Popen("")
+    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--hashlist", "/home/eisner/git/fitcrack/webadmin/fitcrackAPI/src/src/api/fitcrack/endpoints/pcfg/pcfg_manager/README.md", "-r", PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)])
 
     print('started')
