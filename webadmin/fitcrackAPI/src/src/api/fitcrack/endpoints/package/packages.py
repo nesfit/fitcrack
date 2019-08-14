@@ -22,14 +22,14 @@ from src.api.fitcrack.endpoints.package.argumentsParser import packageList_parse
     packageOperation, verifyHash_argument, crackingTime_argument, addPackage_model, editHostMapping_argument, \
     editPackage_argument
 from src.api.fitcrack.endpoints.package.functions import delete_package, verifyHashFormat, create_package, \
-    computeCrackingTime
+    computeCrackingTime, start_pcfg_manager
 from src.api.fitcrack.endpoints.package.responseModels import page_of_packages_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newPackage_model, package_model, verifyHashes_model
 from src.api.fitcrack.functions import shellExec
 from src.api.fitcrack.lang import statuses, package_status_text_to_code_dict
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary
+from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg
 
 log = logging.getLogger(__name__)
 
@@ -149,6 +149,10 @@ class OperationWithPackage(Resource):
         action = args.get('operation')
 
         package = FcJob.query.filter(FcJob.id == id).one()
+        pcfg = FcPcfg.query.filter(FcPcfg.id == package.grammar_id).one()
+
+        start_pcfg_manager(package.id, pcfg.name)
+
         if action == 'start':
             package.status = 10
         elif action == 'stop':
