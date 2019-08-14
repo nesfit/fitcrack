@@ -292,7 +292,7 @@ def compute_keyspace_from_pcfg(pcfg_name):
 
 def calculate_port_number(job_id):
 
-    portNumber = 5000 + job_id
+    portNumber = 50050 + job_id
     return str(portNumber)
 
 
