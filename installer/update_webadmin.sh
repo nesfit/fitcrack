@@ -72,6 +72,14 @@ fi
 
 # Install backend-end
 if [ $INSTALL_BACKEND = "y" ]; then
+  echo "Building hashcat-utils"
+  cd webadmin/fitcrackAPI/hashcat-utils/src
+  make
+  cd ..
+  mkdir bin
+  cp src/*.bin bin/
+  cd $INSTALLER_ROOT
+
   echo "Updating Fitcrack WebAdmin back-end..."
   mkdir $APACHE_DOCUMENT_ROOT/fitcrackAPI
   cp -Rf webadmin/fitcrackAPI/* $APACHE_DOCUMENT_ROOT/fitcrackAPI/
