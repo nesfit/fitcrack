@@ -7,10 +7,12 @@ import os
 import shutil
 import zipfile
 import pathlib
+import subprocess
 
 from pathlib import Path
-from settings import HASHCAT_PATH, PCFG_DIR, HASHCAT_DIR
+from settings import HASHCAT_PATH, PCFG_DIR, HASHCAT_DIR, PCFG_MOWER_DIR, PCFG_MANAGER_DIR
 from src.api.fitcrack.functions import shellExec
+
 
 
 def readingFromFolderPostProcces(PcfgModel):
@@ -44,5 +46,30 @@ def deleteUnzipedFolderDirectory(pcfgZipFilePath):
     else:
         print("Does not exist.")
 
-def create_pcfg_grammar_bin(path):
-    print("done")
+
+def createPcfgGrammarBin(pcfgFileNameZip):
+    #./pcfg-manager marshal -r /usr/share/collections/pcfg/atom
+
+    test = PCFG_MANAGER_DIR + ' marshal -r ' \
+                                 + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
+                                 + ' -o ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
+                                 + '/grammar.bin'
+    print(test)
+    pcfgKeyspace = shellExec(PCFG_MANAGER_DIR + ' marshal -r ' \
+                                 + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
+                                 + ' -o ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
+                                 + '/grammar.bin')
+
+
+
+def calculateKeyspace(pcfgFileNameZip):
+
+    pcfgKeyspace = 0
+    pcfgKeyspace = int(shellExec(PCFG_MOWER_DIR + ' -i ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip))))
+    return pcfgKeyspace
+
+
+def extractNameFromZipfile(pcfgFileNameZip):
+
+    pcfgFileName = Path(pcfgFileNameZip).stem
+    return pcfgFileName

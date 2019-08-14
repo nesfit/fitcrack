@@ -90,7 +90,9 @@ def pcfg_mower(config):
     if guess_cnt == -1:
         iprint("ERROR: get_guesses_cnt", file=sys.stderr)
         return 1
-    print("Original:\t" + str(guess_cnt))
+    #print("Original:\t" + str(guess_cnt))
+    #print(str(guess_cnt))
+    sys.stdout.write(str(guess_cnt))
 
     if config.output_dir == "":
         # output grammar is not defined

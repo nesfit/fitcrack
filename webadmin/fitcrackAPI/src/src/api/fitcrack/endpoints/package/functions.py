@@ -13,12 +13,12 @@ from os.path import basename
 from uuid import uuid1
 
 import sys
-
+import subprocess
 import os
+
 from flask_restplus import abort
 from sqlalchemy import exc
-
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR
+from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR
 from src.api.fitcrack.attacks import processPackage as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, coun_file_lines
 from src.api.fitcrack.functions import shellExec, lenStr
@@ -85,7 +85,8 @@ def create_package(data):
         hash='check hashlist',
         status='0',
         result=None,
-        keyspace=package['keyspace'],
+        keyspace=package['attack_settings']['pcfg_grammar']['keyspace'],
+        #keyspace=package['keyspace'],
         hc_keyspace=package['hc_keyspace'],
         indexes_verified='0',
         current_index='0',
@@ -97,6 +98,7 @@ def create_package(data):
         cracking_time='0',
         seconds_per_workunit=package['seconds_per_job'] if package['seconds_per_job'] > 60 else 60,
         config=package['config'],
+
         #TODO odstrániť dict1, dict2
         dict1=package['dict1'] if package.get('dict1') else '',
         dict2=package['dict2'] if package.get('dict2') else '',
@@ -113,7 +115,8 @@ def create_package(data):
         markov_threshold=package['markov_threshold'] if package.get('markov_threshold') else 0,
         replicate_factor=1,
         deleted=False,
-        #pcfg_grammar=package['pcfg_grammar'] if package.get('pcfg_grammar') else ''
+        grammar_id=package['attack_settings']['pcfg_grammar']['id']
+        #grammar_id=None
         )
 
     try:
@@ -285,3 +288,19 @@ def computeCrackingTime(data):
 
 def compute_keyspace_from_pcfg(pcfg_name):
     return 0
+
+def calculate_port_number(job_id):
+
+    portNumber = 5000 + job_id
+    return str(portNumber)
+
+
+def start_pcfg_manager(job_id, grammar_name):
+
+    #./pcfg-manager server -p 50055 -r /fitcrack --hashlist README.md
+
+    manager = PCFG_MANAGER_DIR + " server -p " + calculate_port_number(job_id) + " --hashlist README.md" + " -r " + PCFG_DIR + grammar_name
+    print(manager)
+    #process = subprocess.Popen("")
+
+    print('started')

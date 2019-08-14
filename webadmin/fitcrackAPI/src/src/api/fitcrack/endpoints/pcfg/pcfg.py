@@ -7,6 +7,7 @@ from itertools import islice
 
 import os
 
+
 import time
 from pathlib import Path
 
@@ -14,12 +15,13 @@ from flask import request, redirect
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
-from settings import PCFG_DIR, HASHCAT_PATH, HASHCAT_DIR
+from settings import PCFG_DIR, HASHCAT_PATH, HASHCAT_DIR, ROOT_DIR
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.pcfg.argumentsParser import pcfg_parser, pcfgFromFile_parser
-from src.api.fitcrack.endpoints.pcfg.functions import readingFromFolderPostProcces
-from src.api.fitcrack.endpoints.pcfg.functions import unzipGrammarToPcfgFolder
-from src.api.fitcrack.endpoints.pcfg.functions import deleteUnzipedFolderDirectory
+from src.api.fitcrack.endpoints.pcfg.functions import readingFromFolderPostProcces, \
+unzipGrammarToPcfgFolder, deleteUnzipedFolderDirectory, extractNameFromZipfile, \
+createPcfgGrammarBin, calculateKeyspace
+
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfgs_model, pcfgData_model, \
     pcfg_model
 from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder
@@ -106,9 +108,14 @@ class pcfgAdd(Resource):
 
         uploadedFile = fileUpload(file, PCFG_DIR, ALLOWED_EXTENSIONS)
         if uploadedFile:
+
+            unzipGrammarToPcfgFolder(uploadedFile['filename'])
             #hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + os.path.join(PCFG_DIR, uploadedFile['path']), cwd=HASHCAT_DIR))
+            # TODO dorobiŤ
+            pcfg_keyspace = calculateKeyspace(uploadedFile['filename'])
+
             pcfg = FcPcfg(
-                name=uploadedFile['filename'], path=uploadedFile['path'], keyspace=int(0))
+                name=extractNameFromZipfile(uploadedFile['filename']), path=uploadedFile['path'], keyspace=calculateKeyspace(uploadedFile['filename']))
 
             try:
                 db.session.add(pcfg)
@@ -118,7 +125,8 @@ class pcfgAdd(Resource):
                 abort(500, 'PCFG with name '
                       + uploadedFile['filename'] + ' already exists.')
 
-            unzipGrammarToPcfgFolder(uploadedFile['filename'])
+            #TODO dorobiť
+            createPcfgGrammarBin(uploadedFile['filename'])
 
             return {
                 'message': 'PCFG ' + uploadedFile['filename'] + ' successfuly uploaded.',

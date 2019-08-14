@@ -15,6 +15,7 @@ from settings import HASHCAT_UTILS_PATH, EXE_OR_BIN, HCSTATS_DIR, DICTIONARY_DIR
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.markov.argumentsParser import makeMarkovFromDictionary_parser
 from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
+from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 from src.api.fitcrack.functions import fileUpload, shellExec
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
@@ -113,7 +114,7 @@ class markovMakeFromDictionary(Resource):
         dict = FcDictionary.query.filter(FcDictionary.id == args['dictionary_id']).first()
         if not dict:
             abort(500, 'Can not find selected dictionary.')
-        filename = secure_filename(args['name'])
+        filename = secure_filename(extractNameFromZipfile(dict.name))
         path = os.path.join(HCSTATS_DIR, filename) + '.hcstat2'
 
         # make hcstat2 file

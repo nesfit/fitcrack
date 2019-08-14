@@ -281,15 +281,34 @@ def post_process_package_7(data, db_package):
 
 # pcfg attack
 def process_package_9(package):
-    package['attack_settings']['attack_submode'] = 9
+    package['attack_settings']['attack_submode'] = 0
 
-    print("PCFG")
+    package['attack_name'] = 'pcfg'
+    package['keyspace'] = int(0)
+    package['hc_keyspace'] = int(0)
+
+    print("\n PCFG attack process\n")
+
+    ruleFileMultiplier = 1
+    if package['attack_settings']['rules']:
+        rules = FcRule.query.filter(FcRule.id == package['attack_settings']['rules']['id']).first()
+        ruleFileMultiplier = coun_file_lines(os.path.join(RULE_DIR, rules.path))
+        if ruleFileMultiplier == 0:
+            ruleFileMultiplier = 1
+        if not rules:
+            abort(500, 'Wrong rules file selected.')
+        if not os.path.exists(os.path.join(RULE_DIR, rules.path)):
+            abort(500, 'Rules file does not exist.')
+        package['attack_settings']['attack_submode'] = 1
+        package['rules'] = rules.name
+        print("\n PCFG attack with rules process\n")
 
     return package
 
 
 def post_process_package_9(data, db_package):
-
+    print("\n PCFG attack post_process\n")
+'''
     for dict in data['attack_settings']['left_dictionaries']:
         packageDict = FcJobDictionary(job_id=db_package.id, dictionary_id=dict.id)
         db.session.add(packageDict)
@@ -297,3 +316,4 @@ def post_process_package_9(data, db_package):
     for dict in data['attack_settings']['right_dictionaries']:
         packageDict = FcJobDictionary(job_id=db_package.id, dictionary_id=dict['id'], is_left=False)
         db.session.add(packageDict)
+'''

@@ -153,6 +153,7 @@ class roleNew(Resource):
             'message': 'Role added.'
         }
 
+@api.marshal_with(simpleResponse)
 @ns.route('/password/change_my_password')
 class change_my_password(Resource):
 
@@ -172,12 +173,8 @@ class change_my_password(Resource):
             current_user.set_password(args['new_password'])
             db.session.commit()
             return {
-                'status': True,
-<<<<<<< HEAD
-                'message': 'User password changed.'
-=======
-                'message': 'User password updated.'
->>>>>>> 79f35c8676ba584eae97455b41cfecc76642b880
+                'message': 'User password changed.',
+                'status': True
             }
 
 
