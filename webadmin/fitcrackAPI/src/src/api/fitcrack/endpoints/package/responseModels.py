@@ -102,6 +102,11 @@ dictionary_package_model = api.model('Dictionary package', {
     'dictionary': fields.Nested(dictionary_model)
 })
 
+pcfgGrammar_model = api.model('PCFG package', {
+    'id': fields.Integer(),
+    'keyspace': fields.Integer()
+})
+
 
 
 
@@ -150,5 +155,6 @@ package_model = api.model('Package', {
     'password': fields.String(),
     'hashes': fields.List(fields.Nested(hash_model)),
     'left_dictionaries': fields.List(fields.Nested(dictionary_package_model)),
-    'right_dictionaries': fields.List(fields.Nested(dictionary_package_model))
+    'right_dictionaries': fields.List(fields.Nested(dictionary_package_model)),
+    'grammar_id': fields.List(fields.Nested(pcfgGrammar_model))
 })

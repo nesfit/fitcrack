@@ -257,6 +257,7 @@ class FcJob(Base):
 
     left_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == True))
     right_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == False))
+    grammar_id = Column(BigInteger, nullable=False)
 
     @hybrid_property
     def hash_type_name(self):
