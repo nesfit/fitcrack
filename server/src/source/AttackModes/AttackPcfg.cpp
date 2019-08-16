@@ -303,6 +303,13 @@ bool CAttackPcfg::generateJob()
     m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
                          false, 0, false);
 
+    /** Check if we reached end of PCFG keyspace */
+    if (m_package->getCurrentIndex() + passCount >= m_package->getKeyspace()) {
+        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+                              "Reached end of keyspace. Setting package to finishing!\n");
+        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageFinishing);
+    }
+
     /**
      * @warning Index and WU-Keyspace updating must be done later, after the response from PCFG Manager
      */
