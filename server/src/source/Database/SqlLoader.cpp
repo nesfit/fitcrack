@@ -317,7 +317,7 @@ std::string CSqlLoader::loadGrammarName(uint64_t grammarId)
         {
             std::string grammar_name(row[0]);
             result = grammar_name;
-            Tools::printDebug("LOG: Loaded grammar name: %s\n", result.c_str());
+            // Tools::printDebug("LOG: Loaded grammar name: %s\n", result.c_str());
         }
     }
 
