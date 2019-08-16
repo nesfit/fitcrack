@@ -199,9 +199,6 @@ bool CAttackPcfg::makeJob()
         return true;
     }
 
-    m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
-    m_job->setHcKeyspace(newKeyspace);
-
     outfile.write(preterminals.c_str(), sizeof(char) * preterminals.size());
     outfile.close();
 
@@ -275,7 +272,10 @@ bool CAttackPcfg::makeJob()
 
     restrict_wu_to_host(wu, m_job->getBoincHostId());
 
+    /** Update keyspaces */
+    m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
     m_job->setWorkunitId(uint64_t(wu.id));
+    m_job->setHcKeyspace(newKeyspace);
     m_sqlLoader->addNewWorkunit(m_job);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
