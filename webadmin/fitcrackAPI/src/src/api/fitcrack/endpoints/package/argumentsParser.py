@@ -91,11 +91,7 @@ addPackage_model = api.schema_model('addPackage', {
                         },
                         'name': {
                             'type': 'string'
-                        },
-                        'time': {
-                            "format": "date-time",
-                            "type": "string"
-                        },
+                        }
                     },
                 },
                 'left_dictionaries': {

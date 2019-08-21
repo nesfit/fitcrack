@@ -16,7 +16,7 @@
         <template slot="items" slot-scope="props">
             <td>{{ props.item.pcfg_grammar.name }}</td>
             <td class="text-xs-right">{{ props.item.pcfg_grammar.keyspace }}</td>
-            <td class="text-xs-right">{{ $moment(props.item.pcfg_grammar.time ).format('DD.MM.YYYY HH:mm') }}</td>
+            <td class="text-xs-right">{{ $moment(props.item.pcfg_grammar.time_added ).format('DD.MM.YYYY HH:mm') }}</td> 
             <td class="text-xs-right">
               <v-tooltip top>
                 <v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.pcfg_grammar.id}}" slot="activator">
@@ -61,7 +61,7 @@
             value: 'name'
           },
           {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
+          {text: 'Time', value: 'time_added', align: 'right'},
           {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
         ]
       }

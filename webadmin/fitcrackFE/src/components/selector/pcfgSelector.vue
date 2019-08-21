@@ -11,8 +11,9 @@
     item-key="id"
     :select-all="selectAll"
   >
-  <h3> Items: {{ items }} </h3>
+
     <template slot="items" slot-scope="props">
+
       <tr @click="updateSelected(props.item.id, props.item)">
         <td>
           <v-checkbox
@@ -24,7 +25,7 @@
         </td>
         <td>{{ props.item.name }}</td>
         <td class="text-xs-right">{{ props.item.keyspace }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
+        <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td> 
         <td class="text-xs-right">
           <v-tooltip top>
             <v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.id}}" slot="activator" @click="hideJob(props.item.id)" disabled=true>
@@ -34,6 +35,7 @@
           </v-tooltip>
         </td>
       </tr>
+      <h3> Items: {{ items }} </h3>
     </template>
   </v-data-table>
 </template>
