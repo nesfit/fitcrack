@@ -190,7 +190,7 @@
             </div>
             </v-flex>
           </v-layout>
-
+            <h3> Message: {{ attackSettings }} </h3>
           <div class="max1000 mx-auto mb-5">
             <fc-tile title="Attack settings">
               <v-layout row wrap>
@@ -249,7 +249,7 @@
                   </v-tab>
                   <v-tab-item lazy>
                     <v-card flat>
-                      <pcfg v-model="attackSettings" ref="pcfg"></pcfg>
+                      <pcfg v-model="attackSettings" ref="pcfgAttack"></pcfg>
                     </v-card>
                   </v-tab-item>
                 </v-tabs>
@@ -449,11 +449,11 @@
         this.validateHashes(null)
       },
       attackTabChanged: function (tab) {
-        if (tab === undefined) {
+      //  if (tab === undefined) {
           this.attackSettings = false
-        } else {
+      //  } else { 
           tab.checkValid()
-        }
+      //  }
       },
       focusTextarea: function () {
         this.$refs.textarea.focus()
@@ -565,6 +565,11 @@
           this.$error('Error in attack settings.')
           return
         }
+
+      /*  if (this.attack_settings === "DictAttack" || "pcfg") {
+          this.$error('Error in attack settings.')
+          return
+        }*/
 
         if (this.hashtype === null) {
           this.$error('No hash type selected.')

@@ -6,17 +6,40 @@
 <template>
     <v-container fluid>
       <h2> My account </h2>
-      <h3> Change password </h3>
+      <div class="table">
+        <v-card class="width150">
+          <v-card-title>
+            <h3> My info </h3>
+          </v-card-title>
+          <v-card-text>
+
+            <v-form ref="form" lazy-validation>
+              <v-text-field
+                label="username"
+                :value = "this.username"
+              ></v-text-field>
+              <v-text-field
+                label="email"
+                :value = "this.email"
+              ></v-text-field>
+              <v-btn color="primary" flat @click="loadUsername()">Try!</v-btn>
+
+            </v-form>
+          </v-card-text>
+
+
+      </v-card>
+
+      </div>
+
+      <div class="table">
+      <v-card class="width150">
+        <v-card-title>
+          <h3> Change password </h3>
+        </v-card-title>
+        <v-card-text>
 
       <v-form ref="form" lazy-validation>
-  <!--      <v-text-field
-          label="username"
-          :placeholder= "username"
-        ></v-text-field>
-        <v-text-field
-            label="email"
-            :placeholder= "email"
-          ></v-text-field> -->
           <v-text-field
             type="password"
             label="Old password"
@@ -35,12 +58,16 @@
             v-model="newPassword1"
             required
           ></v-text-field>
+          </v-form>
+        </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" flat @click.stop="editPassword" :disabled="this.newPassword0 != this.newPassword1">Edit</v-btn>
+            <v-btn color="primary" flat @click.stop="editPassword" :disabled="this.newPassword0 != this.newPassword1 || this.oldPassword == null || this.newPassword0 == null">Update</v-btn>
           </v-card-actions>
-      </v-form>
-      <h3> Message: {{ username }} </h3>
+
+    </v-card>
+  </div>
+      <h3> Message: {{ user }} </h3>
     </v-container>
 </template>
 
@@ -64,19 +91,28 @@
             old_password: this.oldPassword,
             new_password: this.newPassword1
           }).then((response) => {
+            console.log(response.data);
+            console.log('user password changed');
             this.oldPassword = '';
             this.newPassword0 = '';
             this.newPassword1 = ''
           })
-        }
+        },
+        loadUsername() {
+          this.axios.get(this.$serverAddr + '/user/').then((response) => {
+            this.user = response.data.items
+          })
 
+
+        }
       },
       data: function() {
        return {
           username: this.$username,
           email: "mail",
           newPassword0: null,
-          newPassword1: null
+          newPassword1: null,
+          user: []
         }
       }
   }
@@ -89,4 +125,12 @@ h2 {
   padding-bottom: 5px;
   text-align: center;
 }
+.table {
+  max-width: 500px;
+  margin: auto;
+}
+.width150 {
+  min-width: 100px;
+}
+
 </style>

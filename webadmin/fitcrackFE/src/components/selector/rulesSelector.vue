@@ -87,8 +87,15 @@
         })
       },
       updateSelected(id, rule) {
-        this.selected = id
-        this.$emit('input', rule)
+        if(this.selected == id){
+          this.selected = 0
+          //TODO here goes something for JSON update (set rule to null)
+        this.$emit('input', null)
+        }
+        else{
+          this.selected = id
+          this.$emit('input', rule)
+        }
       }
     },
   }

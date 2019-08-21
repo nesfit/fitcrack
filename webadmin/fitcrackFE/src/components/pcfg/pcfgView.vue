@@ -84,7 +84,7 @@
             align: 'left',
             value: 'name'
           },
-          {text: 'Added', value: 'time', align: 'right'},
+          {text: 'Added', value: 'time_added', align: 'right'},
           {text: 'Download', value: 'name', align: 'right'},
           {text: 'Delete', align: 'right'}
         ]

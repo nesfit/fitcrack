@@ -8,16 +8,16 @@
     :headers="headers"
     :items="items"
     :search="search"
-    v-model="selected"
     item-key="id"
     :select-all="selectAll"
-    @input="updateSelected"
   >
+  <h3> Items: {{ items }} </h3>
     <template slot="items" slot-scope="props">
-      <tr @click="props.selected = !props.selected">
+      <tr @click="updateSelected(props.item.id, props.item)">
         <td>
           <v-checkbox
-            v-model="props.selected"
+            :input-value="selected === props.item.id"
+            @click="updateSelected(props.item.id, props.item)"
             primary
             hide-details
           ></v-checkbox>
@@ -27,7 +27,7 @@
         <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
         <td class="text-xs-right">
           <v-tooltip top>
-            <v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.id}}" slot="activator">
+            <v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.id}}" slot="activator" @click="hideJob(props.item.id)" disabled=true>
               <v-icon color="primary">link</v-icon>
             </v-btn>
             <span>Go to the PCFG page</span>
@@ -47,9 +47,13 @@
         default: false
       },
       value: {
-        type: Array,
-        default: function () {
-          return []
+        type: Object
+      }
+    },
+    watch:{
+      value: function(){
+        if (this.value) {
+          this.selected = this.value.id
         }
       }
     },
@@ -58,7 +62,7 @@
         items: [],
         loading: false,
         search: '',
-        selected: [],
+        selected: 0,
         headers: [
           {
             text: 'Name',
@@ -66,7 +70,7 @@
             value: 'name'
           },
           {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
+          {text: 'Added', value: 'time_added', align: 'right'},
           {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
         ]
       }
@@ -85,8 +89,10 @@
           this.loading = false
         })
       },
-      updateSelected() {
-        this.$emit('input', this.selected)
+      updateSelected(id, pcfg) {
+          this.selected = id
+          this.$emit('input', pcfg)
+
       }
     },
   }

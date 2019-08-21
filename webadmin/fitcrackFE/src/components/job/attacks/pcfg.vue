@@ -5,7 +5,7 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0"><h2>Select PCFG<span class="required primary--text"> *</span></h2></v-card-title>
+    <v-card-title class="pb-0"><h2>Select PCFG grammar<span class="required primary--text"> *</span></h2></v-card-title>
     <pcfg-selector v-model="pcfg" @input="checkValid"></pcfg-selector>
 
     <v-divider></v-divider>
@@ -27,8 +27,8 @@
     },
     watch:{
       value: function(){
-        if (this.value.pcfg)
-          this.pcfg = this.value.pcfg
+        if (this.value.pcfg_grammar)
+          this.pcfg = this.value.pcfg_grammar
         if (this.value.rules)
           this.rules = this.value.rules
       }
@@ -38,25 +38,26 @@
       'rules-selector': ruleSelector
     },
     methods: {
-      /*checkValid: function () {
-        if (this.pcfg.length > 0) {
+      checkValid: function () {
+
+      /*  if (this.pcfg_grammmar.length > 0) {
+        alert('motýle')*/
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
             'rules': this.rules,
-            'pcfg': this.pcfg
+            'pcfg_grammar': this.pcfg
           })
           return true
-        }
-        return false
-      }*/
+      //  }
+      //  return false
+      }
     },
     data: function () {
       return {
-        attackId: 0,
+        attackId: 9,
         attackName: 'pcfg',
         valid: false,
-
         pcfg: [],
         rules: null,
       }

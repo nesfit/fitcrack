@@ -20,6 +20,7 @@
             v-model="props.selected"
             primary
             hide-details
+            requiered
           ></v-checkbox>
         </td>
         <td>{{ props.item.name }}</td>

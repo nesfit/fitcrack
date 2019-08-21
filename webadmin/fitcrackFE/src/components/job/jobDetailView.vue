@@ -221,6 +221,7 @@
             <dictionaryDetail class="max500" :data="data" v-else-if="data.attack === 'dictionary'"/>
             <combinatorDetail class="max500" :data="data" v-else-if="data.attack === 'hybrid (Wordlist + Mask)'"/>
             <combinatorDetail class="max500" :data="data" v-else-if="data.attack === 'hybrid (Mask + Wordlist)'"/>
+            <pcfgDetail class="max500" :data="data" v-else-if="data.attack === 'PCFG'"/>
 
 
             <v-layout row wrap class="mt-3 mb-5 elevation-2 white max500">
@@ -522,6 +523,7 @@
   import combinatorDetail from '@/components/job/attacksDetail/combinator'
   import maskDetail from '@/components/job/attacksDetail/mask'
   import dictionaryDetail from '@/components/job/attacksDetail/dictionary'
+  import pcfgDetail from '@/components/job/attacksDetail/pcfg'
   import {DonutChart, LineChart} from 'vue-morris'
   import graph from '@/components/graph/fc_graph'
   import FcTextarea from '@/components/textarea/fc_textarea'
@@ -533,6 +535,7 @@
       'combinatorDetail': combinatorDetail,
       'maskDetail': maskDetail,
       'dictionaryDetail': dictionaryDetail,
+      'pcfgDetail': pcfgDetail,
       'fc-textarea': FcTextarea
     },
     mounted: function () {

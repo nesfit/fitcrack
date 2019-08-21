@@ -99,7 +99,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" flat @click.stop="roleDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="addRole">Add</v-btn>
+          <v-btn color="primary" flat @click.stop="addRole" :disabled="this.newRoleName=''">Add</v-btn>
         </v-card-actions>
         <div class="loadingOver" v-if="addingRole">
           <v-progress-circular
@@ -165,7 +165,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" flat @click.stop="editDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="editUser" :disabled="!validEditUserForm">Edit</v-btn>
+          <v-btn color="primary" flat @click.stop="editUser" disabled=true>Edit</v-btn>
         </v-card-actions>
         <div class="loadingOver" v-if="editingUser">
           <v-progress-circular
@@ -218,7 +218,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" flat @click.stop="userDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="addUser" :disabled="!validNewUserForm">Add user</v-btn>
+          <v-btn color="primary" flat @click.stop="addUser" :disabled="!validNewUserForm || this.newUsername == '' || this.newEmail == '' || this.newPassword == '' || this.newUserRoleID == ''">Add user</v-btn>
         </v-card-actions>
         <div class="loadingOver" v-if="addingUser">
           <v-progress-circular
@@ -231,8 +231,6 @@
         </div>
       </v-card>
     </v-dialog>
-
-
 
   </v-container>
 </template>
