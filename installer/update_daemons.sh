@@ -21,7 +21,7 @@ echo "   * Assimilator"
 echo "   * Validator"
 echo "   * Trickler"
 echo " "
-echo "The database, BOINC daemons and other will be untouched."
+echo "The database and project settings will be untouched."
 echo "However, the project will have to be restarted."
 read -e -p "Do you wish to continue? [y/N] (default: y): " BUILD_SERVER
 BUILD_SERVER=${BUILD_SERVER:-y}

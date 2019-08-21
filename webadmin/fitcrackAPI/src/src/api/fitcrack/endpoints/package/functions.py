@@ -18,12 +18,14 @@ import os
 
 from flask_restplus import abort
 from sqlalchemy import exc
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR
+from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
 from src.api.fitcrack.attacks import processPackage as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, coun_file_lines
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash
+from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
+
 
 
 def create_package(data):
@@ -85,8 +87,7 @@ def create_package(data):
         hash='check hashlist',
         status='0',
         result=None,
-        keyspace=package['attack_settings']['pcfg_grammar']['keyspace'],
-        #keyspace=package['keyspace'],
+        keyspace=package['keyspace'],
         hc_keyspace=package['hc_keyspace'],
         indexes_verified='0',
         current_index='0',
@@ -291,7 +292,7 @@ def compute_keyspace_from_pcfg(pcfg_name):
 
 def calculate_port_number(job_id):
 
-    portNumber = 5000 + job_id
+    portNumber = 50050 + job_id
     return str(portNumber)
 
 
@@ -299,8 +300,9 @@ def start_pcfg_manager(job_id, grammar_name):
 
     #./pcfg-manager server -p 50055 -r /fitcrack --hashlist README.md
 
-    manager = PCFG_MANAGER_DIR + " server -p " + calculate_port_number(job_id) + " --hashlist README.md" + " -r " + PCFG_DIR + grammar_name
+    manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
+    print("\n")
     print(manager)
-    #process = subprocess.Popen("")
+    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)])
 
     print('started')

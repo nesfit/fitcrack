@@ -113,9 +113,9 @@ class pcfgAdd(Resource):
             #hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + os.path.join(PCFG_DIR, uploadedFile['path']), cwd=HASHCAT_DIR))
             # TODO dorobiŤ
             pcfg_keyspace = calculateKeyspace(uploadedFile['filename'])
-
+            print(pcfg_keyspace)
             pcfg = FcPcfg(
-                name=extractNameFromZipfile(uploadedFile['filename']), path=uploadedFile['path'], keyspace=calculateKeyspace(uploadedFile['filename']))
+                name=extractNameFromZipfile(uploadedFile['filename']), path=uploadedFile['path'], keyspace=int(pcfg_keyspace))
 
             try:
                 db.session.add(pcfg)

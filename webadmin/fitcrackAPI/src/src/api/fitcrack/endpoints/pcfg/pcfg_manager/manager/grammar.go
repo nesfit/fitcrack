@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	RulesFolder = "Rules/"
+	RulesFolder = ""
 )
 
 var (

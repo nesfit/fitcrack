@@ -284,8 +284,8 @@ def process_package_9(package):
     package['attack_settings']['attack_submode'] = 0
 
     package['attack_name'] = 'pcfg'
-    package['keyspace'] = int(0)
-    package['hc_keyspace'] = int(0)
+    package['keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
+    package['hc_keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
 
     print("\n PCFG attack process\n")
 

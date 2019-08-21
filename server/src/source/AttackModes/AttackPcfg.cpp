@@ -199,9 +199,6 @@ bool CAttackPcfg::makeJob()
         return true;
     }
 
-    m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
-    m_job->setHcKeyspace(newKeyspace);
-
     outfile.write(preterminals.c_str(), sizeof(char) * preterminals.size());
     outfile.close();
 
@@ -275,11 +272,22 @@ bool CAttackPcfg::makeJob()
 
     restrict_wu_to_host(wu, m_job->getBoincHostId());
 
+    /** Update keyspaces */
+    m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
     m_job->setWorkunitId(uint64_t(wu.id));
+    m_job->setHcKeyspace(newKeyspace);
     m_sqlLoader->addNewWorkunit(m_job);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
+
+    /** Check if we reached end of PCFG keyspace */
+    if (m_package->getCurrentIndex() + m_job->getHcKeyspace() >= m_package->getKeyspace()) {
+        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+                              "Reached end of keyspace. Setting package to finishing!\n");
+        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageFinishing);
+    }
+
     return true;
 }
 

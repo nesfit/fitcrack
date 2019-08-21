@@ -151,9 +151,11 @@ class OperationWithPackage(Resource):
         package = FcJob.query.filter(FcJob.id == id).one()
         pcfg = FcPcfg.query.filter(FcPcfg.id == package.grammar_id).one()
 
-        start_pcfg_manager(package.id, pcfg.name)
+
 
         if action == 'start':
+            start_pcfg_manager(package.id, pcfg.name)
+            print('Hello')
             package.status = 10
         elif action == 'stop':
             package.status = 12
