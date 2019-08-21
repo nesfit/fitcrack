@@ -190,7 +190,7 @@
             </div>
             </v-flex>
           </v-layout>
-            <h3> Message: {{ attackSettings }} </h3>
+        <!--    <h3> Message: {{ attackSettings }} </h3> -->
           <div class="max1000 mx-auto mb-5">
             <fc-tile title="Attack settings">
               <v-layout row wrap>
@@ -451,7 +451,7 @@
       attackTabChanged: function (tab) {
       //  if (tab === undefined) {
           this.attackSettings = false
-      //  } else { 
+      //  } else {
           tab.checkValid()
       //  }
       },
