@@ -116,7 +116,7 @@ def create_package(data):
         markov_threshold=package['markov_threshold'] if package.get('markov_threshold') else 0,
         replicate_factor=1,
         deleted=False,
-        grammar_id=package['attack_settings']['pcfg_grammar']['id']
+        grammar_id=package['attack_settings']['pcfg_grammar']['id'] if package['attack_settings'].get('pcfg_grammar') else 0
         #grammar_id=None
         )
 
