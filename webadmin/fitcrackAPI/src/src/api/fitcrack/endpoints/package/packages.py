@@ -147,15 +147,12 @@ class OperationWithPackage(Resource):
         """
         args = packageOperation.parse_args(request)
         action = args.get('operation')
-
         package = FcJob.query.filter(FcJob.id == id).one()
-        pcfg = FcPcfg.query.filter(FcPcfg.id == package.grammar_id).one()
-
-
 
         if action == 'start':
-            start_pcfg_manager(package.id, pcfg.name)
-            print('Hello')
+            if package.attack_mode == 9:
+                pcfg = FcPcfg.query.filter(FcPcfg.id == package.grammar_id).one()
+                start_pcfg_manager(package.id, pcfg.name)
             package.status = 10
         elif action == 'stop':
             package.status = 12
