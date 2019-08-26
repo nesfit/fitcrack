@@ -119,7 +119,7 @@ class Rules:
 
 
     def get_guesses_cnt(self):
-        cnt_all = 1
+        cnt_all = 0
         for tuple in self.rulesets["Grammar"]:
             cnt_base = 1
             base_arr = [''.join(g) for _, g in groupby(tuple[0], str.isalpha)]
