@@ -169,4 +169,5 @@ if [ $REMOVE_COLLECTIONS = "y" ]; then
   rm -rf /usr/share/collections/encrypted-files
   rm -rf /usr/share/collections/masks
   rm -rf /usr/share/collections/rules
+  rm -rf /usr/share/collections/pcfg
 fi
