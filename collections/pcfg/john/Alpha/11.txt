@@ -1,0 +1,4 @@
+nightshadow	0.25
+rastafarian	0.25
+thunderbird	0.25
+christopher	0.25

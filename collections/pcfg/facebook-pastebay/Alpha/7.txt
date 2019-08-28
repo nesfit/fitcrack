@@ -1,0 +1,4 @@
+october	0.25
+pivskid	0.25
+poupous	0.25
+mitsuko	0.25
