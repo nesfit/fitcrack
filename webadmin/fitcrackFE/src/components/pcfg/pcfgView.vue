@@ -14,7 +14,7 @@
         :items="pcfg.items"
         :loading="loading"
         :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Hcstats per page"
+        rows-per-page-text="PCFGs per page"
         disable-initial-sort
       >
         <template slot="items" slot-scope="props">
@@ -83,7 +83,7 @@
                 <v-text-field
                   name="name"
                   label="Name"
-                  id="newHcStatName"
+                  id="newPcfgName"
                   v-model="newName"
                 ></v-text-field>
               </div>
@@ -119,7 +119,7 @@
                        color="primary"
 
                        outline
-                       @click="makeHcStatFromDictionary()"
+                       @click="makePcfgFromDictionary()"
                        :disabled="selectedDictId === null && newName === ''">
                   Make from dictionary
                 </v-btn>
@@ -167,7 +167,7 @@
           this.loadingDictionaries = false
         })
       },
-      makeHcStatFromDictionary: function () {
+      makePcfgFromDictionary: function () {
         this.adding = true
         this.axios.post(this.$serverAddr + '/pcfg/makeFromDictionary', {
           "dictionary_id": this.selectedDictId,
