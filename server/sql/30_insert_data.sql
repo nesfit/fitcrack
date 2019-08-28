@@ -27,15 +27,14 @@ INSERT INTO `fc_charset` (`id`, `name`, `path`, `time`, `deleted`) VALUES
 --
 
 INSERT INTO `fc_dictionary` (`id`, `name`, `path`, `keyspace`, `time`, `deleted`, `modification_time`) VALUES
-(1,	'rockyou.txt',	'rockyou.txt',	14343296,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(2,	'honeynet.txt',	'honeynet.txt',	226082,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(3,	'darkweb2017-top1000.txt',	'darkweb2017-top1000.txt',	1000,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(4,	'myspace.txt',	'myspace.txt',	37123,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(5,	'phpbb.txt',	'phpbb.txt',	184389,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(6,	'adobe100.txt',	'adobe100.txt',	100,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(7,	'twitter-banned-small.txt',	'twitter-banned-small.txt',	397,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(8,	'bible.txt',	'bible.txt',	12570,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(9,	'english.txt',	'english.txt',	54308,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00');
+(1,	'honeynet.txt',	'honeynet.txt',	226082,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(2,	'darkweb2017-top1000.txt',	'darkweb2017-top1000.txt',	1000,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(3,	'myspace.txt',	'myspace.txt',	37123,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(4,	'phpbb.txt',	'phpbb.txt',	184389,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(5,	'adobe100.txt',	'adobe100.txt',	100,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(6,	'twitter-banned-small.txt',	'twitter-banned-small.txt',	397,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(7,	'bible.txt',	'bible.txt',	12570,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(8,	'english.txt',	'english.txt',	54308,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00');
 
 
 --
@@ -6604,12 +6603,12 @@ INSERT INTO `fc_job` (`id`, `token`, `attack`, `attack_mode`, `attack_submode`, 
 --
 
 INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index`, `is_left`) VALUES
-(1,	2,	1,	0,	1),
+(1,	2,	13,	0,	1),
 (2,	2,	2,	0,	1),
-(3,	2,	9,	0,	1),
-(4,	3,	2,	0,	1),
-(5,	5,	3,	0,	1),
-(6,	5,	7,	0,	0);
+(3,	2,	8,	0,	1),
+(4,	3,	1,	0,	1),
+(5,	5,	2,	0,	1),
+(6,	5,	6,	0,	0);
 
 
 --
