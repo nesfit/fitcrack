@@ -12,6 +12,60 @@
 #include <vector>
 
 #include <AttackMode.h>
+#include <protocol.pb.h>
+#include <protocol.grpc.pb.h>
+#include <grpcpp/grpcpp.h>
+
+
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::Status;
+
+using proto::PCFG;
+using proto::Items;
+using proto::NextRequest;
+using proto::Empty;
+using proto::ConnectResponse;
+using proto::CrackingResponse;
+using proto::ResultResponse;
+
+
+/** Class for gRPC calls */
+class PretermClient {
+    public:
+
+        PretermClient() = default;
+        explicit PretermClient(uint64_t packageId);
+
+        /**
+         * Ask for next batch of preterminals
+         * @param keyspace Number of passwords we ask for
+         * @return Dictionary of passwords, as a single string
+         */
+        std::string GetNextItems(uint64_t & keyspace);
+
+        /**
+         * Connect to PCFG Manager
+         * @return True if connected successfully, False otherwise
+         */
+        bool Connect();
+
+        /**
+        *
+         * Disconnect from PCFG Manager
+        * @return True if disconnected successfully, False otherwise
+        */
+        bool Disconnect();
+
+        /**
+         * Acknowledge the job was received
+         */
+        bool Acknowledge();
+
+
+    private:
+        std::unique_ptr<PCFG::Stub> stub_;
+};
 
 
 class CAttackPcfg : public AttackMode {
@@ -48,6 +102,10 @@ class CAttackPcfg : public AttackMode {
          * @param realKeyspace Number of passwords that are represented by those preterminals
          */
         void loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace, uint64_t currentIndex);
+
+
+        /** gRPC channel */
+        PretermClient m_client;
 };
 
 #endif //WORKGENERATOR_ATTACKPCFG_H

@@ -7,89 +7,101 @@
  */
 
 #include <AttackPcfg.h>
-#include <protocol.pb.h>
-#include <protocol.grpc.pb.h>
-#include <grpcpp/grpcpp.h>
-
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::Status;
-
-using proto::PCFG;
-using proto::Items;
-using proto::NextRequest;
-using proto::Empty;
-using proto::ConnectResponse;
 
 
-/** Class for gRPC calls */
-class PretermClient {
-    public:
-        PretermClient(std::shared_ptr<Channel> channel)
-                : stub_(PCFG::NewStub(channel)) {}
+PretermClient::PretermClient(uint64_t packageId)
+{
+    uint64_t pcfgPort = 50050 + (packageId % 1000);
+    std::string pcfgAddress = "localhost:" + std::to_string(pcfgPort);
 
-        // Assembles the client's payload, sends it and presents the response back
-        // from the server.
-        std::string GetNextItems(uint64_t & keyspace)
-        {
-            // Data we are sending to the server.
-            NextRequest request;
-            request.set_terminals(keyspace);
+    stub_ = PCFG::NewStub(grpc::CreateChannel(pcfgAddress, grpc::InsecureChannelCredentials()));
+}
 
-            // Container for the data we expect from the server.
-            Items reply;
 
-            // Context for the client. It could be used to convey extra information to
-            // the server and/or tweak certain RPC behaviors.
-            ClientContext context;
+// Assembles the client's payload, sends it and presents the response back
+// from the server.
+std::string PretermClient::GetNextItems(uint64_t & keyspace)
+{
+    // Data we are sending to the server.
+    NextRequest request;
+    request.set_terminals(keyspace);
 
-            // The actual RPC.
-            Status status = stub_->GetNextItems(&context, request, &reply);
+    // Container for the data we expect from the server.
+    Items reply;
 
-            // Act upon its status.
-            if (status.ok()) {
-                keyspace = reply.terminalscount();
+    // Context for the client. It could be used to convey extra information to
+    // the server and/or tweak certain RPC behaviors.
+    ClientContext context;
 
-                Tools::printDebug("LOG: gRPC Succeeded: Real keyspace %" PRIu64 "\n", keyspace);
+    // The actual RPC.
+    Status status = stub_->GetNextItems(&context, request, &reply);
 
-                std::string result;
-                reply.SerializeToString(&result);
+    // Act upon its status.
+    if (status.ok()) {
+        keyspace = reply.terminalscount();
 
-                return result;
-            } else {
-                std::string details(status.error_details());
-                std::string msg(status.error_message());
-                Tools::printDebug("LOG: gRPC call failed! Code: %d, %s, %s\n", status.error_code(), details.c_str(), msg.c_str());
-                return std::string();
-            }
-        }
+        Tools::printDebug("LOG: gRPC Succeeded: Real keyspace %" PRIu64 "\n", keyspace);
 
-        bool Connect()
-        {
-            Empty request;
-            ConnectResponse reply;
-            ClientContext context;
-            Status status = stub_->Connect(&context, request, &reply);
+        std::string result;
+        reply.SerializeToString(&result);
 
-            if (status.ok()) {
-                Tools::printDebug("LOG: gRPC Connected!\n");
-                return true;
-            }
-            else {
-                Tools::printDebug("LOG: gRPC could not connect!\n");
-                return false;
-            }
-        }
+        return result;
+    } else {
+        std::string details(status.error_details());
+        std::string msg(status.error_message());
+        Tools::printDebug("LOG: gRPC call failed! Code: %d, %s, %s\n", status.error_code(), details.c_str(), msg.c_str());
+        return std::string();
+    }
+}
 
-    private:
-        std::unique_ptr<PCFG::Stub> stub_;
-};
+bool PretermClient::Connect()
+{
+    Empty request;
+    ConnectResponse reply;
+    ClientContext context;
+    Status status = stub_->Connect(&context, request, &reply);
+
+    if (status.ok()) {
+        Tools::printDebug("LOG: gRPC Connected!\n");
+        return true;
+    }
+    else {
+        Tools::printDebug("LOG: gRPC could not connect!\n");
+        return false;
+    }
+}
+
+bool PretermClient::Disconnect()
+{
+    Empty req_res;
+    ClientContext context;
+
+    Status status = stub_->Disconnect(&context, req_res, &req_res);
+    if (status.ok()) {
+        Tools::printDebug("LOG: gRPC successfully disconnected!\n");
+        return true;
+    }
+    else {
+        Tools::printDebug("LOG: gRPC failed to disconnect!\n");
+        return false;
+    }
+}
+
+bool PretermClient::Acknowledge()
+{
+    CrackingResponse request;
+    ResultResponse reply;
+    ClientContext context;
+
+    Status status = stub_->SendResult(&context, request, &reply);
+    return true;
+}
 
 
 CAttackPcfg::CAttackPcfg(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader)
         :   AttackMode(package, host, seconds, sqlLoader)
 {
-
+    m_client = PretermClient(package->getId());
 }
 
 
@@ -282,10 +294,12 @@ bool CAttackPcfg::makeJob()
                           "Workunit succesfully created\n");
 
     /** Check if we reached end of PCFG keyspace */
-    if (m_package->getCurrentIndex() + m_job->getHcKeyspace() >= m_package->getKeyspace()) {
+    if (m_package->getCurrentIndex() + m_job->getHcKeyspace() >= m_package->getKeyspace())
+    {
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                               "Reached end of keyspace. Setting package to finishing!\n");
         m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageFinishing);
+        m_client.Disconnect();
     }
 
     return true;
@@ -321,15 +335,11 @@ bool CAttackPcfg::generateJob()
 
 void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace, uint64_t currentIndex)
 {
-    /** Compute port used for this job */
-    uint64_t pcfgPort = 50050 + (m_package->getId() % 1000);
-    std::string pcfgAddress = "localhost:" + std::to_string(pcfgPort);
-
     /** Run gRPC query to get preterminals */
-    PretermClient client(grpc::CreateChannel(pcfgAddress, grpc::InsecureChannelCredentials()));
-    if (currentIndex == 0 && !client.Connect())
+    if (currentIndex == 0 && !m_client.Connect())
         return;
 
-    preterminals = client.GetNextItems(realKeyspace);
+    preterminals = m_client.GetNextItems(realKeyspace);
+    m_client.Acknowledge();
 }
 
