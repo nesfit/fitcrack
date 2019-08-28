@@ -232,7 +232,7 @@ bool CAttackPcfg::makeJob()
     }
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                          "Creating grammar file\n");
+                          "Creating grammar file %s\n", (Config::pcfgDir + m_package->getGrammar() + "/grammar.bin").c_str());
 
 
     /** Load grammar path from DB and dump it to BOINC input file  */
@@ -240,7 +240,7 @@ bool CAttackPcfg::makeJob()
     grammarFile.open((Config::pcfgDir + m_package->getGrammar() + "/grammar.bin").c_str());
     if (!grammarFile) {
         Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to open dictionary file! Setting package to malformed.\n");
+                              "Failed to open grammar file! Setting package to malformed.\n");
         m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
         return false;
     }
