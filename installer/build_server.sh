@@ -12,7 +12,7 @@ if ! [ -d "grpc" ]; then
   git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
   cd grpc
   git submodule update --init
-  make
+  make -j$COMPILER_THREADS
   make install
 
   # Install prtocol buffers
@@ -65,7 +65,7 @@ if [[ $? != 0 ]]; then
   exit
 fi
 
-make
+make -j$COMPILER_THREADS
 if [[ $? != 0 ]]; then
   echo "Error during compilation."
   exit

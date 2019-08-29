@@ -36,7 +36,8 @@ if ! [ -d "/usr/share/collections/rules" ]; then
 fi
 
 if ! [ -d "/usr/share/collections/pcfg" ]; then
-  cp -R collections/pcfg /usr/share/collections/
+  #cp -R collections/pcfg /usr/share/collections/
+  mkdir /usr/share/collections/pcfg
 fi
 
 # Set ownership and permissions

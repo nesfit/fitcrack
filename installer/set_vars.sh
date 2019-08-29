@@ -7,6 +7,18 @@
 # Save installer root
 INSTALLER_ROOT=$(pwd)
 
+###################
+# Compiler threads
+###################
+read -e -p "Enter the number of compiler threads (default: 8): " COMPILER_THREADS
+COMPILER_THREADS=${COMPILER_THREADS:-8}
+
+re='^[0-9]+$'
+if ! [[ $COMPILER_THREADS =~ $re ]] ; then
+   echo "Error: Entered value is not a number!"
+   exit 1
+fi
+
 #############
 # BOINC user
 #############
