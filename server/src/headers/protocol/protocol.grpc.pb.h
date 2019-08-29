@@ -65,6 +65,13 @@ class PCFG final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::proto::ResultResponse>> PrepareAsyncSendResult(::grpc::ClientContext* context, const ::proto::CrackingResponse& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::proto::ResultResponse>>(PrepareAsyncSendResultRaw(context, request, cq));
     }
+    virtual ::grpc::Status Kill(::grpc::ClientContext* context, const ::proto::Empty& request, ::proto::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::proto::Empty>> AsyncKill(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::proto::Empty>>(AsyncKillRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::proto::Empty>> PrepareAsyncKill(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::proto::Empty>>(PrepareAsyncKillRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -76,6 +83,8 @@ class PCFG final {
       virtual void GetNextItems(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::proto::Items* response, std::function<void(::grpc::Status)>) = 0;
       virtual void SendResult(::grpc::ClientContext* context, const ::proto::CrackingResponse* request, ::proto::ResultResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void SendResult(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::proto::ResultResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Kill(::grpc::ClientContext* context, const ::proto::Empty* request, ::proto::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Kill(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::proto::Empty* response, std::function<void(::grpc::Status)>) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
@@ -87,6 +96,8 @@ class PCFG final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::proto::Items>* PrepareAsyncGetNextItemsRaw(::grpc::ClientContext* context, const ::proto::NextRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::proto::ResultResponse>* AsyncSendResultRaw(::grpc::ClientContext* context, const ::proto::CrackingResponse& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::proto::ResultResponse>* PrepareAsyncSendResultRaw(::grpc::ClientContext* context, const ::proto::CrackingResponse& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::proto::Empty>* AsyncKillRaw(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::proto::Empty>* PrepareAsyncKillRaw(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -119,6 +130,13 @@ class PCFG final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::proto::ResultResponse>> PrepareAsyncSendResult(::grpc::ClientContext* context, const ::proto::CrackingResponse& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::proto::ResultResponse>>(PrepareAsyncSendResultRaw(context, request, cq));
     }
+    ::grpc::Status Kill(::grpc::ClientContext* context, const ::proto::Empty& request, ::proto::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::proto::Empty>> AsyncKill(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::proto::Empty>>(AsyncKillRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::proto::Empty>> PrepareAsyncKill(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::proto::Empty>>(PrepareAsyncKillRaw(context, request, cq));
+    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -130,6 +148,8 @@ class PCFG final {
       void GetNextItems(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::proto::Items* response, std::function<void(::grpc::Status)>) override;
       void SendResult(::grpc::ClientContext* context, const ::proto::CrackingResponse* request, ::proto::ResultResponse* response, std::function<void(::grpc::Status)>) override;
       void SendResult(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::proto::ResultResponse* response, std::function<void(::grpc::Status)>) override;
+      void Kill(::grpc::ClientContext* context, const ::proto::Empty* request, ::proto::Empty* response, std::function<void(::grpc::Status)>) override;
+      void Kill(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::proto::Empty* response, std::function<void(::grpc::Status)>) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -149,10 +169,13 @@ class PCFG final {
     ::grpc::ClientAsyncResponseReader< ::proto::Items>* PrepareAsyncGetNextItemsRaw(::grpc::ClientContext* context, const ::proto::NextRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::proto::ResultResponse>* AsyncSendResultRaw(::grpc::ClientContext* context, const ::proto::CrackingResponse& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::proto::ResultResponse>* PrepareAsyncSendResultRaw(::grpc::ClientContext* context, const ::proto::CrackingResponse& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::proto::Empty>* AsyncKillRaw(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::proto::Empty>* PrepareAsyncKillRaw(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Connect_;
     const ::grpc::internal::RpcMethod rpcmethod_Disconnect_;
     const ::grpc::internal::RpcMethod rpcmethod_GetNextItems_;
     const ::grpc::internal::RpcMethod rpcmethod_SendResult_;
+    const ::grpc::internal::RpcMethod rpcmethod_Kill_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -164,6 +187,7 @@ class PCFG final {
     virtual ::grpc::Status Disconnect(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response);
     virtual ::grpc::Status GetNextItems(::grpc::ServerContext* context, const ::proto::NextRequest* request, ::proto::Items* response);
     virtual ::grpc::Status SendResult(::grpc::ServerContext* context, const ::proto::CrackingResponse* request, ::proto::ResultResponse* response);
+    virtual ::grpc::Status Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_Connect : public BaseClass {
@@ -245,7 +269,27 @@ class PCFG final {
       ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Connect<WithAsyncMethod_Disconnect<WithAsyncMethod_GetNextItems<WithAsyncMethod_SendResult<Service > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_Kill : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_Kill() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_Kill() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestKill(::grpc::ServerContext* context, ::proto::Empty* request, ::grpc::ServerAsyncResponseWriter< ::proto::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_Connect<WithAsyncMethod_Disconnect<WithAsyncMethod_GetNextItems<WithAsyncMethod_SendResult<WithAsyncMethod_Kill<Service > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_Connect : public BaseClass {
    private:
@@ -346,7 +390,32 @@ class PCFG final {
     }
     virtual void SendResult(::grpc::ServerContext* context, const ::proto::CrackingResponse* request, ::proto::ResultResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_Connect<ExperimentalWithCallbackMethod_Disconnect<ExperimentalWithCallbackMethod_GetNextItems<ExperimentalWithCallbackMethod_SendResult<Service > > > > ExperimentalCallbackService;
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_Kill : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_Kill() {
+      ::grpc::Service::experimental().MarkMethodCallback(4,
+        new ::grpc::internal::CallbackUnaryHandler< ::proto::Empty, ::proto::Empty>(
+          [this](::grpc::ServerContext* context,
+                 const ::proto::Empty* request,
+                 ::proto::Empty* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->Kill(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithCallbackMethod_Kill() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  typedef ExperimentalWithCallbackMethod_Connect<ExperimentalWithCallbackMethod_Disconnect<ExperimentalWithCallbackMethod_GetNextItems<ExperimentalWithCallbackMethod_SendResult<ExperimentalWithCallbackMethod_Kill<Service > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Connect : public BaseClass {
    private:
@@ -411,6 +480,23 @@ class PCFG final {
     }
     // disable synchronous version of this method
     ::grpc::Status SendResult(::grpc::ServerContext* context, const ::proto::CrackingResponse* request, ::proto::ResultResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_Kill : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_Kill() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_Kill() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -493,6 +579,26 @@ class PCFG final {
     }
     void RequestSendResult(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_Kill : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_Kill() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_Kill() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestKill(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -596,6 +702,31 @@ class PCFG final {
     virtual void SendResult(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_Kill : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_Kill() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(4,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->Kill(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_Kill() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void Kill(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_Connect : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
@@ -675,9 +806,29 @@ class PCFG final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedSendResult(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::proto::CrackingResponse,::proto::ResultResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_Connect<WithStreamedUnaryMethod_Disconnect<WithStreamedUnaryMethod_GetNextItems<WithStreamedUnaryMethod_SendResult<Service > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_Kill : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_Kill() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::StreamedUnaryHandler< ::proto::Empty, ::proto::Empty>(std::bind(&WithStreamedUnaryMethod_Kill<BaseClass>::StreamedKill, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_Kill() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedKill(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::proto::Empty,::proto::Empty>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_Connect<WithStreamedUnaryMethod_Disconnect<WithStreamedUnaryMethod_GetNextItems<WithStreamedUnaryMethod_SendResult<WithStreamedUnaryMethod_Kill<Service > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Connect<WithStreamedUnaryMethod_Disconnect<WithStreamedUnaryMethod_GetNextItems<WithStreamedUnaryMethod_SendResult<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Connect<WithStreamedUnaryMethod_Disconnect<WithStreamedUnaryMethod_GetNextItems<WithStreamedUnaryMethod_SendResult<WithStreamedUnaryMethod_Kill<Service > > > > > StreamedService;
 };
 
 }  // namespace proto

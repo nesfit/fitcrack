@@ -341,7 +341,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_protocol_2eproto::offsets[] PR
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::proto::Grammar, rulename_),
+  PROTOBUF_FIELD_OFFSET(::proto::Grammar, rulesfolder_),
   PROTOBUF_FIELD_OFFSET(::proto::Grammar, sections_),
   PROTOBUF_FIELD_OFFSET(::proto::Grammar, mapping_),
   PROTOBUF_FIELD_OFFSET(::proto::IntMap_ValueEntry_DoNotUse, _has_bits_),
@@ -437,29 +437,30 @@ const char descriptor_table_protodef_protocol_2eproto[] =
   "\016ResultResponse\022\013\n\003end\030\001 \001(\010\"v\n\020Cracking"
   "Response\0223\n\006hashes\030\001 \003(\0132#.proto.Crackin"
   "gResponse.HashesEntry\032-\n\013HashesEntry\022\013\n\003"
-  "key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\252\001\n\007Grammar"
-  "\022\020\n\010ruleName\030\001 \001(\t\022 \n\010sections\030\002 \003(\0132\016.p"
-  "roto.Section\022,\n\007mapping\030\003 \003(\0132\033.proto.Gr"
-  "ammar.MappingEntry\032=\n\014MappingEntry\022\013\n\003ke"
-  "y\030\001 \001(\t\022\034\n\005value\030\002 \001(\0132\r.proto.IntMap:\0028"
-  "\001\"_\n\006IntMap\022\'\n\005value\030\001 \003(\0132\030.proto.IntMa"
-  "p.ValueEntry\032,\n\nValueEntry\022\013\n\003key\030\001 \001(\t\022"
-  "\r\n\005value\030\002 \001(\005:\0028\001\"e\n\013Replacement\022\023\n\013pro"
-  "bability\030\001 \001(\001\022\022\n\nisTerminal\030\002 \001(\010\022\016\n\006va"
-  "lues\030\003 \003(\t\022\020\n\010function\030\004 \001(\t\022\013\n\003pos\030\005 \003("
-  "\005\"O\n\007Section\022\014\n\004type\030\001 \001(\t\022\014\n\004name\030\002 \001(\t"
-  "\022(\n\014replacements\030\003 \003(\0132\022.proto.Replaceme"
-  "nt\"Y\n\005Items\022%\n\014preTerminals\030\001 \003(\0132\017.prot"
-  "o.TreeItem\022\021\n\tterminals\030\002 \003(\t\022\026\n\016termina"
-  "lsCount\030\003 \001(\004\"]\n\010TreeItem\022\r\n\005index\030\001 \001(\005"
-  "\022\022\n\ntransition\030\002 \001(\005\022\"\n\tchildrens\030\003 \003(\0132"
-  "\017.proto.TreeItem\022\n\n\002id\030\004 \001(\0102\325\001\n\004PCFG\0221\n"
-  "\007Connect\022\014.proto.Empty\032\026.proto.ConnectRe"
-  "sponse\"\000\022(\n\nDisconnect\022\014.proto.Empty\032\014.p"
-  "roto.Empty\0222\n\014GetNextItems\022\022.proto.NextR"
-  "equest\032\014.proto.Items\"\000\022<\n\nSendResult\022\027.p"
-  "roto.CrackingResponse\032\025.proto.ResultResp"
-  "onseb\006proto3"
+  "key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\255\001\n\007Grammar"
+  "\022\023\n\013rulesFolder\030\001 \001(\t\022 \n\010sections\030\002 \003(\0132"
+  "\016.proto.Section\022,\n\007mapping\030\003 \003(\0132\033.proto"
+  ".Grammar.MappingEntry\032=\n\014MappingEntry\022\013\n"
+  "\003key\030\001 \001(\t\022\034\n\005value\030\002 \001(\0132\r.proto.IntMap"
+  ":\0028\001\"_\n\006IntMap\022\'\n\005value\030\001 \003(\0132\030.proto.In"
+  "tMap.ValueEntry\032,\n\nValueEntry\022\013\n\003key\030\001 \001"
+  "(\t\022\r\n\005value\030\002 \001(\005:\0028\001\"e\n\013Replacement\022\023\n\013"
+  "probability\030\001 \001(\001\022\022\n\nisTerminal\030\002 \001(\010\022\016\n"
+  "\006values\030\003 \003(\t\022\020\n\010function\030\004 \001(\t\022\013\n\003pos\030\005"
+  " \003(\005\"O\n\007Section\022\014\n\004type\030\001 \001(\t\022\014\n\004name\030\002 "
+  "\001(\t\022(\n\014replacements\030\003 \003(\0132\022.proto.Replac"
+  "ement\"Y\n\005Items\022%\n\014preTerminals\030\001 \003(\0132\017.p"
+  "roto.TreeItem\022\021\n\tterminals\030\002 \003(\t\022\026\n\016term"
+  "inalsCount\030\003 \001(\004\"]\n\010TreeItem\022\r\n\005index\030\001 "
+  "\001(\005\022\022\n\ntransition\030\002 \001(\005\022\"\n\tchildrens\030\003 \003"
+  "(\0132\017.proto.TreeItem\022\n\n\002id\030\004 \001(\0102\373\001\n\004PCFG"
+  "\0221\n\007Connect\022\014.proto.Empty\032\026.proto.Connec"
+  "tResponse\"\000\022(\n\nDisconnect\022\014.proto.Empty\032"
+  "\014.proto.Empty\0222\n\014GetNextItems\022\022.proto.Ne"
+  "xtRequest\032\014.proto.Items\"\000\022<\n\nSendResult\022"
+  "\027.proto.CrackingResponse\032\025.proto.ResultR"
+  "esponse\022$\n\004Kill\022\014.proto.Empty\032\014.proto.Em"
+  "pty\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_protocol_2eproto_deps[1] = {
 };
@@ -482,7 +483,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_pro
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_protocol_2eproto_once;
 static bool descriptor_table_protocol_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_protocol_2eproto = {
-  &descriptor_table_protocol_2eproto_initialized, descriptor_table_protodef_protocol_2eproto, "protocol.proto", 1172,
+  &descriptor_table_protocol_2eproto_initialized, descriptor_table_protodef_protocol_2eproto, "protocol.proto", 1213,
   &descriptor_table_protocol_2eproto_once, descriptor_table_protocol_2eproto_sccs, descriptor_table_protocol_2eproto_deps, 14, 0,
   schemas, file_default_instances, TableStruct_protocol_2eproto::offsets,
   file_level_metadata_protocol_2eproto, 14, file_level_enum_descriptors_protocol_2eproto, file_level_service_descriptors_protocol_2eproto,
@@ -2013,7 +2014,7 @@ class Grammar::HasBitSetters {
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Grammar::kRuleNameFieldNumber;
+const int Grammar::kRulesFolderFieldNumber;
 const int Grammar::kSectionsFieldNumber;
 const int Grammar::kMappingFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -2029,16 +2030,16 @@ Grammar::Grammar(const Grammar& from)
       sections_(from.sections_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   mapping_.MergeFrom(from.mapping_);
-  rulename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from.rulename().size() > 0) {
-    rulename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.rulename_);
+  rulesfolder_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from.rulesfolder().size() > 0) {
+    rulesfolder_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.rulesfolder_);
   }
   // @@protoc_insertion_point(copy_constructor:proto.Grammar)
 }
 
 void Grammar::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Grammar_protocol_2eproto.base);
-  rulename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  rulesfolder_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 Grammar::~Grammar() {
@@ -2047,7 +2048,7 @@ Grammar::~Grammar() {
 }
 
 void Grammar::SharedDtor() {
-  rulename_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  rulesfolder_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void Grammar::SetCachedSize(int size) const {
@@ -2067,7 +2068,7 @@ void Grammar::Clear() {
 
   sections_.Clear();
   mapping_.Clear();
-  rulename_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  rulesfolder_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -2079,10 +2080,10 @@ const char* Grammar::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // string ruleName = 1;
+      // string rulesFolder = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParserUTF8(mutable_rulename(), ptr, ctx, "proto.Grammar.ruleName");
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParserUTF8(mutable_rulesfolder(), ptr, ctx, "proto.Grammar.rulesFolder");
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -2140,15 +2141,15 @@ bool Grammar::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string ruleName = 1;
+      // string rulesFolder = 1;
       case 1: {
         if (static_cast< ::PROTOBUF_NAMESPACE_ID::uint8>(tag) == (10 & 0xFF)) {
           DO_(::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::ReadString(
-                input, this->mutable_rulename()));
+                input, this->mutable_rulesfolder()));
           DO_(::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-            this->rulename().data(), static_cast<int>(this->rulename().length()),
+            this->rulesfolder().data(), static_cast<int>(this->rulesfolder().length()),
             ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE,
-            "proto.Grammar.ruleName"));
+            "proto.Grammar.rulesFolder"));
         } else {
           goto handle_unusual;
         }
@@ -2215,14 +2216,14 @@ void Grammar::SerializeWithCachedSizes(
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string ruleName = 1;
-  if (this->rulename().size() > 0) {
+  // string rulesFolder = 1;
+  if (this->rulesfolder().size() > 0) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->rulename().data(), static_cast<int>(this->rulename().length()),
+      this->rulesfolder().data(), static_cast<int>(this->rulesfolder().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "proto.Grammar.ruleName");
+      "proto.Grammar.rulesFolder");
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->rulename(), output);
+      1, this->rulesfolder(), output);
   }
 
   // repeated .proto.Section sections = 2;
@@ -2290,15 +2291,15 @@ void Grammar::SerializeWithCachedSizes(
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string ruleName = 1;
-  if (this->rulename().size() > 0) {
+  // string rulesFolder = 1;
+  if (this->rulesfolder().size() > 0) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->rulename().data(), static_cast<int>(this->rulename().length()),
+      this->rulesfolder().data(), static_cast<int>(this->rulesfolder().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "proto.Grammar.ruleName");
+      "proto.Grammar.rulesFolder");
     target =
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteStringToArray(
-        1, this->rulename(), target);
+        1, this->rulesfolder(), target);
   }
 
   // repeated .proto.Section sections = 2;
@@ -2395,11 +2396,11 @@ size_t Grammar::ByteSizeLong() const {
         MessageSizeNoVirtual(entry);
   }
 
-  // string ruleName = 1;
-  if (this->rulename().size() > 0) {
+  // string rulesFolder = 1;
+  if (this->rulesfolder().size() > 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->rulename());
+        this->rulesfolder());
   }
 
   int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
@@ -2431,9 +2432,9 @@ void Grammar::MergeFrom(const Grammar& from) {
 
   sections_.MergeFrom(from.sections_);
   mapping_.MergeFrom(from.mapping_);
-  if (from.rulename().size() > 0) {
+  if (from.rulesfolder().size() > 0) {
 
-    rulename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.rulename_);
+    rulesfolder_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.rulesfolder_);
   }
 }
 
@@ -2464,7 +2465,7 @@ void Grammar::InternalSwap(Grammar* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   CastToBase(&sections_)->InternalSwap(CastToBase(&other->sections_));
   mapping_.Swap(&other->mapping_);
-  rulename_.Swap(&other->rulename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+  rulesfolder_.Swap(&other->rulesfolder_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 

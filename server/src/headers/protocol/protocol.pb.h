@@ -985,17 +985,17 @@ class Grammar :
   ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::proto::IntMap >*
       mutable_mapping();
 
-  // string ruleName = 1;
-  void clear_rulename();
-  static const int kRuleNameFieldNumber = 1;
-  const std::string& rulename() const;
-  void set_rulename(const std::string& value);
-  void set_rulename(std::string&& value);
-  void set_rulename(const char* value);
-  void set_rulename(const char* value, size_t size);
-  std::string* mutable_rulename();
-  std::string* release_rulename();
-  void set_allocated_rulename(std::string* rulename);
+  // string rulesFolder = 1;
+  void clear_rulesfolder();
+  static const int kRulesFolderFieldNumber = 1;
+  const std::string& rulesfolder() const;
+  void set_rulesfolder(const std::string& value);
+  void set_rulesfolder(std::string&& value);
+  void set_rulesfolder(const char* value);
+  void set_rulesfolder(const char* value, size_t size);
+  std::string* mutable_rulesfolder();
+  std::string* release_rulesfolder();
+  void set_allocated_rulesfolder(std::string* rulesfolder);
 
   // @@protoc_insertion_point(class_scope:proto.Grammar)
  private:
@@ -1009,7 +1009,7 @@ class Grammar :
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
       0 > mapping_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr rulename_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr rulesfolder_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_protocol_2eproto;
 };
@@ -2076,55 +2076,55 @@ CrackingResponse::mutable_hashes() {
 
 // Grammar
 
-// string ruleName = 1;
-inline void Grammar::clear_rulename() {
-  rulename_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+// string rulesFolder = 1;
+inline void Grammar::clear_rulesfolder() {
+  rulesfolder_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
-inline const std::string& Grammar::rulename() const {
-  // @@protoc_insertion_point(field_get:proto.Grammar.ruleName)
-  return rulename_.GetNoArena();
+inline const std::string& Grammar::rulesfolder() const {
+  // @@protoc_insertion_point(field_get:proto.Grammar.rulesFolder)
+  return rulesfolder_.GetNoArena();
 }
-inline void Grammar::set_rulename(const std::string& value) {
+inline void Grammar::set_rulesfolder(const std::string& value) {
   
-  rulename_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:proto.Grammar.ruleName)
+  rulesfolder_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:proto.Grammar.rulesFolder)
 }
-inline void Grammar::set_rulename(std::string&& value) {
+inline void Grammar::set_rulesfolder(std::string&& value) {
   
-  rulename_.SetNoArena(
+  rulesfolder_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:proto.Grammar.ruleName)
+  // @@protoc_insertion_point(field_set_rvalue:proto.Grammar.rulesFolder)
 }
-inline void Grammar::set_rulename(const char* value) {
+inline void Grammar::set_rulesfolder(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  rulename_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:proto.Grammar.ruleName)
+  rulesfolder_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:proto.Grammar.rulesFolder)
 }
-inline void Grammar::set_rulename(const char* value, size_t size) {
+inline void Grammar::set_rulesfolder(const char* value, size_t size) {
   
-  rulename_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+  rulesfolder_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:proto.Grammar.ruleName)
+  // @@protoc_insertion_point(field_set_pointer:proto.Grammar.rulesFolder)
 }
-inline std::string* Grammar::mutable_rulename() {
+inline std::string* Grammar::mutable_rulesfolder() {
   
-  // @@protoc_insertion_point(field_mutable:proto.Grammar.ruleName)
-  return rulename_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:proto.Grammar.rulesFolder)
+  return rulesfolder_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
-inline std::string* Grammar::release_rulename() {
-  // @@protoc_insertion_point(field_release:proto.Grammar.ruleName)
+inline std::string* Grammar::release_rulesfolder() {
+  // @@protoc_insertion_point(field_release:proto.Grammar.rulesFolder)
   
-  return rulename_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  return rulesfolder_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
-inline void Grammar::set_allocated_rulename(std::string* rulename) {
-  if (rulename != nullptr) {
+inline void Grammar::set_allocated_rulesfolder(std::string* rulesfolder) {
+  if (rulesfolder != nullptr) {
     
   } else {
     
   }
-  rulename_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), rulename);
-  // @@protoc_insertion_point(field_set_allocated:proto.Grammar.ruleName)
+  rulesfolder_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), rulesfolder);
+  // @@protoc_insertion_point(field_set_allocated:proto.Grammar.rulesFolder)
 }
 
 // repeated .proto.Section sections = 2;

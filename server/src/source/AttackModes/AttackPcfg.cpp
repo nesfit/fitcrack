@@ -54,6 +54,7 @@ std::string PretermClient::GetNextItems(uint64_t & keyspace)
     }
 }
 
+
 bool PretermClient::Connect()
 {
     Empty request;
@@ -71,6 +72,7 @@ bool PretermClient::Connect()
     }
 }
 
+
 bool PretermClient::Disconnect()
 {
     Empty req_res;
@@ -87,6 +89,7 @@ bool PretermClient::Disconnect()
     }
 }
 
+
 bool PretermClient::Acknowledge()
 {
     CrackingResponse request;
@@ -94,7 +97,31 @@ bool PretermClient::Acknowledge()
     ClientContext context;
 
     Status status = stub_->SendResult(&context, request, &reply);
-    return true;
+    if (status.ok()) {
+        Tools::printDebug("LOG: gRPC successfully acked!\n");
+        return true;
+    }
+    else {
+        Tools::printDebug("LOG: gRPC failed to acked!\n");
+        return false;
+    }
+}
+
+
+bool PretermClient::Kill()
+{
+    Empty req_res;
+    ClientContext context;
+
+    Status status = stub_->Kill(&context, req_res, &req_res);
+    if (status.ok()) {
+        Tools::printDebug("LOG: PCFG-Manager successfully killed!\n");
+        return true;
+    }
+    else {
+        Tools::printDebug("LOG: PCFG-Manager failed to be killed!\n");
+        return false;
+    }
 }
 
 
@@ -300,6 +327,7 @@ bool CAttackPcfg::makeJob()
                               "Reached end of keyspace. Setting package to finishing!\n");
         m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageFinishing);
         m_client.Disconnect();
+        m_client.Kill();
     }
 
     return true;
@@ -336,7 +364,7 @@ bool CAttackPcfg::generateJob()
 void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace, uint64_t currentIndex)
 {
     /** Run gRPC query to get preterminals */
-    if (currentIndex == 0 && !m_client.Connect())
+    if (!m_client.Connect())
         return;
 
     preterminals = m_client.GetNextItems(realKeyspace);

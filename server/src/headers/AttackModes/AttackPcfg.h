@@ -62,6 +62,11 @@ class PretermClient {
          */
         bool Acknowledge();
 
+        /**
+         * Kill the PCFG manager
+         */
+        bool Kill();
+
 
     private:
         std::unique_ptr<PCFG::Stub> stub_;

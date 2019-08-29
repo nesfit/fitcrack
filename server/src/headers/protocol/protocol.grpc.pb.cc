@@ -23,6 +23,7 @@ static const char* PCFG_method_names[] = {
   "/proto.PCFG/Disconnect",
   "/proto.PCFG/GetNextItems",
   "/proto.PCFG/SendResult",
+  "/proto.PCFG/Kill",
 };
 
 std::unique_ptr< PCFG::Stub> PCFG::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -36,6 +37,7 @@ PCFG::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   , rpcmethod_Disconnect_(PCFG_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetNextItems_(PCFG_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_SendResult_(PCFG_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Kill_(PCFG_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status PCFG::Stub::Connect(::grpc::ClientContext* context, const ::proto::Empty& request, ::proto::ConnectResponse* response) {
@@ -118,6 +120,26 @@ void PCFG::Stub::experimental_async::SendResult(::grpc::ClientContext* context, 
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::proto::ResultResponse>::Create(channel_.get(), cq, rpcmethod_SendResult_, context, request, false);
 }
 
+::grpc::Status PCFG::Stub::Kill(::grpc::ClientContext* context, const ::proto::Empty& request, ::proto::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Kill_, context, request, response);
+}
+
+void PCFG::Stub::experimental_async::Kill(::grpc::ClientContext* context, const ::proto::Empty* request, ::proto::Empty* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_Kill_, context, request, response, std::move(f));
+}
+
+void PCFG::Stub::experimental_async::Kill(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::proto::Empty* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_Kill_, context, request, response, std::move(f));
+}
+
+::grpc::ClientAsyncResponseReader< ::proto::Empty>* PCFG::Stub::AsyncKillRaw(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::proto::Empty>::Create(channel_.get(), cq, rpcmethod_Kill_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::proto::Empty>* PCFG::Stub::PrepareAsyncKillRaw(::grpc::ClientContext* context, const ::proto::Empty& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::proto::Empty>::Create(channel_.get(), cq, rpcmethod_Kill_, context, request, false);
+}
+
 PCFG::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       PCFG_method_names[0],
@@ -139,6 +161,11 @@ PCFG::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< PCFG::Service, ::proto::CrackingResponse, ::proto::ResultResponse>(
           std::mem_fn(&PCFG::Service::SendResult), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      PCFG_method_names[4],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< PCFG::Service, ::proto::Empty, ::proto::Empty>(
+          std::mem_fn(&PCFG::Service::Kill), this)));
 }
 
 PCFG::Service::~Service() {
@@ -166,6 +193,13 @@ PCFG::Service::~Service() {
 }
 
 ::grpc::Status PCFG::Service::SendResult(::grpc::ServerContext* context, const ::proto::CrackingResponse* request, ::proto::ResultResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status PCFG::Service::Kill(::grpc::ServerContext* context, const ::proto::Empty* request, ::proto::Empty* response) {
   (void) context;
   (void) request;
   (void) response;
