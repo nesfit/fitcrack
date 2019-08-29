@@ -5,26 +5,26 @@
 
 <template>
   <v-container class="max500">
-    <fc-tile title="PCFG" class="ma-2">
+    <fc-tile title="PCFG grammar" class="ma-2">
       <v-alert :value="true" type="warning" class="mt-0 mb-1" >
-        PCFG files must have a .zip or .rar extension.
+        PCFG files must have a .zip extension.
       </v-alert>
       <v-data-table
         :headers="headers"
         :items="pcfg.items"
         :loading="loading"
         :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="pcfg files per page"
+        rows-per-page-text="PCFGs per page"
         disable-initial-sort
       >
         <template slot="items" slot-scope="props">
-          <td><router-link :to="{name: 'pcfgDetail', params: { id: props.item.id}}">{{ props.item.name }}</router-link></td>
+          <td>{{ props.item.name }}</td>
           <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
           <td class="text-xs-right">
-            <a :href="$serverAddr + '/pcfg/' + props.item.id + '/download'" target="_blank">
-              <v-btn outline fab small color="primary">
-                <v-icon>file_download</v-icon>
-              </v-btn>
+            <a :href="$serverAddr + '/pcfg/' + props.item.id" target="_blank">
+            <v-btn outline fab small color="primary">
+              <v-icon>file_download</v-icon>
+            </v-btn>
             </a>
           </td>
           <td class="text-xs-right">
@@ -32,15 +32,109 @@
               <v-btn icon class="mx-0" @click="deletePcfg(props.item.id)" slot="activator">
                 <v-icon color="error">delete</v-icon>
               </v-btn>
-              <span>Delete pcfg file</span>
+              <span>Delete PCFG file</span>
             </v-tooltip>
           </td>
         </template>
       </v-data-table>
-      <v-divider></v-divider>
-      <file-uploader :url="this.$serverAddr + '/pcfg/add'" @uploadComplete="loadPcfg"></file-uploader>
-
+      <div class="text-xs-right pa-3">
+        <v-btn class="d-inline-block" color="primary" flat outline @click.native.stop="dialog = true; loadDictionaries()">Add new</v-btn>
+      </div>
     </fc-tile>
+
+
+
+
+
+
+
+
+    <v-dialog v-model="dialog" max-width="600" lazy >
+      <v-card>
+        <v-card-title class="headline">Add new PCFG grammar</v-card-title>
+        <v-tabs
+          v-model="active"
+          color="grey lighten-4"
+          light
+          slider-color="primary">
+          <v-tab ripple>
+            Upload file
+          </v-tab>
+          <v-tab ripple>
+            Make from dictionary
+          </v-tab>
+          <v-tab-item>
+            <v-card flat>
+              <file-uploader :url="this.$serverAddr + '/pcfg/add'" @uploadComplete="loadPcfg(); dialog=false"></file-uploader>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item>
+            <div class="text-xs-center" v-if="adding">
+              <v-progress-circular
+                class="ma-5"
+                size="50"
+                :width="3"
+                indeterminate
+                color="primary">
+              </v-progress-circular>
+            </div>
+            <v-card flat v-else>
+              <div class="px-2">
+                <v-text-field
+                  name="name"
+                  label="Name"
+                  id="newPcfgName"
+                  v-model="newName"
+                ></v-text-field>
+              </div>
+              <v-data-table
+                :headers="dictionaryHeader"
+                :items="dictionaries.items"
+                item-key="id"
+                :loading="loadingDictionaries"
+                :rows-per-page-items="[10,25,50]"
+                rows-per-page-text="Dictionaries per page"
+                disable-initial-sort
+              >
+                <template slot="items" slot-scope="props">
+                  <tr @click="selectedDictId=props.item.id" class="clickable"
+                      v-bind:class="{selectedDict: (props.item.id === selectedDictId)}" >
+                    <td>{{ props.item.name }}</td>
+                    <td class="text-xs-right">{{ props.item.keyspace }}</td>
+                    <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
+                    <td class="text-xs-right">
+                      <v-tooltip top>
+                        <v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.id}}" slot="activator">
+                          <v-icon color="primary">link</v-icon>
+                        </v-btn>
+                        <span>Go to the dictionary page</span>
+                      </v-tooltip>
+                    </td>
+                  </tr>
+
+                </template>
+              </v-data-table>
+              <div class="text-xs-right pa-3">
+                <v-btn class="d-inline-block"
+                       color="primary"
+
+                       outline
+                       @click="makePcfgFromDictionary()"
+                       :disabled="selectedDictId === null && newName === ''">
+                  Make from dictionary
+                </v-btn>
+              </div>
+            </v-card>
+          </v-tab-item>
+        </v-tabs>
+      </v-card>
+    </v-dialog>
+
+
+
+
+
+
 
   </v-container>
 </template>
@@ -59,14 +153,35 @@
     },
     methods: {
       loadPcfg: function () {
+        this.dialog= false
         this.loading = true;
         this.axios.get(this.$serverAddr + '/pcfg', {}).then((response) => {
           this.pcfg = response.data;
           this.loading = false
         })
       },
+      loadDictionaries: function () {
+        this.loadingDictionaries = true;
+        this.axios.get(this.$serverAddr + '/dictionary', {}).then((response) => {
+          this.dictionaries = response.data;
+          this.loadingDictionaries = false
+        })
+      },
+      makePcfgFromDictionary: function () {
+        this.adding = true
+        this.axios.post(this.$serverAddr + '/pcfg/makeFromDictionary', {
+          "dictionary_id": this.selectedDictId,
+          "name": this.newName
+        }).then((response) => {
+          this.adding = true
+          this.dialog = false
+          this.loadPcfg()
+        }).catch((error) => {
+          this.adding = false
+        })
+      },
       deletePcfg: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+        this.$root.$confirm('Delete', 'Are you sure?').then((confirm) => {
           this.loading = true;
           this.axios.delete(this.$serverAddr + '/pcfg/' + id).then((response) => {
             this.loadPcfg()
@@ -76,8 +191,14 @@
     },
     data: function () {
       return {
+        newName: '',
+        adding: false,
+        selectedDictId: null,
+        active: null,
+        dialog: false,
         loading: false,
-        pcfg: [],
+        loadingDictionaries: false,
+        dictionaries: [],
         headers: [
           {
             text: 'Name',
@@ -87,7 +208,18 @@
           {text: 'Added', value: 'time_added', align: 'right'},
           {text: 'Download', value: 'name', align: 'right'},
           {text: 'Delete', align: 'right'}
-        ]
+        ],
+        dictionaryHeader: [
+          {
+            text: 'Name',
+            align: 'left',
+            value: 'name'
+          },
+          {text: 'Keyspace', value: 'keyspace', align: 'right'},
+          {text: 'Time', value: 'time', align: 'right'},
+          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+        ],
+        pcfg: [],
       }
     }
   }

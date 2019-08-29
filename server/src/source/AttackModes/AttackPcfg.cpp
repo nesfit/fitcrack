@@ -370,4 +370,3 @@ void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & re
     preterminals = m_client.GetNextItems(realKeyspace);
     m_client.Acknowledge();
 }
-
