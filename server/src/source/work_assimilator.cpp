@@ -55,6 +55,8 @@
 #include "sched_util.h"
 #include "assimilate_handler.h"
 
+#include <AttackPcfgClient.h>
+
 
 /** Static SQL buffer size used in code */
 #define SQL_BUF_SIZE 4096
@@ -925,6 +927,14 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                         delete_jobs2(jobs);
                     else
                         finish_jobs(jobs);
+
+                    /** Kill PCFG Manager */
+                    if (attack_mode == 9)
+                    {
+                        PretermClient m_client(package_id);
+                        m_client.Kill();
+                        std::cerr << __LINE__ << " - PCFG Manager killed " << package_id << std::endl;
+                    }
                 }
                 else
                 {
