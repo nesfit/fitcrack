@@ -6623,6 +6623,16 @@ INSERT INTO `fc_rule` (`id`, `name`, `path`, `time`, `deleted`) VALUES
 
 
 --
+-- Instert default PCFGs
+--
+
+INSERT INTO `fc_pcfg_grammar` (`name`, `path`, `keyspace`, `time_added`, `modification_time`, `deleted`) VALUES
+('john', 'john.zip', 1321431161, '2019-08-30 12:14:53', '2019-08-30 12:14:53', 0),
+('facebook-pastebay', 'facebook-pastebay.zip', 999, '2019-08-30 12:15:08', '2019-08-30 12:15:08', 0),
+('twitter-banned', 'twitter-banned.zip', 1096, '2019-08-30 12:17:48', '2019-08-30 12:17:48', 0);
+
+
+--
 -- Insert default user ( username: fitcrack , password: FITCRACK)
 --
 
@@ -6631,4 +6641,3 @@ INSERT INTO `fc_role` (`name`, `MANAGE_USERS`, `ADD_NEW_JOB`, `UPLOAD_DICTIONARI
 
 INSERT INTO `fc_user` (`username`, `password`, `mail`, `role_id`, `deleted`) VALUES
 ('fitcrack', 'pbkdf2:sha256:50000$YqLJFcXh$430310718869b9783680c546a5fb1a50e9b34d7e49cc1bd1dd2a508b46c7409c', 'ihranicky@fit.vutbr.cz', 1, 0);
-

@@ -37,7 +37,11 @@ fi
 
 if ! [ -d "/usr/share/collections/pcfg" ]; then
   #cp -R collections/pcfg /usr/share/collections/
-  mkdir /usr/share/collections/pcfg
+  cp collections/pcfg.tar.gz /usr/share/collections/
+  cd /usr/share/collections/
+  tar xzvf pcfg.tar.gz
+  rm pcfg.tar.gz
+  cd $INSTALLER_ROOT
 fi
 
 # Set ownership and permissions
