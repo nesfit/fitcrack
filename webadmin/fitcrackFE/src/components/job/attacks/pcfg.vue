@@ -17,7 +17,7 @@
       <v-text-field
         flat
         single-line
-        v-model="keyspaceLimit"
+        v-model.number="keyspaceLimit"
         :value="this.keyspaceLimit"
         required
         type="number"
@@ -57,6 +57,8 @@
     },
     methods: {
       checkValid: function () {
+        if(this.keyspaceLimit > this.pcfg.keyspace)
+          this.keyspaceLimit = this.pcfg.keyspace
 
       /*  if (this.pcfg_grammmar.length > 0) {
         alert('motýle')*/
