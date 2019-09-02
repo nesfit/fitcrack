@@ -89,6 +89,9 @@ addPackage_model = api.schema_model('addPackage', {
                         'keyspace': {
                             'type': 'integer'
                         },
+                        'keyspace_limit': {
+                            'type': 'integer'
+                        },
                         'name': {
                             'type': 'string'
                         }

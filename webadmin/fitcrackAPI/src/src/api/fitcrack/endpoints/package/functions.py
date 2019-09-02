@@ -287,8 +287,8 @@ def computeCrackingTime(data):
 
     return result
 
-def compute_keyspace_from_pcfg(pcfg_name):
-    return 0
+#def compute_keyspace_from_pcfg(pcfg_name):
+#    return 0
 
 def calculate_port_number(job_id):
 
@@ -296,13 +296,11 @@ def calculate_port_number(job_id):
     return str(portNumber)
 
 
-def start_pcfg_manager(job_id, grammar_name):
-
-    #./pcfg-manager server -p 50055 -r /fitcrack --hashlist README.md
+def start_pcfg_manager(job_id, grammar_name, keyspace):
 
     manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
     print("\n")
     print(manager)
-    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)])
+    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--max-gusses", keyspace, "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)])
 
-    print('started')
+    print('Manager started')

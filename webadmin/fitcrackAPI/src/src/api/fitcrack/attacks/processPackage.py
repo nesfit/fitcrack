@@ -3,6 +3,7 @@
    * Licence: MIT, see LICENSE
 '''
 
+import sys
 import os
 from pathlib import Path
 
@@ -284,10 +285,31 @@ def process_package_9(package):
     package['attack_settings']['attack_submode'] = 0
 
     package['attack_name'] = 'pcfg'
-    package['keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
-    package['hc_keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
 
-    print("\n PCFG attack process\n")
+    # Keyspace control
+    INT_MAX = sys.maxsize - 1
+
+    print(package['attack_settings']['pcfg_grammar']['keyspace'])
+    print(package['attack_settings']['pcfg_grammar']['keyspace_limit'])
+
+    if int(package['attack_settings']['pcfg_grammar']['keyspace']) >= INT_MAX:
+        package['keyspace'] = INT_MAX
+        package['hc_keyspace'] = INT_MAX
+        package['attack_settings']['pcfg_grammar']['keyspace'] = INT_MAX
+
+    else:
+        package['keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
+        package['hc_keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
+
+    # Keyspace limit control
+    if int(package['attack_settings']['pcfg_grammar']['keyspace']) >= int(package['attack_settings']['pcfg_grammar']['keyspace_limit']):
+        package['keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace_limit']
+        package['hc_keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace_limit']
+
+    else:
+        package['keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
+        package['hc_keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
+
 
     ruleFileMultiplier = 1
     if package['attack_settings']['rules']:
