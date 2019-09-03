@@ -290,7 +290,7 @@ def process_package_9(package):
     INT_MAX = sys.maxsize - 1
 
     print(package['attack_settings']['pcfg_grammar']['keyspace'])
-    print(package['attack_settings']['pcfg_grammar']['keyspace_limit'])
+    print(package['attack_settings']['keyspace_limit'])
 
     if int(package['attack_settings']['pcfg_grammar']['keyspace']) >= INT_MAX:
         package['keyspace'] = INT_MAX
@@ -302,9 +302,9 @@ def process_package_9(package):
         package['hc_keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
 
     # Keyspace limit control
-    if int(package['attack_settings']['pcfg_grammar']['keyspace']) >= int(package['attack_settings']['pcfg_grammar']['keyspace_limit']):
-        package['keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace_limit']
-        package['hc_keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace_limit']
+    if int(package['attack_settings']['pcfg_grammar']['keyspace']) >= int(package['attack_settings']['keyspace_limit']):
+        package['keyspace'] = package['attack_settings']['keyspace_limit']
+        package['hc_keyspace'] = package['attack_settings']['keyspace_limit']
 
     else:
         package['keyspace'] = package['attack_settings']['pcfg_grammar']['keyspace']
