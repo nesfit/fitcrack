@@ -6,8 +6,8 @@
 <template>
     <v-container fluid>
       <h2> My account </h2>
-      <div class="table">
-        <v-card class="width150">
+  <!--      <div class="table">
+      <v-card class="width150">
           <v-card-title>
             <h3> My info </h3>
           </v-card-title>
@@ -30,7 +30,7 @@
 
       </v-card>
 
-      </div>
+      </div> -->
 
       <div class="table">
       <v-card class="width150">
@@ -67,7 +67,7 @@
 
     </v-card>
   </div>
-      <h3> Message: {{ user }} </h3>
+  <!--    <h3> Message: {{ user }} </h3> -->
     </v-container>
 </template>
 

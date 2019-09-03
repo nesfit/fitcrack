@@ -190,7 +190,7 @@
             </div>
             </v-flex>
           </v-layout>
-            <h3> Message: {{ attackSettings }} </h3> 
+        <!--    <h3> Message: {{ attackSettings }} </h3> -->
           <div class="max1000 mx-auto mb-5">
             <fc-tile title="Attack settings">
               <v-layout row wrap>

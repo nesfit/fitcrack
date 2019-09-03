@@ -109,7 +109,7 @@
         attackName: 'pcfg',
         valid: false,
         pcfg: [],
-    //    rules: null,
+        rules: null,
         keyspaceLimit: 0,
 
 
