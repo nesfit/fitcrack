@@ -266,8 +266,19 @@ def computeCrackingTime(data):
 
     # TODO Calculate PCFG keyspace
     elif attackSettings['attack_mode'] == 9:
-        keyspace = compute_keyspace_from_pcfg("atom")
+        #keyspace = compute_keyspace_from_pcfg("atom")
+        if(attackSettings['keyspace_limit']):
+            if(int(attackSettings['keyspace_limit']) > 0):
+                keyspace = int(attackSettings['keyspace_limit'])
 
+            else:
+                keyspace = int(attackSettings['pcfg_grammar']['keyspace'])
+        else:
+            keyspace = int(attackSettings['pcfg_grammar']['keyspace'])
+
+    print("\nEstimate\n")
+    print(keyspace)
+    print(total_power)
 
     display_time = None
     if (total_power > 0):
