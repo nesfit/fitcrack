@@ -89,13 +89,13 @@ addPackage_model = api.schema_model('addPackage', {
                         'keyspace': {
                             'type': 'integer'
                         },
-                        'keyspace_limit': {
-                            'type': 'integer'
-                        },
                         'name': {
                             'type': 'string'
                         }
                     },
+                },
+                'keyspace_limit': {
+                    'type': 'integer'
                 },
                 'left_dictionaries': {
                     'description': 'array of left dictionaries',
