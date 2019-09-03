@@ -14,7 +14,7 @@
 
     <template slot="items" slot-scope="props">
 
-      <tr @click="updateSelected(props.item.id, props.item)">
+      <tr>
         <td>
           <v-checkbox
             :input-value="selected === props.item.id"
