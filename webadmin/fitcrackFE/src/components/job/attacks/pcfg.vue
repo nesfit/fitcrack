@@ -7,7 +7,7 @@
 
   <div>
     <v-card-title class="pb-0"><h2>Select PCFG grammar<span class="required primary--text"> *</span></h2></v-card-title>
-    <pcfg-selector v-model="pcfg" @input="checkValid"></pcfg-selector>
+    <pcfg-selector v-model="pcfg" @input="checkValidInit" ></pcfg-selector>
 
     <v-divider></v-divider>
   <!--  <v-card-title class="pb-0"><h2>Select rule file</h2></v-card-title> -->
@@ -17,13 +17,13 @@
       <v-text-field
         flat
         single-line
-        v-model.number="keyspaceLimit"
         :value="this.keyspaceLimit"
+        v-model.number="keyspaceLimit"
         required
         type="number"
         suffix="passwords"
         :max="this.pcfg.keyspace"
-        @input="checkValid"
+        @input="checkValidEdit"
       ></v-text-field>
 
     </v-card-text>
@@ -50,14 +50,18 @@
         if (this.pcfg)
           this.keyspaceLimit = this.pcfg.keyspace
         //  this.pcfg.time = "2019-04-16T15:28:52"
+
       }
+
     },
     components: {
       'pcfg-selector': pcfgSelector,
   //    'rules-selector': ruleSelector
     },
     methods: {
-      checkValid: function () {
+      checkValidInit: function () {
+        if(this.keyspaceLimit !== this.pcfg.keyspace)
+          this.keyspaceLimit = this.pcfg.keyspace
         if(this.keyspaceLimit > this.pcfg.keyspace)
           this.keyspaceLimit = this.pcfg.keyspace
 
@@ -73,7 +77,30 @@
           return true
       //  }
       //  return false
-      }
+    },
+    checkValidEdit: function () {
+      if(this.keyspaceLimit > this.pcfg.keyspace)
+        this.keyspaceLimit = this.pcfg.keyspace
+
+    /*  if (this.pcfg_grammmar.length > 0) {
+      alert('motýle')*/
+        this.$emit('input', {
+          'attack_mode': this.attackId,
+          'attack_name': this.attackName,
+          'rules': null, //this.rules,
+          'pcfg_grammar': this.pcfg,
+          'keyspace_limit': this.keyspaceLimit
+        })
+        return true
+    //  }
+    //  return false
+  },
+    myFunction: function() {
+      let context = this
+      setTimeout(() => {
+        this.keyspaceLimit = this.pcfg.keyspace
+      }, 0)
+    }
 
     },
     data: function () {
