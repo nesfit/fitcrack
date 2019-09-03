@@ -49,6 +49,7 @@
           this.rules = this.value.rules */
         if (this.pcfg)
           this.keyspaceLimit = this.pcfg.keyspace
+          this.pcfg.time = "2019-04-16T15:28:52"
       }
     },
     components: {
