@@ -66,7 +66,7 @@
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
-      //      'rules': this.rules,
+            'rules': null, //this.rules,
             'pcfg_grammar': this.pcfg,
             'keyspace_limit': this.keyspaceLimit
           })
