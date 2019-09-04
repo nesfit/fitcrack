@@ -15,8 +15,7 @@ from src.api.fitcrack.functions import shellExec
 
 
 def readingFromFolderPostProcces(PcfgModel):
-    PcfgModel.keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 "' + os.path.join(PCFG_DIR, PcfgModel.path + '"'),
-                                             cwd=HASHCAT_DIR))
+    PcfgModel.keyspace = calculateKeyspace(PcfgModel.name)
     return PcfgModel
 
 
@@ -30,6 +29,8 @@ def unzipGrammarToPcfgFolder(pcfgFilename):
         path = "/usr/share/collections/pcfg/%s" % (Path(pathToZipFile).stem,)
         zipObj.extractall(path)
 
+        if os.path.exists(pathToZipFile):
+            os.remove(pathToZipFile)
     else:
         print("Does not exist.")
 
@@ -63,7 +64,9 @@ def createPcfgGrammarBin(pcfgFileNameZip):
 def calculateKeyspace(pcfgFileNameZip):
 
     pcfgKeyspace = 0
-    pcfgKeyspace = int(shellExec(PCFG_MOWER_DIR + ' -i ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip))))
+    #pcfgKeyspace = int(shellExec(PCFG_MOWER_DIR + ' -i ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip))))
+    pcfgKeyspace = shellExec(PCFG_MOWER_DIR + ' -i ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)))
+
     return pcfgKeyspace
 
 
