@@ -161,6 +161,9 @@
         this.$refs.table.updatePagination({ page: 1, totalItems: this.totalItems })
       },
       progressToPercentage: function (progress) {
+        if(progress > 100){
+          progress = 100
+        }
         return progress.toFixed() + '%'
       },
       operateJob: function (id, operation) {

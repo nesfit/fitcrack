@@ -17,7 +17,6 @@
       <tr>
         <td>
           <v-checkbox
-            @click="(trySelect(props.selected) ? props.selected = !props.selected : $error('You can only select maximum of 4 charsets'))"
             v-model="props.selected"
             primary
             hide-details
@@ -50,6 +49,13 @@
         type: Array,
         default: function () {
           return []
+        }
+      }
+    },
+    watch:{
+      value: function(){
+        if (this.value) {
+          this.selected = this.value.id
         }
       }
     },
