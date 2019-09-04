@@ -113,7 +113,7 @@ bool CAttackPcfg::makeJob()
 
     /** gRPC call to collect preterminals and update current index + keyspace */
     std::string preterminals;
-    uint64_t newKeyspace = 0;
+    uint64_t newKeyspace = m_job->getHcKeyspace();
     loadNextPreterminals(preterminals, newKeyspace);
 
     if (preterminals.empty() || newKeyspace == 0)
