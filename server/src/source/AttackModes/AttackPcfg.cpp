@@ -234,6 +234,9 @@ bool CAttackPcfg::generateJob()
         passCount = Config::minPassCount;
     }
 
+    if (passCount + m_package->getCurrentIndex() > m_package->getHcKeyspace())
+        passCount = m_package->getHcKeyspace() - m_package->getCurrentIndex();
+
     /** Create the job */
     m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
                          false, 0, false);
