@@ -46,9 +46,9 @@ class pcfgCollection(Resource):
         """
         Vracia kolekciu pcfg
         """
-        pcfgs = getFilesFromFolder(
-            PCFG_DIR, FcPcfg, readingFromFolderPostProcces)
-        return {'items': pcfgs}
+        #pcfgs = getFilesFromFolder(
+        #    PCFG_DIR, FcPcfg, readingFromFolderPostProcces)
+        return {'items': FcPcfg.query.filter(FcPcfg.deleted == False).all()}
 
 
 #dictionary -> pcfg
@@ -73,15 +73,16 @@ class pcfg(Resource):
         Vymaže pcfg podľa id
         """
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).one()
-        # if (dictionary.deleted):
-        #     dictionary.deleted = False
-        # else:
-        #     dictionary.deleted = True
-        # db.session.commit()
+        if (pcfg.deleted):
+            pcfg.deleted = False
+        else:
+            pcfg.deleted = True
+
+        db.session.commit()
+
         pcfgFullPath = os.path.join(PCFG_DIR, pcfg.path)
         print(pcfgFullPath)
         if os.path.exists(pcfgFullPath):
-            os.remove(pcfgFullPath)
             deleteUnzipedFolderDirectory(pcfgFullPath)
 
         return {
