@@ -12,7 +12,7 @@
     :select-all="selectAll"
   >
     <template slot="items" slot-scope="props">
-      <tr @click="updateSelected(props.item.id, props.item)">
+      <tr>
         <td>
           <v-checkbox
             :input-value="selected === props.item.id"
@@ -87,15 +87,15 @@
         })
       },
       updateSelected(id, rule) {
-        if(this.selected == id){
+    /*    if(this.selected == id){
           this.selected = 0
           //TODO here goes something for JSON update (set rule to null)
         this.$emit('input', null)
-        }
-        else{
+      }
+        else{*/
           this.selected = id
           this.$emit('input', rule)
-        }
+    //    }
       }
     },
   }
