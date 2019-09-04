@@ -703,6 +703,9 @@
         else this.newHostsMapping = this.hosts.slice()
       },
       progressToPercentage: function (progress) {
+        if(progress > 100){
+          progress = 100
+        }
         return progress.toFixed() + '%'
       },
       changeHostMapping: function () {
