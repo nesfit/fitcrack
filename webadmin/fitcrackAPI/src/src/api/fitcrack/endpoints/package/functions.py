@@ -50,8 +50,9 @@ def create_package(data):
     if not process_func:
         abort(400, "Unsupported attack type")
 
+    data['config'] = ''
     package = process_func(data)
-    package['config'] = (
+    package['config'] += (
                          '|||attack_mode|UInt|' + lenStr(str(package['attack_settings']['attack_mode'])) + '|' +
                          str(package['attack_settings']['attack_mode']) + '|||\n' +
                          '|||attack_submode|UInt|' + lenStr(str(package['attack_settings']['attack_submode'])) + '|' +

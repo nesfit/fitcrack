@@ -13,7 +13,7 @@ from settings import HASHCAT_DIR, \
     HASHCAT_PATH, EXE_OR_BIN, DICTIONARY_DIR, RULE_DIR, HCSTATS_DIR, CHARSET_DIR
 from src.api.fitcrack.attacks.functions import make_dict_from_mask, check_mask_syntax, compute_keyspace_from_mask, \
     coun_file_lines
-from src.api.fitcrack.functions import shellExec
+from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 # process brute force package
 from src.database.models import FcMask, FcDictionary, FcRule, FcHcstat, FcCharset, FcJobDictionary
