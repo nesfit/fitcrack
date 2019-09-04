@@ -15,7 +15,10 @@ PretermClient::PretermClient(uint64_t packageId)
     uint64_t pcfgPort = 50050 + (packageId % 1000);
     std::string pcfgAddress = "localhost:" + std::to_string(pcfgPort);
 
-    stub_ = PCFG::NewStub(grpc::CreateChannel(pcfgAddress, grpc::InsecureChannelCredentials()));
+    grpc::ChannelArguments ch_args;
+    ch_args.SetMaxReceiveMessageSize(-1);
+
+    stub_ = PCFG::NewStub(grpc::CreateCustomChannel(pcfgAddress, grpc::InsecureChannelCredentials(), ch_args));
 }
 
 
