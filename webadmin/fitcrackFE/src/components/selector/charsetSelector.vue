@@ -14,7 +14,7 @@
     @input="updateSelected"
   >
     <template slot="items" slot-scope="props">
-      <tr @click="(trySelect(props.selected) ? props.selected = !props.selected : $error('You can only select maximum of 4 charsets'))">
+      <tr>
         <td>
           <v-checkbox
             @click="(trySelect(props.selected) ? props.selected = !props.selected : $error('You can only select maximum of 4 charsets'))"

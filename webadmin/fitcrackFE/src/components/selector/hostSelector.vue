@@ -14,7 +14,7 @@
     @input="updateSelected"
   >
     <template slot="items" slot-scope="props">
-      <tr @click="props.selected = !props.selected">
+      <tr>
         <td>
           <v-checkbox
             v-model="props.selected"
