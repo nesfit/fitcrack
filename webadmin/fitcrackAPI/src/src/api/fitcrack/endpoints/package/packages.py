@@ -152,6 +152,9 @@ class OperationWithPackage(Resource):
         if action == 'start':
             if package.attack_mode == 9:
                 pcfg = FcPcfg.query.filter(FcPcfg.id == package.grammar_id).one()
+                print(package.id)
+                print(pcfg.name)
+                print(pcfg.keyspace)
                 start_pcfg_manager(package.id, pcfg.name, pcfg.keyspace)
             package.status = 10
         elif action == 'stop':

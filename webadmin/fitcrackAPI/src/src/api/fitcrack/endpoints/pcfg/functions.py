@@ -10,9 +10,8 @@ import pathlib
 import subprocess
 
 from pathlib import Path
-from settings import HASHCAT_PATH, PCFG_DIR, HASHCAT_DIR, PCFG_MOWER_DIR, PCFG_MANAGER_DIR
+from settings import HASHCAT_PATH, PCFG_DIR, HASHCAT_DIR, PCFG_MOWER_DIR, PCFG_MANAGER_DIR, PCFG_TRAINER_DIR, PCFG_TRAINER_RULE_DIR, DICTIONARY_DIR
 from src.api.fitcrack.functions import shellExec
-
 
 
 def readingFromFolderPostProcces(PcfgModel):
@@ -61,7 +60,6 @@ def createPcfgGrammarBin(pcfgFileNameZip):
                                  + '/grammar.bin')
 
 
-
 def calculateKeyspace(pcfgFileNameZip):
 
     pcfgKeyspace = 0
@@ -73,3 +71,20 @@ def extractNameFromZipfile(pcfgFileNameZip):
 
     pcfgFileName = Path(pcfgFileNameZip).stem
     return pcfgFileName
+
+def makePcfgFolder(nameWithExt):
+
+    # ./pcfg_trainer.py --coverage 1.0 --rule rty -t test
+    test = PCFG_TRAINER_DIR + ' --coverage 1.0 ' \
+                                 + ' --rule ' + extractNameFromZipfile(nameWithExt) \
+                                 + ' -t ' + os.path.join(DICTIONARY_DIR, nameWithExt)
+    print(test)
+
+    pcfgMakeGrammar = shellExec(test)
+
+def moveGrammarToPcfgDir(nameWithExt):
+
+    test = 'mv ' + PCFG_TRAINER_RULE_DIR + '/' + extractNameFromZipfile(nameWithExt) + ' ' + PCFG_DIR + '/' + extractNameFromZipfile(nameWithExt)
+    print(test)
+
+    pcfgMoveGrammar = shellExec(test)

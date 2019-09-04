@@ -12,5 +12,6 @@ pcfg_parser.add_argument('search', type=str, required=False)
 pcfgFromFile_parser = reqparse.RequestParser()
 pcfgFromFile_parser.add_argument('files', type=list, required=True, location='json')
 
-#dictionary_parser -> pcfg_parser
-#dictionaryFromFile_parser -> pcfgFromFile_parser
+makePcfgFromDictionary_parser = reqparse.RequestParser()
+makePcfgFromDictionary_parser.add_argument('dictionary_id', type=int, required=True)
+makePcfgFromDictionary_parser.add_argument('name', type=str, required=True)

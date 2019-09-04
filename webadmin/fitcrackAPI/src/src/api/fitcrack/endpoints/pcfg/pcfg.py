@@ -15,19 +15,20 @@ from flask import request, redirect
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
-from settings import PCFG_DIR, HASHCAT_PATH, HASHCAT_DIR, ROOT_DIR
+from settings import PCFG_DIR, HASHCAT_PATH, HASHCAT_DIR, ROOT_DIR, PCFG_TRAINER_DIR, PCFG_TRAINER_RULE_DIR
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.pcfg.argumentsParser import pcfg_parser, pcfgFromFile_parser
+from src.api.fitcrack.endpoints.pcfg.argumentsParser import pcfg_parser, pcfgFromFile_parser, \
+makePcfgFromDictionary_parser
 from src.api.fitcrack.endpoints.pcfg.functions import readingFromFolderPostProcces, \
 unzipGrammarToPcfgFolder, deleteUnzipedFolderDirectory, extractNameFromZipfile, \
-createPcfgGrammarBin, calculateKeyspace
+createPcfgGrammarBin, calculateKeyspace, makePcfgFolder, moveGrammarToPcfgDir
 
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfgs_model, pcfgData_model, \
     pcfg_model
 from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcPcfg
+from src.database.models import FcPcfg, FcDictionary
 
 log = logging.getLogger(__name__)
 ns = api.namespace(
@@ -45,7 +46,6 @@ class pcfgCollection(Resource):
         """
         Vracia kolekciu pcfg
         """
-        #dictionaries -> pcfgs
         pcfgs = getFilesFromFolder(
             PCFG_DIR, FcPcfg, readingFromFolderPostProcces)
         return {'items': pcfgs}
@@ -69,6 +69,9 @@ class pcfg(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Vymaže pcfg podľa id
+        """
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).one()
         # if (dictionary.deleted):
         #     dictionary.deleted = False
@@ -135,3 +138,75 @@ class pcfgAdd(Resource):
             }
         else:
             abort(500, 'Wrong file format')
+
+
+@ns.route('/makeFromDictionary')
+class pcfgMakeFromDictionary(Resource):
+
+    @api.marshal_with(simpleResponse)
+    @api.expect(makePcfgFromDictionary_parser)
+    def post(self):
+        """
+        Vytvorí pcfg zo slovníka
+        """
+        args = makePcfgFromDictionary_parser.parse_args(request)
+        dict = FcDictionary.query.filter(FcDictionary.id == args['dictionary_id']).first()
+        if not dict:
+            abort(500, 'Can not find selected dictionary.')
+
+        print(dict.name)
+
+        # pcfg trainer
+        makePcfgFolder(dict.name)
+
+        moveGrammarToPcfgDir(dict.name)
+
+        pcfg_keyspace = calculateKeyspace(dict.name)
+        print(pcfg_keyspace)
+
+        pcfg = FcPcfg(
+            name=extractNameFromZipfile(dict.name), path=extractNameFromZipfile(dict.name), keyspace=int(pcfg_keyspace))
+
+        try:
+            db.session.add(pcfg)
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'PCFG with name '
+                  + extractNameFromZipfile(dict.name) + ' already exists.')
+
+        #TODO dorobiť
+        createPcfgGrammarBin(dict.name)
+
+        return {
+            'message': 'PCFG ' + dict.name + ' successfuly uploaded.',
+            'status': True
+
+        }
+
+"""
+        filename = secure_filename(extractNameFromZipfile(dict.name))
+        path = os.path.join(HCSTATS_DIR, filename) + '.hcstat2'
+
+        # make hcstat2 file
+        shellExec(
+            HASHCAT_UTILS_PATH + '/hcstat2gen.' + EXE_OR_BIN + ' ' + path + '_tmp < ' + os.path.join(DICTIONARY_DIR,
+                                                                                                     dict.name))
+        # comprime hcstat2 file
+        shellExec('xz --compress --format=raw --stdout -9e ' + path + '_tmp > ' + path)
+        # delete non-comprimed file
+        os.remove(path + '_tmp')
+
+        hcstats = FcHcstat(name=filename + '.hcstat2', path=path)
+        try:
+            db.session.add(hcstats)
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'HcStats with name ' + filename + ' already exists.')
+
+        return {
+            'status': True,
+            'message': 'HcStat file with name ' + filename + ' created.'
+        }
+"""

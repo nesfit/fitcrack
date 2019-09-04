@@ -229,6 +229,7 @@ def computeCrackingTime(data):
         for dict in attackSettings['left_dictionaries']:
             dictsKeyspace += dict['keyspace']
 
+
         rulesKeyspace = 1
         if attackSettings['rules']:
             rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
@@ -312,6 +313,9 @@ def start_pcfg_manager(job_id, grammar_name, keyspace):
     manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
     print("\n")
     print(manager)
-    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--max-gusses", keyspace, "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)])
+    test = PCFG_MANAGER_DIR + " server " + "-p " + str(calculate_port_number(job_id)) + " -m " + str(keyspace) + " --hashlist " + PCFG_MANAGER + "/README.md" + " -r " + PCFG_DIR + "/" + grammar_name
+    print(test)
+    #process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])
+    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", str(calculate_port_number(job_id)), "-m", str(keyspace), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])
 
     print('Manager started')
