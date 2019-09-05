@@ -120,6 +120,9 @@ namespace Config {
     /** Buffer size for SQL queries */
     const unsigned int SQL_BUF_SIZE = 4096;
 
+    /** Maximum keyspace in PCFG Attack */
+    const uint64_t MAX_PCFG_KEYSPACE = 60000000;
+
     /** Minimum job time in seconds */
     const uint64_t minSeconds = 60;
 
