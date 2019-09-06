@@ -117,7 +117,7 @@ bool CAttackPcfg::makeJob()
 
     /** @workaround Limit keyspace because of client memory problems */
     if (newKeyspace > Config::MAX_PCFG_KEYSPACE)
-        newKeyspace = Config::MAX_PCFG_KEYSPACE
+        newKeyspace = Config::MAX_PCFG_KEYSPACE;
 
     loadNextPreterminals(preterminals, newKeyspace);
 
