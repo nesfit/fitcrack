@@ -9,10 +9,13 @@ from time import sleep
 from flask_restplus import Resource
 from src.api.apiConfig import api
 from src.api.fitcrack.responseModels import simpleResponse
-from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo
-from src.api.fitcrack.endpoints.serverInfo.functions import isComponentRunning
-from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation
+from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo
+from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
+from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument
+from src.api.fitcrack.endpoints.graph.argumentsParser import package_graph_arguments
 from src.api.fitcrack.functions import shellExec
+from src.database import db
+from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
 import platform
 from flask import request
@@ -85,5 +88,60 @@ class serverOperation(Resource):
             "message": "Operation " + action + " finished sucesfull."
         }
 
+
+@ns.route('/getUsageData')
+class serverUtil(Resource):
+
+    @api.expect(package_graph_arguments)
+    @api.marshal_with(usageinfoList)
+    def get(self):
+        """
+        Vraci data z tabulky fc_server_usage na zaklade zadanych casu
+        """
+
+        args = package_graph_arguments.parse_args(request)
+        fromDate = args['from_date']
+        toDate = args['to_date']
+
+        return getCpuMemData(fromDate, toDate)
+
+
+@ns.route('/actualUsageData')
+class actualUsageData(Resource):
+
+    @api.marshal_with(usageinfo)
+    def get(self):
+        """
+        Vraci posledni zaznam z tabulky fc_server_usage
+        """
+
+        return FcServerUsage.query.order_by(FcServerUsage.time.desc()).limit(1).one()
+
+
+@ns.route('/saveData')
+class saveData(Resource):
+    is_public = True
+
+    @api.expect(serverUsage_argument)
+    @api.marshal_with(simpleResponse)
+    def get(self):
+        """
+        Funkce pro ulozeni novych dat do tabulky fc_server_usage
+        """
+        args = serverUsage_argument.parse_args(request)
+
+        serverUsage = FcServerUsage(cpu=args['cpu'], ram=args['ram'], net_recv=args['net_recv'],
+                                    net_sent=args['net_sent'], hdd_read=args['hdd_read'], hdd_write=args['hdd_write'])
+        try:
+            db.session.add(serverUsage)
+            db.session.commit()
+        except:
+            db.session().rollback()
+            abort(500, 'An error occurred while saving new statistics data')
+
+        return {
+            'message': 'Usage data saved',
+            'status': True
+        }
 
 

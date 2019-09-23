@@ -18,5 +18,16 @@ serverinfo = api.model('ServerInfo', {
 })
 
 
+usageinfo = api.model("UsageInfo", {
+    "time": fields.DateTime(),
+    "cpu": fields.Float(),
+    "ram": fields.Float(),
+    "hdd_read": fields.Integer(),
+    "hdd_write": fields.Integer(),
+    "net_sent": fields.Integer(),
+    "net_recv": fields.Integer(),
+})
 
-
+usageinfoList = api.model('UsageInfoList', {
+    'items': fields.List(fields.Nested(usageinfo)),
+})

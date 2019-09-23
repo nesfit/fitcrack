@@ -12,6 +12,7 @@ There are four ways of deployment:
   * For **Custom build of Runner**, see [Runner README](runner/README.md)
 
 Once installed, see how to [Operate the server](#oper)
+Don't forget to activate [usage measure](#usage) of your server.
 
 <a name="instgen"></a>
 ## General installation instructions
@@ -186,7 +187,20 @@ boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 ```
-
+<a name="usage"></a>
+## Installing server usage measure
+First of all you need to edit line with address to your API (default is `http://localhost:5000`).
+```
+boincadm@myserver:~/projects/fitcrack$ edit ./bin/measureUsage.py
+```
+Next step is to add this script to your favorite job scheduler. Here is example for Cron.
+```
+boincadm@myserver:~/projects/fitcrack$ crontab -e
+```
+Add this text to last line (script will start every 5 minutes):
+```
+*/5 * * * * /home/boincadm/projects/fitcrack/bin/measureUsage.py
+```
 ## Optional: multiple workunits per hosts
 
 In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary ttack with big dictionaries.

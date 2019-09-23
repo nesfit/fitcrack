@@ -204,6 +204,20 @@
                 <v-divider></v-divider>
                 <v-list-tile class="px-2 py-1">
                   <v-list-tile-action class="pr-3 key">
+                    Efficiency:
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    <v-list-tile-title class="text-xs-right">
+                      <v-tooltip top>
+                        <span slot="activator">{{efficiency}}</span>
+                        <span>Efficiency is computed as sum of cracking time of each workunit divided by count of hosts multipled by total cracking time.</span>
+                      </v-tooltip>
+                    </v-list-tile-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+                <v-divider></v-divider>
+                <v-list-tile class="px-2 py-1">
+                  <v-list-tile-action class="pr-3 key">
                     Seconds per workunit:
                   </v-list-tile-action>
                   <v-list-tile-content>
@@ -322,13 +336,55 @@
               </fc-graph>
             </v-layout>
 
+            <v-layout row wrap class="mt-3 mb-5 elevation-2 white">
+              <v-toolbar color="primary" dark card>
+                <v-toolbar-title>Status history</v-toolbar-title>
+              </v-toolbar>
+              <v-list single-line class="width100">
+                <v-data-table
+                        :headers="statusHeaders"
+                        :items="statusHistory"
+                        :rows-per-page-items='[5,10,15,{"text":"All","value":-1}]'
+                >
+                  <template slot="items" slot-scope="props">
+                    <td class="text-xs-left">{{ $moment(props.item.time).format('DD.MM.YYYY HH:mm')
+                      }}
+                    </td>
+                    <td class="text-xs-right text-xs-right fw500"
+                        v-bind:class="props.item.status_type + '--text'">
+                      <v-tooltip top>
+                                                <span slot="activator">
+                                                    {{ props.item.status_text }}
+                                                </span>
+                        <span>{{ props.item.status_tooltip }}</span>
+                      </v-tooltip>
+                    </td>
+                  </template>
+                </v-data-table>
+              </v-list>
+            </v-layout>
+
           </div>
         </v-layout>
         <div class=" mx-3">
           <v-layout row wrap class="mt-3 mb-5 max1000 mx-auto elevation-2 white">
             <v-toolbar color="primary" dark card>
-              <v-toolbar-title>Workunits</v-toolbar-title>
+              <v-toolbar-title
+                      v-text="'Workunits | Work: ' + workunitTitle.valid + ' | Benchmark: ' + workunitTitle.benchmarks + ' | Avg keyspace: ' + workunitTitle.avgKeyspace.toLocaleString()"></v-toolbar-title></v-toolbar-title>
             </v-toolbar>
+
+            <div class="workunit-parent">
+              <div v-for="workunit in workunitsGraphical"
+                   v-bind:style="{ 'flex-grow': workunit.keyspace, 'background-color': workunit.color }"
+                   class="workunit-child">
+                <v-tooltip bottom>
+                  <div slot="activator">&nbsp;</div>
+                  <span>{{workunit.text}}</span>
+                </v-tooltip>
+
+              </div>
+            </div>
+
             <v-data-table
               :rows-per-page-items="[15,30,60,{'text':'All','value':-1}]"
               rows-per-page-text="Workunits per page"
@@ -551,9 +607,15 @@
     data: function () {
       return {
         data: null,
+        efficiency: 0,
         progressGraph: null,
         hostGraph: null,
         hostPercentageGraph: null,
+        statusHeaders: [
+          {text: 'Time', value: 'time', align: 'left'},
+          {text: 'Status', value: 'status', align: 'right'},
+        ],
+        statusHistory: [],
         hostheaders: [
           {
             text: 'Name',
@@ -563,6 +625,13 @@
           {text: 'IP address', value: 'ip_adress', align: 'right', sortable: false},
           {text: 'Online', value: 'last_seen', align: 'right', sortable: false}
         ],
+        workunitTitle: {
+          valid: 0,
+          benchmarks: 0,
+          avgKeyspace: 0,
+          efectivity: 0,
+
+        },
         workunitsHeader: [
           {
             text: 'Host',
@@ -626,8 +695,66 @@
       },
       loadData: function () {
         this.axios.get(this.$serverAddr + '/jobs/' + this.$route.params.id).then((response) => {
-          this.data = response.data
+          this.data = response.data;
+
+          // Computing of counts and avg keyspace
+          if (this.data.workunits.length > 0) {
+            const validWorkunits = this.data.workunits.filter(workunit =>workunit.hc_keyspace !== 0);
+            this.workunitTitle.valid = validWorkunits.length;
+            this.workunitTitle.benchmarks = this.data.workunits.length - validWorkunits.length;
+            if (validWorkunits.length > 0)
+              this.workunitTitle.avgKeyspace = (validWorkunits.map(workunit => workunit.hc_keyspace).reduce((a, b) => a + b) / validWorkunits.length);
+
+            // Computing of efficiency
+            if(this.data.hosts.length === 0){
+              this.efficiency = "No hosts";
+            }
+
+            // If Job is finished
+            else if (validWorkunits.length > 0) {
+
+              const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.cracking_time);
+
+              this.efficiency = (efficiency * 100).toFixed(2) + ' %';
+              //console.log("Efectivity:", this.efficiency);
+            } else {
+              this.efficiency = "No workunits yet";
+            }
+
+            // Prepare objects for workunits
+            this.workunitsGraphical = validWorkunits.map(workunit => {
+              //console.log(workunit);
+
+              // retry && finished
+              let color = "";
+
+              if (!workunit.retry && workunit.finished) {
+                color = 'lightgreen';
+              } else if (!workunit.retry && !workunit.finished){
+                color = 'yellow';
+              } else if (workunit.retry && !workunit.finished) {
+                color = 'orange';
+              } else {
+                color = 'green';
+              }
+
+              return {
+                id: workunit.id,
+                keyspace: workunit.hc_keyspace,
+                color: color,
+                text: "Id: " + workunit.id + " | Keyspace: " + workunit.hc_keyspace + " | Retry: " + workunit.retry + " | Finished: " + workunit.finished
+              }
+            });
+          }
         });
+
+        this.axios.get(this.$serverAddr + '/status/' + this.$route.params.id)
+                .then((result) => {
+                  this.statusHistory = result.data.items;
+                })
+                .catch((reason => {
+                  console.log("An error ocurred while fetching status", reason);
+                }));
 
         // if package is finished, we dont need to send this stuffs...
         if (this.data !== null && parseInt(this.data.status) < 5)
@@ -841,4 +968,26 @@
     max-height: 500px;
     overflow: auto;
   }
+
+  .workunit-parent {
+
+    overflow: auto;
+    height: 55px;
+    display: flex;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    width: 100%;
+  }
+
+  .workunit-child {
+    height: 20px;
+    margin: 0 2px;
+    border: 1px grey solid;
+    border-radius: 2px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
 </style>

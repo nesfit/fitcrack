@@ -135,3 +135,31 @@ CREATE TRIGGER `timeout_v1` AFTER UPDATE ON `result`
 END
 //
 DELIMITER ;
+
+--
+-- Trigger na ukladani zmen stavu pri vytvoreni
+--
+DROP TRIGGER IF EXISTS `job_status_changes_new`;
+DELIMITER //
+CREATE TRIGGER `job_status_changes_new` AFTER INSERT ON `fc_job`
+ FOR EACH ROW BEGIN
+ INSERT INTO `fc_job_status` (`job_id`, `status`, `time`) VALUES (NEW.id, NEW.status, NOW());
+END
+//
+DELIMITER ;
+
+
+--
+-- Trigger na ukladani zmen stavu pri aktualizaci fc_job
+--
+DROP TRIGGER IF EXISTS `job_status_changes_edit`;
+DELIMITER //
+CREATE TRIGGER `job_status_changes_edit` BEFORE UPDATE ON `fc_job` FOR EACH ROW
+BEGIN
+    IF NEW.status <> OLD.status THEN
+    	INSERT INTO fc_job_status (`job_id`, `status`, `time`)
+    	VALUES (NEW.id, NEW.status, NOW());
+    END IF;
+END
+//
+DELIMITER ;

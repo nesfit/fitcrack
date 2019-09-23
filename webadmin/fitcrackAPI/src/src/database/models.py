@@ -126,21 +126,6 @@ class FcPcfg(Base):
     modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
 
-"""
-    CREATE TABLE `fc_pcfg_grammar` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `path` varchar(400) NOT NULL,
-  `keyspace` bigint(20) unsigned NOT NULL,
-  `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
-
-"""
-
-
 class FcHcstat(Base):
     __tablename__ = 'fc_hcstats'
 
@@ -339,6 +324,36 @@ class FcJobGraph(Base):
         }
 
 
+class FcJobStatus(Base):
+    __tablename__ = 'fc_job_status'
+
+    id = Column(BigInteger, primary_key=True)
+    job_id = Column(ForeignKey('fc_job.id'), nullable=False, index=True)
+    status = Column(SmallInteger, nullable=False, server_default=text("'0'"))
+    time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+    @hybrid_property
+    def status_text(self):
+        return package_status_text_to_code_dict.get(int(self.status))
+
+    @hybrid_property
+    def status_tooltip(self):
+        return package_status_text_info_to_code_dict.get(int(self.status))
+
+    @hybrid_property
+    def status_type(self):
+        if int(self.status) == 0 or int(self.status) == 10 or int(self.status) == 12:
+            return 'info'
+        if int(self.status) == 1:
+            return 'success'
+        if int(self.status) == 0 or int(self.status) == 4:
+            return 'warning'
+        if int(self.status) == 1 or int(self.status) == 2 or int(self.status) == 3:
+            return 'error'
+
+    job = relationship('FcJob')
+
+
 class Host(Base):
     __tablename__ = 'host'
 
@@ -401,6 +416,11 @@ class Host(Base):
                         viewonly=True, order_by="desc(FcWorkunit.id)")
 
     last_active = relationship("FcHostStatus", uselist=False)
+
+    jobs = relationship("FcJob", secondary="fc_host_activity",
+                        primaryjoin="Host.id == FcHostActivity.boinc_host_id",
+                        secondaryjoin="FcHostActivity.job_id == FcJob.id",
+                        viewonly=True)
 
     #job = relationship("FcWorkunit", back_populates="hosts")
 
@@ -713,3 +733,15 @@ class Result(Base):
             return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' )
         except:
             return self.stderr_out.decode("utf-8")
+class FcServerUsage(Base):
+    __tablename__ = 'fc_server_usage'
+
+    id = Column(Integer, primary_key=True)
+    time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    cpu = Column(Float(asdecimal=True), nullable=False)
+    ram = Column(Float(asdecimal=True), nullable=False)
+    net_recv = Column(Integer, nullable=False)
+    net_sent = Column(Integer, nullable=False)
+    hdd_read = Column(Integer, nullable=False)
+    hdd_write = Column(Integer, nullable=False)
+
