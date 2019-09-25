@@ -84,6 +84,11 @@ bool CAttackPcfg::makeJob()
     /** gRPC call to collect preterminals and update current index + keyspace */
     std::string preterminals;
     uint64_t newKeyspace = m_job->getHcKeyspace();
+
+    /** @workaround Limit keyspace because of client memory problems */
+    if (newKeyspace > Config::MAX_PCFG_KEYSPACE)
+        newKeyspace = Config::MAX_PCFG_KEYSPACE;
+
     loadNextPreterminals(preterminals, newKeyspace);
 
     if (preterminals.empty() || newKeyspace == 0)

@@ -25,12 +25,12 @@ class PipeLinux : public PipeBase {
          */
         bool isEndOpen(int file_descriptor) const;
 
-	/**
-	 * @brief   Closes end of the pipe specified by argument
-	 * @param   pipe_end [in] Name of the pipe to close
-	 * @return  Error code  // TODO: remove and add exception
-	 */
-	int closeEnd(int pipe_end);
+      	/**
+      	 * @brief   Closes end of the pipe specified by argument
+      	 * @param   pipe_end [in] Name of the pipe to close
+      	 * @return  Error code  // TODO: remove and add exception
+      	 */
+      	int closeEnd(int pipe_end);
 
     protected:
 
@@ -40,7 +40,7 @@ class PipeLinux : public PipeBase {
         /**
          * @brief   Creates the pipe
          */
-        void createPipe();
+        void createPipe(bool is_NONBLOCK_);
 
         /**
          * @brief   Reads content of the pipe
@@ -61,18 +61,18 @@ class PipeLinux : public PipeBase {
         /**
          * @brief   Constructor which creates the unblocking Linux pipe
          */
-        PipeLinux();
+        PipeLinux(bool is_NONBLOCK_);
 
         /**
          * @brief   Destructor which calls close on both ends of pipe
          */
         ~PipeLinux();
 
-	/**
-	 * @brief   States whether we can read from the pipe
-	 * @return  True when we can, False otherwise
-	 */
-	bool canRead() const;
+      	/**
+      	 * @brief   States whether we can read from the pipe
+      	 * @return  True when we can, False otherwise
+      	 */
+      	bool canRead() const;
 
         /**
          * @brief   Closes read-end of pipe
