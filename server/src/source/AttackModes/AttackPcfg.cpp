@@ -35,39 +35,8 @@ bool CAttackPcfg::makeJob()
     std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_grammar_%" PRIu64 "", Config::appName, m_package->getId());
 
 
-    /** Append mode to config */
-    retval = config.download_path(name1, path);
-    if (retval)
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to receive BOINC filename - config. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
-        return false;
-    }
-
-    std::ofstream f;
-    f.open(path);
-    if (!f)
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to open config BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
-        return false;
-    }
-
-    Tools::printDebug("CONFIG for new job:\n");
-
-    /** Output original config from DB */
-    f << m_package->getConfig();
-    Tools::printDebug(m_package->getConfig().c_str());
-
-    /** Output mode */
-    f << "|||mode|String|1|n|||\n";
-    Tools::printDebug("|||mode|String|1|n|||\n");
-
-    f.close();
-
     /** Create data file */
+    std::ofstream f;
     retval = config.download_path(name2, path);
     if (retval)
     {
@@ -88,6 +57,7 @@ bool CAttackPcfg::makeJob()
 
     f << m_package->getHashes();
     f.close();
+
 
     /** Create preterminals file. */
     retval = config.download_path(name3, path);
@@ -125,6 +95,46 @@ bool CAttackPcfg::makeJob()
 
     outfile.write(preterminals.c_str(), sizeof(char) * preterminals.size());
     outfile.close();
+
+
+    /** Append mode and keyspace to config */
+    retval = config.download_path(name1, path);
+    if (retval)
+    {
+        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+                              "Failed to receive BOINC filename - config. Setting package to malformed.\n");
+        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        return false;
+    }
+
+    f.open(path);
+    if (!f)
+    {
+        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+                              "Failed to open config BOINC input file! Setting package to malformed.\n");
+        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        return false;
+    }
+
+    Tools::printDebug("CONFIG for new job:\n");
+
+    /** Output original config from DB */
+    f << m_package->getConfig();
+    Tools::printDebug(m_package->getConfig().c_str());
+
+    /** Output mode */
+    f << "|||mode|String|1|n|||\n";
+    Tools::printDebug("|||mode|String|1|n|||\n");
+
+    /** Output start_index */
+    int digits = 0;
+    uint64_t num = newKeyspace;
+    do { num /= 10; ++digits; } while (num != 0);    // Count digits
+    f << "|||hc_keyspace|BigUInt|" << digits << "|" << newKeyspace << "|||\n";
+    Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, newKeyspace);
+
+    f.close();
+
 
     /** Create grammar sticky file. */
     retval = config.download_path(name4, path);
