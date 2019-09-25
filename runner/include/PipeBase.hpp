@@ -24,7 +24,7 @@ class PipeBase {
         /**
          * @brief   Pure virtual function creating the pipe
          */
-        virtual void createPipe() = 0;
+        virtual void createPipe(bool is_NONBLOCK_) = 0;
 
         /**
          * @brief   Pure virtual function reading content of the pipe

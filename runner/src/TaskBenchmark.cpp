@@ -23,8 +23,8 @@ void TaskBenchmark::parseHashcatBenchmark(std::string& output_line) {
      * Number before first double-dot represents ID of OCL device number and
      * theoretically it can be 1 - 12ish devices when we take in account
      * 8 GPUs and 4 CPUs which all can be the benchmarked devices. So we
-     * need up to 2 characters to represent such number. 
-     * 
+     * need up to 2 characters to represent such number.
+     *
      * Number after the last double-dot represents the speed of the device
      *
      * Other part represent hash_type, [temperature, fan_speed?], runtime
@@ -44,74 +44,74 @@ void TaskBenchmark::parseHashcatBenchmark(std::string& output_line) {
 
 }
 
-/* Public */ 
+/* Public */
 
 TaskBenchmark::TaskBenchmark (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name)  {
-    mode_ = "b";  
-    initializeTotalHashes();
+  mode_ = "b";
+  initializeTotalHashes();
 }
 
 TaskBenchmark::TaskBenchmark (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name)  {
-    mode_ = "b";  
-    initializeTotalHashes();
+  mode_ = "b";
+  initializeTotalHashes();
 }
 
 std::string TaskBenchmark::generateOutputMessage() {
 
-    std::string output_message = "";
+  std::string output_message = "";
 
-    exit_code_ = process_->getExitCode();
+  exit_code_ = process_->getExitCode();
 
-    output_message += mode_ + "\n"; 
+  output_message += mode_ + "\n";
 
-    if (exit_code_ == HashcatConstant::Succeded) {
+  if (exit_code_ == HashcatConstant::Succeded) {
 
-	output_message += ProjectConstants::TaskFinalStatus::Succeded + "\n";
-	output_message += RunnerUtils::toString(getTotalSpeed()) + "\n";
-	output_message += RunnerUtils::toString(process_->getExecutionTime()) + "\n";
+    output_message += ProjectConstants::TaskFinalStatus::Succeded + "\n";
+    output_message += RunnerUtils::toString(getTotalSpeed()) + "\n";
+    output_message += RunnerUtils::toString(process_->getExecutionTime()) + "\n";
 
-    } else if (exit_code_ != HashcatConstant::Succeded) {
+  } else if (exit_code_ != HashcatConstant::Succeded) {
 
-	output_message += ProjectConstants::TaskFinalStatus::Error + "\n";
-	output_message += RunnerUtils::toString(process_->getExitCode()) + "\n";
-	output_message += getErrorMessage() + "\n"; 
+    output_message += ProjectConstants::TaskFinalStatus::Error + "\n";
+    output_message += RunnerUtils::toString(process_->getExitCode()) + "\n";
+    output_message += getErrorMessage() + "\n";
 
-    }
+  }
 
-    return output_message;
+  return output_message;
 }
 
 unsigned long long TaskBenchmark::getTotalSpeed() {
-    unsigned long long speed_sum = 0;
+  unsigned long long speed_sum = 0;
 
-    /** Sum speeds of all OCL devices used by hashcat on given node */
-    for (std::vector<unsigned long long>::iterator it = speeds_.begin(); it != speeds_.end(); it++) {
-        speed_sum += *it;
-    }
+  /** Sum speeds of all OCL devices used by hashcat on given node */
+  for (std::vector<unsigned long long>::iterator it = speeds_.begin(); it != speeds_.end(); it++) {
+    speed_sum += *it;
+  }
 
-    return speed_sum;
+  return speed_sum;
 }
 
 void TaskBenchmark::initializeTotalHashes() {
-    total_hashes_ = 1;
+  total_hashes_ = 1;
 }
 
 bool TaskBenchmark::parseHashcatOutputLine(std::string& output_line) {
-    parseHashcatBenchmark(output_line);
+  parseHashcatBenchmark(output_line);
 }
 
 void TaskBenchmark::progress() {
-    std::string lines;
-    std::string line;
-    while (!(lines = process_->readOutPipeAvailableLines()).empty()) {
-	size_t found_at = 0, last = 0;
-	for (found_at = 0; found_at != std::string::npos; found_at = lines.find("\n", last)) {
-	    line = lines.substr(last, found_at - last);
+  std::string lines;
+  std::string line;
+  while (!(lines = process_->readOutPipeAvailableLines()).empty()) {
+    size_t found_at = 0, last = 0;
+    for (found_at = 0; found_at != std::string::npos; found_at = lines.find("\n", last)) {
+      line = lines.substr(last, found_at - last);
 
-	    parseHashcatOutputLine(line);
+      parseHashcatOutputLine(line);
 
-	    last = found_at +1;
-	}
-	actualizeComputedHashes(1);
+      last = found_at +1;
     }
+    actualizeComputedHashes(1);
+  }
 }
