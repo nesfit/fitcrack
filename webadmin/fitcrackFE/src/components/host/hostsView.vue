@@ -39,7 +39,7 @@
         <td class="text-xs-right">{{ props.item.ip_address }}</td>
         <td class="text-xs-right">{{ props.item.os_name }}</td>
         <td class="text-xs-right oneline" :title="props.item.p_model">{{ props.item.p_model }}</td>
-        <td class="text-xs-right">{{ props.item.jobs.map(j => j.status === 10 ? 1 : 0).reduce((a, b) => a + b) }}</td>
+        <td class="text-xs-right">{{ props.item.jobs.map(j => j.status === 10 ? 1 : 0).reduce((a, b) => a + b, 0) }}</td>
         <td class="text-xs-right"  v-bind:class="{
           'error--text': props.item.last_active.seconds_delta > 61,
           'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
