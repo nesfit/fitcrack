@@ -124,7 +124,7 @@ class markovMakeFromDictionary(Resource):
         # comprime hcstat2 file
         shellExec('xz --compress --format=raw --stdout -9e ' + path + '_tmp > ' + path)
         # delete non-comprimed file
-        os.remove(path + '_tmp')
+        #os.remove(path + '_tmp')
 
         hcstats = FcHcstat(name=filename + '.hcstat2', path=path)
         try:

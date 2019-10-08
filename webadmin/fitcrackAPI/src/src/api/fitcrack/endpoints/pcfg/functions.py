@@ -32,8 +32,6 @@ def unzipGrammarToPcfgFolder(pcfgFilename):
 
         if os.path.exists(pathToZipFile):
             os.remove(pathToZipFile)
-    else:
-        print("Does not exist.")
 
 
 def deleteUnzipedFolderDirectory(pcfgZipFilePath):
@@ -43,9 +41,6 @@ def deleteUnzipedFolderDirectory(pcfgZipFilePath):
     if(pathlib.Path(pcfgUnzipFolderPath).exists()):
 
         shutil.rmtree(pcfgUnzipFolderPath)
-
-    else:
-        print("Does not exist.")
 
 
 def createPcfgGrammarBin(pcfgFileNameZip):
