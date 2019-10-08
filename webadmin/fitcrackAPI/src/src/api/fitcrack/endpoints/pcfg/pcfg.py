@@ -112,10 +112,7 @@ class pcfgAdd(Resource):
 
         uploadedFile = fileUpload(file, PCFG_DIR, ALLOWED_EXTENSIONS)
         if uploadedFile:
-
             unzipGrammarToPcfgFolder(uploadedFile['filename'])
-            #hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + os.path.join(PCFG_DIR, uploadedFile['path']), cwd=HASHCAT_DIR))
-            # TODO dorobiŤ
             pcfg_keyspace = calculateKeyspace(uploadedFile['filename'])
             print(pcfg_keyspace)
             pcfg = FcPcfg(
@@ -155,15 +152,10 @@ class pcfgMakeFromDictionary(Resource):
         if not dict:
             abort(500, 'Can not find selected dictionary.')
 
-        print(dict.name)
-
-        # pcfg trainer
         makePcfgFolder(dict.name)
-
         moveGrammarToPcfgDir(dict.name)
 
         pcfg_keyspace = calculateKeyspace(dict.name)
-        print(pcfg_keyspace)
 
         pcfg = FcPcfg(
             name=extractNameFromZipfile(dict.name), path=extractNameFromZipfile(dict.name), keyspace=int(pcfg_keyspace))
