@@ -81,7 +81,6 @@ class pcfg(Resource):
         db.session.commit()
 
         pcfgFullPath = os.path.join(PCFG_DIR, pcfg.path)
-        print(pcfgFullPath)
         if os.path.exists(pcfgFullPath):
             deleteUnzipedFolderDirectory(pcfgFullPath)
 
@@ -114,7 +113,6 @@ class pcfgAdd(Resource):
         if uploadedFile:
             unzipGrammarToPcfgFolder(uploadedFile['filename'])
             pcfg_keyspace = calculateKeyspace(uploadedFile['filename'])
-            print(pcfg_keyspace)
             pcfg = FcPcfg(
                 name=extractNameFromZipfile(uploadedFile['filename']), path=uploadedFile['path'], keyspace=int(pcfg_keyspace))
 

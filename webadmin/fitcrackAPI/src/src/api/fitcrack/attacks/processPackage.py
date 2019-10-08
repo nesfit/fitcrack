@@ -319,8 +319,8 @@ def process_package_9(package):
             abort(500, 'Rules file does not exist.')
         package['attack_settings']['attack_submode'] = 1
         package['rules'] = rules.name
-        print("\n PCFG attack with rules process\n")
 
+        package['']
     return package
 
 
