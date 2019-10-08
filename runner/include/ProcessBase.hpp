@@ -98,7 +98,7 @@ class ProcessBase {
          * @brief   Reads a line from stdout of process
          * @return  Line from the stdout
          */
-        std::string readOutPipeLine();
+        std::string readOutPipeLine(ProcessBase* process_);
 
         /**
          * @brief   Computes run time of the launched process after it has

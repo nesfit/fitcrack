@@ -253,13 +253,14 @@ void TaskNormal::progress() {
 
     PRINT_POSITION_IN_CODE();
 
-    line = process_->readOutPipeLine();
+    line = process_->readOutPipeLine(process_);
 
     PRINT_POSITION_IN_CODE();
-    if (parseHashcatOutputLine(line)) {
-      reportProgress();
-    }
-  }
 
+    if (parseHashcatOutputLine(line)) {
+	    reportProgress();
+	  }
+
+  }
   PRINT_POSITION_IN_CODE();
 }

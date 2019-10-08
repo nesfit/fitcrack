@@ -123,7 +123,7 @@ void TaskComputeBase::printProcessOut() {
 
 void TaskComputeBase::printProcessErr() {
   PRINT_POSITION_IN_CODE();
-  Logging::debugPrint(Logging::Detail::Important, "TaskComputeBase: hashcat available stderr : \n" + process_->readErrPipeAvailableLines());
+  //Logging::debugPrint(Logging::Detail::Important, "TaskComputeBase: hashcat available stderr : \n" + process_->readErrPipeAvailableLines());
   PRINT_POSITION_IN_CODE();
 }
 

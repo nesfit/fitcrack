@@ -24,6 +24,7 @@ class TaskComputeBase: public TaskBase {
 
         ProcessBase *process_;          /**< Pointer to process executing the task */
         ProcessBase *process_PCFGmanager_; /** < Pointer to pcfg manager process executing the task */
+        ProcessBase *parent_process_; /** < Pointer to parent process */
 
         bool isPCFG_;
 

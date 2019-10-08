@@ -4,6 +4,9 @@
 */
 
 #include "PipeBase.hpp"
+#ifndef PROCESSBASE_HPP
+#include "ProcessBase.hpp"
+#endif
 
 /* Public */
 
@@ -25,6 +28,25 @@ std::string PipeBase::readLine() {
     if ((read_chars = readChar(c)) > 0) {
       line += c;
     } else if (read_chars == -1) {
+      sleep(HashcatConstant::ProgressPeriod);
+    }
+  }
+
+  return line;
+}
+
+std::string PipeBase::readLine(ProcessBase* process_) {
+  std::string line;
+  char c;
+  int read_chars = -1;
+
+  while (c != '\n' && canRead()) {
+    if ((read_chars = readChar(c)) > 0) {
+      line += c;
+    } else if (read_chars == -1) {
+      if(!process_->isRunning()){
+        break;
+      }
       sleep(HashcatConstant::ProgressPeriod);
     }
   }

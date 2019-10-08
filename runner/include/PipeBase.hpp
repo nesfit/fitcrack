@@ -8,6 +8,7 @@
 
 #include "Constants.hpp"
 #include "Logging.hpp"
+//#include "ProcessBase.hpp"
 
 #include <cerrno>
 #include <string>
@@ -16,6 +17,8 @@
 #include <unistd.h>
 
 #define READ_SIZE 1
+
+class ProcessBase;
 /** Class represeting interface of the Pipe */
 class PipeBase {
 
@@ -77,6 +80,12 @@ class PipeBase {
          * @return  Read line
          */
         std::string readLine();
+
+        /**
+         * @brief   Reads line from the pipe
+         * @return  Read line
+         */
+        std::string readLine(ProcessBase* process_);
 
         /**
          * @brief   Pure virtual function writing message to the pipe
