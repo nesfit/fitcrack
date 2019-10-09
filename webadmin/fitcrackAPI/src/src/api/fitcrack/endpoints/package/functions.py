@@ -278,9 +278,17 @@ def computeCrackingTime(data):
         else:
             keyspace = int(attackSettings['pcfg_grammar']['keyspace'])
 
-    print("\nEstimate\n")
-    print(keyspace)
-    print(total_power)
+        rulesKeyspace = 1
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = coun_file_lines(os.path.join(RULE_DIR,rules.path))
+            keyspace = keyspace * rulesKeyspace
+
+        # Keyspace control
+        INT_MAX = sys.maxsize - 1
+
+        if int(keyspace) >= INT_MAX:
+            keyspace = INT_MAX
 
     display_time = None
     if (total_power > 0):

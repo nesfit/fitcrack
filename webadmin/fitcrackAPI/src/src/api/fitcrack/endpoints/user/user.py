@@ -14,7 +14,7 @@ from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.user.argumentsParser import user_login_arguments, change_user_role_arguments, \
     change_role_arguments, new_role_arguments, new_user_arguments, user_change_password_arguments
 from src.api.fitcrack.endpoints.user.responseModels import fc_user_model, isLoggedIn_model, role_list_model, \
-    user_list_model
+    user_list_model, userSuccessResponse_model
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcUser, FcRole, AnonUser
@@ -165,8 +165,10 @@ class change_my_password(Resource):
 
     is_public = True
 
-    @api.expect(user_change_password_arguments)
-    @api.marshal_with(fc_user_model)
+
+    #@api.expect(user_change_password_arguments)
+    #@api.marshal_with(fc_user_model)
+    @api.marshal_with(userSuccessResponse_model)
     def post(self):
         """
         Zmena hesla uzivatela
@@ -178,10 +180,11 @@ class change_my_password(Resource):
         else:
             current_user.set_password(args['new_password'])
             db.session.commit()
-            return {
-                'message': 'User password changed.',
-                'status': True
-            }
+
+        return {
+            'status': True,
+            'message': 'Password changed.'
+        }
 
 
 

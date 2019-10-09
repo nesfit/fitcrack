@@ -283,14 +283,10 @@ def post_process_package_7(data, db_package):
 # pcfg attack
 def process_package_9(package):
     package['attack_settings']['attack_submode'] = 0
-
     package['attack_name'] = 'pcfg'
 
     # Keyspace control
     INT_MAX = sys.maxsize - 1
-
-    print(package['attack_settings']['pcfg_grammar']['keyspace'])
-    print(package['attack_settings']['keyspace_limit'])
 
     if int(package['attack_settings']['pcfg_grammar']['keyspace']) >= INT_MAX:
         package['keyspace'] = INT_MAX
@@ -323,8 +319,8 @@ def process_package_9(package):
             abort(500, 'Rules file does not exist.')
         package['attack_settings']['attack_submode'] = 1
         package['rules'] = rules.name
-        print("\n PCFG attack with rules process\n")
 
+        package['']
     return package
 
 

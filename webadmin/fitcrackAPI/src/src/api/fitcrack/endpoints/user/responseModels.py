@@ -38,3 +38,8 @@ isLoggedIn_model = api.model('isLoggedIn', {
     'user': fields.Nested(fc_user_model),
     'loggedIn': fields.Boolean()
 })
+
+userSuccessResponse_model = api.model('200', {
+    'message': fields.String(),
+    'status': fields.Boolean()
+})

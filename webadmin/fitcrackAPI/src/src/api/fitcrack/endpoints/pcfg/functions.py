@@ -4,6 +4,7 @@
 '''
 
 import os
+import sys
 import shutil
 import zipfile
 import pathlib
@@ -31,8 +32,6 @@ def unzipGrammarToPcfgFolder(pcfgFilename):
 
         if os.path.exists(pathToZipFile):
             os.remove(pathToZipFile)
-    else:
-        print("Does not exist.")
 
 
 def deleteUnzipedFolderDirectory(pcfgZipFilePath):
@@ -43,18 +42,12 @@ def deleteUnzipedFolderDirectory(pcfgZipFilePath):
 
         shutil.rmtree(pcfgUnzipFolderPath)
 
-    else:
-        print("Does not exist.")
-
 
 def createPcfgGrammarBin(pcfgFileNameZip):
-    #./pcfg-manager marshal -r /usr/share/collections/pcfg/atom
-
     test = PCFG_MANAGER_DIR + ' marshal -r ' \
                                  + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
                                  + ' -o ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
                                  + '/grammar.bin'
-    print(test)
     pcfgKeyspace = shellExec(PCFG_MANAGER_DIR + ' marshal -r ' \
                                  + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
                                  + ' -o ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)) \
@@ -64,8 +57,13 @@ def createPcfgGrammarBin(pcfgFileNameZip):
 def calculateKeyspace(pcfgFileNameZip):
 
     pcfgKeyspace = 0
-    #pcfgKeyspace = int(shellExec(PCFG_MOWER_DIR + ' -i ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip))))
     pcfgKeyspace = shellExec(PCFG_MOWER_DIR + ' -i ' + os.path.join(PCFG_DIR, extractNameFromZipfile(pcfgFileNameZip)))
+
+    # Keyspace control
+    INT_MAX = sys.maxsize - 1
+
+    if int(pcfgKeyspace) >= INT_MAX:
+        pcfgKeyspace = INT_MAX
 
     return pcfgKeyspace
 
@@ -77,17 +75,12 @@ def extractNameFromZipfile(pcfgFileNameZip):
 
 def makePcfgFolder(nameWithExt):
 
-    # ./pcfg_trainer.py --coverage 1.0 --rule rty -t test
     test = PCFG_TRAINER_DIR + ' --coverage 1.0 ' \
                                  + ' --rule ' + extractNameFromZipfile(nameWithExt) \
                                  + ' -t ' + os.path.join(DICTIONARY_DIR, nameWithExt)
-    print(test)
-
     pcfgMakeGrammar = shellExec(test)
 
 def moveGrammarToPcfgDir(nameWithExt):
 
     test = 'mv ' + PCFG_TRAINER_RULE_DIR + '/' + extractNameFromZipfile(nameWithExt) + ' ' + PCFG_DIR + '/' + extractNameFromZipfile(nameWithExt)
-    print(test)
-
     pcfgMoveGrammar = shellExec(test)
