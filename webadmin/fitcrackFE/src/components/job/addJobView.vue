@@ -502,7 +502,7 @@
       },
       uploadComplete: function (data) {
         this.$success("Successfully extracted hash form file.")
-        this.hashtype = this.hashTypes.find(h => h.code == data['hash_type'])
+        this.hashtype = data
         this.addHash(data['hash'])
         this.validateHashes(null)
       },
