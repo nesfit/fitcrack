@@ -79,32 +79,37 @@
               <span>Start job</span>
             </v-tooltip>
             <v-tooltip top>
-              <v-btn icon class="mx-0"  :disabled="props.item.status >= 10"  slot="activator" @click="operateJob(props.item.id, 'restart')">
-                <v-icon color="info">loop</v-icon>
-              </v-btn>
-              <span>Restart job</span>
-            </v-tooltip>
-            <v-tooltip top>
               <v-btn icon class="mx-0"  :disabled="props.item.status !== '10'"  slot="activator" @click="operateJob(props.item.id, 'stop')">
                 <v-icon color="error">pause_circle_outline</v-icon>
               </v-btn>
               <span>Stop job</span>
             </v-tooltip>
+            <v-menu>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  class="mx-0"
+                  v-on="on"
+                >
+                  <v-icon>more_vert</v-icon>
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-tile @click="operateJob(props.item.id, 'restart')">
+                  <v-list-tile-title><v-icon>loop</v-icon> Restart</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile @click="operateJob(props.item.id, 'duplicate')">
+                  <v-list-tile-title><v-icon>content_copy</v-icon> Duplicate</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile @click="hideJob(props.item.id)">
+                  <v-list-tile-title>
+                    <v-icon>{{props.item.deleted ? 'visibility' : 'visibility_off'}}</v-icon> 
+                    {{props.item.deleted ? 'Show' : 'Hide'}}
+                  </v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
           </div>
-        </td>
-        <td class="text-xs-right">
-          <v-tooltip top v-if="props.item.deleted">
-            <v-btn icon class="mx-0" slot="activator" @click="hideJob(props.item.id)">
-              <v-icon color="grey darken-3 ">visibility</v-icon>
-            </v-btn>
-            <span>Show job</span>
-          </v-tooltip>
-          <v-tooltip top v-else>
-            <v-btn icon class="mx-0" slot="activator" @click="hideJob(props.item.id)">
-              <v-icon color="grey ">visibility_off</v-icon>
-            </v-btn>
-            <span>Hide job</span>
-          </v-tooltip>
         </td>
       </tr>
     </v-data-table>
@@ -202,8 +207,7 @@
           {text: 'Status', value: 'status', align: 'right'},
           {text: 'Progress', value: 'progress', align: 'right'},
           {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Actions', value: 'name', sortable: false, align: 'right'},
-          {text: 'Hide', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Actions', value: 'name', sortable: false, align: 'right'}
         ],
         jobs_statuses: [
           {
