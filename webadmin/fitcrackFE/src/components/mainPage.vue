@@ -17,7 +17,7 @@
       color="primary"
     >
       <router-link :to="{ name: 'home'}">
-        <img :src="require('@/assets/fitcrack.png')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
+        <img :src="require('@/assets/fitcrack.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
         <h2 v-show="!miniVariant" class="logoText" ></h2>
       </router-link>
       <v-divider></v-divider>

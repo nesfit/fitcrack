@@ -13,7 +13,7 @@
       <v-container fluid fill-height>
         <v-layout flex align-center justify-center>
           <v-card raised class="jumboCard px-4">
-            <img :src="require(`@/assets/${$vuetify.theme.project}.png`)" class="mx-auto pt-3 pb-2 d-block logo" alt="logo"/>
+            <img :src="require(`@/assets/fitcrack.svg`)" class="mx-auto pt-3 pb-2 d-block logo" alt="logo"/>
             <div class="content">
               <v-progress-circular
                 size="50"
