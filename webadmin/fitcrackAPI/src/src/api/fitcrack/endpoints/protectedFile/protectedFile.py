@@ -29,7 +29,7 @@ class filesCollection(Resource):
     @api.marshal_with(protectedFilesCollection_model)
     def get(self):
         """
-        Vracia kolekciu zaheslovaných suborov
+        Returns collection of hashed files.
         """
         return {'items': FcEncryptedFile.query.all()}
 
@@ -41,7 +41,7 @@ class filesAdd(Resource):
     @api.marshal_with(excryptedFileUploaded_model)
     def post(self):
         """
-        Nahrava zaheslovaný subor na server
+        Uploads hashed files on server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -83,7 +83,7 @@ class protectedFile(Resource):
 
     def get(self, id):
         """
-        Ponukne na stiahnutie zaheslovaný subor subor
+        Downloads hashed file.
         """
 
         file = FcEncryptedFile.query.filter(FcEncryptedFile.id == id).first()

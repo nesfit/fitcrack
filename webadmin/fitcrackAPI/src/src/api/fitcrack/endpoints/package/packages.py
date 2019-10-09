@@ -33,7 +33,7 @@ from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMas
 
 log = logging.getLogger(__name__)
 
-ns = api.namespace('jobs', description='Operácie s package')
+ns = api.namespace('jobs', description='Operations with jobs.')
 
 
 @ns.route('')
@@ -43,7 +43,7 @@ class packagesCollection(Resource):
     @api.marshal_with(page_of_packages_model)
     def get(self):
         """
-        Vracia list balíčkov
+        Returns list of jobs.
         """
         args = packageList_parser.parse_args(request)
         page = args.get('page', 1)
@@ -79,7 +79,7 @@ class packagesCollection(Resource):
     @api.marshal_with(newPackage_model)
     def post(self):
         """
-        Vytvorí nový package
+        Creates new job.
         """
 
         data = request.json
@@ -98,7 +98,7 @@ class PackageByID(Resource):
     @api.marshal_with(package_model)
     def get(self, id):
         """
-        Vráti konkrétny package.
+        Returns job.
         """
         package = FcJob.query.filter(FcJob.id == id).one()
         return package
@@ -106,6 +106,10 @@ class PackageByID(Resource):
     @api.expect(editPackage_argument)
     @api.marshal_with(simpleResponse)
     def put(self, id):
+        """
+        Changes created job.
+        """
+
         args = editPackage_argument.parse_args(request)
         package = FcJob.query.filter(FcJob.id == id).one()
 
@@ -130,7 +134,7 @@ class PackageByID(Resource):
     @api.response(204, 'Package successfully deleted.')
     def delete(self, id):
         """
-        Vzmaže package
+        Deletes job.
         """
         delete_package(id)
         return None, 204
@@ -143,7 +147,7 @@ class OperationWithPackage(Resource):
     @api.marshal_with(simpleResponse)
     def get(self, id):
         """
-        Operácie so package (reštart, štart,stop)
+        Operations with job(restart, start, stop).
         """
         args = packageOperation.parse_args(request)
         action = args.get('operation')
@@ -225,7 +229,7 @@ class packagesHost(Resource):
     @api.marshal_with(page_of_hosts_model)
     def get(self, id):
         """
-        vráti hostov ktorí sa podielaju na crackovaní balíčka
+        Returns list of hosts that are working on job.
         """
 
         args = packageHost_parser.parse_args(request)
@@ -243,7 +247,7 @@ class packagesHost(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        mapping hostov k jobu
+        Mapping of hosts to job.
         """
 
         args = editHostMapping_argument.parse_args(request)
@@ -278,7 +282,7 @@ class packagesJob(Resource):
     @api.marshal_with(page_of_jobs_model)
     def get(self, id):
         """
-        vráti ulohy na ktore je package rozdelený
+        Returns workunits to which job was devides.
         """
 
         args = packageJob_parser.parse_args(request)
@@ -302,7 +306,7 @@ class verifyHash(Resource):
     @api.marshal_with(verifyHashes_model)
     def post(self):
         """
-        overí formát zadaného hashu
+        Verifies format of uploaded hash.
         """
 
         args = verifyHash_argument.parse_args(request)
@@ -329,7 +333,7 @@ class getCrackingTime(Resource):
     @api.marshal_with(crackingTime_model)
     def get(self):
         """
-        Vypočíta dobu crackovania
+        Calculates cracking time.
         """
         args = crackingTime_argument.parse_args(request)
         return computeCrackingTime(args)
@@ -343,7 +347,7 @@ class jobsInfo(Resource):
     #@api.marshal_with(crackingTime_model)
     def get(self):
         """
-        Vráti info o joboch
+        Returns information about jobs.
         """
 
         statusesCount = db.session.query(FcJob.status, func.count(FcJob.id)).group_by(FcJob.status).all()

@@ -17,7 +17,7 @@ from src.api.fitcrack.endpoints.notifications.responseModels import page_of_noti
 from src.database.models import FcNotification
 
 log = logging.getLogger(__name__)
-ns = api.namespace('notifications', description='Endpointy ktoré slúžia na vypisovanie grafov')
+ns = api.namespace('notifications', description='Endpoints for graph representation.')
 
 
 @ns.route('')
@@ -27,7 +27,7 @@ class notifications(Resource):
     @api.marshal_with(page_of_notifications_model)
     def get(self):
         """
-        Vráti uživateľove notifikácie
+        Returns user's notifications.
         """
         args = notifications_parser.parse_args(request)
         page = args.get('page', 1)
@@ -44,7 +44,7 @@ class notifications(Resource):
     @api.marshal_with(notification_count_model)
     def get(self):
         """
-        Vráti počet neprečítaných notifikácií
+        Returns number of unreaded notifications.
         """
 
         count = FcNotification.query.filter(FcNotification.user_id == current_user.id).filter(

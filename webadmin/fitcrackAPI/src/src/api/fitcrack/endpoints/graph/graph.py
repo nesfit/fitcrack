@@ -15,7 +15,7 @@ from src.api.fitcrack.endpoints.graph.functions import computePackagesGraph, com
 from src.api.fitcrack.endpoints.graph.responseModels import package_graph_model, pie_graph_model
 
 log = logging.getLogger(__name__)
-ns = api.namespace('graph', description='Endpointy ktoré slúžia na vypisovanie grafov')
+ns = api.namespace('graph', description='Endpoints for graph presentation')
 
 
 @ns.route('/packagesProgress')
@@ -25,7 +25,7 @@ class runningPackages(Resource):
     @api.marshal_with(package_graph_model)
     def get(self):
         """
-        Vracia 2D graf progresu spustených packagov.
+        Returns 2D graph representing progress of started jobs.
         """
 
         args = package_graph_arguments.parse_args(request)
@@ -43,7 +43,7 @@ class runningPackage(Resource):
     @api.marshal_with(package_graph_model)
     def get(self, id):
         """
-        Vracia 2D graf progresu spusteneho package.
+        Returns 2D graph representing progress of started job.
         """
 
         args = package_graph_arguments.parse_args(request)
@@ -61,7 +61,7 @@ class hostsComputing(Resource):
     @api.marshal_with(package_graph_model)
     def get(self):
         """
-        Vracia 2D graf výpočetnej sily aktívnych hostov
+        Returns 2D graph representing computing power of active hosts.
         """
 
         args = package_graph_arguments.parse_args(request)
@@ -80,7 +80,7 @@ class hostsComputingSingle(Resource):
     @api.marshal_with(package_graph_model)
     def get(self, id):
         """
-        Vracia 2D graf výpočetnej sily aktívnych hostov
+        Returns 2D graph representing computing power of active host.
         """
 
         args = package_graph_arguments.parse_args(request)
@@ -98,7 +98,7 @@ class hostPercentage(Resource):
     @api.marshal_with(pie_graph_model)
     def get(self, id):
         """
-        Vracia 2D kolačový graf percentualneho výkonu hostov
+        Returns 2D graph representing ratio of host's computing power.
         """
 
         args = package_graph_arguments.parse_args(request)

@@ -20,7 +20,7 @@ from src.database import db
 from src.database.models import FcUser, FcRole, AnonUser
 
 log = logging.getLogger(__name__)
-ns = api.namespace('user', description='Endpointy ktoré slúžia na autorizáciu')
+ns = api.namespace('user', description='Endpoints for authorization.')
 
 login_manager = LoginManager()
 login_manager.anonymous_user = AnonUser
@@ -36,7 +36,7 @@ class userCollection(Resource):
     @api.marshal_with(user_list_model)
     def get(self):
         """
-        Vrati list uzivatelov. Je potrebne opravnenie MANAGE_USERS
+        Returns list of users.
         """
         users = FcUser.query.filter_by(deleted=False).all()
         return {'items': users}
@@ -45,7 +45,7 @@ class userCollection(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Pridá nového uživateľa
+        Adds new user.
         """
         args = new_user_arguments.parse_args(request)
         user = FcUser(mail=args['mail'], username=args['username'], role_id=args['role_id'])
@@ -63,6 +63,9 @@ class user(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes user.
+        """
         user = FcUser.query.filter_by(id=id).one()
         user.deleted = True
         db.session.commit()
@@ -78,7 +81,7 @@ class roleCollection(Resource):
     @api.marshal_with(role_list_model)
     def get(self):
         """
-        Vrati list rolí užívatelov.
+        Returns list of roles.
         """
         roles = FcRole.query.all()
         return {'items': roles}
@@ -87,7 +90,7 @@ class roleCollection(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Zmení rolu uživatelovi
+        Changes user's role.
         """
         args = change_user_role_arguments.parse_args(request)
         user = FcUser.query.filter_by(id=args['user_id']).one()
@@ -106,7 +109,7 @@ class role(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        Upraví jednu vlastnosť v roli užívatela
+        Changes one property in user's role.
         """
         args = change_role_arguments.parse_args(request)
         role = FcRole.query.filter_by(id=id).one()
@@ -121,6 +124,9 @@ class role(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes role.
+        """
         role = FcRole.query.filter_by(id=id).one()
         try:
             db.session.delete(role)
@@ -142,7 +148,7 @@ class roleNew(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Pridá novú rolu do DB
+        Adds new role into DB.
         """
         args = new_role_arguments.parse_args(request)
         role = FcRole(name=args['name'])
@@ -187,7 +193,7 @@ class login(Resource):
     @api.marshal_with(fc_user_model)
     def post(self):
         """
-        Prihlasenie uzivatela
+        User login.
         """
         args = user_login_arguments.parse_args(request)
         user = FcUser.query.filter_by(username=args['username'], deleted=False).first()
@@ -202,7 +208,7 @@ class logout(Resource):
 
     def get(self):
         """
-        Odhlasenie uživatela
+        User logout.
         """
         logout_user()
         return 'You are now logged out!'
@@ -215,7 +221,7 @@ class isLoggedIn(Resource):
     @api.marshal_with(isLoggedIn_model)
     def get(self):
         """
-        Zisti ci je pouzivatel prihlaseny. Ak ano, vrati uzivatela.
+        Finds out if user is logged in and returns him.
         """
         if current_user.is_authenticated:
             return {

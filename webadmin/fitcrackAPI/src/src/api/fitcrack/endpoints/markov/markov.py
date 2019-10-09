@@ -22,7 +22,7 @@ from src.database import db
 from src.database.models import FcHcstat, FcDictionary
 
 log = logging.getLogger(__name__)
-ns = api.namespace('markovChains', description='Endpointy ktoré slúžia na pracu s HcStats subormi.')
+ns = api.namespace('markovChains', description='Endpoints for work with HcStats files.')
 
 ALLOWED_EXTENSIONS = set(['hcstat2'])
 
@@ -32,7 +32,7 @@ class markovCollection(Resource):
     @api.marshal_with(hcStatsCollection_model)
     def get(self):
         """
-        Vracia kolekciu HcStats suborov
+        Returns collection of HcStats files.
         """
         return {'items': FcHcstat.query.filter(FcHcstat.deleted == False).all()}
 
@@ -45,7 +45,7 @@ class markovAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava hcstats na server
+        Uploads HcStats files on server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -80,7 +80,7 @@ class markov(Resource):
 
     def get(self, id):
         """
-        Ponukne na stiahnutie binarny hcstats subor
+        Downloads HcStat file.
         """
 
         HcStat = FcHcstat.query.filter(FcHcstat.id == id).first()
@@ -88,6 +88,9 @@ class markov(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes HcStat file.
+        """
         markov = FcHcstat.query.filter(FcHcstat.id == id).one()
         if (markov.deleted):
             markov.deleted = False

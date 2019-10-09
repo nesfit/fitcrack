@@ -15,7 +15,7 @@ from src.database import db
 from src.database.models import Host, FcHostActivity, FcHostStatus
 
 log = logging.getLogger(__name__)
-ns = api.namespace('hosts', description='Operácie s hostami')
+ns = api.namespace('hosts', description='Operations with hosts.')
 
 
 
@@ -27,7 +27,7 @@ class hostsCollection(Resource):
     @api.marshal_with(page_of_hosts_model)
     def get(self):
         """
-        Vracia list hostov
+        Returns list of hosts.
         """
 
         args = packageHost_parser.parse_args(request)
@@ -69,7 +69,7 @@ class HostByID(Resource):
     @api.marshal_with(boincHostDetail_model)
     def get(self, id):
         """
-        Vráti konkrétneho hosta
+        Returns exact host.
         """
 
         host = Host.query.filter(Host.id == id).one()
@@ -78,7 +78,7 @@ class HostByID(Resource):
 
     def delete(self, id):
         """
-        Vzmaže uzol z tabulky
+        Removes host from table
         """
         hostStatus = FcHostStatus.query.filter(FcHostStatus.boinc_host_id == id).one()
         if (hostStatus.deleted):
@@ -96,7 +96,7 @@ class hostsInfo(Resource):
     #@api.marshal_with(host_info_model)
     def get(self):
         """
-        Vráti info o hostoch
+        Returns information about hosts.
         """
 
         totalHosts = Host.query.count()

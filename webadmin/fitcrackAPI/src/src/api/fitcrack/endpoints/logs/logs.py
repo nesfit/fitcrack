@@ -13,7 +13,7 @@ from src.api.fitcrack.endpoints.logs.responseModels import logsCollection_model
 from src.api.fitcrack.functions import shellExec
 
 log = logging.getLogger(__name__)
-ns = api.namespace('log', description='Endpointy ktoré slúžia na pracu s logmi.')
+ns = api.namespace('log', description='Endpoints for log operations.')
 
 
 
@@ -23,7 +23,7 @@ class logs(Resource):
     @api.marshal_with(logsCollection_model)
     def get(self):
         """
-        vráti logy
+        Returns logs.
         """
         args = logs_argument.parse_args(request)
         skip = args.get('skip_count', 0)
@@ -55,7 +55,7 @@ class logs(Resource):
     @api.marshal_with(logsCollection_model)
     def get(self):
         """
-        vráti nove logy
+        Returns new logs.
         """
         args = newLogs_argument.parse_args(request)
         lastLog = args.get('log', 1)

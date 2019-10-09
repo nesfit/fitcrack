@@ -27,7 +27,7 @@ from src.database import db
 from src.database.models import FcDictionary
 
 log = logging.getLogger(__name__)
-ns = api.namespace('dictionary', description='Endpointy ktoré slúžia na pracu so slovnikmi')
+ns = api.namespace('dictionary', description='Endpoints for work with charset dictionary.')
 
 
 ALLOWED_EXTENSIONS = set(['txt'])
@@ -39,7 +39,7 @@ class dictionaryCollection(Resource):
     @api.marshal_with(dictionaries_model)
     def get(self):
         """
-        Vracia kolekciu slovníkov
+        Returns collection of dictionaries.
         """
         dictionaries = getFilesFromFolder(DICTIONARY_DIR,FcDictionary, readingFromFolderPostProcces)
         return {'items': dictionaries}
@@ -50,7 +50,7 @@ class dictionary(Resource):
     @api.marshal_with(dictionary_model)
     def get(self, id):
         """
-        Vráti info o slovniku
+        Returns information about dictionary.
         """
 
         dict = FcDictionary.query.filter(FcDictionary.id==id).first()
@@ -62,6 +62,9 @@ class dictionary(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes dictionary.
+        """
         dictionary = FcDictionary.query.filter(FcDictionary.id == id).one()
         # if (dictionary.deleted):
         #     dictionary.deleted = False
@@ -84,7 +87,7 @@ class dictionaryData(Resource):
     @api.marshal_with(dictData_model)
     def get(self, id):
         """
-        Vráti prvých 25 riadkov zo slovníka
+        Returns first 25 rows from dictionary.
         """
         args = dictionary_parser.parse_args(request)
         page = args.get('page', 1) - 1
@@ -126,7 +129,7 @@ class dictionaryAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava slovník na server
+        Uploads dictionary on the server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -166,7 +169,7 @@ class dictionary(Resource):
     @api.expect(dictionaryFromFile_parser)
     def post(self):
         """
-        Spravi slovník so suboru
+        Makes dictionary from file.
         """
 
         args = dictionaryFromFile_parser.parse_args(request)

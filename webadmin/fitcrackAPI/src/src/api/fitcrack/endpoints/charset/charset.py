@@ -21,7 +21,7 @@ from src.database import db
 from src.database.models import FcCharset
 
 log = logging.getLogger(__name__)
-ns = api.namespace('charset', description='Endpointy ktoré slúžia na pracu s charset subormi.')
+ns = api.namespace('charset', description='Endpoints for work with charset files.')
 
 ALLOWED_EXTENSIONS = set(['txt', 'hcchr', 'charset'])
 
@@ -32,7 +32,7 @@ class charsetCollection(Resource):
     @api.marshal_with(hcStatsCollection_model)
     def get(self):
         """
-        Vracia kolekciu HcStats suborov
+        Ruturns collection of HcStats files.
         """
         return {'items': FcCharset.query.filter(FcCharset.deleted == False).all()}
 
@@ -44,7 +44,7 @@ class charsetAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava charset subor na server
+        Uploads charset file on server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -79,7 +79,7 @@ class charset(Resource):
     @api.marshal_with(charset_model)
     def get(self, id):
         """
-        Vrati info o charsete spolu s datami
+        Returns information about charset with data.
         """
 
         charset = FcCharset.query.filter(FcCharset.id == id).first()
@@ -109,6 +109,9 @@ class charset(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes charset.
+        """
         charset = FcCharset.query.filter(FcCharset.id == id).one()
         if (charset.deleted):
             charset.deleted = False
@@ -126,7 +129,7 @@ class downloadCharset(Resource):
 
     def get(self, id):
         """
-        Stiahne charset
+        Downloads charset.
         """
 
         charset = FcCharset.query.filter(FcCharset.id == id).first()
@@ -140,7 +143,7 @@ class updateCharset(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        Nahradí charset novým stringom
+        Exchanges charset with new string.
         """
 
         args = updateCharset_parser.parse_args(request)

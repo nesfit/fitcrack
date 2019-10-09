@@ -24,7 +24,7 @@ from src.database import db
 from src.database.models import FcRule
 
 log = logging.getLogger(__name__)
-ns = api.namespace('rule', description='Endpointy ktoré slúžia na pracu s rule subormi.')
+ns = api.namespace('rule', description='Endpoints for work with rule files.')
 
 ALLOWED_EXTENSIONS = set(['txt', 'rule'])
 
@@ -35,7 +35,7 @@ class ruleCollection(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava rule subor na server
+        Uploads rule file on server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -66,7 +66,7 @@ class ruleCollection(Resource):
     @api.marshal_with(hcStatsCollection_model)
     def get(self):
         """
-        Vracia kolekciu HcStats suborov
+        Returns collection of HcStats files.
         """
         return {'items': FcRule.query.filter(FcRule.deleted == False).all()}
 
@@ -78,7 +78,7 @@ class ruleAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava rule subor na server
+        Uploads reule file on server.Nahrava rule subor na server
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -113,7 +113,7 @@ class rule(Resource):
     @api.marshal_with(rule_model)
     def get(self, id):
         """
-        Vrati info o subore s pravidlami
+        Returns information about rule file.
         """
 
         rule = FcRule.query.filter(FcRule.id == id).first()
@@ -122,6 +122,9 @@ class rule(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes rule file.
+        """
         rule = FcRule.query.filter(FcRule.id == id).one()
         if (rule.deleted):
             rule.deleted = False
@@ -143,7 +146,7 @@ class ruleData(Resource):
     @api.marshal_with(ruleData_model)
     def get(self, id):
         """
-        Vráti prvých 25 riadkov zo slovníka
+        Returns first 25 rows from dictionary.
         """
         args = rule_parser.parse_args(request)
         page = args.get('page', 1) - 1
@@ -180,7 +183,7 @@ class downloadRule(Resource):
 
     def get(self, id):
         """
-        Stiahne rule
+        Downloads rule.
         """
 
         rule = FcRule.query.filter(FcRule.id == id).first()
@@ -194,7 +197,7 @@ class updateRule(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        Nahradí rule novým stringom
+        Replaces rule with new string.
         """
 
         args = updateRule_parser.parse_args(request)

@@ -25,7 +25,7 @@ import urllib.request
 
 
 log = logging.getLogger(__name__)
-ns = api.namespace('serverInfo', description='Operácie so serverom')
+ns = api.namespace('serverInfo', description='Operation with server.')
 
 
 @ns.route('/info')
@@ -34,7 +34,7 @@ class serverInfo(Resource):
     @api.marshal_with(serverinfo)
     def get(self):
         """
-        Informacie o serveri
+        Information about server.
         """
 
         url = BOINC_SERVER_URI + '/' + PROJECT_NAME + '/server_status.php?xml=1'
@@ -65,7 +65,7 @@ class serverOperation(Resource):
     @api.marshal_with(simpleResponse)
     def get(self):
         """
-        Operácie so serverom (reštart, štart,stop)
+        Operations with server(restart, start, stop).
         """
         args = operation.parse_args(request)
         action = args.get('operation')
@@ -87,6 +87,7 @@ class serverOperation(Resource):
             "status": True,
             "message": "Operation " + action + " finished sucesfull."
         }
+<<<<<<< Updated upstream
 
 
 @ns.route('/getUsageData')
@@ -145,3 +146,5 @@ class saveData(Resource):
         }
 
 
+=======
+>>>>>>> Stashed changes
