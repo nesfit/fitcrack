@@ -6,7 +6,7 @@
 <template>
     <v-container fluid>
       <h2> My account </h2>
-  <!--      <div class="table">
+      <div class="table">
       <v-card class="width150">
           <v-card-title>
             <h3> My info </h3>
@@ -22,15 +22,13 @@
                 label="email"
                 :value = "this.email"
               ></v-text-field>
-              <v-btn color="primary" flat @click="loadUsername()">Try!</v-btn>
-
             </v-form>
           </v-card-text>
 
 
       </v-card>
 
-      </div> -->
+      </div>
 
       <div class="table">
       <v-card class="width150">
@@ -99,8 +97,10 @@
           })
         },
         loadUsername() {
-          this.axios.get(this.$serverAddr + '/user/').then((response) => {
-            this.user = response.data.items
+          this.axios.get(this.$serverAddr + '/user/isLoggedIn').then((response) => {
+            this.user = response.data.items;
+            this.username=response.data.user.username;
+            this.email=response.data.user.mail
           })
 
 
@@ -108,8 +108,8 @@
       },
       data: function() {
        return {
-          username: this.$username,
-          email: "mail",
+          username: "",
+          email: "",
           newPassword0: null,
           newPassword1: null,
           user: []

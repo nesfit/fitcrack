@@ -17,7 +17,7 @@
       </v-flex>
       <v-flex xs6>
         <v-expansion-panel class="elevation-0 pt-2">
-          <mask-single :openForever="true" v-model="mask" @input="checkValid"></mask-single>
+          <mask-single :openForever="false" v-model="mask" @input="checkValid"></mask-single>
         </v-expansion-panel>
       </v-flex>
 

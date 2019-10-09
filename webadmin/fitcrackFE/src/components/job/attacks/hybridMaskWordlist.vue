@@ -14,8 +14,8 @@
       </v-flex>
 
       <v-flex xs6 class="border">
-        <v-expansion-panel class="elevation-0 pt-2">
-          <mask-single :openForever="true" v-model="mask" @input="checkValid"></mask-single>
+        <v-expansion-panel class="elevation-0 pt-2" :expand="true">
+          <mask-single :openForever="false" v-model="mask" @input="checkValid" :customCharsets="charsets"></mask-single>
         </v-expansion-panel>
       </v-flex>
 
@@ -108,6 +108,7 @@
         mask: '',
         ruleLeft: '',
         ruleRight: '',
+        charsets: null,
         maskRules: [
           v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
         ]

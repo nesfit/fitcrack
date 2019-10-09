@@ -19,6 +19,7 @@
       >
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
+          <td>{{ props.item.keyspace }}</td>
           <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
           <td class="text-xs-right">
             <a :href="$serverAddr + '/pcfg/' + props.item.id" target="_blank">
@@ -205,6 +206,7 @@
             align: 'left',
             value: 'name'
           },
+          {text: 'Keyspace', value: 'keyspace', align: 'left'},
           {text: 'Added', value: 'time_added', align: 'right'},
           {text: 'Download', value: 'name', align: 'right'},
           {text: 'Delete', align: 'right'}

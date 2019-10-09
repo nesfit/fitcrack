@@ -11,7 +11,7 @@
       class="expaPanel"
       :hide-actions="true"
       :readonly="openForever"
-      :value="openForever"
+      :value="openForever"btn
     >
       <div slot="header">
         <v-layout row wrap>
@@ -25,7 +25,7 @@
       <div>
         <v-layout row >
           <v-layout row justify-center wrap>
-            <v-tooltip top v-for="(item, key) in represenArray" :key="key">
+            <v-tooltip top v-for="(item, key) in represenArray" :key="key">ite
               <v-btn slot="activator"
                      color="primary"
                      class="maskBtn py-0 mx-1"
@@ -34,7 +34,7 @@
               >{{item.represent}}</v-btn>
               <span>{{item.chars}}</span>
             </v-tooltip>
-            <v-tooltip top v-for="(item, index) in customCharsets">
+            <v-tooltip top v-for="(item, index) in customCharsets" :key="index">
               <v-btn slot="activator"
                      color="primary"
                      class="maskBtn py-0 mx-1"
