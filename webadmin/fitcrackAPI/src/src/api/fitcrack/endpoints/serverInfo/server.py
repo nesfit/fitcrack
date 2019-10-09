@@ -87,7 +87,7 @@ class serverOperation(Resource):
             "status": True,
             "message": "Operation " + action + " finished sucesfull."
         }
-<<<<<<< Updated upstream
+
 
 
 @ns.route('/getUsageData')
@@ -144,7 +144,3 @@ class saveData(Resource):
             'message': 'Usage data saved',
             'status': True
         }
-
-
-=======
->>>>>>> Stashed changes
