@@ -58,8 +58,8 @@ RESTPLUS_MASK_SWAGGER = True
 RESTPLUS_ERROR_404_HELP = False
 
 # SQLAlchemy settings
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://fitcrack:mypassword@localhost/fitcrack'
-# SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/fitcrack'
+
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/fitcrack'
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
