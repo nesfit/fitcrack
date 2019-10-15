@@ -79,24 +79,14 @@
 
         </v-list-group>
 
-        <v-list-group :value="true">
-          <v-list-tile :to="{ name: 'hosts'}" slot="activator" @click.stop="">
-            <v-list-tile-action>
-              <v-icon>desktop_windows</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Hosts</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile :to="{ name: 'hiddenHosts'}">
-            <v-list-tile-action>
-              <v-icon>visibility_off</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Hidden hosts</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list-group>
+        <v-list-tile :to="{ name: 'hosts'}">
+          <v-list-tile-action>
+            <v-icon>desktop_windows</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Hosts</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile :to="{ name: 'hashes'}">
           <v-list-tile-action>
             <database-icon class="material-icons"/>
@@ -171,6 +161,9 @@
             <!--<v-list-tile-title>Control</v-list-tile-title>-->
           <!--</v-list-tile-content>-->
         <!--</v-list-tile>-->
+
+        <v-divider></v-divider>
+
         <v-list-tile :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">
           <v-list-tile-action>
             <v-icon>settings</v-icon>

@@ -5,18 +5,35 @@
 
 <template>
   <div class="cont">
-    <v-card-title class="pt-2 pb-1">
-      <v-text-field
-        clearable
-        solo
-        flat
-        append-icon="search"
-        label="Search by name"
+    <v-text-field
+      class="px-2 pt-3"
+      clearable
+      outline
+      prepend-inner-icon="search"
+      label="Search"
+      single-line
+      hide-details
+      v-model="search"
+    ></v-text-field>
+    <div class="d-flex justify-space-between align-center px-4 pt-2">
+      <v-switch
+        label="View hidden hosts"
+        :prepend-icon="viewHidden ? 'visibility_off' : 'visibility'"
+        v-model="viewHidden"
+      ></v-switch>
+      <v-select
+        class="mr-4"
+        :items="hosts_statuses"
+        label="Online status"
         single-line
-        hide-details
-        v-model="search"
-      ></v-text-field>
-    </v-card-title>
+        item-text="text"
+        item-value="text"
+        prepend-icon="power_settings_new"
+        clearable
+        v-model="status"
+        @change="updateList"
+      ></v-select>
+    </div>
     <v-divider></v-divider>
     <v-data-table
       ref="table"
@@ -72,18 +89,11 @@
     name: "hostsView",
     watch: {
       pagination: {
-        handler() {
-          this.loading = true;
-          this.loadHosts()
-        },
+        handler: 'updateList',
         deep: true
       },
-      '$route.name': {
-        handler () {
-          this.loading = true;
-          this.loadHosts()
-        }
-      },
+      '$route.name': 'updateList',
+      viewHidden: 'updateList'
     },
     mounted() {
       this.interval = setInterval(function () {
@@ -109,13 +119,17 @@
             'order_by': this.pagination.sortBy,
             'descending': this.pagination.descending,
             'name': this.search,
-            'showDeleted': this.$route.name === 'hiddenHosts'
+            'showDeleted': this.viewHidden
           }
         }).then((response) => {
           this.hosts = response.data.items;
           this.totalItems = response.data.total;
           this.loading = false
         })
+      },
+      updateList () {
+        this.loading = true
+        this.loadHosts()
       },
       hideJob: function (id) {
         this.loading = true
@@ -130,6 +144,7 @@
         interval: null,
         status: 'active',
         search: '',
+        viewHidden: false,
         totalItems: 0,
         pagination: {},
         loading: true,
@@ -144,8 +159,9 @@
           {text: 'Processor', value: 'p_model', align: 'right', width: '200', sortable: false},
           {text: 'Active jobs', value: 'jobs', align: 'right', sortable: false},
           {text: 'Online', value: 'last_seen', align: 'right', sortable: false},
-          {text: 'Hide', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Show or hide', value: 'name', sortable: false, align: 'right', width: "1"}
         ],
+        hosts_statuses: [],
         hosts:
           []
       }
