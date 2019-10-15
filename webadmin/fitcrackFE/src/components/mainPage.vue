@@ -39,6 +39,7 @@
               <v-list-tile-title>Jobs</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          <!--
           <v-list-tile :to="{ name: 'hiddenJobs'}">
             <v-list-tile-action>
               <v-icon>visibility_off</v-icon>
@@ -47,6 +48,8 @@
               <v-list-tile-title>Hidden jobs</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          -->
+          
           <v-list-tile :to="{ name: 'addJob'}" v-if="$userCanAddJob()">
             <v-list-tile-action>
               <v-icon>add</v-icon>
@@ -55,6 +58,25 @@
               <v-list-tile-title>Add job</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+
+          <v-list-tile :to="{ name: 'hosts'}" >
+            <v-list-tile-action>
+              <v-icon>inbox</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Bins</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+
+          <v-list-tile :to="{ name: 'hosts'}" >
+            <v-list-tile-action>
+              <v-icon>move_to_inbox</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Smart bins</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+
         </v-list-group>
 
         <v-list-group :value="true">
