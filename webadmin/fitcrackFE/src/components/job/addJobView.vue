@@ -326,12 +326,12 @@
             </fc-tile>
           </div>
           <v-layout row justify-center class="mb-5">
+            <template-modal :data="jobSettings"></template-modal>
             <v-btn
               large
               color="primary"
               @click="submit"
-
-            >Submit
+            ><v-icon left>done</v-icon>Submit
             </v-btn>
             <!--<template-modal :data="sendingJson"></template-modal>-->
           </v-layout>
@@ -409,6 +409,22 @@
       // })
     },
     computed: {
+      jobSettings () {
+        return {
+          "name": this.name,
+          "comment": this.comment,
+          "priority": 0,
+          "hosts_ids": this.hosts.map(h => h.id),
+          "seconds_per_job": parseInt(this.timeForJob),
+          "time_start": (this.startNow ? '' : this.startDate),
+          "time_end": (this.endNever ? '' : this.endDate),
+          'attack_settings': this.attackSettings,
+          "hash_settings": {
+            "hash_type": this.hashtype ? this.hashtype.code : null,
+            "hash_list": this.validatedHashes
+          }
+        }
+      },
       sendingJson: function () {
         return {
           'hosts_ids': this.hosts,
@@ -587,24 +603,7 @@
         }
 
         this.loading = true
-        var hostIds = []
-        for (let i = 0; i < this.hosts.length; i++) {
-          hostIds.push(this.hosts[i].id)
-        }
-        this.axios.post(this.$serverAddr + '/jobs', {
-          "name": this.name,
-          "comment": this.comment,
-          "priority": 0,
-          "hosts_ids": hostIds,
-          "seconds_per_job": parseInt(this.timeForJob),
-          "time_start": (this.startNow ? '' : this.startDate),
-          "time_end": (this.endNever ? '' : this.endDate),
-          'attack_settings': this.attackSettings,
-          "hash_settings": {
-            "hash_type": this.hashtype.code,
-            "hash_list": this.validatedHashes
-          }
-        }).then((response) => {
+        this.axios.post(this.$serverAddr + '/jobs', this.jobSettings).then((response) => {
           this.$router.push({name: 'jobDetail', params: {id: response.data.job_id}})
           console.log(response.data)
         }).catch((error) => {

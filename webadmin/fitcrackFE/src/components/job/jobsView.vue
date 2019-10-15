@@ -95,15 +95,17 @@
                 </v-btn>
               </template>
               <v-list>
-                <v-list-tile @click="operateJob(props.item.id, 'restart')">
-                  <v-list-tile-title><v-icon>loop</v-icon> Restart</v-list-tile-title>
+                <v-list-tile 
+                  v-if="props.item.status >= 10"
+                  @click="operateJob(props.item.id, 'restart')">
+                  <v-list-tile-title><v-icon left>loop</v-icon>Restart</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile @click="operateJob(props.item.id, 'duplicate')">
-                  <v-list-tile-title><v-icon>content_copy</v-icon> Duplicate</v-list-tile-title>
+                  <v-list-tile-title><v-icon left>content_copy</v-icon>Duplicate</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile @click="hideJob(props.item.id)">
                   <v-list-tile-title>
-                    <v-icon>{{props.item.deleted ? 'visibility' : 'visibility_off'}}</v-icon> 
+                    <v-icon left>{{props.item.deleted ? 'visibility' : 'visibility_off'}}</v-icon> 
                     {{props.item.deleted ? 'Show' : 'Hide'}}
                   </v-list-tile-title>
                 </v-list-tile>

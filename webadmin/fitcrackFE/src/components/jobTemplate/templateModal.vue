@@ -13,7 +13,7 @@
       large
       color="primary"
     >
-      Make template
+      <v-icon left>note_add</v-icon>Make template
     </v-btn>
 
     <v-card>
@@ -25,7 +25,21 @@
       </v-card-title>
 
       <v-card-text>
-        <json-viewer :value="data" ></json-viewer>
+        <!-- <json-viewer :value="data" ></json-viewer> -->
+        <v-text-field
+          name="templateName"
+          label="Template name"
+          id="templateName"
+          v-model="data.name"
+        ></v-text-field>
+
+        <div class="flex">
+          <v-icon left>info</v-icon>
+          <div>
+            The choices you made in the job configuration will be saved as a template.<br>
+            You can pre-fill any new job configuration with templates you saved.
+          </div>
+        </div>
       </v-card-text>
 
       <v-divider></v-divider>
@@ -33,11 +47,15 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
+          flat
+          @click="dialog = !dialog"
+        >Back to editing</v-btn>
+        <v-btn
           color="primary"
           flat
           @click="submit"
         >
-          Submit template
+          Save template
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -78,5 +96,7 @@
 </script>
 
 <style scoped>
-
+.flex {
+  display: flex;
+}
 </style>
