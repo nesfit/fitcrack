@@ -5,30 +5,46 @@
 
 <template>
   <div class="cont">
-    <v-card-title class="pt-2 pb-1">
-      <v-text-field
-        clearable
-        solo
-        flat
-        append-icon="search"
-        label="Search by name"
-        single-line
-        hide-details
-        v-model="search"
-      > </v-text-field>
-      <v-spacer></v-spacer>
+    <v-text-field
+      class="px-2 pt-3"
+      clearable
+      outline
+      prepend-inner-icon="search"
+      label="Search"
+      single-line
+      hide-details
+      v-model="search"
+    ></v-text-field>
+    <div class="d-flex justify-space-between align-center px-4 pt-2">
+      <v-switch
+        label="View hidden jobs"
+        :prepend-icon="viewHidden ? 'visibility_off' : 'visibility'"
+        v-model="viewHidden"
+      ></v-switch>
       <v-select
+        class="mr-4"
         :items="jobs_statuses"
-        label="Filter by status"
+        label="Status"
         single-line
         item-text="text"
         item-value="text"
-        solo
-        flat
+        prepend-icon="av_timer"
         clearable
-        @change="updateStatus"
-      > </v-select>
-    </v-card-title>
+        v-model="status"
+        @change="updateList"
+      ></v-select>
+      <v-select
+        :items="jobs_types"
+        label="Attack type"
+        single-line
+        item-text="text"
+        item-value="text"
+        prepend-icon="gps_fixed"
+        clearable
+        v-model="attackType"
+        @change="updateList"
+      ></v-select>
+    </div>
     <v-divider></v-divider>
     <v-data-table
       ref="table"
@@ -71,7 +87,7 @@
         </td>
         <td class="text-xs-right">{{ $moment(props.item.time).format('D.M.YYYY H:mm:ss') }}</td>
         <td>
-          <div class="d-flex text-xs-right actionsBtns">
+          <div class="actionsBtns">
             <v-tooltip top>
               <v-btn icon class="mx-0"  :disabled="props.item.status !== '0'"  slot="activator" @click="operateJob(props.item.id, 'start')">
                 <v-icon color="success">play_circle_outline</v-icon>
@@ -106,7 +122,7 @@
                 <v-list-tile @click="hideJob(props.item.id)">
                   <v-list-tile-title>
                     <v-icon left>{{props.item.deleted ? 'visibility' : 'visibility_off'}}</v-icon> 
-                    {{props.item.deleted ? 'Show' : 'Hide'}}
+                    {{props.item.deleted ? 'Stop hiding' : 'Hide'}}
                   </v-list-tile-title>
                 </v-list-tile>
               </v-list>
@@ -123,18 +139,11 @@
     name: 'jobsView',
     watch: {
       pagination: {
-        handler () {
-          this.loading = true;
-          this.loadJobs()
-        },
+        handler: 'updateList',
         deep: true
       },
-      '$route.name': {
-        handler () {
-          this.loading = true;
-          this.loadJobs()
-        }
-      },
+      '$route.name': 'updateList',
+      viewHidden: 'updateList'
     },
     mounted () {
       // this.loadJobs()
@@ -155,13 +164,18 @@
             'descending': this.pagination.descending,
             'name': this.search,
             'status': this.status,
-            'showDeleted': this.$route.name === 'hiddenJobs'
+            'attack_mode': this.attackType,
+            'showDeleted': this.viewHidden
           }
         }).then((response) => {
           this.jobs = response.data.items;
           this.totalItems = response.data.total;
           this.loading = false
         })
+      },
+      updateList () {
+        this.loading = true
+        this.loadJobs()
       },
       updateStatus: function (e) {
         this.status = e;
@@ -195,7 +209,9 @@
       return {
         interval: null,
         status: null,
+        attackType: null,
         search: '',
+        viewHidden: false,
         totalItems: 0,
         pagination: {},
         loading: true,
@@ -241,6 +257,24 @@
             'code': 12
           }
         ],
+        jobs_types: [
+          {
+            'text': 'dictionary',
+            'code': 0
+          },
+          {
+            'text': 'mask',
+            'code': 1
+          },
+          {
+            'text': 'combinator',
+            'code': 2
+          },
+          {
+            'text': 'pcfg',
+            'code': 3
+          }
+        ],
         jobs:
           [
           ]
@@ -260,8 +294,7 @@
   }
 
   .actionsBtns{
-    width: 125px;
-    float: right;
+    text-align: right;
   }
 
   .middle {
