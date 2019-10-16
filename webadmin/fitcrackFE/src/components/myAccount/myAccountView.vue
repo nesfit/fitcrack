@@ -17,10 +17,12 @@
               <v-text-field
                 label="username"
                 :value = "this.username"
+                disabled
               ></v-text-field>
               <v-text-field
                 label="email"
                 :value = "this.email"
+                disabled
               ></v-text-field>
             </v-form>
           </v-card-text>
@@ -77,13 +79,19 @@
           return window.theme.gradient
         }
       },
+      mounted: function () {
+        this.loadData()
+      },
+
 
       methods: {
-    /*    loadUsername() {
-          this.axios.get(this.$serverAddr + '/user/').then((response) => {
-            this.username = response.data.items
-          })
-        },*/
+        loadData(){
+            this.axios.get(this.$serverAddr + '/user/isLoggedIn').then((response) => {
+              this.user = response.data.items;
+              this.username=response.data.user.username;
+              this.email=response.data.user.mail
+            })
+          },
         editPassword() {
           this.axios.post(this.$serverAddr + '/user/password/change_my_password', {
             old_password: this.oldPassword,
@@ -95,15 +103,6 @@
             this.newPassword0 = '';
             this.newPassword1 = ''
           })
-        },
-        loadUsername() {
-          this.axios.get(this.$serverAddr + '/user/isLoggedIn').then((response) => {
-            this.user = response.data.items;
-            this.username=response.data.user.username;
-            this.email=response.data.user.mail
-          })
-
-
         }
       },
       data: function() {
