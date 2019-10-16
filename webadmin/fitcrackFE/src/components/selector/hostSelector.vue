@@ -23,7 +23,11 @@
           ></v-checkbox>
         </td>
 
-        <td>{{ props.item.domain_name + ' (' + props.item.user.name + ')'}}</td>
+        <td>
+          <router-link :to="{name: 'hostDetail', params: { id: props.item.id}}">
+            {{ props.item.domain_name + ' (' + props.item.user.name + ')'}}
+          </router-link>
+        </td>
         <td class="text-xs-right">{{ props.item.ip_address }}</td>
         <td class="text-xs-right">{{ props.item.os_name }}</td>
         <td class="text-xs-right oneline" :title="props.item.p_model">{{ props.item.p_model }}</td>
@@ -33,6 +37,7 @@
                           'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
                         }">fiber_manual_record</v-icon>
         </td>
+        <!--
         <td class="text-xs-right">
           <v-tooltip top>
             <v-btn icon class="mx-0" :to="{name: 'hostDetail', params: { id: props.item.id}}" slot="activator">
@@ -41,6 +46,7 @@
             <span>Go to the host page</span>
           </v-tooltip>
         </td>
+        -->
       </tr>
     </template>
   </v-data-table>
@@ -79,7 +85,6 @@
           {text: 'Operating system', value: 'os_name', align: 'right', sortable: false},
           {text: 'Processor', value: 'p_model', align: 'right', width: '200', sortable: false},
           {text: 'Online', value: 'last_seen', align: 'right', sortable: false},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
         ]
       }
     },
