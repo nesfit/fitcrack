@@ -45,7 +45,19 @@
         @change="updateList"
       ></v-select>
     </div>
-    <v-divider></v-divider>
+
+    <v-toolbar dense flat color="white">
+      <v-spacer></v-spacer>
+      <v-btn round outline color="primary" :disabled="selectedJobs.length == 0">
+        <v-icon left>play_for_work</v-icon>
+        Move to bin
+      </v-btn>
+      <v-btn round outline color="primary" :disabled="selectedJobs.length == 0">
+        <v-icon left>{{ viewHidden ? 'visibility' : 'visibility_off' }}</v-icon>
+        {{ viewHidden ? 'Stop hiding' : 'Hide' }}
+      </v-btn>
+    </v-toolbar>
+
     <v-data-table
       ref="table"
       :headers="headers"
@@ -57,8 +69,17 @@
       :rows-per-page-items="[25,10,50,100]"
       rows-per-page-text="Jobs per page"
       disable-initial-sort
+      select-all
+      v-model="selectedJobs"
     >
       <tr slot="items" slot-scope="props">
+        <td>
+          <v-checkbox
+            v-model="props.selected"
+            primary
+            hide-details
+          ></v-checkbox>
+        </td>
         <td>
           <router-link :to="{ name: 'jobDetail', params: { id: props.item.id}}" class="middle">{{ props.item.name }}</router-link>
         </td>
@@ -214,6 +235,7 @@
         viewHidden: false,
         totalItems: 0,
         pagination: {},
+        selectedJobs: [],
         loading: true,
         headers: [
           {
