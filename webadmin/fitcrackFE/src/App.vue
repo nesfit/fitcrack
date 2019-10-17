@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <v-app light>
+  <v-app :dark="isDark">
     <v-snackbar
       :timeout="6000"
       bottom
@@ -25,7 +25,7 @@
         {{alertText}}
       </v-alert>
     </v-snackbar>
-    <router-view/>
+    <router-view :isDark="isDark" @toggledAppearance="isDark = !isDark"/>
     <vue-progress-bar></vue-progress-bar>
     <confirm ref="confirm"></confirm>
   </v-app>
@@ -82,7 +82,8 @@
       return {
         alert: false,
         alertText: '',
-        alertType: 'error'
+        alertType: 'error',
+        isDark: false
       }
     }
   }

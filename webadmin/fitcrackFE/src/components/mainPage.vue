@@ -17,7 +17,8 @@
       color="primary"
     >
       <router-link :to="{ name: 'home'}">
-        <img :src="require('@/assets/fitcrack.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
+        <img v-if="isDark" :src="require('@/assets/fitcrack-glow.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
+        <img v-else :src="require('@/assets/fitcrack.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
         <h2 v-show="!miniVariant" class="logoText" ></h2>
       </router-link>
       <v-divider></v-divider>
@@ -224,6 +225,7 @@
         <!--</v-list-group>-->
       </v-list>
     </v-navigation-drawer>
+
     <v-toolbar
       app
       :clipped-left="clipped"
@@ -246,6 +248,9 @@
 
         </router-link>
       </v-spacer>
+      <v-btn icon @click.stop="toggleAppearance">
+        <v-icon>lightbulb_outline</v-icon>
+      </v-btn>
       <v-badge color="red" overlap>
         <span slot="badge" v-if="notificationsCount > 0">{{notificationsCount}}</span>
         <v-btn icon @click.stop="toggleNotifications" class="ma-0">
@@ -281,6 +286,9 @@
 
 
   export default {
+    props: {
+      isDark: Boolean
+    },
     components: {
       'notifications-wrapper': notifications,
       'database-icon': DBicon,
@@ -306,6 +314,9 @@
         this.axios.get(this.$serverAddr + '/user/logout').then((response) => {
           this.$logoutUser()
         })
+      },
+      toggleAppearance () {
+        this.$emit('toggledAppearance')
       },
       toggleNotifications: function () {
         this.rightDrawer = !this.rightDrawer;
