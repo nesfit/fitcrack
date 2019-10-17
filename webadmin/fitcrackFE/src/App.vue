@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <v-app :dark="isDark">
+  <v-app :dark="$store.darkAppearance">
     <v-snackbar
       :timeout="6000"
       bottom
@@ -25,7 +25,7 @@
         {{alertText}}
       </v-alert>
     </v-snackbar>
-    <router-view :isDark="isDark" @toggledAppearance="isDark = !isDark"/>
+    <router-view :isDark="isDark" @toggledAppearance="$store.darkAppearance = !$store.darkAppearance"/>
     <vue-progress-bar></vue-progress-bar>
     <confirm ref="confirm"></confirm>
   </v-app>
@@ -74,6 +74,12 @@
           }
         }.bind(this)
       )
+
+      const mql = window.matchMedia('(prefers-color-scheme: dark)')
+      mql.addListener(e => {
+        this.$store.darkAppearance = e.matches
+      })
+      this.$store.darkAppearance = mql.matches
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open

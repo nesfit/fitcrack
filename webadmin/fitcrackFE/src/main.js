@@ -78,7 +78,8 @@ new Vue({
         },
         'loggedIn': false,
         'loggedInLink': null
-      }
+      },
+      darkAppearance: false
     }
   },
   router,

@@ -8,8 +8,6 @@
     <v-navigation-drawer
       persistent
       class="navigationDrawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
       v-model="drawer"
       enable-resize-watcher
       fixed
@@ -17,9 +15,9 @@
       color="primary"
     >
       <router-link :to="{ name: 'home'}">
-        <img v-if="isDark" :src="require('@/assets/fitcrack-glow.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
+        <img v-if="$store.darkAppearance" :src="require('@/assets/fitcrack-glow.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
         <img v-else :src="require('@/assets/fitcrack.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
-        <h2 v-show="!miniVariant" class="logoText" ></h2>
+        <h2 class="logoText" ></h2>
       </router-link>
       <v-divider></v-divider>
       <v-list expand>
@@ -228,26 +226,15 @@
 
     <v-toolbar
       app
-      :clipped-left="clipped"
       height="64px"
       class="mainToolbar"
-      color="primary"
-      dark
     >
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-spacer>
-        <router-link :to="{ name: 'home'}" class="textLogo">
-          <img :src="require('@/assets/fitcrack_white.png')" class="mx-2 logoSmall" alt="logo"/>
-          <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
-
-        </router-link>
-      </v-spacer>
+      <router-link :to="{ name: 'home'}" class="textLogo">
+        <!-- <span class="logoSmallText" v-text="$vuetify.theme.project"></span> -->
+        <v-toolbar-title>{{$vuetify.theme.project}}</v-toolbar-title>
+      </router-link>
+      <v-spacer></v-spacer>
       <v-btn icon @click.stop="toggleAppearance">
         <v-icon>lightbulb_outline</v-icon>
       </v-btn>
@@ -286,9 +273,6 @@
 
 
   export default {
-    props: {
-      isDark: Boolean
-    },
     components: {
       'notifications-wrapper': notifications,
       'database-icon': DBicon,
@@ -334,9 +318,7 @@
     },
     data() {
       return {
-        clipped: false,
         drawer: true,
-        miniVariant: false,
         rightDrawer: false,
         notificationsCount: 0
       }
@@ -364,15 +346,15 @@
   }
 
   .textLogo {
-    width: 100%;
-    display: block;
+    // width: 100%;
+    // display: block;
     color: inherit;
-    text-align: center;
+    // text-align: center;
   }
 
   .textLogoText {
     font-size: 18px;
-    font-width: 300;
+    font-weight: 300;
   }
 
   .height100 {
