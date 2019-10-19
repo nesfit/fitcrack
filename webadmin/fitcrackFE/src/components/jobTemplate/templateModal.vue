@@ -47,12 +47,12 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          flat
+          text
           @click="dialog = !dialog"
         >Back to editing</v-btn>
         <v-btn
           color="primary"
-          flat
+          text
           @click="submit"
         >
           Save template

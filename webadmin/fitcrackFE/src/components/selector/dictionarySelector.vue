@@ -28,9 +28,9 @@
         <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
         <td class="text-xs-right">
           <v-tooltip top>
-            <v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.id}}" slot="activator">
+            <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.id}}" v-on="on">
               <v-icon color="primary">link</v-icon>
-            </v-btn>
+            </v-btn></template>
             <span>Go to the dictionary page</span>
           </v-tooltip>
         </td>

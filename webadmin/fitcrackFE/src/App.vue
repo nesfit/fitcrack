@@ -12,7 +12,6 @@
       v-model="alert"
       color="transparent"
       class="errorSnackbar pa-0"
-      auto-height
     >
       <v-alert :type="alertType"
                class="height100 ma-0 width100"
@@ -25,7 +24,7 @@
         {{alertText}}
       </v-alert>
     </v-snackbar>
-    <router-view :isDark="isDark" @toggledAppearance="$store.darkAppearance = !$store.darkAppearance"/>
+    <router-view :isDark="isDark"/>
     <vue-progress-bar></vue-progress-bar>
     <confirm ref="confirm"></confirm>
   </v-app>
@@ -77,9 +76,9 @@
 
       const mql = window.matchMedia('(prefers-color-scheme: dark)')
       mql.addListener(e => {
-        this.$store.darkAppearance = e.matches
+        this.$vuetify.theme.dark = e.matches
       })
-      this.$store.darkAppearance = mql.matches
+      this.$vuetify.theme.dark = mql.matches
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open

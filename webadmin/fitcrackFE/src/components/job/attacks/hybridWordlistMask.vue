@@ -16,9 +16,9 @@
         <dict-selector v-model="dictionaries" @input="checkValid"></dict-selector>
       </v-flex>
       <v-flex xs6>
-        <v-expansion-panel class="elevation-0 pt-2">
+        <v-expansion-panels class="elevation-0 pt-2">
           <mask-single :openForever="true" v-model="mask" @input="checkValid"></mask-single>
-        </v-expansion-panel>
+        </v-expansion-panels>
       </v-flex>
 
       <v-flex xs6 class="border">
@@ -30,7 +30,7 @@
 
       <v-flex xs6 class="border px-2">
         <v-text-field
-          outline
+          outlined
           single-line
           placeholder="Rule left"
           v-model="ruleLeft"
@@ -39,7 +39,7 @@
       </v-flex>
       <v-flex xs6  class="px-2">
         <v-text-field
-          outline
+          outlined
           single-line
           placeholder="Rule right"
           v-model="ruleRight"

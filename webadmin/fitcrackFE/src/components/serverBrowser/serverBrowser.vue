@@ -6,43 +6,43 @@
 <template>
   <fc-tile title="Server browser" :loading="data==null || adding" class="mx-auto dictContentContainer">
     <v-list v-if="data!==null" class="filesCont">
-      <v-list-tile
+      <v-list-item
         @click="loadDirectory(data.parent)"
       >
-        <v-list-tile-action>
+        <v-list-item-action>
           <v-icon>keyboard_backspace</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>..</v-list-tile-title>
-          <v-list-tile-sub-title>{{ data.parent }}</v-list-tile-sub-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>..</v-list-item-title>
+          <v-list-item-subtitle>{{ data.parent }}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
         v-for="item in data.folders"
         :key="item.name"
         @click="loadDirectory(item.path)"
       >
-        <v-list-tile-action>
+        <v-list-item-action>
           <v-icon>folder</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>{{ item.name }}</v-list-tile-title>
-          <v-list-tile-sub-title>{{ item.path }}</v-list-tile-sub-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>{{ item.name }}</v-list-item-title>
+          <v-list-item-subtitle>{{ item.path }}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
          v-for="item in data.files"
          :key="item.name"
          @click="fileSelected(item.name, item.path)"
          v-bind:class="{selected: (selectedFiles[item.path] !== undefined && selectedFiles[item.path] !== null)}">
-        <v-list-tile-action>
+        <v-list-item-action>
           <v-icon class="whiteAfterSelected">insert_drive_file</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title class="whiteAfterSelected">{{ item.name }}</v-list-tile-title>
-          <v-list-tile-sub-title class="whiteAfterSelected">{{ item.path }}</v-list-tile-sub-title>
-        </v-list-tile-content>
-      </v-list-tile>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="whiteAfterSelected">{{ item.name }}</v-list-item-title>
+          <v-list-item-subtitle class="whiteAfterSelected">{{ item.path }}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
     <v-divider></v-divider>
     <div v-if="Object.keys(selectedFiles).length > 0">

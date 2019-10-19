@@ -4,8 +4,8 @@
 -->
 
 <template>
-  <v-layout row wrap class=" mx-auto elevation-2 white">
-    <v-toolbar color="primary" dark card class="max64">
+  <v-layout row wrap class=" mx-auto elevation-2">
+    <v-toolbar color="primary" dark flat class="max64">
       <v-toolbar-title>{{title}}</v-toolbar-title>
     </v-toolbar>
     <div class="contentFcTile">

@@ -5,52 +5,47 @@
 
 <template>
   <transition name="fade-transition">
-    <v-jumbotron
-      :gradient="gradient"
-      class="jumbo"
-      height="100%"
-    >
-      <v-container fluid fill-height>
-        <v-layout flex align-center justify-center>
-          <v-card raised class="jumboCard px-4">
-            <img :src="require(`@/assets/fitcrack.svg`)" class="mx-auto pt-3 pb-2 d-block logo" alt="logo"/>
-            <div class="content">
-              <v-progress-circular
-                size="50"
-                :width="3"
-                class="progress trans"
-                indeterminate
+    <v-container fluid fill-height>
+      <v-layout flex align-center justify-center>
+        <v-card raised class="jumboCard px-4">
+          <img v-if="$vuetify.theme.dark" :src="require(`@/assets/fitcrack-glow.svg`)" class="mx-auto pt-3 pb-2 d-block logo" alt="logo"/>
+          <img v-else :src="require(`@/assets/fitcrack.svg`)" class="mx-auto pt-3 pb-2 d-block logo" alt="logo"/>
+          <div class="content">
+            <v-progress-circular
+              size="50"
+              :width="3"
+              class="progress trans"
+              indeterminate
+              color="primary"
+              v-bind:class="{hide: !loading}"
+            ></v-progress-circular>
+            <v-form ref="form" lazy-validation v-bind:class="{hide: loading}" class="trans">
+              <v-text-field
+                label="Username"
+                v-model="username"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="Password"
+                v-model="password"
+                required
+                type="password"
+              ></v-text-field>
+              <v-btn
+                class="d-block mx-auto mb-4"
+                text
+                outlined
+                type="submit"
                 color="primary"
-                v-bind:class="{hide: !loading}"
-              ></v-progress-circular>
-              <v-form ref="form" lazy-validation v-bind:class="{hide: loading}" class="trans">
-                <v-text-field
-                  label="Username"
-                  v-model="username"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  label="Password"
-                  v-model="password"
-                  required
-                  type="password"
-                ></v-text-field>
-                <v-btn
-                  class="d-block mx-auto mb-4"
-                  flat
-                  outline
-                  type="submit"
-                  color="primary"
-                  v-on:click.prevent="submit"
-                >
-                  submit
-                </v-btn>
-              </v-form>
-            </div>
-          </v-card>
-        </v-layout>
-      </v-container>
-    </v-jumbotron>
+                v-on:click.prevent="submit"
+              >
+                submit
+              </v-btn>
+            </v-form>
+          </div>
+        </v-card>
+      </v-layout>
+    </v-container>
   </transition>
 </template>
 
@@ -66,11 +61,6 @@
     },
     created: function () {
       this.isUserLoggedIn()
-    },
-    computed: {
-      gradient: function () {
-        return window.theme.gradient
-      }
     },
     methods: {
       submit() {

@@ -9,7 +9,7 @@
       <v-text-field
         clearable
         solo
-        flat
+        text
         append-icon="search"
         label="Search by password or hash"
         single-line

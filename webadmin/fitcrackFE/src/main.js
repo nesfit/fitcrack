@@ -9,7 +9,7 @@
 require('./assets/styles/font.css')
 require('./assets/styles/icons.css')
 
-import "vue-material-design-icons/styles.css"
+import '@mdi/font/css/materialdesignicons.css'
 import Vue from 'vue'
 import App from './App'
 import router from './router'
@@ -26,11 +26,11 @@ import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
 
-document.title = window.theme.project
+document.title = window.projectName
 var link = document.createElement('link');
 link.type = 'image/png';
 link.rel = 'shortcut icon';
-link.href = require(`@/assets/icons/${window.theme.project}.png`)
+link.href = require(`@/assets/icons/fitcrack.png`)
 document.getElementsByTagName('head')[0].appendChild(link);
 document.querySelector('meta[name="theme-color"]').setAttribute('content', window.theme.primary );
 
@@ -44,23 +44,32 @@ Vue.use(VueMoment, {
 });
 Vue.use(VueAxios, axios);
 Vue.axios.defaults.withCredentials = true
-Vue.use(Vuetify, { theme: window.theme});
+Vue.use(Vuetify);
 
 Vue.use(UserPlugin);
 
 Vue.use(VueProgressBar, {
-  color: window.theme.primary,
-  failedColor: window.theme.error,
+  color: window.theme.light.primary,
+  failedColor: window.theme.light.error,
   height: '2px'
 });
 
 Vue.config.productionTip = false;
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  vuetify: new Vuetify({
+    icons: {
+      iconfont: 'mdi'
+    },
+    theme: {
+      dark: false,
+      themes: window.theme
+    }
+  }),
   data: {
     store: {
+      project: window.projectName,
       user: {
         'userData': {
           'id': null,
@@ -78,8 +87,7 @@ new Vue({
         },
         'loggedIn': false,
         'loggedInLink': null
-      },
-      darkAppearance: false
+      }
     }
   },
   router,

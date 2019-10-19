@@ -5,11 +5,11 @@
 
 <template>
   <div class="containerAddJob height100 mx-auto">
-    <v-toolbar app dark color="primary" height="48px" class="topToolbar"
+    <v-app-bar app dark color="primary" height="48px" class="topToolbar"
                v-bind:class="{scrollTop: (!knowEstimatedTime && !showEstimatedTime)}">
       <v-toolbar-title class="estimatedTime">Estimated cracking time is {{estimatedTime}}.
       </v-toolbar-title>
-    </v-toolbar>
+    </v-app-bar>
     <div class="loadingProgressCont" v-show="loading">
       <v-progress-circular
         indeterminate
@@ -72,15 +72,15 @@
                       @change="validateHashes(null)"
                       required
                       dense
-                      box
+                      filled
                     >
                       <template
                         slot="item"
                         slot-scope="data"
                       >
-                        <v-list-tile-content>
-                          <v-list-tile-title><b>{{data.item.code}}</b> - {{data.item.name}}</v-list-tile-title>
-                        </v-list-tile-content>
+                        <v-list-item-content>
+                          <v-list-item-title><b>{{data.item.code}}</b> - {{data.item.name}}</v-list-item-title>
+                        </v-list-item-content>
                       </template>
                     </v-autocomplete>
                   </v-flex>
@@ -97,16 +97,16 @@
                         item-text="description"
                         :items="value"
                         :label="key"
-                        outline
+                        outlined
                         single-line
                       >
                         <template
                           slot="item"
                           slot-scope="data"
                         >
-                          <v-list-tile-content>
-                            <v-list-tile-title><b>{{data.item.code}}</b> - {{data.item.description}}</v-list-tile-title>
-                          </v-list-tile-content>
+                          <v-list-item-content>
+                            <v-list-item-title><b>{{data.item.code}}</b> - {{data.item.description}}</v-list-item-title>
+                          </v-list-item-content>
                         </template>
                       </v-select>
                     </v-flex>
@@ -127,19 +127,19 @@
                     <v-alert :value="true" type="warning" class="mt-0 mb-0" >
                       Currently we supports these formats:
                       <v-tooltip top>
-                        <span slot="activator"><a href="#">MS_OFFICE</a>,</span>
+                        <template v-slot:activator="{ on }"><span v-on="on"><a href="#">MS_OFFICE</a>,</span></template>
                         <span>Hashtypes: 9400, 9500, 9600, 9700, 9800</span>
                       </v-tooltip>
                       <v-tooltip top>
-                        <span slot="activator"><a href="#">PDF</a>,</span>
+                        <template v-slot:activator="{ on }"><span v-on="on"><a href="#">PDF</a>,</span></template>
                         <span>Hashtypes: 10400, 10500, 10600, 10700</span>
                       </v-tooltip>
                       <v-tooltip top>
-                        <span slot="activator"><a href="#">RAR</a> and </span>
+                        <template v-slot:activator="{ on }"><span v-on="on"><a href="#">RAR</a> and </span></template>
                         <span>Hashtypes: 12500, 13000</span>
                       </v-tooltip>
                       <v-tooltip top>
-                        <span slot="activator"><a href="#">ZIP</a>.</span>
+                        <template v-slot:activator="{ on }"><span v-on="on"><a href="#">ZIP</a>.</span></template>
                         <span>Hashtypes: 13600</span>
                       </v-tooltip>
                     </v-alert>
@@ -168,16 +168,16 @@
                       <div class="hashCeckContainer pl-1 pt-2"  slot="after">
                         <v-layout row justify-end class="pa-0 ma-0" v-for="hashObj in validatedHashes" >
                           <v-flex xs6>
-                            <v-icon small v-if="hashObj.result === 'OK'" color="success">check_circle_outline</v-icon>
+                            <v-icon small v-if="hashObj.result === 'OK'" color="success">check_circle_outlined</v-icon>
                             <v-tooltip left v-else>
-                              <v-icon small slot="activator" color="error" class="clickable">error_circle_outline</v-icon>
+                              <template v-slot:activator="{ on }"><v-icon small v-on="on" color="error" class="clickable">error_circle_outlined</v-icon></template>
                               <span>{{hashObj.result}}</span>
                             </v-tooltip>
                           </v-flex>
 
                           <v-flex xs6>
                             <v-tooltip  left v-if="hashObj.isInCache">
-                              <v-icon small slot="activator" color="warning" class="clickable">error_circle_outline</v-icon>
+                              <template v-slot:activator="{ on }"><v-icon small v-on="on" color="warning" class="clickable">error_circle_outlined</v-icon></template>
                               <span>hash already in hashcache</span>
                             </v-tooltip>
                           </v-flex>
@@ -208,7 +208,7 @@
                     Dictionary attack
                   </v-tab>
                   <v-tab-item lazy >
-                    <v-card flat>
+                    <v-card text>
                       <dictionary v-model="attackSettings" ref="DictAttack"></dictionary>
                     </v-card>
                   </v-tab-item>
@@ -216,7 +216,7 @@
                     Combination attack
                   </v-tab>
                   <v-tab-item lazy>
-                    <v-card flat>
+                    <v-card text>
                       <combinator v-model="attackSettings" ref="CombAttack"></combinator>
                     </v-card>
                   </v-tab-item>
@@ -224,7 +224,7 @@
                     Brute-force attack
                   </v-tab>
                   <v-tab-item lazy>
-                    <v-card flat>
+                    <v-card text>
                       <maskattack v-model="attackSettings" ref="BruteAttack"></maskattack>
                     </v-card>
                   </v-tab-item>
@@ -232,7 +232,7 @@
                     Hybrid Wordlist + Mask
                   </v-tab>
                   <v-tab-item lazy>
-                    <v-card flat>
+                    <v-card text>
                       <hybridWordlistMask v-model="attackSettings" ref="HybridWordMaskAttack"></hybridWordlistMask>
                     </v-card>
                   </v-tab-item>
@@ -240,7 +240,7 @@
                     Hybrid Mask + Wordlist
                   </v-tab>
                   <v-tab-item lazy>
-                    <v-card flat>
+                    <v-card text>
                       <hybridMaskWordlist v-model="attackSettings" ref="HybridMaskWordAttack"></hybridMaskWordlist>
                     </v-card>
                   </v-tab-item>
@@ -248,7 +248,7 @@
                     PCFG
                   </v-tab>
                   <v-tab-item lazy>
-                    <v-card flat>
+                    <v-card text>
                       <pcfg v-model="attackSettings" ref="pcfgAttack"></pcfg>
                     </v-card>
                   </v-tab-item>
@@ -274,7 +274,7 @@
                 </v-flex>
                 <v-flex xs6>
                   <v-text-field
-                    flat
+                    text
                     single-line
                     label="Time for job"
                     v-model="timeForJob"
@@ -291,7 +291,7 @@
                   <v-text-field
                     :disabled="startNow"
                     v-model="startDate"
-                    flat
+                    text
                     single-line
                     label=""
                     mask="date-with-time"
@@ -310,7 +310,7 @@
                   <v-text-field
                     :disabled="endNever"
                     v-model="endDate"
-                    flat
+                    text
                     single-line
                     label=""
                     mask="date-with-time"

@@ -28,9 +28,9 @@
         <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
         <td class="text-xs-right">
           <v-tooltip top>
-            <v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.id}}" slot="activator" @click="hideJob(props.item.id)" disabled=true>
+            <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.id}}" v-on="on" @click="hideJob(props.item.id)" disabled=true>
               <v-icon color="primary">link</v-icon>
-            </v-btn>
+            </v-btn></template>
             <span>Go to the PCFG page</span>
           </v-tooltip>
         </td>

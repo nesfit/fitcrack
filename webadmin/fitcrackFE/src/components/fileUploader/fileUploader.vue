@@ -10,7 +10,7 @@
       </v-alert>
       <form enctype="multipart/form-data" class="form px-2">
         <input type="file" class="uploadInput pt-2" name="file" :multiple="multiple" v-on:change="fileChange($event.target.files)"/>
-        <v-btn v-if="!noUpload" type="button" color="primary" class="uploadButton" outline @click="upload()" :disabled="files === null">
+        <v-btn v-if="!noUpload" type="button" color="primary" class="uploadButton" outlined @click="upload()" :disabled="files === null">
           Upload
           <span class="spacer"></span><v-icon>cloud_upload</v-icon>
         </v-btn>

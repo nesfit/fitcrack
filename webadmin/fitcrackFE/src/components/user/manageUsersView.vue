@@ -10,15 +10,15 @@
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in users">
-            <v-list-tile @click="">
-              <v-list-tile-content>
-                <v-list-tile-title>{{item.username}}
-                </v-list-tile-title>
-                <v-list-tile-sub-title>{{item.mail}}</v-list-tile-sub-title>
-              </v-list-tile-content>
-              <v-list-tile-action class="width150">
+            <v-list-item @click="">
+              <v-list-item-content>
+                <v-list-item-title>{{item.username}}
+                </v-list-item-title>
+                <v-list-item-subtitle>{{item.mail}}</v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action class="width150">
                 <v-select
-                  flat
+                  text
                   solo
                   item-text="name"
                   item-value="id"
@@ -27,27 +27,27 @@
                   :value="item.role.id"
                   @change="updateUserRole($event, item.id)"
                 ></v-select>
-              </v-list-tile-action>
-              <v-list-tile-action>
+              </v-list-item-action>
+              <v-list-item-action>
                 <div class="addBtnCont">
-                  <v-btn color="primary" class="addBtn" flat @click="editDialog=true">Edit</v-btn>
+                  <v-btn color="primary" class="addBtn" text @click="editDialog=true">Edit</v-btn>
                 </div>
-              </v-list-tile-action>
-              <v-list-tile-action>
+              </v-list-item-action>
+              <v-list-item-action>
                 <v-tooltip top>
-                  <v-btn icon class="mx-0" @click="deleteUser(item.id)" slot="activator">
+                  <template v-slot:activator="{ on }"><v-btn icon class="mx-0" @click="deleteUser(item.id)" v-on="on">
                     <v-icon color="error">close</v-icon>
-                  </v-btn>
+                  </v-btn></template>
                   <span>Delete user</span>
                 </v-tooltip>
-              </v-list-tile-action>
-            </v-list-tile>
+              </v-list-item-action>
+            </v-list-item>
             <v-divider v-if="index + 1 < users.length" :key="index"></v-divider>
           </template>
         </v-list>
       </v-card>
       <div class="addBtnCont">
-        <v-btn color="primary" class="addBtn" flat outline @click="userDialog=true">Add user</v-btn>
+        <v-btn color="primary" class="addBtn" text outlined @click="userDialog=true">Add user</v-btn>
       </div>
     </div>
     <h2>User roles</h2>
@@ -72,16 +72,16 @@
           </td>
           <td class="text-xs-right">
             <v-tooltip top>
-              <v-btn icon class="mx-0" @click="deleteRole(props.item.id)" slot="activator">
+              <template v-slot:activator="{ on }"><v-btn icon class="mx-0" @click="deleteRole(props.item.id)" v-on="on">
                 <v-icon color="error">close</v-icon>
-              </v-btn>
+              </v-btn></template>
               <span>Delete role</span>
             </v-tooltip>
           </td>
         </template>
       </v-data-table>
       <div class="addBtnCont">
-        <v-btn color="primary" class="addBtn" @click="roleDialog=true" flat outline>Add role</v-btn>
+        <v-btn color="primary" class="addBtn" @click="roleDialog=true" text outlined>Add role</v-btn>
       </div>
     </div>
 
@@ -98,8 +98,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.stop="roleDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="addRole" :disabled="this.newRoleName=''">Add</v-btn>
+          <v-btn color="primary" text @click.stop="roleDialog=false">Cancel</v-btn>
+          <v-btn color="primary" text @click.stop="addRole" :disabled="this.newRoleName=''">Add</v-btn>
         </v-card-actions>
         <div class="loadingOver" v-if="addingRole">
           <v-progress-circular
@@ -164,8 +164,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.stop="editDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="editUser" disabled=true>Edit</v-btn>
+          <v-btn color="primary" text @click.stop="editDialog=false">Cancel</v-btn>
+          <v-btn color="primary" text @click.stop="editUser" disabled=true>Edit</v-btn>
         </v-card-actions>
         <div class="loadingOver" v-if="editingUser">
           <v-progress-circular
@@ -217,8 +217,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.stop="userDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="addUser" :disabled="!validNewUserForm || this.newUsername == '' || this.newEmail == '' || this.newPassword == '' || this.newUserRoleID == ''">Add user</v-btn>
+          <v-btn color="primary" text @click.stop="userDialog=false">Cancel</v-btn>
+          <v-btn color="primary" text @click.stop="addUser" :disabled="!validNewUserForm || this.newUsername == '' || this.newEmail == '' || this.newPassword == '' || this.newUserRoleID == ''">Add user</v-btn>
         </v-card-actions>
         <div class="loadingOver" v-if="addingUser">
           <v-progress-circular

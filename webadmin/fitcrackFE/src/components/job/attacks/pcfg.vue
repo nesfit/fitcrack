@@ -15,7 +15,7 @@
    <v-card-title class="pb-0"><h2>Edit keyspace limit</h2></v-card-title>
     <v-card-text>
       <v-text-field
-        flat
+        text
         single-line
         :value="this.keyspaceLimit"
         v-model.number="keyspaceLimit"

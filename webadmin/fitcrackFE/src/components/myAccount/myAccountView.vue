@@ -22,7 +22,7 @@
                 label="email"
                 :value = "this.email"
               ></v-text-field>
-              <v-btn color="primary" flat @click="loadUsername()">Try!</v-btn>
+              <v-btn color="primary" text @click="loadUsername()">Try!</v-btn>
 
             </v-form>
           </v-card-text>
@@ -62,7 +62,7 @@
         </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" flat @click.stop="editPassword" :disabled="this.newPassword0 != this.newPassword1 || this.oldPassword == null || this.newPassword0 == null">Update</v-btn>
+            <v-btn color="primary" text @click.stop="editPassword" :disabled="this.newPassword0 != this.newPassword1 || this.oldPassword == null || this.newPassword0 == null">Update</v-btn>
           </v-card-actions>
 
     </v-card>

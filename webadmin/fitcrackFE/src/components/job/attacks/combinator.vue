@@ -28,7 +28,7 @@
 
       <v-flex xs6 class="border px-2">
         <v-text-field
-          outline
+          outlined
           single-line
           placeholder="Rule"
           v-model="ruleLeft"
@@ -37,7 +37,7 @@
       </v-flex>
       <v-flex xs6  class="px-2">
         <v-text-field
-          outline
+          outlined
           single-line
           placeholder="Rule"
           v-model="ruleRight"

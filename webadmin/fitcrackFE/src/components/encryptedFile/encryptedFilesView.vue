@@ -20,7 +20,7 @@
           <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
           <td class="text-xs-right">
             <a :href="$serverAddr + '/protectedFiles/' + props.item.id" target="_blank">
-            <v-btn outline fab small color="primary">
+            <v-btn outlined fab small color="primary">
               <v-icon>file_download</v-icon>
             </v-btn>
             </a>
@@ -30,7 +30,7 @@
       <vue-clip :options="uploadOptions" :on-total-progress="uploadProgressChanged" class="pa-2" :on-complete="uploadComplete">
         <template slot="clip-uploader-action">
           <div class="dz-message">
-            <v-btn outline flat color="primary" class="noEvent">Upload file</v-btn>
+            <v-btn outlined text color="primary" class="noEvent">Upload file</v-btn>
           </div>
           <v-progress-linear background-color="white" v-model="uploadProgress"></v-progress-linear>
         </template>

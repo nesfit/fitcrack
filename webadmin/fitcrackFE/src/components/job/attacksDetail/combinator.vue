@@ -8,11 +8,11 @@
     <v-list single-line class="width100">
       <v-layout row wrap>
         <v-flex xs6>
-          <v-list-tile class="px-2 py-1">
-            <v-list-tile-content>
-              <v-list-tile-title>Left dictionaries</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+          <v-list-item class="px-2 py-1">
+            <v-list-item-content>
+              <v-list-item-title>Left dictionaries</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           <v-divider></v-divider>
           <v-data-table
           :headers="headers"
@@ -27,9 +27,9 @@
             <td class="text-xs-right">{{ $moment(props.item.dictionary.time ).format('DD.MM.YYYY HH:mm') }}</td>
             <td class="text-xs-right">
               <v-tooltip top>
-                <v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.dictionary.id}}" slot="activator">
+                <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.dictionary.id}}" v-on="on">
                   <v-icon color="primary">link</v-icon>
-                </v-btn>
+                </v-btn></template>
                 <span>Go to the dictionary page</span>
               </v-tooltip>
             </td>
@@ -37,11 +37,11 @@
         </v-data-table>
         </v-flex>
         <v-flex xs6 class="borderLeft">
-          <v-list-tile class="px-2 py-1">
-            <v-list-tile-content>
-              <v-list-tile-title>Right dictionaries</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+          <v-list-item class="px-2 py-1">
+            <v-list-item-content>
+              <v-list-item-title>Right dictionaries</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           <v-divider></v-divider>
           <v-data-table
           :headers="headers"
@@ -56,9 +56,9 @@
             <td class="text-xs-right">{{ $moment(props.item.dictionary.time ).format('DD.MM.YYYY HH:mm') }}</td>
             <td class="text-xs-right">
               <v-tooltip top>
-                <v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.dictionary.id}}" slot="activator">
+                <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.dictionary.id}}" v-on="on">
                   <v-icon color="primary">link</v-icon>
-                </v-btn>
+                </v-btn></template>
                 <span>Go to the dictionary page</span>
               </v-tooltip>
             </td>
@@ -68,27 +68,27 @@
       </v-layout>
       <v-divider></v-divider>
       <template v-if="data.rule_left !== ''">
-        <v-list-tile class="px-2 py-1">
-          <v-list-tile-action class="pr-3 key">
+        <v-list-item class="px-2 py-1">
+          <v-list-item-action class="pr-3 key">
             Left rule:
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title class="text-xs-right">{{data.rule_left}}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title class="text-xs-right">{{data.rule_left}}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-divider></v-divider>
       </template>
       <v-divider></v-divider>
       <template v-if="data.rule_right !== ''">
         <v-divider></v-divider>
-        <v-list-tile class="px-2 py-1">
-          <v-list-tile-action class="pr-3 key">
+        <v-list-item class="px-2 py-1">
+          <v-list-item-action class="pr-3 key">
             Right rule:
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title class="text-xs-right">{{data.rule_right}}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title class="text-xs-right">{{data.rule_right}}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </template>
     </v-list>
   </fc-tile>

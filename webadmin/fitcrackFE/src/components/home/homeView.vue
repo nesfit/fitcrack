@@ -7,121 +7,123 @@
           <fc-tile title="Jobs and hosts" class="mx-3 mb-5 height100 wid20" :loading="jobsInfo === null">
             <v-list single-line class="width100" v-if="jobsInfo != null">
               <template v-for="(item, i) in jobsInfo">
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     {{item.status}}:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">
                       {{item.count}}
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider v-if="!(jobsInfo.length === i+1)"></v-divider>
               </template>
               <v-divider></v-divider>
               <v-divider></v-divider>
 
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key">
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key">
                   online hosts:
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right">
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right">
                     {{hostsInfo.activeHosts}}
-                  </v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
               <v-divider></v-divider>
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key">
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key">
                   offline hosts:
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right">
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right">
                     {{hostsInfo.inactiveHosts}}
-                  </v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
           </fc-tile>
           <fc-tile title="Last active jobs" class="mx-3 mb-5 height100 wid20" :loading="lastJobs === null">
             <v-list single-line class="width100" v-if="lastJobs != null">
               <template v-for="(item, i) in lastJobs">
-                <v-list-tile class="px-2 py-1" :to="'/jobs/' + item.id">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1" :to="'/jobs/' + item.id">
+                  <v-list-item-action class="pr-3 key">
                     {{item.name}}
-                  </v-list-tile-action>
-                  <v-list-tile-content>
+                  </v-list-item-action>
+                  <v-list-item-content>
                     {{progressToPercentage(item.progress)}}
-                  </v-list-tile-content>
+                  </v-list-item-content>
 
-                  <v-list-tile-content>
-                    <v-list-tile-title v-bind:class="item.status_type + '--text'"
+                  <v-list-item-content>
+                    <v-list-item-title v-bind:class="item.status_type + '--text'"
                                        class="text-xs-right fw500">
                       <v-tooltip top>
-                                                <span slot="activator">
-                                                  {{ item.status_text }}
-                                                </span>
+                          <template v-slot:activator="{ on }">
+                            <span v-on="on">
+                            {{ item.status_text }}
+                            </span>
+                          </template>
                         <span>{{ item.status_tooltip }}</span>
                       </v-tooltip>
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider v-if="!(lastJobs.length === i+1)"></v-divider>
               </template>
             </v-list>
           </fc-tile>
           <fc-tile title="Server" class="mx-3 mb-5 height100 wid20" :loading="actualUsage == null">
             <v-list single-line class="width100" v-if="actualUsage != null">
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key" v-text="'CPU / RAM'"/>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right"
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key" v-text="'CPU / RAM'"/>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right"
                                      v-text="actualUsage.cpu + ' % / ' + actualUsage.ram + ' %'"/>
-                </v-list-tile-content>
-              </v-list-tile>
+                </v-list-item-content>
+              </v-list-item>
               <v-divider/>
 
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key" v-text="'HDD read'"/>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right" v-text="actualUsage.hdd_read + ' kb/s'"/>
-                </v-list-tile-content>
-              </v-list-tile>
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key" v-text="'HDD read'"/>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right" v-text="actualUsage.hdd_read + ' kb/s'"/>
+                </v-list-item-content>
+              </v-list-item>
               <v-divider/>
 
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key" v-text="'HDD write'"/>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right" v-text="actualUsage.hdd_write + ' kb/s'"/>
-                </v-list-tile-content>
-              </v-list-tile>
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key" v-text="'HDD write'"/>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right" v-text="actualUsage.hdd_write + ' kb/s'"/>
+                </v-list-item-content>
+              </v-list-item>
               <v-divider/>
 
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key" v-text="'Download'"/>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right" v-text="actualUsage.net_recv + ' kb/s'"/>
-                </v-list-tile-content>
-              </v-list-tile>
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key" v-text="'Download'"/>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right" v-text="actualUsage.net_recv + ' kb/s'"/>
+                </v-list-item-content>
+              </v-list-item>
               <v-divider/>
 
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key" v-text="'Upload'"/>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right" v-text="actualUsage.net_sent + ' kb/s'"/>
-                </v-list-tile-content>
-              </v-list-tile>
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key" v-text="'Upload'"/>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right" v-text="actualUsage.net_sent + ' kb/s'"/>
+                </v-list-item-content>
+              </v-list-item>
               <v-divider/>
 
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key" v-text="'Services up/down'"/>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right"
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key" v-text="'Services up/down'"/>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right"
                                      v-text="serverInfoUp + ' / ' + serverInfoDown"/>
-                </v-list-tile-content>
-              </v-list-tile>
+                </v-list-item-content>
+              </v-list-item>
 
 
             </v-list>
@@ -180,7 +182,7 @@
                         @input="loadData"
                         :disabled="!fullDate"
                         v-model="fromDate"
-                        flat
+                        text
                         single-line
                         mask="date-with-time"
                         :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
@@ -194,7 +196,7 @@
                         @input="loadData"
                         :disabled="!fullDate"
                         v-model="toDate"
-                        flat
+                        text
                         single-line
                         mask="date-with-time"
                         :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"

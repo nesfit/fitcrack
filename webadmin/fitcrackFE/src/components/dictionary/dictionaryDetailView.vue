@@ -18,38 +18,38 @@
       <v-layout row wrap justify-center>
         <fc-tile title="Dictionary" :loading="info==null" class="mx-2 dictContentContainer mb-4">
           <v-list single-line class="width100" v-if="info != null">
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Name:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{info.name}}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Keyspace:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{info.keyspace}}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Added:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{ $moment(info.time).format('DD.MM.YYYY HH:mm') }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
           <v-divider></v-divider>
           <div class="dictContent" v-if="info != null">

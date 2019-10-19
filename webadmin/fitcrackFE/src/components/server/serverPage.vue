@@ -11,28 +11,28 @@
         <fc-tile title="Server" class="mx-3 mb-5" :loading="serverInfo == null">
           <v-list single-line class="width100" v-if="serverInfo != null">
             <template v-for="(subsystem, i) in serverInfo.subsystems">
-              <v-list-tile class="px-2 py-1">
-                <v-list-tile-action class="pr-3 key">
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key">
                   {{subsystem.name}}:
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title class="text-xs-right error--text"
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title class="text-xs-right error--text"
                                      v-bind:class="{'success--text': subsystem.status==='running'}">
                     {{ subsystem.status }}
-                  </v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
               <v-divider v-if="!(serverInfo.subsystems.length === i+1)"></v-divider>
             </template>
-            <!--                        <v-list-tile class="px-2 py-1 ">-->
-            <!--                            <v-list-tile-content class="">-->
-            <!--                                <v-list-tile-title class="text-xs-center height60">-->
-            <!--                                    <v-btn @click="operation('start')" flat outline color="success">Start</v-btn>-->
-            <!--                                    <v-btn @click="operation('stop')" flat outline color="error">Stop</v-btn>-->
-            <!--                                    <v-btn @click="operation('restart')" flat outline color="info">Restart</v-btn>-->
-            <!--                                </v-list-tile-title>-->
-            <!--                            </v-list-tile-content>-->
-            <!--                        </v-list-tile>-->
+            <!--                        <v-list-item class="px-2 py-1 ">-->
+            <!--                            <v-list-item-content class="">-->
+            <!--                                <v-list-item-title class="text-xs-center height60">-->
+            <!--                                    <v-btn @click="operation('start')" text outlined color="success">Start</v-btn>-->
+            <!--                                    <v-btn @click="operation('stop')" text outlined color="error">Stop</v-btn>-->
+            <!--                                    <v-btn @click="operation('restart')" text outlined color="info">Restart</v-btn>-->
+            <!--                                </v-list-item-title>-->
+            <!--                            </v-list-item-content>-->
+            <!--                        </v-list-item>-->
           </v-list>
         </fc-tile>
       </v-container>
@@ -89,7 +89,7 @@
                         @input="loadData"
                         :disabled="!fullDate"
                         v-model="fromDate"
-                        flat
+                        text
                         single-line
                         mask="date-with-time"
                         :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
@@ -103,7 +103,7 @@
                         @input="loadData"
                         :disabled="!fullDate"
                         v-model="toDate"
-                        flat
+                        text
                         single-line
                         mask="date-with-time"
                         :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"

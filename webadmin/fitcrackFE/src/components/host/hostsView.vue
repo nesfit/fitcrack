@@ -8,7 +8,7 @@
     <v-text-field
       class="px-2 pt-3"
       clearable
-      outline
+      outlined
       prepend-inner-icon="search"
       label="Search"
       single-line
@@ -65,15 +65,15 @@
         </td>
         <td class="text-xs-right">
           <v-tooltip top v-if="props.item.deleted">
-            <v-btn icon class="mx-0" slot="activator" @click="hideJob(props.item.id)">
+            <template v-slot:activator="{ on }"><v-btn icon class="mx-0" v-on="on" @click="hideJob(props.item.id)">
               <v-icon color="grey darken-3 ">visibility</v-icon>
-            </v-btn>
+            </v-btn></template>
             <span>Show host</span>
           </v-tooltip>
           <v-tooltip top v-else>
-            <v-btn icon class="mx-0" slot="activator" @click="hideJob(props.item.id)">
+            <template v-slot:activator="{ on }"><v-btn icon class="mx-0" v-on="on" @click="hideJob(props.item.id)">
               <v-icon color="grey ">visibility_off</v-icon>
-            </v-btn>
+            </v-btn></template>
             <span>Hide host</span>
           </v-tooltip>
         </td>

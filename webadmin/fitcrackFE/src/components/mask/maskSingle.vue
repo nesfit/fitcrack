@@ -4,7 +4,7 @@
 -->
 
 <template>
-    <v-expansion-panel-content
+    <v-expansion-panel
       lazy
       expand-icon="edit"
       @input="focus"
@@ -29,7 +29,7 @@
               <v-btn slot="activator"
                      color="primary"
                      class="maskBtn py-0 mx-1"
-                     outline
+                     outlined
                      @click="addSymbol(key)"
               >{{item.represent}}</v-btn>
               <span>{{item.chars}}</span>
@@ -38,7 +38,7 @@
               <v-btn slot="activator"
                      color="primary"
                      class="maskBtn py-0 mx-1"
-                     outline
+                     outlined
                      @click="addSymbol(index + 1)"
               >{{item.name}}</v-btn>
               <span>{{item.name}}</span>
@@ -49,7 +49,7 @@
           ref="maskInput"
           autofocus
           label="Mask"
-          outline
+          outlined
           class="primary--text px-2 mx-4"
           single-line
           :rules="maskRules"
@@ -59,7 +59,7 @@
 
         ></v-text-field>
       </div>
-    </v-expansion-panel-content>
+    </v-expansion-panel>
 </template>
 
 <script>

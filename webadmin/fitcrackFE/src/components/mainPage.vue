@@ -12,240 +12,247 @@
       enable-resize-watcher
       fixed
       app
-      color="primary"
     >
       <router-link :to="{ name: 'home'}">
-        <img v-if="$store.darkAppearance" :src="require('@/assets/fitcrack-glow.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
+        <img v-if="$vuetify.theme.dark" :src="require('@/assets/fitcrack-glow.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
         <img v-else :src="require('@/assets/fitcrack.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
         <h2 class="logoText" ></h2>
       </router-link>
+
       <v-divider></v-divider>
-      <v-list expand>
-        <v-list-tile to="/">
-          <v-list-tile-action>
-            <v-icon>home</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Home</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-group :value="true">
-          <v-list-tile :to="{ name: 'jobs'}" slot="activator" @click.stop="">
-            <v-list-tile-action>
-              <v-icon>work</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Jobs</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+
+      <v-list expand nav>
+
+        <v-list-item to="/">
+          <v-list-item-action>
+            <v-icon>mdi-home</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Home</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-group :value="true" prepend-icon="mdi-briefcase-outline">
+          <template v-slot:activator>
+            <v-list-item-title>Jobs</v-list-item-title>
+          </template>
+
+          <v-list-item :to="{ name: 'addJob'}" v-if="$userCanAddJob()">
+            <v-list-item-action>
+              <v-icon>mdi-briefcase-plus</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Add job</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item :to="{ name: 'jobs'}">
+            <v-list-item-action>
+              <v-icon>mdi-briefcase</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>All jobs</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
           <!--
-          <v-list-tile :to="{ name: 'hiddenJobs'}">
-            <v-list-tile-action>
+          <v-list-item :to="{ name: 'hiddenJobs'}">
+            <v-list-item-action>
               <v-icon>visibility_off</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Hidden jobs</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Hidden jobs</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           -->
-          
-          <v-list-tile :to="{ name: 'addJob'}" v-if="$userCanAddJob()">
-            <v-list-tile-action>
-              <v-icon>add</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Add job</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
 
-          <v-list-tile :to="{ name: 'hosts'}" >
-            <v-list-tile-action>
-              <v-icon>inbox</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Bins</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-
-          <v-list-tile :to="{ name: 'hosts'}" >
-            <v-list-tile-action>
-              <v-icon>move_to_inbox</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Smart bins</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+          <v-divider></v-divider>
 
         </v-list-group>
 
-        <v-list-tile :to="{ name: 'hosts'}">
-          <v-list-tile-action>
-            <v-icon>desktop_windows</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Hosts</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'hashes'}">
-          <v-list-tile-action>
-            <database-icon class="material-icons"/>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Hashes</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'dictionaries'}">
-          <v-list-tile-action>
-            <v-icon>format_align_left</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Dictionaries</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        <v-list-item :to="{ name: 'hosts'}">
+          <v-list-item-action>
+            <v-icon>mdi-desktop-classic</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Hosts</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-        <v-list-tile :to="{ name: 'pcfg'}">
-          <v-list-tile-action>
-            <v-icon>linear_scale</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>PCFG</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        <v-list-item :to="{ name: 'hashes'}">
+          <v-list-item-action>
+            <v-icon>mdi-pound</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Hashes</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-        <v-list-tile :to="{ name: 'rules'}">
-          <v-list-tile-action>
-            <v-icon>gavel</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Rules</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'charsets'}">
-          <v-list-tile-action>
-            <v-icon>translate</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Charsets</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'masks'}">
-          <v-list-tile-action>
-            <mask-icon class="material-icons"/>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Masks</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <!--<v-list-tile :to="{ name: 'files'}">-->
-          <!--<v-list-tile-action>-->
+        <v-list-item :to="{ name: 'dictionaries'}">
+          <v-list-item-action>
+            <v-icon>mdi-dictionary</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Dictionaries</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'pcfg'}">
+          <v-list-item-action>
+            <v-icon>mdi-ray-start-end</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>PCFG</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'rules'}">
+          <v-list-item-action>
+            <v-icon>mdi-gavel</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Rules</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'charsets'}">
+          <v-list-item-action>
+            <v-icon>mdi-alphabetical</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Charsets</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'masks'}">
+          <v-list-item-action>
+            <v-icon>mdi-guy-fawkes-mask</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Masks</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!--<v-list-item :to="{ name: 'files'}">-->
+          <!--<v-list-item-action>-->
             <!--<v-icon>insert_drive_file</v-icon>-->
-          <!--</v-list-tile-action>-->
-          <!--<v-list-tile-content>-->
-            <!--<v-list-tile-title>Encrypted files</v-list-tile-title>-->
-          <!--</v-list-tile-content>-->
-        <!--</v-list-tile>-->
-        <v-list-tile :to="{ name: 'markovChains'}">
-          <v-list-tile-action>
-            <matrix-icon class="material-icons"/>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Markov chains</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <!--<v-list-tile :to="{ name: 'server'}">-->
-          <!--<v-list-tile-action>-->
+          <!--</v-list-item-action>-->
+          <!--<v-list-item-content>-->
+            <!--<v-list-item-title>Encrypted files</v-list-item-title>-->
+          <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
+
+        <v-list-item :to="{ name: 'markovChains'}">
+          <v-list-item-action>
+            <v-icon>mdi-matrix</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Markov chains</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!--<v-list-item :to="{ name: 'server'}">-->
+          <!--<v-list-item-action>-->
             <!--<v-icon>settings</v-icon>-->
-          <!--</v-list-tile-action>-->
-          <!--<v-list-tile-content>-->
-            <!--<v-list-tile-title>Control</v-list-tile-title>-->
-          <!--</v-list-tile-content>-->
-        <!--</v-list-tile>-->
+          <!--</v-list-item-action>-->
+          <!--<v-list-item-content>-->
+            <!--<v-list-item-title>Control</v-list-item-title>-->
+          <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
 
         <v-divider></v-divider>
 
-        <v-list-tile :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">
-          <v-list-tile-action>
-            <v-icon>settings</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Manage users</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'myAccount'}">
-          <v-list-tile-action>
-            <v-icon>group</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>My account</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'server'}" v-if="$userCanManageUsers()">
-          <v-list-tile-action>
-            <v-icon>storage</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Server</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile @click="logout">
-          <v-list-tile-action>
-            <v-icon>exit_to_app</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Logout</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        <v-list-item :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">
+          <v-list-item-action>
+            <v-icon>mdi-folder-account</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Manage users</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'myAccount'}">
+          <v-list-item-action>
+            <v-icon>mdi-account</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>My account</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'server'}" v-if="$userCanManageUsers()">
+          <v-list-item-action>
+            <v-icon>mdi-server</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Server</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click="logout">
+          <v-list-item-action>
+            <v-icon>mdi-logout</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <!--<v-list-group prepend-icon>-->
-          <!--<v-list-tile :to="{ name: 'user'}" slot="activator">-->
-            <!--<v-list-tile-action>-->
+          <!--<v-list-item :to="{ name: 'user'}" slot="activator">-->
+            <!--<v-list-item-action>-->
               <!--<v-icon>person</v-icon>-->
-            <!--</v-list-tile-action>-->
-            <!--<v-list-tile-content>-->
-              <!--<v-list-tile-title>User</v-list-tile-title>-->
-            <!--</v-list-tile-content>-->
-          <!--</v-list-tile>-->
-          <!--<v-list-tile :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">-->
-            <!--<v-list-tile-action>-->
+            <!--</v-list-item-action>-->
+            <!--<v-list-item-content>-->
+              <!--<v-list-item-title>User</v-list-item-title>-->
+            <!--</v-list-item-content>-->
+          <!--</v-list-item>-->
+          <!--<v-list-item :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">-->
+            <!--<v-list-item-action>-->
               <!--<v-icon>group</v-icon>-->
-            <!--</v-list-tile-action>-->
-            <!--<v-list-tile-content>-->
-              <!--<v-list-tile-title>Manage users</v-list-tile-title>-->
-            <!--</v-list-tile-content>-->
-          <!--</v-list-tile>-->
-          <!--<v-list-tile @click="logout">-->
-            <!--<v-list-tile-action>-->
+            <!--</v-list-item-action>-->
+            <!--<v-list-item-content>-->
+              <!--<v-list-item-title>Manage users</v-list-item-title>-->
+            <!--</v-list-item-content>-->
+          <!--</v-list-item>-->
+          <!--<v-list-item @click="logout">-->
+            <!--<v-list-item-action>-->
               <!--<v-icon>exit_to_app</v-icon>-->
-            <!--</v-list-tile-action>-->
-            <!--<v-list-tile-content>-->
-              <!--<v-list-tile-title>Logout</v-list-tile-title>-->
-            <!--</v-list-tile-content>-->
-          <!--</v-list-tile>-->
+            <!--</v-list-item-action>-->
+            <!--<v-list-item-content>-->
+              <!--<v-list-item-title>Logout</v-list-item-title>-->
+            <!--</v-list-item-content>-->
+          <!--</v-list-item>-->
         <!--</v-list-group>-->
       </v-list>
     </v-navigation-drawer>
 
-    <v-toolbar
+    <!-- TOP BAR -->
+
+    <v-app-bar
       app
       height="64px"
       class="mainToolbar"
     >
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>{{$store.project}}</v-toolbar-title>
+      <!--
       <router-link :to="{ name: 'home'}" class="textLogo">
-        <!-- <span class="logoSmallText" v-text="$vuetify.theme.project"></span> -->
-        <v-toolbar-title>{{$vuetify.theme.project}}</v-toolbar-title>
+        <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
       </router-link>
+      -->
       <v-spacer></v-spacer>
-      <v-btn icon @click.stop="toggleAppearance">
-        <v-icon>lightbulb_outline</v-icon>
+      <v-btn icon @click.stop="$vuetify.theme.dark = !$vuetify.theme.dark">
+        <v-icon>mdi-theme-light-dark</v-icon>
       </v-btn>
       <v-badge color="red" overlap>
         <span slot="badge" v-if="notificationsCount > 0">{{notificationsCount}}</span>
         <v-btn icon @click.stop="toggleNotifications" class="ma-0">
-          <v-icon>notifications</v-icon>
+          <v-icon>{{notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell' }}</v-icon>
         </v-btn>
       </v-badge>
 
-    </v-toolbar>
+    </v-app-bar>
     <v-content class="height100 main">
       <router-view/>
     </v-content>
@@ -267,17 +274,10 @@
 
 <script>
   import notifications from '@/components/notification/fc_notifications_wrapper'
-  import DBicon from 'vue-material-design-icons/database.vue'
-  import maskIcon from 'vue-material-design-icons/guy-fawkes-mask.vue'
-  import matrixIcon from "vue-material-design-icons/matrix.vue"
-
 
   export default {
     components: {
-      'notifications-wrapper': notifications,
-      'database-icon': DBicon,
-      'mask-icon': maskIcon,
-      'matrix-icon': matrixIcon
+      'notifications-wrapper': notifications
     },
     mounted: function () {
       if (!this.$store.user.loggedIn) {
@@ -298,9 +298,6 @@
         this.axios.get(this.$serverAddr + '/user/logout').then((response) => {
           this.$logoutUser()
         })
-      },
-      toggleAppearance () {
-        this.$emit('toggledAppearance')
       },
       toggleNotifications: function () {
         this.rightDrawer = !this.rightDrawer;

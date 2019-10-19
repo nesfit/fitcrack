@@ -19,49 +19,49 @@
 
         <fc-tile title="Host info" :loading="data==null" class=" dictContentContainer mb-5">
           <v-list single-line class="width100" v-if="data != null">
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Name:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{data.domain_name}}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 User:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{data.user.name}}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Operation system:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{ data.os_name }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Processor:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{ data.p_model }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
           <v-divider></v-divider>
         </fc-tile>
@@ -99,21 +99,21 @@
               <td>
                 <div class="d-flex text-xs-right actionsBtns">
                   <v-tooltip top>
-                    <v-btn icon class="mx-0"  :disabled=" props.item.status !== '0'"  slot="activator" @click="operateJob(props.item.id, 'start')">
-                      <v-icon color="success">play_circle_outline</v-icon>
-                    </v-btn>
+                    <template v-slot:activator="{ on }"><v-btn icon class="mx-0"  :disabled=" props.item.status !== '0'"  v-on="on" @click="operateJob(props.item.id, 'start')">
+                      <v-icon color="success">play_circle_outlined</v-icon>
+                    </v-btn></template>
                     <span>Start job</span>
                   </v-tooltip>
                   <v-tooltip top>
-                    <v-btn icon class="mx-0"  :disabled=" props.item.status >= 10"  slot="activator" @click="operateJob(props.item.id, 'restart')">
+                    <template v-slot:activator="{ on }"><v-btn icon class="mx-0"  :disabled=" props.item.status >= 10"  v-on="on" @click="operateJob(props.item.id, 'restart')">
                       <v-icon color="info">loop</v-icon>
-                    </v-btn>
+                    </v-btn></template>
                     <span>Restart job</span>
                   </v-tooltip>
                   <v-tooltip top>
-                    <v-btn icon class="mx-0"  :disabled=" props.item.status !== '10'"  slot="activator" @click="operateJob(props.item.id, 'stop')">
-                      <v-icon color="error">pause_circle_outline</v-icon>
-                    </v-btn>
+                    <template v-slot:activator="{ on }"><v-btn icon class="mx-0"  :disabled=" props.item.status !== '10'"  v-on="on" @click="operateJob(props.item.id, 'stop')">
+                      <v-icon color="error">pause_circle_outlined</v-icon>
+                    </v-btn></template>
                     <span>Stop job</span>
                   </v-tooltip>
                 </div>

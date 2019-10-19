@@ -22,16 +22,16 @@
           <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
           <td class="text-xs-right">
             <a :href="$serverAddr + '/rule/' + props.item.id + '/download'" target="_blank">
-              <v-btn outline fab small color="primary">
+              <v-btn outlined fab small color="primary">
                 <v-icon>file_download</v-icon>
               </v-btn>
             </a>
           </td>
           <td class="text-xs-right">
             <v-tooltip top>
-              <v-btn icon class="mx-0" @click="deleteRule(props.item.id)" slot="activator">
+              <template v-slot:activator="{ on }"><v-btn icon class="mx-0" @click="deleteRule(props.item.id)" v-on="on">
                 <v-icon color="error">delete</v-icon>
-              </v-btn>
+              </v-btn></template>
               <span>Delete rules file</span>
             </v-tooltip>
           </td>

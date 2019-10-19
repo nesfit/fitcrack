@@ -22,23 +22,23 @@
           <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
           <td class="text-xs-right">
             <a :href="$serverAddr + '/pcfg/' + props.item.id" target="_blank">
-            <v-btn outline fab small color="primary">
+            <v-btn outlined fab small color="primary">
               <v-icon>file_download</v-icon>
             </v-btn>
             </a>
           </td>
           <td class="text-xs-right">
             <v-tooltip top>
-              <v-btn icon class="mx-0" @click="deletePcfg(props.item.id)" slot="activator">
+              <template v-slot:activator="{ on }"><v-btn icon class="mx-0" @click="deletePcfg(props.item.id)" v-on="on">
                 <v-icon color="error">delete</v-icon>
-              </v-btn>
+              </v-btn></template>
               <span>Delete PCFG file</span>
             </v-tooltip>
           </td>
         </template>
       </v-data-table>
       <div class="text-xs-right pa-3">
-        <v-btn class="d-inline-block" color="primary" flat outline @click.native.stop="dialog = true; loadDictionaries()">Add new</v-btn>
+        <v-btn class="d-inline-block" color="primary" text outlined @click.native.stop="dialog = true; loadDictionaries()">Add new</v-btn>
       </div>
     </fc-tile>
 
@@ -64,7 +64,7 @@
             Make from dictionary
           </v-tab>
           <v-tab-item>
-            <v-card flat>
+            <v-card text>
               <file-uploader :url="this.$serverAddr + '/pcfg/add'" @uploadComplete="loadPcfg(); dialog=false"></file-uploader>
             </v-card>
           </v-tab-item>
@@ -78,7 +78,7 @@
                 color="primary">
               </v-progress-circular>
             </div>
-            <v-card flat v-else>
+            <v-card text v-else>
               <div class="px-2">
                 <v-text-field
                   name="name"
@@ -104,9 +104,9 @@
                     <td class="text-xs-right">{{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
                     <td class="text-xs-right">
                       <v-tooltip top>
-                        <v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.id}}" slot="activator">
+                        <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.id}}" v-on="on">
                           <v-icon color="primary">link</v-icon>
-                        </v-btn>
+                        </v-btn></template>
                         <span>Go to the dictionary page</span>
                       </v-tooltip>
                     </td>
@@ -118,7 +118,7 @@
                 <v-btn class="d-inline-block"
                        color="primary"
 
-                       outline
+                       outlined
                        @click="makePcfgFromDictionary()"
                        :disabled="selectedDictId === null && newName === ''">
                   Make from dictionary

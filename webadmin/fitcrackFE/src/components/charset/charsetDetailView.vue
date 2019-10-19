@@ -18,46 +18,46 @@
       <v-layout row wrap justify-center>
         <fc-tile title="Charsets" :loading="data==null" class="mx-2 dictContentContainer mb-4">
           <v-list single-line class="width100" v-if="data != null">
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Name:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{data.name}}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+            <v-list-item class="px-2 py-1">
+              <v-list-item-action class="pr-3 key">
                 Added:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-xs-right">
                   {{ $moment(data.time).format('DD.MM.YYYY HH:mm') }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-content>
+            <v-list-item class="px-2 py-1">
+              <v-list-item-content>
                 <v-layout row class="width100 margintop5">
-                  <v-btn class="ma-0" outline color="primary" v-if="!edit" @click="edit=true">
+                  <v-btn class="ma-0" outlined color="primary" v-if="!edit" @click="edit=true">
                     Edit <v-icon class="ml-2">edit</v-icon>
                   </v-btn>
-                  <v-btn class="ma-0" outline color="primary" v-else @click="saveCharset">
+                  <v-btn class="ma-0" outlined color="primary" v-else @click="saveCharset">
                     Save <v-icon class="ml-2">save</v-icon>
                   </v-btn>
                   <v-spacer></v-spacer>
                   <a :href="$serverAddr + '/charset/' + data.id + '/download'" target="_blank">
-                    <v-btn class="ma-0" outline color="primary">
+                    <v-btn class="ma-0" outlined color="primary">
                       Download <v-icon class="ml-2">file_download</v-icon>
                     </v-btn>
                   </a>
                 </v-layout>
-              </v-list-tile-content>
-            </v-list-tile>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
           <v-divider></v-divider>
           <div class="dictContent pa-2" v-if="data != null" v-bind:class="{editing: edit}">

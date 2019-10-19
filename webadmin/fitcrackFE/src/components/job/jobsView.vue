@@ -8,7 +8,7 @@
     <v-text-field
       class="px-2 pt-3"
       clearable
-      outline
+      outlined
       prepend-inner-icon="search"
       label="Search"
       single-line
@@ -46,13 +46,13 @@
       ></v-select>
     </div>
 
-    <v-toolbar dense flat color="white">
+    <v-toolbar dense text>
       <v-spacer></v-spacer>
-      <v-btn round outline color="primary" :disabled="selectedJobs.length == 0">
+      <v-btn rounded outlined color="primary" :disabled="selectedJobs.length == 0">
         <v-icon left>play_for_work</v-icon>
         Move to bin
       </v-btn>
-      <v-btn round outline color="primary" :disabled="selectedJobs.length == 0">
+      <v-btn rounded outlined color="primary" :disabled="selectedJobs.length == 0">
         <v-icon left>{{ viewHidden ? 'visibility' : 'visibility_off' }}</v-icon>
         {{ viewHidden ? 'Stop hiding' : 'Hide' }}
       </v-btn>
@@ -110,15 +110,15 @@
         <td>
           <div class="actionsBtns">
             <v-tooltip top>
-              <v-btn icon class="mx-0"  :disabled="props.item.status !== '0'"  slot="activator" @click="operateJob(props.item.id, 'start')">
-                <v-icon color="success">play_circle_outline</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on }"><v-btn icon class="mx-0"  :disabled="props.item.status !== '0'"  v-on="on" @click="operateJob(props.item.id, 'start')">
+                <v-icon color="success">play_circle_outlined</v-icon>
+              </v-btn></template>
               <span>Start job</span>
             </v-tooltip>
             <v-tooltip top>
-              <v-btn icon class="mx-0"  :disabled="props.item.status !== '10'"  slot="activator" @click="operateJob(props.item.id, 'stop')">
-                <v-icon color="error">pause_circle_outline</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on }"><v-btn icon class="mx-0"  :disabled="props.item.status !== '10'"  v-on="on" @click="operateJob(props.item.id, 'stop')">
+                <v-icon color="error">pause_circle_outlined</v-icon>
+              </v-btn></template>
               <span>Stop job</span>
             </v-tooltip>
             <v-menu>
@@ -132,20 +132,20 @@
                 </v-btn>
               </template>
               <v-list>
-                <v-list-tile 
+                <v-list-item 
                   v-if="props.item.status >= 10"
                   @click="operateJob(props.item.id, 'restart')">
-                  <v-list-tile-title><v-icon left>loop</v-icon>Restart</v-list-tile-title>
-                </v-list-tile>
-                <v-list-tile @click="operateJob(props.item.id, 'duplicate')">
-                  <v-list-tile-title><v-icon left>content_copy</v-icon>Duplicate</v-list-tile-title>
-                </v-list-tile>
-                <v-list-tile @click="hideJob(props.item.id)">
-                  <v-list-tile-title>
+                  <v-list-item-title><v-icon left>loop</v-icon>Restart</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="operateJob(props.item.id, 'duplicate')">
+                  <v-list-item-title><v-icon left>content_copy</v-icon>Duplicate</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="hideJob(props.item.id)">
+                  <v-list-item-title>
                     <v-icon left>{{props.item.deleted ? 'visibility' : 'visibility_off'}}</v-icon> 
                     {{props.item.deleted ? 'Stop hiding' : 'Hide'}}
-                  </v-list-tile-title>
-                </v-list-tile>
+                  </v-list-item-title>
+                </v-list-item>
               </v-list>
             </v-menu>
           </div>

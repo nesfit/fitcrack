@@ -26,77 +26,77 @@
         <v-layout row wrap justify-center>
           <div class="px-2 max100">
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 white max500">
-              <v-toolbar color="primary" dark card>
+            <v-layout row wrap class="mt-3 mb-5 elevation-2 max500">
+              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>
                   {{data.name}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn outline small fab color="white" @click.native.stop="showEditJobDialog">
+                <v-btn outlined small fab color="white" @click.native.stop="showEditJobDialog">
                   <v-icon>edit</v-icon>
                 </v-btn>
               </v-toolbar>
               <v-list single-line class="width100">
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Operations:
-                  </v-list-tile-action>
-                  <v-list-tile-content class="height100">
-                    <v-list-tile-title class="text-xs-right height100">
+                  </v-list-item-action>
+                  <v-list-item-content class="height100">
+                    <v-list-item-title class="text-xs-right height100">
                       <div class="actionsBtns">
                         <v-tooltip top>
-                          <v-btn icon class="mx-0" :disabled="data.status !== '0'" slot="activator" @click="operateJob('start')">
-                            <v-icon color="success">play_circle_outline</v-icon>
-                          </v-btn>
+                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :disabled="data.status !== '0'" v-on="on" @click="operateJob('start')">
+                            <v-icon color="success">play_circle_outlined</v-icon>
+                          </v-btn></template>
                           <span>Start job</span>
                         </v-tooltip>
                         <v-tooltip top>
-                          <v-btn icon class="mx-0" slot="activator" :disabled="data.status >= 10" @click="operateJob('restart')">
+                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" v-on="on" :disabled="data.status >= 10" @click="operateJob('restart')">
                             <v-icon color="info">loop</v-icon>
-                          </v-btn>
+                          </v-btn></template>
                           <span>Restart job</span>
                         </v-tooltip>
                         <v-tooltip top>
-                          <v-btn icon class="mx-0" :disabled="data.status !== '10'" slot="activator" @click="operateJob('stop')">
-                            <v-icon color="error">pause_circle_outline</v-icon>
-                          </v-btn>
+                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :disabled="data.status !== '10'" v-on="on" @click="operateJob('stop')">
+                            <v-icon color="error">pause_circle_outlined</v-icon>
+                          </v-btn></template>
                           <span>Stop job</span>
                         </v-tooltip>
                         <v-tooltip top>
-                          <v-btn icon class="mx-0" slot="activator" @click="operateJob('kill')">
+                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" v-on="on" @click="operateJob('kill')">
                             <v-icon color="error">cancel</v-icon>
-                          </v-btn>
+                          </v-btn></template>
                           <span>Purge job</span>
                         </v-tooltip>
                       </div>
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Comment:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{data.comment}}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">{{data.comment}}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Job keyspace:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{data.keyspace}}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">{{data.keyspace}}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Status:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title v-bind:class="data.status_type + '--text'" class="text-xs-right fw500">
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title v-bind:class="data.status_type + '--text'" class="text-xs-right fw500">
                       <v-tooltip top>
                         <span
                           slot="activator"
@@ -105,61 +105,61 @@
                         </span>
                         <span>{{ data.status_tooltip }}</span>
                       </v-tooltip>
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Hash type:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right fw500">{{data.hash_type_name}}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right fw500">{{data.hash_type_name}}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1" v-if="data.password !== null">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1" v-if="data.password !== null">
+                  <v-list-item-action class="pr-3 key">
                     Password:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right fw500">{{data.password}}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right fw500">{{data.password}}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Added:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{ $moment(data.time).calendar() }}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">{{ $moment(data.time).calendar() }}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Workunit sum time:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{data.cracking_time_str}}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">{{data.cracking_time_str}}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Job cracking time:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{ $moment.utc($moment(data.time_end).diff($moment(data.time_start))).format("HH:mm:ss") }}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">{{ $moment.utc($moment(data.time_end).diff($moment(data.time_start))).format("HH:mm:ss") }}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Progress:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right jobProgress">
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right jobProgress">
                       <v-layout wrap column>
                         <v-flex xs-12 class="height5 text-xs-center">
                           <span
@@ -174,57 +174,57 @@
                           </v-progress-linear>
                         </v-flex>
                       </v-layout>
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Start time:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">
-                      <v-list-tile-title class="text-xs-right">{{(data.time_start !== null) ? (
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">
+                      <v-list-item-title class="text-xs-right">{{(data.time_start !== null) ? (
                         $moment(data.time_start).format('DD.MM.YYYY HH:mm')) : 'Not started yet'}}
-                      </v-list-tile-title>
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                      </v-list-item-title>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     End time:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{(data.time_end !== null) ? (
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">{{(data.time_end !== null) ? (
                       $moment(data.time_end).format('DD.MM.YYYY HH:mm')) : 'Not set'}}
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Efficiency:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">
                       <v-tooltip top>
-                        <span slot="activator">{{efficiency}}</span>
+                        <template v-slot:activator="{ on }"><span v-on="on">{{efficiency}}</span></template>
                         <span>Efficiency is computed as sum of cracking time of each workunit divided by count of hosts multipled by total cracking time.</span>
                       </v-tooltip>
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-action class="pr-3 key">
                     Seconds per workunit:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">{{data.seconds_per_job}}
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-xs-right">{{data.seconds_per_job}}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
 
               </v-list>
             </v-layout>
@@ -238,8 +238,8 @@
             <pcfgDetail class="max500" :data="data" v-else-if="data.attack === 'PCFG'"/>
 
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 white max500">
-              <v-toolbar color="primary" dark card>
+            <v-layout row wrap class="mt-3 mb-5 elevation-2 max500">
+              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Hashes</v-toolbar-title>
               </v-toolbar>
               <v-data-table
@@ -260,8 +260,8 @@
 
 
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 white max700">
-              <v-toolbar color="primary" dark card>
+            <v-layout row wrap class="mt-3 mb-5 elevation-2 max700">
+              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Hosts</v-toolbar-title>
               </v-toolbar>
               <v-list single-line class="width100">
@@ -286,20 +286,20 @@
                   </template>
                 </v-data-table>
                 <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-content>
-                    <v-btn class="ma-0" outline color="primary" @click.native.stop="showMappingHostDialog">Edit
+                <v-list-item class="px-2 py-1">
+                  <v-list-item-content>
+                    <v-btn class="ma-0" outlined color="primary" @click.native.stop="showMappingHostDialog">Edit
                       mapping
                     </v-btn>
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-content>
+                </v-list-item>
               </v-list>
             </v-layout>
           </div>
 
           <div class="px-3 min500">
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 white">
-              <v-toolbar color="primary" dark card>
+            <v-layout row wrap class="mt-3 mb-5 elevation-2">
+              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Job progress</v-toolbar-title>
               </v-toolbar>
               <fc-graph
@@ -312,8 +312,8 @@
             </v-layout>
 
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 white">
-              <v-toolbar color="primary" dark card>
+            <v-layout row wrap class="mt-3 mb-5 elevation-2">
+              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Hashes in workunit</v-toolbar-title>
               </v-toolbar>
               <fc-graph
@@ -325,8 +325,8 @@
               </fc-graph>
             </v-layout>
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 white">
-              <v-toolbar color="primary" dark card>
+            <v-layout row wrap class="mt-3 mb-5 elevation-2">
+              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Host percentage work</v-toolbar-title>
               </v-toolbar>
               <fc-graph
@@ -336,8 +336,8 @@
               </fc-graph>
             </v-layout>
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 white">
-              <v-toolbar color="primary" dark card>
+            <v-layout row wrap class="mt-3 mb-5 elevation-2">
+              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Status history</v-toolbar-title>
               </v-toolbar>
               <v-list single-line class="width100">
@@ -353,9 +353,11 @@
                     <td class="text-xs-right text-xs-right fw500"
                         v-bind:class="props.item.status_type + '--text'">
                       <v-tooltip top>
-                                                <span slot="activator">
-                                                    {{ props.item.status_text }}
-                                                </span>
+                        <template v-slot:activator="{ on }">
+                          <span v-on="on">
+                              {{ props.item.status_text }}
+                          </span>
+                        </template>
                         <span>{{ props.item.status_tooltip }}</span>
                       </v-tooltip>
                     </td>
@@ -367,8 +369,8 @@
           </div>
         </v-layout>
         <div class=" mx-3">
-          <v-layout row wrap class="mt-3 mb-5 max1000 mx-auto elevation-2 white">
-            <v-toolbar color="primary" dark card>
+          <v-layout row wrap class="mt-3 mb-5 max1000 mx-auto elevation-2">
+            <v-toolbar color="primary" dark flat>
               <v-toolbar-title
                       v-text="'Workunits | Work: ' + workunitTitle.valid + ' | Benchmark: ' + workunitTitle.benchmarks + ' | Avg keyspace: ' + workunitTitle.avgKeyspace.toLocaleString()"></v-toolbar-title></v-toolbar-title>
             </v-toolbar>
@@ -378,7 +380,7 @@
                    v-bind:style="{ 'flex-grow': workunit.keyspace, 'background-color': workunit.color }"
                    class="workunit-child">
                 <v-tooltip bottom>
-                  <div slot="activator">&nbsp;</div>
+                  <template v-slot:activator="{ on }"><div v-on="on">&nbsp;</div></template>
                   <span>{{workunit.text}}</span>
                 </v-tooltip>
 
@@ -419,7 +421,7 @@
                 <td class="text-xs-right error--text" v-bind:class="{'success--text': props.item.finished}">{{
                   yesNo(props.item.finished) }}
                 </td>
-                <td class="text-xs-right"><v-btn icon small flat color="primary" @click="props.expanded = !props.expanded"><v-icon>insert_drive_file</v-icon></v-btn></td>
+                <td class="text-xs-right"><v-btn icon small text color="primary" @click="props.expanded = !props.expanded"><v-icon>insert_drive_file</v-icon></v-btn></td>
               </template>
               <template slot="expand" slot-scope="props">
                 <fc-textarea max-height="500" :readonly="true" :value="props.item.result.stderr_out_text"></fc-textarea>
@@ -460,7 +462,7 @@
             <v-text-field
               :disabled="editJobValues.startNow"
               v-model="editJobValues.time_start"
-              flat
+              text
               single-line
               label=""
               mask="date-with-time"
@@ -479,7 +481,7 @@
             <v-text-field
               :disabled="editJobValues.endNever"
               v-model="editJobValues.time_end"
-              flat
+              text
               single-line
               label=""
               mask="date-with-time"
@@ -502,7 +504,7 @@
         </v-layout>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.native="changeJobSettings">Save</v-btn>
+          <v-btn color="primary" text @click.native="changeJobSettings">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -566,7 +568,7 @@
         </v-data-table>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.native="changeHostMapping">Save</v-btn>
+          <v-btn color="primary" text @click.native="changeHostMapping">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

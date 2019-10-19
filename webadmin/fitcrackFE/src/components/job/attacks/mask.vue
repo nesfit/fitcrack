@@ -6,21 +6,21 @@
 <template>
   <div>
     <v-card-title class="pb-0"><h2>Type masks<span class="required primary--text"> *</span></h2></v-card-title>
-    <v-expansion-panel   popout :expand="false" v-model="editedMaskIdx">
+    <v-expansion-panels   popout :expand="false" v-model="editedMaskIdx">
           <v-layout row align-center fill-height v-for="(mask, i) in masks" class="width100">
               <v-flex>
                 <mask-single v-model="masks[i]" @input="checkValid" :customCharsets="charsets"></mask-single>
               </v-flex>
-              <v-btn flat color="error" icon small @click="deleteMask(i)"><v-icon>close</v-icon></v-btn>
+              <v-btn text color="error" icon small @click="deleteMask(i)"><v-icon>close</v-icon></v-btn>
           </v-layout>
-    </v-expansion-panel>
+    </v-expansion-panels>
     <div>
       <v-btn class="mx-auto d-block"  @click="addMask"  color="success" icon small>
         <v-icon>add</v-icon>
       </v-btn>
     </div>
 
-    <v-btn color="primary" outline flat @click="loadMasksDialog = true">Load masks</v-btn>
+    <v-btn color="primary" outlined text @click="loadMasksDialog = true">Load masks</v-btn>
 
     <v-layout row wrap>
       <v-flex xs6 class="border">
@@ -58,7 +58,7 @@
     <v-dialog v-model="loadMasksDialog" max-width="400">
       <v-card >
         <maskFile-selector v-model="maskFile" @input="checkValid"></maskFile-selector>
-        <v-btn @click="loadMasksFromFile" outline flat class="width96" color="primary" :disabled="maskFile === null">Load</v-btn>
+        <v-btn @click="loadMasksFromFile" outlined text class="width96" color="primary" :disabled="maskFile === null">Load</v-btn>
       </v-card>
     </v-dialog>
   </div>

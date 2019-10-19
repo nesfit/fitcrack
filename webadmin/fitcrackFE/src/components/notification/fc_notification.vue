@@ -5,15 +5,15 @@
 
 <template>
     <div class="cont">
-      <v-list-tile :to="'/jobs/' + jobId">
-        <v-alert :type="type" value="true" class="ma-0 pa-0 width100" id="notif" v-bind:class="{ seen: seen}" outline>
+      <v-list-item :to="'/jobs/' + jobId">
+        <v-alert :type="type" class="ma-0 pa-0 width100" id="notif" v-bind:class="{ seen: seen}" outlined>
           <v-layout row wrap class="width100">
             <v-flex class="text-xs-left">{{text}}</v-flex>
             <v-spacer></v-spacer>
             <v-flex class="text-xs-right">{{$moment(time).format('DD.MM.YYYY HH:mm')}}</v-flex>
           </v-layout>
         </v-alert>
-      </v-list-tile>
+      </v-list-item>
       <v-divider></v-divider>
     </div>
 </template>
