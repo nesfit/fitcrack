@@ -11,23 +11,37 @@
     item-key="id"
     :select-all="selectAll"
   >
-    <template slot="items" slot-scope="props">
+    <template
+      slot="items"
+      slot-scope="props"
+    >
       <tr>
         <td>
           <v-checkbox
             :input-value="selected === props.item.id"
-            @click="updateSelected(props.item.id, props.item)"
             primary
             hide-details
-          ></v-checkbox>
+            @click="updateSelected(props.item.id, props.item)"
+          />
         </td>
         <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-        <td class="text-xs-right">
+        <td class="text-right">
+          {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
+        </td>
+        <td class="text-right">
           <v-tooltip top>
-            <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'maskDetail', params: { id: props.item.id}}" v-on="on">
-              <v-icon color="primary">link</v-icon>
-            </v-btn></template>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                :to="{name: 'maskDetail', params: { id: props.item.id}}"
+                v-on="on"
+              >
+                <v-icon color="primary">
+                  link
+                </v-icon>
+              </v-btn>
+            </template>
             <span>Go to the Markov file page</span>
           </v-tooltip>
         </td>
@@ -38,7 +52,7 @@
 
 <script>
   export default {
-    name: "maskFileSelector",
+    name: "MaskFileSelector",
     props: {
       selectAll: {
         type: Boolean,

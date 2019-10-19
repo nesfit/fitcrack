@@ -1,212 +1,317 @@
 
 <template>
   <v-container fluid>
-    <v-layout column align-center>
+    <v-row
+      align="center"
+    >
       <div class="container max1000">
-        <v-layout row wrap>
-          <fc-tile title="Jobs and hosts" class="mx-3 mb-5 height100 wid20" :loading="jobsInfo === null">
-            <v-list single-line class="width100" v-if="jobsInfo != null">
+        <v-row>
+          <fc-tile
+            title="Jobs and hosts"
+            class="mx-3 mb-5 height100 wid20"
+            :loading="jobsInfo === null"
+          >
+            <v-list
+              v-if="jobsInfo != null"
+              single-line
+              class="width100"
+            >
               <template v-for="(item, i) in jobsInfo">
-                <v-list-item class="px-2 py-1">
+                <v-list-item
+                  :key="i"
+                  class="px-2 py-1"
+                >
                   <v-list-item-action class="pr-3 key">
-                    {{item.status}}:
+                    {{ item.status }}:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">
-                      {{item.count}}
+                    <v-list-item-title class="text-right">
+                      {{ item.count }}
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider v-if="!(jobsInfo.length === i+1)"></v-divider>
               </template>
-              <v-divider></v-divider>
-              <v-divider></v-divider>
 
+              <v-divider />
+              
               <v-list-item class="px-2 py-1">
                 <v-list-item-action class="pr-3 key">
                   online hosts:
                 </v-list-item-action>
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right">
-                    {{hostsInfo.activeHosts}}
+                  <v-list-item-title class="text-right">
+                    {{ hostsInfo.activeHosts }}
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-divider></v-divider>
               <v-list-item class="px-2 py-1">
                 <v-list-item-action class="pr-3 key">
                   offline hosts:
                 </v-list-item-action>
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right">
-                    {{hostsInfo.inactiveHosts}}
+                  <v-list-item-title class="text-right">
+                    {{ hostsInfo.inactiveHosts }}
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list>
           </fc-tile>
-          <fc-tile title="Last active jobs" class="mx-3 mb-5 height100 wid20" :loading="lastJobs === null">
-            <v-list single-line class="width100" v-if="lastJobs != null">
+          <fc-tile
+            title="Last active jobs"
+            class="mx-3 mb-5 height100 wid20"
+            :loading="lastJobs === null"
+          >
+            <v-list
+              v-if="lastJobs != null"
+              single-line
+              class="width100"
+            >
               <template v-for="(item, i) in lastJobs">
-                <v-list-item class="px-2 py-1" :to="'/jobs/' + item.id">
+                <v-list-item 
+                  :key="i"
+                  class="px-2 py-1"
+                  :to="'/jobs/' + item.id"
+                >
                   <v-list-item-action class="pr-3 key">
-                    {{item.name}}
+                    {{ item.name }}
                   </v-list-item-action>
                   <v-list-item-content>
-                    {{progressToPercentage(item.progress)}}
+                    {{ progressToPercentage(item.progress) }}
                   </v-list-item-content>
 
                   <v-list-item-content>
-                    <v-list-item-title v-bind:class="item.status_type + '--text'"
-                                       class="text-xs-right fw500">
+                    <v-list-item-title
+                      :class="item.status_type + '--text'"
+                      class="text-right fw500"
+                    >
                       <v-tooltip top>
-                          <template v-slot:activator="{ on }">
-                            <span v-on="on">
+                        <template v-slot:activator="{ on }">
+                          <span v-on="on">
                             {{ item.status_text }}
-                            </span>
-                          </template>
+                          </span>
+                        </template>
                         <span>{{ item.status_tooltip }}</span>
                       </v-tooltip>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider v-if="!(lastJobs.length === i+1)"></v-divider>
               </template>
             </v-list>
           </fc-tile>
-          <fc-tile title="Server" class="mx-3 mb-5 height100 wid20" :loading="actualUsage == null">
-            <v-list single-line class="width100" v-if="actualUsage != null">
+          <fc-tile
+            title="Server"
+            class="mx-3 mb-5 height100 wid20"
+            :loading="actualUsage == null"
+          >
+            <v-list
+              v-if="actualUsage != null"
+              single-line
+              class="width100"
+            >
               <v-list-item class="px-2 py-1">
-                <v-list-item-action class="pr-3 key" v-text="'CPU / RAM'"/>
+                <v-list-item-action
+                  class="pr-3 key"
+                  v-text="'CPU / RAM'"
+                />
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right"
-                                     v-text="actualUsage.cpu + ' % / ' + actualUsage.ram + ' %'"/>
+                  <v-list-item-title
+                    class="text-right"
+                    v-text="actualUsage.cpu + ' % / ' + actualUsage.ram + ' %'"
+                  />
                 </v-list-item-content>
               </v-list-item>
-              <v-divider/>
+              <v-divider />
 
               <v-list-item class="px-2 py-1">
-                <v-list-item-action class="pr-3 key" v-text="'HDD read'"/>
+                <v-list-item-action
+                  class="pr-3 key"
+                  v-text="'HDD read'"
+                />
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right" v-text="actualUsage.hdd_read + ' kb/s'"/>
+                  <v-list-item-title
+                    class="text-right"
+                    v-text="actualUsage.hdd_read + ' kb/s'"
+                  />
                 </v-list-item-content>
               </v-list-item>
-              <v-divider/>
+              <v-divider />
 
               <v-list-item class="px-2 py-1">
-                <v-list-item-action class="pr-3 key" v-text="'HDD write'"/>
+                <v-list-item-action
+                  class="pr-3 key"
+                  v-text="'HDD write'"
+                />
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right" v-text="actualUsage.hdd_write + ' kb/s'"/>
+                  <v-list-item-title
+                    class="text-right"
+                    v-text="actualUsage.hdd_write + ' kb/s'"
+                  />
                 </v-list-item-content>
               </v-list-item>
-              <v-divider/>
+              <v-divider />
 
               <v-list-item class="px-2 py-1">
-                <v-list-item-action class="pr-3 key" v-text="'Download'"/>
+                <v-list-item-action
+                  class="pr-3 key"
+                  v-text="'Download'"
+                />
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right" v-text="actualUsage.net_recv + ' kb/s'"/>
+                  <v-list-item-title
+                    class="text-right"
+                    v-text="actualUsage.net_recv + ' kb/s'"
+                  />
                 </v-list-item-content>
               </v-list-item>
-              <v-divider/>
+              <v-divider />
 
               <v-list-item class="px-2 py-1">
-                <v-list-item-action class="pr-3 key" v-text="'Upload'"/>
+                <v-list-item-action
+                  class="pr-3 key"
+                  v-text="'Upload'"
+                />
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right" v-text="actualUsage.net_sent + ' kb/s'"/>
+                  <v-list-item-title
+                    class="text-right"
+                    v-text="actualUsage.net_sent + ' kb/s'"
+                  />
                 </v-list-item-content>
               </v-list-item>
-              <v-divider/>
+              <v-divider />
 
               <v-list-item class="px-2 py-1">
-                <v-list-item-action class="pr-3 key" v-text="'Services up/down'"/>
+                <v-list-item-action
+                  class="pr-3 key"
+                  v-text="'Services up/down'"
+                />
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right"
-                                     v-text="serverInfoUp + ' / ' + serverInfoDown"/>
+                  <v-list-item-title
+                    class="text-right"
+                    v-text="serverInfoUp + ' / ' + serverInfoDown"
+                  />
                 </v-list-item-content>
               </v-list-item>
-
-
             </v-list>
           </fc-tile>
-          <fc-tile title="Notifications" class="mx-3 mb-5 height100 wid20" :loading="notifications == null">
-            <div v-if="notifications !== null" class="notifCont">
-              <v-list class="notifContainer pa-0"
-                      v-for="(item, i) in notifications.items"
-                      :key="i"
+          <fc-tile
+            title="Notifications"
+            class="mx-3 mb-5 height100 wid20"
+            :loading="notifications == null"
+          >
+            <div
+              v-if="notifications !== null"
+              class="notifCont"
+            >
+              <v-list
+                v-for="(item, i) in notifications.items"
+                :key="i"
+                class="notifContainer pa-0"
               >
-                <notification :type="item.type"
-                              :text="item.text"
-                              :seen="item.seen"
-                              :time="item.time"
-                              :job-id="item.job_id"
-                ></notification>
+                <notification
+                  :type="item.type"
+                  :text="item.text"
+                  :seen="item.seen"
+                  :time="item.time"
+                  :job-id="item.job_id"
+                />
               </v-list>
             </div>
           </fc-tile>
-        </v-layout>
-        <v-layout row>
-          <fc-tile title="Jobs progress" class="mx-3 mb-5 height100 flex1">
+        </v-row>
+        <v-row>
+          <fc-tile
+            title="Jobs progress"
+            class="mx-3 mb-5 height100 flex1"
+          >
             <fc-graph
-                    id="packageGraph"
-                    :data='packageGraph'
-                    type="job"
-            >
-            </fc-graph>
+              id="packageGraph"
+              :data="packageGraph"
+              type="job"
+            />
           </fc-tile>
-          <fc-tile title="Hosts activity" class="mx-3 height100 flex1">
+          <fc-tile
+            title="Hosts activity"
+            class="mx-3 height100 flex1"
+          >
             <fc-graph
-                    id="hostGraph"
-                    :data='hostGraph'
-                    type="host"
-            >
-            </fc-graph>
+              id="hostGraph"
+              :data="hostGraph"
+              type="host"
+            />
           </fc-tile>
-        </v-layout>
+        </v-row>
 
-        <v-layout class=" dateSelectCont">
-          <v-spacer></v-spacer>
-          <v-flex xs5 @click="fullDate = false">
-            <v-radio-group row class="dateSelect" v-model="hoursBefore" @change="loadData">
-              <v-radio value="1" label="last hour" :disabled="fullDate"></v-radio>
-              <v-radio value="3" label="last 3 hours" :disabled="fullDate"></v-radio>
-              <v-radio value="6" label="last 6 hours" :disabled="fullDate"></v-radio>
+        <v-row class=" dateSelectCont">
+          <v-spacer />
+          <v-col
+            cols="5"
+            @click="fullDate = false"
+          >
+            <v-radio-group
+              v-model="hoursBefore"
+              row
+              class="dateSelect"
+              @change="loadData"
+            >
+              <v-radio
+                value="1"
+                label="last hour"
+                :disabled="fullDate"
+              />
+              <v-radio
+                value="3"
+                label="last 3 hours"
+                :disabled="fullDate"
+              />
+              <v-radio
+                value="6"
+                label="last 6 hours"
+                :disabled="fullDate"
+              />
             </v-radio-group>
-          </v-flex>
-          <v-flex xs6 @click="fullDate = true" class="pl-2">
-            <v-layout row>
-              <v-flex xs2>
-                <v-subheader class="textBottom">From:</v-subheader>
-              </v-flex>
-              <v-flex xs4>
+          </v-col>
+          <v-col
+            cols="6"
+            class="pl-2"
+            @click="fullDate = true"
+          >
+            <v-row>
+              <v-col cols="2">
+                <v-subheader class="textBottom">
+                  From:
+                </v-subheader>
+              </v-col>
+              <v-col cols="4">
                 <v-text-field
-                        @input="loadData"
-                        :disabled="!fullDate"
-                        v-model="fromDate"
-                        text
-                        single-line
-                        mask="date-with-time"
-                        :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs2>
-                <v-subheader class="textBottom">To:</v-subheader>
-              </v-flex>
-              <v-flex xs4>
+                  v-model="fromDate"
+                  :disabled="!fullDate"
+                  text
+                  single-line
+                  mask="date-with-time"
+                  :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+                  @input="loadData"
+                />
+              </v-col>
+              <v-col cols="2">
+                <v-subheader class="textBottom">
+                  To:
+                </v-subheader>
+              </v-col>
+              <v-col cols="4">
                 <v-text-field
-                        @input="loadData"
-                        :disabled="!fullDate"
-                        v-model="toDate"
-                        text
-                        single-line
-                        mask="date-with-time"
-                        :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-                ></v-text-field>
-              </v-flex>
-            </v-layout>
-          </v-flex>
-        </v-layout>
+                  v-model="toDate"
+                  :disabled="!fullDate"
+                  text
+                  single-line
+                  mask="date-with-time"
+                  :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+                  @input="loadData"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
       </div>
-    </v-layout>
+    </v-row>
   </v-container>
 </template>
 
@@ -216,21 +321,11 @@
   import notification from '@/components/notification/fc_notification'
 
   export default {
-    name: 'homeView',
+    name: 'HomeView',
     components: {
       'fc-graph': graph,
       'fc-tile': tile,
       'notification': notification
-    },
-    mounted: function () {
-      this.loadData();
-
-      this.interval = setInterval(function () {
-        this.loadData()
-      }.bind(this), 15000)
-    },
-    beforeDestroy: function () {
-      clearInterval(this.interval)
     },
     data: function () {
       return {
@@ -257,6 +352,16 @@
           net_sent: 0
         }
       }
+    },
+    mounted: function () {
+      this.loadData();
+
+      this.interval = setInterval(function () {
+        this.loadData()
+      }.bind(this), 15000)
+    },
+    beforeDestroy: function () {
+      clearInterval(this.interval)
     },
     methods: {
       yesNo: function (val) {

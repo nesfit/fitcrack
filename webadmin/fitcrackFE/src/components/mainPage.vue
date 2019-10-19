@@ -6,23 +6,35 @@
 <template>
   <div class="height100">
     <v-navigation-drawer
+      v-model="drawer"
       persistent
       class="navigationDrawer"
-      v-model="drawer"
       enable-resize-watcher
       fixed
       app
     >
       <router-link :to="{ name: 'home'}">
-        <img v-if="$vuetify.theme.dark" :src="require('@/assets/fitcrack-glow.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
-        <img v-else :src="require('@/assets/fitcrack.svg')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
-        <h2 class="logoText" ></h2>
+        <img
+          v-if="$vuetify.theme.dark"
+          :src="require('@/assets/fitcrack-glow.svg')"
+          class="mx-auto px-2 mt-2 d-block logo"
+          alt="logo"
+        >
+        <img
+          v-else
+          :src="require('@/assets/fitcrack.svg')"
+          class="mx-auto px-2 mt-2 d-block logo"
+          alt="logo"
+        >
+        <h2 class="logoText" />
       </router-link>
 
-      <v-divider></v-divider>
+      <v-divider />
 
-      <v-list expand nav>
-
+      <v-list
+        expand
+        nav
+      >
         <v-list-item to="/">
           <v-list-item-action>
             <v-icon>mdi-home</v-icon>
@@ -32,12 +44,18 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-group :value="true" prepend-icon="mdi-briefcase-outline">
+        <v-list-group
+          :value="true"
+          prepend-icon="mdi-briefcase-outline"
+        >
           <template v-slot:activator>
             <v-list-item-title>Jobs</v-list-item-title>
           </template>
 
-          <v-list-item :to="{ name: 'addJob'}" v-if="$userCanAddJob()">
+          <v-list-item
+            v-if="$userCanAddJob()"
+            :to="{ name: 'addJob'}"
+          >
             <v-list-item-action>
               <v-icon>mdi-briefcase-plus</v-icon>
             </v-list-item-action>
@@ -66,8 +84,7 @@
           </v-list-item>
           -->
 
-          <v-divider></v-divider>
-
+          <v-divider class="mb-2" />
         </v-list-group>
 
         <v-list-item :to="{ name: 'hosts'}">
@@ -134,12 +151,12 @@
         </v-list-item>
 
         <!--<v-list-item :to="{ name: 'files'}">-->
-          <!--<v-list-item-action>-->
-            <!--<v-icon>insert_drive_file</v-icon>-->
-          <!--</v-list-item-action>-->
-          <!--<v-list-item-content>-->
-            <!--<v-list-item-title>Encrypted files</v-list-item-title>-->
-          <!--</v-list-item-content>-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>insert_drive_file</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Encrypted files</v-list-item-title>-->
+        <!--</v-list-item-content>-->
         <!--</v-list-item>-->
 
         <v-list-item :to="{ name: 'markovChains'}">
@@ -152,17 +169,20 @@
         </v-list-item>
 
         <!--<v-list-item :to="{ name: 'server'}">-->
-          <!--<v-list-item-action>-->
-            <!--<v-icon>settings</v-icon>-->
-          <!--</v-list-item-action>-->
-          <!--<v-list-item-content>-->
-            <!--<v-list-item-title>Control</v-list-item-title>-->
-          <!--</v-list-item-content>-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>settings</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Control</v-list-item-title>-->
+        <!--</v-list-item-content>-->
         <!--</v-list-item>-->
 
-        <v-divider></v-divider>
+        <v-divider />
 
-        <v-list-item :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">
+        <v-list-item
+          v-if="$userCanManageUsers()"
+          :to="{ name: 'manageUsers'}"
+        >
           <v-list-item-action>
             <v-icon>mdi-folder-account</v-icon>
           </v-list-item-action>
@@ -180,7 +200,10 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :to="{ name: 'server'}" v-if="$userCanManageUsers()">
+        <v-list-item
+          v-if="$userCanManageUsers()"
+          :to="{ name: 'server'}"
+        >
           <v-list-item-action>
             <v-icon>mdi-server</v-icon>
           </v-list-item-action>
@@ -199,30 +222,30 @@
         </v-list-item>
 
         <!--<v-list-group prepend-icon>-->
-          <!--<v-list-item :to="{ name: 'user'}" slot="activator">-->
-            <!--<v-list-item-action>-->
-              <!--<v-icon>person</v-icon>-->
-            <!--</v-list-item-action>-->
-            <!--<v-list-item-content>-->
-              <!--<v-list-item-title>User</v-list-item-title>-->
-            <!--</v-list-item-content>-->
-          <!--</v-list-item>-->
-          <!--<v-list-item :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">-->
-            <!--<v-list-item-action>-->
-              <!--<v-icon>group</v-icon>-->
-            <!--</v-list-item-action>-->
-            <!--<v-list-item-content>-->
-              <!--<v-list-item-title>Manage users</v-list-item-title>-->
-            <!--</v-list-item-content>-->
-          <!--</v-list-item>-->
-          <!--<v-list-item @click="logout">-->
-            <!--<v-list-item-action>-->
-              <!--<v-icon>exit_to_app</v-icon>-->
-            <!--</v-list-item-action>-->
-            <!--<v-list-item-content>-->
-              <!--<v-list-item-title>Logout</v-list-item-title>-->
-            <!--</v-list-item-content>-->
-          <!--</v-list-item>-->
+        <!--<v-list-item :to="{ name: 'user'}" slot="activator">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>person</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>User</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
+        <!--<v-list-item :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>group</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Manage users</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
+        <!--<v-list-item @click="logout">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>exit_to_app</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Logout</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
         <!--</v-list-group>-->
       </v-list>
     </v-navigation-drawer>
@@ -234,40 +257,55 @@
       height="64px"
       class="mainToolbar"
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>{{$store.project}}</v-toolbar-title>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-toolbar-title>{{ $store.project }}</v-toolbar-title>
       <!--
       <router-link :to="{ name: 'home'}" class="textLogo">
         <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
       </router-link>
       -->
-      <v-spacer></v-spacer>
-      <v-btn icon @click.stop="$vuetify.theme.dark = !$vuetify.theme.dark">
+      <v-spacer />
+      <v-btn
+        icon
+        @click.stop="$vuetify.theme.dark = !$vuetify.theme.dark"
+      >
         <v-icon>mdi-theme-light-dark</v-icon>
       </v-btn>
-      <v-badge color="red" overlap>
-        <span slot="badge" v-if="notificationsCount > 0">{{notificationsCount}}</span>
-        <v-btn icon @click.stop="toggleNotifications" class="ma-0">
-          <v-icon>{{notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell' }}</v-icon>
+      <v-badge
+        color="red"
+        overlap
+      >
+        <span
+          v-if="notificationsCount > 0"
+          slot="badge"
+        >{{ notificationsCount }}</span>
+        <v-btn
+          icon
+          class="ma-0"
+          @click.stop="toggleNotifications"
+        >
+          <v-icon>{{ notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell' }}</v-icon>
         </v-btn>
       </v-badge>
-
     </v-app-bar>
     <v-content class="height100 main">
-      <router-view/>
+      <router-view />
     </v-content>
     <v-navigation-drawer
+      v-model="rightDrawer"
       class="pa-0"
       temporary
       right
-      v-model="rightDrawer"
       fixed
       app
     >
-      <v-toolbar class="notifHeader">
+      <v-toolbar
+        flat 
+        class="notifHeader"
+      >
         <v-toolbar-title>Notifications</v-toolbar-title>
       </v-toolbar>
-      <notifications-wrapper ref="notifWrapper"></notifications-wrapper>
+      <notifications-wrapper ref="notifWrapper" />
     </v-navigation-drawer>
   </div>
 </template>
@@ -278,6 +316,13 @@
   export default {
     components: {
       'notifications-wrapper': notifications
+    },
+    data() {
+      return {
+        drawer: true,
+        rightDrawer: false,
+        notificationsCount: 0
+      }
     },
     mounted: function () {
       if (!this.$store.user.loggedIn) {
@@ -311,13 +356,6 @@
         }).then((response) => {
           this.notificationsCount = response.data.count
         })
-      }
-    },
-    data() {
-      return {
-        drawer: true,
-        rightDrawer: false,
-        notificationsCount: 0
       }
     }
   }

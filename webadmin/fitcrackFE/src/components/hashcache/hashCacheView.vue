@@ -7,6 +7,7 @@
   <div class="cont">
     <v-card-title class="pt-2 pb-1">
       <v-text-field
+        v-model="search"
         clearable
         solo
         text
@@ -14,28 +15,36 @@
         label="Search by password or hash"
         single-line
         hide-details
-        v-model="search"
-      ></v-text-field>
-      <v-spacer></v-spacer>
+      />
+      <v-spacer />
     </v-card-title>
-    <v-divider></v-divider>
+    <v-divider />
     <v-data-table
       ref="table"
       :headers="headers"
       :items="hashes"
       :search="search"
       :pagination.sync="pagination"
-      :total-items="totalItems"
+      :server-items-length="totalItems"
       :loading="loading"
       :rows-per-page-items="[25,50,100]"
       rows-per-page-text="Passwords per page"
-      disable-initial-sort
+      
     >
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.password}} </td>
-        <td class="text-xs-right">{{ props.item.hash_type_name }}</td>
-        <td class="text-xs-right">{{ props.item.hash }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.added).format('D.M.YYYY H:mm:ss')}}</td>
+      <template
+        slot="items"
+        slot-scope="props"
+      >
+        <td>{{ props.item.password }} </td>
+        <td class="text-right">
+          {{ props.item.hash_type_name }}
+        </td>
+        <td class="text-right">
+          {{ props.item.hash }}
+        </td>
+        <td class="text-right">
+          {{ $moment(props.item.added).format('D.M.YYYY H:mm:ss') }}
+        </td>
       </template>
     </v-data-table>
   </div>
@@ -44,6 +53,24 @@
 <script>
   export default {
     name: "HashesView",
+    data: function () {
+      return {
+        interval: null,
+        status: 'active',
+        search: '',
+        totalItems: 0,
+        pagination: {},
+        loading: true,
+        headers: [
+          {text: 'Password', value: 'result', align: 'left', sortable: true},
+          {text: 'Hash type', value: 'hash_type', align: 'right', sortable: true},
+          {text: 'Hash', value: 'hash', align: 'right', sortable: true},
+          {text: 'Added', value: 'added', align: 'right', sortable: true}
+        ],
+        hashes:
+          []
+      }
+    },
     watch: {
       pagination: {
         handler() {
@@ -81,24 +108,6 @@
         this.status = e;
         this.$refs.table.updatePagination({page: 1, totalItems: this.totalItems})
       }
-    },
-    data: function () {
-      return {
-        interval: null,
-        status: 'active',
-        search: '',
-        totalItems: 0,
-        pagination: {},
-        loading: true,
-        headers: [
-          {text: 'Password', value: 'result', align: 'left', sortable: true},
-          {text: 'Hash type', value: 'hash_type', align: 'right', sortable: true},
-          {text: 'Hash', value: 'hash', align: 'right', sortable: true},
-          {text: 'Added', value: 'added', align: 'right', sortable: true}
-        ],
-        hashes:
-          []
-      }
     }
   }
 </script>
@@ -111,7 +120,7 @@
 
   .cont {
     height: 100%;
-    background: white;
+
   }
 
 </style>

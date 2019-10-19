@@ -5,10 +5,19 @@
 
 <template>
   <div class="graphContainer">
-    <div v-if="data === null" class="loading">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    <div
+      v-if="data === null"
+      class="loading"
+    >
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      />
     </div>
-    <div v-else-if="data.data.length === 0" class="loading">
+    <div
+      v-else-if="data.data.length === 0"
+      class="loading"
+    >
       <h1>No data</h1>
     </div>
     <div v-else>
@@ -16,32 +25,29 @@
         <line-chart
           :id="id"
           class="d-flex graph"
-          :data='data.data'
-          :xkey='data.axies.x'
+          :data="data.data"
+          :xkey="data.axies.x"
           :ykeys="data.axies.y"
-          :labels='data.labels'
+          :labels="data.labels"
           grid="true"
           :ymax="type === 'job' ? '100' : 'auto'"
           hide-hover="false"
           resize="true"
           :post-units="units"
           :smooth="false"
-          :hoverCallback="type === 'job' ? hoverCallbackPackage : hoverCallBackJob"
+          :hover-callback="type === 'job' ? hoverCallbackPackage : hoverCallBackJob"
           :line-colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
-
-        >
-        </line-chart>
+        />
       </div>
       <div v-else-if="data.type === 'pie'">
         <donut-chart
           :id="id"
           id="pie"
           class="d-flex graph"
-          :data='data.data'
+          :data="data.data"
           resize="true"
           :colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
-        >
-        </donut-chart>
+        />
       </div>
     </div>
   </div>
@@ -54,11 +60,16 @@
   global.Raphael = Raphael;
 
   export default {
-    name: "fc_graph",
-    props: ['data', 'id', 'units', 'type'],
+    name: "FcGraph",
     components: {
       LineChart,
       DonutChart
+    },
+    props: ['data', 'id', 'units', 'type'],
+    data: function () {
+      return {
+        i: 1
+      }
     },
     methods: {
       hoverCallbackPackage: function (index, options, content, row) {
@@ -97,11 +108,6 @@
 
         return '<b>' + time + '</b></br> Host <a href="/hosts/' + hostId + '"> ' +
           hostName + '</a>'
-      }
-    },
-    data: function () {
-      return {
-        i: 1
       }
     }
   }

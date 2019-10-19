@@ -5,30 +5,44 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
-    v-model="selected"
     item-key="id"
     :select-all="selectAll"
     @input="updateSelected"
   >
-    <template slot="items" slot-scope="props">
+    <template
+      slot="items"
+      slot-scope="props"
+    >
       <tr>
         <td>
           <v-checkbox
             v-model="props.selected"
             primary
             hide-details
-          ></v-checkbox>
+          />
         </td>
         <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-        <td class="text-xs-right">
+        <td class="text-right">
+          {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
+        </td>
+        <td class="text-right">
           <v-tooltip top>
-            <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'charsetDetail', params: { id: props.item.id}}" v-on="on">
-              <v-icon color="primary">link</v-icon>
-            </v-btn></template>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                :to="{name: 'charsetDetail', params: { id: props.item.id}}"
+                v-on="on"
+              >
+                <v-icon color="primary">
+                  link
+                </v-icon>
+              </v-btn>
+            </template>
             <span>Go to the charset page</span>
           </v-tooltip>
         </td>
@@ -39,7 +53,7 @@
 
 <script>
   export default {
-    name: "charsetSelector",
+    name: "CharsetSelector",
     props: {
       selectAll: {
         type: Boolean,
@@ -49,13 +63,6 @@
         type: Array,
         default: function () {
           return []
-        }
-      }
-    },
-    watch:{
-      value: function(){
-        if (this.value) {
-          this.selected = this.value.id
         }
       }
     },
@@ -74,6 +81,13 @@
           {text: 'Added', value: 'time', align: 'right'},
           {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
         ],
+      }
+    },
+    watch:{
+      value: function(){
+        if (this.value) {
+          this.selected = this.value.id
+        }
       }
     },
     mounted() {

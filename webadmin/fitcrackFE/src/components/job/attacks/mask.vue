@@ -5,64 +5,147 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0"><h2>Type masks<span class="required primary--text"> *</span></h2></v-card-title>
-    <v-expansion-panels   popout :expand="false" v-model="editedMaskIdx">
-          <v-layout row align-center fill-height v-for="(mask, i) in masks" class="width100">
-              <v-flex>
-                <mask-single v-model="masks[i]" @input="checkValid" :customCharsets="charsets"></mask-single>
-              </v-flex>
-              <v-btn text color="error" icon small @click="deleteMask(i)"><v-icon>close</v-icon></v-btn>
-          </v-layout>
+    <v-card-title class="pb-0">
+      <h2>Type masks<span class="required primary--text"> *</span></h2>
+    </v-card-title>
+    <v-expansion-panels
+      v-model="editedMaskIdx"
+      popout
+      :expand="false"
+    >
+      <v-row
+        v-for="(mask, i) in masks"
+        align="center"
+        class="width100 fill-height"
+      >
+        <v-col>
+          <mask-single
+            v-model="masks[i]"
+            :custom-charsets="charsets"
+            @input="checkValid"
+          />
+        </v-col>
+        <v-btn
+          text
+          color="error"
+          icon
+          small
+          @click="deleteMask(i)"
+        >
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-row>
     </v-expansion-panels>
     <div>
-      <v-btn class="mx-auto d-block"  @click="addMask"  color="success" icon small>
+      <v-btn
+        class="mx-auto d-block"
+        color="success"
+        icon
+        small
+        @click="addMask"
+      >
         <v-icon>add</v-icon>
       </v-btn>
     </div>
 
-    <v-btn color="primary" outlined text @click="loadMasksDialog = true">Load masks</v-btn>
+    <v-btn
+      color="primary"
+      outlined
+      text
+      @click="loadMasksDialog = true"
+    >
+      Load masks
+    </v-btn>
 
-    <v-layout row wrap>
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Select charsets (max. 4)</h2></v-card-title>
-        <charset-selector v-model="charsets" @input="checkValid"></charset-selector>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Markov file</h2></v-card-title>
-        <markov-selector v-model="markov" @input="checkValid"></markov-selector>
+    <v-row>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title class="pb-0">
+          <h2>Select charsets (max. 4)</h2>
+        </v-card-title>
+        <charset-selector
+          v-model="charsets"
+          @input="checkValid"
+        />
+      </v-col>
+      <v-col cols="6">
+        <v-card-title class="pb-0">
+          <h2>Markov file</h2>
+        </v-card-title>
+        <markov-selector
+          v-model="markov"
+          @input="checkValid"
+        />
 
-        <v-layout row wrap>
-          <v-flex xs6 class="pl-2">
-            <v-radio-group v-model="markovSubmode" column :disabled="markov === null" @change="checkValid">
-              <v-radio label="2D Markov" color="primary" :value="1" :disabled="markov === null"></v-radio>
-              <v-radio label="3D Markov" color="primary" :value="2" :disabled="markov === null"></v-radio>
+        <v-row>
+          <v-col
+            cols="6"
+            class="pl-2"
+          >
+            <v-radio-group
+              v-model="markovSubmode"
+              column
+              :disabled="markov === null"
+              @change="checkValid"
+            >
+              <v-radio
+                label="2D Markov"
+                color="primary"
+                :value="1"
+                :disabled="markov === null"
+              />
+              <v-radio
+                label="3D Markov"
+                color="primary"
+                :value="2"
+                :disabled="markov === null"
+              />
             </v-radio-group>
-          </v-flex>
-          <v-flex xs6 class="pr-2">
+          </v-col>
+          <v-col
+            cols="6"
+            class="pr-2"
+          >
             <v-text-field
+              v-model="markovTreshold"
               type="tel"
               :disabled="markov === null"
               label="Markov treshold"
               single-line
               mask="########"
-              v-model="markovTreshold"
               @input="checkValid"
-            ></v-text-field>
-          </v-flex>
-        </v-layout>
-      </v-flex>
-    </v-layout>
+            />
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
 
 
 
-    <v-dialog v-model="loadMasksDialog" max-width="400">
-      <v-card >
-        <maskFile-selector v-model="maskFile" @input="checkValid"></maskFile-selector>
-        <v-btn @click="loadMasksFromFile" outlined text class="width96" color="primary" :disabled="maskFile === null">Load</v-btn>
+    <v-dialog
+      v-model="loadMasksDialog"
+      max-width="400"
+    >
+      <v-card>
+        <maskFile-selector
+          v-model="maskFile"
+          @input="checkValid"
+        />
+        <v-btn
+          outlined
+          text
+          class="width96"
+          color="primary"
+          :disabled="maskFile === null"
+          @click="loadMasksFromFile"
+        >
+          Load
+        </v-btn>
       </v-card>
     </v-dialog>
   </div>
-
 </template>
 
 <script>
@@ -71,24 +154,38 @@
   import markovSelector from '@/components/selector/markovSelector'
   import maskFileSelector from '@/components/selector/loadMaskFileSelector'
   export default {
-    name: "fc-mask",
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
-    watch:{
-      value: function(){
-
-      }
-    },
+    name: "FcMask",
     components: {
       CharsetSelector,
       'mask-single': maskSingle,
       'charset-selector': CharsetSelector,
       'markov-selector': markovSelector,
       'maskFile-selector': maskFileSelector
+    },
+    props: {
+      value: {
+        type: [Boolean, Object],
+        default: null
+      },
+    },
+    data: function () {
+      return {
+        loadMasksDialog: false,
+        markovSubmode: 0,
+        attackId: 3,
+        attackName: 'mask',
+        markovTreshold: '',
+        maskFile: null,
+        charsets: null,
+        markov: null,
+        editedMaskIdx: 0,
+        masks: [''],
+      }
+    },
+    watch:{
+      value: function(){
+
+      }
     },
     methods: {
       loadMasksFromFile: function () {
@@ -137,20 +234,6 @@
         this.masks.splice(i, 1)
         this.checkValid()
       },
-    },
-    data: function () {
-      return {
-        loadMasksDialog: false,
-        markovSubmode: 0,
-        attackId: 3,
-        attackName: 'mask',
-        markovTreshold: '',
-        maskFile: null,
-        charsets: null,
-        markov: null,
-        editedMaskIdx: 0,
-        masks: [''],
-      }
     }
   }
 </script>

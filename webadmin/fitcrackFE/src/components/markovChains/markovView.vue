@@ -5,8 +5,15 @@
 
 <template>
   <v-container class="max500">
-    <fc-tile title="Markov chains" class="ma-2">
-      <v-alert :value="true" type="warning" class="mt-0 mb-1" >
+    <fc-tile
+      title="Markov chains"
+      class="ma-2"
+    >
+      <v-alert
+        :value="true"
+        type="warning"
+        class="mt-0 mb-1"
+      >
         Markov files must have a .hcstat extension.
       </v-alert>
       <v-data-table
@@ -15,30 +22,60 @@
         :loading="loading"
         :rows-per-page-items="[10,25,50]"
         rows-per-page-text="Hcstats per page"
-        disable-initial-sort
+        
       >
-        <template slot="items" slot-scope="props">
+        <template
+          slot="items"
+          slot-scope="props"
+        >
           <td>{{ props.item.name }}</td>
-          <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-          <td class="text-xs-right">
-            <a :href="$serverAddr + '/markovChains/' + props.item.id" target="_blank">
-            <v-btn outlined fab small color="primary">
-              <v-icon>file_download</v-icon>
-            </v-btn>
+          <td class="text-right">
+            {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
+          </td>
+          <td class="text-right">
+            <a
+              :href="$serverAddr + '/markovChains/' + props.item.id"
+              target="_blank"
+            >
+              <v-btn
+                outlined
+                fab
+                small
+                color="primary"
+              >
+                <v-icon>file_download</v-icon>
+              </v-btn>
             </a>
           </td>
-          <td class="text-xs-right">
+          <td class="text-right">
             <v-tooltip top>
-              <template v-slot:activator="{ on }"><v-btn icon class="mx-0" @click="deleteMarkov(props.item.id)" v-on="on">
-                <v-icon color="error">delete</v-icon>
-              </v-btn></template>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  class="mx-0"
+                  @click="deleteMarkov(props.item.id)"
+                  v-on="on"
+                >
+                  <v-icon color="error">
+                    delete
+                  </v-icon>
+                </v-btn>
+              </template>
               <span>Delete Markov file</span>
             </v-tooltip>
           </td>
         </template>
       </v-data-table>
-      <div class="text-xs-right pa-3">
-        <v-btn class="d-inline-block" color="primary" text outlined @click.native.stop="dialog = true; loadDictionaries()">Add new</v-btn>
+      <div class="text-right pa-3">
+        <v-btn
+          class="d-inline-block"
+          color="primary"
+          text
+          outlined
+          @click.native.stop="dialog = true; loadDictionaries()"
+        >
+          Add new
+        </v-btn>
       </div>
     </fc-tile>
 
@@ -49,14 +86,21 @@
 
 
 
-    <v-dialog v-model="dialog" max-width="600" lazy >
+    <v-dialog
+      v-model="dialog"
+      max-width="600"
+      lazy
+    >
       <v-card>
-        <v-card-title class="headline">Add new HcStat</v-card-title>
+        <v-card-title class="headline">
+          Add new HcStat
+        </v-card-title>
         <v-tabs
           v-model="active"
           color="grey lighten-4"
           light
-          slider-color="primary">
+          slider-color="primary"
+        >
           <v-tab ripple>
             Upload file
           </v-tab>
@@ -65,27 +109,36 @@
           </v-tab>
           <v-tab-item>
             <v-card text>
-              <file-uploader :url="this.$serverAddr + '/markovChains/add'" @uploadComplete="loadMarkovChains(); dialog=false"></file-uploader>
+              <file-uploader
+                :url="this.$serverAddr + '/markovChains/add'"
+                @uploadComplete="loadMarkovChains(); dialog=false"
+              />
             </v-card>
           </v-tab-item>
           <v-tab-item>
-            <div class="text-xs-center" v-if="adding">
+            <div
+              v-if="adding"
+              class="text-center"
+            >
               <v-progress-circular
                 class="ma-5"
                 size="50"
                 :width="3"
                 indeterminate
-                color="primary">
-              </v-progress-circular>
+                color="primary"
+              />
             </div>
-            <v-card text v-else>
+            <v-card
+              v-else
+              text
+            >
               <div class="px-2">
                 <v-text-field
-                  name="name"
-                  label="Name"
                   id="newHcStatName"
                   v-model="newName"
-                ></v-text-field>
+                  name="name"
+                  label="Name"
+                />
               </div>
               <v-data-table
                 :headers="dictionaryHeader"
@@ -94,33 +147,53 @@
                 :loading="loadingDictionaries"
                 :rows-per-page-items="[10,25,50]"
                 rows-per-page-text="Dictionaries per page"
-                disable-initial-sort
+                
               >
-                <template slot="items" slot-scope="props">
-                  <tr @click="selectedDictId=props.item.id" class="clickable"
-                      v-bind:class="{selectedDict: (props.item.id === selectedDictId)}" >
+                <template
+                  slot="items"
+                  slot-scope="props"
+                >
+                  <tr
+                    class="clickable"
+                    :class="{selectedDict: (props.item.id === selectedDictId)}"
+                    @click="selectedDictId=props.item.id"
+                  >
                     <td>{{ props.item.name }}</td>
-                    <td class="text-xs-right">{{ props.item.keyspace }}</td>
-                    <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-                    <td class="text-xs-right">
+                    <td class="text-right">
+                      {{ props.item.keyspace }}
+                    </td>
+                    <td class="text-right">
+                      {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
+                    </td>
+                    <td class="text-right">
                       <v-tooltip top>
-                        <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.id}}" v-on="on">
-                          <v-icon color="primary">link</v-icon>
-                        </v-btn></template>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            icon
+                            class="mx-0"
+                            :to="{name: 'dictionaryDetail', params: { id: props.item.id}}"
+                            v-on="on"
+                          >
+                            <v-icon color="primary">
+                              link
+                            </v-icon>
+                          </v-btn>
+                        </template>
                         <span>Go to the dictionary page</span>
                       </v-tooltip>
                     </td>
                   </tr>
-
                 </template>
               </v-data-table>
-              <div class="text-xs-right pa-3">
-                <v-btn class="d-inline-block"
-                       color="primary"
+              <div class="text-right pa-3">
+                <v-btn
+                  class="d-inline-block"
+                  color="primary"
 
-                       outlined
-                       @click="makeHcStatFromDictionary()"
-                       :disabled="selectedDictId === null && newName === ''">
+                  outlined
+                  :disabled="selectedDictId === null && newName === ''"
+                  @click="makeHcStatFromDictionary()"
+                >
                   Make from dictionary
                 </v-btn>
               </div>
@@ -129,13 +202,6 @@
         </v-tabs>
       </v-card>
     </v-dialog>
-
-
-
-
-
-
-
   </v-container>
 </template>
 
@@ -143,10 +209,43 @@
   import tile from '@/components/tile/fc_tile'
   import FileUploader from "@/components/fileUploader/fileUploader";
   export default {
-    name: "markovView",
+    name: "MarkovView",
     components: {
       FileUploader,
       'fc-tile': tile,
+    },
+    data: function () {
+      return {
+        newName: '',
+        adding: false,
+        selectedDictId: null,
+        active: null,
+        dialog: false,
+        loading: false,
+        loadingDictionaries: false,
+        dictionaries: [],
+        headers: [
+          {
+            text: 'Name',
+            align: 'left',
+            value: 'name'
+          },
+          {text: 'Added', value: 'time', align: 'right'},
+          {text: 'Download', value: 'name', align: 'right'},
+          {text: 'Delete', align: 'right'}
+        ],
+        dictionaryHeader: [
+          {
+            text: 'Name',
+            align: 'left',
+            value: 'name'
+          },
+          {text: 'Keyspace', value: 'keyspace', align: 'right'},
+          {text: 'Time', value: 'time', align: 'right'},
+          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+        ],
+        markovChains: [],
+      }
     },
     mounted: function () {
       this.loadMarkovChains()
@@ -187,39 +286,6 @@
             this.loadMarkovChains()
           })
         })
-      }
-    },
-    data: function () {
-      return {
-        newName: '',
-        adding: false,
-        selectedDictId: null,
-        active: null,
-        dialog: false,
-        loading: false,
-        loadingDictionaries: false,
-        dictionaries: [],
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'},
-          {text: 'Delete', align: 'right'}
-        ],
-        dictionaryHeader: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
-        ],
-        markovChains: [],
       }
     }
   }

@@ -6,97 +6,161 @@
 <template>
   <div class="relative">
     <div v-if="data === null">
-      <v-progress-circular indeterminate
-                           color="primary"
-                           size="65"
-                           class="loadingProgress"
-                           :width="4">
-      </v-progress-circular>
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="65"
+        class="loadingProgress"
+        :width="4"
+      />
     </div>
     <div v-else>
-      <v-breadcrumbs divider="/" class="pb-0">
+      <v-breadcrumbs
+        divider="/"
+        class="pb-0"
+      >
         <v-breadcrumbs-item>
-          <router-link :to="{name: 'jobs'}">Jobs</router-link>
+          <router-link :to="{name: 'jobs'}">
+            Jobs
+          </router-link>
         </v-breadcrumbs-item>
         <v-breadcrumbs-item>
-          {{data.name}}
+          {{ data.name }}
         </v-breadcrumbs-item>
       </v-breadcrumbs>
       <div>
-        <v-layout row wrap justify-center>
+        <v-row justify="center">
           <div class="px-2 max100">
-
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 max500">
-              <v-toolbar color="primary" dark flat>
+            <v-row class="mt-3 mb-5 elevation-2 max500">
+              <v-toolbar
+                color="primary"
+                dark
+                flat
+              >
                 <v-toolbar-title>
-                  {{data.name}}
+                  {{ data.name }}
                 </v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn outlined small fab color="white" @click.native.stop="showEditJobDialog">
+                <v-spacer />
+                <v-btn
+                  outlined
+                  small
+                  fab
+                  color="white"
+                  @click.native.stop="showEditJobDialog"
+                >
                   <v-icon>edit</v-icon>
                 </v-btn>
               </v-toolbar>
-              <v-list single-line class="width100">
+              <v-list
+                single-line
+                class="width100"
+              >
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Operations:
                   </v-list-item-action>
                   <v-list-item-content class="height100">
-                    <v-list-item-title class="text-xs-right height100">
+                    <v-list-item-title class="text-right height100">
                       <div class="actionsBtns">
                         <v-tooltip top>
-                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :disabled="data.status !== '0'" v-on="on" @click="operateJob('start')">
-                            <v-icon color="success">play_circle_outlined</v-icon>
-                          </v-btn></template>
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                              icon
+                              class="mx-0"
+                              :disabled="data.status !== '0'"
+                              v-on="on"
+                              @click="operateJob('start')"
+                            >
+                              <v-icon color="success">
+                                play_circle_outlined
+                              </v-icon>
+                            </v-btn>
+                          </template>
                           <span>Start job</span>
                         </v-tooltip>
                         <v-tooltip top>
-                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" v-on="on" :disabled="data.status >= 10" @click="operateJob('restart')">
-                            <v-icon color="info">loop</v-icon>
-                          </v-btn></template>
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                              icon
+                              class="mx-0"
+                              :disabled="data.status >= 10"
+                              v-on="on"
+                              @click="operateJob('restart')"
+                            >
+                              <v-icon color="info">
+                                loop
+                              </v-icon>
+                            </v-btn>
+                          </template>
                           <span>Restart job</span>
                         </v-tooltip>
                         <v-tooltip top>
-                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :disabled="data.status !== '10'" v-on="on" @click="operateJob('stop')">
-                            <v-icon color="error">pause_circle_outlined</v-icon>
-                          </v-btn></template>
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                              icon
+                              class="mx-0"
+                              :disabled="data.status !== '10'"
+                              v-on="on"
+                              @click="operateJob('stop')"
+                            >
+                              <v-icon color="error">
+                                pause_circle_outlined
+                              </v-icon>
+                            </v-btn>
+                          </template>
                           <span>Stop job</span>
                         </v-tooltip>
                         <v-tooltip top>
-                          <template v-slot:activator="{ on }"><v-btn icon class="mx-0" v-on="on" @click="operateJob('kill')">
-                            <v-icon color="error">cancel</v-icon>
-                          </v-btn></template>
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                              icon
+                              class="mx-0"
+                              v-on="on"
+                              @click="operateJob('kill')"
+                            >
+                              <v-icon color="error">
+                                cancel
+                              </v-icon>
+                            </v-btn>
+                          </template>
                           <span>Purge job</span>
                         </v-tooltip>
                       </div>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Comment:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">{{data.comment}}</v-list-item-title>
+                    <v-list-item-title class="text-right">
+                      {{ data.comment }}
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Job keyspace:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">{{data.keyspace}}</v-list-item-title>
+                    <v-list-item-title class="text-right">
+                      {{ data.keyspace }}
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Status:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title v-bind:class="data.status_type + '--text'" class="text-xs-right fw500">
+                    <v-list-item-title
+                      :class="data.status_type + '--text'"
+                      class="text-right fw500"
+                    >
                       <v-tooltip top>
                         <span
                           slot="activator"
@@ -108,254 +172,354 @@
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Hash type:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right fw500">{{data.hash_type_name}}</v-list-item-title>
+                    <v-list-item-title class="text-right fw500">
+                      {{ data.hash_type_name }}
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
-                <v-list-item class="px-2 py-1" v-if="data.password !== null">
+                <v-divider />
+                <v-list-item
+                  v-if="data.password !== null"
+                  class="px-2 py-1"
+                >
                   <v-list-item-action class="pr-3 key">
                     Password:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right fw500">{{data.password}}</v-list-item-title>
+                    <v-list-item-title class="text-right fw500">
+                      {{ data.password }}
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Added:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">{{ $moment(data.time).calendar() }}</v-list-item-title>
+                    <v-list-item-title class="text-right">
+                      {{ $moment(data.time).calendar() }}
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Workunit sum time:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">{{data.cracking_time_str}}</v-list-item-title>
+                    <v-list-item-title class="text-right">
+                      {{ data.cracking_time_str }}
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Job cracking time:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">{{ $moment.utc($moment(data.time_end).diff($moment(data.time_start))).format("HH:mm:ss") }}</v-list-item-title>
+                    <v-list-item-title class="text-right">
+                      {{ $moment.utc($moment(data.time_end).diff($moment(data.time_start))).format("HH:mm:ss") }}
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Progress:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right jobProgress">
-                      <v-layout wrap column>
-                        <v-flex xs-12 class="height5 text-xs-center">
+                    <v-list-item-title class="text-right jobProgress">
+                      <v-row column>
+                        <v-col class="height5 text-center xs-12">
                           <span
-                            class="progressPercentage primary--text">{{ progressToPercentage(data.progress) }}</span>
-                        </v-flex>
-                        <v-flex xs-12 class="progressLinear">
+                            class="progressPercentage primary--text"
+                          >{{ progressToPercentage(data.progress) }}</span>
+                        </v-col>
+                        <v-col class="progressLinear xs-12">
                           <v-progress-linear
                             height="3"
                             color="primary"
                             :value="data.progress"
-                          >
-                          </v-progress-linear>
-                        </v-flex>
-                      </v-layout>
+                          />
+                        </v-col>
+                      </v-row>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Start time:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">
-                      <v-list-item-title class="text-xs-right">{{(data.time_start !== null) ? (
-                        $moment(data.time_start).format('DD.MM.YYYY HH:mm')) : 'Not started yet'}}
+                    <v-list-item-title class="text-right">
+                      <v-list-item-title class="text-right">
+                        {{ (data.time_start !== null) ? (
+                          $moment(data.time_start).format('DD.MM.YYYY HH:mm')) : 'Not started yet' }}
                       </v-list-item-title>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     End time:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">{{(data.time_end !== null) ? (
-                      $moment(data.time_end).format('DD.MM.YYYY HH:mm')) : 'Not set'}}
+                    <v-list-item-title class="text-right">
+                      {{ (data.time_end !== null) ? (
+                        $moment(data.time_end).format('DD.MM.YYYY HH:mm')) : 'Not set' }}
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Efficiency:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">
+                    <v-list-item-title class="text-right">
                       <v-tooltip top>
-                        <template v-slot:activator="{ on }"><span v-on="on">{{efficiency}}</span></template>
+                        <template v-slot:activator="{ on }">
+                          <span v-on="on">{{ efficiency }}</span>
+                        </template>
                         <span>Efficiency is computed as sum of cracking time of each workunit divided by count of hosts multipled by total cracking time.</span>
                       </v-tooltip>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Seconds per workunit:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-xs-right">{{data.seconds_per_job}}
+                    <v-list-item-title class="text-right">
+                      {{ data.seconds_per_job }}
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-
               </v-list>
-            </v-layout>
+            </v-row>
 
 
-            <combinatorDetail class="max500" :data="data" v-if="data.attack === 'combinator'"/>
-            <maskDetail class="max500" :data="data" v-else-if="data.attack === 'mask'"/>
-            <dictionaryDetail class="max500" :data="data" v-else-if="data.attack === 'dictionary'"/>
-            <combinatorDetail class="max500" :data="data" v-else-if="data.attack === 'hybrid (Wordlist + Mask)'"/>
-            <combinatorDetail class="max500" :data="data" v-else-if="data.attack === 'hybrid (Mask + Wordlist)'"/>
-            <pcfgDetail class="max500" :data="data" v-else-if="data.attack === 'PCFG'"/>
+            <combinatorDetail
+              v-if="data.attack === 'combinator'"
+              class="max500"
+              :data="data"
+            />
+            <maskDetail
+              v-else-if="data.attack === 'mask'"
+              class="max500"
+              :data="data"
+            />
+            <dictionaryDetail
+              v-else-if="data.attack === 'dictionary'"
+              class="max500"
+              :data="data"
+            />
+            <combinatorDetail
+              v-else-if="data.attack === 'hybrid (Wordlist + Mask)'"
+              class="max500"
+              :data="data"
+            />
+            <combinatorDetail
+              v-else-if="data.attack === 'hybrid (Mask + Wordlist)'"
+              class="max500"
+              :data="data"
+            />
+            <pcfgDetail
+              v-else-if="data.attack === 'PCFG'"
+              class="max500"
+              :data="data"
+            />
 
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 max500">
-              <v-toolbar color="primary" dark flat>
+            <v-row class="mt-3 mb-5 elevation-2 max500">
+              <v-toolbar
+                color="primary"
+                dark
+                flat
+              >
                 <v-toolbar-title>Hashes</v-toolbar-title>
               </v-toolbar>
               <v-data-table
                 :headers="hashHeaders"
                 class="width100 maxHeight500"
                 :items="data.hashes"
-                disable-initial-sort
-                :rows-per-page-items='[25,50,100,{"text":"All","value":-1}]'
+                
+                :rows-per-page-items="[25,50,100,{&quot;text&quot;:&quot;All&quot;,&quot;value&quot;:-1}]"
               >
-                <template slot="items" slot-scope="props">
+                <template
+                  slot="items"
+                  slot-scope="props"
+                >
                   <td>{{ props.item.hashText }}</td>
-                  <td class="text-xs-right">
+                  <td class="text-right">
                     {{ props.item.password }}
                   </td>
                 </template>
               </v-data-table>
-            </v-layout>
+            </v-row>
 
 
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2 max700">
-              <v-toolbar color="primary" dark flat>
+            <v-row class="mt-3 mb-5 elevation-2 max700">
+              <v-toolbar
+                color="primary"
+                dark
+                flat
+              >
                 <v-toolbar-title>Hosts</v-toolbar-title>
               </v-toolbar>
-              <v-list single-line class="width100">
+              <v-list
+                single-line
+                class="width100"
+              >
                 <v-data-table
                   :headers="hostheaders"
                   :items="data.hosts"
-                  disable-initial-sort
-                  hide-actions
+                  
+                  hide-default-footer
                 >
-                  <template slot="items" slot-scope="props">
+                  <template
+                    slot="items"
+                    slot-scope="props"
+                  >
                     <td>
-                      <router-link :to="{ name: 'hostDetail', params: { id: props.item.id}}" class="middle">
-                        {{ props.item.domain_name + ' (' + props.item.user.name + ')'}}</router-link>
+                      <router-link
+                        :to="{ name: 'hostDetail', params: { id: props.item.id}}"
+                        class="middle"
+                      >
+                        {{ props.item.domain_name + ' (' + props.item.user.name + ')' }}
+                      </router-link>
                     </td>
-                    <td class="text-xs-right">{{ props.item.ip_address }}</td>
-                    <td class="text-xs-right"  v-bind:class="{
+                    <td class="text-right">
+                      {{ props.item.ip_address }}
+                    </td>
+                    <td
+                      class="text-right"
+                      :class="{
                         'error--text': props.item.last_active.seconds_delta > 61,
                         'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
-                      }">
-                      <v-icon :title="parseTimeDelta(props.item.last_active.last_seen)" class="inheritColor">fiber_manual_record</v-icon>
+                      }"
+                    >
+                      <v-icon
+                        :title="parseTimeDelta(props.item.last_active.last_seen)"
+                        class="inheritColor"
+                      >
+                        fiber_manual_record
+                      </v-icon>
                     </td>
                   </template>
                 </v-data-table>
-                <v-divider></v-divider>
+                <v-divider />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-content>
-                    <v-btn class="ma-0" outlined color="primary" @click.native.stop="showMappingHostDialog">Edit
+                    <v-btn
+                      class="ma-0"
+                      outlined
+                      color="primary"
+                      @click.native.stop="showMappingHostDialog"
+                    >
+                      Edit
                       mapping
                     </v-btn>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
-            </v-layout>
+            </v-row>
           </div>
 
           <div class="px-3 min500">
-            <v-layout row wrap class="mt-3 mb-5 elevation-2">
-              <v-toolbar color="primary" dark flat>
+            <v-row class="mt-3 mb-5 elevation-2">
+              <v-toolbar
+                color="primary"
+                dark
+                flat
+              >
                 <v-toolbar-title>Job progress</v-toolbar-title>
               </v-toolbar>
               <fc-graph
                 id="progressGraph"
-                :data='progressGraph'
+                :data="progressGraph"
                 units="%"
                 type="job"
+              />
+            </v-row>
+
+
+            <v-row class="mt-3 mb-5 elevation-2">
+              <v-toolbar
+                color="primary"
+                dark
+                flat
               >
-              </fc-graph>
-            </v-layout>
-
-
-            <v-layout row wrap class="mt-3 mb-5 elevation-2">
-              <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Hashes in workunit</v-toolbar-title>
               </v-toolbar>
               <fc-graph
                 id="hostGraph"
-                :data='hostGraph'
+                :data="hostGraph"
                 units=" hashes"
                 type="host"
-              >
-              </fc-graph>
-            </v-layout>
+              />
+            </v-row>
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2">
-              <v-toolbar color="primary" dark flat>
+            <v-row class="mt-3 mb-5 elevation-2">
+              <v-toolbar
+                color="primary"
+                dark
+                flat
+              >
                 <v-toolbar-title>Host percentage work</v-toolbar-title>
               </v-toolbar>
               <fc-graph
                 id="hostPercentageGraph"
-                :data='hostPercentageGraph'
-              >
-              </fc-graph>
-            </v-layout>
+                :data="hostPercentageGraph"
+              />
+            </v-row>
 
-            <v-layout row wrap class="mt-3 mb-5 elevation-2">
-              <v-toolbar color="primary" dark flat>
+            <v-row class="mt-3 mb-5 elevation-2">
+              <v-toolbar
+                color="primary"
+                dark
+                flat
+              >
                 <v-toolbar-title>Status history</v-toolbar-title>
               </v-toolbar>
-              <v-list single-line class="width100">
+              <v-list
+                single-line
+                class="width100"
+              >
                 <v-data-table
-                        :headers="statusHeaders"
-                        :items="statusHistory"
-                        :rows-per-page-items='[5,10,15,{"text":"All","value":-1}]'
+                  :headers="statusHeaders"
+                  :items="statusHistory"
+                  :rows-per-page-items="[5,10,15,{&quot;text&quot;:&quot;All&quot;,&quot;value&quot;:-1}]"
                 >
-                  <template slot="items" slot-scope="props">
-                    <td class="text-xs-left">{{ $moment(props.item.time).format('DD.MM.YYYY HH:mm')
+                  <template
+                    slot="items"
+                    slot-scope="props"
+                  >
+                    <td class="text-left">
+                      {{ $moment(props.item.time).format('DD.MM.YYYY HH:mm')
                       }}
                     </td>
-                    <td class="text-xs-right text-xs-right fw500"
-                        v-bind:class="props.item.status_type + '--text'">
+                    <td
+                      class="text-right text-right fw500"
+                      :class="props.item.status_type + '--text'"
+                    >
                       <v-tooltip top>
                         <template v-slot:activator="{ on }">
                           <span v-on="on">
-                              {{ props.item.status_text }}
+                            {{ props.item.status_text }}
                           </span>
                         </template>
                         <span>{{ props.item.status_tooltip }}</span>
@@ -364,43 +528,59 @@
                   </template>
                 </v-data-table>
               </v-list>
-            </v-layout>
-
+            </v-row>
           </div>
-        </v-layout>
+        </v-row>
         <div class=" mx-3">
-          <v-layout row wrap class="mt-3 mb-5 max1000 mx-auto elevation-2">
-            <v-toolbar color="primary" dark flat>
+          <v-row class="mt-3 mb-5 max1000 mx-auto elevation-2">
+            <v-toolbar
+              color="primary"
+              dark
+              flat
+            >
               <v-toolbar-title
-                      v-text="'Workunits | Work: ' + workunitTitle.valid + ' | Benchmark: ' + workunitTitle.benchmarks + ' | Avg keyspace: ' + workunitTitle.avgKeyspace.toLocaleString()"></v-toolbar-title></v-toolbar-title>
+                v-text="'Workunits | Work: ' + workunitTitle.valid + ' | Benchmark: ' + workunitTitle.benchmarks + ' | Avg keyspace: ' + workunitTitle.avgKeyspace.toLocaleString()"
+              /></v-toolbar-title>
             </v-toolbar>
 
             <div class="workunit-parent">
-              <div v-for="workunit in workunitsGraphical"
-                   v-bind:style="{ 'flex-grow': workunit.keyspace, 'background-color': workunit.color }"
-                   class="workunit-child">
+              <div
+                v-for="workunit in workunitsGraphical"
+                :style="{ 'flex-grow': workunit.keyspace, 'background-color': workunit.color }"
+                class="workunit-child"
+              >
                 <v-tooltip bottom>
-                  <template v-slot:activator="{ on }"><div v-on="on">&nbsp;</div></template>
-                  <span>{{workunit.text}}</span>
+                  <template v-slot:activator="{ on }">
+                    <div v-on="on">
+&nbsp;
+                    </div>
+                  </template>
+                  <span>{{ workunit.text }}</span>
                 </v-tooltip>
-
               </div>
             </div>
 
             <v-data-table
               :rows-per-page-items="[15,30,60,{'text':'All','value':-1}]"
               rows-per-page-text="Workunits per page"
-              disable-initial-sort
+              
               :headers="workunitsHeader"
               :items="data.workunits"
               class="width100"
             >
-              <template slot="items" slot-scope="props">
+              <template
+                slot="items"
+                slot-scope="props"
+              >
                 <td>
-                  <router-link :to="{ name: 'hostDetail', params: { id: props.item.host.id}}" class="middle">
-                    {{ props.item.host.domain_name + ' (' + props.item.host.user.name + ')' }}</router-link>
+                  <router-link
+                    :to="{ name: 'hostDetail', params: { id: props.item.host.id}}"
+                    class="middle"
+                  >
+                    {{ props.item.host.domain_name + ' (' + props.item.host.user.name + ')' }}
+                  </router-link>
                 </td>
-                <td class="text-xs-right">
+                <td class="text-right">
                   <v-progress-circular
                     size="35"
                     :width="1.5"
@@ -411,106 +591,164 @@
                     <span class="progressPercentageMask">{{ props.item.progress }}</span>
                   </v-progress-circular>
                 </td>
-                <td class="text-xs-right">{{ props.item.cracking_time_str }}</td>
-                <td class="text-xs-right">{{ $moment(props.item.time).format('DD.MM.YYYY HH:mm') }}</td>
-                <td class="text-xs-right">{{ props.item.start_index }}</td>
-                <td class="text-xs-right">{{ props.item.hc_keyspace }}</td>
-                <td class="text-xs-right error--text" v-bind:class="{'success--text': props.item.retry}">{{
-                  yesNo(props.item.retry) }}
+                <td class="text-right">
+                  {{ props.item.cracking_time_str }}
                 </td>
-                <td class="text-xs-right error--text" v-bind:class="{'success--text': props.item.finished}">{{
-                  yesNo(props.item.finished) }}
+                <td class="text-right">
+                  {{ $moment(props.item.time).format('DD.MM.YYYY HH:mm') }}
                 </td>
-                <td class="text-xs-right"><v-btn icon small text color="primary" @click="props.expanded = !props.expanded"><v-icon>insert_drive_file</v-icon></v-btn></td>
+                <td class="text-right">
+                  {{ props.item.start_index }}
+                </td>
+                <td class="text-right">
+                  {{ props.item.hc_keyspace }}
+                </td>
+                <td
+                  class="text-right error--text"
+                  :class="{'success--text': props.item.retry}"
+                >
+                  {{
+                    yesNo(props.item.retry) }}
+                </td>
+                <td
+                  class="text-right error--text"
+                  :class="{'success--text': props.item.finished}"
+                >
+                  {{
+                    yesNo(props.item.finished) }}
+                </td>
+                <td class="text-right">
+                  <v-btn
+                    icon
+                    small
+                    text
+                    color="primary"
+                    @click="props.expanded = !props.expanded"
+                  >
+                    <v-icon>insert_drive_file</v-icon>
+                  </v-btn>
+                </td>
               </template>
-              <template slot="expand" slot-scope="props">
-                <fc-textarea max-height="500" :readonly="true" :value="props.item.result.stderr_out_text"></fc-textarea>
+              <template
+                slot="expand"
+                slot-scope="props"
+              >
+                <fc-textarea
+                  max-height="500"
+                  :readonly="true"
+                  :value="props.item.result.stderr_out_text"
+                />
               </template>
             </v-data-table>
-          </v-layout>
+          </v-row>
         </div>
-
       </div>
     </div>
 
 
-    <v-dialog v-model="editJobDialog" max-width="490" lazy>
-      <v-card class="pt-4" v-if="editJobValues !== null">
-        <v-layout row wrap class="px-3">
-          <v-flex xs4>
-            <v-subheader class="height64">Name:</v-subheader>
-          </v-flex>
-          <v-flex xs8>
+    <v-dialog
+      v-model="editJobDialog"
+      max-width="490"
+      lazy
+    >
+      <v-card
+        v-if="editJobValues !== null"
+        class="pt-4"
+      >
+        <v-row class="px-3">
+          <v-col cols="4">
+            <v-subheader class="height64">
+              Name:
+            </v-subheader>
+          </v-col>
+          <v-col cols="8">
             <v-text-field
-              single-line
               v-model="editJobValues.name"
+              single-line
               required
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs4>
-            <v-subheader class="height64">Comment:</v-subheader>
-          </v-flex>
-          <v-flex xs8>
+            />
+          </v-col>
+          <v-col cols="4">
+            <v-subheader class="height64">
+              Comment:
+            </v-subheader>
+          </v-col>
+          <v-col cols="8">
             <v-text-field
               v-model="editJobValues.comment"
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs4>
-            <v-subheader class="height64">Start time:</v-subheader>
-          </v-flex>
-          <v-flex xs5>
+            />
+          </v-col>
+          <v-col cols="4">
+            <v-subheader class="height64">
+              Start time:
+            </v-subheader>
+          </v-col>
+          <v-col cols="5">
             <v-text-field
-              :disabled="editJobValues.startNow"
               v-model="editJobValues.time_start"
+              :disabled="editJobValues.startNow"
               text
               single-line
               label=""
               mask="date-with-time"
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs3>
+            />
+          </v-col>
+          <v-col cols="3">
             <v-checkbox
-              label="start now"
               v-model="editJobValues.startNow"
-            ></v-checkbox>
-          </v-flex>
-          <v-flex xs4>
-            <v-subheader class="height64">End time:</v-subheader>
-          </v-flex>
-          <v-flex xs5>
+              label="start now"
+            />
+          </v-col>
+          <v-col cols="4">
+            <v-subheader class="height64">
+              End time:
+            </v-subheader>
+          </v-col>
+          <v-col cols="5">
             <v-text-field
-              :disabled="editJobValues.endNever"
               v-model="editJobValues.time_end"
+              :disabled="editJobValues.endNever"
               text
               single-line
               label=""
               mask="date-with-time"
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs3>
+            />
+          </v-col>
+          <v-col cols="3">
             <v-checkbox
-              label="End never"
               v-model="editJobValues.endNever"
-            ></v-checkbox>
-          </v-flex>
-          <v-flex xs4>
-            <v-subheader class="height64">Seconds per workunit:</v-subheader>
-          </v-flex>
-          <v-flex xs8>
+              label="End never"
+            />
+          </v-col>
+          <v-col cols="4">
+            <v-subheader class="height64">
+              Seconds per workunit:
+            </v-subheader>
+          </v-col>
+          <v-col cols="8">
             <v-text-field
               v-model="editJobValues.seconds_per_job"
-            ></v-text-field>
-          </v-flex>
-        </v-layout>
+            />
+          </v-col>
+        </v-row>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click.native="changeJobSettings">Save</v-btn>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            @click.native="changeJobSettings"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
 
-    <v-dialog v-model="editHostsDialog" max-width="800">
+    <v-dialog
+      v-model="editHostsDialog"
+      max-width="800"
+    >
       <v-card>
         <v-data-table
           v-model="newHostsMapping"
@@ -520,22 +758,25 @@
           :headers="hostHeaders"
           :items="hosts"
           :pagination.sync="paginationHost"
-          :total-items="totalHostItems"
+          :server-items-length="totalHostItems"
           :loading="loadingHosts"
           :rows-per-page-items="[10, 25,50,100]"
           rows-per-page-text="Hosts per page"
-          disable-initial-sort
+          
         >
-          <template slot="headers" slot-scope="props">
+          <template
+            slot="headers"
+            slot-scope="props"
+          >
             <tr>
               <th>
                 <v-checkbox
                   primary
                   hide-details
-                  @click.native="toggleAll"
                   :input-value="props.all"
                   :indeterminate="props.indeterminate"
-                ></v-checkbox>
+                  @click.native="toggleAll"
+                />
               </th>
               <th
                 v-for="header in hostHeaders"
@@ -543,37 +784,64 @@
                 :class="['column sortable', paginationHost.descending ? 'desc' : 'asc', header.value === paginationHost.sortBy ? 'active' : '']"
                 @click="changeSort(header.value)"
               >
-                <v-icon small>arrow_upward</v-icon>
+                <v-icon small>
+                  arrow_upward
+                </v-icon>
                 {{ header.text }}
               </th>
             </tr>
           </template>
-          <template slot="items" slot-scope="props">
-            <tr :active="props.selected" @click="props.selected = !props.selected">
+          <template
+            slot="items"
+            slot-scope="props"
+          >
+            <tr
+              :active="props.selected"
+              @click="props.selected = !props.selected"
+            >
               <td>
-                <v-checkbox :input-value="props.selected"></v-checkbox>
+                <v-checkbox :input-value="props.selected" />
               </td>
               <td>
-                <router-link :to="{ name: 'hostDetail', params: { id: props.item.id}}" class="middle">{{ props.item.domain_name + ' (' + props.item.user.name + ')'}}</router-link>
+                <router-link
+                  :to="{ name: 'hostDetail', params: { id: props.item.id}}"
+                  class="middle"
+                >
+                  {{ props.item.domain_name + ' (' + props.item.user.name + ')' }}
+                </router-link>
               </td>
-              <td class="text-xs-right">{{ props.item.ip_address }}</td>
-              <td class="text-xs-right"  v-bind:class="{
+              <td class="text-right">
+                {{ props.item.ip_address }}
+              </td>
+              <td
+                class="text-right"
+                :class="{
                   'error--text': props.item.last_active.seconds_delta > 61,
                   'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
-                }">
-                <v-icon :title="parseTimeDelta(props.item.last_active.last_seen)" class="inheritColor">fiber_manual_record</v-icon>
+                }"
+              >
+                <v-icon
+                  :title="parseTimeDelta(props.item.last_active.last_seen)"
+                  class="inheritColor"
+                >
+                  fiber_manual_record
+                </v-icon>
               </td>
             </tr>
           </template>
         </v-data-table>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click.native="changeHostMapping">Save</v-btn>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            @click.native="changeHostMapping"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-
   </div>
 </template>
 
@@ -587,7 +855,7 @@
   import FcTextarea from '@/components/textarea/fc_textarea'
 
   export default {
-    name: "jobDetail",
+    name: "JobDetail",
     components: {
       'fc-graph': graph,
       'combinatorDetail': combinatorDetail,
@@ -595,15 +863,6 @@
       'dictionaryDetail': dictionaryDetail,
       'pcfgDetail': pcfgDetail,
       'fc-textarea': FcTextarea
-    },
-    mounted: function () {
-      this.loadData();
-      this.interval = setInterval(function () {
-        this.loadData()
-      }.bind(this), 8000)
-    },
-    beforeDestroy: function () {
-      clearInterval(this.interval)
     },
 
     data: function () {
@@ -683,6 +942,15 @@
           endNever: false
         }
       }
+    },
+    mounted: function () {
+      this.loadData();
+      this.interval = setInterval(function () {
+        this.loadData()
+      }.bind(this), 8000)
+    },
+    beforeDestroy: function () {
+      clearInterval(this.interval)
     },
     methods: {
       parseTimeDelta: function (delta) {

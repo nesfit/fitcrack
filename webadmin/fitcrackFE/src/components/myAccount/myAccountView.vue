@@ -4,9 +4,9 @@
 -->
 
 <template>
-    <v-container fluid>
-      <h2> My account </h2>
-  <!--      <div class="table">
+  <v-container fluid>
+    <h2> My account </h2>
+    <!--      <div class="table">
       <v-card class="width150">
           <v-card-title>
             <h3> My info </h3>
@@ -32,48 +32,65 @@
 
       </div> -->
 
-      <div class="table">
+    <div class="table">
       <v-card class="width150">
         <v-card-title>
           <h3> Change password </h3>
         </v-card-title>
         <v-card-text>
-
-      <v-form ref="form" lazy-validation>
-          <v-text-field
-            type="password"
-            label="Old password"
-            v-model="oldPassword"
-            required
-          ></v-text-field>
-          <v-text-field
-            type="password"
-            label="New password"
-            v-model="newPassword0"
-            required
-          ></v-text-field>
-          <v-text-field
-            type="password"
-            label="New password"
-            v-model="newPassword1"
-            required
-          ></v-text-field>
+          <v-form
+            ref="form"
+            lazy-validation
+          >
+            <v-text-field
+              v-model="oldPassword"
+              type="password"
+              label="Old password"
+              required
+            />
+            <v-text-field
+              v-model="newPassword0"
+              type="password"
+              label="New password"
+              required
+            />
+            <v-text-field
+              v-model="newPassword1"
+              type="password"
+              label="New password"
+              required
+            />
           </v-form>
         </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" text @click.stop="editPassword" :disabled="this.newPassword0 != this.newPassword1 || this.oldPassword == null || this.newPassword0 == null">Update</v-btn>
-          </v-card-actions>
-
-    </v-card>
-  </div>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            :disabled="this.newPassword0 != this.newPassword1 || this.oldPassword == null || this.newPassword0 == null"
+            @click.stop="editPassword"
+          >
+            Update
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </div>
   <!--    <h3> Message: {{ user }} </h3> -->
-    </v-container>
+  </v-container>
 </template>
 
 <script>
     export default {
-      name: "myAccount",
+      name: "MyAccount",
+      data: function() {
+       return {
+          username: this.$username,
+          email: "mail",
+          newPassword0: null,
+          newPassword1: null,
+          user: []
+        }
+      },
       computed: {
         gradient: function () {
           return window.theme.gradient
@@ -104,15 +121,6 @@
           })
 
 
-        }
-      },
-      data: function() {
-       return {
-          username: this.$username,
-          email: "mail",
-          newPassword0: null,
-          newPassword1: null,
-          user: []
         }
       }
   }

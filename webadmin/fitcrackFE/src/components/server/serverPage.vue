@@ -5,24 +5,33 @@
 
 <template>
   <v-container fluid>
-    <v-layout>
+    <v-row>
       <v-container class="flex1">
-
-        <fc-tile title="Server" class="mx-3 mb-5" :loading="serverInfo == null">
-          <v-list single-line class="width100" v-if="serverInfo != null">
+        <fc-tile
+          title="Server"
+          class="mx-3 mb-5"
+          :loading="serverInfo == null"
+        >
+          <v-list
+            v-if="serverInfo != null"
+            single-line
+            class="width100"
+          >
             <template v-for="(subsystem, i) in serverInfo.subsystems">
               <v-list-item class="px-2 py-1">
                 <v-list-item-action class="pr-3 key">
-                  {{subsystem.name}}:
+                  {{ subsystem.name }}:
                 </v-list-item-action>
                 <v-list-item-content>
-                  <v-list-item-title class="text-xs-right error--text"
-                                     v-bind:class="{'success--text': subsystem.status==='running'}">
+                  <v-list-item-title
+                    class="text-right error--text"
+                    :class="{'success--text': subsystem.status==='running'}"
+                  >
                     {{ subsystem.status }}
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-divider v-if="!(serverInfo.subsystems.length === i+1)"></v-divider>
+              <v-divider v-if="!(serverInfo.subsystems.length === i+1)" />
             </template>
             <!--                        <v-list-item class="px-2 py-1 ">-->
             <!--                            <v-list-item-content class="">-->
@@ -37,83 +46,117 @@
         </fc-tile>
       </v-container>
       <v-container class="flex2">
-        <fc-tile title="CPU & Memory" class="mx-3 mb-5 maxh300 flex1">
+        <fc-tile
+          title="CPU & Memory"
+          class="mx-3 mb-5 maxh300 flex1"
+        >
           <fc-graph
-                  id="packageGraph1"
-                  :data='usageData'
-                  type="job"
-                  :labels="cpumemLabels"
-                  :labelsText="cpumemLabelsFriendly"
-          >
-          </fc-graph>
+            id="packageGraph1"
+            :data="usageData"
+            type="job"
+            :labels="cpumemLabels"
+            :labels-text="cpumemLabelsFriendly"
+          />
         </fc-tile>
 
-        <fc-tile title="HDD usage" class="mx-3 mb-5 maxh300 flex1">
+        <fc-tile
+          title="HDD usage"
+          class="mx-3 mb-5 maxh300 flex1"
+        >
           <fc-graph
-                  id="packageGraph2"
-                  :data='usageData'
-                  type="job"
-                  :labels="hddLabels"
-                  :labelsText="hddLabelsFriendly"
-          >
-          </fc-graph>
+            id="packageGraph2"
+            :data="usageData"
+            type="job"
+            :labels="hddLabels"
+            :labels-text="hddLabelsFriendly"
+          />
         </fc-tile>
 
-        <fc-tile title="Network usage" class="mx-3 mb-5 maxh300 flex1">
+        <fc-tile
+          title="Network usage"
+          class="mx-3 mb-5 maxh300 flex1"
+        >
           <fc-graph
-                  id="packageGraph3"
-                  :data='usageData'
-                  type="job"
-                  :labels="netLabels"
-                  :labelsText="netLabelsFriendly"
-          >
-          </fc-graph>
+            id="packageGraph3"
+            :data="usageData"
+            type="job"
+            :labels="netLabels"
+            :labels-text="netLabelsFriendly"
+          />
         </fc-tile>
 
-        <v-layout class=" dateSelectCont">
-          <v-spacer></v-spacer>
-          <v-flex xs5 @click="fullDate = false">
-            <v-radio-group row class="dateSelect" v-model="hoursBefore" @change="loadData">
-              <v-radio value="1" label="last hour" :disabled="fullDate"></v-radio>
-              <v-radio value="3" label="last 3 hours" :disabled="fullDate"></v-radio>
-              <v-radio value="6" label="last 6 hours" :disabled="fullDate"></v-radio>
+        <v-row class=" dateSelectCont">
+          <v-spacer />
+          <v-col
+            cols="5"
+            @click="fullDate = false"
+          >
+            <v-radio-group
+              v-model="hoursBefore"
+              row
+              class="dateSelect"
+              @change="loadData"
+            >
+              <v-radio
+                value="1"
+                label="last hour"
+                :disabled="fullDate"
+              />
+              <v-radio
+                value="3"
+                label="last 3 hours"
+                :disabled="fullDate"
+              />
+              <v-radio
+                value="6"
+                label="last 6 hours"
+                :disabled="fullDate"
+              />
             </v-radio-group>
-          </v-flex>
-          <v-flex xs6 @click="fullDate = true" class="pl-2">
-            <v-layout row>
-              <v-flex xs2>
-                <v-subheader class="textBottom">From:</v-subheader>
-              </v-flex>
-              <v-flex xs4>
+          </v-col>
+          <v-col
+            cols="6"
+            class="pl-2"
+            @click="fullDate = true"
+          >
+            <v-row>
+              <v-col cols="2">
+                <v-subheader class="textBottom">
+                  From:
+                </v-subheader>
+              </v-col>
+              <v-col cols="4">
                 <v-text-field
-                        @input="loadData"
-                        :disabled="!fullDate"
-                        v-model="fromDate"
-                        text
-                        single-line
-                        mask="date-with-time"
-                        :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs2>
-                <v-subheader class="textBottom">To:</v-subheader>
-              </v-flex>
-              <v-flex xs4>
+                  v-model="fromDate"
+                  :disabled="!fullDate"
+                  text
+                  single-line
+                  @input="loadData"
+                  mask="date-with-time"
+                  :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+                />
+              </v-col>
+              <v-col cols="2">
+                <v-subheader class="textBottom">
+                  To:
+                </v-subheader>
+              </v-col>
+              <v-col cols="4">
                 <v-text-field
-                        @input="loadData"
-                        :disabled="!fullDate"
-                        v-model="toDate"
-                        text
-                        single-line
-                        mask="date-with-time"
-                        :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-                ></v-text-field>
-              </v-flex>
-            </v-layout>
-          </v-flex>
-        </v-layout>
+                  v-model="toDate"
+                  :disabled="!fullDate"
+                  text
+                  single-line
+                  @input="loadData"
+                  mask="date-with-time"
+                  :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
       </v-container>
-    </v-layout>
+    </v-row>
   </v-container>
 </template>
 
@@ -122,10 +165,27 @@
   import graph from '@/components/graph/fc_usage_graph'
 
   export default {
-    name: "serverPage",
+    name: "ServerPage",
     components: {
       'fc-tile': tile,
       'fc-graph': graph,
+    },
+    data: function () {
+      return {
+        serverInfo: null,
+        usageData: null,
+        cpumemLabels: ['cpu', 'ram'],
+        cpumemLabelsFriendly: ['CPU [%]', 'RAM [%]'],
+        hddLabels: ['hdd_read', 'hdd_write'],
+        hddLabelsFriendly: ['HDD Read [Kb/s]', 'HDD Write [Kb/s]'],
+        netLabels: ['net_recv', 'net_sent'],
+        netLabelsFriendly: ['Net receive [Kb/s]', 'Net sent [Kb/s]'],
+        loading: false,
+        fullDate: false,
+        hoursBefore: '1',
+        fromDate: this.$moment().format('DDMMYYYYHHmm'),
+        toDate: this.$moment().format('DDMMYYYYHHmm'),
+      }
     },
     mounted: function () {
       this.loadData();
@@ -175,23 +235,6 @@
       },
       yesNo: function (val) {
         return val ? 'Yes' : 'No'
-      }
-    },
-    data: function () {
-      return {
-        serverInfo: null,
-        usageData: null,
-        cpumemLabels: ['cpu', 'ram'],
-        cpumemLabelsFriendly: ['CPU [%]', 'RAM [%]'],
-        hddLabels: ['hdd_read', 'hdd_write'],
-        hddLabelsFriendly: ['HDD Read [Kb/s]', 'HDD Write [Kb/s]'],
-        netLabels: ['net_recv', 'net_sent'],
-        netLabelsFriendly: ['Net receive [Kb/s]', 'Net sent [Kb/s]'],
-        loading: false,
-        fullDate: false,
-        hoursBefore: '1',
-        fromDate: this.$moment().format('DDMMYYYYHHmm'),
-        toDate: this.$moment().format('DDMMYYYYHHmm'),
       }
     }
   }

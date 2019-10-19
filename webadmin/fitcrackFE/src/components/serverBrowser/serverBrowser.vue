@@ -4,8 +4,15 @@
 -->
 
 <template>
-  <fc-tile title="Server browser" :loading="data==null || adding" class="mx-auto dictContentContainer">
-    <v-list v-if="data!==null" class="filesCont">
+  <fc-tile
+    title="Server browser"
+    :loading="data==null || adding"
+    class="mx-auto dictContentContainer"
+  >
+    <v-list
+      v-if="data!==null"
+      class="filesCont"
+    >
       <v-list-item
         @click="loadDirectory(data.parent)"
       >
@@ -31,29 +38,43 @@
         </v-list-item-content>
       </v-list-item>
       <v-list-item
-         v-for="item in data.files"
-         :key="item.name"
-         @click="fileSelected(item.name, item.path)"
-         v-bind:class="{selected: (selectedFiles[item.path] !== undefined && selectedFiles[item.path] !== null)}">
+        v-for="item in data.files"
+        :key="item.name"
+        :class="{selected: (selectedFiles[item.path] !== undefined && selectedFiles[item.path] !== null)}"
+        @click="fileSelected(item.name, item.path)"
+      >
         <v-list-item-action>
-          <v-icon class="whiteAfterSelected">insert_drive_file</v-icon>
+          <v-icon class="whiteAfterSelected">
+            insert_drive_file
+          </v-icon>
         </v-list-item-action>
         <v-list-item-content>
-          <v-list-item-title class="whiteAfterSelected">{{ item.name }}</v-list-item-title>
-          <v-list-item-subtitle class="whiteAfterSelected">{{ item.path }}</v-list-item-subtitle>
+          <v-list-item-title class="whiteAfterSelected">
+            {{ item.name }}
+          </v-list-item-title>
+          <v-list-item-subtitle class="whiteAfterSelected">
+            {{ item.path }}
+          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-list>
-    <v-divider></v-divider>
+    <v-divider />
     <div v-if="Object.keys(selectedFiles).length > 0">
       <v-card-title>Selected files:</v-card-title>
       <v-card-text
-        class="my-0 py-0"
         v-for="item in selectedFiles"
-        :key="item.name">
-        {{item.path}}
+        :key="item.name"
+        class="my-0 py-0"
+      >
+        {{ item.path }}
       </v-card-text>
-      <v-btn class="selectBtn d-block mx-auto" color="primary" @click="upload">Select</v-btn>
+      <v-btn
+        class="selectBtn d-block mx-auto"
+        color="primary"
+        @click="upload"
+      >
+        Select
+      </v-btn>
     </div>
   </fc-tile>
 </template>
@@ -61,9 +82,16 @@
 <script>
   import tile from '@/components/tile/fc_tile'
   export default {
-    name: "serverBrowser",
+    name: "ServerBrowser",
     components: {
       'fc-tile': tile
+    },
+    data: function () {
+      return {
+        data: null,
+        selectedFiles:{},
+        adding: false
+      }
     },
     mounted: function () {
       this.loadDirectory('/')
@@ -107,13 +135,6 @@
           this.adding = false
           this.$emit('filesuploaded', false)
         })
-      }
-    },
-    data: function () {
-      return {
-        data: null,
-        selectedFiles:{},
-        adding: false
       }
     }
   }

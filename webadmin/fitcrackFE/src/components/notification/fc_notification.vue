@@ -4,23 +4,33 @@
 -->
 
 <template>
-    <div class="cont">
-      <v-list-item :to="'/jobs/' + jobId">
-        <v-alert :type="type" class="ma-0 pa-0 width100" id="notif" v-bind:class="{ seen: seen}" outlined>
-          <v-layout row wrap class="width100">
-            <v-flex class="text-xs-left">{{text}}</v-flex>
-            <v-spacer></v-spacer>
-            <v-flex class="text-xs-right">{{$moment(time).format('DD.MM.YYYY HH:mm')}}</v-flex>
-          </v-layout>
-        </v-alert>
-      </v-list-item>
-      <v-divider></v-divider>
-    </div>
+  <div class="cont">
+    <v-list-item :to="'/jobs/' + jobId">
+      <v-alert
+        id="notif"
+        :type="type"
+        class="ma-0 pa-0 width100"
+        :class="{ seen: seen}"
+        outlined
+      >
+        <v-row class="width100">
+          <v-col class="text-left">
+            {{ text }}
+          </v-col>
+          <v-spacer />
+          <v-col class="text-right">
+            {{ $moment(time).format('DD.MM.YYYY HH:mm') }}
+          </v-col>
+        </v-row>
+      </v-alert>
+    </v-list-item>
+    <v-divider />
+  </div>
 </template>
 
 <script>
     export default {
-      name: 'notification',
+      name: 'Notification',
       props: ['type', 'text', 'seen', 'time', 'jobId']
     }
 </script>

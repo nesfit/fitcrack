@@ -5,8 +5,15 @@
 
 <template>
   <v-container class="max500">
-    <fc-tile title="Mask sets" class="ma-2">
-      <v-alert :value="true" type="warning" class="mt-0 mb-1" >
+    <fc-tile
+      title="Mask sets"
+      class="ma-2"
+    >
+      <v-alert
+        :value="true"
+        type="warning"
+        class="mt-0 mb-1"
+      >
         Mask files must have a .txt or .hcmask extension.
       </v-alert>
       <v-data-table
@@ -15,32 +22,60 @@
         :loading="loading"
         :rows-per-page-items="[10,25,50]"
         rows-per-page-text="Mask sets per page"
-        disable-initial-sort
+        
       >
-        <template slot="items" slot-scope="props">
-          <td><router-link :to="{name: 'maskDetail', params: { id: props.item.id}}">{{ props.item.name }}</router-link></td>
-          <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-          <td class="text-xs-right">
-            <a :href="$serverAddr + '/masks/' + props.item.id + '/download'" target="_blank">
-              <v-btn outlined fab small color="primary">
+        <template
+          slot="items"
+          slot-scope="props"
+        >
+          <td>
+            <router-link :to="{name: 'maskDetail', params: { id: props.item.id}}">
+              {{ props.item.name }}
+            </router-link>
+          </td>
+          <td class="text-right">
+            {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
+          </td>
+          <td class="text-right">
+            <a
+              :href="$serverAddr + '/masks/' + props.item.id + '/download'"
+              target="_blank"
+            >
+              <v-btn
+                outlined
+                fab
+                small
+                color="primary"
+              >
                 <v-icon>file_download</v-icon>
               </v-btn>
             </a>
           </td>
-          <td class="text-xs-right">
+          <td class="text-right">
             <v-tooltip top>
-              <template v-slot:activator="{ on }"><v-btn icon class="mx-0" @click="deleteMask(props.item.id)" v-on="on">
-                <v-icon color="error">delete</v-icon>
-              </v-btn></template>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  class="mx-0"
+                  @click="deleteMask(props.item.id)"
+                  v-on="on"
+                >
+                  <v-icon color="error">
+                    delete
+                  </v-icon>
+                </v-btn>
+              </template>
               <span>Delete mask file</span>
             </v-tooltip>
           </td>
         </template>
       </v-data-table>
-      <v-divider></v-divider>
-      <file-uploader :url="this.$serverAddr + '/masks/add'" @uploadComplete="loadMasks"></file-uploader>
+      <v-divider />
+      <file-uploader
+        :url="this.$serverAddr + '/masks/add'"
+        @uploadComplete="loadMasks"
+      />
     </fc-tile>
-
   </v-container>
 </template>
 
@@ -48,10 +83,26 @@
   import tile from '@/components/tile/fc_tile'
   import FileUploader from "@/components/fileUploader/fileUploader";
   export default {
-    name: "masksView",
+    name: "MasksView",
     components: {
       FileUploader,
       'fc-tile': tile,
+    },
+    data: function () {
+      return {
+        loading: false,
+        masks: [],
+        headers: [
+          {
+            text: 'Name',
+            align: 'left',
+            value: 'name'
+          },
+          {text: 'Added', value: 'time', align: 'right'},
+          {text: 'Download', value: 'name', align: 'right'},
+          {text: 'Delete', align: 'right'}
+        ]
+      }
     },
     mounted: function () {
       this.loadMasks()
@@ -71,22 +122,6 @@
             this.loadMasks()
           })
         })
-      }
-    },
-    data: function () {
-      return {
-        loading: false,
-        masks: [],
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'},
-          {text: 'Delete', align: 'right'}
-        ]
       }
     }
   }

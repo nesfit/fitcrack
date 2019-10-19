@@ -5,26 +5,45 @@
 
 <template>
   <fc-tile title="PCFG and rules">
-    <v-list single-line class="width100">
+    <v-list
+      single-line
+      class="width100"
+    >
       <v-data-table
         :headers="headers"
         :items="data.pcfg_grammar"
         item-key="id"
-        disable-initial-sort
-        hide-actions
+        
+        hide-default-footer
       >
-        <template slot="items" slot-scope="props">
-            <td>{{ props.item.pcfg_grammar.name }}</td>
-            <td class="text-xs-right">{{ props.item.pcfg_grammar.keyspace }}</td>
-            <td class="text-xs-right">{{ $moment(props.item.pcfg_grammar.time_added ).format('DD.MM.YYYY HH:mm') }}</td>
-            <td class="text-xs-right">
-              <v-tooltip top>
-                <template v-slot:activator="{ on }"><v-btn icon class="mx-0" :to="{name: 'pcfgDetail', params: { id: props.item.pcfg_grammar.id}}" v-on="on">
-                  <v-icon color="primary">link</v-icon>
-                </v-btn></template>
-                <span>Go to the PCFG page</span>
-              </v-tooltip>
-            </td>
+        <template
+          slot="items"
+          slot-scope="props"
+        >
+          <td>{{ props.item.pcfg_grammar.name }}</td>
+          <td class="text-right">
+            {{ props.item.pcfg_grammar.keyspace }}
+          </td>
+          <td class="text-right">
+            {{ $moment(props.item.pcfg_grammar.time_added ).format('DD.MM.YYYY HH:mm') }}
+          </td>
+          <td class="text-right">
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  class="mx-0"
+                  :to="{name: 'pcfgDetail', params: { id: props.item.pcfg_grammar.id}}"
+                  v-on="on"
+                >
+                  <v-icon color="primary">
+                    link
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>Go to the PCFG page</span>
+            </v-tooltip>
+          </td>
         </template>
       </v-data-table>
     <!--  <template v-if="data.rulesFile.id !== null">
@@ -47,11 +66,11 @@
 <script>
   import tile from '@/components/tile/fc_tile'
   export default {
-    name: "pcfgDetail",
-    props: ['data'],
+    name: "PcfgDetail",
     components: {
       'fc-tile': tile
     },
+    props: ['data'],
     data() {
       return {
         headers: [

@@ -4,67 +4,81 @@
 -->
 
 <template>
-    <v-expansion-panel
-      lazy
-      expand-icon="edit"
-      @input="focus"
-      class="expaPanel"
-      :hide-actions="true"
-      :readonly="openForever"
-      :value="openForever"
-    >
-      <div slot="header">
-        <v-layout row wrap>
-          <v-flex>
-            <div  class="width100 fakeInput" :class="{validationError: validateError}" v-html="parsedHTML"></div>
-          </v-flex>
-
-        </v-layout>
-
-      </div>
-      <div>
-        <v-layout row >
-          <v-layout row justify-center wrap>
-            <v-tooltip top v-for="(item, key) in represenArray" :key="key">
-              <v-btn slot="activator"
-                     color="primary"
-                     class="maskBtn py-0 mx-1"
-                     outlined
-                     @click="addSymbol(key)"
-              >{{item.represent}}</v-btn>
-              <span>{{item.chars}}</span>
-            </v-tooltip>
-            <v-tooltip top v-for="(item, index) in customCharsets">
-              <v-btn slot="activator"
-                     color="primary"
-                     class="maskBtn py-0 mx-1"
-                     outlined
-                     @click="addSymbol(index + 1)"
-              >{{item.name}}</v-btn>
-              <span>{{item.name}}</span>
-            </v-tooltip>
-          </v-layout>
-        </v-layout>
-        <v-text-field
-          ref="maskInput"
-          autofocus
-          label="Mask"
-          outlined
-          class="primary--text px-2 mx-4"
-          single-line
-          :rules="maskRules"
-          :value="value"
-          :error="validateError"
-          @input="update"
-
-        ></v-text-field>
-      </div>
-    </v-expansion-panel>
+  <v-expansion-panel
+    lazy
+    expand-icon="edit"
+    class="expaPanel"
+    :hide-default-footer="true"
+    :readonly="openForever"
+    :value="openForever"
+    @input="focus"
+  >
+    <div slot="header">
+      <v-row>
+        <v-col>
+          <div
+            class="width100 fakeInput"
+            :class="{validationError: validateError}"
+            v-html="parsedHTML"
+          />
+        </v-col>
+      </v-row>
+    </div>
+    <div>
+      <v-row>
+        <v-row justify="center">
+          <v-tooltip
+            v-for="(item, key) in represenArray"
+            :key="key"
+            top
+          >
+            <v-btn
+              slot="activator"
+              color="primary"
+              class="maskBtn py-0 mx-1"
+              outlined
+              @click="addSymbol(key)"
+            >
+              {{ item.represent }}
+            </v-btn>
+            <span>{{ item.chars }}</span>
+          </v-tooltip>
+          <v-tooltip
+            v-for="(item, index) in customCharsets"
+            top
+          >
+            <v-btn
+              slot="activator"
+              color="primary"
+              class="maskBtn py-0 mx-1"
+              outlined
+              @click="addSymbol(index + 1)"
+            >
+              {{ item.name }}
+            </v-btn>
+            <span>{{ item.name }}</span>
+          </v-tooltip>
+        </v-row>
+      </v-row>
+      <v-text-field
+        ref="maskInput"
+        autofocus
+        label="Mask"
+        outlined
+        class="primary--text px-2 mx-4"
+        single-line
+        :rules="maskRules"
+        :value="value"
+        :error="validateError"
+        @input="update"
+      />
+    </div>
+  </v-expansion-panel>
 </template>
 
 <script>
   export default {
-    name: "maskSingle",
+    name: "MaskSingle",
     props: {
       value: {
         type: String,
@@ -77,6 +91,50 @@
       customCharsets: {
         type: [Array, null],
         default: null
+      }
+    },
+    data() {
+      return {
+        validateError: false,
+        rawValue: '',
+        maskRules: [
+          v => /^(\?[ludhHsab\?]|[ -~])*$/.test(v) || ''
+        ],
+        editing: true,
+        represenArray: {
+          'l': {
+            'chars': 'abcdefghijklmnopqrstuvwxyz',
+            'represent': 'a-z'
+          },
+          'u': {
+            'chars': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'represent': 'A-Z'
+          },
+          'd': {
+            'chars': '0123456789',
+            'represent': '0-9'
+          },
+          'h': {
+            'chars': '0123456789abcdef',
+            'represent': '0-f'
+          },
+          'H': {
+            'chars': '0123456789ABCDEF',
+            'represent': '0-F'
+          },
+          's': {
+            'chars': '«space»!"#$%&()*+,-./:;<=>?@[]^_`{|}~',
+            'represent': 'special'
+          },
+          'a': {
+            'chars': '?l?u?d?s',
+            'represent': 'a-z,A-Z,0-9,special'
+          },
+          'b': {
+            'chars': '0x00 - 0xff',
+            'represent': 'ASCII'
+          }
+        }
       }
     },
     computed: {
@@ -135,50 +193,6 @@
           this.$nextTick(() => {
             this.$refs.maskInput.focus()
           })
-        }
-      }
-    },
-    data() {
-      return {
-        validateError: false,
-        rawValue: '',
-        maskRules: [
-          v => /^(\?[ludhHsab\?]|[ -~])*$/.test(v) || ''
-        ],
-        editing: true,
-        represenArray: {
-          'l': {
-            'chars': 'abcdefghijklmnopqrstuvwxyz',
-            'represent': 'a-z'
-          },
-          'u': {
-            'chars': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            'represent': 'A-Z'
-          },
-          'd': {
-            'chars': '0123456789',
-            'represent': '0-9'
-          },
-          'h': {
-            'chars': '0123456789abcdef',
-            'represent': '0-f'
-          },
-          'H': {
-            'chars': '0123456789ABCDEF',
-            'represent': '0-F'
-          },
-          's': {
-            'chars': '«space»!"#$%&()*+,-./:;<=>?@[]^_`{|}~',
-            'represent': 'special'
-          },
-          'a': {
-            'chars': '?l?u?d?s',
-            'represent': 'a-z,A-Z,0-9,special'
-          },
-          'b': {
-            'chars': '0x00 - 0xff',
-            'represent': 'ASCII'
-          }
         }
       }
     },

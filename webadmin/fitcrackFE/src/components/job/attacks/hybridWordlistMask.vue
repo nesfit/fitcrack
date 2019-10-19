@@ -5,49 +5,78 @@
 
 <template>
   <div>
-    <v-layout row wrap>
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Select dictionary<span class="required primary--text"> *</span></h2></v-card-title>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Type mask<span class="required primary--text"> *</span></h2></v-card-title>
-      </v-flex>
-      <v-flex xs6 class="border">
-        <dict-selector v-model="dictionaries" @input="checkValid"></dict-selector>
-      </v-flex>
-      <v-flex xs6>
+    <v-row>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title class="pb-0">
+          <h2>Select dictionary<span class="required primary--text"> *</span></h2>
+        </v-card-title>
+      </v-col>
+      <v-col cols="6">
+        <v-card-title class="pb-0">
+          <h2>Type mask<span class="required primary--text"> *</span></h2>
+        </v-card-title>
+      </v-col>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <dict-selector
+          v-model="dictionaries"
+          @input="checkValid"
+        />
+      </v-col>
+      <v-col cols="6">
         <v-expansion-panels class="elevation-0 pt-2">
-          <mask-single :openForever="true" v-model="mask" @input="checkValid"></mask-single>
+          <mask-single
+            v-model="mask"
+            :open-forever="true"
+            @input="checkValid"
+          />
         </v-expansion-panels>
-      </v-flex>
+      </v-col>
 
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Type rule</h2></v-card-title>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Type rule</h2></v-card-title>
-      </v-flex>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title class="pb-0">
+          <h2>Type rule</h2>
+        </v-card-title>
+      </v-col>
+      <v-col cols="6">
+        <v-card-title class="pb-0">
+          <h2>Type rule</h2>
+        </v-card-title>
+      </v-col>
 
-      <v-flex xs6 class="border px-2">
+      <v-col
+        cols="6"
+        class="border px-2"
+      >
         <v-text-field
+          v-model="ruleLeft"
           outlined
           single-line
           placeholder="Rule left"
-          v-model="ruleLeft"
           @input="checkValid"
-        ></v-text-field>
-      </v-flex>
-      <v-flex xs6  class="px-2">
+        />
+      </v-col>
+      <v-col
+        cols="6"
+        class="px-2"
+      >
         <v-text-field
+          v-model="ruleRight"
           outlined
           single-line
           placeholder="Rule right"
-          v-model="ruleRight"
           @input="checkValid"
-        ></v-text-field>
-      </v-flex>
-    </v-layout>
-
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -55,21 +84,35 @@
   import dictSelector from '@/components/selector/dictionarySelector'
   import maskSingle from '@/components/mask/maskSingle'
   export default {
-    name: "hybridMaskWordlist",
+    name: "HybridMaskWordlist",
+    components: {
+      'mask-single': maskSingle,
+      'dict-selector': dictSelector
+    },
     props: {
       value: {
         type: [Boolean, Object],
         default: null
       },
     },
+    data: function () {
+      return {
+        attackId: 6,
+        attackName: 'Hybrid wordlist+mask',
+        dictionaries: [],
+        valid: false,
+        mask: '',
+        ruleLeft: '',
+        ruleRight: '',
+        maskRules: [
+          v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
+        ]
+      }
+    },
     watch:{
       value: function(){
 
       }
-    },
-    components: {
-      'mask-single': maskSingle,
-      'dict-selector': dictSelector
     },
     methods: {
       dictSelected: function (id, dictNubmer) {
@@ -94,20 +137,6 @@
         }
         return false
       },
-    },
-    data: function () {
-      return {
-        attackId: 6,
-        attackName: 'Hybrid wordlist+mask',
-        dictionaries: [],
-        valid: false,
-        mask: '',
-        ruleLeft: '',
-        ruleRight: '',
-        maskRules: [
-          v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
-        ]
-      }
     }
   }
 </script>

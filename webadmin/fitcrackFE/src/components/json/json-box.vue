@@ -4,12 +4,23 @@
 -->
 
 <template>
-    <div class="node">
-        <span class="key" v-if="keyName">
-            <v-icon v-if="isObject"  @click.stop="toggleNode">{{value ? 'arrow_drop_down' : 'arrow_drop_up'}}</v-icon>{{keyName}}:
-        </span>
-        <commponent :is="`Json${valueType}`" :json-value="value" v-model="toggle" :key-name="keyName"></commponent>
-    </div>
+  <div class="node">
+    <span
+      v-if="keyName"
+      class="key"
+    >
+      <v-icon
+        v-if="isObject"
+        @click.stop="toggleNode"
+      >{{ value ? 'arrow_drop_down' : 'arrow_drop_up' }}</v-icon>{{ keyName }}:
+    </span>
+    <commponent
+      :is="`Json${valueType}`"
+      v-model="toggle"
+      :json-value="value"
+      :key-name="keyName"
+    />
+  </div>
 </template>
 
 <script>
@@ -21,6 +32,13 @@ import JsonArray from '@/components/json/types/json-array';
 
 export default {
     name: 'JsonBox',
+    components: {
+        JsonString,
+        JsonNumber,
+        JsonBoolean,
+        JsonObject,
+        JsonArray
+    },
     props: {
         value: [Object, Array, String, Number, Boolean],
         keyName: String
@@ -29,11 +47,6 @@ export default {
         return {
             toggle: true
         };
-    },
-    methods: {
-        toggleNode() {
-            this.toggle = !this.toggle;
-        }
     },
     computed: {
         valueType() {
@@ -55,12 +68,10 @@ export default {
             return this.valueType == 'Array' || this.valueType == 'Object'; // eslint-disable-line
         }
     },
-    components: {
-        JsonString,
-        JsonNumber,
-        JsonBoolean,
-        JsonObject,
-        JsonArray
+    methods: {
+        toggleNode() {
+            this.toggle = !this.toggle;
+        }
     }
 };
 </script>

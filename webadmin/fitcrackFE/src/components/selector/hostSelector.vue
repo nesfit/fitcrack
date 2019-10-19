@@ -5,37 +5,54 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
-    v-model="selected"
     item-key="id"
     :select-all="selectAll"
     @input="updateSelected"
   >
-    <template slot="items" slot-scope="props">
+    <template
+      slot="items"
+      slot-scope="props"
+    >
       <tr>
         <td>
           <v-checkbox
             v-model="props.selected"
             primary
             hide-details
-          ></v-checkbox>
+          />
         </td>
 
         <td>
           <router-link :to="{name: 'hostDetail', params: { id: props.item.id}}">
-            {{ props.item.domain_name + ' (' + props.item.user.name + ')'}}
+            {{ props.item.domain_name + ' (' + props.item.user.name + ')' }}
           </router-link>
         </td>
-        <td class="text-xs-right">{{ props.item.ip_address }}</td>
-        <td class="text-xs-right">{{ props.item.os_name }}</td>
-        <td class="text-xs-right oneline" :title="props.item.p_model">{{ props.item.p_model }}</td>
-        <td class="text-xs-right" >
-          <v-icon :title="parseTimeDelta(props.item.last_active.last_seen)" v-bind:class="{
-                          'error--text': props.item.last_active.seconds_delta > 61,
-                          'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
-                        }">fiber_manual_record</v-icon>
+        <td class="text-right">
+          {{ props.item.ip_address }}
+        </td>
+        <td class="text-right">
+          {{ props.item.os_name }}
+        </td>
+        <td
+          class="text-right oneline"
+          :title="props.item.p_model"
+        >
+          {{ props.item.p_model }}
+        </td>
+        <td class="text-right">
+          <v-icon
+            :title="parseTimeDelta(props.item.last_active.last_seen)"
+            :class="{
+              'error--text': props.item.last_active.seconds_delta > 61,
+              'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
+            }"
+          >
+            fiber_manual_record
+          </v-icon>
         </td>
         <!--
         <td class="text-xs-right">
@@ -54,7 +71,7 @@
 
 <script>
   export default {
-    name: "hostSelector",
+    name: "HostSelector",
     props: {
       selectAll: {
         type: Boolean,

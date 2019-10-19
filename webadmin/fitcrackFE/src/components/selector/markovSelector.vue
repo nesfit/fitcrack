@@ -11,18 +11,23 @@
     item-key="id"
     :select-all="selectAll"
   >
-    <template slot="items" slot-scope="props">
+    <template
+      slot="items"
+      slot-scope="props"
+    >
       <tr>
         <td>
           <v-checkbox
             :input-value="selected === props.item.id"
-            @click="updateSelected(props.item.id, props.item)"
             primary
             hide-details
-          ></v-checkbox>
+            @click="updateSelected(props.item.id, props.item)"
+          />
         </td>
         <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
+        <td class="text-right">
+          {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
+        </td>
       </tr>
     </template>
   </v-data-table>
@@ -30,7 +35,7 @@
 
 <script>
   export default {
-    name: "markovSelector",
+    name: "MarkovSelector",
     props: {
       selectAll: {
         type: Boolean,
