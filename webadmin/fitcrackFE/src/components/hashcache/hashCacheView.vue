@@ -24,12 +24,10 @@
       :headers="headers"
       :items="hashes"
       :search="search"
-      :pagination.sync="pagination"
+      :options.sync="pagination"
       :server-items-length="totalItems"
       :loading="loading"
-      :rows-per-page-items="[25,50,100]"
-      rows-per-page-text="Passwords per page"
-      
+      :footer-props="{itemsPerPageOptions: [25,50,100], itemsPerPageText: 'Passwords per page'}"
     >
       <template
         slot="items"

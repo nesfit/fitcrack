@@ -13,7 +13,6 @@
         :headers="headers"
         :items="data.pcfg_grammar"
         item-key="id"
-        
         hide-default-footer
       >
         <template

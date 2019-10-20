@@ -7,7 +7,6 @@
   <div class="containerAddJob height100 mx-auto">
     <v-app-bar
       app
-      dark
       color="primary"
       height="48px"
       class="topToolbar"
@@ -91,13 +90,13 @@
                         validate-on-blur
                         clearable
                         multi-line
-                        label="Hashtype"
+                        label="Select hash type"
                         :items="hashTypes"
                         item-text="name"
                         return-object
                         required
                         dense
-                        filled
+                        outlined
                         @change="validateHashes(null)"
                       >
                         <template
@@ -317,21 +316,15 @@
               <v-row>
                 <v-tabs
                   v-model="attackSettingsTab"
-                  class="width100 attackSettings"
-                  xs12
-                  centered
-                  show-arrows
+                  vertical
                   color="primary darken-1"
-                  dark
-                  slider-color="white"
                 >
                   <v-tab
-                    :ripple="false"
                     @click="attackTabChanged($refs.DictAttack)"
                   >
                     Dictionary attack
                   </v-tab>
-                  <v-tab-item lazy>
+                  <v-tab-item>
                     <v-card text>
                       <dictionary
                         ref="DictAttack"
@@ -340,12 +333,11 @@
                     </v-card>
                   </v-tab-item>
                   <v-tab
-                    :ripple="false"
                     @click="attackTabChanged($refs.CombAttack)"
                   >
                     Combination attack
                   </v-tab>
-                  <v-tab-item lazy>
+                  <v-tab-item>
                     <v-card text>
                       <combinator
                         ref="CombAttack"
@@ -354,12 +346,11 @@
                     </v-card>
                   </v-tab-item>
                   <v-tab
-                    :ripple="false"
                     @click="attackTabChanged($refs.BruteAttack)"
                   >
                     Brute-force attack
                   </v-tab>
-                  <v-tab-item lazy>
+                  <v-tab-item>
                     <v-card text>
                       <maskattack
                         ref="BruteAttack"
@@ -368,12 +359,11 @@
                     </v-card>
                   </v-tab-item>
                   <v-tab
-                    :ripple="false"
                     @click="attackTabChanged($refs.HybridWordMaskAttack)"
                   >
                     Hybrid Wordlist + Mask
                   </v-tab>
-                  <v-tab-item lazy>
+                  <v-tab-item>
                     <v-card text>
                       <hybridWordlistMask
                         ref="HybridWordMaskAttack"
@@ -382,12 +372,11 @@
                     </v-card>
                   </v-tab-item>
                   <v-tab
-                    :ripple="false"
                     @click="attackTabChanged($refs.HybridMaskWordAttack)"
                   >
                     Hybrid Mask + Wordlist
                   </v-tab>
-                  <v-tab-item lazy>
+                  <v-tab-item>
                     <v-card text>
                       <hybridMaskWordlist
                         ref="HybridMaskWordAttack"
@@ -396,12 +385,11 @@
                     </v-card>
                   </v-tab-item>
                   <v-tab
-                    :ripple="false"
                     @click="attackTabChanged($refs.pcfg)"
                   >
                     PCFG
                   </v-tab>
-                  <v-tab-item lazy>
+                  <v-tab-item>
                     <v-card text>
                       <pcfg
                         ref="pcfgAttack"

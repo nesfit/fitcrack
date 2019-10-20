@@ -6,21 +6,24 @@
 <template>
   <v-row class=" mx-auto elevation-2">
     <v-toolbar
-      color="primary"
-      dark
       flat
       class="max64"
     >
-      <v-toolbar-title>{{ title }}</v-toolbar-title>
+      <v-toolbar-title class="d-flex align-center">
+        <v-icon 
+          v-if="icon"
+          left
+        >
+          {{ icon }}
+        </v-icon>
+        {{ title }}
+      </v-toolbar-title>
     </v-toolbar>
     <div class="contentFcTile">
-      <v-progress-circular
+      <v-skeleton-loader
         v-if="loading"
-        size="50"
-        :width="3"
-        class="progress"
-        indeterminate
-        color="primary"
+        class="mx-auto"
+        type="article"
       />
       <slot v-else />
     </div>
@@ -30,15 +33,17 @@
 <script>
   export default {
     name: "FcTile",
-    props: ['title', 'loading']
-
+    props: {
+      title: String,
+      loading: Boolean,
+      icon: String
+    }
   }
 </script>
 
 <style scoped>
 
   .white {
-
     min-width: 300px;
     position: relative;
   }

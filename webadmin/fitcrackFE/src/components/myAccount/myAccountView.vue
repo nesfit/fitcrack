@@ -4,36 +4,39 @@
 -->
 
 <template>
-  <v-container fluid>
+  <v-container>
     <h2> My account </h2>
-    <!--      <div class="table">
-      <v-card class="width150">
-          <v-card-title>
-            <h3> My info </h3>
-          </v-card-title>
-          <v-card-text>
-
-            <v-form ref="form" lazy-validation>
-              <v-text-field
-                label="username"
-                :value = "this.username"
-              ></v-text-field>
-              <v-text-field
-                label="email"
-                :value = "this.email"
-              ></v-text-field>
-              <v-btn color="primary" text @click="loadUsername()">Try!</v-btn>
-
-            </v-form>
-          </v-card-text>
-
-
+    <v-row justify="center">
+      <v-card
+        class="mb-4"
+        min-width="300"
+        max-width="500"
+      >
+        <v-card-title>
+          <h3> My info </h3>
+        </v-card-title>
+        <v-card-text>
+          <v-form
+            ref="form"
+            lazy-validation
+          >
+            <v-text-field
+              label="username"
+              :value="username"
+            />
+            <v-text-field
+              label="email"
+              :value="mail"
+            />
+          </v-form>
+        </v-card-text>
       </v-card>
-
-      </div> -->
-
-    <div class="table">
-      <v-card class="width150">
+    </v-row>
+    <v-row justify="center">
+      <v-card
+        min-width="300"
+        max-width="500"
+      >
         <v-card-title>
           <h3> Change password </h3>
         </v-card-title>
@@ -67,15 +70,15 @@
           <v-btn
             color="primary"
             text
-            :disabled="this.newPassword0 != this.newPassword1 || this.oldPassword == null || this.newPassword0 == null"
+            :disabled="newPassword0 != newPassword1 || oldPassword == null || newPassword0 == null"
             @click.stop="editPassword"
           >
             Update
           </v-btn>
         </v-card-actions>
       </v-card>
-    </div>
-  <!--    <h3> Message: {{ user }} </h3> -->
+    <!--    <h3> Message: {{ user }} </h3> -->
+    </v-row>
   </v-container>
 </template>
 
@@ -84,11 +87,11 @@
       name: "MyAccount",
       data: function() {
        return {
-          username: this.$username,
-          email: "mail",
+          username: this.$store.user.userData.username,
+          mail: this.$store.user.userData.mail,
+          oldPassword: null,
           newPassword0: null,
-          newPassword1: null,
-          user: []
+          newPassword1: null
         }
       },
       computed: {
@@ -114,13 +117,6 @@
             this.newPassword0 = '';
             this.newPassword1 = ''
           })
-        },
-        loadUsername() {
-          this.axios.get(this.$serverAddr + '/user/').then((response) => {
-            this.user = response.data.items
-          })
-
-
         }
       }
   }

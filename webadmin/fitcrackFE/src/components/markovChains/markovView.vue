@@ -20,9 +20,7 @@
         :headers="headers"
         :items="markovChains.items"
         :loading="loading"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Hcstats per page"
-        
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Hcstats per page'}"
       >
         <template
           slot="items"
@@ -145,9 +143,7 @@
                 :items="dictionaries.items"
                 item-key="id"
                 :loading="loadingDictionaries"
-                :rows-per-page-items="[10,25,50]"
-                rows-per-page-text="Dictionaries per page"
-                
+                :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Dictionaries per page'}"
               >
                 <template
                   slot="items"

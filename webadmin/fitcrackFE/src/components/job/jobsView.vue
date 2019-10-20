@@ -10,7 +10,7 @@
       class="px-2 pt-3"
       clearable
       outlined
-      prepend-inner-icon="search"
+      prepend-inner-icon="mdi-table-search"
       label="Search"
       single-line
       hide-details
@@ -52,29 +52,26 @@
       flat
     >
       <v-spacer />
-      <v-btn
-        rounded
-        outlined
-        class="mr-2"
-        color="primary"
-        :disabled="selectedJobs.length == 0"
-      >
-        <v-icon left>
-          mdi-folder-move
-        </v-icon>
-        Move to bin
-      </v-btn>
-      <v-btn
-        rounded
-        outlined
-        color="primary"
-        :disabled="selectedJobs.length == 0"
-      >
-        <v-icon left>
-          {{ viewHidden ? 'mdi-eye' : 'mdi-eye-off' }}
-        </v-icon>
-        {{ viewHidden ? 'Stop hiding' : 'Hide' }}
-      </v-btn>
+      <v-toolbar-items>
+        <v-btn
+          text
+          :disabled="selectedJobs.length == 0"
+        >
+          <v-icon left>
+            mdi-folder-move
+          </v-icon>
+          Move to bin
+        </v-btn>
+        <v-btn
+          text
+          :disabled="selectedJobs.length == 0"
+        >
+          <v-icon left>
+            {{ viewHidden ? 'mdi-eye' : 'mdi-eye-off' }}
+          </v-icon>
+          {{ viewHidden ? 'Stop hiding' : 'Hide' }}
+        </v-btn>
+      </v-toolbar-items>
     </v-toolbar>
 
     <v-data-table
@@ -88,6 +85,7 @@
       :loading="loading"
       :footer-props="{itemsPerPageOptions: [25,10,50,100], itemsPerPageText:'Jobs per page'}"
       show-select
+      fixed-header
     >
       <!-- Job name cell -->
       <template v-slot:item.name="{ item }">
@@ -177,7 +175,7 @@
             </template>
             <v-list>
               <v-list-item 
-                v-if="item.status >= 10"
+                v-if="item.status < 10"
                 @click="operateJob(item.id, 'restart')"
               >
                 <v-list-item-title>

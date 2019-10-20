@@ -10,7 +10,7 @@
       class="px-2 pt-3"
       clearable
       outlined
-      prepend-inner-icon="search"
+      prepend-inner-icon="mdi-table-search"
       label="Search"
       single-line
       hide-details
@@ -19,7 +19,7 @@
       <v-switch
         v-model="viewHidden"
         label="View hidden hosts"
-        :prepend-icon="viewHidden ? 'visibility_off' : 'visibility'"
+        :prepend-icon="viewHidden ? 'mdi-eye-off' : 'mdi-eye'"
         class="mr-4"
       />
       <v-select
@@ -29,7 +29,7 @@
         single-line
         item-text="text"
         item-value="text"
-        prepend-icon="power_settings_new"
+        prepend-icon="mdi-power"
         clearable
         @change="updateList"
       />
@@ -44,6 +44,7 @@
       :server-items-length="totalItems"
       :loading="loading"
       :footer-props="{itemsPerPageOptions: [25,50,100], itemsPerPageText: 'Hosts per page'}"
+      fixed-header
     >
       <template v-slot:item.domain_name="{ item }">
         <router-link
@@ -62,9 +63,9 @@
       <template v-slot:item.last_active="{ item }">
         <v-icon
           v-if="item.last_active.seconds_delta > 61"
-          color="warning"
+          color="error"
         >
-          mdi-power-sleep
+          mdi-power-off
         </v-icon>
         <v-icon
           v-else
@@ -196,7 +197,6 @@
     text-overflow: ellipsis;
     display: block;
     width: 200px;
-    vertical-align: middle;
     line-height: 50px;
     height: 50px;
   }

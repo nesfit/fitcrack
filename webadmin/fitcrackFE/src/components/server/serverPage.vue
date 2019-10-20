@@ -48,6 +48,7 @@
       <v-container class="flex2">
         <fc-tile
           title="CPU & Memory"
+          icon="mdi-memory"
           class="mx-3 mb-5 maxh300 flex1"
         >
           <fc-graph
@@ -61,6 +62,7 @@
 
         <fc-tile
           title="HDD usage"
+          icon="mdi-harddisk"
           class="mx-3 mb-5 maxh300 flex1"
         >
           <fc-graph
@@ -74,6 +76,7 @@
 
         <fc-tile
           title="Network usage"
+          icon="mdi-ethernet"
           class="mx-3 mb-5 maxh300 flex1"
         >
           <fc-graph

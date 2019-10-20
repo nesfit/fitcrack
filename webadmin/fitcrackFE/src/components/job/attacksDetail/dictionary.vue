@@ -13,7 +13,6 @@
         :headers="headers"
         :items="data.left_dictionaries"
         item-key="id"
-        
         hide-default-footer
       >
         <template

@@ -20,9 +20,7 @@
         :headers="headers"
         :items="charsets.items"
         :loading="loading"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Charsets sets per page"
-        
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Charsets per page'}"
       >
         <template
           slot="items"

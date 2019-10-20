@@ -85,7 +85,6 @@
         :headers="headers"
         :items="userRoles"
         :loading="loading"
-        
         hide-default-footer
       >
         <template

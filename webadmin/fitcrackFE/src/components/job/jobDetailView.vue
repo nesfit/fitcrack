@@ -355,8 +355,7 @@
                 :headers="hashHeaders"
                 class="width100 maxHeight500"
                 :items="data.hashes"
-                
-                :rows-per-page-items="[25,50,100,{&quot;text&quot;:&quot;All&quot;,&quot;value&quot;:-1}]"
+                :footer-props="{itemsPerPageOptions: [25,50,100,{text: 'All', value: -1}], itemsPerPageText: 'Hashes per page'}"
               >
                 <template
                   slot="items"
@@ -387,7 +386,6 @@
                 <v-data-table
                   :headers="hostheaders"
                   :items="data.hosts"
-                  
                   hide-default-footer
                 >
                   <template
@@ -502,7 +500,7 @@
                 <v-data-table
                   :headers="statusHeaders"
                   :items="statusHistory"
-                  :rows-per-page-items="[5,10,15,{&quot;text&quot;:&quot;All&quot;,&quot;value&quot;:-1}]"
+                  :footer-props="{itemsPerPageOptions: [25,50,100,{text: 'All', value: -1}]}"
                 >
                   <template
                     slot="items"
@@ -561,9 +559,7 @@
             </div>
 
             <v-data-table
-              :rows-per-page-items="[15,30,60,{'text':'All','value':-1}]"
-              rows-per-page-text="Workunits per page"
-              
+              :footer-props="{itemsPerPageOptions: [15,30,60,{text: 'All', value: -1}], itemsPerPageText: 'Workunits per page'}"
               :headers="workunitsHeader"
               :items="data.workunits"
               class="width100"
@@ -753,16 +749,14 @@
         <v-data-table
           v-model="newHostsMapping"
           item-key="id"
-          select-all
+          show-select
           class="width100"
           :headers="hostHeaders"
           :items="hosts"
-          :pagination.sync="paginationHost"
+          :options.sync="paginationHost"
           :server-items-length="totalHostItems"
           :loading="loadingHosts"
-          :rows-per-page-items="[10, 25,50,100]"
-          rows-per-page-text="Hosts per page"
-          
+          :footer-props="{itemsPerPageOptions: [10,25,50,100], itemsPerPageText: 'Hosts per page'}"
         >
           <template
             slot="headers"

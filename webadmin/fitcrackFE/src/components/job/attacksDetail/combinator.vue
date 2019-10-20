@@ -21,7 +21,6 @@
             :headers="headers"
             :items="data.left_dictionaries"
             item-key="id"
-            
             hide-default-footer
           >
             <template
@@ -69,7 +68,6 @@
             :headers="headers"
             :items="data.right_dictionaries"
             item-key="id"
-            
             hide-default-footer
           >
             <template

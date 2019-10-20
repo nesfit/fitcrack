@@ -14,9 +14,7 @@
         v-if="encryptedFiles !== null"
         :headers="headers"
         :items="encryptedFiles.items"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Files per page"
-        
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Files per page'}"
       >
         <template
           slot="items"

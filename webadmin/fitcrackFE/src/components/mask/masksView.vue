@@ -20,9 +20,7 @@
         :headers="headers"
         :items="masks.items"
         :loading="loading"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Mask sets per page"
-        
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Masks per page'}"
       >
         <template
           slot="items"

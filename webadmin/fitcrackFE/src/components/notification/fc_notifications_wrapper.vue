@@ -14,11 +14,11 @@
     />
     <div v-else>
       <v-list
-        v-for="(item, i) in notifications.items"
-        :key="i"
         class="notifContainer pa-0"
       >
         <notification
+          v-for="(item, i) in notifications.items"
+          :key="i"
           :type="item.type"
           :text="item.text"
           :seen="item.seen"

@@ -88,9 +88,7 @@
           v-if="data !== null"
           :headers="jobHeaders"
           :items="data.jobs"
-          :rows-per-page-items="[10, 25,50,100]"
-          rows-per-page-text="Jobs per page"
-          
+          :footer-props="{itemsPerPageOptions: [10,25,50,100], itemsPerPageText: 'Jobs per page'}"
         >
           <template
             slot="items"
@@ -194,9 +192,7 @@
       >
         <v-data-table
           v-if="data !== null"
-          :rows-per-page-items="[10,30,60,{'text':'All','value':-1}]"
-          rows-per-page-text="Workunits per page"
-          
+          :footer-props="{itemsPerPageOptions: [10,30,60,{'text':'All','value':-1}], itemsPerPageText: 'Workunits per page'}"
           :headers="workunitsHeader"
           :items="data.workunits"
           class="width100"

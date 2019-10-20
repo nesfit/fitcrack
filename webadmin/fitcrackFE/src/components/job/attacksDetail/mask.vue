@@ -102,7 +102,6 @@
       <v-data-table
         :headers="maskHeaders"
         :items="data.masks"
-        
         hide-default-footer
       >
         <template

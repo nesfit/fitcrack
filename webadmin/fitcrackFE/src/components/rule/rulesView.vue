@@ -20,9 +20,7 @@
         :headers="headers"
         :items="rules.items"
         :loading="loading"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Rule files per page"
-        
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Rules per page'}"
       >
         <template
           slot="items"

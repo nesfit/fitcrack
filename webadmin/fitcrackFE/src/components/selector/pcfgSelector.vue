@@ -9,7 +9,7 @@
     :items="items"
     :search="search"
     item-key="id"
-    :select-all="selectAll"
+    :show-select="selectAll"
   >
     <template
       slot="items"

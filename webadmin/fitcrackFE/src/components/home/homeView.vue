@@ -192,6 +192,7 @@
               </v-list-item>
             </v-list>
           </fc-tile>
+          <!--
           <fc-tile
             title="Notifications"
             class="mx-3 mb-5 height100 wid20"
@@ -216,6 +217,7 @@
               </v-list>
             </div>
           </fc-tile>
+          -->
         </v-row>
         <v-row>
           <fc-tile
