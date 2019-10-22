@@ -59,7 +59,7 @@ if [[ $? != 0 ]]; then
   exit
 fi
 
-./configure -C --disable-client --disable-manager
+./configure --disable-client --disable-manager
 if [[ $? != 0 ]]; then
   echo "Error during configuration."
   exit
