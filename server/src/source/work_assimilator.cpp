@@ -63,7 +63,7 @@
 #define MAX_HASH_SIZE 8192
 
 /** Benchmark is usually much faster than real cracking, shrink the first 2 workunits times-: */
-#define FIRST_JOB_SHRINK_FACTOR 3
+#define FIRST_WU_SHRINK_FACTOR 3
 
 /** Special ID of special bench_all package in fc_package */
 #define BENCHALL_PACKAGE_ID 1
@@ -121,13 +121,13 @@ enum HostStatus
 /*******************************/
 
 /**
- * @brief MysqlJob class definiton
+ * @brief MysqlWorkunit class definiton
  */
-class MysqlJob
+class MysqlWorkunit
 {
     public:
         /** Constructor */
-        MysqlJob(MYSQL_ROW row);
+        MysqlWorkunit(MYSQL_ROW row);
 
         /** Table Attributes */
         uint64_t m_id;
@@ -148,10 +148,10 @@ class MysqlJob
 
 
 /**
- * @brief MysqlJob constructor
+ * @brief MysqlWorkunit constructor
  * @param row
  */
-MysqlJob::MysqlJob(MYSQL_ROW row)
+MysqlWorkunit::MysqlWorkunit(MYSQL_ROW row)
 {
     this->m_id = boost::lexical_cast<uint64_t>(row[0]);
     this->m_package_id = boost::lexical_cast<uint64_t>(row[1]);
@@ -286,11 +286,11 @@ void assimilate_handler_usage()
     //);
 }
 
-vector<MysqlJob *> find_workunits2(uint64_t package_id, std::string query)
+vector<MysqlWorkunit *> find_workunits2(uint64_t package_id, std::string query)
 {
     log_messages.printf(MSG_DEBUG, "find_workunits2: package_id-%" PRIu64 ", query-%s\n", package_id, query.c_str());
 
-    vector<MysqlJob *> result;
+    vector<MysqlWorkunit *> result;
 
     if(query != "")
     {
@@ -314,7 +314,7 @@ vector<MysqlJob *> find_workunits2(uint64_t package_id, std::string query)
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(rp)))
     {
-        result.push_back(new MysqlJob(row));
+        result.push_back(new MysqlWorkunit(row));
     }
 
     mysql_free_result(rp);
@@ -326,11 +326,11 @@ vector<MysqlJob *> find_workunits2(uint64_t package_id, std::string query)
 
 
 // TODO: NOT USBALE
-vector<MysqlJob *> find_workunit_duplicates2(uint64_t package_id, uint64_t host_id)
+vector<MysqlWorkunit *> find_workunit_duplicates2(uint64_t package_id, uint64_t host_id)
 {
     log_messages.printf(MSG_DEBUG, "find_workunit_duplicates2: package_id-%" PRIu64 ", host_id-%" PRIu64 "\n", package_id, host_id);
 
-    vector<MysqlJob *> result, temp;
+    vector<MysqlWorkunit *> result, temp;
     char buf[SQL_BUF_SIZE];
 
     std::snprintf(buf, SQL_BUF_SIZE, "SELECT * FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_workunit.c_str(), host_id);
@@ -350,7 +350,7 @@ vector<MysqlJob *> find_workunit_duplicates2(uint64_t package_id, uint64_t host_
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(rp)))
     {
-        result.push_back(new MysqlJob(row));
+        result.push_back(new MysqlWorkunit(row));
     }
 
     mysql_free_result(rp);
@@ -373,11 +373,11 @@ vector<MysqlJob *> find_workunit_duplicates2(uint64_t package_id, uint64_t host_
 }
 
 
-void cancel_workunits2(vector<MysqlJob *> workunits)
+void cancel_workunits2(vector<MysqlWorkunit *> workunits)
 {
     log_messages.printf(MSG_DEBUG, "cancel_workunits2: %lu workunits\n", workunits.size());
 
-    std::vector<MysqlJob *>::iterator workunit;
+    std::vector<MysqlWorkunit *>::iterator workunit;
 
     for(workunit = workunits.begin(); workunit != workunits.end(); ++workunit)
     {
@@ -389,11 +389,11 @@ void cancel_workunits2(vector<MysqlJob *> workunits)
 }
 
 
-void delete_workunits2(vector<MysqlJob *> workunits)
+void delete_workunits2(vector<MysqlWorkunit *> workunits)
 {
     log_messages.printf(MSG_DEBUG, "delete_workunits2: workunits:%lu\n", workunits.size());
 
-    std::vector<MysqlJob *>::iterator workunit;
+    std::vector<MysqlWorkunit *>::iterator workunit;
     char buf[SQL_BUF_SIZE];
 
     for(workunit = workunits.begin(); workunit != workunits.end(); ++workunit)
@@ -408,11 +408,11 @@ void delete_workunits2(vector<MysqlJob *> workunits)
  * @brief Sets 'finish' column to number of 'fc_workunit' entries
  * @param workunits Vector of 'fc_workunit' entries
  */
-void finish_workunits(vector<MysqlJob *> workunits)
+void finish_workunits(vector<MysqlWorkunit *> workunits)
 {
     log_messages.printf(MSG_DEBUG, "finish_workunits: workunits:%lu\n", workunits.size());
 
-    std::vector<MysqlJob *>::iterator workunit;
+    std::vector<MysqlWorkunit *>::iterator workunit;
     char buf[SQL_BUF_SIZE];
 
     for(workunit = workunits.begin(); workunit != workunits.end(); ++workunit)
@@ -572,7 +572,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
     char hash_string[MAX_HASH_SIZE];   // hash results
 
     uint64_t host_id, boinc_host_id, package_id;
-    std::vector<MysqlJob *> workunits;
+    std::vector<MysqlWorkunit *> workunits;
 
     retval = boinc_mkdir(config.project_path("sample_results"));
 
@@ -712,7 +712,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                     if (factor > 1)
                     {
-                        power /= factor * FIRST_JOB_SHRINK_FACTOR;
+                        power /= factor * FIRST_WU_SHRINK_FACTOR;
                         std::cerr << __LINE__ << " - Updating power for mask-attack with ratio: 1/" << factor << ", new power: " << power << std::endl;
                     }
                 }
@@ -1003,7 +1003,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 cancel_workunits2(workunits);
 
                 std::cerr << __LINE__ << " - Adding them to Retry and deleting them from Workunits" << std::endl;
-                std::vector<MysqlJob *>::iterator workunitIt;
+                std::vector<MysqlWorkunit *>::iterator workunitIt;
                 for(workunitIt = workunits.begin(); workunitIt != workunits.end(); ++workunitIt)
                     set_retry_workunit((*workunitIt)->m_workunit_id);
 
