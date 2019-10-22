@@ -327,7 +327,7 @@ fitcrack_sources = \
     Config.h \
     Dictionary.h \
     Host.h \
-    Job.h \
+    Workunit.h \
     Mask.h \
     Package.h \
     SqlLoader.h \
@@ -345,7 +345,7 @@ fitcrack_sources = \
     Config.cpp \
     Dictionary.cpp \
     Host.cpp \
-    Job.cpp \
+    Workunit.cpp \
     Mask.cpp \
     Package.cpp \
     SqlLoader.cpp \
