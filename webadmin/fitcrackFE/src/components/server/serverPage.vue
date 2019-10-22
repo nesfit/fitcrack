@@ -61,7 +61,7 @@
         </fc-tile>
 
         <fc-tile
-          title="HDD usage"
+          title="Disk usage"
           icon="mdi-harddisk"
           class="mx-3 mb-5 maxh300 flex1"
         >
@@ -195,6 +195,9 @@
       this.interval = setInterval(function () {
         this.loadData()
       }.bind(this), 15000)
+    },
+    beforeDestroy () {
+      clearInterval(this.interval)
     },
     methods: {
       loadData: function () {

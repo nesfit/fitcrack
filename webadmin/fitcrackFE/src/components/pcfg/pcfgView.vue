@@ -6,13 +6,15 @@
 <template>
   <v-container class="max500">
     <fc-tile
-      title="PCFG grammar"
+      title="PCFGs"
       class="ma-2"
+      :icon="$route.meta.icon"
     >
       <v-alert
-        :value="true"
+        tile
+        text
         type="warning"
-        class="mt-0 mb-1"
+        class="mb-0"
       >
         PCFG files must have a .zip extension.
       </v-alert>
@@ -22,46 +24,39 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'PCFGs per page'}"
       >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>{{ props.item.name }}</td>
-          <td class="text-right">
-            {{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}
-          </td>
-          <td class="text-right">
-            <a
-              :href="$serverAddr + '/pcfg/' + props.item.id"
-              target="_blank"
-            >
-              <v-btn
-                outlined
-                fab
-                small
-                color="primary"
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/pcfg/' + item.id"
+                target="_blank"
+                download
+                v-on="on"
               >
-                <v-icon>file_download</v-icon>
-              </v-btn>
-            </a>
-          </td>
-          <td class="text-right">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  class="mx-0"
-                  @click="deletePcfg(props.item.id)"
-                  v-on="on"
-                >
-                  <v-icon color="error">
-                    delete
-                  </v-icon>
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
                 </v-btn>
-              </template>
-              <span>Delete PCFG file</span>
-            </v-tooltip>
-          </td>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                @click="deletePcfg(item)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  mdi-delete-outline
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Delete</span>
+          </v-tooltip>
         </template>
       </v-data-table>
       <div class="text-right pa-3">
@@ -70,177 +65,48 @@
           color="primary"
           text
           outlined
-          @click.native.stop="dialog = true; loadDictionaries()"
+          @click.native.stop="dialog = true"
         >
           Add new
         </v-btn>
       </div>
     </fc-tile>
 
-
-
-
-
-
-
-
-    <v-dialog
+    <file-creator
       v-model="dialog"
-      max-width="600"
-      lazy
-    >
-      <v-card>
-        <v-card-title class="headline">
-          Add new PCFG grammar
-        </v-card-title>
-        <v-tabs
-          v-model="active"
-          color="grey lighten-4"
-          light
-          slider-color="primary"
-        >
-          <v-tab ripple>
-            Upload file
-          </v-tab>
-          <v-tab ripple>
-            Make from dictionary
-          </v-tab>
-          <v-tab-item>
-            <v-card text>
-              <file-uploader
-                :url="this.$serverAddr + '/pcfg/add'"
-                @uploadComplete="loadPcfg(); dialog=false"
-              />
-            </v-card>
-          </v-tab-item>
-          <v-tab-item>
-            <div
-              v-if="adding"
-              class="text-center"
-            >
-              <v-progress-circular
-                class="ma-5"
-                size="50"
-                :width="3"
-                indeterminate
-                color="primary"
-              />
-            </div>
-            <v-card
-              v-else
-              text
-            >
-              <div class="px-2">
-                <v-text-field
-                  id="newPcfgName"
-                  v-model="newName"
-                  name="name"
-                  label="Name"
-                />
-              </div>
-              <v-data-table
-                :headers="dictionaryHeader"
-                :items="dictionaries.items"
-                item-key="id"
-                :loading="loadingDictionaries"
-                :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Dictionaries per page'}"
-              >
-                <template
-                  slot="items"
-                  slot-scope="props"
-                >
-                  <tr
-                    class="clickable"
-                    :class="{selectedDict: (props.item.id === selectedDictId)}"
-                    @click="selectedDictId=props.item.id"
-                  >
-                    <td>{{ props.item.name }}</td>
-                    <td class="text-right">
-                      {{ props.item.keyspace }}
-                    </td>
-                    <td class="text-right">
-                      {{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}
-                    </td>
-                    <td class="text-right">
-                      <v-tooltip top>
-                        <template v-slot:activator="{ on }">
-                          <v-btn
-                            icon
-                            class="mx-0"
-                            :to="{name: 'dictionaryDetail', params: { id: props.item.id}}"
-                            v-on="on"
-                          >
-                            <v-icon color="primary">
-                              link
-                            </v-icon>
-                          </v-btn>
-                        </template>
-                        <span>Go to the dictionary page</span>
-                      </v-tooltip>
-                    </td>
-                  </tr>
-                </template>
-              </v-data-table>
-              <div class="text-right pa-3">
-                <v-btn
-                  class="d-inline-block"
-                  color="primary"
-
-                  outlined
-                  :disabled="selectedDictId === null && newName === ''"
-                  @click="makePcfgFromDictionary()"
-                >
-                  Make from dictionary
-                </v-btn>
-              </div>
-            </v-card>
-          </v-tab-item>
-        </v-tabs>
-      </v-card>
-    </v-dialog>
+      title="Add new PCFG grammar"
+      :upload-url="this.$serverAddr + '/pcfg/add'"
+      :working="working"
+      @fileUploaded="loadPcfg"
+      @dictionarySelected="makePcfgFromDictionary"
+    />
   </v-container>
 </template>
 
 <script>
   import tile from '@/components/tile/fc_tile'
-  import FileUploader from "@/components/fileUploader/fileUploader";
+  import fileCreator from "@/components/fileUploader/fileCreator"
   export default {
     name: "PcfgView",
     components: {
-      FileUploader,
+      fileCreator,
       'fc-tile': tile,
     },
     data: function () {
       return {
-        newName: '',
-        adding: false,
-        selectedDictId: null,
-        active: null,
+        working: false,
         dialog: false,
         loading: false,
-        loadingDictionaries: false,
-        dictionaries: [],
         headers: [
           {
             text: 'Name',
             align: 'left',
             value: 'name'
           },
-          {text: 'Added', value: 'time_added', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'},
-          {text: 'Delete', align: 'right'}
+          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ],
-        dictionaryHeader: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
-        ],
-        pcfg: [],
+        pcfg: []
       }
     },
     mounted: function () {
@@ -248,37 +114,29 @@
     },
     methods: {
       loadPcfg: function () {
-        this.dialog= false
-        this.loading = true;
+        this.loading = true
         this.axios.get(this.$serverAddr + '/pcfg', {}).then((response) => {
           this.pcfg = response.data;
           this.loading = false
         })
       },
-      loadDictionaries: function () {
-        this.loadingDictionaries = true;
-        this.axios.get(this.$serverAddr + '/dictionary', {}).then((response) => {
-          this.dictionaries = response.data;
-          this.loadingDictionaries = false
-        })
-      },
-      makePcfgFromDictionary: function () {
-        this.adding = true
+      makePcfgFromDictionary: function (id, name) {
+        this.working = true
         this.axios.post(this.$serverAddr + '/pcfg/makeFromDictionary', {
-          "dictionary_id": this.selectedDictId,
-          "name": this.newName
+          "dictionary_id": id,
+          "name": name
         }).then((response) => {
-          this.adding = true
+          this.working = false
           this.dialog = false
           this.loadPcfg()
         }).catch((error) => {
-          this.adding = false
+          this.working = false
         })
       },
-      deletePcfg: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?').then((confirm) => {
-          this.loading = true;
-          this.axios.delete(this.$serverAddr + '/pcfg/' + id).then((response) => {
+      deletePcfg: function (item) {
+        this.$root.$confirm('Delete', `This will remove ${item.name} from your PCFGs. Are you sure?`).then((confirm) => {
+          this.loading = true
+          this.axios.delete(this.$serverAddr + '/pcfg/' + item.id).then((response) => {
             this.loadPcfg()
           })
         })
@@ -302,20 +160,4 @@
     max-width: 600px;
   }
 
-</style>
-
-
-<style>
-  .selectedDict {
-    background: rgba(37, 157, 173, 0.85) !important;
-    color: white;
-  }
-
-  .selectedDict a {
-    color: white;
-  }
-
-  .clickable {
-    cursor: pointer;
-  }
 </style>

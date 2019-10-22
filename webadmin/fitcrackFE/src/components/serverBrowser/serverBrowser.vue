@@ -11,6 +11,7 @@
   >
     <v-list
       v-if="data!==null"
+      tile
       class="filesCont"
     >
       <v-list-item

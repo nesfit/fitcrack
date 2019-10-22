@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <v-row class=" mx-auto elevation-2">
+  <v-row class="mx-auto elevation-2">
     <v-toolbar
       flat
       class="max64"
@@ -19,6 +19,7 @@
         {{ title }}
       </v-toolbar-title>
     </v-toolbar>
+
     <div class="contentFcTile">
       <v-skeleton-loader
         v-if="loading"

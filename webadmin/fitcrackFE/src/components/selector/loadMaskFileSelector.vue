@@ -69,8 +69,8 @@
           this.loading = false
         })
       },
-      updateSelected(mask) {
-        this.$emit('input', mask.id)
+      updateSelected() {
+        this.$emit('input', this.selected[0])
       }
     },
   }

@@ -313,103 +313,100 @@
           <!--    <h3> Message: {{ attackSettings }} </h3> -->
           <div class="max1000 mx-auto mb-5">
             <fc-tile title="Attack settings">
-              <v-row>
-                <v-tabs
-                  v-model="attackSettingsTab"
-                  vertical
-                  color="primary darken-1"
+              <v-tabs
+                v-model="attackSettingsTab"
+                vertical
+                color="primary"
+                class="mx-0"
+              >
+                <v-tab
+                  @click="attackTabChanged($refs.DictAttack)"
                 >
-                  <v-tab
-                    @click="attackTabChanged($refs.DictAttack)"
-                  >
-                    Dictionary attack
-                  </v-tab>
-                  <v-tab-item>
-                    <v-card text>
-                      <dictionary
-                        ref="DictAttack"
-                        v-model="attackSettings"
-                      />
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab
-                    @click="attackTabChanged($refs.CombAttack)"
-                  >
-                    Combination attack
-                  </v-tab>
-                  <v-tab-item>
-                    <v-card text>
-                      <combinator
-                        ref="CombAttack"
-                        v-model="attackSettings"
-                      />
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab
-                    @click="attackTabChanged($refs.BruteAttack)"
-                  >
-                    Brute-force attack
-                  </v-tab>
-                  <v-tab-item>
-                    <v-card text>
-                      <maskattack
-                        ref="BruteAttack"
-                        v-model="attackSettings"
-                      />
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab
-                    @click="attackTabChanged($refs.HybridWordMaskAttack)"
-                  >
-                    Hybrid Wordlist + Mask
-                  </v-tab>
-                  <v-tab-item>
-                    <v-card text>
-                      <hybridWordlistMask
-                        ref="HybridWordMaskAttack"
-                        v-model="attackSettings"
-                      />
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab
-                    @click="attackTabChanged($refs.HybridMaskWordAttack)"
-                  >
-                    Hybrid Mask + Wordlist
-                  </v-tab>
-                  <v-tab-item>
-                    <v-card text>
-                      <hybridMaskWordlist
-                        ref="HybridMaskWordAttack"
-                        v-model="attackSettings"
-                      />
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab
-                    @click="attackTabChanged($refs.pcfg)"
-                  >
-                    PCFG
-                  </v-tab>
-                  <v-tab-item>
-                    <v-card text>
-                      <pcfg
-                        ref="pcfgAttack"
-                        v-model="attackSettings"
-                      />
-                    </v-card>
-                  </v-tab-item>
-                </v-tabs>
-              </v-row>
+                  Dictionary attack
+                </v-tab>
+                <v-tab-item>
+                  <v-card text>
+                    <dictionary
+                      ref="DictAttack"
+                      v-model="attackSettings"
+                    />
+                  </v-card>
+                </v-tab-item>
+                <v-tab
+                  @click="attackTabChanged($refs.CombAttack)"
+                >
+                  Combination attack
+                </v-tab>
+                <v-tab-item>
+                  <v-card text>
+                    <combinator
+                      ref="CombAttack"
+                      v-model="attackSettings"
+                    />
+                  </v-card>
+                </v-tab-item>
+                <v-tab
+                  @click="attackTabChanged($refs.BruteAttack)"
+                >
+                  Brute-force attack
+                </v-tab>
+                <v-tab-item>
+                  <v-card text>
+                    <maskattack
+                      ref="BruteAttack"
+                      v-model="attackSettings"
+                    />
+                  </v-card>
+                </v-tab-item>
+                <v-tab
+                  @click="attackTabChanged($refs.HybridWordMaskAttack)"
+                >
+                  Hybrid Wordlist + Mask
+                </v-tab>
+                <v-tab-item>
+                  <v-card text>
+                    <hybridWordlistMask
+                      ref="HybridWordMaskAttack"
+                      v-model="attackSettings"
+                    />
+                  </v-card>
+                </v-tab-item>
+                <v-tab
+                  @click="attackTabChanged($refs.HybridMaskWordAttack)"
+                >
+                  Hybrid Mask + Wordlist
+                </v-tab>
+                <v-tab-item>
+                  <v-card text>
+                    <hybridMaskWordlist
+                      ref="HybridMaskWordAttack"
+                      v-model="attackSettings"
+                    />
+                  </v-card>
+                </v-tab-item>
+                <v-tab
+                  @click="attackTabChanged($refs.pcfg)"
+                >
+                  PCFG
+                </v-tab>
+                <v-tab-item>
+                  <v-card text>
+                    <pcfg
+                      ref="pcfgAttack"
+                      v-model="attackSettings"
+                    />
+                  </v-card>
+                </v-tab-item>
+              </v-tabs>
             </fc-tile>
           </div>
 
           <div class="max800 mx-auto mb-5">
             <fc-tile title="Host mapping">
-              <v-row class="">
-                <host-selector
-                  v-model="hosts"
-                  :select-all="true"
-                />
-              </v-row>
+              <host-selector
+                v-model="hosts"
+                :select-all="true"
+              />
             </fc-tile>
           </div>
 

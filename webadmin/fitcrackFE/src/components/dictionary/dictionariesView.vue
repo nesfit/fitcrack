@@ -7,14 +7,16 @@
   <v-container class="max500">
     <fc-tile
       title="Dictionaries"
+      :icon="$route.meta.icon"
       class="ma-2"
     >
       <v-alert
-        :value="true"
+        tile
+        text
         type="warning"
-        class="mt-2 mb-0"
+        class="mb-0"
       >
-        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is through SFTP server.
+        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is via SFTP.
       </v-alert>
       <v-data-table
         :headers="headers"
@@ -22,52 +24,36 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Dictionaries per page'}"
       >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>
-            <router-link :to="{name: 'dictionaryDetail', params: { id: props.item.id}}">
-              {{ props.item.name }}
-            </router-link>
-          </td>
-          <td class="text-right">
-            {{ props.item.keyspace }}
-          </td>
-          <td class="text-right">
-            {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
-          </td>
-          <td class="text-right">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  class="mx-0"
-                  @click="deleteDictionary(props.item.id)"
-                  v-on="on"
-                >
-                  <v-icon color="error">
-                    delete
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>Delete dictionary</span>
-            </v-tooltip>
-          </td>
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                @click="deleteDictionary(item)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  mdi-delete-outline
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Delete dictionary</span>
+          </v-tooltip>
         </template>
       </v-data-table>
+      <v-btn
+        color="primary"
+        block
+        text
+        @click.native.stop="dialog = true"
+      >
+        Select from server
+      </v-btn>
       <v-divider />
-      <div class="text-right px-2 ">
-        <v-btn
-          class="d-inline-block"
-          color="primary"
-          text
-          outlined
-          @click.native.stop="dialog = true"
-        >
-          Select from drive
-        </v-btn>
-      </div>
 
       <file-uploader
         :url="this.$serverAddr + '/dictionary/add'"
@@ -102,12 +88,12 @@
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
-          {text: 'Delete', align: 'right'}
+          {text: 'Keyspace', value: 'keyspace', align: 'end'},
+          {text: 'Time', value: 'time', align: 'end'},
+          {text: 'Delete', value: 'actions', align: 'end', sortable: false}
         ],
         dictionaries: [],
         dialog: false
@@ -124,10 +110,10 @@
           this.loading = false
         })
       },
-      deleteDictionary: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+      deleteDictionary: function (item) {
+        this.$root.$confirm('Delete', `This will remove ${item.name} from your dictionaries. Are you sure?`).then((confirm) => {
           this.loading = true;
-          this.axios.delete(this.$serverAddr + '/dictionary/' + id).then((response) => {
+          this.axios.delete(this.$serverAddr + '/dictionary/' + item.id).then((response) => {
             this.loadDictionaries()
           })
         })

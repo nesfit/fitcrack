@@ -34,10 +34,11 @@
       <v-list
         expand
         nav
+        dense
       >
         <v-list-item to="/">
           <v-list-item-action>
-            <v-icon>mdi-home</v-icon>
+            <v-icon>{{ routeIcon('home') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Home</v-list-item-title>
@@ -57,7 +58,7 @@
             :to="{ name: 'addJob'}"
           >
             <v-list-item-action>
-              <v-icon>mdi-briefcase-plus</v-icon>
+              <v-icon>{{ routeIcon('addJob') }}</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Add job</v-list-item-title>
@@ -66,7 +67,7 @@
 
           <v-list-item :to="{ name: 'jobs'}">
             <v-list-item-action>
-              <v-icon>mdi-briefcase</v-icon>
+              <v-icon>{{ routeIcon('jobs') }}</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>All jobs</v-list-item-title>
@@ -76,7 +77,7 @@
           <!--
           <v-list-item :to="{ name: 'hiddenJobs'}">
             <v-list-item-action>
-              <v-icon>visibility_off</v-icon>
+              <v-icon>{{ routeIcon('hiddenJobs') }}</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Hidden jobs</v-list-item-title>
@@ -84,12 +85,12 @@
           </v-list-item>
           -->
 
-          <v-divider class="mb-2" />
+          <v-divider class="mb-1" />
         </v-list-group>
 
         <v-list-item :to="{ name: 'hosts'}">
           <v-list-item-action>
-            <v-icon>mdi-desktop-classic</v-icon>
+            <v-icon>{{ routeIcon('hosts') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Hosts</v-list-item-title>
@@ -98,7 +99,7 @@
 
         <v-list-item :to="{ name: 'hashes'}">
           <v-list-item-action>
-            <v-icon>mdi-pound</v-icon>
+            <v-icon>{{ routeIcon('hashes') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Hashes</v-list-item-title>
@@ -107,7 +108,7 @@
 
         <v-list-item :to="{ name: 'dictionaries'}">
           <v-list-item-action>
-            <v-icon>mdi-dictionary</v-icon>
+            <v-icon>{{ routeIcon('dictionaries') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Dictionaries</v-list-item-title>
@@ -116,7 +117,7 @@
 
         <v-list-item :to="{ name: 'pcfg'}">
           <v-list-item-action>
-            <v-icon>mdi-ray-start-end</v-icon>
+            <v-icon>{{ routeIcon('pcfg') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>PCFG</v-list-item-title>
@@ -125,7 +126,7 @@
 
         <v-list-item :to="{ name: 'rules'}">
           <v-list-item-action>
-            <v-icon>mdi-gavel</v-icon>
+            <v-icon>{{ routeIcon('rules') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Rules</v-list-item-title>
@@ -134,7 +135,7 @@
 
         <v-list-item :to="{ name: 'charsets'}">
           <v-list-item-action>
-            <v-icon>mdi-alphabetical</v-icon>
+            <v-icon>{{ routeIcon('charsets') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Charsets</v-list-item-title>
@@ -143,7 +144,7 @@
 
         <v-list-item :to="{ name: 'masks'}">
           <v-list-item-action>
-            <v-icon>mdi-guy-fawkes-mask</v-icon>
+            <v-icon>{{ routeIcon('masks') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Masks</v-list-item-title>
@@ -152,7 +153,7 @@
 
         <!--<v-list-item :to="{ name: 'files'}">-->
         <!--<v-list-item-action>-->
-        <!--<v-icon>insert_drive_file</v-icon>-->
+        <!--<v-icon>{{ routeIcon('') }}</v-icon>-->
         <!--</v-list-item-action>-->
         <!--<v-list-item-content>-->
         <!--<v-list-item-title>Encrypted files</v-list-item-title>-->
@@ -161,7 +162,7 @@
 
         <v-list-item :to="{ name: 'markovChains'}">
           <v-list-item-action>
-            <v-icon>mdi-matrix</v-icon>
+            <v-icon>{{ routeIcon('markovChains') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Markov chains</v-list-item-title>
@@ -170,21 +171,21 @@
 
         <!--<v-list-item :to="{ name: 'server'}">-->
         <!--<v-list-item-action>-->
-        <!--<v-icon>settings</v-icon>-->
+        <!--<v-icon>{{ routeIcon('') }}</v-icon>-->
         <!--</v-list-item-action>-->
         <!--<v-list-item-content>-->
         <!--<v-list-item-title>Control</v-list-item-title>-->
         <!--</v-list-item-content>-->
         <!--</v-list-item>-->
 
-        <v-divider />
+        <v-divider class="mb-1" />
 
         <v-list-item
           v-if="$userCanManageUsers()"
           :to="{ name: 'manageUsers'}"
         >
           <v-list-item-action>
-            <v-icon>mdi-folder-account</v-icon>
+            <v-icon>{{ routeIcon('manageUsers') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Manage users</v-list-item-title>
@@ -193,7 +194,7 @@
 
         <v-list-item :to="{ name: 'myAccount'}">
           <v-list-item-action>
-            <v-icon>mdi-account</v-icon>
+            <v-icon>{{ routeIcon('myAccount') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>My account</v-list-item-title>
@@ -205,7 +206,7 @@
           :to="{ name: 'server'}"
         >
           <v-list-item-action>
-            <v-icon>mdi-server</v-icon>
+            <v-icon>{{ routeIcon('server') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Server</v-list-item-title>
@@ -217,7 +218,7 @@
             <v-icon>mdi-logout</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Logout</v-list-item-title>
+            <v-list-item-title>Log out</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -298,6 +299,7 @@
       right
       fixed
       app
+      width="400"
     >
       <v-toolbar
         flat 
@@ -312,6 +314,7 @@
 
 <script>
   import notifications from '@/components/notification/fc_notifications_wrapper'
+  import { routeIcon } from '@/router'
 
   export default {
     components: {
@@ -339,6 +342,7 @@
       clearInterval(this.interval)
     },
     methods: {
+      routeIcon,
       logout: function () {
         this.axios.get(this.$serverAddr + '/user/logout').then((response) => {
           this.$logoutUser()

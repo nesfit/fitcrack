@@ -5,99 +5,56 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
     item-key="id"
-    :show-select="selectAll"
+    show-select
+    :single-select="!selectAll"
+    @input="updateSelected"
   >
-    <template
-      slot="items"
-      slot-scope="props"
-    >
-      <tr>
-        <td>
-          <v-checkbox
-            :input-value="selected === props.item.id"
-            primary
-            hide-details
-            @click="updateSelected(props.item.id, props.item)"
-          />
-        </td>
-        <td>{{ props.item.name }}</td>
-        <td class="text-right">
-          {{ props.item.keyspace }}
-        </td>
-        <td class="text-right">
-          {{ $moment(props.item.time_added ).format('DD.MM.YYYY HH:mm') }}
-        </td>
-        <td class="text-right">
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                class="mx-0"
-                :to="{name: 'pcfgDetail', params: { id: props.item.id}}"
-                disabled="true"
-                v-on="on"
-                @click="hideJob(props.item.id)"
-              >
-                <v-icon color="primary">
-                  link
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Go to the PCFG page</span>
-          </v-tooltip>
-        </td>
-      </tr>
-    <!--  <h3> Items: {{ items }} </h3> -->
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'pcfgDetail', params: { id: item.id}}">
+        {{ item.name }}
+        <v-icon 
+          small
+          color="primary"
+        >
+          mdi-open-in-new
+        </v-icon>
+      </router-link>
+    </template>
+    <template v-slot:item.time_added="{ item }">
+      {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
     </template>
   </v-data-table>
 </template>
 
 <script>
+  import selector from './selectorMixin'
   export default {
     name: "PcfgSelector",
-    props: {
-      selectAll: {
-        type: Boolean,
-        default: false
-      },
-      value: {
-        type: Object
-      }
-    },
+    mixins: [selector],
     data() {
       return {
-        items: [],
-        loading: false,
-        search: '',
-        selected: 0,
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Added', value: 'time_added', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Keyspace', value: 'keyspace', align: 'end'},
+          {text: 'Added', value: 'time_added', align: 'end'}
         ]
       }
     },
     watch:{
       value: function(){
         if (this.value) {
-          this.selected = this.value.id
+          this.selected = this.value
         }
       }
-    },
-    mounted() {
-      if (!this.selectAll) {
-        this.headers.unshift({width: "1"})
-      }
-      this.getData()
     },
     methods: {
       getData() {
@@ -106,25 +63,7 @@
           this.items = response.data.items
           this.loading = false
         })
-      },
-      updateSelected(id, pcfg) {
-          this.selected = id
-          this.$emit('input', pcfg)
-
       }
-    },
+    }
   }
 </script>
-
-<style scoped>
-  .oneline {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    width: 200px;
-    vertical-align: middle;
-    line-height: 50px;
-    height: 50px;
-  }
-</style>

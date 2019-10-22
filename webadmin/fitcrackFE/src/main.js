@@ -67,6 +67,7 @@ new Vue({
       themes: window.theme
     }
   }),
+  components: { App },
   data: {
     store: {
       project: window.projectName,
@@ -91,6 +92,5 @@ new Vue({
     }
   },
   router,
-  components: { App },
   template: '<App/>'
 });

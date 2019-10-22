@@ -9,14 +9,13 @@
       <v-text-field
         v-model="search"
         clearable
-        solo
-        text
-        append-icon="search"
+        flat
+        outlined
+        prepend-inner-icon="mdi-database-search"
         label="Search by password or hash"
         single-line
         hide-details
       />
-      <v-spacer />
     </v-card-title>
     <v-divider />
     <v-data-table
@@ -29,20 +28,49 @@
       :loading="loading"
       :footer-props="{itemsPerPageOptions: [25,50,100], itemsPerPageText: 'Passwords per page'}"
     >
-      <template
-        slot="items"
-        slot-scope="props"
-      >
-        <td>{{ props.item.password }} </td>
-        <td class="text-right">
-          {{ props.item.hash_type_name }}
-        </td>
-        <td class="text-right">
-          {{ props.item.hash }}
-        </td>
-        <td class="text-right">
-          {{ $moment(props.item.added).format('D.M.YYYY H:mm:ss') }}
-        </td>
+      <template v-slot:item.password="{ item }">
+        {{ item.password || '–' }}
+      </template>
+      <template v-slot:item.hash="{ item }">
+        <div class="d-flex align-center">
+          <v-dialog max-width="600">
+            <template v-slot:activator="{ on }">
+              <v-btn 
+                icon
+                class="mr-2"
+                v-on="on"
+              >
+                <v-icon>mdi-text</v-icon>
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title primary-title>
+                {{ item.hash_type_name }}
+              </v-card-title>
+              <v-card-text>
+                {{ item.hash }}
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg"
+            height="18"
+            width="100%"
+          >
+            <rect
+              v-for="(char, i) in item.hash"
+              :key="i"
+              :x="i"
+              :y="18 + 5 - char.charCodeAt(0) / 5"
+              width="1"
+              :height="char.charCodeAt(0) / 5 - 5"
+              :fill="'hsla(' + (char.charCodeAt(0) * 5 - 100) + ',100%,50%,50%)'"
+            />
+          </svg>
+        </div>
+      </template>
+      <template v-slot:item.added="{ item }">
+        {{ $moment(item.added).format('D.M.YYYY H:mm:ss') }}
       </template>
     </v-data-table>
   </div>
@@ -60,10 +88,10 @@
         pagination: {},
         loading: true,
         headers: [
-          {text: 'Password', value: 'result', align: 'left', sortable: true},
-          {text: 'Hash type', value: 'hash_type', align: 'right', sortable: true},
-          {text: 'Hash', value: 'hash', align: 'right', sortable: true},
-          {text: 'Added', value: 'added', align: 'right', sortable: true}
+          {text: 'Password', value: 'password', align: 'start', sortable: true},
+          {text: 'Hash type', value: 'hash_type_name', align: 'end', sortable: true},
+          {text: 'Hash', value: 'hash', align: 'start', sortable: true},
+          {text: 'Added', value: 'added', align: 'end', sortable: true}
         ],
         hashes:
           []

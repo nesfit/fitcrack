@@ -8,11 +8,13 @@
     <fc-tile
       title="Rules"
       class="ma-2"
+      :icon="$route.meta.icon"
     >
       <v-alert
-        :value="true"
+        tile
+        text
         type="warning"
-        class="mt-0 mb-1"
+        class="mb-0"
       >
         Rule files must have a .txt or .rule extension.
       </v-alert>
@@ -22,50 +24,39 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Rules per page'}"
       >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>
-            <router-link :to="{name: 'ruleDetail', params: { id: props.item.id}}">
-              {{ props.item.name }}
-            </router-link>
-          </td>
-          <td class="text-right">
-            {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
-          </td>
-          <td class="text-right">
-            <a
-              :href="$serverAddr + '/rule/' + props.item.id + '/download'"
-              target="_blank"
-            >
-              <v-btn
-                outlined
-                fab
-                small
-                color="primary"
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/rule/' + item.id + '/download'"
+                target="_blank"
+                download
+                v-on="on"
               >
-                <v-icon>file_download</v-icon>
-              </v-btn>
-            </a>
-          </td>
-          <td class="text-right">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  class="mx-0"
-                  @click="deleteRule(props.item.id)"
-                  v-on="on"
-                >
-                  <v-icon color="error">
-                    delete
-                  </v-icon>
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
                 </v-btn>
-              </template>
-              <span>Delete rules file</span>
-            </v-tooltip>
-          </td>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                @click="deleteRule(item)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  mdi-delete-outline
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Delete</span>
+          </v-tooltip>
         </template>
       </v-data-table>
       <v-divider />
@@ -93,12 +84,11 @@
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'},
-          {text: 'Delete', align: 'right'}
+          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ]
       }
     },
@@ -113,8 +103,8 @@
           this.loading = false
         })
       },
-      deleteRule: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+      deleteRule: function (item) {
+        this.$root.$confirm('Delete', `This will remove ${item.name} from your rules. Are you sure?`).then((confirm) => {
           this.loading = true;
           this.axios.delete(this.$serverAddr + '/rule/' + id).then((response) => {
             this.loadRules()

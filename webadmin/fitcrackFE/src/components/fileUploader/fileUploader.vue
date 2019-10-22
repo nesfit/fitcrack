@@ -8,6 +8,7 @@
     <v-alert
       v-if="overSizeLimit"
       type="error"
+      tile
     >
       Maximum size of uploaded file is 2 GB.
     </v-alert>

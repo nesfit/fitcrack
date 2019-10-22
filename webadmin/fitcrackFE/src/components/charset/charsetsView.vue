@@ -8,11 +8,13 @@
     <fc-tile
       title="Charsets"
       class="ma-2"
+      :icon="$route.meta.icon"
     >
       <v-alert
-        :value="true"
+        tile
+        text
         type="warning"
-        class="mt-0 mb-1"
+        class="mb-0"
       >
         Charsets must have a .txt, .hcchr or .charset extension.
       </v-alert>
@@ -22,50 +24,39 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Charsets per page'}"
       >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>
-            <router-link :to="{name: 'charsetDetail', params: { id: props.item.id}}">
-              {{ props.item.name }}
-            </router-link>
-          </td>
-          <td class="text-right">
-            {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
-          </td>
-          <td class="text-right">
-            <a
-              :href="$serverAddr + '/charset/' + props.item.id + '/download'"
-              target="_blank"
-            >
-              <v-btn
-                outlined
-                fab
-                small
-                color="primary"
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/charset/' + item.id + '/download'"
+                target="_blank"
+                download
+                v-on="on"
               >
-                <v-icon>file_download</v-icon>
-              </v-btn>
-            </a>
-          </td>
-          <td class="text-right">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  class="mx-0"
-                  @click="deleteCharset(props.item.id)"
-                  v-on="on"
-                >
-                  <v-icon color="error">
-                    delete
-                  </v-icon>
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
                 </v-btn>
-              </template>
-              <span>Delete charset file</span>
-            </v-tooltip>
-          </td>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                @click="deleteCharset(item)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  mdi-delete-outline
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Delete</span>
+          </v-tooltip>
         </template>
       </v-data-table>
       <v-divider />
@@ -93,12 +84,11 @@
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'},
-          {text: 'Delete', align: 'right'}
+          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ]
       }
     },
@@ -113,10 +103,10 @@
           this.loading = false
         })
       },
-      deleteCharset: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+      deleteCharset: function (item) {
+        this.$root.$confirm('Delete', `This will remove ${item.name} from your charsets. Are you sure?`).then((confirm) => {
           this.loading = true;
-          this.axios.delete(this.$serverAddr + '/charset/' + id).then((response) => {
+          this.axios.delete(this.$serverAddr + '/charset/' + item.id).then((response) => {
             this.loadCharsets()
           })
         })
