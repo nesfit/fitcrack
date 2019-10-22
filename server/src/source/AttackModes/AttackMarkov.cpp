@@ -18,7 +18,7 @@ CAttackMarkov::CAttackMarkov(PtrPackage & package, PtrHost & host, uint64_t seco
 
 bool CAttackMarkov::makeWorkunit()
 {
-/** Create the job instance first */
+/** Create the workunit instance first */
     if (!m_workunit && !generateWorkunit())
         return false;
 
@@ -27,13 +27,13 @@ bool CAttackMarkov::makeWorkunit()
     const char* infiles[3];
     int retval;
 
-    /** Make a unique name for the job and its input file */
+    /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_markov_%" PRIu64 "", Config::appName, m_package->getId());
 
-    /** Load the job mask to object */
-    PtrMask jobMask = m_sqlLoader->loadMask(m_workunit->getMaskId());
+    /** Load the workunit mask to object */
+    PtrMask workunitMask = m_sqlLoader->loadMask(m_workunit->getMaskId());
 
     /** Append mode, mask, start_index, stop_index to config */
     retval = config.download_path(name1, path);
@@ -55,7 +55,7 @@ bool CAttackMarkov::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new job:\n");
+    Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
     f << m_package->getConfig();
@@ -66,8 +66,8 @@ bool CAttackMarkov::makeWorkunit()
     Tools::printDebug("|||mode|String|1|n|||\n");
 
     /** Output mask */
-    f << "|||mask|String|" << jobMask->getMask().length() << "|" << jobMask->getMask() << "|||\n";
-    Tools::printDebug("|||mask|String|%d|%s|||\n", jobMask->getMask().length(), jobMask->getMask().c_str());
+    f << "|||mask|String|" << workunitMask->getMask().length() << "|" << workunitMask->getMask() << "|||\n";
+    Tools::printDebug("|||mask|String|%d|%s|||\n", workunitMask->getMask().length(), workunitMask->getMask().c_str());
 
     /** Output start_index */
     int digits = 0;
@@ -87,17 +87,17 @@ bool CAttackMarkov::makeWorkunit()
         Tools::printDebug("|||markov_threshold|UInt|%d|%" PRIu32 "|||\n", digits, markov_threshold);
     }
 
-    uint64_t maskHcKeyspace = jobMask->getHcKeyspace();
-    uint64_t jobHcKeyspace = m_workunit->getHcKeyspace();
+    uint64_t maskHcKeyspace = workunitMask->getHcKeyspace();
+    uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
 
-    /** Output stop_index - only if it is not the last job in the current mask */
-    if (m_workunit->getStartIndex() + jobHcKeyspace < maskHcKeyspace)
+    /** Output stop_index - only if it is not the last workunit in the current mask */
+    if (m_workunit->getStartIndex() + workunitHcKeyspace < maskHcKeyspace)
     {
         digits = 0;
-        num = jobHcKeyspace;
+        num = workunitHcKeyspace;
         do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||hc_keyspace|BigUInt|" << digits << "|" << jobHcKeyspace << "|||\n";
-        Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, jobHcKeyspace);
+        f << "|||hc_keyspace|BigUInt|" << digits << "|" << workunitHcKeyspace << "|||\n";
+        Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitHcKeyspace);
     }
     else
     {
@@ -176,18 +176,18 @@ bool CAttackMarkov::makeWorkunit()
     f.close();
 
 
-    /** Fill in the job parameters */
+    /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerJob());
+    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
 
     setDefaultWorkunitParams(&wu);
 
-    /** Register the job with BOINC */
+    /** Register the workunit with BOINC */
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
@@ -245,7 +245,7 @@ bool CAttackMarkov::generateWorkunit()
     {
         if (mask->getCurrentIndex() < mask->getHcKeyspace())
         {
-            /** Mask for a new job found */
+            /** Mask for a new workunit found */
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "Mask found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
                     mask->getMask().c_str(), mask->getCurrentIndex(), mask->getHcKeyspace());
@@ -256,7 +256,7 @@ bool CAttackMarkov::generateWorkunit()
 
     if (!currentMask)
     {
-        /** No masks found, no job could be generated */
+        /** No masks found, no workunit could be generated */
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "No masks found for this package\n");
         return false;
@@ -272,7 +272,7 @@ bool CAttackMarkov::generateWorkunit()
                 "Adjusting #passwords, mask too small, new keyspace: %" PRIu64 "\n", passCount);
     }
 
-    /** Create new mask job */
+    /** Create new mask workunit */
     m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
                          currentMask->getId(), 0, false, 0, false);
 

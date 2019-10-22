@@ -29,14 +29,14 @@ class CAbstractGenerator
         virtual void run() = 0;
 
         /**
-         * Calculates duration of job according to adaptive algorithm presented on ICDF2C
-         * @return Number of seconds for a job
+         * Calculates duration of workunit according to adaptive algorithm presented on ICDF2C
+         * @return Number of seconds for a workunit
          */
         uint64_t calculateSecondsIcdf2c(PtrPackage & package);
 
         /**
-         * @brief Wait for the transitioner to create instances of the jobs we just created.
-         * Otherwise we'll create too many jobs.
+         * @brief Wait for the transitioner to create instances of the workunits we just created.
+         * Otherwise we'll create too many workunits.
          */
         void activateJobs();
 

@@ -57,7 +57,7 @@ public:
     bool Disconnect();
 
     /**
-     * Acknowledge the job was received
+     * Acknowledge the workunit was received
      */
     bool Acknowledge();
 

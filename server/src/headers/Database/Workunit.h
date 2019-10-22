@@ -21,10 +21,10 @@ class CWorkunit {
     private:
         /**
          * @brief Private constructor, called by create() static function
-         * @param jobMap [in] Map representing fc_job table entry
+         * @param workunitMap [in] Map representing fc_workunit table entry
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
-        explicit CWorkunit(DbMap & jobMap);
+        explicit CWorkunit(DbMap & workunitMap);
 
         /**
          * @brief Private constructor, called by create() static function
@@ -41,14 +41,14 @@ class CWorkunit {
 
         /**
          * @brief Creating instance as a shared pointer from database select
-         * @param jobMap [in] Map representing fc_job table entry
+         * @param workunitMap [in] Map representing fc_workunit table entry
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
-         * @return Shared pointer to fc_job entry object
+         * @return Shared pointer to fc_workunit entry object
          */
-        static PtrWorkunit create(DbMap & jobMap, CSqlLoader * sqlLoader);
+        static PtrWorkunit create(DbMap & workunitMap, CSqlLoader * sqlLoader);
 
         /**
-         * @brief Creating instance as a shared pointer from generated job data
+         * @brief Creating instance as a shared pointer from generated workunit data
          * @param ... [in] Attributes needed by database
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
@@ -57,15 +57,15 @@ class CWorkunit {
                              bool duplicated, uint64_t duplicate, bool retry);
 
         /**
-         * @brief Get the job SQL table name, usually fc_job
-         * @return Job SQL table name
+         * @brief Get the workunit SQL table name, usually fc_workunit
+         * @return Workunit SQL table name
          */
         static std::string getTableName();
 
     private:
 
         /**
-         * @section Table attributes of fc_job
+         * @section Table attributes of fc_workunit
          */
 
         uint64_t m_id;

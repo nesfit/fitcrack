@@ -19,7 +19,7 @@ CAttackPcfg::CAttackPcfg(PtrPackage & package, PtrHost & host, uint64_t seconds,
 
 bool CAttackPcfg::makeWorkunit()
 {
-    /** Create the job instance first */
+    /** Create the workunit instance first */
     if (!m_workunit && !generateWorkunit())
         return false;
 
@@ -28,7 +28,7 @@ bool CAttackPcfg::makeWorkunit()
     const char* infiles[4];
     int retval;
 
-    /** Make a unique name for the job and its input file */
+    /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
@@ -55,7 +55,7 @@ bool CAttackPcfg::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new job:\n");
+    Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
     f << m_package->getConfig();
@@ -167,11 +167,11 @@ bool CAttackPcfg::makeWorkunit()
     f.close();
 
 
-    /** Fill in the job parameters */
+    /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerJob());
+    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
@@ -179,7 +179,7 @@ bool CAttackPcfg::makeWorkunit()
 
     setDefaultWorkunitParams(&wu);
 
-    /** Register the job with BOINC */
+    /** Register the workunit with BOINC */
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
@@ -242,7 +242,7 @@ bool CAttackPcfg::generateWorkunit()
     if (passCount + m_package->getCurrentIndex() > m_package->getHcKeyspace())
         passCount = m_package->getHcKeyspace() - m_package->getCurrentIndex();
 
-    /** Create the job */
+    /** Create the workunit */
     m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
                          false, 0, false);
 

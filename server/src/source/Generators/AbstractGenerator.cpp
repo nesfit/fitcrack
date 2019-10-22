@@ -24,8 +24,8 @@ uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrPackage & package)
         seconds = maximum;
 
     Tools::printDebugPackage(Config::DebugType::Log, package->getId(),
-            "Calculating seconds: seconds_per_job = %" PRIu64 ", real seconds = %" PRIu64"\n",
-            package->getSecondsPerJob(), seconds);
+            "Calculating seconds: seconds_per_workunit = %" PRIu64 ", real seconds = %" PRIu64"\n",
+                             package->getSecondsPerWorkunit(), seconds);
 
     return seconds;
 }
@@ -35,8 +35,8 @@ void CAbstractGenerator::activateJobs()
 {
     int retval;
     /** Wait for the transitioner to create instances
-     * of the jobs we just created.
-     * Otherwise we'll create too many jobs.
+     * of the workunits we just created.
+     * Otherwise we'll create too many workunits.
      */
     double now = dtime();
     while (1)

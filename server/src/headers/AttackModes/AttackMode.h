@@ -37,15 +37,15 @@ class AttackMode {
         virtual ~AttackMode() = default;
 
         /**
-         * @brief Creates BOINC workunit, adds entry to fc_job
-         * @return True if a job was planned, False otherwise
+         * @brief Creates BOINC workunit, adds entry to fc_workunit
+         * @return True if a workunit was planned, False otherwise
          */
         virtual bool makeWorkunit() = 0;
 
         /**
-         * @brief Can be used to set job to attack mode from retry
-         * Then, new job is NOT generated when makeJob is called
-         * @param workunit [in] Pointer to job created from retry
+         * @brief Can be used to set workunit to attack mode from retry
+         * Then, new workunit is NOT generated when makeWorkunit is called
+         * @param workunit [in] Pointer to workunit created from retry
          */
         void setWorkunit(PtrWorkunit &workunit);
 
@@ -72,7 +72,7 @@ protected:
         }
 
 
-        PtrWorkunit m_workunit;           /**< Instance of CJob which is used to create this attack instance */
+        PtrWorkunit m_workunit;           /**< Instance of CWorkunit which is used to create this attack instance */
         PtrPackage m_package;   /**< Instance of CPackage which is parent of this attack instance */
         PtrHost m_host;         /**< Instance of CHost which this attack belongs to */
         uint64_t m_seconds;     /**< Number of seconds this instance of attack should take */
@@ -82,7 +82,7 @@ protected:
     private:
 
         /**
-         * @brief Base function for generating CJob object for certain attack, all attacks implement it
+         * @brief Base function for generating CWorkunit object for certain attack, all attacks implement it
          * @return True if generating was successful, False otherwise
          */
         virtual bool generateWorkunit() = 0;

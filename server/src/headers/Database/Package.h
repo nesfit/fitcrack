@@ -134,8 +134,8 @@ class CPackage {
 
         uint64_t m_totalPower;          /**< Sum of host power for this package */
         uint64_t m_secondsPassed;       /**< Seconds from time_start to now() */
-        uint64_t m_maxSeconds;          /**< Maximum time of job */
-        unsigned int m_timeoutFactor;   /**< Timeout for jobs, factor of time for a single job */
+        uint64_t m_maxSeconds;          /**< Maximum time of workunit */
+        unsigned int m_timeoutFactor;   /**< Timeout for workunits, factor of time for a single workunit */
 
     public:
 
@@ -155,7 +155,7 @@ class CPackage {
         uint64_t getCurrentIndex() const;
         uint64_t getCurrentIndex2() const;
         const std::string & getName() const;
-        uint64_t getSecondsPerJob() const;
+        uint64_t getSecondsPerWorkunit() const;
         const std::string & getConfig() const;
         const std::string & getDict1() const;
         const std::string & getDict2() const;

@@ -44,7 +44,7 @@ CPackage::CPackage(DbMap &packageMap, CSqlLoader * sqlLoader)
         if (this->m_secondsPerWorkunit < Config::minSeconds)
         {
             Tools::printDebugPackage(Config::DebugType::Warn, this->m_id,
-                    "Found seconds_per_job=%" PRIu64 ", falling back to minimum of %" PRIu64"s\n",
+                    "Found seconds_per_workunit=%" PRIu64 ", falling back to minimum of %" PRIu64"s\n",
                     this->m_secondsPerWorkunit, Config::minSeconds);
             this->m_secondsPerWorkunit = Config::minSeconds;
         }
@@ -71,7 +71,7 @@ CPackage::CPackage(DbMap &packageMap, CSqlLoader * sqlLoader)
         if(m_maxSeconds > this->m_secondsPerWorkunit)
             m_maxSeconds = this->m_secondsPerWorkunit;
 
-        /** Load job timeout */
+        /** Load workunit timeout */
         m_timeoutFactor = m_sqlLoader->getTimeoutFactor();
         if (this->m_timeoutFactor < Config::minTimeoutFactor)
         {
@@ -272,7 +272,7 @@ const std::string & CPackage::getName() const
 }
 
 
-uint64_t CPackage::getSecondsPerJob() const
+uint64_t CPackage::getSecondsPerWorkunit() const
 {
     return m_secondsPerWorkunit;
 }

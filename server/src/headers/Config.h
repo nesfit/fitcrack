@@ -99,7 +99,7 @@ namespace Config {
         PackageMalformed  =  3,   /**< Package has incorrect input */
         PackageTimeout    =  4,   /**< time_end of the package was reached, cracking stopped */
         PackageRunning    = 10,   /**< Package is running */
-        PackageFinishing  = 12    /**< Package is running, but all jobs has been generated, ending soon */
+        PackageFinishing  = 12    /**< Package is running, but all workunits has been generated, ending soon */
     };
 
     /** Attack modes in haschat*/
@@ -123,16 +123,16 @@ namespace Config {
     /** Maximum keyspace in PCFG Attack */
     const uint64_t MAX_PCFG_KEYSPACE = 60000000;
 
-    /** Minimum job time in seconds */
+    /** Minimum workunit time in seconds */
     const uint64_t minSeconds = 60;
 
-    /** Minimum timeout factor of seconds_per_job */
+    /** Minimum timeout factor of seconds_per_workunit */
     const uint64_t minTimeoutFactor = 5;
 
     /** ID of bench_all package */
     const uint64_t benchAllId = 1;
 
-    /** Job replication factor, must be 1 */
+    /** Workunit replication factor, must be 1 */
     const int replicationFactor = 1;
 
     /** Minimum passwords in attack */

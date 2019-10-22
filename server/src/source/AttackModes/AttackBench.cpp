@@ -1,6 +1,6 @@
 /**
  * @file AttackBench.cpp
- * @brief Source file for creation of Benchmark job
+ * @brief Source file for creation of Benchmark workunit
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
@@ -18,7 +18,7 @@ CAttackBench::CAttackBench(PtrPackage & package, PtrHost & host, CSqlLoader * sq
 
 bool CAttackBench::makeWorkunit()
 {
-    /** Create the job first */
+    /** Create the workunit first */
     generateWorkunit();
 
     DB_WORKUNIT wu;
@@ -26,7 +26,7 @@ bool CAttackBench::makeWorkunit()
     const char* infiles[1];
     int retval;
 
-    /** Make a unique name for the job and its config file */
+    /** Make a unique name for the workunit and its config file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
 
     /** Append bech mode to the config file */
@@ -49,7 +49,7 @@ bool CAttackBench::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new job:\n");
+    Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
     f << m_package->getConfig();
@@ -69,16 +69,16 @@ bool CAttackBench::makeWorkunit()
     }
     f.close();
 
-    /** Fill in the job parameters */
+    /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerJob());
+    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
     infiles[0] = name1;
 
     setDefaultWorkunitParams(&wu);
 
-    /** Register the job with BOINC */
+    /** Register the workunit with BOINC */
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
         wu,
@@ -114,7 +114,7 @@ bool CAttackBench::generateWorkunit()
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "Generating benchmark workunit ...\n");
 
-    /** Create benchmark job */
+    /** Create benchmark workunit */
     m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), 0, 0, 0, 0, 0, false, 0, false);
     return true;
 }

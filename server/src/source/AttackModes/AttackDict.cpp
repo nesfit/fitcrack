@@ -18,7 +18,7 @@ CAttackDict::CAttackDict(PtrPackage & package, PtrHost & host, uint64_t seconds,
 
 bool CAttackDict::makeWorkunit()
 {
-    /** Create the job instance first */
+    /** Create the workunit instance first */
     if (!m_workunit && !generateWorkunit())
         return false;
 
@@ -27,7 +27,7 @@ bool CAttackDict::makeWorkunit()
     const char* infiles[3];
     int retval;
 
-    /** Make a unique name for the job and its input file */
+    /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
@@ -52,7 +52,7 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new job:\n");
+    Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
     f << m_package->getConfig();
@@ -108,17 +108,17 @@ bool CAttackDict::makeWorkunit()
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "Creating dictionary fragment\n");
 
-    /** Load current job dictionary */
-    PtrDictionary jobDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+    /** Load current workunit dictionary */
+    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
     std::ifstream* dictFile;
     std::string passwd;
     uint64_t currentIndex;
 
     if(m_workunit->isDuplicated())
     {
-        /** Open new FD for retry jobs */
+        /** Open new FD for retry workunits */
         uint64_t startIndex = m_workunit->getStartIndex();
-        dictFile = new std::ifstream((Config::dictDir + jobDict->getDictFileName()).c_str());
+        dictFile = new std::ifstream((Config::dictDir + workunitDict->getDictFileName()).c_str());
         if (!(*dictFile))
         {
             Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
@@ -141,7 +141,7 @@ bool CAttackDict::makeWorkunit()
                                   "'start_index' parameter is too far away\n");
             if (!m_workunit->isDuplicated())
             {
-                jobDict->updateIndex(jobDict->getHcKeyspace());
+                workunitDict->updateIndex(workunitDict->getHcKeyspace());
                 m_package->updateIndex(m_package->getCurrentIndex() - m_workunit->getHcKeyspace());
             }
             return true;
@@ -149,7 +149,7 @@ bool CAttackDict::makeWorkunit()
     }
     else {
 
-        dictFile = Tools::getStream(m_package->getId(), jobDict->getDictionaryId(), jobDict->getDictFileName());
+        dictFile = Tools::getStream(m_package->getId(), workunitDict->getDictionaryId(), workunitDict->getDictFileName());
         if (!(*dictFile))
         {
             Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
@@ -160,11 +160,11 @@ bool CAttackDict::makeWorkunit()
     }
     /** Add 'keyspace' passwords to dict file */
 
-    uint64_t jobKeyspace = m_workunit->getHcKeyspace();
+    uint64_t workunitKeyspace = m_workunit->getHcKeyspace();
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "Adding %" PRIu64 " passwords to host dictionary file\n", jobKeyspace);
-    for (currentIndex = 0; currentIndex < jobKeyspace; ++currentIndex)
+            "Adding %" PRIu64 " passwords to host dictionary file\n", workunitKeyspace);
+    for (currentIndex = 0; currentIndex < workunitKeyspace; ++currentIndex)
     {
         std::getline((*dictFile), passwd);
         if (!passwd.empty())
@@ -174,13 +174,13 @@ bool CAttackDict::makeWorkunit()
         if ((*dictFile).eof())
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                    "Ate all passwords, new job keyspace: %" PRIu64 "\nSetting package to Finishing\n",
+                    "Ate all passwords, new workunit keyspace: %" PRIu64 "\nSetting package to Finishing\n",
                               currentIndex);
 
             if (!m_workunit->isDuplicated())
             {
                 m_package->updateIndex(m_package->getCurrentIndex() - m_workunit->getHcKeyspace() + currentIndex);
-                jobDict->updateIndex(jobDict->getHcKeyspace());
+                workunitDict->updateIndex(workunitDict->getHcKeyspace());
             }
 
             m_workunit->setHcKeyspace(currentIndex);
@@ -198,18 +198,18 @@ bool CAttackDict::makeWorkunit()
 
     f.close();
 
-    /** Fill in the job parameters */
+    /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerJob());
+    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
 
     setDefaultWorkunitParams(&wu);
 
-    /** Register the job with BOINC */
+    /** Register the workunit with BOINC */
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
@@ -266,7 +266,7 @@ bool CAttackDict::generateWorkunit()
     {
         if (dict->getCurrentIndex() < dict->getHcKeyspace())
         {
-            /** Dictionary for a new job found */
+            /** Dictionary for a new workunit found */
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "Dict found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
                     dict->getDictFileName().c_str(), dict->getCurrentIndex(), dict->getHcKeyspace());
@@ -277,7 +277,7 @@ bool CAttackDict::generateWorkunit()
 
     if (!currentDict)
     {
-        /** No dictionaries found, no job could be generated */
+        /** No dictionaries found, no workunit could be generated */
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "No dictionaries found for this package\n");
         return false;
@@ -293,7 +293,7 @@ bool CAttackDict::generateWorkunit()
                 "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n", passCount);
     }
 
-    /** Create the job */
+    /** Create the workunit */
     m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex, 0, passCount, 0,
                          currentDict->getId(), false, 0, false);
 

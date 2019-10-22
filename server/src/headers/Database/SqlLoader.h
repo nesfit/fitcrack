@@ -62,37 +62,37 @@ class CSqlLoader {
 
         /**
          * @brief Return number of benchmark entries for package-host combo
-         * @param packageId [in] Package parent of this job
+         * @param packageId [in] Package parent of this workunit
          * @param hostId [in] Benchmark owner
          * @return Number of benchmarks, usually 0 if no benchmark is present, 1 otherwise
          */
         uint64_t getBenchCount(uint64_t packageId, uint64_t hostId);
 
         /**
-         * @brief Return number of jobs in fc_job for supplied package-host combo
+         * @brief Return number of workunits in fc_workunit for supplied package-host combo
          * @param packageId Package ID used to filtering
          * @param hostId Host ID used for filtering
-         * @return Number of job entries
+         * @return Number of workunit entries
          */
-        uint64_t getJobCount(uint64_t packageId, uint64_t hostId);
+        uint64_t getWorkunitCount(uint64_t packageId, uint64_t hostId);
 
         /**
-         * @brief Return number of jobs in fc_job for supplied package
+         * @brief Return number of workunits in fc_workunit for supplied package
          * @param packageId Package ID used for filtering
-         * @return Number of job entries
+         * @return Number of workunit entries
          */
-        uint64_t getJobCount(uint64_t packageId);
+        uint64_t getWorkunitCount(uint64_t packageId);
 
         /**
-         * @brief Sets database entry of job with supplied ID to finished == 1
-         * @param id [in] ID of job to modify
+         * @brief Sets database entry of workunit with supplied ID to finished == 1
+         * @param id [in] ID of workunit to modify
          */
-        void setJobFinished(uint64_t id);
+        void setWorkunitFinished(uint64_t id);
 
         /**
-         * @brief Gets job from database with supplied packageId and retry set to 1
-         * @param packageId ID of package of the job we are looking for
-         * @return Pointer to job, created from database entry
+         * @brief Gets workunit from database with supplied packageId and retry set to 1
+         * @param packageId ID of package of the workunit we are looking for
+         * @return Pointer to workunit, created from database entry
          */
         Config::Ptr<CWorkunit> getEasiestRetry(uint64_t packageId);
 
@@ -154,13 +154,13 @@ class CSqlLoader {
         bool isPackageTimeout(uint64_t packageId);
 
         /**
-         * @brief Inserts new job to fc_job table
-         * @param job Pointer to job appended to database
+         * @brief Inserts new workunit to fc_workunit table
+         * @param workunit Pointer to workunit appended to database
          */
-        void addNewWorkunit(Config::Ptr<CWorkunit> job);
+        void addNewWorkunit(Config::Ptr<CWorkunit> workunit);
 
         /**
-         * @brief Reads default_job_timeout_factor from fc_settings
+         * @brief Reads default_workunit_timeout_factor from fc_settings
          * @return Number from DB
          */
         unsigned int getTimeoutFactor();
@@ -293,7 +293,7 @@ private:
 
         /**
          * @brief This is template function for loading different objects from database
-         * @tparam T This can be CHost, CJob, CMask, CPackage and CDictionary
+         * @tparam T This can be CHost, CWorkunit, CMask, CPackage and CDictionary
          * @param filter [in] An SQL filter which follows select
          * @return Vector of smart pointers to instantiated objects
          * @note Implementation must be in header file, see https://stackoverflow.com/a/8752879
@@ -348,7 +348,7 @@ private:
                 /** Debug output */
                 //Tools::printDbMap(dbMap);
 
-                /** Create job object */
+                /** Create workunit object */
                 result.push_back(T::create(dbMap, this));
             }
 
@@ -360,7 +360,7 @@ private:
         /**
          * @brief Similar to load function but supports more difficult queries
          * which qrequire JOINS or selecting non-* columns
-         * @tparam T This can be CHost, CJob, CMask, CPackage and CDictionary
+         * @tparam T This can be CHost, CWorkunit, CMask, CPackage and CDictionary
          * @param filter [in] A complete SQL query
          * @return Vector of smart pointers to instantiated objects
          * @note Implementation must be in header file, see https://stackoverflow.com/a/8752879
@@ -413,7 +413,7 @@ private:
                 /** Debug output */
                 //Tools::printDbMap(dbMap);
 
-                /** Create job object */
+                /** Create workunit object */
                 result.push_back(T::create(dbMap, this));
             }
 
@@ -424,7 +424,7 @@ private:
 
         /**
          * This is template function for loading row count from database
-         * @tparam T This can be CHost, CJob, CMask and CPakckage
+         * @tparam T This can be CHost, CWorkunit, CMask and CPakckage
          * @param filter [in] An SQL filter which follows select
          * @return Number from result select in database
          * @note Implementation must be in header file, see https://stackoverflow.com/a/8752879

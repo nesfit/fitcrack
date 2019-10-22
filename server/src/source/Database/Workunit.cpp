@@ -10,22 +10,22 @@
 #include <SqlLoader.h>
 
 
-CWorkunit::CWorkunit(DbMap & jobMap)
+CWorkunit::CWorkunit(DbMap & workunitMap)
 {
     try
     {
-        this->m_id = std::stoull(jobMap["id"]);
-        this->m_packageId = std::stoull(jobMap["job_id"]);
-        this->m_workunitId = std::stoull(jobMap["workunit_id"]);
-        this->m_hostId = std::stoull(jobMap["host_id"]);
-        this->m_boincHostId = std::stoull(jobMap["boinc_host_id"]);
-        this->m_startIndex = std::stoull(jobMap["start_index"]);
-        this->m_startIndex2 = std::stoull(jobMap["start_index_2"]);
-        this->m_hcKeyspace = std::stoull(jobMap["hc_keyspace"]);
-        this->m_maskId = std::stoull(jobMap["mask_id"]);
-        this->m_dictionaryId = std::stoull(jobMap["dictionary_id"]);
+        this->m_id = std::stoull(workunitMap["id"]);
+        this->m_packageId = std::stoull(workunitMap["job_id"]);
+        this->m_workunitId = std::stoull(workunitMap["workunit_id"]);
+        this->m_hostId = std::stoull(workunitMap["host_id"]);
+        this->m_boincHostId = std::stoull(workunitMap["boinc_host_id"]);
+        this->m_startIndex = std::stoull(workunitMap["start_index"]);
+        this->m_startIndex2 = std::stoull(workunitMap["start_index_2"]);
+        this->m_hcKeyspace = std::stoull(workunitMap["hc_keyspace"]);
+        this->m_maskId = std::stoull(workunitMap["mask_id"]);
+        this->m_dictionaryId = std::stoull(workunitMap["dictionary_id"]);
         this->m_duplicated = true;
-        this->m_duplicate = std::stoull(jobMap["id"]);   /**< We use this only for duplicate job creation */
+        this->m_duplicate = std::stoull(workunitMap["id"]);   /**< We use this only for duplicate workunit creation */
         this->m_retry = false;
         this->m_finished = false;
         
@@ -33,7 +33,7 @@ CWorkunit::CWorkunit(DbMap & jobMap)
     }
     catch(std::logic_error & error)
     {
-        Tools::printDebugTimestamp("Error converting jobMap to PtrWorkunit: %s", error.what());
+        Tools::printDebugTimestamp("Error converting workunitMap to PtrWorkunit: %s", error.what());
         exit(1);
     }
 }
@@ -71,11 +71,11 @@ PtrWorkunit CWorkunit::create(uint64_t packageId, uint64_t hostId, uint64_t boin
 }
 
 
-PtrWorkunit CWorkunit::create(DbMap & jobMap, CSqlLoader * sqlLoader)
+PtrWorkunit CWorkunit::create(DbMap & workunitMap, CSqlLoader * sqlLoader)
 {
     /** sqlLoader is here just for common interface in load() function */
     UNUSED(sqlLoader);
-    return PtrWorkunit(new CWorkunit(jobMap));
+    return PtrWorkunit(new CWorkunit(workunitMap));
 }
 
 

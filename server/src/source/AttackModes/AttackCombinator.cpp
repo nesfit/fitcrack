@@ -20,7 +20,7 @@ CAttackCombinator::CAttackCombinator(PtrPackage & package, PtrHost & host, uint6
 
 bool CAttackCombinator::makeWorkunit()
 {
-    /** Create the job first */
+    /** Create the workunit first */
     if (!m_workunit && !generateWorkunit())
         return false;
 
@@ -31,7 +31,7 @@ bool CAttackCombinator::makeWorkunit()
     const char* infiles[4];
     int retval;
 
-    /** Make a unique name for the job and its input file */
+    /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     /** Same name of first dictionary - for sticky flag to work */
@@ -58,7 +58,7 @@ bool CAttackCombinator::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new job:\n");
+    Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
     f << m_package->getConfig();
@@ -68,16 +68,16 @@ bool CAttackCombinator::makeWorkunit()
     f << "|||mode|String|1|n|||\n";
     Tools::printDebug("|||mode|String|1|n|||\n");
 
-    /** Load current job dictionary */
-    PtrDictionary jobDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+    /** Load current workunit dictionary */
+    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
 
     // Debug
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "In first dicts, there are %" PRIu64 " total passwords\n", m_package->getHcKeyspace());
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "In second dict, there are %" PRIu64 " passwords\n", jobDict->getHcKeyspace());
+            "In second dict, there are %" PRIu64 " passwords\n", workunitDict->getHcKeyspace());
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "Job can compute %" PRIu64 " passwords\n", m_workunit->getHcKeyspace());
+            "Workunit can compute %" PRIu64 " passwords\n", m_workunit->getHcKeyspace());
 
     /** Create dict2 file */
     retval = config.download_path(name4, path);
@@ -100,7 +100,7 @@ bool CAttackCombinator::makeWorkunit()
     }
 
     std::ifstream dict2_file;
-    dict2_file.open((Config::dictDir + jobDict->getDictFileName()).c_str());
+    dict2_file.open((Config::dictDir + workunitDict->getDictFileName()).c_str());
     if (!dict2_file)
     {
         Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
@@ -109,7 +109,7 @@ bool CAttackCombinator::makeWorkunit()
         return false;
     }
 
-    /** Check combinator job type */
+    /** Check combinator workunit type */
     /** Dictionary is already fragmented, continue fragmenting */
     if (m_workunit->getStartIndex2() != 0)
     {
@@ -117,13 +117,13 @@ bool CAttackCombinator::makeWorkunit()
                 "Dictionary is already fragmented, we need to continue\n");
 
         /** Ignore 'start_index' passwords */
-        uint64_t jobStartIndex = m_workunit->getStartIndex();
+        uint64_t workunitStartIndex = m_workunit->getStartIndex();
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                "Skipping %" PRIu64 " passwords\n", jobStartIndex);
+                "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
 
         std::string passwd;
         uint64_t currentIndex;
-        for (currentIndex = 0; currentIndex < jobStartIndex; ++currentIndex)
+        for (currentIndex = 0; currentIndex < workunitStartIndex; ++currentIndex)
             std::getline(dict2_file, passwd);
 
         /** No more passwords in current dictionary */
@@ -132,7 +132,7 @@ bool CAttackCombinator::makeWorkunit()
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "'start_index' parameter is too far away\n");
             if (!m_workunit->isDuplicated())
-                jobDict->updateIndex(jobDict->getHcKeyspace());
+                workunitDict->updateIndex(workunitDict->getHcKeyspace());
 
             return true;
         }
@@ -142,10 +142,10 @@ bool CAttackCombinator::makeWorkunit()
         if (passwd.empty() || dict2_file.eof())
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                    "Empty password or just reached EOF, skipping job\n");
+                    "Empty password or just reached EOF, skipping workunit\n");
             if (!m_workunit->isDuplicated())
             {
-                jobDict->updateIndex(jobDict->getCurrentIndex() + 1);
+                workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
                 m_package->updateIndex(m_package->getCurrentIndex() + 1);
             }
             return true;
@@ -158,36 +158,36 @@ bool CAttackCombinator::makeWorkunit()
         /** Append skip and limit to config */
         Tools::printDebug("Adding additional info to CONFIG:\n");
 
-        uint64_t jobStartIndex2 = m_workunit->getStartIndex2();
+        uint64_t workunitStartIndex2 = m_workunit->getStartIndex2();
         int digits = 0;
-        uint64_t num = jobStartIndex2;
+        uint64_t num = workunitStartIndex2;
         do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||start_index|BigUInt|" << digits << "|" << jobStartIndex2 << "|||\n";
-        Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, jobStartIndex2);
+        f << "|||start_index|BigUInt|" << digits << "|" << workunitStartIndex2 << "|||\n";
+        Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitStartIndex2);
 
         /** Check if we reach the end of password keyspace in 1st dict */
-        if (m_workunit->getHcKeyspace() + jobStartIndex2 >= m_package->getHcKeyspace())
+        if (m_workunit->getHcKeyspace() + workunitStartIndex2 >= m_package->getHcKeyspace())
         {
-            m_workunit->setHcKeyspace(m_package->getHcKeyspace() - jobStartIndex2);
+            m_workunit->setHcKeyspace(m_package->getHcKeyspace() - workunitStartIndex2);
 
             if (!m_workunit->isDuplicated())
             {
-                jobDict->updateIndex(jobDict->getCurrentIndex() + 1);
+                workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
                 m_package->updateIndex(m_package->getCurrentIndex() + 1);
                 m_package->updateIndex2(0);
             }
         }
         else
         {
-            uint64_t jobHcKeyspace = m_workunit->getHcKeyspace();
+            uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
             if (!m_workunit->isDuplicated())
-                m_package->updateIndex2(jobStartIndex2 + jobHcKeyspace);
+                m_package->updateIndex2(workunitStartIndex2 + workunitHcKeyspace);
 
             digits = 0;
-            num = jobHcKeyspace;
+            num = workunitHcKeyspace;
             do { num /= 10; ++digits; } while (num != 0);    // Count digits
-            f << "|||hc_keyspace|BigUInt|" << digits << "|" << jobHcKeyspace << "|||\n";
-            Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, jobHcKeyspace);
+            f << "|||hc_keyspace|BigUInt|" << digits << "|" << workunitHcKeyspace << "|||\n";
+            Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitHcKeyspace);
         }
     }
     /** Host has enough power, no fragments */
@@ -206,37 +206,37 @@ bool CAttackCombinator::makeWorkunit()
                 "New current index of current dict2: %" PRIu64 "\n", newCurrentIndex);
 
         /** Check if we reached end of keyspace of current dict2 */
-        if (newCurrentIndex >= jobDict->getHcKeyspace())
+        if (newCurrentIndex >= workunitDict->getHcKeyspace())
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                    "We reached the end of current dict2, modifiyng job keyspace\n");
+                    "We reached the end of current dict2, modifiyng workunit keyspace\n");
 
-            secDictKeyspace = jobDict->getHcKeyspace() - m_workunit->getStartIndex();
-            newCurrentIndex = jobDict->getHcKeyspace();
+            secDictKeyspace = workunitDict->getHcKeyspace() - m_workunit->getStartIndex();
+            newCurrentIndex = workunitDict->getHcKeyspace();
         }
 
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "The #passwords from second dict is therefore: %" PRIu64 "\n", secDictKeyspace);
         if (!m_workunit->isDuplicated())
         {
-            jobDict->updateIndex(newCurrentIndex);
+            workunitDict->updateIndex(newCurrentIndex);
             m_package->updateIndex(m_package->getCurrentIndex() + secDictKeyspace);
         }
 
-        /** Exact number of passwords in job
+        /** Exact number of passwords in workunit
          * @warning Combinator sets real keyspace to hc_keyspace, as there is no such thing as hc_keyspace here
          **/
         m_workunit->setHcKeyspace(secDictKeyspace * m_package->getHcKeyspace());
 
         /** Computation done, start creating dictionary dict2 */
         /** Ignore 'start_index' passwords */
-        uint64_t jobStartIndex = m_workunit->getStartIndex();
+        uint64_t workunitStartIndex = m_workunit->getStartIndex();
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                "Skipping %" PRIu64 " passwords\n", jobStartIndex);
+                "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
 
         std::string passwd;
         uint64_t currentIndex;
-        for (currentIndex = 0; currentIndex < jobStartIndex; ++currentIndex)
+        for (currentIndex = 0; currentIndex < workunitStartIndex; ++currentIndex)
             std::getline(dict2_file, passwd);
 
         /** No more passwords in dictionary */
@@ -245,7 +245,7 @@ bool CAttackCombinator::makeWorkunit()
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "'start_index' parameter is too far away\n");
             if (!m_workunit->isDuplicated())
-                jobDict->updateIndex(jobDict->getHcKeyspace());
+                workunitDict->updateIndex(workunitDict->getHcKeyspace());
 
             return true;
         }
@@ -269,7 +269,7 @@ bool CAttackCombinator::makeWorkunit()
 
                 if (!m_workunit->isDuplicated())
                 {
-                    jobDict->updateIndex(jobDict->getHcKeyspace());
+                    workunitDict->updateIndex(workunitDict->getHcKeyspace());
                     m_package->updateIndex(m_package->getCurrentIndex() + currentIndex);
                 }
 
@@ -284,12 +284,12 @@ bool CAttackCombinator::makeWorkunit()
                 "Host doesn't have the power, start fragmenting\n");
 
         /** Ignore 'start_index' passwords */
-        uint64_t jobStartIndex = m_workunit->getStartIndex();
+        uint64_t workunitStartIndex = m_workunit->getStartIndex();
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                "Skipping %" PRIu64 " passwords\n", jobStartIndex);
+                "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
         std::string passwd;
         uint64_t currentIndex;
-        for (currentIndex = 0; currentIndex < jobStartIndex; ++currentIndex)
+        for (currentIndex = 0; currentIndex < workunitStartIndex; ++currentIndex)
             std::getline(dict2_file, passwd);
 
         /** No more passwords in current dictionary */
@@ -298,7 +298,7 @@ bool CAttackCombinator::makeWorkunit()
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "'start_index' parameter is too far away\n");
             if (!m_workunit->isDuplicated())
-                jobDict->updateIndex(jobDict->getHcKeyspace());
+                workunitDict->updateIndex(workunitDict->getHcKeyspace());
 
             return true;
         }
@@ -307,10 +307,10 @@ bool CAttackCombinator::makeWorkunit()
         if (passwd.empty() || dict2_file.eof())
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                    "Empty password or just reached EOF, skipping job\n");
+                    "Empty password or just reached EOF, skipping workunit\n");
             if (!m_workunit->isDuplicated())
             {
-                jobDict->updateIndex(jobDict->getCurrentIndex() + 1);
+                workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
                 m_package->updateIndex(m_package->getCurrentIndex() + 1);
             }
             return true;
@@ -326,16 +326,16 @@ bool CAttackCombinator::makeWorkunit()
         f << "|||start_index|BigUInt|1|0|||\n";
         Tools::printDebug("|||start_index|BigUInt|1|0|||\n");
 
-        uint64_t jobHcKeyspace = m_workunit->getHcKeyspace();
+        uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
         int digits = 0;
-        uint64_t num = jobHcKeyspace;
+        uint64_t num = workunitHcKeyspace;
         do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||hc_keyspace|BigUInt|" << digits << "|" << jobHcKeyspace << "|||\n";
-        Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, jobHcKeyspace);
+        f << "|||hc_keyspace|BigUInt|" << digits << "|" << workunitHcKeyspace << "|||\n";
+        Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitHcKeyspace);
 
         /** Update current_index_2 of the first fragmented dict */
         if (!m_workunit->isDuplicated())
-            m_package->updateIndex2(jobHcKeyspace);
+            m_package->updateIndex2(workunitHcKeyspace);
     }
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
@@ -408,11 +408,11 @@ bool CAttackCombinator::makeWorkunit()
 
     f.close();
 
-    /** Fill in the job parameters */
+    /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerJob());
+    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
@@ -420,7 +420,7 @@ bool CAttackCombinator::makeWorkunit()
 
     setDefaultWorkunitParams(&wu);
 
-    /** Register the job with BOINC */
+    /** Register the workunit with BOINC */
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
@@ -477,7 +477,7 @@ bool CAttackCombinator::generateWorkunit()
     {
         if (dict->getCurrentIndex() < dict->getHcKeyspace())
         {
-            /** Dictionary for a new job found */
+            /** Dictionary for a new workunit found */
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "Dict found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
                     dict->getDictFileName().c_str(), dict->getCurrentIndex(), dict->getHcKeyspace());
@@ -488,14 +488,14 @@ bool CAttackCombinator::generateWorkunit()
 
     if (!currentDict)
     {
-        /** No dictionaries found, no job could be generated */
+        /** No dictionaries found, no workunit could be generated */
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "No dictionaries found for this package\n");
         return false;
     }
 
     /**
-     * Create the job
+     * Create the workunit
      * @warning We save number of real passwords to hc_keyspace as we don't work with hc_indexes in combinator attack
      */
     m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
