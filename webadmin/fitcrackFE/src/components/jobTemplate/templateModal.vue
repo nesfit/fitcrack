@@ -14,7 +14,7 @@
       color="primary"
     >
       <v-icon left>
-        note_add
+        mdi-file-plus
       </v-icon>Make template
     </v-btn>
 
