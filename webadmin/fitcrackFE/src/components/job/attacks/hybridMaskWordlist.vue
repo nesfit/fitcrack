@@ -11,12 +11,12 @@
         class="border"
       >
         <v-card-title class="pb-0">
-          <h2>Type mask<span class="required primary--text"> *</span></h2>
+          <span>Type mask<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
         <v-card-title class="pb-0">
-          <h2>Select dictionary<span class="required primary--text"> *</span></h2>
+          <span>Select dictionary<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
 
@@ -45,12 +45,12 @@
         class="border"
       >
         <v-card-title class="pb-0">
-          <h2>Type rule</h2>
+          <span>Type rule</span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
         <v-card-title class="pb-0">
-          <h2>Type rule</h2>
+          <span>Type rule</span>
         </v-card-title>
       </v-col>
 

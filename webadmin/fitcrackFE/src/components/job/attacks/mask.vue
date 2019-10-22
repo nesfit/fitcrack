@@ -6,7 +6,7 @@
 <template>
   <div>
     <v-card-title class="pb-0">
-      <h2>Type masks<span class="required primary--text"> *</span></h2>
+      <span>Type masks<span class="required primary--text"> *</span></span>
     </v-card-title>
     <v-expansion-panels
       v-model="editedMaskIdx"
@@ -63,7 +63,7 @@
         class="border"
       >
         <v-card-title class="pb-0">
-          <h2>Select charsets (max. 4)</h2>
+          <span>Select charsets (max. 4)</span>
         </v-card-title>
         <charset-selector
           v-model="charsets"
@@ -72,7 +72,7 @@
       </v-col>
       <v-col cols="6">
         <v-card-title class="pb-0">
-          <h2>Markov file</h2>
+          <span>Markov file</span>
         </v-card-title>
         <markov-selector
           v-model="markov"

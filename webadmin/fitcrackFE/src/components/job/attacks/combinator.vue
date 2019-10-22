@@ -11,12 +11,12 @@
         class="border"
       >
         <v-card-title class="pb-0">
-          <h2>Select left dictionary<span class="required primary--text"> *</span></h2>
+          <span>Select left dictionary<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
         <v-card-title class="pb-0">
-          <h2>Select right dictionary<span class="required primary--text"> *</span></h2>
+          <span>Select right dictionary<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
       <v-col
@@ -40,12 +40,12 @@
         class="border"
       >
         <v-card-title class="pb-0">
-          <h2>Type left rule</h2>
+          <span>Type left rule</span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
         <v-card-title class="pb-0">
-          <h2>Type right rule</h2>
+          <span>Type right rule</span>
         </v-card-title>
       </v-col>
 
