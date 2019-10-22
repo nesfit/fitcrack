@@ -17,10 +17,10 @@ CAttackPcfg::CAttackPcfg(PtrPackage & package, PtrHost & host, uint64_t seconds,
 }
 
 
-bool CAttackPcfg::makeJob()
+bool CAttackPcfg::makeWorkunit()
 {
     /** Create the job instance first */
-    if (!m_job && !generateJob())
+    if (!m_workunit && !generateWorkunit())
         return false;
 
     DB_WORKUNIT wu;
@@ -113,7 +113,7 @@ bool CAttackPcfg::makeJob()
 
     /** gRPC call to collect preterminals and update current index + keyspace */
     std::string preterminals;
-    uint64_t newKeyspace = m_job->getHcKeyspace();
+    uint64_t newKeyspace = m_workunit->getHcKeyspace();
 
     /** @workaround Limit keyspace because of client memory problems */
     if (newKeyspace > Config::MAX_PCFG_KEYSPACE)
@@ -199,13 +199,13 @@ bool CAttackPcfg::makeJob()
         return false;
     }
 
-    restrict_wu_to_host(wu, m_job->getBoincHostId());
+    restrict_wu_to_host(wu, m_workunit->getBoincHostId());
 
     /** Update keyspaces */
     m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
-    m_job->setWorkunitId(uint64_t(wu.id));
-    m_job->setHcKeyspace(newKeyspace);
-    m_sqlLoader->addNewWorkunit(m_job);
+    m_workunit->setWorkunitId(uint64_t(wu.id));
+    m_workunit->setHcKeyspace(newKeyspace);
+    m_sqlLoader->addNewWorkunit(m_workunit);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
@@ -224,7 +224,7 @@ bool CAttackPcfg::makeJob()
 }
 
 
-bool CAttackPcfg::generateJob()
+bool CAttackPcfg::generateWorkunit()
 {
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Generating PCFG workunit ...\n");
@@ -243,7 +243,7 @@ bool CAttackPcfg::generateJob()
         passCount = m_package->getHcKeyspace() - m_package->getCurrentIndex();
 
     /** Create the job */
-    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
+    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
                          false, 0, false);
 
     /**

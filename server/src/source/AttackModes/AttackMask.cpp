@@ -16,10 +16,10 @@ CAttackMask::CAttackMask(PtrPackage & package, PtrHost & host, uint64_t seconds,
 }
 
 
-bool CAttackMask::makeJob()
+bool CAttackMask::makeWorkunit()
 {
     /** Create the job instance first */
-    if (!m_job && !generateJob())
+    if (!m_workunit && !generateWorkunit())
         return false;
 
     DB_WORKUNIT wu;
@@ -32,7 +32,7 @@ bool CAttackMask::makeJob()
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
 
     /** Load the job mask to object */
-    PtrMask jobMask = m_sqlLoader->loadMask(m_job->getMaskId());
+    PtrMask jobMask = m_sqlLoader->loadMask(m_workunit->getMaskId());
 
     /** Append mode, mask, start_index, stop_index to config */
     retval = config.download_path(name1, path);
@@ -70,16 +70,16 @@ bool CAttackMask::makeJob()
 
     /** Output start_index */
     int digits = 0;
-    uint64_t num = m_job->getStartIndex();
+    uint64_t num = m_workunit->getStartIndex();
     do { num /= 10; ++digits; } while (num != 0);    // Count digits
-    f << "|||start_index|BigUInt|" << digits << "|" << m_job->getStartIndex() << "|||\n";
-    Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, m_job->getStartIndex());
+    f << "|||start_index|BigUInt|" << digits << "|" << m_workunit->getStartIndex() << "|||\n";
+    Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, m_workunit->getStartIndex());
 
     uint64_t maskHcKeyspace = jobMask->getHcKeyspace();
-    uint64_t jobHcKeyspace = m_job->getHcKeyspace();
+    uint64_t jobHcKeyspace = m_workunit->getHcKeyspace();
 
     /** Output stop_index - only if it is not the last job in the current mask */
-    if (m_job->getStartIndex() + jobHcKeyspace < maskHcKeyspace)
+    if (m_workunit->getStartIndex() + jobHcKeyspace < maskHcKeyspace)
     {
         digits = 0;
         num = jobHcKeyspace;
@@ -152,10 +152,10 @@ bool CAttackMask::makeJob()
         return false;
     }
 
-    restrict_wu_to_host(wu, m_job->getBoincHostId());
+    restrict_wu_to_host(wu, m_workunit->getBoincHostId());
 
-    m_job->setWorkunitId(uint64_t(wu.id));
-    m_sqlLoader->addNewWorkunit(m_job);
+    m_workunit->setWorkunitId(uint64_t(wu.id));
+    m_sqlLoader->addNewWorkunit(m_workunit);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
@@ -163,7 +163,7 @@ bool CAttackMask::makeJob()
 }
 
 
-bool CAttackMask::generateJob()
+bool CAttackMask::generateWorkunit()
 {
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "Generating mask workunit ...\n");
@@ -218,7 +218,7 @@ bool CAttackMask::generateJob()
     }
 
     /** Create new mask job */
-    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
+    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
                          currentMask->getId(), 0, false, 0, false);
 
     /** Update indexes for package and mask*/

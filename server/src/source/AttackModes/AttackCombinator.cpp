@@ -18,10 +18,10 @@ CAttackCombinator::CAttackCombinator(PtrPackage & package, PtrHost & host, uint6
 }
 
 
-bool CAttackCombinator::makeJob()
+bool CAttackCombinator::makeWorkunit()
 {
     /** Create the job first */
-    if (!m_job && !generateJob())
+    if (!m_workunit && !generateWorkunit())
         return false;
 
     DB_WORKUNIT wu;
@@ -69,7 +69,7 @@ bool CAttackCombinator::makeJob()
     Tools::printDebug("|||mode|String|1|n|||\n");
 
     /** Load current job dictionary */
-    PtrDictionary jobDict = m_sqlLoader->loadDictionary(m_job->getDictionaryId());
+    PtrDictionary jobDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
 
     // Debug
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
@@ -77,7 +77,7 @@ bool CAttackCombinator::makeJob()
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "In second dict, there are %" PRIu64 " passwords\n", jobDict->getHcKeyspace());
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "Job can compute %" PRIu64 " passwords\n", m_job->getHcKeyspace());
+            "Job can compute %" PRIu64 " passwords\n", m_workunit->getHcKeyspace());
 
     /** Create dict2 file */
     retval = config.download_path(name4, path);
@@ -111,13 +111,13 @@ bool CAttackCombinator::makeJob()
 
     /** Check combinator job type */
     /** Dictionary is already fragmented, continue fragmenting */
-    if (m_job->getStartIndex2() != 0)
+    if (m_workunit->getStartIndex2() != 0)
     {
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "Dictionary is already fragmented, we need to continue\n");
 
         /** Ignore 'start_index' passwords */
-        uint64_t jobStartIndex = m_job->getStartIndex();
+        uint64_t jobStartIndex = m_workunit->getStartIndex();
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "Skipping %" PRIu64 " passwords\n", jobStartIndex);
 
@@ -131,7 +131,7 @@ bool CAttackCombinator::makeJob()
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "'start_index' parameter is too far away\n");
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
                 jobDict->updateIndex(jobDict->getHcKeyspace());
 
             return true;
@@ -143,7 +143,7 @@ bool CAttackCombinator::makeJob()
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "Empty password or just reached EOF, skipping job\n");
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
             {
                 jobDict->updateIndex(jobDict->getCurrentIndex() + 1);
                 m_package->updateIndex(m_package->getCurrentIndex() + 1);
@@ -158,7 +158,7 @@ bool CAttackCombinator::makeJob()
         /** Append skip and limit to config */
         Tools::printDebug("Adding additional info to CONFIG:\n");
 
-        uint64_t jobStartIndex2 = m_job->getStartIndex2();
+        uint64_t jobStartIndex2 = m_workunit->getStartIndex2();
         int digits = 0;
         uint64_t num = jobStartIndex2;
         do { num /= 10; ++digits; } while (num != 0);    // Count digits
@@ -166,11 +166,11 @@ bool CAttackCombinator::makeJob()
         Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, jobStartIndex2);
 
         /** Check if we reach the end of password keyspace in 1st dict */
-        if (m_job->getHcKeyspace() + jobStartIndex2 >= m_package->getHcKeyspace())
+        if (m_workunit->getHcKeyspace() + jobStartIndex2 >= m_package->getHcKeyspace())
         {
-            m_job->setHcKeyspace(m_package->getHcKeyspace() - jobStartIndex2);
+            m_workunit->setHcKeyspace(m_package->getHcKeyspace() - jobStartIndex2);
 
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
             {
                 jobDict->updateIndex(jobDict->getCurrentIndex() + 1);
                 m_package->updateIndex(m_package->getCurrentIndex() + 1);
@@ -179,8 +179,8 @@ bool CAttackCombinator::makeJob()
         }
         else
         {
-            uint64_t jobHcKeyspace = m_job->getHcKeyspace();
-            if (!m_job->isDuplicated())
+            uint64_t jobHcKeyspace = m_workunit->getHcKeyspace();
+            if (!m_workunit->isDuplicated())
                 m_package->updateIndex2(jobStartIndex2 + jobHcKeyspace);
 
             digits = 0;
@@ -191,14 +191,14 @@ bool CAttackCombinator::makeJob()
         }
     }
     /** Host has enough power, no fragments */
-    else if (m_job->getHcKeyspace() > (0.5f * m_package->getHcKeyspace()))
+    else if (m_workunit->getHcKeyspace() > (0.5f * m_package->getHcKeyspace()))
     {
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "Host has enough power, no fragments\n");
 
         /** # of real passwords / # of passwords in first dictionaries = # of passwords to check from dict2*/
-        uint64_t secDictKeyspace = (uint64_t)(std::round(m_job->getHcKeyspace() / (float)(m_package->getHcKeyspace())));
-        uint64_t newCurrentIndex = m_job->getStartIndex() + secDictKeyspace;
+        uint64_t secDictKeyspace = (uint64_t)(std::round(m_workunit->getHcKeyspace() / (float)(m_package->getHcKeyspace())));
+        uint64_t newCurrentIndex = m_workunit->getStartIndex() + secDictKeyspace;
 
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "Rounded # of passwords from dict2: %" PRIu64 " passwords\n", secDictKeyspace);
@@ -211,13 +211,13 @@ bool CAttackCombinator::makeJob()
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "We reached the end of current dict2, modifiyng job keyspace\n");
 
-            secDictKeyspace = jobDict->getHcKeyspace() - m_job->getStartIndex();
+            secDictKeyspace = jobDict->getHcKeyspace() - m_workunit->getStartIndex();
             newCurrentIndex = jobDict->getHcKeyspace();
         }
 
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "The #passwords from second dict is therefore: %" PRIu64 "\n", secDictKeyspace);
-        if (!m_job->isDuplicated())
+        if (!m_workunit->isDuplicated())
         {
             jobDict->updateIndex(newCurrentIndex);
             m_package->updateIndex(m_package->getCurrentIndex() + secDictKeyspace);
@@ -226,11 +226,11 @@ bool CAttackCombinator::makeJob()
         /** Exact number of passwords in job
          * @warning Combinator sets real keyspace to hc_keyspace, as there is no such thing as hc_keyspace here
          **/
-        m_job->setHcKeyspace(secDictKeyspace * m_package->getHcKeyspace());
+        m_workunit->setHcKeyspace(secDictKeyspace * m_package->getHcKeyspace());
 
         /** Computation done, start creating dictionary dict2 */
         /** Ignore 'start_index' passwords */
-        uint64_t jobStartIndex = m_job->getStartIndex();
+        uint64_t jobStartIndex = m_workunit->getStartIndex();
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "Skipping %" PRIu64 " passwords\n", jobStartIndex);
 
@@ -244,7 +244,7 @@ bool CAttackCombinator::makeJob()
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "'start_index' parameter is too far away\n");
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
                 jobDict->updateIndex(jobDict->getHcKeyspace());
 
             return true;
@@ -265,9 +265,9 @@ bool CAttackCombinator::makeJob()
             {
                 Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                         "Ate all passwords from current dictionary\n");
-                m_job->setHcKeyspace(currentIndex * m_package->getHcKeyspace());
+                m_workunit->setHcKeyspace(currentIndex * m_package->getHcKeyspace());
 
-                if (!m_job->isDuplicated())
+                if (!m_workunit->isDuplicated())
                 {
                     jobDict->updateIndex(jobDict->getHcKeyspace());
                     m_package->updateIndex(m_package->getCurrentIndex() + currentIndex);
@@ -284,7 +284,7 @@ bool CAttackCombinator::makeJob()
                 "Host doesn't have the power, start fragmenting\n");
 
         /** Ignore 'start_index' passwords */
-        uint64_t jobStartIndex = m_job->getStartIndex();
+        uint64_t jobStartIndex = m_workunit->getStartIndex();
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "Skipping %" PRIu64 " passwords\n", jobStartIndex);
         std::string passwd;
@@ -297,7 +297,7 @@ bool CAttackCombinator::makeJob()
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "'start_index' parameter is too far away\n");
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
                 jobDict->updateIndex(jobDict->getHcKeyspace());
 
             return true;
@@ -308,7 +308,7 @@ bool CAttackCombinator::makeJob()
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "Empty password or just reached EOF, skipping job\n");
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
             {
                 jobDict->updateIndex(jobDict->getCurrentIndex() + 1);
                 m_package->updateIndex(m_package->getCurrentIndex() + 1);
@@ -326,7 +326,7 @@ bool CAttackCombinator::makeJob()
         f << "|||start_index|BigUInt|1|0|||\n";
         Tools::printDebug("|||start_index|BigUInt|1|0|||\n");
 
-        uint64_t jobHcKeyspace = m_job->getHcKeyspace();
+        uint64_t jobHcKeyspace = m_workunit->getHcKeyspace();
         int digits = 0;
         uint64_t num = jobHcKeyspace;
         do { num /= 10; ++digits; } while (num != 0);    // Count digits
@@ -334,7 +334,7 @@ bool CAttackCombinator::makeJob()
         Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, jobHcKeyspace);
 
         /** Update current_index_2 of the first fragmented dict */
-        if (!m_job->isDuplicated())
+        if (!m_workunit->isDuplicated())
             m_package->updateIndex2(jobHcKeyspace);
     }
 
@@ -440,10 +440,10 @@ bool CAttackCombinator::makeJob()
         return false;
     }
 
-    restrict_wu_to_host(wu, m_job->getBoincHostId());
+    restrict_wu_to_host(wu, m_workunit->getBoincHostId());
 
-    m_job->setWorkunitId(uint64_t(wu.id));
-    m_sqlLoader->addNewWorkunit(m_job);
+    m_workunit->setWorkunitId(uint64_t(wu.id));
+    m_sqlLoader->addNewWorkunit(m_workunit);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
@@ -451,7 +451,7 @@ bool CAttackCombinator::makeJob()
 }
 
 
-bool CAttackCombinator::generateJob()
+bool CAttackCombinator::generateWorkunit()
 {
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "Generating combinator workunit ...\n");
@@ -498,7 +498,7 @@ bool CAttackCombinator::generateJob()
      * Create the job
      * @warning We save number of real passwords to hc_keyspace as we don't work with hc_indexes in combinator attack
      */
-    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
+    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
                          m_package->getCurrentIndex2(), passCount, 0, currentDict->getId(), false, 0, false);
     /**
      * @warning Index updating (current_index(_2)) must be done later

@@ -34,14 +34,14 @@ class CAttackPcfg : public AttackMode {
          * @brief Creates BOINC workunit, adds entry to en_workunit
          * @return True if a workunit was planned, False otherwise
          */
-        bool makeJob() override ;
+        bool makeWorkunit() override ;
 
     private:
         /**
          * @brief Function to generate new CWorkunit for certain host for given time
          * @return True if workunit was generated successfully, False otherwise
          */
-        bool generateJob() override ;
+        bool generateWorkunit() override ;
 
         /**
          * @brief Calls gRPC request to PCFG Manager which asks for new preterminals

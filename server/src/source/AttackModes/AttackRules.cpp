@@ -18,9 +18,9 @@ CAttackRules::CAttackRules(PtrPackage & package, PtrHost & host, uint64_t second
 }
 
 
-bool CAttackRules::makeJob() {
+bool CAttackRules::makeWorkunit() {
     /** Create the job first */
-    if (!m_job && !generateJob())
+    if (!m_workunit && !generateWorkunit())
         return false;
 
     DB_WORKUNIT wu;
@@ -70,7 +70,7 @@ bool CAttackRules::makeJob() {
     f.close();
 
     /** Load current job dictionary */
-    PtrDictionary jobDict = m_sqlLoader->loadDictionary(m_job->getDictionaryId());
+    PtrDictionary jobDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
 
     /** Debug */
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
@@ -78,7 +78,7 @@ bool CAttackRules::makeJob() {
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "In rule file, there are %" PRIu64 " rules\n", m_package->getCombSecDictSize());
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "Job can compute %" PRIu64 " passwords\n", m_job->getHcKeyspace());
+            "Job can compute %" PRIu64 " passwords\n", m_workunit->getHcKeyspace());
 
 
     /** Create dict1 file */
@@ -110,14 +110,14 @@ bool CAttackRules::makeJob() {
         return false;
     }
 
-    uint64_t dictKeyspace = (uint64_t)(std::round(m_job->getHcKeyspace() / (float)(m_package->getCombSecDictSize())));
+    uint64_t dictKeyspace = (uint64_t)(std::round(m_workunit->getHcKeyspace() / (float)(m_package->getCombSecDictSize())));
 
     /** Always send at least one password */
     if (dictKeyspace < 1)
         dictKeyspace = 1;
 
-    uint64_t newCurrentIndex = m_job->getStartIndex() + dictKeyspace;
-    if (!m_job->isDuplicated())
+    uint64_t newCurrentIndex = m_workunit->getStartIndex() + dictKeyspace;
+    if (!m_workunit->isDuplicated())
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "New dictionary current index: %" PRIu64 "\n", newCurrentIndex);
 
@@ -127,24 +127,24 @@ bool CAttackRules::makeJob() {
         Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                 "We reached the end of current dictionary, modifiyng job keyspace\n");
 
-        dictKeyspace = jobDict->getHcKeyspace() - m_job->getStartIndex();
+        dictKeyspace = jobDict->getHcKeyspace() - m_workunit->getStartIndex();
         newCurrentIndex = jobDict->getHcKeyspace();
     }
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "The #passwords from dict is therefore: %" PRIu64 "\n", dictKeyspace);
 
-    if (!m_job->isDuplicated())
+    if (!m_workunit->isDuplicated())
     {
         jobDict->updateIndex(newCurrentIndex);
         m_package->updateIndex(m_package->getCurrentIndex() + dictKeyspace);
     }
 
-    m_job->setHcKeyspace(dictKeyspace);
+    m_workunit->setHcKeyspace(dictKeyspace);
 
     /** Computation done, start creating dictionary */
     /** Ignore 'start_index' passwords */
-    uint64_t jobStartIndex = m_job->getStartIndex();
+    uint64_t jobStartIndex = m_workunit->getStartIndex();
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "Skipping %" PRIu64 " passwords\n", jobStartIndex);
 
@@ -178,9 +178,9 @@ bool CAttackRules::makeJob() {
         {
             Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                     "Ate all passwords from current dictionary\n");
-            m_job->setHcKeyspace(currentIndex);
+            m_workunit->setHcKeyspace(currentIndex);
 
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
             {
                 jobDict->updateIndex(jobDict->getHcKeyspace());
                 m_package->updateIndex(m_package->getCurrentIndex() - dictKeyspace + currentIndex);
@@ -293,10 +293,10 @@ bool CAttackRules::makeJob() {
         return false;
     }
 
-    restrict_wu_to_host(wu, m_job->getBoincHostId());
+    restrict_wu_to_host(wu, m_workunit->getBoincHostId());
 
-    m_job->setWorkunitId(uint64_t(wu.id));
-    m_sqlLoader->addNewWorkunit(m_job);
+    m_workunit->setWorkunitId(uint64_t(wu.id));
+    m_sqlLoader->addNewWorkunit(m_workunit);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
@@ -304,7 +304,7 @@ bool CAttackRules::makeJob() {
 }
 
 
-bool CAttackRules::generateJob()
+bool CAttackRules::generateWorkunit()
 {
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "Generating rules workunit ...\n");
@@ -351,7 +351,7 @@ bool CAttackRules::generateJob()
      * Create the job
      * @warning We save number of real passwords to hc_keyspace and modify it later
      */
-    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
+    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
                          0, passCount, 0, currentDict->getId(), false, 0, false);
     /**
      * @warning Index updating (current_index) must be done later

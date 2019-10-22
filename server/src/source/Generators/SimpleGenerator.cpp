@@ -98,7 +98,7 @@ void CSimpleGenerator::createBenchmark(PtrPackage & package, PtrHost & host)
 
         /** Create Benchmark job */
         CAttackBench bench(package, host, m_sqlLoader);
-        bench.makeJob();
+        bench.makeWorkunit();
     }
 }
 
@@ -178,7 +178,7 @@ void CSimpleGenerator::createRegularJob(PtrPackage & package, PtrHost & host)
         Tools::printDebugHost(Config::DebugType::Log, packageId, hostBoincId,
                               "No more retry jobs available. Job will end soon.\n");
     }
-    else if (!attack->makeJob() && package->getStatus() != Config::PackageState::PackageFinishing)
+    else if (!attack->makeWorkunit() && package->getStatus() != Config::PackageState::PackageFinishing)
     {
         /** No job could be generated, setting package to finishing */
         Tools::printDebugPackage(Config::DebugType::Log, packageId,
@@ -250,7 +250,7 @@ bool CSimpleGenerator::setEasiestRetry(PtrPackage & package, PtrHost & host, Att
     m_sqlLoader->setJobFinished(retryJob->getId());
 
     // TODO: Use some intelligent thresholds to split retry job (if it is too large)
-    attack->setJob(retryJob);
+    attack->setWorkunit(retryJob);
     return true;
 }
 

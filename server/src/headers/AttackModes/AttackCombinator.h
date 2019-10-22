@@ -34,14 +34,14 @@ class CAttackCombinator : public AttackMode {
          * @brief Creates BOINC workunit, adds entry to fc_job
          * @return True if a job was planned, False otherwise
          */
-        bool makeJob() override ;
+        bool makeWorkunit() override ;
 
     private:
         /**
          * @brief Function to generate new CJob for certain host for given time
          * @return True if job was generated successfully, False otherwise
          */
-        bool generateJob() override ;
+        bool generateWorkunit() override ;
 };
 
 #endif //WORKGENERATOR_ATTACKCOMBINATOR_H

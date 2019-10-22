@@ -16,10 +16,10 @@ CAttackBench::CAttackBench(PtrPackage & package, PtrHost & host, CSqlLoader * sq
 }
 
 
-bool CAttackBench::makeJob()
+bool CAttackBench::makeWorkunit()
 {
     /** Create the job first */
-    generateJob();
+    generateWorkunit();
 
     DB_WORKUNIT wu;
     char name1[Config::SQL_BUF_SIZE], path[Config::SQL_BUF_SIZE];
@@ -98,10 +98,10 @@ bool CAttackBench::makeJob()
         return false;
     }
 
-    restrict_wu_to_host(wu, m_job->getBoincHostId());
+    restrict_wu_to_host(wu, m_workunit->getBoincHostId());
 
-    m_job->setWorkunitId(uint64_t(wu.id));
-    m_sqlLoader->addNewWorkunit(m_job);
+    m_workunit->setWorkunitId(uint64_t(wu.id));
+    m_sqlLoader->addNewWorkunit(m_workunit);
 
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
@@ -109,12 +109,12 @@ bool CAttackBench::makeJob()
 }
 
 
-bool CAttackBench::generateJob()
+bool CAttackBench::generateWorkunit()
 {
     Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
             "Generating benchmark workunit ...\n");
 
     /** Create benchmark job */
-    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), 0, 0, 0, 0, 0, false, 0, false);
+    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), 0, 0, 0, 0, 0, false, 0, false);
     return true;
 }
