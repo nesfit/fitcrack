@@ -294,7 +294,7 @@ bool CAttackDict::generateJob()
     }
 
     /** Create the job */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex, 0, passCount, 0,
+    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex, 0, passCount, 0,
                          currentDict->getId(), false, 0, false);
 
     /** Update the package/dictionary index */

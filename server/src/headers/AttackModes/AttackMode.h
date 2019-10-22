@@ -10,7 +10,7 @@
 #define WORKGENERATOR_ATTACKMODE_H
 
 /** Project headers */
-#include <Job.h>
+#include <Workunit.h>
 #include <Host.h>
 #include <Mask.h>
 #include <Package.h>
@@ -47,7 +47,7 @@ class AttackMode {
          * Then, new job is NOT generated when makeJob is called
          * @param job [in] Pointer to job created from retry
          */
-        void setJob(PtrJob & job);
+        void setJob(PtrWorkunit & job);
 
         /**
          * @brief Sets default parameters of BOINC workunit
@@ -72,7 +72,7 @@ protected:
         }
 
 
-        PtrJob m_job;           /**< Instance of CJob which is used to create this attack instance */
+        PtrWorkunit m_job;           /**< Instance of CJob which is used to create this attack instance */
         PtrPackage m_package;   /**< Instance of CPackage which is parent of this attack instance */
         PtrHost m_host;         /**< Instance of CHost which this attack belongs to */
         uint64_t m_seconds;     /**< Number of seconds this instance of attack should take */

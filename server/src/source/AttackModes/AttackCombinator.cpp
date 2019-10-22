@@ -498,7 +498,7 @@ bool CAttackCombinator::generateJob()
      * Create the job
      * @warning We save number of real passwords to hc_keyspace as we don't work with hc_indexes in combinator attack
      */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
+    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
                          m_package->getCurrentIndex2(), passCount, 0, currentDict->getId(), false, 0, false);
     /**
      * @warning Index updating (current_index(_2)) must be done later

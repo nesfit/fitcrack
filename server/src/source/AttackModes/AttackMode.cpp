@@ -9,7 +9,7 @@
 #include "AttackMode.h"
 
 
-void AttackMode::setJob(PtrJob & job)
+void AttackMode::setJob(PtrWorkunit & job)
 {
     m_job = job;
 }

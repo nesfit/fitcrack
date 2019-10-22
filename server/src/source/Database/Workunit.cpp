@@ -1,16 +1,16 @@
 /**
- * @file Job.cpp
+ * @file Workunit.cpp
  * @brief Source file for fc_workunit entry
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
 
-#include <Job.h>
+#include <Workunit.h>
 #include <SqlLoader.h>
 
 
-CJob::CJob(DbMap & jobMap)
+CWorkunit::CWorkunit(DbMap & jobMap)
 {
     try
     {
@@ -33,13 +33,13 @@ CJob::CJob(DbMap & jobMap)
     }
     catch(std::logic_error & error)
     {
-        Tools::printDebugTimestamp("Error converting jobMap to PtrJob: %s", error.what());
+        Tools::printDebugTimestamp("Error converting jobMap to PtrWorkunit: %s", error.what());
         exit(1);
     }
 }
 
 
-CJob::CJob(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint64_t & startIndex,
+CWorkunit::CWorkunit(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint64_t & startIndex,
            uint64_t & startIndex2, uint64_t & hcKeyspace, uint64_t & maskId, uint64_t & dictionaryId,
            bool & duplicated, uint64_t & duplicate, bool & retry)
 {
@@ -62,24 +62,24 @@ CJob::CJob(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint
 }
 
 
-PtrJob CJob::create(uint64_t packageId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
+PtrWorkunit CWorkunit::create(uint64_t packageId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
                     uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
                     bool duplicated, uint64_t duplicate, bool retry)
 {
-    return PtrJob(new CJob(packageId, hostId, boincHostId, startIndex, startIndex2, hcKeyspace, maskId, dictionaryId,
+    return PtrWorkunit(new CWorkunit(packageId, hostId, boincHostId, startIndex, startIndex2, hcKeyspace, maskId, dictionaryId,
                            duplicated, duplicate, retry));
 }
 
 
-PtrJob CJob::create(DbMap & jobMap, CSqlLoader * sqlLoader)
+PtrWorkunit CWorkunit::create(DbMap & jobMap, CSqlLoader * sqlLoader)
 {
     /** sqlLoader is here just for common interface in load() function */
     UNUSED(sqlLoader);
-    return PtrJob(new CJob(jobMap));
+    return PtrWorkunit(new CWorkunit(jobMap));
 }
 
 
-std::string CJob::getTableName()
+std::string CWorkunit::getTableName()
 {
     return Config::tableNameWorkunit;
 }
@@ -89,133 +89,133 @@ std::string CJob::getTableName()
  * @section Table attributes getters/setters
  */
 
-uint64_t CJob::getId() const
+uint64_t CWorkunit::getId() const
 {
     return m_id;
 }
 
 
-uint64_t CJob::getPackageId() const
+uint64_t CWorkunit::getPackageId() const
 {
     return m_packageId;
 }
 
 
-uint64_t CJob::getWorkunitId() const
+uint64_t CWorkunit::getWorkunitId() const
 {
     return m_workunitId;
 }
 
 
-uint64_t CJob::getHostId() const
+uint64_t CWorkunit::getHostId() const
 {
     return m_hostId;
 }
 
 
-uint64_t CJob::getBoincHostId() const
+uint64_t CWorkunit::getBoincHostId() const
 {
     return m_boincHostId;
 }
 
 
-uint64_t CJob::getStartIndex() const
+uint64_t CWorkunit::getStartIndex() const
 {
     return m_startIndex;
 }
 
 
-uint64_t CJob::getStartIndex2() const
+uint64_t CWorkunit::getStartIndex2() const
 {
     return m_startIndex2;
 }
 
 
-uint64_t CJob::getHcKeyspace() const
+uint64_t CWorkunit::getHcKeyspace() const
 {
     return m_hcKeyspace;
 }
 
 
-uint64_t CJob::getMaskId() const
+uint64_t CWorkunit::getMaskId() const
 {
     return m_maskId;
 }
 
 
-uint64_t CJob::getDictionaryId() const
+uint64_t CWorkunit::getDictionaryId() const
 {
     return m_dictionaryId;
 }
 
 
-bool CJob::isDuplicated() const
+bool CWorkunit::isDuplicated() const
 {
     return m_duplicated;
 }
 
 
-uint64_t CJob::getDuplicate() const
+uint64_t CWorkunit::getDuplicate() const
 {
     return m_duplicate;
 }
 
 
-bool CJob::isRetry() const
+bool CWorkunit::isRetry() const
 {
     return m_retry;
 }
 
 
-bool CJob::isFinished() const
+bool CWorkunit::isFinished() const
 {
     return m_finished;
 }
 
 
-bool CJob::isFinishJob() const
+bool CWorkunit::isFinishJob() const
 {
     return m_finishJob;
 }
 
 
-void CJob::setWorkunitId(uint64_t workunitId)
+void CWorkunit::setWorkunitId(uint64_t workunitId)
 {
     m_workunitId = workunitId;
 }
 
 
-void CJob::setHcKeyspace(uint64_t hcKeyspace)
+void CWorkunit::setHcKeyspace(uint64_t hcKeyspace)
 {
     m_hcKeyspace = hcKeyspace;
 }
 
 
-void CJob::setRetry(bool retry)
+void CWorkunit::setRetry(bool retry)
 {
     m_retry = retry;
 }
 
 
-void CJob::setHostId(uint64_t hostId)
+void CWorkunit::setHostId(uint64_t hostId)
 {
     m_hostId = hostId;
 }
 
 
-void CJob::setBoincHostId(uint64_t boincHostId)
+void CWorkunit::setBoincHostId(uint64_t boincHostId)
 {
     m_boincHostId = boincHostId;
 }
 
 
-void CJob::setDuplicated(bool duplicated)
+void CWorkunit::setDuplicated(bool duplicated)
 {
     m_duplicated = duplicated;
 }
 
 
-void CJob::setDuplicate(uint64_t duplicate)
+void CWorkunit::setDuplicate(uint64_t duplicate)
 {
     m_duplicate = duplicate;
 }

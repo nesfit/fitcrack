@@ -1,43 +1,43 @@
 /**
- * @file Job.h
+ * @file Workunit.h
  * @brief Header file for fc_workunit entry
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
 
-#ifndef WORKGENERATOR_JOB_H
-#define WORKGENERATOR_JOB_H
+#ifndef WORKGENERATOR_WORKUNIT_H
+#define WORKGENERATOR_WORKUNIT_H
 
 #include <Config.h>
 
 
 class CSqlLoader;
-class CJob;
-using PtrJob = Config::Ptr<CJob>;
+class CWorkunit;
+using PtrWorkunit = Config::Ptr<CWorkunit>;
 
 
-class CJob {
+class CWorkunit {
     private:
         /**
          * @brief Private constructor, called by create() static function
          * @param jobMap [in] Map representing fc_job table entry
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
-        explicit CJob(DbMap & jobMap);
+        explicit CWorkunit(DbMap & jobMap);
 
         /**
          * @brief Private constructor, called by create() static function
          * @param ... [in] Attributes needed by database
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
-        explicit CJob(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint64_t & startIndex,
+        explicit CWorkunit(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint64_t & startIndex,
                       uint64_t & startIndex2, uint64_t & hcKeyspace, uint64_t & maskId, uint64_t & dictionaryId,
                       bool & duplicated, uint64_t & duplicate, bool & retry);
 
     public:
         /** Default destructor */
-        ~CJob() = default;
+        ~CWorkunit() = default;
 
         /**
          * @brief Creating instance as a shared pointer from database select
@@ -45,14 +45,14 @@ class CJob {
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          * @return Shared pointer to fc_job entry object
          */
-        static PtrJob create(DbMap & jobMap, CSqlLoader * sqlLoader);
+        static PtrWorkunit create(DbMap & jobMap, CSqlLoader * sqlLoader);
 
         /**
          * @brief Creating instance as a shared pointer from generated job data
          * @param ... [in] Attributes needed by database
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
-        static PtrJob create(uint64_t packageId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
+        static PtrWorkunit create(uint64_t packageId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
                              uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
                              bool duplicated, uint64_t duplicate, bool retry);
 
@@ -121,4 +121,4 @@ public:
         void setDuplicate(uint64_t duplicate);
 };
 
-#endif //WORKGENERATOR_JOB_H
+#endif //WORKGENERATOR_WORKUNIT_H

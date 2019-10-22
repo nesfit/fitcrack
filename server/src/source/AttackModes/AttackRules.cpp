@@ -351,7 +351,7 @@ bool CAttackRules::generateJob()
      * Create the job
      * @warning We save number of real passwords to hc_keyspace and modify it later
      */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
+    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), currentDict->getCurrentIndex(),
                          0, passCount, 0, currentDict->getId(), false, 0, false);
     /**
      * @warning Index updating (current_index) must be done later

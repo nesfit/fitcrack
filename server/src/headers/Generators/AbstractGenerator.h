@@ -12,7 +12,7 @@
 #include <Config.h>
 
 #include <Host.h>
-#include <Job.h>
+#include <Workunit.h>
 #include <Mask.h>
 #include <Package.h>
 

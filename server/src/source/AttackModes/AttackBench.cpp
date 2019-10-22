@@ -115,6 +115,6 @@ bool CAttackBench::generateJob()
             "Generating benchmark workunit ...\n");
 
     /** Create benchmark job */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), 0, 0, 0, 0, 0, false, 0, false);
+    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), 0, 0, 0, 0, 0, false, 0, false);
     return true;
 }

@@ -13,7 +13,7 @@
 
 
 class CHost;
-class CJob;
+class CWorkunit;
 class CPackage;
 class CMask;
 class CDictionary;
@@ -94,7 +94,7 @@ class CSqlLoader {
          * @param packageId ID of package of the job we are looking for
          * @return Pointer to job, created from database entry
          */
-        Config::Ptr<CJob> getEasiestRetry(uint64_t packageId);
+        Config::Ptr<CWorkunit> getEasiestRetry(uint64_t packageId);
 
         /**
          * @brief Updates status of a host in fc_host table
@@ -157,7 +157,7 @@ class CSqlLoader {
          * @brief Inserts new job to fc_job table
          * @param job Pointer to job appended to database
          */
-        void addNewWorkunit(Config::Ptr<CJob> job);
+        void addNewWorkunit(Config::Ptr<CWorkunit> job);
 
         /**
          * @brief Reads default_job_timeout_factor from fc_settings

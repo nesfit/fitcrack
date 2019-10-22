@@ -230,7 +230,7 @@ void CSimpleGenerator::finishPackage(PtrPackage & package)
 
 bool CSimpleGenerator::setEasiestRetry(PtrPackage & package, PtrHost & host, AttackMode * attack)
 {
-    PtrJob retryJob = m_sqlLoader->getEasiestRetry(package->getId());
+    PtrWorkunit retryJob = m_sqlLoader->getEasiestRetry(package->getId());
 
     if (!retryJob || retryJob->getHcKeyspace() == 0)
         return false;

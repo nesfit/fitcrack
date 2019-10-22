@@ -243,7 +243,7 @@ bool CAttackPcfg::generateJob()
         passCount = m_package->getHcKeyspace() - m_package->getCurrentIndex();
 
     /** Create the job */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
+    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
                          false, 0, false);
 
     /**

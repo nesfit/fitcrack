@@ -8,7 +8,7 @@
 
 #include <SqlLoader.h>
 #include <Host.h>
-#include <Job.h>
+#include <Workunit.h>
 #include <Mask.h>
 #include <Package.h>
 #include <Dictionary.h>
@@ -78,7 +78,7 @@ void CSqlLoader::finishTimeoutPackages()
 
 uint64_t CSqlLoader::getBenchCount(uint64_t packageId, uint64_t hostId)
 {
-    return getRowCount<CJob>(formatQuery(
+    return getRowCount<CWorkunit>(formatQuery(
             "WHERE `host_id` = %" PRIu64 " AND `job_id` = %" PRIu64 " AND `finished` = 0 AND `retry` = 0 AND `hc_keyspace` = 0",
             hostId, packageId));
 }
@@ -89,7 +89,7 @@ uint64_t CSqlLoader::getJobCount(uint64_t packageId, uint64_t hostId)
     /**
      * @warning This select is used for job generating, retry == 0 is checked (retry == 1 is not and active job)
      */
-    return getRowCount<CJob>(formatQuery(
+    return getRowCount<CWorkunit>(formatQuery(
             "WHERE `host_id` = %" PRIu64 " AND `job_id` = %" PRIu64 " AND `finished` = 0 AND `retry` = 0 AND `hc_keyspace` > 0",
             hostId, packageId));
 }
@@ -100,20 +100,20 @@ uint64_t CSqlLoader::getJobCount(uint64_t packageId)
     /**
      * @warning This select is used for finished status checking, retry == 0 is not checked (new jobs will be generated)
      */
-    return getRowCount<CJob>(
+    return getRowCount<CWorkunit>(
             formatQuery("WHERE `job_id` = %" PRIu64 " AND `finished` = 0 AND `hc_keyspace` > 0", packageId));
 }
 
 
 void CSqlLoader::setJobFinished(uint64_t id)
 {
-    return updateSql(formatQuery("UPDATE `%s` SET finished = 1, progress = 100 WHERE id = %" PRIu64 " LIMIT 1;", CJob::getTableName().c_str(), id));
+    return updateSql(formatQuery("UPDATE `%s` SET finished = 1, progress = 100 WHERE id = %" PRIu64 " LIMIT 1;", CWorkunit::getTableName().c_str(), id));
 }
 
 
-Config::Ptr<CJob> CSqlLoader::getEasiestRetry(uint64_t packageId)
+Config::Ptr<CWorkunit> CSqlLoader::getEasiestRetry(uint64_t packageId)
 {
-    std::vector<Config::Ptr<CJob>> jobVec = load<CJob>(formatQuery("WHERE retry != 0 AND finished = 0 AND hc_keyspace != 0 AND job_id = %" PRIu64 " ORDER BY hc_keyspace ASC",
+    std::vector<Config::Ptr<CWorkunit>> jobVec = load<CWorkunit>(formatQuery("WHERE retry != 0 AND finished = 0 AND hc_keyspace != 0 AND job_id = %" PRIu64 " ORDER BY hc_keyspace ASC",
                                                                    packageId));
 
     if (jobVec.empty())
@@ -179,12 +179,12 @@ bool CSqlLoader::isPackageTimeout(uint64_t packageId)
 }
 
 
-void CSqlLoader::addNewWorkunit(PtrJob job)
+void CSqlLoader::addNewWorkunit(PtrWorkunit job)
 {
     return updateSql(formatQuery("INSERT INTO `%s` (`job_id`,`workunit_id`,`host_id`, `boinc_host_id`, \
 `start_index`, `start_index_2`, `hc_keyspace`, `mask_id`, `dictionary_id`, `duplicated`, `duplicate`, `retry`) VALUES ('%" PRIu64 "','%" PRIu64 "',\
 '%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%d', '%" PRIu64 "', '%d');",
-                                 CJob::getTableName().c_str(), job->getPackageId(), job->getWorkunitId(), job->getHostId(),
+                                 CWorkunit::getTableName().c_str(), job->getPackageId(), job->getWorkunitId(), job->getHostId(),
                                  job->getBoincHostId(), job->getStartIndex(), job->getStartIndex2(), job->getHcKeyspace(),
                                  job->getMaskId(), job->getDictionaryId(), job->isDuplicated(), job->getDuplicate(),
                                  job->isRetry()));

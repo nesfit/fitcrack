@@ -218,7 +218,7 @@ bool CAttackMask::generateJob()
     }
 
     /** Create new mask job */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
+    m_job = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
                          currentMask->getId(), 0, false, 0, false);
 
     /** Update indexes for package and mask*/
