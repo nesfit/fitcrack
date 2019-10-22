@@ -1,92 +1,92 @@
 /**
- * @file Package.h
+ * @file Job.h
  * @brief Header file for fc_job entry
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
 
-#ifndef WORKGENERATOR_PACKAGE_H
-#define WORKGENERATOR_PACKAGE_H
+#ifndef WORKGENERATOR_JOB_H
+#define WORKGENERATOR_JOB_H
 
 #include <Config.h>
 
 
 class CSqlLoader;
-class CPackage;
+class CJob;
 class CMask;
 class CDictionary;
-using PtrPackage = Config::Ptr<CPackage>;
+using PtrJob = Config::Ptr<CJob>;
 
 
-class CPackage {
+class CJob {
     private:
         /**
          * @brief Private constructor, called by create() static function
-         * @param packageMap [in] Map representing fc_package table entry
+         * @param jobMap [in] Map representing fc_job table entry
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
-        explicit CPackage(DbMap & packageMap, CSqlLoader * sqlLoader);
+        explicit CJob(DbMap & jobMap, CSqlLoader * sqlLoader);
 
     public:
         /** Default destructor */
-        ~CPackage() = default;
+        ~CJob() = default;
 
         /**
          * @brief Creating instance as a shared pointer from database select
-         * @param hostMap [in] Map representing fc_package table entry
+         * @param hostMap [in] Map representing fc_job table entry
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
-         * @return Shared pointer to fc_package entry object
+         * @return Shared pointer to fc_job entry object
          */
-        static PtrPackage create(DbMap &packageMap, CSqlLoader * sqlLoader);
+        static PtrJob create(DbMap &jobMap, CSqlLoader * sqlLoader);
 
         /**
-         * @brief Get the package SQL table name, usually fc_package
-         * @return Package SQL table name
+         * @brief Get the job SQL table name, usually fc_job
+         * @return Job SQL table name
          */
         static std::string getTableName();
 
         /**
-         * @brief Updates index of this package object and database entry
+         * @brief Updates index of this job object and database entry
          * @param newIndex [in] New mask current index
          */
         void updateIndex(uint64_t newIndex);
 
         /**
-         * @brief Updates index 2 of this package object and database entry
+         * @brief Updates index 2 of this job object and database entry
          * @param newIndex [in] New mask current index 2
          */
         void updateIndex2(uint64_t newIndex2);
 
         /**
-         * @brief Updates status of this package object and database entry
-         * @param newIndex [in] New package status
+         * @brief Updates status of this job object and database entry
+         * @param newIndex [in] New job status
          */
-        void updateStatus(Config::PackageState newStatus);
+        void updateStatus(Config::JobState newStatus);
 
         /**
-         * @brief Updates status of running package, otherwise, does nothing
-         * @param newIndex [in] New package status, original status must be >= 10
+         * @brief Updates status of running job, otherwise, does nothing
+         * @param newIndex [in] New job status, original status must be >= 10
          */
-        void updateStatusOfRunningPackage(Config::PackageState newStatus);
+        void updateStatusOfRunningJob(Config::JobState newStatus);
 
         /**
-         * @brief Updates start time of package database entry to now, only if it is NULL
+         * @brief Updates start time of job database entry to now, only if it is NULL
          */
         void updateStartTime();
 
         /**
-         * @brief Loads all non-exhausted mask database entries for this package to package vector m_masks
+         * @brief Loads all non-exhausted mask database entries for this job to job vector m_masks
          */
         void loadMasks();
 
         /**
-         * @brief Loads all non-exhausted dictionary database entries for this package to package vector m_dictionaries
+         * @brief Loads all non-exhausted dictionary database entries for this job to job vector m_dictionaries
          */
         void loadDictionaries();
 
         /**
-         * @brief Loads all non-cracked hash database entries fot his package to package string m_hashes
+         * @brief Loads all non-cracked hash database entries fot his job to job string m_hashes
          * @return True if any hashes were loaded, False otherwise
          */
         bool loadHashes();
@@ -96,7 +96,7 @@ class CPackage {
         CSqlLoader * m_sqlLoader;         /**< SqlLoader for database updating */
 
         /**
-         * @section Table attributes of fc_package
+         * @section Table attributes of fc_job
          */
 
         uint64_t    m_id;
@@ -130,9 +130,9 @@ class CPackage {
         uint64_t m_combSecDictSize;     /**< Size of second dictionary in Combinator attack */
         std::vector<Config::Ptr<CMask>> m_masks;    /**< Vector of non-exhausted masks for mask attack */
         std::vector<Config::Ptr<CDictionary>> m_dictionaries;  /**< Vector of non-exhausted dictionaries */
-        std::string m_hashes;           /**< Package hash(es) denoted by newlines */
+        std::string m_hashes;           /**< job hash(es) denoted by newlines */
 
-        uint64_t m_totalPower;          /**< Sum of host power for this package */
+        uint64_t m_totalPower;          /**< Sum of host power for this job */
         uint64_t m_secondsPassed;       /**< Seconds from time_start to now() */
         uint64_t m_maxSeconds;          /**< Maximum time of workunit */
         unsigned int m_timeoutFactor;   /**< Timeout for workunits, factor of time for a single workunit */
@@ -190,4 +190,4 @@ class CPackage {
         const std::string & getGrammar() const;
 };
 
-#endif //WORKGENERATOR_PACKAGE_H
+#endif //WORKGENERATOR_JOB_H

@@ -13,7 +13,7 @@
 #include <Workunit.h>
 #include <Host.h>
 #include <Mask.h>
-#include <Package.h>
+#include <Job.h>
 #include <Dictionary.h>
 #include <SqlLoader.h>
 #include <Config.h>
@@ -58,12 +58,12 @@ class AttackMode {
 protected:
         /**
         * @brief Base constructor for all attacks, saves supplied arguments to member variables
-        * @param package [in] Instance of CPackage which is parent of this attack instance
+        * @param job [in] Instance of CJob which is parent of this attack instance
         * @param host [in] Instance of CHost which this attack belongs to
         * @param seconds [in] Number of seconds this instance of attack should take
         */
-        AttackMode(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader)
-        :   m_package(package),
+        AttackMode(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+        :   m_job(job),
             m_host(host),
             m_seconds(seconds),
             m_sqlLoader(sqlLoader)
@@ -72,8 +72,8 @@ protected:
         }
 
 
-        PtrWorkunit m_workunit;           /**< Instance of CWorkunit which is used to create this attack instance */
-        PtrPackage m_package;   /**< Instance of CPackage which is parent of this attack instance */
+        PtrWorkunit m_workunit; /**< Instance of CWorkunit which is used to create this attack instance */
+        PtrJob m_job;           /**< Instance of CJob which is parent of this attack instance */
         PtrHost m_host;         /**< Instance of CHost which this attack belongs to */
         uint64_t m_seconds;     /**< Number of seconds this instance of attack should take */
 

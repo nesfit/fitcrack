@@ -11,21 +11,21 @@
 #include "AbstractGenerator.h"
 
 
-uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrPackage & package)
+uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job)
 {
     uint64_t minimum = Config::minSeconds;
-    uint64_t maximum = package->getMaxSeconds();
+    uint64_t maximum = job->getMaxSeconds();
 
-    uint64_t seconds = ((package->getHcKeyspace() - package->getCurrentIndex()) / (package->getTotalPower() + 1)) / 10;
+    uint64_t seconds = ((job->getHcKeyspace() - job->getCurrentIndex()) / (job->getTotalPower() + 1)) / 10;
 
     if (seconds < minimum)
         seconds = minimum;
     else if (seconds > maximum)
         seconds = maximum;
 
-    Tools::printDebugPackage(Config::DebugType::Log, package->getId(),
-            "Calculating seconds: seconds_per_workunit = %" PRIu64 ", real seconds = %" PRIu64"\n",
-                             package->getSecondsPerWorkunit(), seconds);
+    Tools::printDebugJob(Config::DebugType::Log, job->getId(),
+                         "Calculating seconds: seconds_per_workunit = %" PRIu64 ", real seconds = %" PRIu64"\n",
+                         job->getSecondsPerWorkunit(), seconds);
 
     return seconds;
 }
@@ -57,29 +57,29 @@ void CAbstractGenerator::activateJobs()
 }
 
 
-void CAbstractGenerator::deleteStickyFiles(PtrPackage & package, std::vector<PtrHost> & packageHosts)
+void CAbstractGenerator::deleteStickyFiles(PtrJob &job, std::vector<PtrHost> &jobHosts)
 {
     std::string stickyName;
 
     /** Get sticky file name according to attack */
-    switch (package->getAttackMode())
+    switch (job->getAttackMode())
     {
         case Config::AttackMode::AttackCombinator:
-            stickyName = std::string(Config::appName) + "_combinator_" + std::to_string(package->getId());
+            stickyName = std::string(Config::appName) + "_combinator_" + std::to_string(job->getId());
             break;
 
         case Config::AttackMode::AttackMask:
-            if (package->getAttackSubmode() == 0)
+            if (job->getAttackSubmode() == 0)
                 break;
 
-            stickyName = std::string(Config::appName) + "_markov_" + std::to_string(package->getId());
+            stickyName = std::string(Config::appName) + "_markov_" + std::to_string(job->getId());
             break;
 
         case Config::AttackMode::AttackDict:
-            if (package->getAttackSubmode() == 0)
+            if (job->getAttackSubmode() == 0)
                 break;
 
-            stickyName = std::string(Config::appName) + "_rules_" + std::to_string(package->getId());
+            stickyName = std::string(Config::appName) + "_rules_" + std::to_string(job->getId());
             break;
 
         default:
@@ -89,7 +89,7 @@ void CAbstractGenerator::deleteStickyFiles(PtrPackage & package, std::vector<Ptr
     if (stickyName.empty())
         return;
 
-    /** Send message to all hosts in fc_host working on package */
-    for (PtrHost & host : packageHosts)
+    /** Send message to all hosts in fc_host working on job */
+    for (PtrHost & host : jobHosts)
         create_delete_file_msg((int)host->getBoincHostId(), stickyName.c_str());
 }

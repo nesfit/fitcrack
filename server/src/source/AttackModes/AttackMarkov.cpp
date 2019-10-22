@@ -9,8 +9,8 @@
 #include <AttackMarkov.h>
 
 
-CAttackMarkov::CAttackMarkov(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader)
-    :   AttackMode(package, host, seconds, sqlLoader)
+CAttackMarkov::CAttackMarkov(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(job, host, seconds, sqlLoader)
 {
 
 }
@@ -30,7 +30,7 @@ bool CAttackMarkov::makeWorkunit()
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
-    std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_markov_%" PRIu64 "", Config::appName, m_package->getId());
+    std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_markov_%" PRIu64 "", Config::appName, m_job->getId());
 
     /** Load the workunit mask to object */
     PtrMask workunitMask = m_sqlLoader->loadMask(m_workunit->getMaskId());
@@ -39,9 +39,9 @@ bool CAttackMarkov::makeWorkunit()
     retval = config.download_path(name1, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - config. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - config. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -49,17 +49,17 @@ bool CAttackMarkov::makeWorkunit()
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open config BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open config BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
-    f << m_package->getConfig();
-    Tools::printDebug(m_package->getConfig().c_str());
+    f << m_job->getConfig();
+    Tools::printDebug(m_job->getConfig().c_str());
 
     /** Output mode */
     f << "|||mode|String|1|n|||\n";
@@ -77,7 +77,7 @@ bool CAttackMarkov::makeWorkunit()
     Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, m_workunit->getStartIndex());
 
     /** Output markov_threshold */
-    uint32_t markov_threshold = m_package->getMarkovThreshold();
+    uint32_t markov_threshold = m_job->getMarkovThreshold();
     if (markov_threshold != 0)
     {
         digits = 0;
@@ -116,22 +116,22 @@ bool CAttackMarkov::makeWorkunit()
     retval = config.download_path(name2, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - data. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - data. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open data BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open data BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    f << m_package->getHashes();
+    f << m_job->getHashes();
     f.close();
 
 
@@ -139,36 +139,36 @@ bool CAttackMarkov::makeWorkunit()
     retval = config.download_path(name3, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - markov. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - markov. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open markov BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open markov BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    if(m_package->getMarkov().empty())
+    if(m_job->getMarkov().empty())
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Package markov is empty! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Job markov is empty! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     std::ifstream markovFile;
-    markovFile.open((Config::markovDir + m_package->getMarkov()).c_str());
+    markovFile.open((Config::markovDir + m_job->getMarkov()).c_str());
     if (!markovFile)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open markov file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open markov file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -180,7 +180,7 @@ bool CAttackMarkov::makeWorkunit()
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
+    wu.delay_bound = m_job->getTimeoutFactor() * (uint32_t)(m_job->getSecondsPerWorkunit());
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
@@ -201,9 +201,9 @@ bool CAttackMarkov::makeWorkunit()
 
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to create BOINC workunit. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to create BOINC workunit. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -212,7 +212,7 @@ bool CAttackMarkov::makeWorkunit()
     m_workunit->setWorkunitId(uint64_t(wu.id));
     m_sqlLoader->addNewWorkunit(m_workunit);
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Workunit succesfully created\n");
     return true;
 }
@@ -220,24 +220,24 @@ bool CAttackMarkov::makeWorkunit()
 
 bool CAttackMarkov::generateWorkunit()
 {
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Generating markov workunit ...\n");
 
     /** Compute password count */
     uint64_t passCount = m_host->getPower() * m_seconds;
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Number of real passwords host could compute: %" PRIu64 "\n", passCount);
 
     if (passCount < Config::minPassCount)
     {
-        Tools::printDebugHost(Config::DebugType::Warn, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
         passCount = Config::minPassCount;
     }
 
-    std::vector<PtrMask> maskVec = m_package->getMasks();
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "Masks left for this package: %" PRIu64 "\n", maskVec.size());
+    std::vector<PtrMask> maskVec = m_job->getMasks();
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "Masks left for this job: %" PRIu64 "\n", maskVec.size());
 
     /** Find the following mask */
     PtrMask currentMask;
@@ -246,7 +246,7 @@ bool CAttackMarkov::generateWorkunit()
         if (mask->getCurrentIndex() < mask->getHcKeyspace())
         {
             /** Mask for a new workunit found */
-            Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                     "Mask found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
                     mask->getMask().c_str(), mask->getCurrentIndex(), mask->getHcKeyspace());
             currentMask = mask;
@@ -257,8 +257,8 @@ bool CAttackMarkov::generateWorkunit()
     if (!currentMask)
     {
         /** No masks found, no workunit could be generated */
-        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                "No masks found for this package\n");
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                "No masks found for this job\n");
         return false;
     }
 
@@ -268,16 +268,16 @@ bool CAttackMarkov::generateWorkunit()
     {
         /** Host is too powerful for this mask, it will finish it */
         passCount = maskHcKeyspace - maskIndex;
-        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                 "Adjusting #passwords, mask too small, new keyspace: %" PRIu64 "\n", passCount);
     }
 
     /** Create new mask workunit */
-    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
+    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
                          currentMask->getId(), 0, false, 0, false);
 
-    /** Update indexes for package and mask*/
-    m_package->updateIndex(m_package->getCurrentIndex() + passCount);
+    /** Update indexes for job and mask*/
+    m_job->updateIndex(m_job->getCurrentIndex() + passCount);
     currentMask->updateIndex(maskIndex + passCount);
 
     return true;

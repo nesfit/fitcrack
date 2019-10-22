@@ -10,9 +10,9 @@
 #include <Config.h>
 
 
-PretermClient::PretermClient(uint64_t packageId)
+PretermClient::PretermClient(uint64_t jobId)
 {
-    uint64_t pcfgPort = 50050 + (packageId % 1000);
+    uint64_t pcfgPort = 50050 + (jobId % 1000);
     std::string pcfgAddress = "localhost:" + std::to_string(pcfgPort);
 
     grpc::ChannelArguments ch_args;

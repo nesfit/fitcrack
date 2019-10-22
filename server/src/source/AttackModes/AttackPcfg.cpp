@@ -10,10 +10,10 @@
 #include <AttackPcfgClient.h>
 
 
-CAttackPcfg::CAttackPcfg(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader)
-        :   AttackMode(package, host, seconds, sqlLoader)
+CAttackPcfg::CAttackPcfg(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+        :   AttackMode(job, host, seconds, sqlLoader)
 {
-    m_client = PretermClient(package->getId());
+    m_client = PretermClient(job->getId());
 }
 
 
@@ -32,16 +32,16 @@ bool CAttackPcfg::makeWorkunit()
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
-    std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_grammar_%" PRIu64 "", Config::appName, m_package->getId());
+    std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_grammar_%" PRIu64 "", Config::appName, m_job->getId());
 
 
     /** Append mode to config */
     retval = config.download_path(name1, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to receive BOINC filename - config. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to receive BOINC filename - config. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -49,17 +49,17 @@ bool CAttackPcfg::makeWorkunit()
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to open config BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to open config BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
-    f << m_package->getConfig();
-    Tools::printDebug(m_package->getConfig().c_str());
+    f << m_job->getConfig();
+    Tools::printDebug(m_job->getConfig().c_str());
 
     /** Output mode */
     f << "|||mode|String|1|n|||\n";
@@ -71,44 +71,44 @@ bool CAttackPcfg::makeWorkunit()
     retval = config.download_path(name2, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to receive BOINC filename - data. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to receive BOINC filename - data. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to open data BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to open data BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    f << m_package->getHashes();
+    f << m_job->getHashes();
     f.close();
 
     /** Create preterminals file. */
     retval = config.download_path(name3, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to receive BOINC filename - dict1. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to receive BOINC filename - dict1. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     std::ofstream outfile(path, std::ofstream::binary);
     if (!outfile)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to open dict1 BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to open dict1 BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                           "Asking for preterminals fragment ...\n");
 
     /** gRPC call to collect preterminals and update current index + keyspace */
@@ -123,7 +123,7 @@ bool CAttackPcfg::makeWorkunit()
 
     if (preterminals.empty() || newKeyspace == 0)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to fetch response from PCFG Manager!\n");
         return true;
     }
@@ -135,7 +135,7 @@ bool CAttackPcfg::makeWorkunit()
     retval = config.download_path(name4, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to receive BOINC filename - grammar. Skipping workunit.\n");
         return true;
     }
@@ -143,22 +143,22 @@ bool CAttackPcfg::makeWorkunit()
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open grammar BOINC input file! Skipping workunit.\n");
         return true;
     }
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                          "Creating grammar file %s\n", (Config::pcfgDir + m_package->getGrammar() + "/grammar.bin").c_str());
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                          "Creating grammar file %s\n", (Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
 
 
     /** Load grammar path from DB and dump it to BOINC input file  */
     std::ifstream grammarFile;
-    grammarFile.open((Config::pcfgDir + m_package->getGrammar() + "/grammar.bin").c_str());
+    grammarFile.open((Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
     if (!grammarFile) {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to open grammar file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to open grammar file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -171,7 +171,7 @@ bool CAttackPcfg::makeWorkunit()
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
+    wu.delay_bound = m_job->getTimeoutFactor() * (uint32_t)(m_job->getSecondsPerWorkunit());
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
@@ -193,29 +193,29 @@ bool CAttackPcfg::makeWorkunit()
 
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                              "Failed to create BOINC workunit. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                              "Failed to create BOINC workunit. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     restrict_wu_to_host(wu, m_workunit->getBoincHostId());
 
     /** Update keyspaces */
-    m_package->updateIndex(m_package->getCurrentIndex() + newKeyspace);
+    m_job->updateIndex(m_job->getCurrentIndex() + newKeyspace);
     m_workunit->setWorkunitId(uint64_t(wu.id));
     m_workunit->setHcKeyspace(newKeyspace);
     m_sqlLoader->addNewWorkunit(m_workunit);
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
 
     /** Check if we reached end of PCFG keyspace */
-    if (m_package->getCurrentIndex() >= m_package->getKeyspace())
+    if (m_job->getCurrentIndex() >= m_job->getKeyspace())
     {
-        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                              "Reached end of keyspace. Setting package to finishing!\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageFinishing);
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                              "Reached end of keyspace. Setting job to finishing!\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobFinishing);
         m_client.Disconnect();
         m_client.Kill();
     }
@@ -226,7 +226,7 @@ bool CAttackPcfg::makeWorkunit()
 
 bool CAttackPcfg::generateWorkunit()
 {
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                           "Generating PCFG workunit ...\n");
 
     /** Compute password count */
@@ -234,16 +234,16 @@ bool CAttackPcfg::generateWorkunit()
 
     if (passCount < Config::minPassCount)
     {
-        Tools::printDebugHost(Config::DebugType::Warn, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                               "Passcount is too small! Falling back to minimum passwords\n");
         passCount = Config::minPassCount;
     }
 
-    if (passCount + m_package->getCurrentIndex() > m_package->getHcKeyspace())
-        passCount = m_package->getHcKeyspace() - m_package->getCurrentIndex();
+    if (passCount + m_job->getCurrentIndex() > m_job->getHcKeyspace())
+        passCount = m_job->getHcKeyspace() - m_job->getCurrentIndex();
 
     /** Create the workunit */
-    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), m_package->getCurrentIndex(), 0, passCount, 0, 0,
+    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), m_job->getCurrentIndex(), 0, passCount, 0, 0,
                          false, 0, false);
 
     /**

@@ -31,9 +31,9 @@ class CWorkunit {
          * @param ... [in] Attributes needed by database
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
-        explicit CWorkunit(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint64_t & startIndex,
-                      uint64_t & startIndex2, uint64_t & hcKeyspace, uint64_t & maskId, uint64_t & dictionaryId,
-                      bool & duplicated, uint64_t & duplicate, bool & retry);
+        explicit CWorkunit(uint64_t &jobId, uint64_t &hostId, uint64_t &boincHostId, uint64_t &startIndex,
+                           uint64_t &startIndex2, uint64_t &hcKeyspace, uint64_t &maskId, uint64_t &dictionaryId,
+                           bool &duplicated, uint64_t &duplicate, bool &retry);
 
     public:
         /** Default destructor */
@@ -52,9 +52,9 @@ class CWorkunit {
          * @param ... [in] Attributes needed by database
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
-        static PtrWorkunit create(uint64_t packageId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
-                             uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
-                             bool duplicated, uint64_t duplicate, bool retry);
+        static PtrWorkunit create(uint64_t jobId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
+                                  uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
+                                  bool duplicated, uint64_t duplicate, bool retry);
 
         /**
          * @brief Get the workunit SQL table name, usually fc_workunit
@@ -69,7 +69,7 @@ class CWorkunit {
          */
 
         uint64_t m_id;
-        uint64_t m_packageId;
+        uint64_t m_jobId;
         uint64_t m_workunitId;
         uint64_t m_hostId;
         uint64_t m_boincHostId;
@@ -97,7 +97,7 @@ public:
          */
 
         uint64_t getId() const;
-        uint64_t getPackageId() const;
+        uint64_t getJobId() const;
         uint64_t getWorkunitId() const;
         uint64_t getHostId() const;
         uint64_t getBoincHostId() const;

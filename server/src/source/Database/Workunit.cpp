@@ -15,7 +15,7 @@ CWorkunit::CWorkunit(DbMap & workunitMap)
     try
     {
         this->m_id = std::stoull(workunitMap["id"]);
-        this->m_packageId = std::stoull(workunitMap["job_id"]);
+        this->m_jobId = std::stoull(workunitMap["job_id"]);
         this->m_workunitId = std::stoull(workunitMap["workunit_id"]);
         this->m_hostId = std::stoull(workunitMap["host_id"]);
         this->m_boincHostId = std::stoull(workunitMap["boinc_host_id"]);
@@ -39,12 +39,12 @@ CWorkunit::CWorkunit(DbMap & workunitMap)
 }
 
 
-CWorkunit::CWorkunit(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint64_t & startIndex,
-           uint64_t & startIndex2, uint64_t & hcKeyspace, uint64_t & maskId, uint64_t & dictionaryId,
-           bool & duplicated, uint64_t & duplicate, bool & retry)
+CWorkunit::CWorkunit(uint64_t &jobId, uint64_t &hostId, uint64_t &boincHostId, uint64_t &startIndex,
+                     uint64_t &startIndex2, uint64_t &hcKeyspace, uint64_t &maskId, uint64_t &dictionaryId,
+                     bool &duplicated, uint64_t &duplicate, bool &retry)
 {
     this->m_id = 0;     /**< ID will be filled by BOINC*/
-    this->m_packageId = packageId;
+    this->m_jobId = jobId;
     this->m_hostId = hostId;
     this->m_boincHostId = boincHostId;
     this->m_workunitId = 0;     /**< WUID will be filled by BOINC */
@@ -62,11 +62,11 @@ CWorkunit::CWorkunit(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHo
 }
 
 
-PtrWorkunit CWorkunit::create(uint64_t packageId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
-                    uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
-                    bool duplicated, uint64_t duplicate, bool retry)
+PtrWorkunit CWorkunit::create(uint64_t jobId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
+                              uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
+                              bool duplicated, uint64_t duplicate, bool retry)
 {
-    return PtrWorkunit(new CWorkunit(packageId, hostId, boincHostId, startIndex, startIndex2, hcKeyspace, maskId, dictionaryId,
+    return PtrWorkunit(new CWorkunit(jobId, hostId, boincHostId, startIndex, startIndex2, hcKeyspace, maskId, dictionaryId,
                            duplicated, duplicate, retry));
 }
 
@@ -95,9 +95,9 @@ uint64_t CWorkunit::getId() const
 }
 
 
-uint64_t CWorkunit::getPackageId() const
+uint64_t CWorkunit::getJobId() const
 {
-    return m_packageId;
+    return m_jobId;
 }
 
 

@@ -9,8 +9,8 @@
 #include <AttackBench.h>
 
 
-CAttackBench::CAttackBench(PtrPackage & package, PtrHost & host, CSqlLoader * sqlLoader)
-    :   AttackMode(package, host, 0, sqlLoader)
+CAttackBench::CAttackBench(PtrJob &job, PtrHost &host, CSqlLoader *sqlLoader)
+    :   AttackMode(job, host, 0, sqlLoader)
 {
 
 }
@@ -33,9 +33,9 @@ bool CAttackBench::makeWorkunit()
     retval = config.download_path(name1, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - config. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - config. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -43,20 +43,20 @@ bool CAttackBench::makeWorkunit()
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open config BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open config BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
-    f << m_package->getConfig();
-    Tools::printDebug(m_package->getConfig().c_str());
+    f << m_job->getConfig();
+    Tools::printDebug(m_job->getConfig().c_str());
 
     /** Output mode */
-    if (m_package->getId() == Config::benchAllId)
+    if (m_job->getId() == Config::benchAllId)
     {
         /** Benchmark all hash types */
         f << "|||mode|String|1|a|||\n";
@@ -73,7 +73,7 @@ bool CAttackBench::makeWorkunit()
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerWorkunit());
+    wu.delay_bound = m_job->getTimeoutFactor() * (uint32_t)(m_job->getSecondsPerWorkunit());
     infiles[0] = name1;
 
     setDefaultWorkunitParams(&wu);
@@ -92,9 +92,9 @@ bool CAttackBench::makeWorkunit()
 
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to create BOINC workunit. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to create BOINC workunit. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -103,7 +103,7 @@ bool CAttackBench::makeWorkunit()
     m_workunit->setWorkunitId(uint64_t(wu.id));
     m_sqlLoader->addNewWorkunit(m_workunit);
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
     return true;
 }
@@ -111,10 +111,10 @@ bool CAttackBench::makeWorkunit()
 
 bool CAttackBench::generateWorkunit()
 {
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Generating benchmark workunit ...\n");
 
     /** Create benchmark workunit */
-    m_workunit = CWorkunit::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), 0, 0, 0, 0, 0, false, 0, false);
+    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), 0, 0, 0, 0, 0, false, 0, false);
     return true;
 }

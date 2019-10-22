@@ -1,6 +1,6 @@
 /**
  * @file Dictionary.h
- * @brief Header file for fc_[package_]dictionary entries
+ * @brief Header file for fc_[job_]dictionary entries
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
@@ -21,7 +21,7 @@ class CDictionary {
     private:
         /**
          * @brief Private constructor, called by create() static function
-         * @param dictMap [in] Map representing fc_[package_]dictionary table entries
+         * @param dictMap [in] Map representing fc_[job_]dictionary table entries
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
          */
         explicit CDictionary(DbMap & dictMap, CSqlLoader * sqlLoader);
@@ -33,14 +33,14 @@ class CDictionary {
 
         /**
          * @brief Creating instance as a shared pointer from database select
-         * @param dictMap [in] Map representing fc_[package_]dictionary table entries
+         * @param dictMap [in] Map representing fc_[job_]dictionary table entries
          * @param sqlLoader [in] Pointer to SqlLoader for database updates
-         * @return Shared pointer to fc_[package_]dictionary entries object
+         * @return Shared pointer to fc_[job_]dictionary entries object
          */
         static PtrDictionary create(DbMap & dictMap, CSqlLoader * sqlLoader);
 
         /**
-        * @brief Get the mask SQL table name, usually fc_package_dictionary
+        * @brief Get the mask SQL table name, usually fc_job_dictionary
         * @return Mask SQL table name
         */
         static std::string getTableName();
@@ -57,11 +57,11 @@ class CDictionary {
         CSqlLoader * m_sqlLoader;         /**< SqlLoader for database updating */
 
         /**
-         * @section Table attributes of fc_[package_]dictionary
+         * @section Table attributes of fc_[job_]dictionary
          */
 
         uint64_t    m_id;
-        uint64_t    m_packageId;
+        uint64_t    m_jobId;
         uint64_t    m_dictionaryId;
         uint64_t    m_currentIndex;
         uint64_t    m_hcKeyspace;
@@ -75,7 +75,7 @@ class CDictionary {
          */
 
         uint64_t getId() const;
-        uint64_t getPackageId() const;
+        uint64_t getJobId() const;
         uint64_t getDictionaryId() const;
         uint64_t getCurrentIndex() const;
         uint64_t getHcKeyspace() const;

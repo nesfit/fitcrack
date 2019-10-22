@@ -329,7 +329,7 @@ fitcrack_sources = \
     Host.h \
     Workunit.h \
     Mask.h \
-    Package.h \
+    Job.h \
     SqlLoader.h \
     AbstractGenerator.h \
     SimpleGenerator.h \
@@ -347,7 +347,7 @@ fitcrack_sources = \
     Host.cpp \
     Workunit.cpp \
     Mask.cpp \
-    Package.cpp \
+    Job.cpp \
     SqlLoader.cpp \
     AbstractGenerator.cpp \
     SimpleGenerator.cpp \

@@ -14,7 +14,7 @@
 
 class CHost;
 class CWorkunit;
-class CPackage;
+class CJob;
 class CMask;
 class CDictionary;
 
@@ -33,55 +33,55 @@ class CSqlLoader {
         ~CSqlLoader();
 
         /**
-         * @brief Loads running packages from database
-         * @return Vector of PtrPackage instances from fc_package (status >= 10)
+         * @brief Loads running jobs from database
+         * @return Vector of PtrJob instances from fc_job (status >= 10)
          */
-        std::vector<Config::Ptr<CPackage>> loadRunningPackages();
+        std::vector<Config::Ptr<CJob>> loadRunningJobs();
 
         /**
          * @brief Loads all active hosts
          * @return All rows in fc_host table
          */
-        std::vector<Config::Ptr<CHost>> loadActiveHosts(uint64_t packageId);
+        std::vector<Config::Ptr<CHost>> loadActiveHosts(uint64_t jobId);
 
         /**
-         * Loads all hosts which package is not running
+         * Loads all hosts whose job is not running
          * @return Vector of finished hosts
          */
         std::vector<Config::Ptr<CHost>> loadFinishedHosts();
 
         /**
-         * @brief Removes finished/exhausted package hosts from fc_host
+         * @brief Removes finished/exhausted job hosts from fc_host
          */
         void removeFinishedHosts();
 
         /**
-         * @brief Checks if any running packages have passed time_end and sets them to finishing state
+         * @brief Checks if any running jobs have passed time_end and sets them to finishing state
          */
-        void finishTimeoutPackages();
+        void finishTimeoutJobs();
 
         /**
-         * @brief Return number of benchmark entries for package-host combo
-         * @param packageId [in] Package parent of this workunit
+         * @brief Return number of benchmark entries for job-host combo
+         * @param jobId [in] Job parent of this workunit
          * @param hostId [in] Benchmark owner
          * @return Number of benchmarks, usually 0 if no benchmark is present, 1 otherwise
          */
-        uint64_t getBenchCount(uint64_t packageId, uint64_t hostId);
+        uint64_t getBenchCount(uint64_t jobId, uint64_t hostId);
 
         /**
-         * @brief Return number of workunits in fc_workunit for supplied package-host combo
-         * @param packageId Package ID used to filtering
+         * @brief Return number of workunits in fc_workunit for supplied job-host combo
+         * @param jobId Job ID used to filtering
          * @param hostId Host ID used for filtering
          * @return Number of workunit entries
          */
-        uint64_t getWorkunitCount(uint64_t packageId, uint64_t hostId);
+        uint64_t getWorkunitCount(uint64_t jobId, uint64_t hostId);
 
         /**
-         * @brief Return number of workunits in fc_workunit for supplied package
-         * @param packageId Package ID used for filtering
+         * @brief Return number of workunits in fc_workunit for supplied job
+         * @param jobId Job ID used for filtering
          * @return Number of workunit entries
          */
-        uint64_t getWorkunitCount(uint64_t packageId);
+        uint64_t getWorkunitCount(uint64_t jobId);
 
         /**
          * @brief Sets database entry of workunit with supplied ID to finished == 1
@@ -90,11 +90,11 @@ class CSqlLoader {
         void setWorkunitFinished(uint64_t id);
 
         /**
-         * @brief Gets workunit from database with supplied packageId and retry set to 1
-         * @param packageId ID of package of the workunit we are looking for
+         * @brief Gets workunit from database with supplied jobId and retry set to 1
+         * @param jobId ID of job of the workunit we are looking for
          * @return Pointer to workunit, created from database entry
          */
-        Config::Ptr<CWorkunit> getEasiestRetry(uint64_t packageId);
+        Config::Ptr<CWorkunit> getEasiestRetry(uint64_t jobId);
 
         /**
          * @brief Updates status of a host in fc_host table
@@ -111,47 +111,47 @@ class CSqlLoader {
         void updateMaskIndex(uint64_t maskId, uint64_t newIndex);
 
         /**
-         * @brief Updates current_index of fc_package_dictionary entry
-         * @param dictId [in] ID of package_dictionary entry
+         * @brief Updates current_index of fc_job_dictionary entry
+         * @param dictId [in] ID of job_dictionary entry
          * @param newIndex [in] New index value
          */
         void updateDictionaryIndex(uint64_t dictId, uint64_t newIndex);
 
         /**
-         * @brief Updates current_index of fc_package entry
-         * @param packageId [in] ID of the package entry
+         * @brief Updates current_index of fc_job entry
+         * @param jobId [in] ID of the job entry
          * @param newIndex [in] New index value
          */
-        void updatePackageIndex(uint64_t packageId, uint64_t newIndex);
+        void updateJobIndex(uint64_t jobId, uint64_t newIndex);
 
         /**
-         * @brief Updates current_index_2 of fc_package entry
-         * @param packageId [in] ID of package entry
+         * @brief Updates current_index_2 of fc_job entry
+         * @param jobId [in] ID of job entry
          * @param newIndex2 [in] New index value
          */
-        void updatePackageIndex2(uint64_t packageId, uint64_t newIndex2);
+        void updateJobIndex2(uint64_t jobId, uint64_t newIndex2);
 
         /**
          * @brief Update status of fc_pacakge entry
-         * @param packageId [in] ID of package entry
+         * @param jobId [in] ID of job entry
          * @param newStatus [in] New status value
          */
-        void updatePackageStatus(uint64_t packageId, uint32_t newStatus);
+        void updateJobStatus(uint64_t jobId, uint32_t newStatus);
 
         /**
-         * @brief Update status of RUNNING fc_package entry, otherwise, does nothing
-         * @param packageId [in] ID of package entry
+         * @brief Update status of RUNNING fc_job entry, otherwise, does nothing
+         * @param jobId [in] ID of job entry
          * @param newStatus [in] New status value
-         * @note This is used for SQL atomic swap, so stopped package won't be switched to >= 10 by mistake
+         * @note This is used for SQL atomic swap, so stopped job won't be switched to >= 10 by mistake
          */
-        void updateRunningPackageStatus(uint64_t packageId, uint32_t newStatus);
+        void updateRunningJobStatus(uint64_t jobId, uint32_t newStatus);
 
         /**
-         * @brief Returns if package with supplied ID has passed time_end
-         * @param packageId ID of package to check
-         * @return True if now() is greater than time_end of supplied package, False otherwise
+         * @brief Returns if job with supplied ID has passed time_end
+         * @param jobId ID of job to check
+         * @return True if now() is greater than time_end of supplied job, False otherwise
          */
-        bool isPackageTimeout(uint64_t packageId);
+        bool isJobTimeout(uint64_t jobId);
 
         /**
          * @brief Inserts new workunit to fc_workunit table
@@ -168,44 +168,43 @@ class CSqlLoader {
         /**
          * Returns fresh host status from DB
          * @param host_id ID of the host
-         * @param package_id ID of the package
          * @return status column form fc_host
          */
         uint32_t getHostStatus(uint64_t host_id);
 
         /**
-         * @brief Set time_start of package with supplied packageId to now(), only if it is currently NULL
+         * @brief Set time_start of job with supplied jobId to now(), only if it is currently NULL
          * Otherwise does nothing
-         * @param packageId Package ID to which set time_start
+         * @param jobId Job ID to which set time_start
          */
-        void updateStartTimeNow(uint64_t packageId);
+        void updateStartTimeNow(uint64_t jobId);
 
         /**
-         * @brief Set time_end of package with supplied packageId to now()
-         * @param packageId Package ID to which set time_end
+         * @brief Set time_end of job with supplied jobId to now()
+         * @param jobId Job ID to which set time_end
          */
-        void updateEndTimeNow(uint64_t packageId);
+        void updateEndTimeNow(uint64_t jobId);
 
         /**
-         * @brief Returns vector of masks which are not exhausted and belongs to supplied package
-         * @param packageId Package ID which masks we search for
+         * @brief Returns vector of masks which are not exhausted and belongs to supplied job
+         * @param jobId Job ID which masks we search for
          * @return Vector of smart pointers to found masks
          */
-        std::vector<Config::Ptr<CMask>> loadPackageMasks(uint64_t packageId);
+        std::vector<Config::Ptr<CMask>> loadJobMasks(uint64_t jobId);
 
         /**
-         * @brief Returns vector of dictionaries which are not exhausted and belongs to supplied package
-         * @param packageId Package ID which dictionaries we search for
+         * @brief Returns vector of dictionaries which are not exhausted and belongs to supplied job
+         * @param jobId Job ID which dictionaries we search for
          * @return Vector of smart pointers to found dictionaries
          */
-        std::vector<Config::Ptr<CDictionary>> loadPackageDictionaries(uint64_t packageId);
+        std::vector<Config::Ptr<CDictionary>> loadJobDictionaries(uint64_t jobId);
 
         /**
          * @brief Returns vector of hashes as strings, possibly even binary ones
-         * @param packageId Package ID which hashes we search for
+         * @param jobId Job ID which hashes we search for
          * @return Vector of strings=hashes
          */
-        std::vector<std::string> loadPackageHashes(uint64_t packageId);
+        std::vector<std::string> loadJobHashes(uint64_t jobId);
 
         /**
          * @brief Loads mask object from database with supplied ID
@@ -216,17 +215,17 @@ class CSqlLoader {
 
         /**
          * @brief Loads dictionary object from database with supplied ID
-         * @param dictId ID of the dictionary in fc_package_dictionary table
+         * @param dictId ID of the dictionary in fc_job_dictionary table
          * @return Loaded dictionary object
          */
         Config::Ptr<CDictionary> loadDictionary(uint64_t dictId);
 
         /**
-         * @brief Loads package object from database with supplied ID
-         * @param packageId ID of the package in DB
-         * @return Loaded package object
+         * @brief Loads job object from database with supplied ID
+         * @param jobId ID of the job in DB
+         * @return Loaded job object
          */
-        Config::Ptr<CPackage> loadPackage(uint64_t packageId);
+        Config::Ptr<CJob> loadJob(uint64_t jobId);
 
         /**
          * @brief Sets grammar object from database with supplied ID
@@ -237,17 +236,17 @@ class CSqlLoader {
 
         /**
          * @brief Returns number of seconds between time_start column and now()
-         * @param packageId ID of package from fc_package
+         * @param jobId ID of job from fc_job
          * @return Number of seconds
          */
-        uint64_t getSecondsPassed(uint64_t packageId);
+        uint64_t getSecondsPassed(uint64_t jobId);
 
         /**
-         * @brief Computes sum of power of hosts working on supplied package
-         * @param packageId ID of package we work with
+         * @brief Computes sum of power of hosts working on supplied job
+         * @param jobId ID of job we work with
          * @return Sum of host power
          */
-        uint64_t getTotalPower(uint64_t packageId);
+        uint64_t getTotalPower(uint64_t jobId);
 
         /**
          * @brief Returns name of dictionary with supplied ID
@@ -257,11 +256,11 @@ class CSqlLoader {
         std::string getDictFileName(uint64_t dictId);
 
         /**
-         * @brief Checks if any package hashes are cracked
-         * @param packageId ID of the package
+         * @brief Checks if any job hashes are cracked
+         * @param jobId ID of the job
          * @return True if any hashes with not-null result found, False otherwise
          */
-        bool isAnythingCracked(uint64_t packageId);
+        bool isAnythingCracked(uint64_t jobId);
 
 private:
 
@@ -282,7 +281,7 @@ private:
         /**
          * @brief Adds missing active hosts to fc_host
          */
-        void addNewHosts(uint64_t packageId);
+        void addNewHosts(uint64_t jobId);
 
         /**
          * Returns number from database select
@@ -293,7 +292,7 @@ private:
 
         /**
          * @brief This is template function for loading different objects from database
-         * @tparam T This can be CHost, CWorkunit, CMask, CPackage and CDictionary
+         * @tparam T This can be CHost, CWorkunit, CMask, CJob and CDictionary
          * @param filter [in] An SQL filter which follows select
          * @return Vector of smart pointers to instantiated objects
          * @note Implementation must be in header file, see https://stackoverflow.com/a/8752879
@@ -360,7 +359,7 @@ private:
         /**
          * @brief Similar to load function but supports more difficult queries
          * which qrequire JOINS or selecting non-* columns
-         * @tparam T This can be CHost, CWorkunit, CMask, CPackage and CDictionary
+         * @tparam T This can be CHost, CWorkunit, CMask, CJob and CDictionary
          * @param filter [in] A complete SQL query
          * @return Vector of smart pointers to instantiated objects
          * @note Implementation must be in header file, see https://stackoverflow.com/a/8752879

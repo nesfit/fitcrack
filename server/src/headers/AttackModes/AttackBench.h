@@ -16,10 +16,10 @@ class CAttackBench : public AttackMode {
     public:
         /**
          * @brief Constructor for Benchmark Workunit
-         * @param package [in] Instance of CPackage which is parent of this workunit instance
+         * @param job [in] Instance of CJob which is parent of this workunit instance
          * @param host [in] Instance of CHost which this workunit belongs to
          */
-        CAttackBench(PtrPackage & package, PtrHost & host, CSqlLoader * sqlLoader);
+        CAttackBench(PtrJob &job, PtrHost &host, CSqlLoader *sqlLoader);
 
         /**
          * @brief Default destructor

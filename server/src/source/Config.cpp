@@ -24,7 +24,7 @@ namespace Config {
     /** Table names, for easy configuration */
     std::string tableNameBenchmark =    "fc_benchmark";
     std::string tableNameWorkunit =     "fc_workunit";
-    std::string tableNamePackage =      "fc_job";
+    std::string tableNameJob =          "fc_job";
     std::string tableNameHost =         "fc_host";
     std::string tableNameHostActivity = "fc_host_activity";
     std::string tableNameMask =         "fc_mask";
@@ -86,7 +86,7 @@ void Tools::printDebugTimestamp(const char *format, ...)
 }
 
 
-void Tools::printDebugPackage(Config::DebugType type, uint64_t packageId, const char *format, ...)
+void Tools::printDebugJob(Config::DebugType type, uint64_t jobId, const char *format, ...)
 {
     std::stringstream tmpStream;
     switch (type)
@@ -105,7 +105,7 @@ void Tools::printDebugPackage(Config::DebugType type, uint64_t packageId, const 
 
     std::time_t timeNow = std::time(nullptr);
     tmpStream << std::put_time(std::localtime(&timeNow), "%d.%m.%Y %H:%M:%S ");
-    tmpStream << "[Package #" << packageId << "] ";
+    tmpStream << "[Job #" << jobId << "] ";
 
     std::cerr << tmpStream.str();
 
@@ -151,7 +151,7 @@ void Tools::printDebugPackage(Config::DebugType type, uint64_t packageId, const 
 
 
 
-void Tools::printDebugHost(Config::DebugType type, uint64_t packageId, uint64_t hostId, const char *format, ...)
+void Tools::printDebugHost(Config::DebugType type, uint64_t jobId, uint64_t hostId, const char *format, ...)
 {
     std::stringstream tmpStream;
     switch (type)
@@ -170,7 +170,7 @@ void Tools::printDebugHost(Config::DebugType type, uint64_t packageId, uint64_t 
 
     std::time_t timeNow = std::time(nullptr);
     tmpStream << std::put_time(std::localtime(&timeNow), "%d.%m.%Y %H:%M:%S ");
-    tmpStream << "[Package #" << packageId << "][Host #" << hostId << "] ";
+    tmpStream << "[Job #" << jobId << "][Host #" << hostId << "] ";
 
     std::cerr << tmpStream.str();
 
@@ -224,18 +224,18 @@ void Tools::printDbMap(DbMap & map)
 }
 
 
-std::ifstream * Tools::getStream(uint64_t packageId, uint64_t dictId, std::string dictFileName)
+std::ifstream * Tools::getStream(uint64_t jobId, uint64_t dictId, std::string dictFileName)
 {
     /** Search for opened file descriptor */
     for(auto & entry : m_fd_map)
     {
-        if(entry.first.first == packageId && entry.first.second == dictId)
+        if(entry.first.first == jobId && entry.first.second == dictId)
             return entry.second;
     }
 
     /** Open a new one */
     auto newStream = new std::ifstream(Config::dictDir + dictFileName);
-    m_fd_map.insert(std::make_pair(std::pair<uint64_t, uint64_t >(packageId, dictId), newStream));
+    m_fd_map.insert(std::make_pair(std::pair<uint64_t, uint64_t >(jobId, dictId), newStream));
     return newStream;
 }
 

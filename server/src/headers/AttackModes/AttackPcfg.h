@@ -19,11 +19,11 @@ class CAttackPcfg : public AttackMode {
     public:
         /**
          * @brief Constructor for PCFG Attack
-         * @param package [in] Instance of CPackage which is parent of this attack instance
+         * @param job [in] Instance of CJob which is parent of this attack instance
          * @param host [in] Instance of CHost which this attack belongs to
          * @param seconds [in] Number of seconds this instance of attack should take
          */
-        CAttackPcfg(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader);
+        CAttackPcfg(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
 
         /**
          * @brief Default destructor

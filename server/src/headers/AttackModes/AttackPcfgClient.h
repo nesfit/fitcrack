@@ -34,7 +34,7 @@ class PretermClient {
 public:
 
     PretermClient() = default;
-    explicit PretermClient(uint64_t packageId);
+    explicit PretermClient(uint64_t jobId);
 
     /**
      * Ask for next batch of preterminals

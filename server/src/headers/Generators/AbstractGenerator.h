@@ -14,7 +14,7 @@
 #include <Host.h>
 #include <Workunit.h>
 #include <Mask.h>
-#include <Package.h>
+#include <Job.h>
 
 
 class CAbstractGenerator
@@ -32,7 +32,7 @@ class CAbstractGenerator
          * Calculates duration of workunit according to adaptive algorithm presented on ICDF2C
          * @return Number of seconds for a workunit
          */
-        uint64_t calculateSecondsIcdf2c(PtrPackage & package);
+        uint64_t calculateSecondsIcdf2c(PtrJob &job);
 
         /**
          * @brief Wait for the transitioner to create instances of the workunits we just created.
@@ -41,10 +41,10 @@ class CAbstractGenerator
         void activateJobs();
 
         /**
-         * @brief Send all package host a message to delete package sticky files
-         * @param package CPackage which is done
+         * @brief Send all job host a message to delete job sticky files
+         * @param job CJob which is done
          */
-        void deleteStickyFiles(PtrPackage & package, std::vector<PtrHost> & packageHosts);
+        void deleteStickyFiles(PtrJob &job, std::vector<PtrHost> &jobHosts);
 };
 
 #endif //WORKGENERATOR_ABSTRACTGENERATOR_H
