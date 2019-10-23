@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <fc-tile title="PCFG and rules">
+  <fc-tile title="PCFG info">
     <v-list
       single-line
       class="width100"
@@ -19,12 +19,12 @@
           slot="items"
           slot-scope="props"
         >
-          <td>{{ props.item.pcfg_grammar.name }}</td>
+          <td>{{ props.item.pcfg.name }}</td>
           <td class="text-right">
-            {{ props.item.pcfg_grammar.keyspace }}
+            {{ props.item.pcfg.keyspace }}
           </td>
           <td class="text-right">
-            {{ $moment(props.item.pcfg_grammar.time_added ).format('DD.MM.YYYY HH:mm') }}
+            {{ $moment(props.item.pcfg.time_added ).format('DD.MM.YYYY HH:mm') }}
           </td>
           <td class="text-right">
             <v-tooltip top>
@@ -32,7 +32,7 @@
                 <v-btn
                   icon
                   class="mx-0"
-                  :to="{name: 'pcfgDetail', params: { id: props.item.pcfg_grammar.id}}"
+                  :to="{name: 'pcfgDetail', params: { id: props.item.pcfg.id}}"
                   v-on="on"
                 >
                   <v-icon color="primary">

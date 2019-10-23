@@ -337,7 +337,7 @@
               :data="data"
             />
             <pcfgDetail
-              v-else-if="data.attack === 'PCFG'"
+              v-else-if="data.attack === 'pcfg'"
               class="max500"
               :data="data"
             />

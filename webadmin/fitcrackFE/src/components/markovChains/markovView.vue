@@ -8,7 +8,7 @@
     <fc-tile
       title="Markov chains"
       class="ma-2"
-      :icon="$route.meta.item"
+      :icon="$route.meta.icon"
     >
       <v-alert
         tile

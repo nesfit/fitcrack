@@ -24,8 +24,8 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'PCFGs per page'}"
       >
-        <template v-slot:item.time="{ item }">
-          {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+        <template v-slot:item.time_added="{ item }">
+          {{ $moment(item.time_added).format('DD.MM.YYYY HH:mm') }}
         </template>
         <template v-slot:item.actions="{ item }">
           <v-tooltip top>
@@ -103,7 +103,8 @@
             align: 'left',
             value: 'name'
           },
-          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Keyspace', value: 'keyspace', align: 'start'},
+          {text: 'Added', value: 'time_added', align: 'end'},
           {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ],
         pcfg: []

@@ -15,6 +15,7 @@
     >
       <v-row
         v-for="(mask, i) in masks"
+        :key="i"
         align="center"
         class="width100 fill-height"
       >
@@ -76,6 +77,7 @@
         </v-card-title>
         <markov-selector
           v-model="markov"
+          :markov-submode="markovSubmode"
           @input="checkValid"
         />
 
@@ -87,20 +89,17 @@
             <v-radio-group
               v-model="markovSubmode"
               column
-              :disabled="markov === null"
               @change="checkValid"
             >
               <v-radio
                 label="2D Markov"
                 color="primary"
                 :value="1"
-                :disabled="markov === null"
               />
               <v-radio
                 label="3D Markov"
                 color="primary"
                 :value="2"
-                :disabled="markov === null"
               />
             </v-radio-group>
           </v-col>
@@ -110,8 +109,8 @@
           >
             <v-text-field
               v-model="markovTreshold"
-              type="tel"
-              :disabled="markov === null"
+              type="number"
+              :disabled="markovSubmode === 0"
               label="Markov treshold"
               single-line
               mask="########"
@@ -171,7 +170,7 @@
     data: function () {
       return {
         loadMasksDialog: false,
-        markovSubmode: 0,
+        markovSubmode: 2,
         attackId: 3,
         attackName: 'mask',
         markovTreshold: '',

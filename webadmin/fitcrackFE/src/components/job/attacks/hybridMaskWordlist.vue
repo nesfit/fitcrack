@@ -105,6 +105,7 @@
         mask: '',
         ruleLeft: '',
         ruleRight: '',
+        charsets:null,
         maskRules: [
           v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
         ]

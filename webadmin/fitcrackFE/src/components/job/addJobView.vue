@@ -306,7 +306,7 @@
               <v-tab
                 @click="attackTabChanged($refs.DictAttack)"
               >
-                Dictionary attack
+                Dictionary
               </v-tab>
               <v-tab-item>
                 <v-card text>
@@ -319,7 +319,7 @@
               <v-tab
                 @click="attackTabChanged($refs.CombAttack)"
               >
-                Combination attack
+                Combination
               </v-tab>
               <v-tab-item>
                 <v-card text>
@@ -332,7 +332,7 @@
               <v-tab
                 @click="attackTabChanged($refs.BruteAttack)"
               >
-                Brute-force attack
+                Brute-force
               </v-tab>
               <v-tab-item>
                 <v-card text>

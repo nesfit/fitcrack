@@ -202,7 +202,7 @@
             slot-scope="props"
           >
             <router-link
-              :to="{ name: 'jobDetail', params: { id: props.item.package_id}}"
+              :to="{ name: 'jobDetail', params: { id: props.item.job_id}}"
               class="middle"
             >
               <td>{{ props.item.job.name }}</td>
@@ -249,7 +249,7 @@
       return {
         data: null,
         workunitsHeader: [
-          {text: 'Package', align: 'left', value: 'package_id'},
+          {text: 'Job', align: 'left', value: 'job_id'},
           {text: 'Cracking time', align: 'left', value: 'cracking_time'},
           {text: 'Generated', align: 'right', value: 'time'},
           {text: 'Start index', align: 'right', value: 'start_index'},

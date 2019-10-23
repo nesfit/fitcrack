@@ -13,22 +13,10 @@
         max-width="500"
       >
         <v-card-title>
-          <h3> My info </h3>
+          {{ username }}
         </v-card-title>
         <v-card-text>
-          <v-form
-            ref="form"
-            lazy-validation
-          >
-            <v-text-field
-              label="username"
-              :value="username"
-            />
-            <v-text-field
-              label="email"
-              :value="mail"
-            />
-          </v-form>
+          {{ mail }}
         </v-card-text>
       </v-card>
     </v-row>
@@ -38,7 +26,7 @@
         max-width="500"
       >
         <v-card-title>
-          <h3> Change password </h3>
+          Change password
         </v-card-title>
         <v-card-text>
           <v-form
@@ -48,7 +36,7 @@
             <v-text-field
               v-model="oldPassword"
               type="password"
-              label="Old password"
+              label="Current password"
               required
             />
             <v-text-field
@@ -60,7 +48,7 @@
             <v-text-field
               v-model="newPassword1"
               type="password"
-              label="New password"
+              label="Confirm new password"
               required
             />
           </v-form>
@@ -99,13 +87,7 @@
           return window.theme.gradient
         }
       },
-
       methods: {
-    /*    loadUsername() {
-          this.axios.get(this.$serverAddr + '/user/').then((response) => {
-            this.username = response.data.items
-          })
-        },*/
         editPassword() {
           this.axios.post(this.$serverAddr + '/user/password/change_my_password', {
             old_password: this.oldPassword,

@@ -10,7 +10,7 @@
     :items="items"
     :search="search"
     item-key="id"
-    show-select
+    :show-select="markovSubmode != 0"
     :single-select="!selectAll"
     @input="updateSelected"
   >
@@ -29,6 +29,10 @@
       value: {
         type: Object,
         default: () => ({})
+      },
+      markovSubmode: {
+        type: Number,
+        default: 2
       }
     },
     data() {
