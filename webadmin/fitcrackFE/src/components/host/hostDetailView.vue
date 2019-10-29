@@ -7,18 +7,13 @@
   <div>
     <v-breadcrumbs
       v-if="data != null"
+      :items="
+        [
+          { text: 'Hosts', to: { name : 'hosts' }, exact: true },
+          { text: data.domain_name }
+        ]"
       divider="/"
-      class="pb-0"
-    >
-      <v-breadcrumbs-item>
-        <router-link :to="{name: 'hosts'}">
-          Hosts
-        </router-link>
-      </v-breadcrumbs-item>
-      <v-breadcrumbs-item>
-        {{ data.domain_name }}
-      </v-breadcrumbs-item>
-    </v-breadcrumbs>
+    />
 
     <v-container>
       <fc-tile

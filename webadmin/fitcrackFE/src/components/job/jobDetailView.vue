@@ -17,17 +17,12 @@
     <div v-else>
       <v-breadcrumbs
         divider="/"
-        class="pb-0"
-      >
-        <v-breadcrumbs-item>
-          <router-link :to="{name: 'jobs'}">
-            Jobs
-          </router-link>
-        </v-breadcrumbs-item>
-        <v-breadcrumbs-item>
-          {{ data.name }}
-        </v-breadcrumbs-item>
-      </v-breadcrumbs>
+        :items="
+          [
+            { text: 'Jobs', to: { name: 'jobs' }, exact: true },
+            { text: data.name }
+          ]"
+      />
       <div>
         <v-row justify="center">
           <div class="px-2 max100">

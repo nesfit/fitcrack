@@ -7,18 +7,13 @@
   <div>
     <v-breadcrumbs
       v-if="info != null"
+      :items="
+        [
+          { text: 'Dictionaries', to: { name: 'dictionaries' }, exact: true },
+          { text: info.name }
+        ]"
       divider="/"
-      class="pb-0"
-    >
-      <v-breadcrumbs-item>
-        <router-link :to="{name: 'dictionaries'}">
-          Dictionaries
-        </router-link>
-      </v-breadcrumbs-item>
-      <v-breadcrumbs-item>
-        {{ info.name }}
-      </v-breadcrumbs-item>
-    </v-breadcrumbs>
+    />
 
     <v-container>
       <v-row justify="center">
