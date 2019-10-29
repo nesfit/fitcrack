@@ -4,31 +4,25 @@
 -->
 
 <template>
-  <v-row class="mx-auto elevation-2">
-    <v-toolbar
-      flat
-      class="max64"
-    >
-      <v-toolbar-title class="d-flex align-center">
-        <v-icon 
-          v-if="icon"
-          left
-        >
-          {{ icon }}
-        </v-icon>
-        {{ title }}
-      </v-toolbar-title>
-    </v-toolbar>
-
-    <div class="contentFcTile">
+  <v-card class="mx-auto">
+    <v-card-title>
+      <v-icon 
+        v-if="icon"
+        left
+      >
+        {{ icon }}
+      </v-icon>
+      {{ title }}
+    </v-card-title>
+    <v-card-text class="contentFcTile">
       <v-skeleton-loader
         v-if="loading"
         class="mx-auto"
         type="article"
       />
       <slot v-else />
-    </div>
-  </v-row>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -53,6 +47,7 @@
     position: relative;
     min-height: 100px;
     width: 100%;
+    padding: 0;
   }
 
   .progress {

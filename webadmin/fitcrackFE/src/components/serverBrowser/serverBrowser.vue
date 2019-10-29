@@ -6,12 +6,13 @@
 <template>
   <fc-tile
     title="Server browser"
-    :loading="data==null || adding"
+    icon="mdi-server-network"
     class="mx-auto dictContentContainer"
   >
     <v-list
       v-if="data!==null"
       tile
+      nav
       class="filesCont"
     >
       <v-list-item
@@ -59,8 +60,8 @@
         </v-list-item-content>
       </v-list-item>
     </v-list>
-    <v-divider />
     <div v-if="Object.keys(selectedFiles).length > 0">
+      <v-divider />
       <v-card-title>Selected files:</v-card-title>
       <v-card-text
         v-for="item in selectedFiles"
@@ -99,7 +100,7 @@
     },
     methods: {
       loadDirectory: function (path) {
-        this.data = null
+        // this.data = null
         this.axios.get(this.$serverAddr + '/directory', {
           params: {
             path: path
@@ -156,6 +157,7 @@
 
 
   .filesCont {
+    height: max-content;
     max-height: 500px;
     overflow: auto;
   }
