@@ -19,64 +19,49 @@
       <fc-tile
         title="Host info"
         :loading="data==null"
-        class=" dictContentContainer mb-5"
+        class=" max800 mb-5"
       >
-        <v-list
-          v-if="data != null"
-          single-line
-          class="width100"
-        >
-          <v-list-item class="px-2 py-1">
-            <v-list-item-action class="pr-3 key">
-              Name:
-            </v-list-item-action>
+        <v-list v-if="data != null">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-desktop-classic</v-icon>
+            </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="text-right">
+              <v-list-item-title>
                 {{ data.domain_name }}
               </v-list-item-title>
+              <v-list-item-subtitle>
+                User: {{ data.user.name }}
+              </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
-          <v-divider />
-          <v-list-item class="px-2 py-1">
-            <v-list-item-action class="pr-3 key">
-              User:
-            </v-list-item-action>
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>{{ getOsIcon(data.os_name) }}</v-icon>
+            </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="text-right">
-                {{ data.user.name }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-divider />
-          <v-list-item class="px-2 py-1">
-            <v-list-item-action class="pr-3 key">
-              Operation system:
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title class="text-right">
+              <v-list-item-title>
                 {{ data.os_name }}
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-divider />
-          <v-list-item class="px-2 py-1">
-            <v-list-item-action class="pr-3 key">
-              Processor:
-            </v-list-item-action>
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-memory</v-icon>
+            </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="text-right">
+              <v-list-item-title>
                 {{ data.p_model }}
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <v-divider />
       </fc-tile>
 
 
       <fc-tile
         title="Jobs"
-        class="max800 mb-5"
+        class="mb-5"
         :loading="data === null"
       >
         <v-data-table
@@ -85,95 +70,99 @@
           :items="data.jobs"
           :footer-props="{itemsPerPageOptions: [10,25,50,100], itemsPerPageText: 'Jobs per page'}"
         >
-          <template
-            slot="items"
-            slot-scope="props"
-          >
+          <!-- Job name cell -->
+          <template v-slot:item.name="{ item }">
             <router-link
-              :to="{ name: 'jobDetail', params: { id: props.item.id}}"
+              :to="{ name: 'jobDetail', params: { id: item.id } }"
               class="middle"
             >
-              <td>{{ props.item.name }}</td>
+              {{ item.name }}
             </router-link>
-            <td class="text-right">
-              {{ props.item.attack }}
-            </td>
-            <td
-              class="text-right"
-              :class="props.item.status_type + '--text'"
-            >
-              {{ props.item.status_text }}
-            </td>
-            <td class="text-right">
+          </template>
+          <!-- Status text cell -->
+          <template v-slot:item.status="{ item }">
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <span
+                  :class="item.status_type + '--text'"
+                  v-on="on"
+                >
+                  {{ item.status_text }}
+                </span>
+              </template>
+              <span>{{ item.status_tooltip }}</span>
+            </v-tooltip>
+          </template>
+          <!-- Progress indicator cell -->
+          <template v-slot:item.progress="{ item }">
+            <div class="d-flex align-center justify-end">
+              <span class="mr-2">{{ progressToPercentage(item.progress) }}</span>
               <v-progress-circular
-                size="35"
-                :width="1.5"
+                size="18"
+                :width="3"
                 :rotate="270"
                 color="primary"
                 class="jobProgress"
-                :value="props.item.progress"
-              >
-                <span class="progressPercentage">{{ progressToPercentage(props.item.progress) }}</span>
-              </v-progress-circular>
-            </td>
-            <td class="text-right">
-              {{ $moment(props.item.time).format('D.M.YYYY H:mm:ss') }}
-            </td>
-            <td class="text-right">
-              {{ props.item.password }}
-            </td>
-            <td>
-              <div class="d-flex text-right actionsBtns">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      icon
-                      class="mx-0"
-                      :disabled=" props.item.status !== '0'"
-                      v-on="on"
-                      @click="operateJob(props.item.id, 'start')"
-                    >
-                      <v-icon color="success">
-                        play_circle_outlined
-                      </v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Start job</span>
-                </v-tooltip>
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      icon
-                      class="mx-0"
-                      :disabled=" props.item.status >= 10"
-                      v-on="on"
-                      @click="operateJob(props.item.id, 'restart')"
-                    >
-                      <v-icon color="info">
-                        loop
-                      </v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Restart job</span>
-                </v-tooltip>
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      icon
-                      class="mx-0"
-                      :disabled=" props.item.status !== '10'"
-                      v-on="on"
-                      @click="operateJob(props.item.id, 'stop')"
-                    >
-                      <v-icon color="error">
-                        pause_circle_outlined
-                      </v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Stop job</span>
-                </v-tooltip>
-              </div>
-            </td>
+                :value="item.progress"
+              />
+            </div>
+          </template>
+          <!-- Date added cell -->
+          <template v-slot:item.time="{ item }">
+            {{ $moment(item.time).format('D.M.YYYY H:mm:ss') }}
+          </template>
+          <!-- Action buttons cell -->
+          <template v-slot:item.actions="{ item }">
+            <div class="d-flex justify-end actionsBtns">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    icon
+                    class="mx-0"
+                    :disabled="item.status !== '0'"
+                    v-on="on"
+                    @click="operateJob(item.id, 'start')"
+                  >
+                    <v-icon color="success">
+                      mdi-play-circle
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <span>Start job</span>
+              </v-tooltip>
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    icon
+                    class="mx-0"
+                    :disabled="item.status !== '10'"
+                    v-on="on"
+                    @click="operateJob(item.id, 'stop')"
+                  >
+                    <v-icon color="error">
+                      mdi-pause-circle
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <span>Stop job</span>
+              </v-tooltip>
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    icon
+                    class="mx-0"
+                    :disabled="item.status >= 10"
+                    v-on="on"
+                    @click="operateJob(item.id, 'restart')"
+                  >
+                    <v-icon color="info">
+                      mdi-restart
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <span>Restart job</span>
+              </v-tooltip>
+            </div>
           </template>
         </v-data-table>
       </fc-tile>
@@ -192,40 +181,22 @@
           :items="data.workunits"
           class="width100"
         >
-          <template
-            slot="items"
-            slot-scope="props"
-          >
+          <template v-slot:item.job_id="{ item }">
             <router-link
-              :to="{ name: 'jobDetail', params: { id: props.item.job_id}}"
+              :to="{ name: 'jobDetail', params: { id: item.job_id}}"
               class="middle"
             >
-              <td>{{ props.item.job.name }}</td>
+              {{ item.job.name || 'Detail' }}
             </router-link>
-            <td>{{ props.item.cracking_time_str }}</td>
-            <td class="text-right">
-              {{ $moment(props.item.time).format('D.M.YYYY H:mm:ss') }}
-            </td>
-            <td class="text-right">
-              {{ props.item.start_index }}
-            </td>
-            <td class="text-right">
-              {{ props.item.hc_keyspace }}
-            </td>
-            <td
-              class="text-right error--text"
-              :class="{'success--text': props.item.retry}"
-            >
-              {{
-                yesNo(props.item.retry) }}
-            </td>
-            <td
-              class="text-right error--text"
-              :class="{'success--text': props.item.finished}"
-            >
-              {{
-                yesNo(props.item.finished) }}
-            </td>
+          </template>
+          <template v-slot:item.time="{ item }">
+            {{ $moment(item.time).format('D.M.YYYY H:mm:ss') }}
+          </template>
+          <template v-slot:item.retry="{ item }">
+            {{ yesNo(item.retry) }}
+          </template>
+          <template v-slot:item.finished="{ item }">
+            {{ yesNo(item.finished) }}
           </template>
         </v-data-table>
       </fc-tile>
@@ -244,26 +215,26 @@
       return {
         data: null,
         workunitsHeader: [
-          {text: 'Job', align: 'left', value: 'job_id'},
-          {text: 'Cracking time', align: 'left', value: 'cracking_time'},
-          {text: 'Generated', align: 'right', value: 'time'},
-          {text: 'Start index', align: 'right', value: 'start_index'},
-          {text: 'Keyspace', align: 'right', value: 'hc_keyspace'},
-          {text: 'Retry', align: 'right', value: 'retry'},
-          {text: 'Finish', align: 'right', value: 'finished'}
+          {text: 'Job', align: 'start', value: 'job_id'},
+          {text: 'Cracking time', align: 'start', value: 'cracking_time_str'},
+          {text: 'Generated', align: 'end', value: 'time'},
+          {text: 'Start index', align: 'end', value: 'start_index'},
+          {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
+          {text: 'Retry', align: 'end', value: 'retry'},
+          {text: 'Finish', align: 'end', value: 'finished'}
         ],
         jobHeaders: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Attack type', value: 'attack_mode', align: 'right'},
-          {text: 'Status', value: 'status', align: 'right'},
-          {text: 'Progress', value: 'progress', align: 'right'},
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Result', value: 'password', align: 'right', sortable: false},
-          {text: 'Actions', value: 'name', sortable: false, align: 'right'}
+          {text: 'Attack type', value: 'attack', align: 'end'},
+          {text: 'Status', value: 'status', align: 'end'},
+          {text: 'Progress', value: 'progress', align: 'end'},
+          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Result', value: 'password', align: 'end', sortable: false},
+          {text: 'Actions', value: 'actions', sortable: false, align: 'end'}
         ],
         jobs_statuses: [
           {
@@ -308,6 +279,17 @@
       },
       yesNo: function (val) {
         return val ? 'Yes' : 'No'
+      },
+      getOsIcon (os) {
+        if (/(windows|microsoft)/ig.test(os)) {
+          return 'mdi-windows'
+        } else if (/(linux)/ig.test(os)) {
+          return 'mdi-linux'
+        } else if (/(apple|mac)/ig.test(os)) {
+          return 'mdi-apple'
+        } else {
+          return 'mdi-application'
+        }
       },
       progressToPercentage: function (progress) {
         return progress.toFixed() + '%'
