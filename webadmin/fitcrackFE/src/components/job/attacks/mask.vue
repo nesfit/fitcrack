@@ -29,19 +29,20 @@
       </v-flex>
       <v-flex xs6>
         <v-card-title class="pb-0"><h2>Markov file</h2></v-card-title>
-        <markov-selector v-model="markov" @input="checkValid"></markov-selector>
+        <markov-selector v-model="markov" @input="checkValid" ></markov-selector>
 
         <v-layout row wrap>
           <v-flex xs6 class="pl-2">
-            <v-radio-group v-model="markovSubmode" column :disabled="markov === null" @change="checkValid">
-              <v-radio label="2D Markov" color="primary" :value="1" :disabled="markov === null"></v-radio>
-              <v-radio label="3D Markov" color="primary" :value="2" :disabled="markov === null"></v-radio>
+            <v-radio-group v-model="markovSubmode" column @change="checkValid">
+              <v-radio label="Disable Markov" color="primary" :value="0" ></v-radio>
+              <v-radio label="2D Markov" color="primary" :value="1" ></v-radio>
+              <v-radio label="3D Markov" color="primary" :value="2" ></v-radio>
             </v-radio-group>
           </v-flex>
           <v-flex xs6 class="pr-2">
             <v-text-field
-              type="tel"
-              :disabled="markov === null"
+              type="number"
+              :disabled="markovSubmode === 0"
               label="Markov treshold"
               single-line
               mask="########"
@@ -141,7 +142,7 @@
     data: function () {
       return {
         loadMasksDialog: false,
-        markovSubmode: 0,
+        markovSubmode: 2,
         attackId: 3,
         attackName: 'mask',
         markovTreshold: '',

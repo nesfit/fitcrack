@@ -235,7 +235,7 @@
             <dictionaryDetail class="max500" :data="data" v-else-if="data.attack === 'dictionary'"/>
             <combinatorDetail class="max500" :data="data" v-else-if="data.attack === 'hybrid (Wordlist + Mask)'"/>
             <combinatorDetail class="max500" :data="data" v-else-if="data.attack === 'hybrid (Mask + Wordlist)'"/>
-            <pcfgDetail class="max500" :data="data" v-else-if="data.attack === 'PCFG'"/>
+            <pcfgDetail class="max500" :data="data" v-else-if="data.attack === 'pcfg'"/>
 
 
             <v-layout row wrap class="mt-3 mb-5 elevation-2 white max500">

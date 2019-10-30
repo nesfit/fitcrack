@@ -77,7 +77,7 @@
             disable-initial-sort
           >
             <template slot="items" slot-scope="props">
-              <router-link :to="{ name: 'jobDetail', params: { id: props.item.id}}" class="middle">
+              <router-link :to="{ name: 'jobDetail', params: { id: props.item.id} }" class="middle">
                 <td>{{ props.item.name }}</td>
               </router-link>
               <td class="text-xs-right">{{ props.item.attack }}</td>
@@ -136,8 +136,8 @@
             class="width100"
           >
             <template slot="items" slot-scope="props">
-              <router-link :to="{ name: 'jobDetail', params: { id: props.item.package_id}}" class="middle">
-                <td>{{ props.item.job.name }}</td>
+              <router-link :to="{ name: 'jobDetail', params: { id: props.item.job_id} }" class="middle">
+                <td>{{ props.item.job_id }}</td>
               </router-link>
               <td>{{ props.item.cracking_time_str }}</td>
               <td class="text-xs-right">{{ $moment(props.item.time).format('D.M.YYYY H:mm:ss') }}</td>
@@ -194,7 +194,7 @@
       return {
         data: null,
         workunitsHeader: [
-          {text: 'Package', align: 'left', value: 'package_id'},
+          {text: 'Job', align: 'left', value: 'job_id'},
           {text: 'Cracking time', align: 'left', value: 'cracking_time'},
           {text: 'Generated', align: 'right', value: 'time'},
           {text: 'Start index', align: 'right', value: 'start_index'},
@@ -212,7 +212,6 @@
           {text: 'Status', value: 'status', align: 'right'},
           {text: 'Progress', value: 'progress', align: 'right'},
           {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Result', value: 'password', align: 'right', sortable: false},
           {text: 'Actions', value: 'name', sortable: false, align: 'right'}
         ],
         jobs_statuses: [

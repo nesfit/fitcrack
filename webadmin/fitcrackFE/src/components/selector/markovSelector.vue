@@ -12,6 +12,7 @@
     :select-all="selectAll"
   >
     <template slot="items" slot-scope="props">
+
       <tr>
         <td>
           <v-checkbox
@@ -19,6 +20,7 @@
             @click="updateSelected(props.item.id, props.item)"
             primary
             hide-details
+            :disabled="markovSubmode === 0"
           ></v-checkbox>
         </td>
         <td>{{ props.item.name }}</td>
@@ -61,10 +63,12 @@
         this.headers.unshift({width: "1"})
       }
       this.getData()
+
     },
     methods: {
       getData() {
         this.loading = true
+      //  this.markovSubmode = 0
         this.axios.get(this.$serverAddr + '/markovChains').then((response) => {
           this.items = response.data.items
           this.loading = false
