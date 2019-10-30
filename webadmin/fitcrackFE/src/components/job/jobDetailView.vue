@@ -317,17 +317,7 @@
                 class="width100 maxHeight500"
                 :items="data.hashes"
                 :footer-props="{itemsPerPageOptions: [25,50,100,{text: 'All', value: -1}], itemsPerPageText: 'Hashes per page'}"
-              >
-                <template
-                  slot="items"
-                  slot-scope="props"
-                >
-                  <td>{{ props.item.hashText }}</td>
-                  <td class="text-right">
-                    {{ props.item.password }}
-                  </td>
-                </template>
-              </v-data-table>
+              />
             </v-card>
 
 
@@ -345,35 +335,27 @@
                   :items="data.hosts"
                   hide-default-footer
                 >
-                  <template
-                    slot="items"
-                    slot-scope="props"
-                  >
-                    <td>
-                      <router-link
-                        :to="{ name: 'hostDetail', params: { id: props.item.id}}"
-                        class="middle"
-                      >
-                        {{ props.item.domain_name + ' (' + props.item.user.name + ')' }}
-                      </router-link>
-                    </td>
-                    <td class="text-right">
-                      {{ props.item.ip_address }}
-                    </td>
-                    <td
-                      class="text-right"
-                      :class="{
-                        'error--text': props.item.last_active.seconds_delta > 61,
-                        'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
-                      }"
+                  <template v-slot:item.name="{ item }">
+                    <router-link
+                      :to="{ name: 'hostDetail', params: { id: item.id}}"
+                      class="middle"
                     >
-                      <v-icon
-                        :title="parseTimeDelta(props.item.last_active.last_seen)"
-                        class="inheritColor"
-                      >
-                        fiber_manual_record
-                      </v-icon>
-                    </td>
+                      {{ item.domain_name + ' (' + item.user.name + ')' }}
+                    </router-link>
+                  </template>
+                  <template v-slot:item.last_active="{ item }">
+                    <v-icon
+                      v-if="item.last_active.seconds_delta > 61"
+                      color="error"
+                    >
+                      mdi-power-off
+                    </v-icon>
+                    <v-icon
+                      v-else
+                      color="success"
+                    >
+                      mdi-power
+                    </v-icon>
                   </template>
                 </v-data-table>
                 <v-divider />
@@ -498,77 +480,47 @@
               :footer-props="{itemsPerPageOptions: [15,30,60,{text: 'All', value: -1}], itemsPerPageText: 'Workunits per page'}"
               :headers="workunitsHeader"
               :items="data.workunits"
+              show-expand
+              expand-icon="mdi-file"
               class="width100"
             >
-              <template
-                slot="items"
-                slot-scope="props"
-              >
-                <td>
-                  <router-link
-                    :to="{ name: 'hostDetail', params: { id: props.item.host.id}}"
-                    class="middle"
-                  >
-                    {{ props.item.host.domain_name + ' (' + props.item.host.user.name + ')' }}
-                  </router-link>
-                </td>
-                <td class="text-right">
+              <template v-slot:item.boinc_host_id="{ item }">
+                <router-link
+                  :to="{ name: 'hostDetail', params: { id: item.host.id}}"
+                  class="middle"
+                >
+                  {{ item.host.domain_name + ' (' + item.host.user.name + ')' }}
+                </router-link>
+              </template>
+              <template v-slot:item.progress="{ item }">
+                <div class="d-flex align-center justify-end">
+                  <span class="mr-2">{{ progressToPercentage(item.progress) }}</span>
                   <v-progress-circular
-                    size="35"
-                    :width="1.5"
+                    size="18"
+                    :width="3"
                     :rotate="270"
                     color="primary"
-                    :value="props.item.progress"
-                  >
-                    <span class="progressPercentageMask">{{ props.item.progress }}</span>
-                  </v-progress-circular>
-                </td>
-                <td class="text-right">
-                  {{ props.item.cracking_time_str }}
-                </td>
-                <td class="text-right">
-                  {{ $moment(props.item.time).format('DD.MM.YYYY HH:mm') }}
-                </td>
-                <td class="text-right">
-                  {{ props.item.start_index }}
-                </td>
-                <td class="text-right">
-                  {{ props.item.hc_keyspace }}
-                </td>
-                <td
-                  class="text-right error--text"
-                  :class="{'success--text': props.item.retry}"
-                >
-                  {{
-                    yesNo(props.item.retry) }}
-                </td>
-                <td
-                  class="text-right error--text"
-                  :class="{'success--text': props.item.finished}"
-                >
-                  {{
-                    yesNo(props.item.finished) }}
-                </td>
-                <td class="text-right">
-                  <v-btn
-                    icon
-                    small
-                    text
-                    color="primary"
-                    @click="props.expanded = !props.expanded"
-                  >
-                    <v-icon>insert_drive_file</v-icon>
-                  </v-btn>
-                </td>
+                    class="jobProgress"
+                    :value="item.progress"
+                  />
+                </div>
+              </template>
+              <template v-slot:item.time="{ item }">
+                {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+              </template>
+              <template v-slot:item.retry="{ item }">
+                {{ yesNo(item.retry) }}
+              </template>
+              <template v-slot:item.finished="{ item }">
+                {{ yesNo(item.finished) }}
               </template>
               <template
-                slot="expand"
-                slot-scope="props"
+                v-slot:expanded-item="{ item }"
               >
                 <fc-textarea
                   max-height="500"
                   :readonly="true"
-                  :value="props.item.result.stderr_out_text"
+                  :value="item.result.stderr_out_text"
                 />
               </template>
             </v-data-table>
@@ -803,18 +755,18 @@
         hostGraph: null,
         hostPercentageGraph: null,
         statusHeaders: [
-          {text: 'Time', value: 'time', align: 'left'},
-          {text: 'Status', value: 'status', align: 'right'},
+          {text: 'Time', value: 'time', align: 'start'},
+          {text: 'Status', value: 'status', align: 'end'},
         ],
         statusHistory: [],
         hostheaders: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'IP address', value: 'ip_adress', align: 'right', sortable: false},
-          {text: 'Online', value: 'last_seen', align: 'right', sortable: false}
+          {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
+          {text: 'Online', value: 'last_active', align: 'end', sortable: false}
         ],
         workunitTitle: {
           valid: 0,
@@ -828,37 +780,36 @@
             text: 'Host',
             value: 'boinc_host_id',
           },
-          {text: 'Progress', align: 'right', value: 'progress'},
-          {text: 'Cracking time', align: 'right', value: 'cracking_time'},
-          {text: 'Generated', align: 'right', value: 'time'},
-          {text: 'Start index', align: 'right', value: 'start_index'},
-          {text: 'Keyspace', align: 'right', value: 'hc_keyspace'},
-          {text: 'Retry', align: 'right', value: 'retry'},
-          {text: 'Finished', align: 'right', value: 'finished'},
-          {text: 'Log', align: 'left', value: 'test'}
+          {text: 'Progress', align: 'end', value: 'progress'},
+          {text: 'Cracking time', align: 'end', value: 'cracking_time'},
+          {text: 'Generated', align: 'end', value: 'time'},
+          {text: 'Start index', align: 'end', value: 'start_index'},
+          {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
+          {text: 'Retry', align: 'end', value: 'retry'},
+          {text: 'Finished', align: 'end', value: 'finished'},
+          {text: 'Log', align: 'center', value: 'data-table-expand'}
         ],
         hashHeaders: [
           {
             text: 'Hash',
-            align: 'left',
-            value: 'hash'
+            align: 'start',
+            value: 'hashText'
           },
-          {text: 'Password', value: 'password', align: 'right'}
+          {text: 'Password', value: 'password', align: 'end'}
         ],
         editJobDialog: false,
         editHostsDialog: false,
         totalHostItems: 0,
         paginationHost: {},
         loadingHosts: true,
-
         hostHeaders: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'IP address', value: 'ip_adress', align: 'right', sortable: false},
-          {text: 'Online', value: 'last_seen', align: 'right', sortable: false}
+          {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
+          {text: 'Online', value: 'last_active', align: 'end', sortable: false}
         ],
         hosts: [],
         newHostsMapping: [],
