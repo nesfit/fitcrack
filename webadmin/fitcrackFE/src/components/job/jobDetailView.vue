@@ -24,28 +24,25 @@
           ]"
       />
       <div>
-        <v-row justify="center">
-          <div class="px-2 max100">
-            <v-row class="mt-3 mb-5 elevation-2 max500">
-              <v-toolbar
-                color="primary"
-                dark
-                flat
-              >
-                <v-toolbar-title>
+        <v-row 
+          justify="center"
+          class="mx-3"
+        >
+          <v-col>
+            <v-card class="mb-5">
+              <v-card-title>
+                <span>
                   {{ data.name }}
-                </v-toolbar-title>
+                </span>
                 <v-spacer />
                 <v-btn
-                  outlined
                   small
                   fab
-                  color="white"
                   @click.native.stop="showEditJobDialog"
                 >
                   <v-icon>edit</v-icon>
                 </v-btn>
-              </v-toolbar>
+              </v-card-title>
               <v-list
                 single-line
                 class="width100"
@@ -303,49 +300,18 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
-            </v-row>
+            </v-card>
 
-
-            <combinatorDetail
-              v-if="data.attack === 'combinator'"
-              class="max500"
+            <component
+              :is="attackDetailComponent"
               :data="data"
-            />
-            <maskDetail
-              v-else-if="data.attack === 'mask'"
-              class="max500"
-              :data="data"
-            />
-            <dictionaryDetail
-              v-else-if="data.attack === 'dictionary'"
-              class="max500"
-              :data="data"
-            />
-            <combinatorDetail
-              v-else-if="data.attack === 'hybrid (Wordlist + Mask)'"
-              class="max500"
-              :data="data"
-            />
-            <combinatorDetail
-              v-else-if="data.attack === 'hybrid (Mask + Wordlist)'"
-              class="max500"
-              :data="data"
-            />
-            <pcfgDetail
-              v-else-if="data.attack === 'pcfg'"
-              class="max500"
-              :data="data"
+              class="mb-5"
             />
 
-
-            <v-row class="mt-3 mb-5 elevation-2 max500">
-              <v-toolbar
-                color="primary"
-                dark
-                flat
-              >
-                <v-toolbar-title>Hashes</v-toolbar-title>
-              </v-toolbar>
+            <v-card class="mb-5">
+              <v-card-title>
+                Hashes
+              </v-card-title>
               <v-data-table
                 :headers="hashHeaders"
                 class="width100 maxHeight500"
@@ -362,18 +328,14 @@
                   </td>
                 </template>
               </v-data-table>
-            </v-row>
+            </v-card>
 
 
 
-            <v-row class="mt-3 mb-5 elevation-2 max700">
-              <v-toolbar
-                color="primary"
-                dark
-                flat
-              >
-                <v-toolbar-title>Hosts</v-toolbar-title>
-              </v-toolbar>
+            <v-card class="mb-5">
+              <v-card-title>
+                Hosts
+              </v-card-title>
               <v-list
                 single-line
                 class="width100"
@@ -429,65 +391,49 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
-            </v-row>
-          </div>
+            </v-card>
+          </v-col>
 
-          <div class="px-3 min500">
-            <v-row class="mt-3 mb-5 elevation-2">
-              <v-toolbar
-                color="primary"
-                dark
-                flat
-              >
-                <v-toolbar-title>Job progress</v-toolbar-title>
-              </v-toolbar>
+          <v-col>
+            <v-card class="mb-5">
+              <v-card-title>
+                Job progress
+              </v-card-title>
               <fc-graph
                 id="progressGraph"
                 :data="progressGraph"
                 units="%"
                 type="job"
               />
-            </v-row>
+            </v-card>
 
 
-            <v-row class="mt-3 mb-5 elevation-2">
-              <v-toolbar
-                color="primary"
-                dark
-                flat
-              >
-                <v-toolbar-title>Hashes in workunit</v-toolbar-title>
-              </v-toolbar>
+            <v-card class="mb-5">
+              <v-card-title>
+                Hashes in workunit
+              </v-card-title>
               <fc-graph
                 id="hostGraph"
                 :data="hostGraph"
                 units=" hashes"
                 type="host"
               />
-            </v-row>
+            </v-card>
 
-            <v-row class="mt-3 mb-5 elevation-2">
-              <v-toolbar
-                color="primary"
-                dark
-                flat
-              >
-                <v-toolbar-title>Host percentage work</v-toolbar-title>
-              </v-toolbar>
+            <v-card class="mb-5">
+              <v-card-title>
+                Host percentage work
+              </v-card-title>
               <fc-graph
                 id="hostPercentageGraph"
                 :data="hostPercentageGraph"
               />
-            </v-row>
+            </v-card>
 
-            <v-row class="mt-3 mb-5 elevation-2">
-              <v-toolbar
-                color="primary"
-                dark
-                flat
-              >
-                <v-toolbar-title>Status history</v-toolbar-title>
-              </v-toolbar>
+            <v-card class="mt-3 mb-5 elevation-2">
+              <v-card-title>
+                Status history
+              </v-card-title>
               <v-list
                 single-line
                 class="width100"
@@ -521,20 +467,15 @@
                   </template>
                 </v-data-table>
               </v-list>
-            </v-row>
-          </div>
+            </v-card>
+          </v-col>
         </v-row>
-        <div class=" mx-3">
-          <v-row class="mt-3 mb-5 max1000 mx-auto elevation-2">
-            <v-toolbar
-              color="primary"
-              dark
-              flat
-            >
-              <v-toolbar-title
-                v-text="'Workunits | Work: ' + workunitTitle.valid + ' | Benchmark: ' + workunitTitle.benchmarks + ' | Avg keyspace: ' + workunitTitle.avgKeyspace.toLocaleString()"
-              /></v-toolbar-title>
-            </v-toolbar>
+
+        <div class="mx-3 mb-5">
+          <v-card>
+            <v-card-title>
+              {{ 'Workunits | Work: ' + workunitTitle.valid + ' | Benchmark: ' + workunitTitle.benchmarks + ' | Avg keyspace: ' + workunitTitle.avgKeyspace.toLocaleString() }}
+            </v-card-title>
 
             <div class="workunit-parent">
               <div
@@ -631,7 +572,7 @@
                 />
               </template>
             </v-data-table>
-          </v-row>
+          </v-card>
         </div>
       </div>
     </div>
@@ -740,7 +681,7 @@
       v-model="editHostsDialog"
       max-width="800"
     >
-      <v-card>
+      <v-card class="mb-5">
         <v-data-table
           v-model="newHostsMapping"
           item-key="id"
@@ -929,6 +870,20 @@
           time_end:   this.$moment().format('DD/MM/YYYY HH:mm'),
           startNow: false,
           endNever: false
+        }
+      }
+    },
+    computed: {
+      attackDetailComponent () {
+        switch (this.data.attack) {
+          case 'mask':
+            return 'maskDetail'
+          case 'dictionary':
+            return 'dicttionaryDetail'
+          case 'pcfg':
+            return 'pcfgDetail'
+          default:
+            return 'combinatorDetail'
         }
       }
     },
