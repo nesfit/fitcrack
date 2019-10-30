@@ -515,13 +515,15 @@
                 {{ yesNo(item.finished) }}
               </template>
               <template
-                v-slot:expanded-item="{ item }"
+                v-slot:expanded-item="{ headers, item }"
               >
-                <fc-textarea
-                  max-height="500"
-                  :readonly="true"
-                  :value="item.result.stderr_out_text"
-                />
+                <td :colspan="headers.length">
+                  <fc-textarea
+                    max-height="500"
+                    :readonly="true"
+                    :value="item.result.stderr_out_text"
+                  />
+                </td>
               </template>
             </v-data-table>
           </v-card>
