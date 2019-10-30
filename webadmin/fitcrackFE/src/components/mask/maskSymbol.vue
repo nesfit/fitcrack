@@ -4,12 +4,12 @@
 -->
 
 <template>
-    <div>Halo</div>
+  <div>Halo</div>
 </template>
 
 <script>
   export default {
-    name: "maskSymbol"
+    name: "MaskSymbol"
   }
 </script>
 

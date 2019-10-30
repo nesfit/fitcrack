@@ -4,42 +4,30 @@
 -->
 
 <template>
-    <div class="cont">
-      <v-list-tile :to="'/jobs/' + jobId">
-        <v-alert :type="type" value="true" class="ma-0 pa-0 width100" id="notif" v-bind:class="{ seen: seen}" outline>
-          <v-layout row wrap class="width100">
-            <v-flex class="text-xs-left">{{text}}</v-flex>
-            <v-spacer></v-spacer>
-            <v-flex class="text-xs-right">{{$moment(time).format('DD.MM.YYYY HH:mm')}}</v-flex>
-          </v-layout>
-        </v-alert>
-      </v-list-tile>
-      <v-divider></v-divider>
-    </div>
+  <v-list-item :to="'/jobs/' + jobId">
+    <v-alert
+      class="d-inline-block width100 my-2"
+      :type="type"
+      :text="!seen"
+      outlined
+    >
+      <div class="text-left">
+        {{ text }}
+      </div>
+      <small>
+        {{ $moment(time).format('DD.MM.YYYY HH:mm') }}
+      </small>
+    </v-alert>
+  </v-list-item>
 </template>
 
 <script>
     export default {
-      name: 'notification',
+      name: 'Notification',
       props: ['type', 'text', 'seen', 'time', 'jobId']
     }
 </script>
 
 <style scoped>
-  .cont{
-    display: block;
-    width: 100%;
-  }
 
-  #notif {
-    border: none !important;
-  }
-
-  .width100 {
-    width: 100%;
-  }
-
-  .seen {
-    opacity: 0.5;
-  }
 </style>

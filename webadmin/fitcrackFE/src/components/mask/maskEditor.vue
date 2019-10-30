@@ -4,26 +4,30 @@
 -->
 
 <template>
-    <div>
-      <VuePellEditor
-        :actions="editorOptions"
-        :content="editorContent"
-        :placeholder="editorPlaceholder"
-        v-model="editorContent"
-        :style-with-css="true"
-        default-paragraph-separator="span"
-        @change="doSomething"
-        @mounted="doSomethingAfterMounted"
-      />
-      {{editorContent}}
-    </div>
+  <div>
+    <VuePellEditor
+      v-model="editorContent"
+      :actions="editorOptions"
+      :content="editorContent"
+      :placeholder="editorPlaceholder"
+      :style-with-css="true"
+      default-paragraph-separator="span"
+      @change="doSomething"
+      @mounted="doSomethingAfterMounted"
+    />
+    {{ editorContent }}
+  </div>
 </template>
 
 <script>
   import VuePellEditor from 'vue-pell-editor'
   import maskSymbol from '@/components/mask/maskSymbol'
   export default {
-    name: "maskEditor",
+    name: "MaskEditor",
+    components: {
+      VuePellEditor,
+      maskSymbol
+    },
     data: () => ({
       editorContent: '',
       editorOptions: [
@@ -57,10 +61,6 @@
       editorPlaceholder: 'Write something amazing...',
       editorContent: 'Predefined Content'
     }),
-    components: {
-      VuePellEditor,
-      maskSymbol
-    },
     methods: {
       doSomething() {
         console.log('Hello')

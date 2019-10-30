@@ -5,51 +5,47 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
-    v-model="selected"
     item-key="id"
-    :select-all="selectAll"
+    show-select
+    :single-select="!selectAll"
     @input="updateSelected"
   >
-    <template slot="items" slot-scope="props">
-      <tr>
-        <td>
-          <v-checkbox
-            v-model="props.selected"
-            primary
-            hide-details
-          ></v-checkbox>
-        </td>
-        <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-        <td class="text-xs-right">
-          <v-tooltip top>
-            <v-btn icon class="mx-0" :to="{name: 'charsetDetail', params: { id: props.item.id}}" slot="activator">
-              <v-icon color="primary">link</v-icon>
-            </v-btn>
-            <span>Go to the charset page</span>
-          </v-tooltip>
-        </td>
-      </tr>
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'charsetDetail', params: { id: item.id}}">
+        {{ item.name }}
+        <v-icon 
+          small
+          color="primary"
+        >
+          mdi-open-in-new
+        </v-icon>
+      </router-link>
+    </template>
+    <template v-slot:item.time="{ item }">
+      {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
     </template>
   </v-data-table>
 </template>
 
 <script>
+  import selector from './selectorMixin'
   export default {
-    name: "charsetSelector",
-    props: {
-      selectAll: {
-        type: Boolean,
-        default: false
-      },
-      value: {
-        type: Array,
-        default: function () {
-          return []
-        }
+    name: "CharsetSelector",
+    mixins: [selector],
+    data() {
+      return {
+        headers: [
+          {
+            text: 'Name',
+            align: 'start',
+            value: 'name'
+          },
+          {text: 'Added', value: 'time', align: 'end'},
+        ],
       }
     },
     watch:{
@@ -59,29 +55,6 @@
         }
       }
     },
-    data() {
-      return {
-        items: [],
-        loading: false,
-        search: '',
-        selected: [],
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
-        ],
-      }
-    },
-    mounted() {
-      if (!this.selectAll) {
-        this.headers.unshift({width: "1"})
-      }
-      this.getData()
-    },
     methods: {
       getData() {
         this.loading = true
@@ -89,9 +62,6 @@
           this.items = response.data.items
           this.loading = false
         })
-      },
-      updateSelected() {
-        this.$emit('input', this.selected)
       },
       trySelect(isSelected) {
         return isSelected || this.selected.length < 4

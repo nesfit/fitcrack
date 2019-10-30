@@ -4,12 +4,11 @@
 -->
 
 <template>
-    <div class="json-viewer">
-        <div class="code-box" >
-            <json-box :value="value"></json-box>
-        </div>
-
+  <div class="json-viewer">
+    <div class="code-box">
+      <json-box :value="value" />
     </div>
+  </div>
 </template>
 
 <script>
@@ -18,11 +17,11 @@ import JsonBox from '@/components/json/json-box'
 Vue.component(JsonBox.name, JsonBox);
 export default {
     name: 'JsonViewer',
-    props: {
-        value: [Object, Array, String, Number, Boolean]
-    },
      components: {
         JsonBox
+    },
+    props: {
+        value: [Object, Array, String, Number, Boolean]
     }
 };
 </script>

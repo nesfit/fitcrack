@@ -4,28 +4,33 @@
 -->
 
 <template>
-
   <div>
-    <v-card-title class="pb-0"><h2>Select PCFG grammar<span class="required primary--text"> *</span></h2></v-card-title>
-    <pcfg-selector v-model="pcfg" @input="checkValidInit" ></pcfg-selector>
+    <v-card-title class="pb-0">
+      <span>Select PCFG grammar<span class="required primary--text"> *</span></span>
+    </v-card-title>
+    <pcfg-selector
+      v-model="pcfg"
+      @input="checkValidInit"
+    />
 
-    <v-divider></v-divider>
-  <!--  <v-card-title class="pb-0"><h2>Select rule file</h2></v-card-title> -->
-  <!--  <rules-selector v-model="rules" @input="checkValid"></rules-selector> -->
-   <v-card-title class="pb-0"><h2>Edit keyspace limit</h2></v-card-title>
+    <v-divider />
+    <!--  <v-card-title class="pb-0"><span>Select rule file</span></v-card-title> -->
+    <!--  <rules-selector v-model="rules" @input="checkValid"></rules-selector> -->
+    <v-card-title class="pb-0">
+      <span>Edit keyspace limit</span>
+    </v-card-title>
     <v-card-text>
       <v-text-field
-        flat
+        v-model.number="keyspaceLimit"
+        text
         single-line
         :value="this.keyspaceLimit"
-        v-model.number="keyspaceLimit"
         required
         type="number"
         suffix="passwords"
         :max="this.pcfg.keyspace"
         @input="checkValidEdit"
-      ></v-text-field>
-
+      />
     </v-card-text>
   </div>
 </template>
@@ -34,12 +39,28 @@
   import pcfgSelector from '@/components/selector/pcfgSelector'
 //  import ruleSelector from '@/components/selector/rulesSelector'
   export default {
-    name: "pcfg",
+    name: "Pcfg",
+    components: {
+      'pcfg-selector': pcfgSelector,
+  //    'rules-selector': ruleSelector
+    },
     props: {
       value: {
         type: [Boolean, Object],
         default: null
       },
+    },
+    data: function () {
+      return {
+        attackId: 9,
+        attackName: 'pcfg',
+        valid: false,
+        pcfg: [],
+        rules: null,
+        keyspaceLimit: 0,
+
+
+      }
     },
     watch:{
       value: function(){
@@ -53,10 +74,6 @@
 
       }
 
-    },
-    components: {
-      'pcfg-selector': pcfgSelector,
-  //    'rules-selector': ruleSelector
     },
     methods: {
       checkValidInit: function () {
@@ -102,18 +119,6 @@
       }, 0)
     }
 
-    },
-    data: function () {
-      return {
-        attackId: 9,
-        attackName: 'pcfg',
-        valid: false,
-        pcfg: [],
-        rules: null,
-        keyspaceLimit: 0,
-
-
-      }
     }
   }
 </script>

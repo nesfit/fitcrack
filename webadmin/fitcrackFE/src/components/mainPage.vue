@@ -6,271 +6,326 @@
 <template>
   <div class="height100">
     <v-navigation-drawer
+      v-model="drawer"
       persistent
       class="navigationDrawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      v-model="drawer"
       enable-resize-watcher
       fixed
       app
-      color="primary"
     >
       <router-link :to="{ name: 'home'}">
-        <img :src="require('@/assets/fitcrack.png')" class="mx-auto px-2 mt-2 d-block logo" alt="logo"/>
-        <h2 v-show="!miniVariant" class="logoText" ></h2>
+        <img
+          v-if="$vuetify.theme.dark"
+          :src="require('@/assets/fitcrack-glow.svg')"
+          class="mx-auto px-2 mt-2 d-block logo"
+          alt="logo"
+        >
+        <img
+          v-else
+          :src="require('@/assets/fitcrack.svg')"
+          class="mx-auto px-2 mt-2 d-block logo"
+          alt="logo"
+        >
+        <h2 class="logoText" />
       </router-link>
-      <v-divider></v-divider>
-      <v-list expand>
-        <v-list-tile to="/">
-          <v-list-tile-action>
-            <v-icon>home</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Home</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-group :value="true">
-          <v-list-tile :to="{ name: 'jobs'}" slot="activator" @click.stop="">
-            <v-list-tile-action>
-              <v-icon>work</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Jobs</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile :to="{ name: 'hiddenJobs'}">
-            <v-list-tile-action>
-              <v-icon>visibility_off</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Hidden jobs</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile :to="{ name: 'addJob'}" v-if="$userCanAddJob()">
-            <v-list-tile-action>
-              <v-icon>add</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Add job</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+
+      <v-divider />
+
+      <v-list
+        expand
+        nav
+        dense
+      >
+        <v-list-item to="/">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('home') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Home</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-group
+          :value="true"
+          prepend-icon="mdi-briefcase-outline"
+        >
+          <template v-slot:activator>
+            <v-list-item-title>Jobs</v-list-item-title>
+          </template>
+
+          <v-list-item
+            v-if="$userCanAddJob()"
+            :to="{ name: 'addJob'}"
+          >
+            <v-list-item-action>
+              <v-icon>{{ routeIcon('addJob') }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Add job</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item :to="{ name: 'jobs'}">
+            <v-list-item-action>
+              <v-icon>{{ routeIcon('jobs') }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>All jobs</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <!--
+          <v-list-item :to="{ name: 'hiddenJobs'}">
+            <v-list-item-action>
+              <v-icon>{{ routeIcon('hiddenJobs') }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Hidden jobs</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          -->
+
+          <v-divider class="mb-1" />
         </v-list-group>
 
-        <v-list-group :value="true">
-          <v-list-tile :to="{ name: 'hosts'}" slot="activator" @click.stop="">
-            <v-list-tile-action>
-              <v-icon>desktop_windows</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Hosts</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile :to="{ name: 'hiddenHosts'}">
-            <v-list-tile-action>
-              <v-icon>visibility_off</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Hidden hosts</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list-group>
-        <v-list-tile :to="{ name: 'hashes'}">
-          <v-list-tile-action>
-            <database-icon class="material-icons"/>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Hashes</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'dictionaries'}">
-          <v-list-tile-action>
-            <v-icon>format_align_left</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Dictionaries</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        <v-list-item :to="{ name: 'hosts'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('hosts') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Hosts</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-        <v-list-tile :to="{ name: 'pcfg'}">
-          <v-list-tile-action>
-            <v-icon>linear_scale</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>PCFG</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        <v-list-item :to="{ name: 'hashes'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('hashes') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Hashes</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-        <v-list-tile :to="{ name: 'rules'}">
-          <v-list-tile-action>
-            <v-icon>gavel</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Rules</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'charsets'}">
-          <v-list-tile-action>
-            <v-icon>translate</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Charsets</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'masks'}">
-          <v-list-tile-action>
-            <mask-icon class="material-icons"/>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Masks</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <!--<v-list-tile :to="{ name: 'files'}">-->
-          <!--<v-list-tile-action>-->
-            <!--<v-icon>insert_drive_file</v-icon>-->
-          <!--</v-list-tile-action>-->
-          <!--<v-list-tile-content>-->
-            <!--<v-list-tile-title>Encrypted files</v-list-tile-title>-->
-          <!--</v-list-tile-content>-->
-        <!--</v-list-tile>-->
-        <v-list-tile :to="{ name: 'markovChains'}">
-          <v-list-tile-action>
-            <matrix-icon class="material-icons"/>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Markov chains</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <!--<v-list-tile :to="{ name: 'server'}">-->
-          <!--<v-list-tile-action>-->
-            <!--<v-icon>settings</v-icon>-->
-          <!--</v-list-tile-action>-->
-          <!--<v-list-tile-content>-->
-            <!--<v-list-tile-title>Control</v-list-tile-title>-->
-          <!--</v-list-tile-content>-->
-        <!--</v-list-tile>-->
-        <v-list-tile :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">
-          <v-list-tile-action>
-            <v-icon>settings</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Manage users</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'myAccount'}">
-          <v-list-tile-action>
-            <v-icon>group</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>My account</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'server'}" v-if="$userCanManageUsers()">
-          <v-list-tile-action>
-            <v-icon>storage</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Server</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile @click="logout">
-          <v-list-tile-action>
-            <v-icon>exit_to_app</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Logout</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        <v-list-item :to="{ name: 'dictionaries'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('dictionaries') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Dictionaries</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'pcfg'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('pcfg') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>PCFG</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'rules'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('rules') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Rules</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'charsets'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('charsets') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Charsets</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'masks'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('masks') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Masks</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!--<v-list-item :to="{ name: 'files'}">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>{{ routeIcon('') }}</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Encrypted files</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
+
+        <v-list-item :to="{ name: 'markovChains'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('markovChains') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Markov chains</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!--<v-list-item :to="{ name: 'server'}">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>{{ routeIcon('') }}</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Control</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
+
+        <v-divider class="mb-1" />
+
+        <v-list-item
+          v-if="$userCanManageUsers()"
+          :to="{ name: 'manageUsers'}"
+        >
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('manageUsers') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Manage users</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'myAccount'}">
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('myAccount') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>My account</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item
+          v-if="$userCanManageUsers()"
+          :to="{ name: 'server'}"
+        >
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('server') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Server</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click="logout">
+          <v-list-item-action>
+            <v-icon>mdi-logout</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Log out</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <!--<v-list-group prepend-icon>-->
-          <!--<v-list-tile :to="{ name: 'user'}" slot="activator">-->
-            <!--<v-list-tile-action>-->
-              <!--<v-icon>person</v-icon>-->
-            <!--</v-list-tile-action>-->
-            <!--<v-list-tile-content>-->
-              <!--<v-list-tile-title>User</v-list-tile-title>-->
-            <!--</v-list-tile-content>-->
-          <!--</v-list-tile>-->
-          <!--<v-list-tile :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">-->
-            <!--<v-list-tile-action>-->
-              <!--<v-icon>group</v-icon>-->
-            <!--</v-list-tile-action>-->
-            <!--<v-list-tile-content>-->
-              <!--<v-list-tile-title>Manage users</v-list-tile-title>-->
-            <!--</v-list-tile-content>-->
-          <!--</v-list-tile>-->
-          <!--<v-list-tile @click="logout">-->
-            <!--<v-list-tile-action>-->
-              <!--<v-icon>exit_to_app</v-icon>-->
-            <!--</v-list-tile-action>-->
-            <!--<v-list-tile-content>-->
-              <!--<v-list-tile-title>Logout</v-list-tile-title>-->
-            <!--</v-list-tile-content>-->
-          <!--</v-list-tile>-->
+        <!--<v-list-item :to="{ name: 'user'}" slot="activator">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>person</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>User</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
+        <!--<v-list-item :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>group</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Manage users</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
+        <!--<v-list-item @click="logout">-->
+        <!--<v-list-item-action>-->
+        <!--<v-icon>exit_to_app</v-icon>-->
+        <!--</v-list-item-action>-->
+        <!--<v-list-item-content>-->
+        <!--<v-list-item-title>Logout</v-list-item-title>-->
+        <!--</v-list-item-content>-->
+        <!--</v-list-item>-->
         <!--</v-list-group>-->
       </v-list>
     </v-navigation-drawer>
-    <v-toolbar
+
+    <!-- TOP BAR -->
+
+    <v-app-bar
       app
-      :clipped-left="clipped"
       height="64px"
       class="mainToolbar"
-      color="primary"
-      dark
     >
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-toolbar-title>{{ $store.project }}</v-toolbar-title>
+      <!--
+      <router-link :to="{ name: 'home'}" class="textLogo">
+        <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
+      </router-link>
+      -->
+      <v-spacer />
+      <v-btn
+        icon
+        @click.stop="$vuetify.theme.dark = !$vuetify.theme.dark"
+      >
+        <v-icon>mdi-theme-light-dark</v-icon>
       </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-spacer>
-        <router-link :to="{ name: 'home'}" class="textLogo">
-          <img :src="require('@/assets/fitcrack_white.png')" class="mx-2 logoSmall" alt="logo"/>
-          <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
-
-        </router-link>
-      </v-spacer>
-      <v-badge color="red" overlap>
-        <span slot="badge" v-if="notificationsCount > 0">{{notificationsCount}}</span>
-        <v-btn icon @click.stop="toggleNotifications" class="ma-0">
-          <v-icon>notifications</v-icon>
+      <v-badge
+        color="red"
+        overlap
+      >
+        <span
+          v-if="notificationsCount > 0"
+          slot="badge"
+        >{{ notificationsCount }}</span>
+        <v-btn
+          icon
+          class="ma-0"
+          @click.stop="toggleNotifications"
+        >
+          <v-icon>{{ notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell' }}</v-icon>
         </v-btn>
       </v-badge>
-
-    </v-toolbar>
+    </v-app-bar>
     <v-content class="height100 main">
-      <router-view/>
+      <router-view />
     </v-content>
     <v-navigation-drawer
+      v-model="rightDrawer"
       class="pa-0"
       temporary
       right
-      v-model="rightDrawer"
       fixed
       app
+      width="400"
     >
-      <v-toolbar class="notifHeader">
+      <v-toolbar
+        flat 
+        class="notifHeader"
+      >
         <v-toolbar-title>Notifications</v-toolbar-title>
       </v-toolbar>
-      <notifications-wrapper ref="notifWrapper"></notifications-wrapper>
+      <notifications-wrapper ref="notifWrapper" />
     </v-navigation-drawer>
   </div>
 </template>
 
 <script>
   import notifications from '@/components/notification/fc_notifications_wrapper'
-  import DBicon from 'vue-material-design-icons/database.vue'
-  import maskIcon from 'vue-material-design-icons/guy-fawkes-mask.vue'
-  import matrixIcon from "vue-material-design-icons/matrix.vue"
-
+  import { routeIcon } from '@/router'
 
   export default {
     components: {
-      'notifications-wrapper': notifications,
-      'database-icon': DBicon,
-      'mask-icon': maskIcon,
-      'matrix-icon': matrixIcon
+      'notifications-wrapper': notifications
+    },
+    data() {
+      return {
+        drawer: true,
+        rightDrawer: false,
+        notificationsCount: 0
+      }
     },
     mounted: function () {
       if (!this.$store.user.loggedIn) {
@@ -287,6 +342,7 @@
       clearInterval(this.interval)
     },
     methods: {
+      routeIcon,
       logout: function () {
         this.axios.get(this.$serverAddr + '/user/logout').then((response) => {
           this.$logoutUser()
@@ -304,15 +360,6 @@
         }).then((response) => {
           this.notificationsCount = response.data.count
         })
-      }
-    },
-    data() {
-      return {
-        clipped: false,
-        drawer: true,
-        miniVariant: false,
-        rightDrawer: false,
-        notificationsCount: 0
       }
     }
   }
@@ -338,15 +385,15 @@
   }
 
   .textLogo {
-    width: 100%;
-    display: block;
+    // width: 100%;
+    // display: block;
     color: inherit;
-    text-align: center;
+    // text-align: center;
   }
 
   .textLogoText {
     font-size: 18px;
-    font-width: 300;
+    font-weight: 300;
   }
 
   .height100 {

@@ -5,65 +5,47 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
     item-key="id"
-    :select-all="selectAll"
+    :show-select="markovSubmode != 0"
+    :single-select="!selectAll"
+    @input="updateSelected"
   >
-    <template slot="items" slot-scope="props">
-
-      <tr>
-        <td>
-          <v-checkbox
-            :input-value="selected === props.item.id"
-            @click="updateSelected(props.item.id, props.item)"
-            primary
-            hide-details
-            :disabled="markovSubmode === 0"
-          ></v-checkbox>
-        </td>
-        <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-      </tr>
+    <template v-slot:item.time="{ item }">
+      {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
     </template>
   </v-data-table>
 </template>
 
 <script>
+  import selector from './selectorMixin'
   export default {
-    name: "markovSelector",
+    name: "MarkovSelector",
+    mixins: [selector],
     props: {
-      selectAll: {
-        type: Boolean,
-        default: false
-      },
       value: {
-        type: Object
+        type: Object,
+        default: () => ({})
+      },
+      markovSubmode: {
+        type: Number,
+        default: 2
       }
     },
     data() {
       return {
-        items: [],
-        loading: false,
-        search: '',
-        selected: 0,
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Added', value: 'time', align: 'right'}
+          {text: 'Added', value: 'time', align: 'end'}
         ],
       }
-    },
-    mounted() {
-      if (!this.selectAll) {
-        this.headers.unshift({width: "1"})
-      }
-      this.getData()
-
     },
     methods: {
       getData() {
@@ -73,24 +55,7 @@
           this.items = response.data.items
           this.loading = false
         })
-      },
-      updateSelected(id, markov) {
-        this.selected = id
-        this.$emit('input', markov)
       }
-    },
+    }
   }
 </script>
-
-<style scoped>
-  .oneline {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    width: 200px;
-    vertical-align: middle;
-    line-height: 50px;
-    height: 50px;
-  }
-</style>
