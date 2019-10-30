@@ -24,6 +24,11 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Dictionaries per page'}"
       >
+        <template v-slot:item.name="{ item }">
+          <router-link :to="`dictionaries/${item.id}`">
+            {{ item.name }}
+          </router-link>
+        </template>
         <template v-slot:item.time="{ item }">
           {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
         </template>

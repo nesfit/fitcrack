@@ -24,6 +24,11 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Charsets per page'}"
       >
+        <template v-slot:item.name="{ item }">
+          <router-link :to="`charsets/${item.id}`">
+            {{ item.name }}
+          </router-link>
+        </template>
         <template v-slot:item.time="{ item }">
           {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
         </template>
