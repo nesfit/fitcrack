@@ -5,15 +5,19 @@
 
 <template>
   <div class="textAreaCont">
-    <v-row v-if="searchEnable">
+    <v-row 
+      v-if="searchEnable"
+      class="mx-2 mb-2"
+    >
       <v-text-field
         v-model="searchText"
         single-line
         hide-details
         label="Search"
-        class=" ml-3 mb-1"
+        class="ml-3"
         clearable
         @click:clear="clearSearch"
+        @keypress.enter="search"
       />
       <v-btn
         icon
@@ -50,7 +54,7 @@
       </div>
       <v-row
         v-else
-        class="minheight200"
+        class="minheight200 mx-2"
       >
         <div class="lineNumberCont pr-1 pl-3 pt-2">
           <p
@@ -61,7 +65,7 @@
             {{ index }}
           </p>
         </div>
-        <v-col>
+        <div>
           <textarea
             v-if="searching"
             v-model="searchData"
@@ -71,9 +75,9 @@
           />
           <textarea
             v-else
+            ref="textarea"
             v-model="textareaData"
             class="pt-2 pl-1"
-            ref="textarea"
             :readonly="readonly"
             wrap="off"
             @input="update"
@@ -98,7 +102,7 @@
               You reached the end of file.
             </span>
           </infinite-loading>
-        </v-col>
+        </div>
         <slot name="after" />
         <div
           v-if="canRemoveLine"
@@ -131,7 +135,8 @@
     components: {
       InfiniteLoading,
     },
-    props: {'maxHeight': String,
+    props: {
+      'maxHeight': String,
       'readonly': Boolean,
       'url': String,
       'searchEnable': Boolean,
@@ -168,8 +173,9 @@
       style () {
         if (this.maxHeight) {
           return 'max-height: ' + this.maxHeight + 'px'
+        } else {
+          return ''
         }
-
       }
     },
     watch:{
@@ -253,38 +259,36 @@
   textarea{
     width: 100%;
     height: calc(100% + 20px);
-    color: #000;
+    color: #222;
     resize: none;
     overflow-x: scroll;
     overflow-y: hidden;
   }
 
-  .lineNumberCont {
-    color: #888888;
-    border-right: 1px solid #eee;
+  .theme--dark textarea {
+    color: #dedede;
+  }
 
+  .lineNumberCont {
+    opacity: .7;
     margin-left: 1px;
   }
 
   .textAreaCont {
     /*border: 2px solid rgba(0,0,0,.75);*/
     box-sizing: border-box;
+    min-width: 30vw;
   }
 
   .scrollCont {
     height: 100%;
     overflow: auto;
-    background: #f1f1f1;
     min-height: 200px;
     font-family: monospace,monospace;
   }
 
   .minheight200 {
     min-height: 200px;
-  }
-
-  .editable {
-    background: #fff;
   }
 
   .removeLineBtn {
