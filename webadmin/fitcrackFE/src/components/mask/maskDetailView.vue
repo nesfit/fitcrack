@@ -24,11 +24,9 @@
         >
           <v-list
             v-if="data != null"
-            single-line
-            class="width100"
           >
-            <v-list-item class="px-2 py-1">
-              <v-list-item-action class="pr-3 key">
+            <v-list-item>
+              <v-list-item-action>
                 Name:
               </v-list-item-action>
               <v-list-item-content>
@@ -38,8 +36,8 @@
               </v-list-item-content>
             </v-list-item>
             <v-divider />
-            <v-list-item class="px-2 py-1">
-              <v-list-item-action class="pr-3 key">
+            <v-list-item>
+              <v-list-item-action>
                 Added:
               </v-list-item-action>
               <v-list-item-content>
@@ -48,49 +46,42 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-divider />
-            <v-list-item class="px-2 py-1">
-              <v-list-item-content>
-                <v-row class="width100 margintop5">
-                  <v-btn
-                    v-if="!edit"
-                    class="ma-0"
-                    outlined
-                    color="primary"
-                    @click="edit=true"
-                  >
-                    Edit <v-icon class="ml-2">
-                      edit
-                    </v-icon>
-                  </v-btn>
-                  <v-btn
-                    v-else
-                    class="ma-0"
-                    outlined
-                    color="primary"
-                    @click="saveMask"
-                  >
-                    Save <v-icon class="ml-2">
-                      save
-                    </v-icon>
-                  </v-btn>
-                  <v-spacer />
-                  <a
-                    :href="$serverAddr + '/masks/' + data.id + '/download'"
-                    target="_blank"
-                  >
-                    <v-btn
-                      class="ma-0"
-                      outlined
-                      color="primary"
-                    >
-                      Download <v-icon class="ml-2">file_download</v-icon>
-                    </v-btn>
-                  </a>
-                </v-row>
-              </v-list-item-content>
-            </v-list-item>
           </v-list>
+          <v-row class="mx-2">
+            <v-col>
+              <v-btn
+                v-if="!edit"
+                class="ma-0"
+                outlined
+                color="primary"
+                @click="edit=true"
+              >
+                Edit <v-icon class="ml-2">
+                  mdi-pencil
+                </v-icon>
+              </v-btn>
+              <v-btn
+                v-else
+                class="ma-0"
+                outlined
+                color="primary"
+                @click="saveMask"
+              >
+                Save <v-icon class="ml-2">
+                  mdi-save
+                </v-icon>
+              </v-btn>
+              <v-btn
+                class="ma-0"
+                outlined
+                color="primary"
+                :href="$serverAddr + '/masks/' + data.id + '/download'"
+                target="_blank"
+              >
+                Download <v-icon class="ml-2">mdi-download</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
           <v-divider />
           <div
             v-if="data != null"

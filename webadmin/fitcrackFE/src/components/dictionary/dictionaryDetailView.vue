@@ -24,11 +24,9 @@
         >
           <v-list
             v-if="info != null"
-            single-line
-            class="width100"
           >
-            <v-list-item class="px-2 py-1">
-              <v-list-item-action class="pr-3 key">
+            <v-list-item>
+              <v-list-item-action>
                 Name:
               </v-list-item-action>
               <v-list-item-content>
@@ -38,8 +36,8 @@
               </v-list-item-content>
             </v-list-item>
             <v-divider />
-            <v-list-item class="px-2 py-1">
-              <v-list-item-action class="pr-3 key">
+            <v-list-item>
+              <v-list-item-action>
                 Keyspace:
               </v-list-item-action>
               <v-list-item-content>
@@ -49,8 +47,8 @@
               </v-list-item-content>
             </v-list-item>
             <v-divider />
-            <v-list-item class="px-2 py-1">
-              <v-list-item-action class="pr-3 key">
+            <v-list-item>
+              <v-list-item-action>
                 Added:
               </v-list-item-action>
               <v-list-item-content>

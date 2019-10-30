@@ -24,11 +24,9 @@
         >
           <v-list
             v-if="data != null"
-            single-line
-            class="width100"
           >
-            <v-list-item class="px-2 py-1">
-              <v-list-item-action class="pr-3 key">
+            <v-list-item>
+              <v-list-item-action>
                 Name:
               </v-list-item-action>
               <v-list-item-content>
@@ -38,8 +36,8 @@
               </v-list-item-content>
             </v-list-item>
             <v-divider />
-            <v-list-item class="px-2 py-1">
-              <v-list-item-action class="pr-3 key">
+            <v-list-item>
+              <v-list-item-action>
                 Added:
               </v-list-item-action>
               <v-list-item-content>
@@ -48,27 +46,20 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-divider />
-            <v-list-item class="px-2 py-1">
-              <v-list-item-content>
-                <v-row class="width100 margintop5">
-                  <v-spacer />
-                  <a
-                    :href="$serverAddr + '/rule/' + data.id + '/download'"
-                    target="_blank"
-                  >
-                    <v-btn
-                      class="ma-0"
-                      outlined
-                      color="primary"
-                    >
-                      Download <v-icon class="ml-2">file_download</v-icon>
-                    </v-btn>
-                  </a>
-                </v-row>
-              </v-list-item-content>
-            </v-list-item>
           </v-list>
+          <v-row class="mx-2">
+            <v-col>
+              <v-btn
+                class="ma-0"
+                outlined
+                color="primary"
+                :href="$serverAddr + '/rule/' + data.id + '/download'"
+                target="_blank"
+              >
+                Download <v-icon right>mdi-download</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
           <v-divider />
           <div
             v-if="data != null"
