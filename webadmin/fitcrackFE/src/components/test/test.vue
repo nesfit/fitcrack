@@ -4,21 +4,21 @@
 -->
 
 <template>
-    <v-container>
-      <v-layout row wrap>
-        <v-flex xs12>
-          <test-element>
-            test
-          </test-element>
-        </v-flex>
-      </v-layout>
-    </v-container>
+  <v-container>
+    <v-row>
+      <v-col cols="12">
+        <test-element>
+          test
+        </test-element>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
   import element from '@/components/logs/logsView'
   export default {
-    name: "test",
+    name: "Test",
     components: {
       'test-element': element
     },

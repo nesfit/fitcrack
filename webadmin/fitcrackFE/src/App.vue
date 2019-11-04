@@ -4,30 +4,29 @@
 -->
 
 <template>
-  <v-app light>
+  <v-app :dark="$store.darkAppearance">
     <v-snackbar
+      v-model="alert"
       :timeout="6000"
       bottom
       right
-      v-model="alert"
       color="transparent"
       class="errorSnackbar pa-0"
-      auto-height
     >
-      <v-alert :type="alertType"
-               class="height100 ma-0 width100"
-               :value="true"
-               dismissible
-               v-model="alert"
-               transition="none"
-
+      <v-alert
+        v-model="alert"
+        :type="alertType"
+        class="height100 ma-0 width100"
+        :value="true"
+        dismissible
+        transition="none"
       >
-        {{alertText}}
+        {{ alertText }}
       </v-alert>
     </v-snackbar>
-    <router-view/>
-    <vue-progress-bar></vue-progress-bar>
-    <confirm ref="confirm"></confirm>
+    <router-view :is-dark="isDark" />
+    <vue-progress-bar />
+    <confirm ref="confirm" />
   </v-app>
 </template>
 
@@ -37,6 +36,14 @@
     name: 'App',
     components: {
       'confirm': confirm
+    },
+    data: function () {
+      return {
+        alert: false,
+        alertText: '',
+        alertType: 'error',
+        isDark: false
+      }
     },
     created: function () {
       this.$store.loggedInLink = this.$route;
@@ -74,16 +81,15 @@
           }
         }.bind(this)
       )
+
+      const mql = window.matchMedia('(prefers-color-scheme: dark)')
+      mql.addListener(e => {
+        this.$vuetify.theme.dark = e.matches
+      })
+      this.$vuetify.theme.dark = mql.matches
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open
-    },
-    data: function () {
-      return {
-        alert: false,
-        alertText: '',
-        alertType: 'error'
-      }
     }
   }
 </script>

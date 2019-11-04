@@ -4,94 +4,90 @@
 -->
 
 <template>
-    <v-container fluid>
-      <h2> My account </h2>
-      <div class="table">
-      <v-card class="width150">
-          <v-card-title>
-            <h3> My info </h3>
-          </v-card-title>
-          <v-card-text>
-
-            <v-form ref="form" lazy-validation>
-              <v-text-field
-                label="username"
-                :value = "this.username"
-                disabled
-              ></v-text-field>
-              <v-text-field
-                label="email"
-                :value = "this.email"
-                disabled
-              ></v-text-field>
-            </v-form>
-          </v-card-text>
-
-
-      </v-card>
-
-      </div>
-
-      <div class="table">
-      <v-card class="width150">
+  <v-container>
+    <h2> My account </h2>
+    <v-row justify="center">
+      <v-card
+        class="mb-4"
+        min-width="300"
+        max-width="500"
+      >
         <v-card-title>
-          <h3> Change password </h3>
+          {{ username }}
         </v-card-title>
         <v-card-text>
-
-      <v-form ref="form" lazy-validation>
-          <v-text-field
-            type="password"
-            label="Old password"
-            v-model="oldPassword"
-            required
-          ></v-text-field>
-          <v-text-field
-            type="password"
-            label="New password"
-            v-model="newPassword0"
-            required
-          ></v-text-field>
-          <v-text-field
-            type="password"
-            label="New password"
-            v-model="newPassword1"
-            required
-          ></v-text-field>
+          {{ mail }}
+        </v-card-text>
+      </v-card>
+    </v-row>
+    <v-row justify="center">
+      <v-card
+        min-width="300"
+        max-width="500"
+      >
+        <v-card-title>
+          Change password
+        </v-card-title>
+        <v-card-text>
+          <v-form
+            ref="form"
+            lazy-validation
+          >
+            <v-text-field
+              v-model="oldPassword"
+              type="password"
+              label="Current password"
+              required
+            />
+            <v-text-field
+              v-model="newPassword0"
+              type="password"
+              label="New password"
+              required
+            />
+            <v-text-field
+              v-model="newPassword1"
+              type="password"
+              label="Confirm new password"
+              required
+            />
           </v-form>
         </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" flat @click.stop="editPassword" :disabled="this.newPassword0 != this.newPassword1 || this.oldPassword == null || this.newPassword0 == null">Update</v-btn>
-          </v-card-actions>
-
-    </v-card>
-  </div>
-  <!--    <h3> Message: {{ user }} </h3> -->
-    </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            :disabled="newPassword0 != newPassword1 || oldPassword == null || newPassword0 == null"
+            @click.stop="editPassword"
+          >
+            Update
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    <!--    <h3> Message: {{ user }} </h3> -->
+    </v-row>
+  </v-container>
 </template>
 
 <script>
     export default {
-      name: "myAccount",
+      name: "MyAccount",
+      data: function() {
+       return {
+          username: this.$store.user.userData.username,
+          mail: this.$store.user.userData.mail,
+          oldPassword: null,
+          newPassword0: null,
+          newPassword1: null
+        }
+      },
       computed: {
         gradient: function () {
           return window.theme.gradient
         }
       },
-      mounted: function () {
-        this.loadData()
-      },
-
-
       methods: {
-        loadData(){
-            this.axios.get(this.$serverAddr + '/user/isLoggedIn').then((response) => {
-              this.user = response.data.items;
-              this.username=response.data.user.username;
-              this.email=response.data.user.mail
-            })
-          },
         editPassword() {
           this.axios.post(this.$serverAddr + '/user/password/change_my_password', {
             old_password: this.oldPassword,
@@ -103,15 +99,6 @@
             this.newPassword0 = '';
             this.newPassword1 = ''
           })
-        }
-      },
-      data: function() {
-       return {
-          username: "",
-          email: "",
-          newPassword0: null,
-          newPassword1: null,
-          user: []
         }
       }
   }

@@ -29,14 +29,13 @@
     "vue-json-pretty": "^1.6.1",
     "vue-json-tree-view": "^2.1.4",
     "vue-json-viewer": "^1.0.4",
-    "vue-material-design-icons": "^1.6.0",
     "vue-moment": "^3.2.0",
     "vue-morris": "0.0.13",
     "vue-progressbar": "^0.7.5",
     "vue-router": "^3.1.2",
     "vue-stash": "^2.0.1-beta",
     "vue-visible": "^1.0.2",
-    "vuetify": "^1.5.18"
+    "vuetify": "^2.1.5"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.5",
@@ -61,6 +60,8 @@
     "eslint-plugin-node": "^5.2.0",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
+    "eslint-plugin-vue": "^5.2.3",
+    "eslint-plugin-vuetify": "^1.0.0-beta.3",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.17.1",
     "extract-text-webpack-plugin": "^3.0.0",

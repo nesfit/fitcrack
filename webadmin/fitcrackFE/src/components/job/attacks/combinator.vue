@@ -4,59 +4,102 @@
 -->
 
 <template>
-  <div >
-    <v-layout row wrap>
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Select left dictionary<span class="required primary--text"> *</span></h2></v-card-title>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Select right dictionary<span class="required primary--text"> *</span></h2></v-card-title>
-      </v-flex>
-      <v-flex xs6 class="border">
-        <dict-selector v-model="leftDictionaries" @input="checkValid"></dict-selector>
-      </v-flex>
-      <v-flex xs6>
-        <dict-selector v-model="rightDictionaries" @input="checkValid"></dict-selector>
-      </v-flex>
+  <div>
+    <v-row>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title class="pb-0">
+          <span>Select left dictionary<span class="required primary--text"> *</span></span>
+        </v-card-title>
+      </v-col>
+      <v-col cols="6">
+        <v-card-title class="pb-0">
+          <span>Select right dictionary<span class="required primary--text"> *</span></span>
+        </v-card-title>
+      </v-col>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <dict-selector
+          v-model="leftDictionaries"
+          @input="checkValid"
+        />
+      </v-col>
+      <v-col cols="6">
+        <dict-selector
+          v-model="rightDictionaries"
+          @input="checkValid"
+        />
+      </v-col>
 
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Type left rule</h2></v-card-title>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Type right rule</h2></v-card-title>
-      </v-flex>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title class="pb-0">
+          <span>Type left rule</span>
+        </v-card-title>
+      </v-col>
+      <v-col cols="6">
+        <v-card-title class="pb-0">
+          <span>Type right rule</span>
+        </v-card-title>
+      </v-col>
 
-      <v-flex xs6 class="border px-2">
+      <v-col
+        cols="6"
+        class="border px-2"
+      >
         <v-text-field
-          outline
-          single-line
-          placeholder="Rule"
           v-model="ruleLeft"
-          @input="checkValid"
-        ></v-text-field>
-      </v-flex>
-      <v-flex xs6  class="px-2">
-        <v-text-field
-          outline
+          outlined
           single-line
           placeholder="Rule"
-          v-model="ruleRight"
           @input="checkValid"
-        ></v-text-field>
-      </v-flex>
-    </v-layout>
+        />
+      </v-col>
+      <v-col
+        cols="6"
+        class="px-2"
+      >
+        <v-text-field
+          v-model="ruleRight"
+          outlined
+          single-line
+          placeholder="Rule"
+          @input="checkValid"
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
   import dictSelector from '@/components/selector/dictionarySelector'
   export default {
-    name: "combinator",
+    name: "Combinator",
+    components: {
+      'dict-selector': dictSelector
+    },
     props: {
       value: {
         type: [Boolean, Object],
         default: null
       },
+    },
+    data: function () {
+      return {
+        attackId: 1,
+        attackName: 'combinator',
+        valid: false,
+        leftDictionaries: [],
+        rightDictionaries: [],
+        ruleLeft: '',
+        ruleRight: ''
+      }
     },
     watch:{
       value: function(){
@@ -70,9 +113,6 @@
         if (this.value.ruleRight)
           this.ruleRight = this.value.ruleRight
       }
-    },
-    components: {
-      'dict-selector': dictSelector
     },
     methods: {
       checkValid: function () {
@@ -88,17 +128,6 @@
           return true
         }
         return false
-      }
-    },
-    data: function () {
-      return {
-        attackId: 1,
-        attackName: 'combinator',
-        valid: false,
-        leftDictionaries: [],
-        rightDictionaries: [],
-        ruleLeft: '',
-        ruleRight: ''
       }
     }
   }

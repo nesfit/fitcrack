@@ -5,205 +5,233 @@
 
 <template>
   <div class="cont">
-    <v-card-title class="pt-2 pb-1">
-      <v-text-field
-        clearable
-        solo
-        flat
-        append-icon="search"
-        label="Search by name"
-        single-line
-        hide-details
-        v-model="search"
-      > </v-text-field>
-      <v-spacer></v-spacer>
+    <v-text-field
+      v-model="search"
+      class="px-2 pt-3"
+      clearable
+      outlined
+      prepend-inner-icon="mdi-table-search"
+      label="Search"
+      single-line
+      hide-details
+    />
+    <div class="d-flex justify-space-between align-center px-4 pt-2">
+      <v-switch
+        v-model="viewHidden"
+        class="mr-4"
+        label="View hidden jobs"
+        :prepend-icon="viewHidden ? 'mdi-eye-off' : 'mdi-eye'"
+      />
       <v-select
+        v-model="status"
+        class="mr-4"
         :items="jobs_statuses"
-        label="Filter by status"
+        label="Status"
         single-line
         item-text="text"
         item-value="text"
-        solo
-        flat
+        prepend-icon="mdi-timelapse"
         clearable
-        @change="updateStatus"
-      > </v-select>
-    </v-card-title>
-    <v-divider></v-divider>
+        @change="updateList"
+      />
+      <v-select
+        v-model="attackType"
+        :items="jobs_types"
+        label="Attack type"
+        single-line
+        item-text="text"
+        item-value="text"
+        prepend-icon="mdi-crosshairs-gps"
+        clearable
+        @change="updateList"
+      />
+    </div>
+
+    <v-toolbar
+      dense
+      flat
+    >
+      <v-spacer />
+      <v-toolbar-items>
+        <v-btn
+          text
+          :disabled="selectedJobs.length == 0"
+        >
+          <v-icon left>
+            mdi-folder-move
+          </v-icon>
+          Move to bin
+        </v-btn>
+        <v-btn
+          text
+          :disabled="selectedJobs.length == 0"
+        >
+          <v-icon left>
+            {{ viewHidden ? 'mdi-eye' : 'mdi-eye-off' }}
+          </v-icon>
+          {{ viewHidden ? 'Stop hiding' : 'Hide' }}
+        </v-btn>
+      </v-toolbar-items>
+    </v-toolbar>
+
     <v-data-table
       ref="table"
+      v-model="selectedJobs"
       :headers="headers"
       :items="jobs"
       :search="search"
-      :pagination.sync="pagination"
-      :total-items="totalItems"
+      :options.sync="pagination"
+      :server-items-length="totalItems"
       :loading="loading"
-      :rows-per-page-items="[25,10,50,100]"
-      rows-per-page-text="Jobs per page"
-      disable-initial-sort
+      :footer-props="{itemsPerPageOptions: [25,10,50,100], itemsPerPageText:'Jobs per page'}"
+      show-select
+      fixed-header
     >
-      <tr slot="items" slot-scope="props">
-        <td>
-          <router-link :to="{ name: 'jobDetail', params: { id: props.item.id}}" class="middle">{{ props.item.name }}</router-link>
-        </td>
-        <td class="text-xs-right">{{ props.item.attack }}</td>
-        <td class="text-xs-right" v-bind:class="props.item.status_type + '--text'">
-          <v-tooltip top>
+      <!-- Job name cell -->
+      <template v-slot:item.name="{ item }">
+        <router-link
+          :to="{ name: 'jobDetail', params: { id: item.id } }"
+          class="middle"
+        >
+          {{ item.name }}
+        </router-link>
+      </template>
+      <!-- Status text cell -->
+      <template v-slot:item.status="{ item }">
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
             <span
-              slot="activator"
+              :class="item.status_type + '--text'"
+              v-on="on"
             >
-              {{ props.item.status_text }}
+              {{ item.status_text }}
             </span>
-            <span>{{ props.item.status_tooltip }}</span>
-          </v-tooltip>
-        </td>
-        <td class="text-xs-right">
+          </template>
+          <span>{{ item.status_tooltip }}</span>
+        </v-tooltip>
+      </template>
+      <!-- Progress indicator cell -->
+      <template v-slot:item.progress="{ item }">
+        <div class="d-flex align-center justify-end">
+          <span class="mr-2">{{ progressToPercentage(item.progress) }}</span>
           <v-progress-circular
-            size="35"
-            :width="1.5"
+            size="18"
+            :width="3"
             :rotate="270"
             color="primary"
             class="jobProgress"
-            :value="props.item.progress"
-          >
-            <span class="progressPercentage">{{ progressToPercentage(props.item.progress) }}</span>
-          </v-progress-circular>
-        </td>
-        <td class="text-xs-right">{{ $moment(props.item.time).format('D.M.YYYY H:mm:ss') }}</td>
-        <td>
-          <div class="d-flex text-xs-right actionsBtns">
-            <v-tooltip top>
-              <v-btn icon class="mx-0"  :disabled="props.item.status !== '0'"  slot="activator" @click="operateJob(props.item.id, 'start')">
-                <v-icon color="success">play_circle_outline</v-icon>
+            :value="item.progress"
+          />
+        </div>
+      </template>
+      <!-- Date added cell -->
+      <template v-slot:item.time="{ item }">
+        {{ $moment(item.time).format('D.M.YYYY H:mm:ss') }}
+      </template>
+      <!-- Action buttons cell -->
+      <template v-slot:item.actions="{ item }">
+        <div class="actionsBtns">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                :disabled="item.status !== '0'"
+                v-on="on"
+                @click="operateJob(item.id, 'start')"
+              >
+                <v-icon color="success">
+                  mdi-play-circle
+                </v-icon>
               </v-btn>
-              <span>Start job</span>
-            </v-tooltip>
-            <v-tooltip top>
-              <v-btn icon class="mx-0"  :disabled="props.item.status >= 10"  slot="activator" @click="operateJob(props.item.id, 'restart')">
-                <v-icon color="info">loop</v-icon>
-              </v-btn>
-              <span>Restart job</span>
-            </v-tooltip>
-            <v-tooltip top>
-              <v-btn icon class="mx-0"  :disabled="props.item.status !== '10'"  slot="activator" @click="operateJob(props.item.id, 'stop')">
-                <v-icon color="error">pause_circle_outline</v-icon>
-              </v-btn>
-              <span>Stop job</span>
-            </v-tooltip>
-          </div>
-        </td>
-        <td class="text-xs-right">
-          <v-tooltip top v-if="props.item.deleted">
-            <v-btn icon class="mx-0" slot="activator" @click="hideJob(props.item.id)">
-              <v-icon color="grey darken-3 ">visibility</v-icon>
-            </v-btn>
-            <span>Show job</span>
+            </template>
+            <span>Start job</span>
           </v-tooltip>
-          <v-tooltip top v-else>
-            <v-btn icon class="mx-0" slot="activator" @click="hideJob(props.item.id)">
-              <v-icon color="grey ">visibility_off</v-icon>
-            </v-btn>
-            <span>Hide job</span>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                :disabled="item.status !== '10'"
+                v-on="on"
+                @click="operateJob(item.id, 'stop')"
+              >
+                <v-icon color="error">
+                  mdi-pause-circle
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Stop job</span>
           </v-tooltip>
-        </td>
-      </tr>
+          <v-menu>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                v-on="on"
+              >
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item 
+                v-if="item.status < 10"
+                @click="operateJob(item.id, 'restart')"
+              >
+                <v-list-item-title>
+                  <v-icon left>
+                    mdi-restart
+                  </v-icon>Restart
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="operateJob(item.id, 'duplicate')">
+                <v-list-item-title>
+                  <v-icon left>
+                    mdi-content-copy
+                  </v-icon>Duplicate
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="hideJob(item.id)">
+                <v-list-item-title>
+                  <v-icon left>
+                    {{ item.deleted ? 'mdi-eye' : 'mdi-eye-off' }}
+                  </v-icon> 
+                  {{ item.deleted ? 'Stop hiding' : 'Hide' }}
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </div>
+      </template>
     </v-data-table>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'jobsView',
-    watch: {
-      pagination: {
-        handler () {
-          this.loading = true;
-          this.loadJobs()
-        },
-        deep: true
-      },
-      '$route.name': {
-        handler () {
-          this.loading = true;
-          this.loadJobs()
-        }
-      },
-    },
-    mounted () {
-      // this.loadJobs()
-      this.interval = setInterval(function () {
-        this.loadJobs()
-      }.bind(this), 15000)
-    },
-    beforeDestroy: function () {
-      clearInterval(this.interval)
-    },
-    methods: {
-      loadJobs () {
-        this.axios.get(this.$serverAddr + '/jobs', {
-          params: {
-            'page': this.pagination.page,
-            'per_page': this.pagination.rowsPerPage,
-            'order_by': this.pagination.sortBy,
-            'descending': this.pagination.descending,
-            'name': this.search,
-            'status': this.status,
-            'showDeleted': this.$route.name === 'hiddenJobs'
-          }
-        }).then((response) => {
-          this.jobs = response.data.items;
-          this.totalItems = response.data.total;
-          this.loading = false
-        })
-      },
-      updateStatus: function (e) {
-        this.status = e;
-        this.$refs.table.updatePagination({ page: 1, totalItems: this.totalItems })
-      },
-      progressToPercentage: function (progress) {
-        if(progress > 100){
-          progress = 100
-        }
-        return progress.toFixed() + '%'
-      },
-      operateJob: function (id, operation) {
-        this.axios.get(this.$serverAddr + '/jobs/' + id + '/action', {
-          params: {
-            'operation': operation
-          }
-        }).then((response) => {
-          console.log(response.data);
-          this.loadJobs()
-        })
-      },
-      hideJob: function (id) {
-        this.loading = true
-        this.axios.delete(this.$serverAddr + '/jobs/' + id)
-        .then((response) => {
-          this.loadJobs()
-        })
-      }
-    },
+    name: 'JobsView',
     data () {
       return {
         interval: null,
         status: null,
+        attackType: null,
         search: '',
+        viewHidden: false,
         totalItems: 0,
         pagination: {},
+        selectedJobs: [],
         loading: true,
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Attack type', value: 'attack_mode', align: 'right'},
-          {text: 'Status', value: 'status', align: 'right'},
-          {text: 'Progress', value: 'progress', align: 'right'},
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Actions', value: 'name', sortable: false, align: 'right'},
-          {text: 'Hide', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Attack type', value: 'attack', align: 'end', sortable: false},
+          {text: 'Status', value: 'status', align: 'end'},
+          {text: 'Progress', value: 'progress', align: 'end'},
+          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Actions', value: 'actions', sortable: false, align: 'end'}
         ],
         jobs_statuses: [
           {
@@ -235,9 +263,95 @@
             'code': 12
           }
         ],
+        jobs_types: [
+          {
+            'text': 'dictionary',
+            'code': 0
+          },
+          {
+            'text': 'mask',
+            'code': 1
+          },
+          {
+            'text': 'combinator',
+            'code': 2
+          },
+          {
+            'text': 'pcfg',
+            'code': 3
+          }
+        ],
         jobs:
           [
           ]
+      }
+    },
+    watch: {
+      pagination: {
+        handler: 'updateList',
+        deep: true
+      },
+      '$route.name': 'updateList',
+      viewHidden: 'updateList'
+    },
+    mounted () {
+      // this.loadJobs()
+      this.interval = setInterval(function () {
+        this.loadJobs()
+      }.bind(this), 15000)
+    },
+    beforeDestroy: function () {
+      clearInterval(this.interval)
+    },
+    methods: {
+      loadJobs () {
+        this.axios.get(this.$serverAddr + '/jobs', {
+          params: {
+            'page': this.pagination.page,
+            'per_page': this.pagination.itemsPerPage,
+            'order_by': this.pagination.sortBy[0],
+            'descending': this.pagination.sortDesc[0],
+            'name': this.search,
+            'status': this.status,
+            'attack_mode': this.attackType,
+            'showDeleted': this.viewHidden
+          }
+        }).then((response) => {
+          this.jobs = response.data.items;
+          this.totalItems = response.data.total;
+          this.loading = false
+        })
+      },
+      updateList () {
+        this.loading = true
+        this.loadJobs()
+      },
+      updateStatus: function (e) {
+        this.status = e;
+        this.$refs.table.updatePagination({ page: 1, totalItems: this.totalItems })
+      },
+      progressToPercentage: function (progress) {
+        if(progress > 100){
+          progress = 100
+        }
+        return progress.toFixed() + '%'
+      },
+      operateJob: function (id, operation) {
+        this.axios.get(this.$serverAddr + '/jobs/' + id + '/action', {
+          params: {
+            'operation': operation
+          }
+        }).then((response) => {
+          console.log(response.data);
+          this.loadJobs()
+        })
+      },
+      hideJob: function (id) {
+        this.loading = true
+        this.axios.delete(this.$serverAddr + '/jobs/' + id)
+        .then((response) => {
+          this.loadJobs()
+        })
       }
     }
   }
@@ -246,26 +360,15 @@
 <style scoped>
 .cont {
   height: 100%;
-  background: white;
+
 }
 
-  .progressPercentage{
-    font-size: 11px;
-  }
-
   .actionsBtns{
-    width: 125px;
-    float: right;
+    text-align: right;
   }
 
   .middle {
     vertical-align: middle;
   }
 
-</style>
-
-<style>
-  .jobProgress .progress-circular__overlay {
-    transition: none;
-  }
 </style>

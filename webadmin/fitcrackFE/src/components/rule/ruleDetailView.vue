@@ -5,61 +5,75 @@
 
 <template>
   <div>
-    <v-breadcrumbs divider="/" class="pb-0"  v-if="data != null">
-      <v-breadcrumbs-item>
-        <router-link :to="{name: 'rules'}">Rules</router-link>
-      </v-breadcrumbs-item>
-      <v-breadcrumbs-item>
-        {{data.name}}
-      </v-breadcrumbs-item>
-    </v-breadcrumbs>
+    <v-breadcrumbs
+      v-if="data != null"
+      :items="
+        [
+          { text: 'Rules', to: { name: 'rules' }, exact: true },
+          { text: data.name }
+        ]"
+      divider="/"
+    />
 
     <v-container>
-      <v-layout row wrap justify-center>
-        <fc-tile title="Rule file" :loading="data==null" class="mx-2 dictContentContainer mb-4">
-          <v-list single-line class="width100" v-if="data != null">
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+      <v-row justify="center">
+        <fc-tile
+          title="Rule file"
+          :loading="data==null"
+          class="mx-2 dictContentContainer mb-4"
+        >
+          <v-list
+            v-if="data != null"
+          >
+            <v-list-item>
+              <v-list-item-action>
                 Name:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
-                  {{data.name}}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-right">
+                  {{ data.name }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider />
+            <v-list-item>
+              <v-list-item-action>
                 Added:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-right">
                   {{ $moment(data.time).format('DD.MM.YYYY HH:mm') }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-content>
-                <v-layout row class="width100 margintop5">
-                  <v-spacer></v-spacer>
-                  <a :href="$serverAddr + '/rule/' + data.id + '/download'" target="_blank">
-                    <v-btn class="ma-0" outline color="primary">
-                      Download <v-icon class="ml-2">file_download</v-icon>
-                    </v-btn>
-                  </a>
-                </v-layout>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
-          <v-divider></v-divider>
-          <div class="dictContent" v-if="data != null">
-            <fc-textarea :readonly="true" :searchEnable="true" :url="this.$serverAddr + '/rule/' +  this.$route.params.id + '/data'" maxHeight="500"></fc-textarea>
+          <v-row class="mx-2">
+            <v-col>
+              <v-btn
+                class="ma-0"
+                outlined
+                color="primary"
+                :href="$serverAddr + '/rule/' + data.id + '/download'"
+                target="_blank"
+              >
+                Download <v-icon right>mdi-download</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-divider />
+          <div
+            v-if="data != null"
+            class="dictContent"
+          >
+            <fc-textarea
+              :readonly="true"
+              :search-enable="true"
+              :url="this.$serverAddr + '/rule/' + this.$route.params.id + '/data'"
+              max-height="500"
+            />
           </div>
-
         </fc-tile>
-      </v-layout>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -68,10 +82,15 @@
   import tile from '@/components/tile/fc_tile'
   import fcTextarea from '@/components/textarea/fc_textarea'
   export default {
-    name: "ruleDetailView",
+    name: "RuleDetailView",
     components: {
       'fc-tile': tile,
       'fc-textarea': fcTextarea
+    },
+    data: function () {
+      return {
+        data: null
+      }
     },
     mounted: function () {
       this.loadData()
@@ -81,11 +100,6 @@
         this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
           this.data = response.data
         });
-      }
-    },
-    data: function () {
-      return {
-        data: null
       }
     }
   }

@@ -13,7 +13,9 @@
       large
       color="primary"
     >
-      Make template
+      <v-icon left>
+        mdi-file-plus
+      </v-icon>Make template
     </v-btn>
 
     <v-card>
@@ -25,19 +27,41 @@
       </v-card-title>
 
       <v-card-text>
-        <json-viewer :value="data" ></json-viewer>
+        <!-- <json-viewer :value="data" ></json-viewer> -->
+        <v-text-field
+          id="templateName"
+          v-model="data.name"
+          name="templateName"
+          label="Template name"
+        />
+
+        <div class="flex">
+          <v-icon left>
+            info
+          </v-icon>
+          <div>
+            The choices you made in the job configuration will be saved as a template.<br>
+            You can pre-fill any new job configuration with templates you saved.
+          </div>
+        </div>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer />
+        <v-btn
+          text
+          @click="dialog = !dialog"
+        >
+          Back to editing
+        </v-btn>
         <v-btn
           color="primary"
-          flat
+          text
           @click="submit"
         >
-          Submit template
+          Save template
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -45,17 +69,18 @@
 </template>
 
 <script>
-  import jsonViewer from '@/components/json/json-viewer'
   export default {
-    name: "templateModal",
-    components: {
-      'json-viewer': jsonViewer
-    },
+    name: "TemplateModal",
     props: {
       data: {
         type: Object,
         default: null
       },
+    },
+    data() {
+      return {
+        dialog: false
+      }
     },
     methods: {
       submit() {
@@ -69,14 +94,11 @@
         this.dialog = false
       }
     },
-    data() {
-      return {
-        dialog: false
-      }
-    },
   }
 </script>
 
 <style scoped>
-
+.flex {
+  display: flex;
+}
 </style>

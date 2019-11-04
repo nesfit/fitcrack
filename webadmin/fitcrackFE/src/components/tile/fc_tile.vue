@@ -4,36 +4,41 @@
 -->
 
 <template>
-  <v-layout row wrap class=" mx-auto elevation-2 white">
-    <v-toolbar color="primary" dark card class="max64">
-      <v-toolbar-title>{{title}}</v-toolbar-title>
-    </v-toolbar>
-    <div class="contentFcTile">
-      <v-progress-circular
-        size="50"
-        :width="3"
-        class="progress"
-        indeterminate
-        color="primary"
+  <v-card class="mx-auto">
+    <v-card-title>
+      <v-icon 
+        v-if="icon"
+        left
+      >
+        {{ icon }}
+      </v-icon>
+      {{ title }}
+    </v-card-title>
+    <v-card-text class="contentFcTile">
+      <v-skeleton-loader
         v-if="loading"
-      ></v-progress-circular>
-      <slot v-else></slot>
-    </div>
-  </v-layout>
+        class="mx-auto"
+        type="article"
+      />
+      <slot v-else />
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
   export default {
-    props: ['title', 'loading'],
-    name: "fc_tile"
-
+    name: "FcTile",
+    props: {
+      title: String,
+      loading: Boolean,
+      icon: String
+    }
   }
 </script>
 
 <style scoped>
 
   .white {
-    background: white;
     min-width: 300px;
     position: relative;
   }
@@ -42,6 +47,7 @@
     position: relative;
     min-height: 100px;
     width: 100%;
+    padding: 0;
   }
 
   .progress {

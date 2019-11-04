@@ -5,43 +5,71 @@
 
 <template>
   <v-container class="max500">
-    <fc-tile title="Rules" class="ma-2">
-      <v-alert :value="true" type="warning" class="mt-0 mb-1" >
+    <fc-tile
+      title="Rules"
+      class="ma-2"
+      :icon="$route.meta.icon"
+    >
+      <v-alert
+        tile
+        text
+        type="warning"
+        class="mb-0"
+      >
         Rule files must have a .txt or .rule extension.
       </v-alert>
       <v-data-table
         :headers="headers"
         :items="rules.items"
         :loading="loading"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Rule files per page"
-        disable-initial-sort
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Rules per page'}"
       >
-        <template slot="items" slot-scope="props">
-          <td><router-link :to="{name: 'ruleDetail', params: { id: props.item.id}}">{{ props.item.name }}</router-link></td>
-          <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-          <td class="text-xs-right">
-            <a :href="$serverAddr + '/rule/' + props.item.id + '/download'" target="_blank">
-              <v-btn outline fab small color="primary">
-                <v-icon>file_download</v-icon>
+        <template v-slot:item.name="{ item }">
+          <router-link :to="`rules/${item.id}`">
+            {{ item.name }}
+          </router-link>
+        </template>
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/rule/' + item.id + '/download'"
+                target="_blank"
+                download
+                v-on="on"
+              >
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
+                </v-btn>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                @click="deleteRule(item)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  mdi-delete-outline
+                </v-icon>
               </v-btn>
-            </a>
-          </td>
-          <td class="text-xs-right">
-            <v-tooltip top>
-              <v-btn icon class="mx-0" @click="deleteRule(props.item.id)" slot="activator">
-                <v-icon color="error">delete</v-icon>
-              </v-btn>
-              <span>Delete rules file</span>
-            </v-tooltip>
-          </td>
+            </template>
+            <span>Delete</span>
+          </v-tooltip>
         </template>
       </v-data-table>
-      <v-divider></v-divider>
-      <file-uploader :url="this.$serverAddr + '/rule/add'" @uploadComplete="loadRules"></file-uploader>
-
+      <v-divider />
+      <file-uploader
+        :url="this.$serverAddr + '/rule/add'"
+        @uploadComplete="loadRules"
+      />
     </fc-tile>
-
   </v-container>
 </template>
 
@@ -49,10 +77,25 @@
   import tile from '@/components/tile/fc_tile'
   import FileUploader from "@/components/fileUploader/fileUploader";
   export default {
-    name: "rulesView",
+    name: "RulesView",
     components: {
       FileUploader,
       'fc-tile': tile,
+    },
+    data: function () {
+      return {
+        loading: false,
+        rules: [],
+        headers: [
+          {
+            text: 'Name',
+            align: 'start',
+            value: 'name'
+          },
+          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
+        ]
+      }
     },
     mounted: function () {
       this.loadRules()
@@ -65,29 +108,13 @@
           this.loading = false
         })
       },
-      deleteRule: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+      deleteRule: function (item) {
+        this.$root.$confirm('Delete', `This will remove ${item.name} from your rules. Are you sure?`).then((confirm) => {
           this.loading = true;
           this.axios.delete(this.$serverAddr + '/rule/' + id).then((response) => {
             this.loadRules()
           })
         })
-      }
-    },
-    data: function () {
-      return {
-        loading: false,
-        rules: [],
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'},
-          {text: 'Delete', align: 'right'}
-        ]
       }
     }
   }

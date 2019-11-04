@@ -5,341 +5,486 @@
 
 <template>
   <div class="containerAddJob height100 mx-auto">
-    <v-toolbar app dark color="primary" height="48px" class="topToolbar"
-               v-bind:class="{scrollTop: (!knowEstimatedTime && !showEstimatedTime)}">
-      <v-toolbar-title class="estimatedTime">Estimated cracking time is {{estimatedTime}}.
+    <v-app-bar
+      app
+      color="primary"
+      height="48px"
+      class="topToolbar"
+      :class="{scrollTop: (!knowEstimatedTime && !showEstimatedTime)}"
+    >
+      <v-toolbar-title class="estimatedTime">
+        Estimated cracking time is {{ estimatedTime }}.
       </v-toolbar-title>
-    </v-toolbar>
-    <div class="loadingProgressCont" v-show="loading">
+    </v-app-bar>
+    <div
+      v-show="loading"
+      class="loadingProgressCont"
+    >
       <v-progress-circular
         indeterminate
         color="primary"
         size="65"
         class="loadingProgress"
-        :width="4"/>
+        :width="4"
+      />
     </div>
+
+    <h1 class="mb-4">
+      Create a new job
+    </h1>
+
+    <v-text-field
+      v-model="name"
+      label="Name"
+      outlined
+      autofocus
+      required
+    />
+
+    <v-textarea
+      v-model="comment"
+      label="Comment (optional)"
+      outlined
+    />
+
     <div>
-      <v-flex class="addJobContent mx-auto">
-        <v-form v-model="valid" ref="form">
-          <v-layout row wrap>
-            <v-flex xs6 class="px-2">
-              <div class="max500 mx-auto mb-5">
-              <fc-tile title="Create new job">
-                <v-layout row wrap class="px-3">
-                  <v-flex xs4>
-                    <v-subheader class="height64">Name:</v-subheader>
-                  </v-flex>
-                  <v-flex xs8>
-                    <v-text-field
-                      single-line
-                      label="Name"
-                      v-model="name"
-                      required
-                    ></v-text-field>
-                  </v-flex>
-                  <v-flex xs4>
-                    <v-subheader class="height64">Comment:</v-subheader>
-                  </v-flex>
-                  <v-flex xs8>
-                    <v-text-field
-                      label="Comment"
-                      v-model="comment"
-                    ></v-text-field>
-                  </v-flex>
-                </v-layout>
-              </fc-tile>
-            </div>
-            </v-flex>
-            <v-flex xs6 class="px-2">
-              <div class="max500 mx-auto mb-5">
-              <fc-tile title="Input settings">
-                <v-layout row wrap class="px-0 pt-2">
-                  <v-flex xs4>
-                    <v-subheader class="height100">Hashtype:</v-subheader>
-                  </v-flex>
-                  <v-flex xs8>
-                    <v-autocomplete
-                      class="hashtypeSelect pr-2"
-                      editable
-                      validate-on-blur
-                      clearable
-                      multi-line
-                      label="Hashtype"
-                      v-model="hashtype"
-                      :items="hashTypes"
-                      item-text="name"
-                      return-object
-                      @change="validateHashes(null)"
-                      required
-                      dense
-                      box
-                    >
-                      <template
-                        slot="item"
-                        slot-scope="data"
-                      >
-                        <v-list-tile-content>
-                          <v-list-tile-title><b>{{data.item.code}}</b> - {{data.item.name}}</v-list-tile-title>
-                        </v-list-tile-content>
-                      </template>
-                    </v-autocomplete>
-                  </v-flex>
-                  <v-flex xs12 v-if="hashtype && hashtype.subcategories !== null" class="pt-3">
-                    <v-flex xs12 d-flex v-for="(value, key) in hashtype.subcategories">
-                      <v-select
-                        @change="subHashtypeChanged(key, $event)"
-                        return-object
-                        required
-                        hide-details
-                        class="px-3 pt-2"
-                        height="24"
-                        offset-y
-                        item-text="description"
-                        :items="value"
-                        :label="key"
-                        outline
-                        single-line
-                      >
-                        <template
-                          slot="item"
-                          slot-scope="data"
-                        >
-                          <v-list-tile-content>
-                            <v-list-tile-title><b>{{data.item.code}}</b> - {{data.item.description}}</v-list-tile-title>
-                          </v-list-tile-content>
-                        </template>
-                      </v-select>
-                    </v-flex>
-                  </v-flex>
-
-                  <v-flex xs4>
-                    <v-subheader class="height100">Upload method:</v-subheader>
-                  </v-flex>
-                  <v-flex xs8>
-                    <v-radio-group v-model="inputMethod">
-                      <v-radio value="extractFromFile" label="Extract from file"></v-radio>
-                      <v-radio value="hashFile" label="Upload hash files"></v-radio>
-                      <v-radio value="multipleHashes" label="Enter hashes" @click.native="focusTextarea"></v-radio>
-                    </v-radio-group>
-                  </v-flex>
-                  <v-flex xs12 v-if="inputMethod === 'extractFromFile'">
-                    <v-divider></v-divider>
-                    <v-alert :value="true" type="warning" class="mt-0 mb-0" >
-                      Currently we supports these formats:
-                      <v-tooltip top>
-                        <span slot="activator"><a href="#">MS_OFFICE</a>,</span>
-                        <span>Hashtypes: 9400, 9500, 9600, 9700, 9800</span>
-                      </v-tooltip>
-                      <v-tooltip top>
-                        <span slot="activator"><a href="#">PDF</a>,</span>
-                        <span>Hashtypes: 10400, 10500, 10600, 10700</span>
-                      </v-tooltip>
-                      <v-tooltip top>
-                        <span slot="activator"><a href="#">RAR</a> and </span>
-                        <span>Hashtypes: 12500, 13000</span>
-                      </v-tooltip>
-                      <v-tooltip top>
-                        <span slot="activator"><a href="#">ZIP</a>.</span>
-                        <span>Hashtypes: 13600</span>
-                      </v-tooltip>
-                    </v-alert>
-                    <file-uploader ref="encryptedFileUploader" :url="this.$serverAddr + '/protectedFiles/add'" @uploadComplete="uploadComplete"></file-uploader>
-                  </v-flex>
-                  <v-flex xs12 v-if="inputMethod === 'hashFile'">
-                    <v-alert :value="true" type="warning" class="mt-0 mb-0" >
-                      Input to hashcat. Can be binary hash (WPA/WPA2), or hashlist.
-                    </v-alert>
-                    <file-uploader ref="hashFileUploader" :noUpload="true" @filesChanged="hashFileSelected"></file-uploader>
-                  </v-flex>
-                  <v-flex xs12>
-                    <v-alert :value="true" type="info" color="primary" class="mt-0 mb-0" v-if="gotBinaryHash" >You can select only one binary hash.</v-alert>
-                    <fc-textarea
-                      :class="{error: hashListError}"
-                      class="textarea"
-                      v-if="inputMethod !== null"
-                      ref="textarea"
-                      maxHeight="500"
-                      :readonly="!(inputMethod === 'multipleHashes' && !gotBinaryHash) "
-                      v-model="hashList"
-                      @blur="validateHashes"
-                      @focus="unvalidateHashes"
-                      :canRemoveLine="true "
-                    >
-                      <div class="hashCeckContainer pl-1 pt-2"  slot="after">
-                        <v-layout row justify-end class="pa-0 ma-0" v-for="hashObj in validatedHashes" >
-                          <v-flex xs6>
-                            <v-icon small v-if="hashObj.result === 'OK'" color="success">check_circle_outline</v-icon>
-                            <v-tooltip left v-else>
-                              <v-icon small slot="activator" color="error" class="clickable">error_circle_outline</v-icon>
-                              <span>{{hashObj.result}}</span>
-                            </v-tooltip>
-                          </v-flex>
-
-                          <v-flex xs6>
-                            <v-tooltip  left v-if="hashObj.isInCache">
-                              <v-icon small slot="activator" color="warning" class="clickable">error_circle_outline</v-icon>
-                              <span>hash already in hashcache</span>
-                            </v-tooltip>
-                          </v-flex>
-                        </v-layout>
-                      </div>
-                    </fc-textarea>
-                  </v-flex>
-                </v-layout>
-              </fc-tile>
-            </div>
-            </v-flex>
-          </v-layout>
-        <!--    <h3> Message: {{ attackSettings }} </h3> -->
-          <div class="max1000 mx-auto mb-5">
-            <fc-tile title="Attack settings">
-              <v-layout row wrap>
-                <v-tabs
-                  class="width100 attackSettings"
-                  xs12
-                  v-model="attackSettingsTab"
-                  centered
-                  show-arrows
-                  color="primary darken-1"
-                  dark
-                  slider-color="white"
+      <v-col class="addJobContent mx-auto">
+        <v-stepper
+          v-model="step"
+          vertical
+          class="mb-4"
+        >
+          <v-stepper-step 
+            editable
+            step="1"
+          >
+            Input settings
+          </v-stepper-step>
+          <v-stepper-content step="1">
+            <v-row class="px-0 pt-2">
+              <v-col cols="4">
+                <v-subheader class="height100">
+                  Hashtype:
+                </v-subheader>
+              </v-col>
+              <v-col cols="8">
+                <v-autocomplete
+                  v-model="hashtype"
+                  class="hashtypeSelect pr-2"
+                  editable
+                  validate-on-blur
+                  clearable
+                  multi-line
+                  label="Select hash type"
+                  :items="hashTypes"
+                  item-text="name"
+                  return-object
+                  required
+                  dense
+                  outlined
+                  @change="validateHashes(null)"
                 >
-                  <v-tab  :ripple="false" @click="attackTabChanged($refs.DictAttack)">
-                    Dictionary attack
-                  </v-tab>
-                  <v-tab-item lazy >
-                    <v-card flat>
-                      <dictionary v-model="attackSettings" ref="DictAttack"></dictionary>
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab  :ripple="false" @click="attackTabChanged($refs.CombAttack)">
-                    Combination attack
-                  </v-tab>
-                  <v-tab-item lazy>
-                    <v-card flat>
-                      <combinator v-model="attackSettings" ref="CombAttack"></combinator>
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab  :ripple="false" @click="attackTabChanged($refs.BruteAttack)">
-                    Brute-force attack
-                  </v-tab>
-                  <v-tab-item lazy>
-                    <v-card flat>
-                      <maskattack v-model="attackSettings" ref="BruteAttack"></maskattack>
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab  :ripple="false" @click="attackTabChanged($refs.HybridWordMaskAttack)">
-                    Hybrid Wordlist + Mask
-                  </v-tab>
-                  <v-tab-item lazy>
-                    <v-card flat>
-                      <hybridWordlistMask v-model="attackSettings" ref="HybridWordMaskAttack"></hybridWordlistMask>
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab :ripple="false" @click="attackTabChanged($refs.HybridMaskWordAttack)">
-                    Hybrid Mask + Wordlist
-                  </v-tab>
-                  <v-tab-item lazy>
-                    <v-card flat>
-                      <hybridMaskWordlist v-model="attackSettings" ref="HybridMaskWordAttack"></hybridMaskWordlist>
-                    </v-card>
-                  </v-tab-item>
-                  <v-tab :ripple="false" @click="attackTabChanged($refs.pcfg)">
-                    PCFG
-                  </v-tab>
-                  <v-tab-item lazy>
-                    <v-card flat>
-                      <pcfg v-model="attackSettings" ref="pcfgAttack"></pcfg>
-                    </v-card>
-                  </v-tab-item>
-                </v-tabs>
-              </v-layout>
-            </fc-tile>
-          </div>
-
-          <div class="max800 mx-auto mb-5">
-            <fc-tile title="Host mapping">
-              <v-layout row wrap class="">
-                <host-selector :selectAll="true" v-model="hosts"></host-selector>
-              </v-layout>
-            </fc-tile>
-          </div>
-
-
-          <div class="max500 mx-auto mb-5">
-            <fc-tile title="Miscellanious settings">
-              <v-layout row wrap class="px-3">
-                <v-flex xs6>
-                  <v-subheader class="height100">Desired time for each job:</v-subheader>
-                </v-flex>
-                <v-flex xs6>
-                  <v-text-field
-                    flat
-                    single-line
-                    label="Time for job"
-                    v-model="timeForJob"
+                  <template
+                    slot="item"
+                    slot-scope="data"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title><b>{{ data.item.code }}</b> - {{ data.item.name }}</v-list-item-title>
+                    </v-list-item-content>
+                  </template>
+                </v-autocomplete>
+              </v-col>
+              <v-col
+                v-if="hashtype && hashtype.subcategories !== null"
+                cols="12"
+                class="pt-3"
+              >
+                <v-col
+                  v-for="(value, key) in hashtype.subcategories"
+                  class="d-flex"
+                  cols="12"
+                >
+                  <v-select
+                    return-object
                     required
-                    type="number"
-                    suffix="seconds"
-                    :min="60"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs4>
-                  <v-subheader class="height100">Start:</v-subheader>
-                </v-flex>
-                <v-flex xs5>
-                  <v-text-field
-                    :disabled="startNow"
-                    v-model="startDate"
-                    flat
+                    hide-details
+                    class="px-3 pt-2"
+                    height="24"
+                    offset-y
+                    @change="subHashtypeChanged(key, $event)"
+                    item-text="description"
+                    :items="value"
+                    :label="key"
+                    outlined
                     single-line
-                    label=""
-                    mask="date-with-time"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs3>
-                  <v-checkbox
-                    label="start now"
-                    v-model="startNow"
-                  ></v-checkbox>
-                </v-flex>
-                <v-flex xs4>
-                  <v-subheader class="height100">End:</v-subheader>
-                </v-flex>
-                <v-flex xs5>
-                  <v-text-field
-                    :disabled="endNever"
-                    v-model="endDate"
-                    flat
-                    single-line
-                    label=""
-                    mask="date-with-time"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs3>
-                  <v-checkbox
-                    label="End never"
-                    v-model="endNever"
-                  ></v-checkbox>
-                </v-flex>
-              </v-layout>
-            </fc-tile>
-          </div>
-          <v-layout row justify-center class="mb-5">
-            <v-btn
-              large
+                  >
+                    <template
+                      slot="item"
+                      slot-scope="data"
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title><b>{{ data.item.code }}</b> - {{ data.item.description }}</v-list-item-title>
+                      </v-list-item-content>
+                    </template>
+                  </v-select>
+                </v-col>
+              </v-col>
+
+              <v-col cols="4">
+                <v-subheader class="height100">
+                  Upload method:
+                </v-subheader>
+              </v-col>
+              <v-col cols="8">
+                <v-radio-group v-model="inputMethod">
+                  <v-radio
+                    value="extractFromFile"
+                    label="Extract from file"
+                  />
+                  <v-radio
+                    value="hashFile"
+                    label="Upload hash files"
+                  />
+                  <v-radio
+                    value="multipleHashes"
+                    label="Enter hashes"
+                    @click.native="focusTextarea"
+                  />
+                </v-radio-group>
+              </v-col>
+              <v-col
+                v-if="inputMethod === 'extractFromFile'"
+                cols="12"
+              >
+                <v-alert
+                  type="warning"
+                  class="mt-0 mb-0"
+                >
+                  Currently we support these formats:
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on"><a href="#">MS_OFFICE</a>,</span>
+                    </template>
+                    <span>Hashtypes: 9400, 9500, 9600, 9700, 9800</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on"><a href="#">PDF</a>,</span>
+                    </template>
+                    <span>Hashtypes: 10400, 10500, 10600, 10700</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on"><a href="#">RAR</a> and </span>
+                    </template>
+                    <span>Hashtypes: 12500, 13000</span>
+                  </v-tooltip>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on"><a href="#">ZIP</a>.</span>
+                    </template>
+                    <span>Hashtypes: 13600</span>
+                  </v-tooltip>
+                </v-alert>
+                <file-uploader
+                  ref="encryptedFileUploader"
+                  :url="this.$serverAddr + '/protectedFiles/add'"
+                  @uploadComplete="uploadComplete"
+                />
+              </v-col>
+              <v-col
+                v-if="inputMethod === 'hashFile'"
+                cols="12"
+              >
+                <v-alert
+                  type="warning"
+                  class="mt-0 mb-0"
+                >
+                  Input to hashcat. Can be binary hash (WPA/WPA2), or hashlist.
+                </v-alert>
+                <file-uploader
+                  ref="hashFileUploader"
+                  :no-upload="true"
+                  @filesChanged="hashFileSelected"
+                />
+              </v-col>
+              <v-col cols="12">
+                <v-alert
+                  :value="gotBinaryHash"
+                  text
+                  type="info"
+                  color="primary"
+                  class="mt-0 mb-0"
+                >
+                  You can select only one binary hash.
+                </v-alert>
+                <fc-textarea
+                  v-if="inputMethod !== null"
+                  ref="textarea"
+                  v-model="hashList"
+                  :class="{error: hashListError}"
+                  class="textarea"
+                  max-height="500"
+                  :readonly="!(inputMethod === 'multipleHashes' && !gotBinaryHash) "
+                  :can-remove-line="true "
+                  @blur="validateHashes"
+                  @focus="unvalidateHashes"
+                >
+                  <div
+                    slot="after"
+                    class="hashCeckContainer pl-1 pt-2"
+                  >
+                    <v-row
+                      v-for="hashObj in validatedHashes"
+                      justify="end"
+                      class="pa-0 ma-0"
+                    >
+                      <v-col cols="6">
+                        <v-icon
+                          v-if="hashObj.result === 'OK'"
+                          small
+                          color="success"
+                        >
+                          check_circle_outlined
+                        </v-icon>
+                        <v-tooltip
+                          v-else
+                          left
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              small
+                              color="error"
+                              class="clickable"
+                              v-on="on"
+                            >
+                              error_circle_outlined
+                            </v-icon>
+                          </template>
+                          <span>{{ hashObj.result }}</span>
+                        </v-tooltip>
+                      </v-col>
+
+                      <v-col cols="6">
+                        <v-tooltip
+                          v-if="hashObj.isInCache"
+                          left
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              small
+                              color="warning"
+                              class="clickable"
+                              v-on="on"
+                            >
+                              error_circle_outlined
+                            </v-icon>
+                          </template>
+                          <span>hash already in hashcache</span>
+                        </v-tooltip>
+                      </v-col>
+                    </v-row>
+                  </div>
+                </fc-textarea>
+              </v-col>
+            </v-row>
+          </v-stepper-content>
+
+          <v-stepper-step 
+            editable
+            step="2"
+          >
+            Attack settings
+          </v-stepper-step>
+          <!--    <h3> Message: {{ attackSettings }} </h3> -->
+          <v-stepper-content step="2">
+            <v-tabs
+              v-model="attackSettingsTab"
               color="primary"
-              @click="submit"
+              class="mx-0"
+            >
+              <v-tab
+                @click="attackTabChanged($refs.DictAttack)"
+              >
+                Dictionary
+              </v-tab>
+              <v-tab-item>
+                <v-card text>
+                  <dictionary
+                    ref="DictAttack"
+                    v-model="attackSettings"
+                  />
+                </v-card>
+              </v-tab-item>
+              <v-tab
+                @click="attackTabChanged($refs.CombAttack)"
+              >
+                Combination
+              </v-tab>
+              <v-tab-item>
+                <v-card text>
+                  <combinator
+                    ref="CombAttack"
+                    v-model="attackSettings"
+                  />
+                </v-card>
+              </v-tab-item>
+              <v-tab
+                @click="attackTabChanged($refs.BruteAttack)"
+              >
+                Brute-force
+              </v-tab>
+              <v-tab-item>
+                <v-card text>
+                  <maskattack
+                    ref="BruteAttack"
+                    v-model="attackSettings"
+                  />
+                </v-card>
+              </v-tab-item>
+              <v-tab
+                @click="attackTabChanged($refs.HybridWordMaskAttack)"
+              >
+                Hybrid Wordlist + Mask
+              </v-tab>
+              <v-tab-item>
+                <v-card text>
+                  <hybridWordlistMask
+                    ref="HybridWordMaskAttack"
+                    v-model="attackSettings"
+                  />
+                </v-card>
+              </v-tab-item>
+              <v-tab
+                @click="attackTabChanged($refs.HybridMaskWordAttack)"
+              >
+                Hybrid Mask + Wordlist
+              </v-tab>
+              <v-tab-item>
+                <v-card text>
+                  <hybridMaskWordlist
+                    ref="HybridMaskWordAttack"
+                    v-model="attackSettings"
+                  />
+                </v-card>
+              </v-tab-item>
+              <v-tab
+                @click="attackTabChanged($refs.pcfg)"
+              >
+                PCFG
+              </v-tab>
+              <v-tab-item>
+                <v-card text>
+                  <pcfg
+                    ref="pcfgAttack"
+                    v-model="attackSettings"
+                  />
+                </v-card>
+              </v-tab-item>
+            </v-tabs>
+          </v-stepper-content>
+          <v-stepper-step 
+            editable
+            step="3"
+          >
+            Host assignment
+          </v-stepper-step>
+          <v-stepper-content step="3">
+            <v-subheader>Select which hosts to distribute workunits to</v-subheader>
+            <host-selector
+              v-model="hosts"
+              :select-all="true"
+            />
+          </v-stepper-content>
+          <v-stepper-step 
+            editable
+            step="4"
+          >
+            Additional settings
+          </v-stepper-step>
+          <v-stepper-content step="4">
+            <v-row class="px-3">
+              <v-col cols="6">
+                <v-subheader class="height100">
+                  Desired time for each job:
+                </v-subheader>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  v-model="timeForJob"
+                  text
+                  single-line
+                  label="Time for job"
+                  required
+                  type="number"
+                  suffix="seconds"
+                  :min="60"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-subheader class="height100">
+                  Start:
+                </v-subheader>
+              </v-col>
+              <v-col cols="5">
+                <v-text-field
+                  v-model="startDate"
+                  :disabled="startNow"
+                  text
+                  single-line
+                  label=""
+                  mask="date-with-time"
+                />
+              </v-col>
+              <v-col cols="3">
+                <v-checkbox
+                  v-model="startNow"
+                  label="start now"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-subheader class="height100">
+                  End:
+                </v-subheader>
+              </v-col>
+              <v-col cols="5">
+                <v-text-field
+                  v-model="endDate"
+                  :disabled="endNever"
+                  text
+                  single-line
+                  label=""
+                  mask="date-with-time"
+                />
+              </v-col>
+              <v-col cols="3">
+                <v-checkbox
+                  v-model="endNever"
+                  label="End never"
+                />
+              </v-col>
+            </v-row>
+          </v-stepper-content>
+        </v-stepper>
 
-            >Submit
-            </v-btn>
-            <!--<template-modal :data="sendingJson"></template-modal>-->
-          </v-layout>
-
-        </v-form>
-
-      </v-flex>
-
+        <v-row
+          justify="center"
+          class="mb-5"
+        >
+          <template-modal :data="jobSettings" />
+          <v-btn
+            large
+            color="primary"
+            class="ml-2"
+            @click="submit"
+          >
+            <v-icon left>
+              mdi-check
+            </v-icon>Submit
+          </v-btn>
+          <!--<template-modal :data="sendingJson"></template-modal>-->
+        </v-row>
+      </v-col>
     </div>
   </div>
 </template>
@@ -351,16 +496,14 @@
   import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist'
   import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask'
   import pcfg from '@/components/job/attacks/pcfg'
-  import tile from '@/components/tile/fc_tile'
   import FileUploader from "@/components/fileUploader/fileUploader";
   import fcTextarea from '@/components/textarea/fc_textarea'
   import hostSelector from '@/components/selector/hostSelector'
   import templateModal from '@/components/jobTemplate/templateModal'
   export default {
-    name: 'addJob',
+    name: 'AddJob',
     components: {
       FileUploader,
-      'fc-tile': tile,
       'combinator': combinator,
       'maskattack': mask,
       'dictionary': dictionary,
@@ -373,6 +516,7 @@
     },
     data: function () {
       return {
+        step: 1,
         attackSettingsTab: null,
         attackSettings: false,
         loading: false,
@@ -396,19 +540,23 @@
         hashListError: false
       }
     },
-    mounted: function () {
-      this.getHashTypes()
-      // this.axios.get(this.$serverAddr + '/template/1', ).then((response) => {
-      //   setTimeout(function(){
-      //     var data = JSON.parse(response.data.data)
-      //     console.log( data.attack_settings)
-      //     this.$set(this, 'attackSettings', data.attack_settings)
-      //
-      //   }.bind(this), 1000);
-      //
-      // })
-    },
     computed: {
+      jobSettings () {
+        return {
+          "name": this.name,
+          "comment": this.comment,
+          "priority": 0,
+          "hosts_ids": this.hosts.map(h => h.id),
+          "seconds_per_job": parseInt(this.timeForJob),
+          "time_start": (this.startNow ? '' : this.startDate),
+          "time_end": (this.endNever ? '' : this.endDate),
+          'attack_settings': this.attackSettings,
+          "hash_settings": {
+            "hash_type": this.hashtype ? this.hashtype.code : null,
+            "hash_list": this.validatedHashes
+          }
+        }
+      },
       sendingJson: function () {
         return {
           'hosts_ids': this.hosts,
@@ -442,6 +590,18 @@
           })
         }
       },
+    },
+    mounted: function () {
+      this.getHashTypes()
+      // this.axios.get(this.$serverAddr + '/template/1', ).then((response) => {
+      //   setTimeout(function(){
+      //     var data = JSON.parse(response.data.data)
+      //     console.log( data.attack_settings)
+      //     this.$set(this, 'attackSettings', data.attack_settings)
+      //
+      //   }.bind(this), 1000);
+      //
+      // })
     },
     methods: {
       subHashtypeChanged: function (key, val) {
@@ -587,24 +747,7 @@
         }
 
         this.loading = true
-        var hostIds = []
-        for (let i = 0; i < this.hosts.length; i++) {
-          hostIds.push(this.hosts[i].id)
-        }
-        this.axios.post(this.$serverAddr + '/jobs', {
-          "name": this.name,
-          "comment": this.comment,
-          "priority": 0,
-          "hosts_ids": hostIds,
-          "seconds_per_job": parseInt(this.timeForJob),
-          "time_start": (this.startNow ? '' : this.startDate),
-          "time_end": (this.endNever ? '' : this.endDate),
-          'attack_settings': this.attackSettings,
-          "hash_settings": {
-            "hash_type": this.hashtype.code,
-            "hash_list": this.validatedHashes
-          }
-        }).then((response) => {
+        this.axios.post(this.$serverAddr + '/jobs', this.jobSettings).then((response) => {
           this.$router.push({name: 'jobDetail', params: {id: response.data.job_id}})
           console.log(response.data)
         }).catch((error) => {
@@ -617,6 +760,7 @@
 
 <style scoped>
   .containerAddJob {
+    padding: 2em;
     padding-top: 54px;
     position: relative;
     max-width: 1185px;
@@ -660,10 +804,6 @@
   .estimatedTime {
     font-weight: normal;
     font-size: 16px;
-  }
-
-
-  .addBtn {
   }
 
 
@@ -711,7 +851,7 @@
     bottom: 0;
     margin: auto;
     z-index: 2;
-    background: white;
+
   }
 
   .loadingProgress {
@@ -732,7 +872,6 @@
     text-overflow: ellipsis;
     display: block;
     width: 200px;
-    vertical-align: middle;
     line-height: 50px;
     height: 50px;
   }
@@ -750,7 +889,6 @@
   .textarea.error {
     border-width: 2px;
     border-style: solid;
-    background: white !important;
   }
 
   .width15 {

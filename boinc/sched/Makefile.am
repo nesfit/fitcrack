@@ -359,11 +359,11 @@ fitcrack_sources = \
 assimilator_SOURCES = $(ASSIMILATOR_SOURCES) \
 	$(fitcrack_sources) \
 	work_assimilator.cpp
-assimilator_LDADD = $(SERVERLIBS) -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection
+assimilator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
 
 work_generator_SOURCES = $(fitcrack_sources) \
 	work_generator.cpp
-work_generator_LDADD = $(SERVERLIBS) -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection
+work_generator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
 
 bitwise_validator_SOURCES = $(VALIDATOR_SOURCES) \
 	sample_bitwise_validator.cpp

@@ -18,7 +18,7 @@ CAttackMarkov::CAttackMarkov(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlL
 
 bool CAttackMarkov::makeWorkunit()
 {
-/** Create the workunit instance first */
+    /** Create the workunit instance first */
     if (!m_workunit && !generateWorkunit())
         return false;
 

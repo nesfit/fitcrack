@@ -35,6 +35,180 @@ import Server from '@/components/server/serverPage'
 
 Vue.use(Router);
 
+const appRoutes = [
+  {
+    path: '/',
+    name: 'home',
+    component: home,
+    meta: {
+      icon: 'mdi-home'
+    }
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: testView
+  },
+  {
+    path: '/jobs',
+    name: 'jobs',
+    component: jobs,
+    meta: {
+      icon: 'mdi-briefcase'
+    }
+  },
+  {
+    path: '/jobs/hidden',
+    name: 'hiddenJobs',
+    component: jobs
+  },
+  {
+    path: '/jobs/add',
+    name: 'addJob',
+    component: addJob,
+    meta: {
+      icon: 'mdi-briefcase-plus'
+    }
+  },
+  {
+    path: '/jobs/:id',
+    name: 'jobDetail',
+    component: jobDetail
+  },
+  {
+    path: '/hosts',
+    name: 'hosts',
+    component: hosts,
+    meta: {
+      icon: 'mdi-desktop-classic'
+    }
+  },
+  {
+    path: '/hosts/hidden',
+    name: 'hiddenHosts',
+    component: hosts
+  },
+  {
+    path: '/hosts/:id',
+    name: 'hostDetail',
+    component: hostDetail
+  },
+  {
+    path: '/hashes',
+    name: 'hashes',
+    component: hashes,
+    meta: {
+      icon: 'mdi-book-lock'
+    }
+  },
+  {
+    path: '/dictionaries',
+    name: 'dictionaries',
+    component: dictionaries,
+    meta: {
+      icon: 'mdi-dictionary'
+    }
+  },
+  {
+    path: '/dictionaries/:id',
+    name: 'dictionaryDetail',
+    component: dictionaryDetail
+  },
+  {
+    path: '/pcfg',
+    name: 'pcfg',
+    component: pcfg,
+    meta: {
+      icon: 'mdi-ray-start-end'
+    }
+  },
+  {
+    path: '/rules',
+    name: 'rules',
+    component: rules,
+    meta: {
+      icon: 'mdi-gavel'
+    }
+  },
+  {
+    path: '/rules/:id',
+    name: 'ruleDetail',
+    component: ruleDetail
+  },
+  {
+    path: '/charsets',
+    name: 'charsets',
+    component: charsets,
+    meta: {
+      icon: 'mdi-alphabetical'
+    }
+  },
+  {
+    path: '/charsets/:id',
+    name: 'charsetDetail',
+    component: charsetDetail
+  },
+  {
+    path: '/masks',
+    name: 'masks',
+    component: masks,
+    meta: {
+      icon: 'mdi-guy-fawkes-mask'
+    }
+  },
+  {
+    path: '/masks/:id',
+    name: 'maskDetail',
+    component: maskDetail
+  },
+  {
+    path: '/markovChains',
+    name: 'markovChains',
+    component: markovChains,
+    meta: {
+      icon: 'mdi-matrix'
+    }
+  },
+  {
+    path: '/files',
+    name: 'files',
+    component: EncryptedFiles
+  },
+  {
+    path: '/user',
+    name: 'user',
+    component: user
+  },
+  {
+    path: '/user/manageUsers',
+    name: 'manageUsers',
+    component: manageUsers,
+    meta: {
+      icon: 'mdi-folder-account'
+    }
+  },
+  {
+    path: '/myAccount',
+    name: 'myAccount',
+    component: myAccount,
+    meta: {
+      icon: 'mdi-account'
+    }
+  },
+  {
+    path: '/server',
+    name: 'server',
+    component: Server,
+    meta: {
+      icon: 'mdi-server'
+    }
+  },
+  {
+    path: "*",
+    component: PageNotFound
+  }
+]
+
 export default new Router({
   mode: 'history',
   routes: [
@@ -46,136 +220,16 @@ export default new Router({
     {
       path: '',
       component: mainPage,
-      children: [
-        {
-          path: '/',
-          name: 'home',
-          component: home
-        },
-        {
-          path: '/test',
-          name: 'test',
-          component: testView
-        },
-        {
-          path: '/jobs',
-          name: 'jobs',
-          component: jobs
-        },
-        {
-          path: '/jobs/hidden',
-          name: 'hiddenJobs',
-          component: jobs
-        },
-        {
-          path: '/jobs/add',
-          name: 'addJob',
-          component: addJob
-        },
-        {
-          path: '/jobs/:id',
-          name: 'jobDetail',
-          component: jobDetail
-        },
-        {
-          path: '/hosts',
-          name: 'hosts',
-          component: hosts
-        },
-        {
-          path: '/hosts/hidden',
-          name: 'hiddenHosts',
-          component: hosts
-        },
-        {
-          path: '/hosts/:id',
-          name: 'hostDetail',
-          component: hostDetail
-        },
-        {
-          path: '/hashes',
-          name: 'hashes',
-          component: hashes
-        },
-        {
-          path: '/dictionaries',
-          name: 'dictionaries',
-          component: dictionaries
-        },
-        {
-          path: '/dictionaries/:id',
-          name: 'dictionaryDetail',
-          component: dictionaryDetail
-        },
-        {
-          path: '/pcfg',
-          name: 'pcfg',
-          component: pcfg
-        },
-        {
-          path: '/rules',
-          name: 'rules',
-          component: rules
-        },
-        {
-          path: '/rules/:id',
-          name: 'ruleDetail',
-          component: ruleDetail
-        },
-        {
-          path: '/charsets',
-          name: 'charsets',
-          component: charsets
-        },
-        {
-          path: '/charsets/:id',
-          name: 'charsetDetail',
-          component: charsetDetail
-        },
-        {
-          path: '/masks',
-          name: 'masks',
-          component: masks
-        },
-        {
-          path: '/masks/:id',
-          name: 'maskDetail',
-          component: maskDetail
-        },
-        {
-          path: '/markovChains',
-          name: 'markovChains',
-          component: markovChains
-        },
-        {
-          path: '/files',
-          name: 'files',
-          component: EncryptedFiles
-        },
-        {
-          path: '/user',
-          name: 'user',
-          component: user
-        },
-        {
-          path: '/user/manageUsers',
-          name: 'manageUsers',
-          component: manageUsers
-        },
-        {
-          path: '/myAccount',
-          name: 'myAccount',
-          component: myAccount
-        },
-        {
-          path: '/server',
-          name: 'server',
-          component: Server
-        },
-        { path: "*",
-          component: PageNotFound
-        }
-      ]
+      children: appRoutes
     }
   ]
 })
+
+export function routeIcon(name) {
+  const route = appRoutes.find(r => r.name === name)
+  if (route.meta && route.meta.icon) {
+    return route.meta.icon
+  } else {
+    return null
+  }
+}

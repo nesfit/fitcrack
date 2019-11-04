@@ -5,12 +5,22 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0"><h2>Select dictionary<span class="required primary--text"> *</span></h2></v-card-title>
-    <dict-selector v-model="dictionaries" @input="checkValid"></dict-selector>
+    <v-card-title class="pb-0">
+      <span>Select dictionary<span class="required primary--text"> *</span></span>
+    </v-card-title>
+    <dict-selector
+      v-model="dictionaries"
+      @input="checkValid"
+    />
 
-    <v-divider></v-divider>
-    <v-card-title class="pb-0"><h2>Select rule file</h2></v-card-title>
-    <rules-selector v-model="rules" @input="checkValid"></rules-selector>
+    <v-divider />
+    <v-card-title class="pb-0">
+      <span>Select rule file</span>
+    </v-card-title>
+    <rules-selector
+      v-model="rules"
+      @input="checkValid"
+    />
   </div>
 </template>
 
@@ -18,12 +28,26 @@
   import dictSelector from '@/components/selector/dictionarySelector'
   import ruleSelector from '@/components/selector/rulesSelector'
   export default {
-    name: "dictionary",
+    name: "Dictionary",
+    components: {
+      'dict-selector': dictSelector,
+      'rules-selector': ruleSelector
+    },
     props: {
       value: {
         type: [Boolean, Object],
         default: null
       },
+    },
+    data: function () {
+      return {
+        attackId: 0,
+        attackName: 'dict',
+        valid: false,
+
+        dictionaries: [],
+        rules: null,
+      }
     },
     watch:{
       value: function(){
@@ -32,10 +56,6 @@
         if (this.value.rules)
           this.rules = this.value.rules
       }
-    },
-    components: {
-      'dict-selector': dictSelector,
-      'rules-selector': ruleSelector
     },
     methods: {
       checkValid: function () {
@@ -49,16 +69,6 @@
           return true
         }
         return false
-      }
-    },
-    data: function () {
-      return {
-        attackId: 0,
-        attackName: 'dict',
-        valid: false,
-
-        dictionaries: [],
-        rules: null,
       }
     }
   }

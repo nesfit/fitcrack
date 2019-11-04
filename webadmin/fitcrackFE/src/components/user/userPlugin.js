@@ -32,7 +32,6 @@ const UserPlugin = {
     Vue.prototype.$logInUser = function (user) {
       console.log(this.$store.loggedInLink);
       this.$store.user.userData = user;
-      this.$store.user.userData.username = name;
       this.$store.user.loggedIn = true;
       console.log('logged IN!!!');
       if (this.$store.loggedInLink === null || this.$store.loggedInLink.name === 'login') {

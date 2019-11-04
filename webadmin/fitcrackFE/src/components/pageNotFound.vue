@@ -9,22 +9,33 @@
     class="jumbo"
     height="100%"
   >
-    <v-container fluid fill-height>
-      <v-layout flex align-center justify-center>
+    <v-container
+      class="fill-height"
+      fluid
+    >
+      <v-row
+        class="flex"
+        align="center"
+        justify="center"
+      >
         <div class="jumboCard px-4">
           <div class="contentJumbo">
-            <h1 class="d-block">404 - Not Found</h1>
-            <h2 class="d-block">We are sorry. Could not find what you are looking for.</h2>
+            <h1 class="d-block">
+              404 - Not Found
+            </h1>
+            <h2 class="d-block">
+              We are sorry. Could not find what you are looking for.
+            </h2>
           </div>
         </div>
-      </v-layout>
+      </v-row>
     </v-container>
   </v-jumbotron>
 </template>
 
 <script>
     export default {
-      name: "pageNotFound",
+      name: "PageNotFound",
       computed: {
         gradient: function () {
           return window.theme.gradient
