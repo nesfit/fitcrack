@@ -5,7 +5,7 @@
 
 from sqlalchemy import desc
 
-from src.api.fitcrack.lang import package_status_text_to_code_dict
+from src.api.fitcrack.lang import job_status_text_info_to_code_dict
 from src.database import db
 from src.database.models import FcNotification
 
@@ -18,7 +18,7 @@ def getNotifications(userID, page, per_page, markAsSeen):
         notifications.append(
             {
                 'job_id': notif.source_id,
-                'text': 'Job ' + notif.source.name + ' ' + package_status_text_to_code_dict[notif.new_value],
+                'text': 'Job ' + notif.source.name + ' ' + job_status_text_info_to_code_dict[notif.new_value],
                 'type': getNotifType(notif.new_value),
                 'seen': notif.seen,
                 'time': notif.time
