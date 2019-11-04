@@ -16,7 +16,7 @@ from src.api.fitcrack.endpoints.graph.graph import ns as graph_namespace
 from src.api.fitcrack.endpoints.hashcat.hashcat import ns as hashcat_namespace
 from src.api.fitcrack.endpoints.host.hosts import ns as hosts_namespace
 from src.api.fitcrack.endpoints.notifications.notifications import ns as notifications_namespace
-from src.api.fitcrack.endpoints.package.packages import ns as packages_namespace
+from src.api.fitcrack.endpoints.job.job import ns as job_namespace
 from src.api.fitcrack.endpoints.serverInfo.server import ns as server_namespace
 from src.api.fitcrack.endpoints.user.user import login_manager
 from src.api.fitcrack.endpoints.user.user import ns as user_namespace
@@ -56,7 +56,7 @@ def initialize_app(flask_app):
 
     blueprint = Blueprint('api',  __name__)
     api.init_app(blueprint)
-    api.add_namespace(packages_namespace)
+    #api.add_namespace(job_namespace)
     api.add_namespace(hosts_namespace)
     api.add_namespace(hashcat_namespace)
     api.add_namespace(server_namespace)
