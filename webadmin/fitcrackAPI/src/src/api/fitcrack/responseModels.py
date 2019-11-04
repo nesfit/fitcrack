@@ -2,6 +2,10 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
+'''
+job_short_model => job_short_model
+package_nano_model => job_nano_model
+'''
 
 """response models which are used in multiple endpoints"""
 
@@ -42,10 +46,11 @@ boincHostActivity_model = api.model('Host activity', {
     'online': fields.Boolean()
 })
 
-package_nano_model = api.model('Package nano', {
-    'id': fields.Integer(readOnly=True, required=False, description='id ukolu'),
+#package_nano_model => job_nano_model
+job_nano_model = api.model('Job nano', {
+    'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
     'name': fields.String(required=True, description='nazev ukolu'),
-    'status': fields.Integer(readOnly=True, required=False, description='stav ukolu'),
+    'status': fields.Integer(readOnly=True, required=False, description='state of the job'),
 })
 
 boincHost_model = api.model('Host boinc', {
@@ -57,12 +62,13 @@ boincHost_model = api.model('Host boinc', {
     'user': fields.Nested(user_model),
     'last_active': fields.Nested(boincHostActivity_model),
     'deleted': fields.Boolean(),
-    'jobs': fields.Nested(package_nano_model)
+    'jobs': fields.Nested(job_nano_model)
 })
 
-package_short_model = api.model('Package short', {
-    'id': fields.Integer(readOnly=True, required=False, description='id package'),
-    'name': fields.String(required=True, description='meno package'),
+# job_short_model => job_short_model
+job_short_model = api.model('Job short', {
+    'id': fields.Integer(readOnly=True, required=False, description='id job'),
+    'name': fields.String(required=True, description='name of the job'),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
     'attack_mode': fields.String(required=True),

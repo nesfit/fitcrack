@@ -17,10 +17,6 @@ def getHashFromFile(filename, path):
     if res['returnCode'] != 0:
         abort(500, 'Could not extract hash from file.')
     res = res['msg'].split('\n')
-    print("HASH\n")
-    print(res[0])
-    print("HASH TYPE\n")
-    print(res[1])
     return {
         'hash': res[0],
         'hash_type': res[1]

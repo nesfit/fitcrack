@@ -11,40 +11,42 @@ from sqlalchemy import func, Integer, desc
 from src.database import db
 from src.database.models import FcJobGraph, FcWorkunit, Host
 
-
-def computePackagesGraph(fromDate=None, toDate=None, packageId=None):
+# computePackagesGraph => computeJobsGraph
+# packageId=> jobId
+def computeJobsGraph(fromDate=None, toDate=None, jobId=None):
     x = "time"
     y = set()
     data = []
     labels = []
 
-    packagesGraphData = FcJobGraph.query
+# packagesGraphData => jobsGraphData
+    jobsGraphData = FcJobGraph.query
 
     if toDate:
         date = get_date_or_exception(toDate)
-        packagesGraphData = packagesGraphData.filter(FcJobGraph.time <= date)
+        jobsGraphData = jobsGraphData.filter(FcJobGraph.time <= date)
         data.append({'time': toDate})
 
     if fromDate:
         date = get_date_or_exception(fromDate)
-        packagesGraphData = packagesGraphData.filter(FcJobGraph.time >= date)
+        jobsGraphData = jobsGraphData.filter(FcJobGraph.time >= date)
         data.append({'time': fromDate})
 
     if toDate and fromDate and get_date_or_exception(toDate) < get_date_or_exception(fromDate):
         abort(500, 'From date is greater than to date.')
 
 
-    if packageId:
-        packagesGraphData = packagesGraphData.filter_by(job_id=packageId)
+    if jobId:
+        jobsGraphData = jobsGraphData.filter_by(job_id=jobId)
+# packageProgress => jobProgress
+    jobsGraphData.order_by(desc(FcJobGraph.id))
+    for jobProgress in jobsGraphData:
+        data.append(jobProgress.as_graph())
+        if not jobProgress.job.id in y:
+            y.add(jobProgress.job.id)
+            labels.insert(0, jobProgress.job.name)
 
-    packagesGraphData.order_by(desc(FcJobGraph.id))
-    for packageProgress in packagesGraphData:
-        data.append(packageProgress.as_graph())
-        if not packageProgress.job.id in y:
-            y.add(packageProgress.job.id)
-            labels.insert(0, packageProgress.job.name)
-
-    if not packageId and not toDate:
+    if not jobId and not toDate:
         data.append({'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
 
     if len(y) == 0:
@@ -63,7 +65,7 @@ def computePackagesGraph(fromDate=None, toDate=None, packageId=None):
     }
 
 
-def computeHostGraph(fromDate=None, toDate=None, packageId=None):
+def computeHostGraph(fromDate=None, toDate=None, jobId=None):
     x = "time"
     y = []
     data = []
@@ -85,8 +87,8 @@ def computeHostGraph(fromDate=None, toDate=None, packageId=None):
     if toDate and fromDate and get_date_or_exception(toDate) < get_date_or_exception(fromDate) :
         abort(500, 'From date is greater than to date.')
 
-    if packageId:
-        jobsGraphData = jobsGraphData.filter_by(job_id=packageId)
+    if jobId:
+        jobsGraphData = jobsGraphData.filter_by(job_id=jobId)
 
     for jobData in jobsGraphData:
         data.append(jobData.as_graph())
@@ -95,7 +97,7 @@ def computeHostGraph(fromDate=None, toDate=None, packageId=None):
             y.append(yAx)
             labels.append(jobData.host.domain_name)
 
-    if not packageId and not toDate:
+    if not jobId and not toDate:
         data.append({'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
 
     if len(y) == 0:
@@ -114,7 +116,7 @@ def computeHostGraph(fromDate=None, toDate=None, packageId=None):
     }
 
 
-def computeHostPercentageGraph(fromDate=None, packageId=None):
+def computeHostPercentageGraph(fromDate=None, jobId=None):
     date = None
     jobsGraphData = FcWorkunit.query
 
@@ -129,7 +131,7 @@ def computeHostPercentageGraph(fromDate=None, packageId=None):
 
     jobsGraphData = db.session.query(Host.domain_name.label('label'),
                                      func.cast(func.sum(FcWorkunit.hc_keyspace), Integer()).label('value')).filter(
-        FcWorkunit.job_id == packageId).group_by(FcWorkunit.boinc_host_id).join(FcWorkunit.host).all()
+        FcWorkunit.job_id == jobId).group_by(FcWorkunit.boinc_host_id).join(FcWorkunit.host).all()
 
     data = []
     for tup in jobsGraphData:

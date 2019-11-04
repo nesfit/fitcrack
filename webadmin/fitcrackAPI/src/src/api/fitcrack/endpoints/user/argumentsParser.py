@@ -19,11 +19,11 @@ change_user_role_arguments.add_argument('user_id', type=int, help='user id', req
 change_user_role_arguments.add_argument('role_id', type=int, help='role id', required=True, location='json')
 
 change_role_arguments = reqparse.RequestParser()
-change_role_arguments.add_argument('key', type=str, help='nazov opravnenia', required=True, location='json')
+change_role_arguments.add_argument('key', type=str, help='name of the permission', required=True, location='json')
 change_role_arguments.add_argument('value', type=bool, help='true/false', required=True, location='json')
 
 new_role_arguments = reqparse.RequestParser()
-new_role_arguments.add_argument('name', type=str, help='meno novej role', required=True, location='json')
+new_role_arguments.add_argument('name', type=str, help='name of new role', required=True, location='json')
 
 new_user_arguments = reqparse.RequestParser()
 new_user_arguments.add_argument('mail', type=str, help='email', required=True, location='json')

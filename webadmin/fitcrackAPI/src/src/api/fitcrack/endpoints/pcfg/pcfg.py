@@ -32,7 +32,7 @@ from src.database.models import FcPcfg, FcDictionary
 
 log = logging.getLogger(__name__)
 ns = api.namespace(
-    'pcfg', description='Endpointy ktoré slúžia na pracu s pcfg')
+    'pcfg', description='Endpoint for pcfg operations')
 
 
 ALLOWED_EXTENSIONS = set(['zip'])
@@ -44,7 +44,7 @@ class pcfgCollection(Resource):
     @api.marshal_with(pcfgs_model)
     def get(self):
         """
-        Vracia kolekciu pcfg
+        Returns collection of pcfg
         """
         #pcfgs = getFilesFromFolder(
         #    PCFG_DIR, FcPcfg, readingFromFolderPostProcces)
@@ -58,7 +58,7 @@ class pcfg(Resource):
     @api.marshal_with(pcfg_model)
     def get(self, id):
         """
-        Vráti info o pcfg
+        Returns information about pcfg
         """
 
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
@@ -70,7 +70,7 @@ class pcfg(Resource):
     @api.marshal_with(simpleResponse)
     def delete(self, id):
         """
-        Vymaže pcfg podľa id
+        Deletes pcfg
         """
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).one()
         if (pcfg.deleted):
@@ -97,7 +97,7 @@ class pcfgAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava pcfg na server
+        Upload pcfg on server
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -124,7 +124,6 @@ class pcfgAdd(Resource):
                 abort(500, 'PCFG with name '
                       + uploadedFile['filename'] + ' already exists.')
 
-            #TODO dorobiť
             createPcfgGrammarBin(uploadedFile['filename'])
 
             return {
@@ -143,7 +142,7 @@ class pcfgMakeFromDictionary(Resource):
     @api.expect(makePcfgFromDictionary_parser)
     def post(self):
         """
-        Vytvorí pcfg zo slovníka
+        Creates pcfg from the dictionary
         """
         args = makePcfgFromDictionary_parser.parse_args(request)
         dict = FcDictionary.query.filter(FcDictionary.id == args['dictionary_id']).first()

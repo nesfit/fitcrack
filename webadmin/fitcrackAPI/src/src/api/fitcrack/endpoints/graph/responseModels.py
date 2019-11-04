@@ -12,7 +12,7 @@ axies_model = api.model('GraphAxies', {
     'y': fields.List(fields.String())
 })
 
-package_graph_model = api.model('Package graph', {
+job_graph_model = api.model('Job graph', {
     'type': fields.String(),
     'axies': fields.Nested(axies_model),
     'data': fields.List(fields.Raw),

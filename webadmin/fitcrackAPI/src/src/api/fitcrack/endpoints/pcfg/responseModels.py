@@ -4,7 +4,6 @@
 '''
 
 from flask_restplus import fields
-
 from src.api.apiConfig import api
 
 pcfg_model = api.model('PCFG', {
