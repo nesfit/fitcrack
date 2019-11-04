@@ -10,10 +10,18 @@
     :items="items"
     :search="search"
     item-key="id"
-    :show-select="markovSubmode != 0"
+    show-select
     :single-select="!selectAll"
     @input="updateSelected"
   >
+    <template v-slot:item.data-table-select="{ select, isSelected }">
+      <v-checkbox
+        hide-details
+        :value="isSelected"
+        :disabled="markovSubmode == 0"
+        @change="select"
+      />
+    </template>
     <template v-slot:item.time="{ item }">
       {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
     </template>
