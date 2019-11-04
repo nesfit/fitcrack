@@ -306,7 +306,7 @@
       loadData: function () {
 
 
-        this.axios.get(this.$serverAddr + '/jobs/lastJobs')
+        this.axios.get(this.$serverAddr + '/job/lastJobs')
                 .then((response) => {
                   this.lastJobs = response.data.items;
                 });
@@ -336,7 +336,7 @@
         }
 
 
-        this.axios.get(this.$serverAddr + '/graph/packagesProgress?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
+        this.axios.get(this.$serverAddr + '/graph/jobsProgress?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
           this.packageGraph = response.data;
         });
         this.axios.get(this.$serverAddr + '/graph/hostsComputing?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
@@ -351,7 +351,7 @@
           this.hostsInfo = response.data;
         });
 
-        this.axios.get(this.$serverAddr + '/jobs/info').then((response) => {
+        this.axios.get(this.$serverAddr + '/job/info').then((response) => {
           this.jobsInfo = response.data;
         });
 

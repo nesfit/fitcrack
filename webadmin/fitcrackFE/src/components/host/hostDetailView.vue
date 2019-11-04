@@ -295,7 +295,7 @@
         return progress.toFixed() + '%'
       },
       operateJob: function (id, operation) {
-        this.axios.get(this.$serverAddr + '/jobs/' + id + '/action', {
+        this.axios.get(this.$serverAddr + '/job/' + id + '/action', {
           params: {
             'operation': operation
           }

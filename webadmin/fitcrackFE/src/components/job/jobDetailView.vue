@@ -861,7 +861,7 @@
         return val ? 'Yes' : 'No'
       },
       loadData: function () {
-        this.axios.get(this.$serverAddr + '/jobs/' + this.$route.params.id).then((response) => {
+        this.axios.get(this.$serverAddr + '/job/' + this.$route.params.id).then((response) => {
           this.data = response.data;
 
           // Computing of counts and avg keyspace
@@ -927,7 +927,7 @@
         if (this.data !== null && parseInt(this.data.status) < 5)
           return
 
-        this.axios.get(this.$serverAddr + '/graph/packagesProgress/' + this.$route.params.id).then((response) => {
+        this.axios.get(this.$serverAddr + '/graph/jobsProgress/' + this.$route.params.id).then((response) => {
           this.progressGraph = response.data
         });
 
@@ -966,7 +966,7 @@
           this.editJobValues.time_end = this.$moment(this.editJobValues.time_end, 'DDMMYYYYHHmm').format('DD/MM/YYYY HH:mm')
         }
 
-        this.axios.put(this.$serverAddr + '/jobs/' + this.data.id , this.editJobValues
+        this.axios.put(this.$serverAddr + '/job/' + this.data.id , this.editJobValues
         ).then((response) => {
           console.log(response.data);
           this.editJobDialog = false
@@ -1007,7 +1007,7 @@
         for (let i = 0; i < this.newHostsMapping.length; i++) {
           hostIds.push(this.newHostsMapping[i].id)
         }
-        this.axios.post(this.$serverAddr + '/jobs/' + this.data.id + '/host', {
+        this.axios.post(this.$serverAddr + '/job/' + this.data.id + '/host', {
           'newHost_ids': hostIds
         }).then((response) => {
           console.log(response.data);
@@ -1017,7 +1017,7 @@
 
       },
       operateJob: function (operation) {
-        this.axios.get(this.$serverAddr + '/jobs/' + this.data.id + '/action', {
+        this.axios.get(this.$serverAddr + '/job/' + this.data.id + '/action', {
           params: {
             'operation': operation
           }
@@ -1025,7 +1025,7 @@
           console.log(response.data);
           this.loadData()
           if (operation === "kill") {
-            this.axios.get(this.$serverAddr + '/graph/packagesProgress/' + this.$route.params.id).then((response) => {
+            this.axios.get(this.$serverAddr + '/graph/jobsProgress/' + this.$route.params.id).then((response) => {
               this.progressGraph = response.data
             });
 
