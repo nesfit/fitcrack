@@ -33,6 +33,7 @@ from src.api.fitcrack.endpoints.jobTemplate.template import ns as template_ns
 from src.api.fitcrack.endpoints.logs.logs import ns as logs_ns
 from src.api.fitcrack.endpoints.status.status import ns as status_ns
 from src.api.fitcrack.endpoints.pcfg.pcfg import ns as pcfg_ns
+
 from src.database import db
 
 app = Flask(__name__)
@@ -56,7 +57,7 @@ def initialize_app(flask_app):
 
     blueprint = Blueprint('api',  __name__)
     api.init_app(blueprint)
-    #api.add_namespace(job_namespace)
+    api.add_namespace(job_namespace)
     api.add_namespace(hosts_namespace)
     api.add_namespace(hashcat_namespace)
     api.add_namespace(server_namespace)
