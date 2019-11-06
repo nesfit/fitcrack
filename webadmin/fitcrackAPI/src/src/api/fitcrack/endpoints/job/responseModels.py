@@ -28,7 +28,7 @@ boincResult_model = api.model('boinc result', {
 
 })
 
-job_model = api.model('Job', {
+workunit_model = api.model('Workunit', {
     'id': fields.String(),
     'job_id': fields.Integer(),
     'workunit_id': fields.Integer(),
@@ -68,12 +68,13 @@ hash_model = api.model('Hash', {
 })
 
 # page_of_packages_model => page_of_jobs_model
-page_of_jobs_model = api.inherit('Page of packages', pagination, {
+page_of_jobs_model = api.inherit('Page of jobs', pagination, {
     'items': fields.List(fields.Nested(job_short_model))
 })
 
-page_of_jobs_model = api.inherit('Page of jobs', pagination, {
-    'items': fields.List(fields.Nested(job_model))
+# page_of_jobs_model => page_of_workunits_model
+page_of_workunits_model = api.inherit('Page of workunits', pagination, {
+    'items': fields.List(fields.Nested(workunit_model))
 })
 
 verifyHash_model = api.model('Verified hash', {
@@ -163,7 +164,7 @@ job_big_model = api.model('Job', {
     'markov': fields.Nested(hcStat_model),
     'replicate_factor': fields.String(required=True),
     'hosts': fields.List(fields.Nested(boincHost_model)),
-    'workunits': fields.List(fields.Nested(job_model)),
+    'workunits': fields.List(fields.Nested(workunit_model)),
     'masks': fields.List(fields.Nested(mask_model)),
     'password': fields.String(),
     'hashes': fields.List(fields.Nested(hash_model)),
