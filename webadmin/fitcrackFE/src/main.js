@@ -80,10 +80,10 @@ new Vue({
             'MANAGE_USERS': true,
             'ADD_NEW_JOB': true,
             'UPLOAD_DICTIONARIES': true,
-            'VIEW_ALL_PACKAGES': true,
-            'EDIT_ALL_PACKAGES': true,
-            'OPERATE_ALL_PACKAGES': true,
-            'ADD_USER_PERMISSIONS_TO_PACKAGE': true
+            'VIEW_ALL_JOBS': true,
+            'EDIT_ALL_JOBS': true,
+            'OPERATE_ALL_JOBS': true,
+            'ADD_USER_PERMISSIONS_TO_JOB': true
           }
         },
         'loggedIn': false,

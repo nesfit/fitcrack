@@ -52,7 +52,7 @@
           class="mx-3 mb-5 maxh300 flex1"
         >
           <fc-graph
-            id="packageGraph1"
+            id="jobGraph1"
             :data="usageData"
             type="job"
             :labels="cpumemLabels"
@@ -66,7 +66,7 @@
           class="mx-3 mb-5 maxh300 flex1"
         >
           <fc-graph
-            id="packageGraph2"
+            id="jobGraph2"
             :data="usageData"
             type="job"
             :labels="hddLabels"
@@ -80,7 +80,7 @@
           class="mx-3 mb-5 maxh300 flex1"
         >
           <fc-graph
-            id="packageGraph3"
+            id="jobGraph3"
             :data="usageData"
             type="job"
             :labels="netLabels"

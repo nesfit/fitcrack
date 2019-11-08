@@ -791,6 +791,7 @@
           {text: 'Finished', align: 'center', value: 'finished'},
           {text: 'Log', align: 'center', value: 'data-table-expand'}
         ],
+        workunitsGraphical: [],
         hashHeaders: [
           {
             text: 'Hash',
@@ -923,7 +924,7 @@
                   console.log("An error ocurred while fetching status", reason);
                 }));
 
-        // if package is finished, we dont need to send this stuffs...
+        // if job is finished, we dont need to send this stuff...
         if (this.data !== null && parseInt(this.data.status) < 5)
           return
 

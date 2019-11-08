@@ -152,8 +152,8 @@
         <v-card>
           <v-card-title>Job activity</v-card-title>
           <fc-graph
-            id="packageGraph"
-            :data="packageGraph"
+            id="jobGraph"
+            :data="jobGraph"
             type="job"
           />
         </v-card>
@@ -253,7 +253,7 @@
     },
     data: function () {
       return {
-        packageGraph: null,
+        jobGraph: null,
         hostGraph: null,
         interval: null,
         hoursBefore: '6',
@@ -337,7 +337,7 @@
 
 
         this.axios.get(this.$serverAddr + '/graph/jobsProgress?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
-          this.packageGraph = response.data;
+          this.jobGraph = response.data;
         });
         this.axios.get(this.$serverAddr + '/graph/hostsComputing?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
           this.hostGraph = response.data;

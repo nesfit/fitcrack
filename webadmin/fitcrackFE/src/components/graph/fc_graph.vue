@@ -35,14 +35,13 @@
           resize="true"
           :post-units="units"
           :smooth="false"
-          :hover-callback="type === 'job' ? hoverCallbackPackage : hoverCallBackJob"
+          :hover-callback="type === 'job' ? hoverCallbackJob : hoverCallbackWorkunit"
           :line-colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
         />
       </div>
       <div v-else-if="data.type === 'pie'">
         <donut-chart
-          :id="id"
-          id="pie"
+          :id="id || 'pie'"
           class="d-flex graph"
           :data="data.data"
           resize="true"
@@ -72,25 +71,25 @@
       }
     },
     methods: {
-      hoverCallbackPackage: function (index, options, content, row) {
+      hoverCallbackJob: function (index, options, content, row) {
         if (Object.keys(row).length < 2)
           return
-        var packageId = Object.keys(row)[0];
-        var progress = row[packageId];
+        var jobId = Object.keys(row)[0];
+        var progress = row[jobId];
         var time = this.$moment(row['time']).format('DD.MM.YYYY HH:mm');
-        var packageName = '';
+        var jobName = '';
 
         for (let i = 0; i < options.ykeys.length; i++) {
-          if (options.ykeys[i] === packageId) {
-            packageName = options.labels[i];
+          if (options.ykeys[i] === jobId) {
+            jobName = options.labels[i];
             break
           }
         }
 
-        return '<b>' + time + '</b></br> Job <a href="/jobs/' + packageId + '"> ' +
-          packageName + '</a> ' + progress + '%'
+        return '<b>' + time + '</b></br> Job <a href="/jobs/' + jobId + '"> ' +
+          jobName + '</a> ' + progress + '%'
       },
-      hoverCallBackJob: function (index, options, content, row) {
+      hoverCallbackWorkunit: function (index, options, content, row) {
         if (Object.keys(row).length < 2)
           return
         var hostIdentifier = Object.keys(row)[1]

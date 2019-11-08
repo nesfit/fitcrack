@@ -15,7 +15,7 @@
       :type="log.type"
       :time="log.time"
       :host-i-d="log.host"
-      :package-i-d="log.package"
+      :job-i-d="log.job"
     >
       {{ log.log }}
     </fc-log>
