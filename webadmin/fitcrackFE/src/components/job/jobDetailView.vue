@@ -228,21 +228,17 @@
                     Progress:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-right jobProgress">
-                      <v-row column>
-                        <v-col class="height5 text-center xs-12">
-                          <span
-                            class="progressPercentage primary--text"
-                          >{{ progressToPercentage(data.progress) }}</span>
-                        </v-col>
-                        <v-col class="progressLinear xs-12">
-                          <v-progress-linear
-                            height="3"
-                            color="primary"
-                            :value="data.progress"
-                          />
-                        </v-col>
-                      </v-row>
+                    <v-list-item-title class="text-right jobProgress d-flex align-center">
+                      <span
+                        class="progressPercentage primary--text mr-2"
+                      >
+                        {{ progressToPercentage(data.progress) }}
+                      </span>
+                      <v-progress-linear
+                        height="3"
+                        color="primary"
+                        :value="data.progress"
+                      />
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -423,29 +419,23 @@
                 <v-data-table
                   :headers="statusHeaders"
                   :items="statusHistory"
-                  :footer-props="{itemsPerPageOptions: [25,50,100,{text: 'All', value: -1}]}"
+                  :footer-props="{itemsPerPageOptions: [5,25,50,{text: 'All', value: -1}]}"
                 >
-                  <template
-                    slot="items"
-                    slot-scope="props"
-                  >
-                    <td class="text-left">
-                      {{ $moment(props.item.time).format('DD.MM.YYYY HH:mm')
-                      }}
-                    </td>
-                    <td
-                      class="text-right text-right fw500"
-                      :class="props.item.status_type + '--text'"
-                    >
-                      <v-tooltip top>
-                        <template v-slot:activator="{ on }">
-                          <span v-on="on">
-                            {{ props.item.status_text }}
-                          </span>
-                        </template>
-                        <span>{{ props.item.status_tooltip }}</span>
-                      </v-tooltip>
-                    </td>
+                  <template v-slot:item.time="{ item }">
+                    {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+                  </template>
+                  <template v-slot:item.status="{ item }">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <span 
+                          :class="item.status_type + '--text'"
+                          v-on="on"
+                        >
+                          {{ item.status_text }}
+                        </span>
+                      </template>
+                      <span>{{ item.status_tooltip }}</span>
+                    </v-tooltip>
                   </template>
                 </v-data-table>
               </v-list>
@@ -462,6 +452,7 @@
             <div class="workunit-parent">
               <div
                 v-for="workunit in workunitsGraphical"
+                :key="workunit.id"
                 :style="{ 'flex-grow': workunit.keyspace, 'background-color': workunit.color }"
                 class="workunit-child"
               >
@@ -481,7 +472,6 @@
               :headers="workunitsHeader"
               :items="data.workunits"
               show-expand
-              expand-icon="mdi-file"
               class="width100"
             >
               <template v-slot:item.boinc_host_id="{ item }">
@@ -509,10 +499,20 @@
                 {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
               </template>
               <template v-slot:item.retry="{ item }">
-                {{ yesNo(item.retry) }}
+                <v-chip
+                  small
+                  :color="item.retry ? 'success' : 'error'"
+                >
+                  {{ yesNo(item.retry) }}
+                </v-chip>
               </template>
               <template v-slot:item.finished="{ item }">
-                {{ yesNo(item.finished) }}
+                <v-chip
+                  small
+                  :color="item.finished ? 'success' : 'error'"
+                >
+                  {{ yesNo(item.finished) }}
+                </v-chip>
               </template>
               <template
                 v-slot:expanded-item="{ headers, item }"
@@ -783,12 +783,12 @@
             value: 'boinc_host_id',
           },
           {text: 'Progress', align: 'end', value: 'progress'},
-          {text: 'Cracking time', align: 'end', value: 'cracking_time'},
+          {text: 'Cracking time', align: 'end', value: 'cracking_time_str'},
           {text: 'Generated', align: 'end', value: 'time'},
           {text: 'Start index', align: 'end', value: 'start_index'},
           {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
-          {text: 'Retry', align: 'end', value: 'retry'},
-          {text: 'Finished', align: 'end', value: 'finished'},
+          {text: 'Retry', align: 'center', value: 'retry'},
+          {text: 'Finished', align: 'center', value: 'finished'},
           {text: 'Log', align: 'center', value: 'data-table-expand'}
         ],
         hashHeaders: [
@@ -832,7 +832,7 @@
           case 'mask':
             return 'maskDetail'
           case 'dictionary':
-            return 'dicttionaryDetail'
+            return 'dictionaryDetail'
           case 'pcfg':
             return 'pcfgDetail'
           default:
