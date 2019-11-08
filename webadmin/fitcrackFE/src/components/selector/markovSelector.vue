@@ -15,8 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.data-table-select="{ select, isSelected }">
-      <v-checkbox
-        hide-details
+      <v-simple-checkbox
         :value="isSelected"
         :disabled="markovSubmode == 0"
         @change="select"
@@ -58,9 +57,9 @@
     methods: {
       getData() {
         this.loading = true
-      //  this.markovSubmode = 0
         this.axios.get(this.$serverAddr + '/markovChains').then((response) => {
           this.items = response.data.items
+          this.selected = [this.items.find(i => i.name === 'hashcat.hcstat2')]
           this.loading = false
         })
       }
