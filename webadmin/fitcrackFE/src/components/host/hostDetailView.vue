@@ -233,7 +233,6 @@
           {text: 'Status', value: 'status', align: 'end'},
           {text: 'Progress', value: 'progress', align: 'end'},
           {text: 'Added', value: 'time', align: 'end'},
-          {text: 'Result', value: 'password', align: 'end', sortable: false},
           {text: 'Actions', value: 'actions', sortable: false, align: 'end'}
         ],
         jobs_statuses: [
