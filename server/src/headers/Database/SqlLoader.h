@@ -262,6 +262,12 @@ class CSqlLoader {
          */
         bool isAnythingCracked(uint64_t jobId);
 
+        /**
+        * Stops job, cancels and finishes all workunits
+        * @param job Pointer to the job
+        */
+        void killJob(Config::Ptr<CJob> &job);
+
 private:
 
         /**
