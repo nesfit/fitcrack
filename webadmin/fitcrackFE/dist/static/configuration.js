@@ -3,7 +3,7 @@
    * Licence: MIT, see LICENSE
 */
 
-window.serverAddress = 'http://pchranicky.fit.vutbr.cz:5000' //'http://localhost:5000'
+window.serverAddress = 'http://localhost:5000'
 
 window.theme = {
   light: {
