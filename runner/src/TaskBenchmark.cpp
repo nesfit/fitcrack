@@ -98,6 +98,7 @@ void TaskBenchmark::initializeTotalHashes() {
 
 bool TaskBenchmark::parseHashcatOutputLine(std::string& output_line) {
   parseHashcatBenchmark(output_line);
+  return true;
 }
 
 void TaskBenchmark::progress() {

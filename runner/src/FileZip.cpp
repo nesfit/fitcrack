@@ -13,7 +13,6 @@ void FileZip::decodeEntry(size_t entry_number, zip_stat_t *entry_stats) {
   std::vector<char> data_buffer;
 
   size_t read_bytes = 0;
-  size_t written_bytes = 0;
 
   zip_file_t *entry = NULL;
 

@@ -4,6 +4,7 @@
 */
 
 #include "TaskComputeBase.hpp"
+#include <cassert>
 
 /* Protected */
 void TaskComputeBase::getAllArguments() {
@@ -88,7 +89,7 @@ void TaskComputeBase::initialize() {
   directory_.printDirectories();
   directory_.printFiles();
 
-  PipeBase* manager_pipeout;
+  PipeBase* pcfg_manager_pipeout = nullptr;
 
   isPCFG_ = false;
 
@@ -101,7 +102,8 @@ void TaskComputeBase::initialize() {
     if(isPCFG_){
       if(process_PCFGmanager_ == nullptr){
         process_PCFGmanager_ = ProcessPCFG::create(PCFGmanager_arguments_, directory_);
-        manager_pipeout = process_PCFGmanager_->GetPipeOut();
+        assert(pcfg_manager_pipeout && "No pcfg manager pipe out?");
+        pcfg_manager_pipeout = process_PCFGmanager_->GetPipeOut();
       }
     }
 
@@ -109,7 +111,7 @@ void TaskComputeBase::initialize() {
 
     if(isPCFG_){
       process_->initInPipe();
-      process_->setInPipe(manager_pipeout);
+      process_->setInPipe(pcfg_manager_pipeout);
     }
   }
 

@@ -41,7 +41,7 @@ void PipeWindows::createPipe() {
 
 int PipeWindows::readChar(char& c) {
 
-  int read_size = READ_SIZE;
+  unsigned long read_size = READ_SIZE;
   unsigned long n_read_chars = 0;
 
   /** Try to read N chars but don't really read it yet */
@@ -73,7 +73,7 @@ int PipeWindows::readChar(char& c) {
 
 /* Public */
 
-PipeWindows::PipeWindows() : read_(NULL), write_(NULL), error_(ERROR_SUCCESS) {
+PipeWindows::PipeWindows() : error_(ERROR_SUCCESS), read_(NULL), write_(NULL) {
   createPipe();
 }
 

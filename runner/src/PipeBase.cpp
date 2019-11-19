@@ -24,9 +24,11 @@ std::string PipeBase::readLine() {
   char c;
   int read_chars = -1;
 
-  while (c != '\n' && canRead()) {
-    if ((read_chars = readChar(c)) > 0) {
+  while (canRead()) {
+    read_chars = readChar(c);
+    if (read_chars > 0) {
       line += c;
+      if (c == '\n') break;
     } else if (read_chars == -1) {
       sleep(HashcatConstant::ProgressPeriod);
     }
@@ -40,9 +42,11 @@ std::string PipeBase::readLine(ProcessBase* process_) {
   char c;
   int read_chars = -1;
 
-  while (c != '\n' && canRead()) {
-    if ((read_chars = readChar(c)) > 0) {
+  while (canRead()) {
+    read_chars = readChar(c);
+    if (read_chars > 0) {
       line += c;
+      if (c == '\n') break;
     } else if (read_chars == -1) {
       if(!process_->isRunning()){
         break;
@@ -53,4 +57,8 @@ std::string PipeBase::readLine(ProcessBase* process_) {
 
   //Logging::debugPrint(Logging::Detail::CustomOutput, POSITION_IN_CODE + "Pipe read line : " + line);
   return line;
+}
+
+PipeBase::~PipeBase() {
+  // Nothing
 }

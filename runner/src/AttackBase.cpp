@@ -87,10 +87,13 @@ void AttackBase::findAndAddRequired(const std::string& key, const std::string& a
 
 /* Public */
 
-AttackBase::AttackBase(const ConfigTask& config) : config_(config), output_file_(HashcatConstant::OutputFile), success_exit_code_(HashcatConstant::Succeded) {
+AttackBase::AttackBase(const ConfigTask& config) : output_file_(HashcatConstant::OutputFile), config_(config), success_exit_code_(HashcatConstant::Succeded) {
   initializeArguments();
 }
 
+AttackBase::~AttackBase() {
+  // Nothing
+}
 std::vector<char*>& AttackBase::getArguments() {
   return arguments_;
 }

@@ -154,12 +154,12 @@ void TaskNormal::readPasswordsFromFile() {
 
 /* Public */
 
-TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name), start_index_(0), parse_curku_(false) {
+TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name), parse_curku_(false), start_index_(0) {
   mode_ = "n";
   initializeTotalHashes();
 }
 
-TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name), start_index_(0), parse_curku_(false)  {
+TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name), parse_curku_(false), start_index_(0) {
   mode_ = "n";
   initializeTotalHashes();
 }

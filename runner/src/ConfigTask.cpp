@@ -176,7 +176,6 @@ bool ConfigTask::isEmpty() const {
 void ConfigTask::parse() {
   std::fstream file;
   std::string line;
-  unsigned long len;
 
   File::openReadStream(file, path_);
 

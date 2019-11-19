@@ -32,7 +32,8 @@ AttackBase* Attack::create(const ConfigTask& task_config, Directory& directory, 
     }
   } else if (mode == "a" || mode == "b") {
     return new AttackBenchmark(task_config);
-  } else {
-    RunnerUtils::runtimeException("Invalid task mode");
   }
+
+  RunnerUtils::runtimeException("Invalid task mode");
+  return nullptr;
 }

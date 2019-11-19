@@ -25,6 +25,10 @@ start_time_(0), stop_time_(0) {
   arguments_.push_back(NULL);
 }
 
+ProcessBase::~ProcessBase() {
+  // Nothing
+}
+
 std::string ProcessBase::getReadableArguments() {
   std::string readable_arguments;
 

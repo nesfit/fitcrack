@@ -10,7 +10,7 @@ TAB=$(shell echo -e '\t')
 CXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -pedantic -lboinc_api -lboinc -lzip -lz -static-libgcc -static-libstdc++ 
 CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'  
 ## Release
-LDXXFLAGS=-O3 -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+LDXXFLAGS=-Wall -Wno-c++11-compat -O3 -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 ## Debug
 #LDXXFLAGS=-pg -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 
@@ -30,10 +30,10 @@ windows: CXXPATHS+=-L'./lib/windows_x86_64/'
 windows: $(OBJDIR) $(BINDIR) runner
 
 $(OBJDIR): 
-	mkdir $@
+	mkdir -p $@
 
 $(BINDIR): 
-	mkdir $@
+	mkdir -p $@
 
 $(OBJDIR)%.o: $(SRCDIR)%.cpp  
 	$(CXX) $(CXXPATHS) $(LDXXFLAGS) -c $< -o $@  

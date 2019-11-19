@@ -106,6 +106,11 @@ class AttackBase {
         AttackBase(const ConfigTask& config);
 
         /**
+         * @brief   Destructor
+         */
+        virtual ~AttackBase() = 0;
+
+        /**
          * @brief  Getter of arguments_
          * @return Copy of arguments_ vector
          */

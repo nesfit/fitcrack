@@ -88,6 +88,11 @@ class TaskBase {
         TaskBase(Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name);
 
         /**
+         * @brief   Destructor
+         */
+        virtual ~TaskBase () = 0;
+
+        /**
          * @brief   Reads hashcat output file
          * @return  Exit code of the process
          */
