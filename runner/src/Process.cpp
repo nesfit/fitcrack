@@ -13,7 +13,7 @@ ProcessBase* Process::create(std::vector<char*>& arguments, Directory& directory
   return new ProcessLinux(executable.getRelativePath(), arguments, false);
   #elif defined (PROCESSWINDOWS_HPP)
   directory.findVersionedFile("hashcat", "exe", executable);
-  return new ProcessWindows(executable.getRelativePath(), arguments);
+  return new ProcessWindows(executable.getRelativePath(), arguments, false);
   #else
   #error "No viable Process implementation. This is caused by your target platfrom. Supported platforms are __linux__, _WIN32."
   #endif

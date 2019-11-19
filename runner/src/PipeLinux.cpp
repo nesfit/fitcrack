@@ -139,4 +139,7 @@ int PipeLinux::writeMessage(std::string& message) {
   return write(write_, message.data(), message.length());
 }
 
+PipeBase *PipeLinux::createBlockingPipe() { return new PipeLinux(false); }
+PipeBase *PipeLinux::createNonBlockingPipe() { return new PipeLinux(true); }
+
 #endif // __linux__

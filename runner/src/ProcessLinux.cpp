@@ -39,13 +39,12 @@ void ProcessLinux::launchSubprocess() {
 /* Public */
 
 ProcessLinux::ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args, bool isPCFG) : ProcessBase(exec_name, exec_args) {
-  if(isPCFG){
-    out_pipe_ = new PipeLinux(false);
+  if (isPCFG) {
+    out_pipe_ = PipeLinux::createBlockingPipe();
+  } else {
+    out_pipe_ = PipeLinux::createNonBlockingPipe();
   }
-  else{
-    out_pipe_ = new PipeLinux(true);
-  }
-  err_pipe_ = new PipeLinux(true);
+  err_pipe_ = PipeLinux::createNonBlockingPipe();
   in_pipe_ = nullptr;
 }
 
