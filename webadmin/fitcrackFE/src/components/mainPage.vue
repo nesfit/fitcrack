@@ -45,6 +45,33 @@
           </v-list-item-content>
         </v-list-item>
 
+        <v-list-item
+          v-if="$userCanAddJob()"
+          :to="{ name: 'addJob'}"
+        >
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('addJob') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Add job</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item 
+          :to="{ name: 'jobs'}"
+          exact
+        >
+          <v-list-item-action>
+            <v-icon>{{ routeIcon('jobs') }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>All jobs</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-divider class="mb-1" />
+
+<!--
         <v-list-group
           :value="true"
           prepend-icon="mdi-briefcase-outline"
@@ -74,19 +101,10 @@
             </v-list-item-content>
           </v-list-item>
 
-          <!--
-          <v-list-item :to="{ name: 'hiddenJobs'}">
-            <v-list-item-action>
-              <v-icon>{{ routeIcon('hiddenJobs') }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>Hidden jobs</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          -->
-
           <v-divider class="mb-1" />
         </v-list-group>
+
+-->
 
         <v-list-item :to="{ name: 'hosts'}">
           <v-list-item-action>

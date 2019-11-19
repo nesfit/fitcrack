@@ -26,7 +26,7 @@ import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
 
-document.title = window.projectName
+document.title = window.projectName || 'Fitcrack'
 var link = document.createElement('link');
 link.type = 'image/png';
 link.rel = 'shortcut icon';
@@ -70,7 +70,7 @@ new Vue({
   components: { App },
   data: {
     store: {
-      project: window.projectName,
+      project: window.projectName || 'Fitcrack',
       user: {
         'userData': {
           'id': null,
