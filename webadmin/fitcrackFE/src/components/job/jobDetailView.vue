@@ -636,86 +636,18 @@
       max-width="800"
     >
       <v-card class="mb-5">
-        <v-data-table
-          v-model="newHostsMapping"
-          item-key="id"
-          show-select
-          class="width100"
-          :headers="hostHeaders"
-          :items="hosts"
-          :options.sync="paginationHost"
-          :server-items-length="totalHostItems"
-          :loading="loadingHosts"
-          :footer-props="{itemsPerPageOptions: [10,25,50,100], itemsPerPageText: 'Hosts per page'}"
-        >
-          <template
-            slot="headers"
-            slot-scope="props"
-          >
-            <tr>
-              <th>
-                <v-checkbox
-                  primary
-                  hide-details
-                  :input-value="props.all"
-                  :indeterminate="props.indeterminate"
-                  @click.native="toggleAll"
-                />
-              </th>
-              <th
-                v-for="header in hostHeaders"
-                :key="header.text"
-                :class="['column sortable', paginationHost.descending ? 'desc' : 'asc', header.value === paginationHost.sortBy ? 'active' : '']"
-                @click="changeSort(header.value)"
-              >
-                <v-icon small>
-                  arrow_upward
-                </v-icon>
-                {{ header.text }}
-              </th>
-            </tr>
-          </template>
-          <template
-            slot="items"
-            slot-scope="props"
-          >
-            <tr
-              :active="props.selected"
-              @click="props.selected = !props.selected"
-            >
-              <td>
-                <v-checkbox :input-value="props.selected" />
-              </td>
-              <td>
-                <router-link
-                  :to="{ name: 'hostDetail', params: { id: props.item.id}}"
-                  class="middle"
-                >
-                  {{ props.item.domain_name + ' (' + props.item.user.name + ')' }}
-                </router-link>
-              </td>
-              <td class="text-right">
-                {{ props.item.ip_address }}
-              </td>
-              <td
-                class="text-right"
-                :class="{
-                  'error--text': props.item.last_active.seconds_delta > 61,
-                  'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
-                }"
-              >
-                <v-icon
-                  :title="parseTimeDelta(props.item.last_active.last_seen)"
-                  class="inheritColor"
-                >
-                  fiber_manual_record
-                </v-icon>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
+        <host-selector 
+          v-model="newHostsMapping" 
+          select-all 
+        />
         <v-card-actions>
           <v-spacer />
+          <v-btn
+            text
+            @click="editHostsDialog = false"
+          >
+            Cancel
+          </v-btn>
           <v-btn
             color="primary"
             text
@@ -737,6 +669,7 @@
   import {DonutChart, LineChart} from 'vue-morris'
   import graph from '@/components/graph/fc_graph'
   import FcTextarea from '@/components/textarea/fc_textarea'
+  import hostSelector from '@/components/selector/hostSelector'
 
   export default {
     name: "JobDetail",
@@ -746,7 +679,8 @@
       'maskDetail': maskDetail,
       'dictionaryDetail': dictionaryDetail,
       'pcfgDetail': pcfgDetail,
-      'fc-textarea': FcTextarea
+      'fc-textarea': FcTextarea,
+      hostSelector
     },
 
     data: function () {
@@ -802,19 +736,6 @@
         ],
         editJobDialog: false,
         editHostsDialog: false,
-        totalHostItems: 0,
-        paginationHost: {},
-        loadingHosts: true,
-        hostHeaders: [
-          {
-            text: 'Name',
-            align: 'start',
-            value: 'name'
-          },
-          {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
-          {text: 'Online', value: 'last_active', align: 'end', sortable: false}
-        ],
-        hosts: [],
         newHostsMapping: [],
         editJobValues : {
           name: '',
@@ -977,25 +898,6 @@
       showMappingHostDialog() {
         this.newHostsMapping = this.data.hosts.slice()
         this.editHostsDialog = true
-        this.axios.get(this.$serverAddr + '/hosts', {
-          params: {
-            'all': true,
-            'page': this.paginationHost.page,
-            'per_page': this.paginationHost.rowsPerPage,
-            'order_by': this.paginationHost.sortBy,
-            'descending': this.paginationHost.descending,
-            'name': this.search,
-            'status': this.status
-          }
-        }).then((response) => {
-          this.hosts = response.data.items
-          this.totalItems = response.data.total
-          this.loadingHosts = false
-        })
-      },
-      toggleAll() {
-        if (this.newHostsMapping.length) this.newHostsMapping = []
-        else this.newHostsMapping = this.hosts.slice()
       },
       progressToPercentage: function (progress) {
         if(progress > 100){
