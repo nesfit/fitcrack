@@ -8,7 +8,7 @@
 
 #include <AttackPcfgRules.h>
 #include <AttackPcfgClient.h>
-
+#include <cmath>
 
 CAttackPcfgRules::CAttackPcfgRules(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
         :   AttackMode(job, host, seconds, sqlLoader)
