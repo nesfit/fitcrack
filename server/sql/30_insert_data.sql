@@ -27,15 +27,14 @@ INSERT INTO `fc_charset` (`id`, `name`, `path`, `time`, `deleted`) VALUES
 --
 
 INSERT INTO `fc_dictionary` (`id`, `name`, `path`, `keyspace`, `time`, `deleted`, `modification_time`) VALUES
-(1,	'rockyou.txt',	'rockyou.txt',	14343296,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(2,	'honeynet.txt',	'honeynet.txt',	226082,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(3,	'darkweb2017-top1000.txt',	'darkweb2017-top1000.txt',	1000,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(4,	'myspace.txt',	'myspace.txt',	37123,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(5,	'phpbb.txt',	'phpbb.txt',	184389,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(6,	'adobe100.txt',	'adobe100.txt',	100,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(7,	'twitter-banned-small.txt',	'twitter-banned-small.txt',	397,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(8,	'bible.txt',	'bible.txt',	12570,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(9,	'english.txt',	'english.txt',	54308,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00');
+(1,	'honeynet.txt',	'honeynet.txt',	226082,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(2,	'darkweb2017-top1000.txt',	'darkweb2017-top1000.txt',	1000,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(3,	'myspace.txt',	'myspace.txt',	37123,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(4,	'phpbb.txt',	'phpbb.txt',	184389,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(5,	'adobe100.txt',	'adobe100.txt',	100,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(6,	'twitter-banned-small.txt',	'twitter-banned-small.txt',	397,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(7,	'bible.txt',	'bible.txt',	12570,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
+(8,	'english.txt',	'english.txt',	54308,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00');
 
 
 --
@@ -43,9 +42,9 @@ INSERT INTO `fc_dictionary` (`id`, `name`, `path`, `keyspace`, `time`, `deleted`
 --
 
 INSERT INTO `fc_hash` (`id`, `job_id`, `hash_type`, `hash`, `result`, `added`, `time_cracked`) VALUES
-(1,	2,	0,	'000405dbc07c3b595fc87031af6f9879',	NULL,	'2018-08-18 12:00:00',	NULL),
-(2,	2,	0,	'001e99bd69f0a582d39cca7284b60784',	NULL,	'2018-08-18 12:00:00',	NULL),
-(3,	2,	0,	'0021ca52049c734ac0d3d6f92042abf7',	NULL,	'2018-08-18 12:00:00',	NULL),
+(1,	2,	0,	'1ffd9e753c8054cc61456ac7fac1ac89',	NULL,	'2018-08-18 12:00:00',	NULL),
+(2,	2,	0,	'79e262a81dd19d40ae008f74eb59edce',	NULL,	'2018-08-18 12:00:00',	NULL),
+(3,	2,	0,	'6517217c0041e7f36e9eae5caca8b69e',	NULL,	'2018-08-18 12:00:00',	NULL),
 (4,	2,	0,	'0028080e7fa8c81268ef340d7d692681',	NULL,	'2018-08-18 12:00:00',	NULL),
 (5,	2,	0,	'002ace365a341e55de9d6387100b2c65',	NULL,	'2018-08-18 12:00:00',	NULL),
 (6,	2,	0,	'002e95d82be30396fccd375ff23f8b4c',	NULL,	'2018-08-18 12:00:00',	NULL),
@@ -6593,7 +6592,7 @@ INSERT INTO `fc_masks_set` (`id`, `name`, `path`, `time`, `deleted`) VALUES
 
 INSERT INTO `fc_job` (`id`, `token`, `attack`, `attack_mode`, `attack_submode`, `hash_type`, `hash`, `status`, `result`, `keyspace`, `hc_keyspace`, `indexes_verified`, `current_index`, `current_index_2`, `time`, `name`, `comment`, `time_start`, `time_end`, `cracking_time`, `seconds_per_workunit`, `config`, `dict1`, `dict2`, `charset1`, `charset2`, `charset3`, `charset4`, `rules`, `rule_left`, `rule_right`, `markov_hcstat`, `markov_threshold`, `replicate_factor`, `deleted`) VALUES
 (1, 'ad97b17dc57f0b4ab480bf57bea0f2e301ab4725386e12b9521ab86efb36f8d9', 'mask', 3, 0, 0, '', 0, NULL, 0, 0, 0, 0, 0, NULL, 'BENCH_ALL', 'This is default job for benchmarking all hosts.', NULL, NULL, 0, 3600, '|||attack_mode|UInt|1|3|||\n|||name|String|7|Test DB|||\n', '', '', '', '', '', '', NULL, '', '', NULL, 0, 1, true),
-(2, 'f2c0bec0a2cc11e8b0320242ac140005',	'dictionary',	0,	0,	0,	'check hashlist',	0,	NULL,	14623686,	14623686,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick ',	'Default hashcat MD5 hashlist',	NULL,	NULL,	0,	120,	'|||attack_mode|UInt|1|0|||\n|||attack_submode|UInt|1|0|||\n|||name|String|22|sample-dict-md5-quick |||\n|||hash_type|UInt|1|0|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0,	1,	0),
+(2, 'f2c0bec0a2cc11e8b0320242ac140005',	'dictionary',	0,	0,	0,	'check hashlist',	0,	NULL,	92431,	92431,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick ',	'Default hashcat MD5 hashlist',	NULL,	NULL,	0,	120,	'|||attack_mode|UInt|1|0|||\n|||attack_submode|UInt|1|0|||\n|||name|String|22|sample-dict-md5-quick |||\n|||hash_type|UInt|1|0|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0,	1,	0),
 (3, '55214a34a2ce11e889a50242ac140005',	'dictionary',	0,	0,	3200,	'check hashlist',	0,	NULL,	226082,	226082,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-bcrypt',	'',	NULL,	NULL,	0,	60,	'|||attack_mode|UInt|1|0|||\n|||attack_submode|UInt|1|0|||\n|||name|String|18|sample-dict-bcrypt|||\n|||hash_type|UInt|4|3200|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0,	1,	0),
 (4, 'ed5245baa2ce11e885330242ac140005',	'mask',	3,	0,	5000,	'check hashlist',	0,	NULL,	217180147158,	13270583,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-mask-sha3',	'',	NULL,	NULL,	0,	60,	'|||attack_mode|UInt|1|3|||\n|||attack_submode|UInt|1|0|||\n|||name|String|16|sample-mask-sha3|||\n|||hash_type|UInt|4|5000|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0,	1,	0),
 (5, '6b873008a2cf11e8af3c0242ac140005',	'combinator',	1,	0,	3200,	'check hashlist',	0,	NULL,	397000,	1000,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-combinator-bcrypt',	'',	NULL,	NULL,	0,	60,	'|||attack_mode|UInt|1|1|||\n|||attack_submode|UInt|1|0|||\n|||name|String|24|sample-combinator-bcrypt|||\n|||hash_type|UInt|4|3200|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0,	1,	0);
@@ -6604,12 +6603,12 @@ INSERT INTO `fc_job` (`id`, `token`, `attack`, `attack_mode`, `attack_submode`, 
 --
 
 INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index`, `is_left`) VALUES
-(1,	2,	1,	0,	1),
+(1,	2,	3,	0,	1),
 (2,	2,	2,	0,	1),
-(3,	2,	9,	0,	1),
-(4,	3,	2,	0,	1),
-(5,	5,	3,	0,	1),
-(6,	5,	7,	0,	0);
+(3,	2,	8,	0,	1),
+(4,	3,	1,	0,	1),
+(5,	5,	2,	0,	1),
+(6,	5,	6,	0,	0);
 
 
 --
