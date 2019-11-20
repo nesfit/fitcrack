@@ -218,7 +218,7 @@
             'masks': this.masks,
             'attack_submode': this.markovSubmode,
             'markov_treshold': this.markovSubmode == 0 ? null : parseInt(this.markovTreshold),
-            'markov': this.markovSubmode == 0 ? null : this.markov,
+            'markov': this.markovSubmode == 0 ? null : this.markov[0],
             'charset': this.charsets
           })
           return true
