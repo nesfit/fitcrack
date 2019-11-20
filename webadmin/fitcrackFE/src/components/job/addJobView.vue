@@ -7,13 +7,12 @@
   <div class="containerAddJob height100 mx-auto">
     <v-app-bar
       app
-      color="primary"
       height="48px"
       class="topToolbar"
       :class="{scrollTop: (!knowEstimatedTime && !showEstimatedTime)}"
     >
       <v-toolbar-title class="estimatedTime">
-        Estimated cracking time is {{ estimatedTime }}.
+        Keyspace: {{ keyspace }}. Estimated cracking time is {{ estimatedTime }}.
       </v-toolbar-title>
     </v-app-bar>
     <div
@@ -531,6 +530,7 @@
         hosts: [],
         showEstimatedTime: false,
         estimatedTime: '',
+        keyspace: null,
         startDate: this.$moment().format('DD/MM/YYYY HH:mm'),
         startNow: true,
         endDate: this.$moment().format('DD/MM/YYYY HH:mm'),
@@ -567,9 +567,14 @@
         }
       },
       knowEstimatedTime: function () {
-        if ( typeof this.attackSettings !== 'object' || this.hashtype == null || this.hosts.length === 0)
+        return !!this.estimatedTime
+      },
+    },
+    watch: {
+      jobSettings () {
+        if ( typeof this.attackSettings !== 'object' || this.hashtype == null || this.hosts.length === 0) {
           this.showEstimatedTime = false
-        else {
+        } else {
           var boincIds = []
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
@@ -585,11 +590,12 @@
             console.log(response)
             if (response['data']) {
               this.estimatedTime = response.data.display_time
+              this.keyspace = response.data.keyspace
               this.showEstimatedTime = true
             }
           })
         }
-      },
+      }
     },
     mounted: function () {
       this.getHashTypes()
