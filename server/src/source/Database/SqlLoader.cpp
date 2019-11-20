@@ -384,6 +384,9 @@ void CSqlLoader::killJob(PtrJob &job)
     updateSql(formatQuery("UPDATE `%s` SET `kill` = 0 WHERE `id` = %" PRIu64 " LIMIT 1;",
                           CJob::getTableName().c_str(), jobId));
 
+    /** Stop the job */
+    updateRunningJobStatus(jobId, Config::JobState::JobReady);
+
     Tools::printDebugJob(Config::DebugType::Log, jobId,
                          "Job killed successfully!\n");
 }
