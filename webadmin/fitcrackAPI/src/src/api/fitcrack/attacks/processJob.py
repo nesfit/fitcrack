@@ -173,7 +173,7 @@ def process_job_3(job, hashcatKeyspace=True):
         if not os.path.exists(os.path.join(HCSTATS_DIR, markov.path)):
             abort(500, 'Markov file does not exist.')
         job['markov_hcstat'] = markov.name
-        job['attack_settings']['attack_submode'] = 1
+        #job['attack_settings']['attack_submode'] = 1
 
     markovTreshold = job['attack_settings']['markov_treshold'] if job['attack_settings'].get(
         'markov_treshold') and job['attack_settings']['markov_treshold'] > 1 else None
@@ -268,6 +268,7 @@ def process_job_7(job):
     job['attack_name'] = 'hybrid (Mask + Wordlist)'
     job['hc_keyspace'] = dictsLeftKeyspace
     job['keyspace'] = keyspace
+    job['attack_settings']['attack_mode'] = 3
     return job
 
 

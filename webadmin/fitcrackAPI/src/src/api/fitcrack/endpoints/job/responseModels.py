@@ -17,6 +17,7 @@ from flask_restplus import fields
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.dictionary.responseModels import dictionary_model
+from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
 from src.api.fitcrack.responseModels import pagination, simpleResponse, job_short_model, \
     boincHost_model
@@ -114,13 +115,11 @@ dictionary_job_model = api.model('Dictionary job', {
     'is_left': fields.Boolean(),
     'dictionary': fields.Nested(dictionary_model)
 })
-
+'''
 pcfgGrammar_model = api.model('PCFG job', {
-    'id': fields.Integer(),
-    'keyspace': fields.Integer(),
-    'name': fields.String()
+    'pcfg': fields.String(pcfg_model)
 })
-
+'''
 
 
 # package_model => job_big_model
@@ -170,7 +169,7 @@ job_big_model = api.model('Job', {
     'hashes': fields.List(fields.Nested(hash_model)),
     'left_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
-    'grammar_id': fields.List(fields.Nested(pcfgGrammar_model))
+    'grammar_id': fields.List(fields.Nested(pcfg_model))
 })
 
 # package_nano_model => job_nano_model

@@ -28,7 +28,7 @@ jobList_parser.add_argument('descending', type=inputs.boolean, required=False)
 jobList_parser.add_argument('showDeleted', type=inputs.boolean, required=False, default=False)
 
 
-job_parser = pagination.copy()
+jobWorkunit_parser = pagination.copy()
 
 verifyHash_argument = reqparse.RequestParser()
 verifyHash_argument.add_argument('hashes', type=str, required=True, help='hash na overenie',

@@ -57,12 +57,23 @@ def create_job(data):
 
 # process_package_ => process_job_
     process_func = getattr(attacks, 'process_job_' + str(data['attack_settings']['attack_mode']))
+
     if not process_func:
         abort(400, "Unsupported attack type")
 
     data['config'] = ''
     # package => job
     job = process_func(data)
+
+    # nastavenie submodu pre markov
+    if job['attack_settings']['attack_mode'] == 3:
+        print(data['attack_settings']['attack_submode'])
+        job['attack_settings']['attack_submode'] = data['attack_settings']['attack_submode']
+
+    # nastavenie attack modu pre hybrid
+    # if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
+    #     job['attack_settings']['attack_mode'] = 1
+
     job['config'] += (
                          '|||attack_mode|UInt|' + lenStr(str(job['attack_settings']['attack_mode'])) + '|' +
                          str(job['attack_settings']['attack_mode']) + '|||\n' +
@@ -93,7 +104,7 @@ def create_job(data):
     db_job = FcJob(
         token=token.hex,
         attack=job['attack_name'],
-        attack_mode=job['attack_settings']['attack_mode'],
+        attack_mode='1' if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7 else job['attack_settings']['attack_mode'],
         attack_submode=job['attack_settings']['attack_submode'],
         hash_type=job['hash_settings']['hash_type'],
         hash='check hashlist',

@@ -26,7 +26,7 @@ from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
 from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
-from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, job_parser, \
+from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWorkunit_parser, \
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
     editJob_argument
 from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
@@ -81,8 +81,10 @@ class jobsCollection(Resource):
         else:
             jobs_query = jobs_query.order_by(FcJob.id.desc())
 
+
         # packages_page => jobs_page
         jobs_page = jobs_query.paginate(page, per_page, error_out=True)
+
         return jobs_page
 
     @api.expect(addJob_model)
@@ -95,6 +97,7 @@ class jobsCollection(Resource):
         #package => job
         data = request.json
         job = create_job(data)
+
         return {
             'message': 'Job ' + job.name + ' succesful created.',
             'status': True,
@@ -111,6 +114,7 @@ class JobByID(Resource):
         """
         Returns job.
         """
+
         job = FcJob.query.filter(FcJob.id == id).one()
         return job
 
@@ -286,14 +290,14 @@ class jobsHost(Resource):
 @api.response(404, 'Job not found.')
 class workunitsJob(Resource):
 
-    @api.expect(job_parser)
+    @api.expect(jobWorkunit_parser)
     @api.marshal_with(page_of_jobs_model)
     def get(self, id):
         """
         Returns workunits to which job was devides.
         """
         # packageJob_parser => job_parser
-        args = job_parser.parse_args(request)
+        args = jobWorkunit_parser.parse_args(request)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
 

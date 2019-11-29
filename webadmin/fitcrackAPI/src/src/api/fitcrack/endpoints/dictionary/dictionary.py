@@ -41,7 +41,7 @@ class dictionaryCollection(Resource):
         """
         Returns collection of dictionaries.
         """
-        dictionaries = getFilesFromFolder(DICTIONARY_DIR,FcDictionary, readingFromFolderPostProcces)
+        dictionaries = getFilesFromFolder(DICTIONARY_DIR, FcDictionary, readingFromFolderPostProcces)
         return {'items': dictionaries}
 
 @ns.route('/<id>')
