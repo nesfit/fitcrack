@@ -19,24 +19,6 @@ int PipeBase::closeAll() {
   return 0;
 }
 
-std::string PipeBase::readLine() {
-  std::string line;
-  char c;
-  int read_chars = -1;
-
-  while (canRead()) {
-    read_chars = readChar(c);
-    if (read_chars > 0) {
-      line += c;
-      if (c == '\n') break;
-    } else if (read_chars == -1) {
-      sleep(HashcatConstant::ProgressPeriod);
-    }
-  }
-
-  return line;
-}
-
 std::string PipeBase::readLine(ProcessBase* process_) {
   std::string line;
   char c;
@@ -48,7 +30,7 @@ std::string PipeBase::readLine(ProcessBase* process_) {
       line += c;
       if (c == '\n') break;
     } else if (read_chars == -1) {
-      if(!process_->isRunning()){
+      if (process_ && !process_->isRunning()) {
         break;
       }
       sleep(HashcatConstant::ProgressPeriod);

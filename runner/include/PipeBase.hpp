@@ -79,13 +79,7 @@ class PipeBase {
          * @brief   Reads line from the pipe
          * @return  Read line
          */
-        std::string readLine();
-
-        /**
-         * @brief   Reads line from the pipe
-         * @return  Read line
-         */
-        std::string readLine(ProcessBase* process_);
+        std::string readLine(ProcessBase* process_ = nullptr);
 
         /**
          * @brief   Pure virtual function writing message to the pipe
