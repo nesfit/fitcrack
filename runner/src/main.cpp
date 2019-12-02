@@ -5,7 +5,7 @@
 
 #include <main.hpp>
 
-int main(int argc, char **argv) {
+int main(void) {
 
 
   BOINC_OPTIONS options;
@@ -60,8 +60,9 @@ int main(int argc, char **argv) {
 
   if (!exception_message.empty()) {
     boinc_finish_message(error_value, exception_message.c_str(), false); //exit(0);
+  } else {
+    boinc_finish(error_value); // exit(0);
   }
-  else {
-    boinc_finish(error_value); //exit(0);
-  }
+
+  return 0;
 }

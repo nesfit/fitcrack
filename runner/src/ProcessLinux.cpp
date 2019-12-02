@@ -38,8 +38,8 @@ void ProcessLinux::launchSubprocess() {
 
 /* Public */
 
-ProcessLinux::ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args, bool isPCFG) : ProcessBase(exec_name, exec_args) {
-  if (isPCFG) {
+ProcessLinux::ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args, bool isExternalGenerator) : ProcessBase(exec_name, exec_args) {
+  if (isExternalGenerator) {
     out_pipe_ = PipeLinux::createBlockingPipe();
   } else {
     out_pipe_ = PipeLinux::createNonBlockingPipe();

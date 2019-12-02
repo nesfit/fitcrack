@@ -87,6 +87,7 @@ int PipeLinux::readChar(char& c) {
       break;
     } else {
       RunnerUtils::runtimeException("read() failed", errno);
+      return 0;
     }
     case 0:
     closeRead();
