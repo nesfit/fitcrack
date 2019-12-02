@@ -60,7 +60,7 @@ std::string TaskBenchmark::generateOutputMessage() {
 
   std::string output_message = "";
 
-  exit_code_ = process_->getExitCode();
+  exit_code_ = process_hashcat_->getExitCode();
 
   output_message += mode_ + "\n";
 
@@ -68,12 +68,12 @@ std::string TaskBenchmark::generateOutputMessage() {
 
     output_message += ProjectConstants::TaskFinalStatus::Succeded + "\n";
     output_message += RunnerUtils::toString(getTotalSpeed()) + "\n";
-    output_message += RunnerUtils::toString(process_->getExecutionTime()) + "\n";
+    output_message += RunnerUtils::toString(process_hashcat_->getExecutionTime()) + "\n";
 
   } else if (exit_code_ != HashcatConstant::Succeded) {
 
     output_message += ProjectConstants::TaskFinalStatus::Error + "\n";
-    output_message += RunnerUtils::toString(process_->getExitCode()) + "\n";
+    output_message += RunnerUtils::toString(process_hashcat_->getExitCode()) + "\n";
     output_message += getErrorMessage() + "\n";
 
   }
@@ -104,7 +104,7 @@ bool TaskBenchmark::parseHashcatOutputLine(std::string& output_line) {
 void TaskBenchmark::progress() {
   std::string lines;
   std::string line;
-  while (!(lines = process_->readOutPipeAvailableLines()).empty()) {
+  while (!(lines = process_hashcat_->readOutPipeAvailableLines()).empty()) {
     size_t found_at = 0, last = 0;
     for (found_at = 0; found_at != std::string::npos; found_at = lines.find("\n", last)) {
       line = lines.substr(last, found_at - last);

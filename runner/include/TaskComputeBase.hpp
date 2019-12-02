@@ -22,14 +22,14 @@ class TaskComputeBase: public TaskBase {
 
 	      AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
 
-        ProcessBase *process_;          /**< Pointer to process executing the task */
-        ProcessBase *process_PCFGmanager_; /** < Pointer to pcfg manager process executing the task */
+        ProcessBase *process_hashcat_;          /**< Pointer to process executing the task */
+        ProcessBase *process_external_generator_; /** < Pointer to pcfg manager/princepreprocessor process executing the task */
         ProcessBase *parent_process_; /** < Pointer to parent process */
 
-        bool isPCFG_;
+        enum AttackType attack_type;
 
         std::vector<char*> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
-        std::vector<char*> PCFGmanager_arguments_; /**<Merge pcfg-manager arguments from Attack, ConfigTask, ConfigHost */
+        std::vector<char*> external_generator_arguments_; /**<Merge pcfg-manager/princepreprocessor arguments from Attack, ConfigTask, ConfigHost */
 
         /**
          * @brief   Merges vectors with arguments from the member objects

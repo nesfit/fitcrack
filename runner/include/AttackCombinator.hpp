@@ -25,7 +25,7 @@ class AttackCombinator: public AttackCrackingBase {
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackCombinator(const ConfigTask& config, Directory& directory, bool &isPCFG);
+        AttackCombinator(const ConfigTask& config, Directory& directory);
 
 };
 

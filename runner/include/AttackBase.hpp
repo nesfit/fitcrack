@@ -34,8 +34,6 @@ class AttackBase {
 
         std::vector<char*> arguments_;		/**< Hashcat arguments based on the config */
 
-        std::vector<char*> PCFG_arguments_; /**< PCFG-manager arguments based on the config */
-
         const ConfigTask& config_;              /**< Representer of configuration file */
 
         const unsigned long long success_exit_code_; /**< Expected hashcat exit code on successful execution */
@@ -62,10 +60,7 @@ class AttackBase {
          * @param   key [in] Search selector (TLV key)
          * @param   argument [in] Argument to add if found
          */
-        bool findAndAdd(const std::string& key, const std::string& argument);
-
-
-        bool findAndAdd(const std::string& key, const std::string& argument, bool& isPCFG);
+        bool findAndAdd(const std::string& key, const std::string& argument, const char *override_arg_value = nullptr);
         /**
          * @brief   Searches for key in config_, if found adds argument and its value to arguments_,
          *          else throws exception
@@ -94,11 +89,10 @@ class AttackBase {
          * @param   key [in] Search selector (TLV key)
          * @param   argument [in] Argument to add if found
          */
-        void findAndAddRequired(const std::string& key, const std::string& argument);
+        void findAndAddRequired(const std::string& key, const std::string& argument,
+                                const char *override_arg_value = nullptr);
 
-        void findAndAddRequired(const std::string& key, const std::string& argument, bool& isPCFG);
-    public:
-
+      public:
         /**
          * @brief   Basic constructor
          * @param   config [in] Representation of config file
@@ -116,7 +110,6 @@ class AttackBase {
          */
         std::vector<char*>& getArguments();
 
-        std::vector<char*>& getPCFGArguments();
         /**
          * @brief   Getter of arguments_ size
          * @return  Size of the arguments_

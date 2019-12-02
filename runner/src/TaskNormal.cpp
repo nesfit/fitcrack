@@ -168,7 +168,7 @@ std::string TaskNormal::generateOutputMessage() {
 
   std::string output_info = "";
 
-  exit_code_ = process_->getExitCode();
+  exit_code_ = process_hashcat_->getExitCode();
   readPasswordsFromFile();
 
   output_info += mode_ + "\n";
@@ -180,19 +180,19 @@ std::string TaskNormal::generateOutputMessage() {
   if (exit_code_ == HashcatConstant::Succeded || !passwords_.empty()) {
 
     output_info += ProjectConstants::TaskFinalStatus::Succeded + "\n";
-    output_info += RunnerUtils::toString(process_->getExecutionTime()) + "\n";
+    output_info += RunnerUtils::toString(process_hashcat_->getExecutionTime()) + "\n";
     output_info += passwords_;
 
   } else if (exit_code_ == HashcatConstant::Exhausted) {
 
     output_info += ProjectConstants::TaskFinalStatus::Exhausted + "\n";
-    output_info += RunnerUtils::toString(process_->getExecutionTime()) + "\n";
+    output_info += RunnerUtils::toString(process_hashcat_->getExecutionTime()) + "\n";
 
   } else {
 
     output_info += ProjectConstants::TaskFinalStatus::Error + "\n";
     output_info += RunnerUtils::toString(exit_code_) + "\n";
-    output_info += process_->readErrPipeAvailableLines() + "\n";
+    output_info += process_hashcat_->readErrPipeAvailableLines() + "\n";
 
     /*
   } else if (exit_code == 4) {
@@ -249,11 +249,11 @@ void TaskNormal::progress() {
 
   PRINT_POSITION_IN_CODE();
 
-  while (process_->isRunning()) {
+  while (process_hashcat_->isRunning()) {
 
     PRINT_POSITION_IN_CODE();
 
-    line = process_->readOutPipeLine(process_);
+    line = process_hashcat_->readOutPipeLine();
 
     PRINT_POSITION_IN_CODE();
 

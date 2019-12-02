@@ -5,8 +5,18 @@
 
 #include "AttackPCFG.hpp"
 
-AttackPCFG::AttackPCFG(const ConfigTask& config, Directory& directory, bool& isPCFG) : AttackCrackingBase(config, directory, isPCFG) {
+AttackPCFG::AttackPCFG(const ConfigTask &config, Directory &directory)
+    : AttackCrackingBase(
+          config, directory,
+          /*attack_mode=*/"0") { // Change attack mode from 9 to 0
   addSpecificArguments();
+}
+
+AttackPCFG::~AttackPCFG() {
+  for (std::vector<char *>::iterator it = PCFG_arguments_.begin();
+       it != PCFG_arguments_.end(); it++) {
+    free(*it);
+  }
 }
 
 void AttackPCFG::addSpecificArguments() {
@@ -35,10 +45,9 @@ void AttackPCFG::addSpecificArguments() {
 }
 
 //
-void AttackPCFG::addPCFGArgument(std::string argument){
-  std::string *new_PCFG_argument = new std::string(argument);
-  PCFG_arguments_.push_back(TOCSTRING(new_PCFG_argument->c_str()));
-  Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding PCFG argument '" + *new_PCFG_argument + "'");
+void AttackPCFG::addPCFGArgument(const std::string &argument){
+  PCFG_arguments_.push_back(strdup(argument.c_str()));
+  Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding PCFG argument '" + argument + "'");
 }
 
 void AttackPCFG::addPCFGRequiredFile(const std::string& file_name) {
@@ -52,4 +61,9 @@ void AttackPCFG::addPCFGRequiredFile(const std::string& file_name) {
 
   addPCFGArgument(filePCFG.getRelativePath());
 }
+
+std::vector<char*>& AttackPCFG::getPCFGArguments() {
+  return PCFG_arguments_;
+}
+
 //

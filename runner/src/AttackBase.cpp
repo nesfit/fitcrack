@@ -7,26 +7,14 @@
 
 /* Private */
 
-bool AttackBase::findAndAdd(const std::string& key, const std::string& argument) {
+bool AttackBase::findAndAdd(const std::string& key, const std::string& argument, const char *override_arg_value) {
   std::string value;
 
   if (config_.find(key, value)) {
     addArgument(argument);
-    addArgument(value);
-    return true;
-  }
-  return false;
-}
-
-bool AttackBase::findAndAdd(const std::string& key, const std::string& argument, bool& isPCFG) {
-  std::string value;
-
-  if (config_.find(key, value)) {
-    addArgument(argument);
-    if(isPCFG){
-      addArgument("0");
-    }
-    else{
+    if (override_arg_value) {
+      addArgument(override_arg_value);
+    } else {
       addArgument(value);
     }
     return true;
@@ -75,13 +63,8 @@ void AttackBase::findAndAddRequired(const std::string& key) {
   RunnerUtils::runtimeException(key + "is missing in config");
 }
 
-void AttackBase::findAndAddRequired(const std::string& key, const std::string& argument) {
-  if (!findAndAdd(key, argument))
-  RunnerUtils::runtimeException(key + "is missing in config");
-}
-
-void AttackBase::findAndAddRequired(const std::string& key, const std::string& argument, bool& isPCFG) {
-  if (!findAndAdd(key, argument, isPCFG))
+void AttackBase::findAndAddRequired(const std::string& key, const std::string& argument, const char *override_arg_value) {
+  if (!findAndAdd(key, argument, override_arg_value))
   RunnerUtils::runtimeException(key + "is missing in config");
 }
 
@@ -97,11 +80,6 @@ AttackBase::~AttackBase() {
 std::vector<char*>& AttackBase::getArguments() {
   return arguments_;
 }
-
-std::vector<char*>& AttackBase::getPCFGArguments() {
-  return PCFG_arguments_;
-}
-
 
 size_t AttackBase::getArgumentsSize() {
   return arguments_.size();

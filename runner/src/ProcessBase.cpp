@@ -104,9 +104,9 @@ std::string ProcessBase::readOutPipeAvailableLines() {
   return readPipeAvailableLines(out_pipe_);
 }
 
-std::string ProcessBase::readOutPipeLine(ProcessBase* process_) {
+std::string ProcessBase::readOutPipeLine() {
   if (err_pipe_ != nullptr && out_pipe_ != nullptr)
-  return out_pipe_->readLine(process_);
+  return out_pipe_->readLine(this);
   RunnerUtils::runtimeException("out_pipe_ is nullptr. Can't read.");
   return "";
 }

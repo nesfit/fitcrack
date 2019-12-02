@@ -1,10 +1,10 @@
 /*
- * Author : see AUTHORS
+ * Author : Dávid Bolvanský
  * Licence: MIT, see LICENSE
  */
 
-#ifndef PROCESSPCFG_HPP
-#define PROCESSPCFG_HPP
+#ifndef PROCESSPRINCE_HPP
+#define PROCESSPRINCE_HPP
 
 #include "Directory.hpp"
 
@@ -14,7 +14,7 @@
 #include "ProcessWindows.hpp"
 
 /** Namespace for creating new process via function */
-namespace ProcessPCFG {
+namespace ProcessPrince {
 
     /**
      * @brief   Creates new platform based process
@@ -24,4 +24,4 @@ namespace ProcessPCFG {
      */
     ProcessBase* create(std::vector<char*>& arguments, Directory& directory);
 };
-#endif // PROCESSPCFG_HPP
+#endif // PROCESSPRINCE_HPP
