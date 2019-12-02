@@ -12,6 +12,7 @@
 #include "AttackDictionary.hpp"
 #include "AttackMask.hpp"
 #include "AttackPCFG.hpp"
+#include "AttackPrince.hpp"
 
 #include "ConfigTask.hpp"
 

@@ -13,7 +13,7 @@
 
 #include "Process.hpp"
 #include "ProcessPCFG.hpp"
-
+#include "ProcessPrince.hpp"
 
 /** Class representing base of the computation tasks */
 class TaskComputeBase: public TaskBase {

@@ -16,8 +16,8 @@ AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory, 
   case AT_Mask:
     return new AttackMask(task_config, directory);
     break;
-  case AT_Prince: // TODO: Prince
-    return new AttackPCFG(task_config, directory);
+  case AT_Prince:
+    return new AttackPrince(task_config, directory);
   case AT_PCFG:
     return new AttackPCFG(task_config, directory);
     break;

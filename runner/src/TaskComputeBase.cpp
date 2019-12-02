@@ -11,9 +11,17 @@ void TaskComputeBase::getAllArguments() {
 
   hashcat_arguments_ = attack_->getArguments();
 
-  if (attack_type == AT_PCFG) { // TODO: Prince
+  switch (attack_type) {
+  case AT_PCFG:
     external_generator_arguments_ =
         static_cast<AttackPCFG *>(attack_)->getPCFGArguments();
+    break;
+  case AT_Prince:
+    external_generator_arguments_ =
+        static_cast<AttackPrince *>(attack_)->getPrinceArguments();
+    break;
+  default:
+    break;
   }
 
   host_config_.read();
@@ -104,14 +112,21 @@ void TaskComputeBase::initialize() {
       }
       break;
     }
-    // TODO: prince
+    case AT_Prince: {
+      if (process_external_generator_ == nullptr) {
+        process_external_generator_ =
+            ProcessPrince::create(external_generator_arguments_, directory_);
+      }
+      break;
+    }
     default:
       break;
     }
 
     process_hashcat_ = Process::create(hashcat_arguments_, directory_);
-    // TODO: Linux only! Plus Prince...
-    if(attack_type == AT_PCFG){
+    // TODO: Linux only!
+    if (process_external_generator_) {
+      assert(attack_type == AT_PCFG || attack_type == AT_Prince);
       process_hashcat_->initInPipe();
       process_hashcat_->setInPipe(process_external_generator_->GetPipeOut());
     }
