@@ -8,7 +8,7 @@
 AttackPrince::AttackPrince(const ConfigTask &config, Directory &directory)
     : AttackCrackingBase(
           config, directory,
-          /*attack_mode=*/"0") { // Change attack mode from 9 to 0
+          /*attack_mode=*/"0") { // Change attack mode from 8 to 0
   addSpecificArguments();
 }
 
