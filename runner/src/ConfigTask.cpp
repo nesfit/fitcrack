@@ -45,6 +45,7 @@ void ConfigTask::initSupported() {
   supported_.push_back("hc_keyspace");
   supported_.push_back("mask_hc_keyspace");
   supported_.push_back("dict_hc_keyspace");
+  supported_.push_back("markov_threshold");
 }
 
 bool ConfigTask::isSupported(const std::string& key) {
