@@ -68,6 +68,7 @@ namespace Config {
     extern std::string inTemplateFileCombinator;
     extern std::string inTemplateFileRule;
     extern std::string inTemplateFilePcfg;
+    extern std::string inTemplateFilePcfgRules;
     extern std::string outTemplateFile;
 
     /** Other parameters filled by BOINC arg parsing */
@@ -78,6 +79,7 @@ namespace Config {
     extern char * inTemplatePathCombinator;
     extern char * inTemplatePathRule;
     extern char * inTemplatePathPcfg;
+    extern char * inTemplatePathPcfgRules;
     extern DB_APP * app;
     extern int startTime;
     extern int seqNo;

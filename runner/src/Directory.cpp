@@ -122,7 +122,7 @@ void Directory::scanForEntities() {
 }
 
 void Directory::makePath(const std::string& path) {
-  int occurence_index;
+  size_t occurence_index;
   if (mkdir(path.c_str() DIR_CREATE_FLAGS) == 0) { // Missing comma isn't typo
   Logging::debugPrint(Logging::Detail::CustomOutput, "Created directory " + path);
   return;

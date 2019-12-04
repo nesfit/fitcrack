@@ -152,8 +152,8 @@
         <v-card>
           <v-card-title>Job activity</v-card-title>
           <fc-graph
-            id="packageGraph"
-            :data="packageGraph"
+            id="jobGraph"
+            :data="jobGraph"
             type="job"
           />
         </v-card>
@@ -253,7 +253,7 @@
     },
     data: function () {
       return {
-        packageGraph: null,
+        jobGraph: null,
         hostGraph: null,
         interval: null,
         hoursBefore: '6',
@@ -306,7 +306,7 @@
       loadData: function () {
 
 
-        this.axios.get(this.$serverAddr + '/jobs/lastJobs')
+        this.axios.get(this.$serverAddr + '/job/lastJobs')
                 .then((response) => {
                   this.lastJobs = response.data.items;
                 });
@@ -336,8 +336,8 @@
         }
 
 
-        this.axios.get(this.$serverAddr + '/graph/packagesProgress?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
-          this.packageGraph = response.data;
+        this.axios.get(this.$serverAddr + '/graph/jobsProgress?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
+          this.jobGraph = response.data;
         });
         this.axios.get(this.$serverAddr + '/graph/hostsComputing?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
           this.hostGraph = response.data;
@@ -351,7 +351,7 @@
           this.hostsInfo = response.data;
         });
 
-        this.axios.get(this.$serverAddr + '/jobs/info').then((response) => {
+        this.axios.get(this.$serverAddr + '/job/info').then((response) => {
           this.jobsInfo = response.data;
         });
 

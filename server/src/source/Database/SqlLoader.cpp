@@ -368,6 +368,30 @@ bool CSqlLoader::isAnythingCracked(uint64_t jobId)
 }
 
 
+void CSqlLoader::killJob(PtrJob &job)
+{
+    uint64_t jobId = job->getId();
+    Tools::printDebugJob(Config::DebugType::Log, jobId,
+                         "JOB KILLED, sending BOINC messages ...\n");
+
+    /** Find corresponding workunits */
+    std::vector<PtrWorkunit > jobWorkunits = load<CWorkunit>(formatQuery("WHERE job_id = %" PRIu64 ";", jobId));
+
+    for (PtrWorkunit & wu : jobWorkunits)
+        cancel_jobs(wu->getWorkunitId(), wu->getWorkunitId());
+
+    /** Put down the kill flag */
+    updateSql(formatQuery("UPDATE `%s` SET `kill` = 0 WHERE `id` = %" PRIu64 " LIMIT 1;",
+                          CJob::getTableName().c_str(), jobId));
+
+    /** Stop the job */
+    updateRunningJobStatus(jobId, Config::JobState::JobReady);
+
+    Tools::printDebugJob(Config::DebugType::Log, jobId,
+                         "Job killed successfully!\n");
+}
+
+
 uint64_t CSqlLoader::getSecondsPassed(uint64_t jobId)
 {
     return getSqlNumber(formatQuery("SELECT TIMESTAMPDIFF(SECOND, time_start, now()) FROM `%s` WHERE id = %" PRIu64 ";",

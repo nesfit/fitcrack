@@ -25,7 +25,7 @@ class AttackDictionary: public AttackCrackingBase {
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackDictionary(const ConfigTask& config, Directory& directory, bool& isPCFG);
+        AttackDictionary(const ConfigTask& config, Directory& directory);
 
 };
 #endif // ATTACKDICTIONARY_HPP

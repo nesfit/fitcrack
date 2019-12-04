@@ -87,6 +87,7 @@ int PipeLinux::readChar(char& c) {
       break;
     } else {
       RunnerUtils::runtimeException("read() failed", errno);
+      return 0;
     }
     case 0:
     closeRead();
@@ -138,5 +139,8 @@ int PipeLinux::writeMessage(std::string& message) {
   Logging::debugPrint(Logging::Detail::CustomOutput, POSITION_IN_CODE + "Pipe writing message : " + message);
   return write(write_, message.data(), message.length());
 }
+
+PipeBase *PipeLinux::createBlockingPipe() { return new PipeLinux(false); }
+PipeBase *PipeLinux::createNonBlockingPipe() { return new PipeLinux(true); }
 
 #endif // __linux__

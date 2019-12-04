@@ -17,6 +17,9 @@ void ProcessWindows::launchSubprocess() {
   * stderr.txt */
   Logging::debugPrint(Logging::Detail::GeneralInfo, "Executing: " + command);
 
+  if (in_pipe_)
+    startup_info_.hStdInput  = static_cast<PipeWindows*>(in_pipe_)->getReadHandle();
+
   /** Start the child process */
   if(!CreateProcess( NULL,   // No module name (use command line)
   (char*)(command.c_str()),        // Command line
@@ -40,10 +43,15 @@ out_pipe_->closeWrite();
 }
 /* Public */
 
-ProcessWindows::ProcessWindows(const std::string& exec_name, std::vector<char* >& exec_args) : ProcessBase(exec_name, exec_args) {
+ProcessWindows::ProcessWindows(const std::string& exec_name, std::vector<char* >& exec_args, bool isExternalGenerator) : ProcessBase(exec_name, exec_args) {
 
-  out_pipe_ = new PipeWindows;
-  err_pipe_ = new PipeWindows;
+  if (isExternalGenerator) {
+    out_pipe_ = PipeWindows::createBlockingPipe();
+  } else {
+    out_pipe_ = PipeWindows::createNonBlockingPipe();
+  }
+  err_pipe_ = PipeWindows::createNonBlockingPipe();
+  in_pipe_ = nullptr;
 
   if (!SetHandleInformation(static_cast<PipeWindows*>(out_pipe_)->getReadHandle(), HANDLE_FLAG_INHERIT, 0)) {
     RunnerUtils::runtimeException("SetHandleInformation() failed", GetLastError());
@@ -93,6 +101,7 @@ int ProcessWindows::run() {
 
   setStartTime();
   launchSubprocess();
+  return 0;
 }
 
 #endif // __WIN32

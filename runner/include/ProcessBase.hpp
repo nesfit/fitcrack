@@ -57,13 +57,17 @@ class ProcessBase {
     public:
 
         /**
-         * @brief   Conctutor which sets name of the executable
+         * @brief   Constructor which sets name of the executable
          * @param   exec_name [in] Path to the executable / shell command
          * @param   exec_args [in] Arguments of the executable / shell command
          *          to be passed to it
          */
         ProcessBase(const std::string& exec_name, std::vector<char* >& exec_args);
-
+         /**
+         * @brief   Destructor
+         *
+         */
+        virtual ~ProcessBase() = 0;
         /**
          * @brief   Pure virtual function converting status to exit code
          * @return  Exit code of child process
@@ -98,7 +102,7 @@ class ProcessBase {
          * @brief   Reads a line from stdout of process
          * @return  Line from the stdout
          */
-        std::string readOutPipeLine(ProcessBase* process_);
+        std::string readOutPipeLine();
 
         /**
          * @brief   Computes run time of the launched process after it has

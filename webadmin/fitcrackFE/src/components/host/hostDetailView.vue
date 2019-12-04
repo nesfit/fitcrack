@@ -233,7 +233,6 @@
           {text: 'Status', value: 'status', align: 'end'},
           {text: 'Progress', value: 'progress', align: 'end'},
           {text: 'Added', value: 'time', align: 'end'},
-          {text: 'Result', value: 'password', align: 'end', sortable: false},
           {text: 'Actions', value: 'actions', sortable: false, align: 'end'}
         ],
         jobs_statuses: [
@@ -295,7 +294,7 @@
         return progress.toFixed() + '%'
       },
       operateJob: function (id, operation) {
-        this.axios.get(this.$serverAddr + '/jobs/' + id + '/action', {
+        this.axios.get(this.$serverAddr + '/job/' + id + '/action', {
           params: {
             'operation': operation
           }

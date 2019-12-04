@@ -92,6 +92,11 @@
               @change="checkValid"
             >
               <v-radio
+                label="Markov disabled"
+                color="primary"
+                :value="0"
+              />
+              <v-radio
                 label="2D Markov"
                 color="primary"
                 :value="1"
@@ -212,8 +217,8 @@
             'attack_name': this.attackName,
             'masks': this.masks,
             'attack_submode': this.markovSubmode,
-            'markov_treshold': parseInt(this.markovTreshold),
-            'markov': this.markov,
+            'markov_treshold': this.markovSubmode == 0 ? null : parseInt(this.markovTreshold),
+            'markov': this.markovSubmode == 0 ? null : this.markov[0],
             'charset': this.charsets
           })
           return true

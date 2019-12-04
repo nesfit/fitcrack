@@ -26,7 +26,7 @@ import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
 
-document.title = window.projectName
+document.title = window.projectName || 'Fitcrack'
 var link = document.createElement('link');
 link.type = 'image/png';
 link.rel = 'shortcut icon';
@@ -70,7 +70,7 @@ new Vue({
   components: { App },
   data: {
     store: {
-      project: window.projectName,
+      project: window.projectName || 'Fitcrack',
       user: {
         'userData': {
           'id': null,
@@ -80,10 +80,10 @@ new Vue({
             'MANAGE_USERS': true,
             'ADD_NEW_JOB': true,
             'UPLOAD_DICTIONARIES': true,
-            'VIEW_ALL_PACKAGES': true,
-            'EDIT_ALL_PACKAGES': true,
-            'OPERATE_ALL_PACKAGES': true,
-            'ADD_USER_PERMISSIONS_TO_PACKAGE': true
+            'VIEW_ALL_JOBS': true,
+            'EDIT_ALL_JOBS': true,
+            'OPERATE_ALL_JOBS': true,
+            'ADD_USER_PERMISSIONS_TO_JOB': true
           }
         },
         'loggedIn': false,

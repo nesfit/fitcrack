@@ -6,13 +6,13 @@
 from datetime import datetime
 import re
 
-
+# package => job
 def log_parser(log):
     result = {
         'type': '',
         'time': '',
         'host': '',
-        'package': '',
+        'job': '',
         'log': '',
         'raw': log
     }
@@ -26,11 +26,10 @@ def log_parser(log):
         result['type'] = 'WARN'
         result['time'] = datetime.strptime(log[6:25], '%d.%m.%Y %H:%M:%S')
 
-    m = re.match(r"(.*)(\[Package #(?P<job_id>\w+)])(\[Host #(?P<host_id>\w+)])? (?P<msg>(.*))", log)
+    m = re.match(r"(.*)(\[Job #(?P<job_id>\w+)])(\[Host #(?P<host_id>\w+)])? (?P<msg>(.*))", log)
     regexDict = m.groupdict()
-    result['package'] = regexDict['job_id']
+    result['job'] = regexDict['job_id']
     result['host'] = regexDict['host_id']
     result['log'] = regexDict['msg']
 
     return result
-

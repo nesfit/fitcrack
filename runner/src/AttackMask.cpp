@@ -83,6 +83,6 @@ void AttackMask::addSpecificArguments() {
 
 
 /* Public */
-AttackMask::AttackMask(const ConfigTask& config, Directory& directory, bool& isPCFG) : AttackCrackingBase(config, directory, isPCFG), has_charsets_(false) {
+AttackMask::AttackMask(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory), has_charsets_(false) {
   addSpecificArguments();
 }

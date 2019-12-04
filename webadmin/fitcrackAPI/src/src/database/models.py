@@ -17,8 +17,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.api.fitcrack.attacks.hashtypes import getHashById
 from src.api.fitcrack.functions import getStringBetween
-from src.api.fitcrack.lang import package_status_text_to_code_dict, host_status_text_to_code_dict, \
-    package_status_text_info_to_code_dict
+from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
+    job_status_text_info_to_code_dict
 from src.database import db
 
 Base = db.Model
@@ -274,11 +274,11 @@ class FcJob(Base):
 
     @hybrid_property
     def status_text(self):
-        return package_status_text_to_code_dict.get(int(self.status))
+        return job_status_text_to_code_dict.get(int(self.status))
 
     @hybrid_property
     def status_tooltip(self):
-        return package_status_text_info_to_code_dict.get(int(self.status))
+        return job_status_text_info_to_code_dict.get(int(self.status))
 
     @hybrid_property
     def status_type(self):
@@ -334,11 +334,11 @@ class FcJobStatus(Base):
 
     @hybrid_property
     def status_text(self):
-        return package_status_text_to_code_dict.get(int(self.status))
+        return job_status_text_to_code_dict.get(int(self.status))
 
     @hybrid_property
     def status_tooltip(self):
-        return package_status_text_info_to_code_dict.get(int(self.status))
+        return job_status_text_info_to_code_dict.get(int(self.status))
 
     @hybrid_property
     def status_type(self):
@@ -744,4 +744,3 @@ class FcServerUsage(Base):
     net_sent = Column(Integer, nullable=False)
     hdd_read = Column(Integer, nullable=False)
     hdd_write = Column(Integer, nullable=False)
-

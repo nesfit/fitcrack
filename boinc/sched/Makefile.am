@@ -323,6 +323,7 @@ fitcrack_sources = \
     AttackRules.h \
     AttackPcfg.h \
     AttackPcfgClient.h \
+    AttackPcfgRules.h \
     Base64.h \
     Config.h \
     Dictionary.h \
@@ -342,6 +343,7 @@ fitcrack_sources = \
     AttackRules.cpp \
     AttackPcfg.cpp \
     AttackPcfgClient.cpp \
+    AttackPcfgRules.cpp \
     Config.cpp \
     Dictionary.cpp \
     Host.cpp \

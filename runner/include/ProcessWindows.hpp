@@ -34,7 +34,7 @@ class ProcessWindows : public ProcessBase {
 	 * @param   exec_name [in] Name of the executable
 	 * @param   exec_args [in] Arguments which to pass to executable
 	 */
-	ProcessWindows(const std::string& exec_name, std::vector<char*>& exec_args);
+	ProcessWindows(const std::string& exec_name, std::vector<char*>& exec_args, bool isPCFG);
 
 	/**
 	 * @brief Destructor closing the process and thread handles

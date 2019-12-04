@@ -585,7 +585,7 @@
             boincIds.push(this.hosts[i].id)
           }
 
-          this.axios.get(this.$serverAddr + '/jobs/crackingTime', {
+          this.axios.get(this.$serverAddr + '/job/crackingTime', {
             params: {
               'hash_type_code': this.hashtype,
               'boinc_host_ids': boincIds.join(","),
@@ -645,7 +645,7 @@
           return
         }
 
-        this.axios.post(this.$serverAddr + '/jobs/verifyHash', {
+        this.axios.post(this.$serverAddr + '/job/verifyHash', {
           'hashtype': this.hashtype.code,
           'hashes': data
         }).then((response) => {
@@ -757,7 +757,7 @@
         }
 
         this.loading = true
-        this.axios.post(this.$serverAddr + '/jobs', this.jobSettings).then((response) => {
+        this.axios.post(this.$serverAddr + '/job', this.jobSettings).then((response) => {
           this.$router.push({name: 'jobDetail', params: {id: response.data.job_id}})
           console.log(response.data)
         }).catch((error) => {

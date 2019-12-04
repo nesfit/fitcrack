@@ -53,6 +53,13 @@ void CSimpleGenerator::run()
         /** Generate workunits for each job */
         for (PtrJob & job : runningJobs)
         {
+            /** Process kill requests */
+            if (job->getKillFlag())
+            {
+                m_sqlLoader->killJob(job);
+                continue;
+            }
+
             uint64_t jobId = job->getId();
 
             /** Update start_time of job */

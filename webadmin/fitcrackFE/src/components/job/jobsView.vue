@@ -305,7 +305,7 @@
     },
     methods: {
       loadJobs () {
-        this.axios.get(this.$serverAddr + '/jobs', {
+        this.axios.get(this.$serverAddr + '/job', {
           params: {
             'page': this.pagination.page,
             'per_page': this.pagination.itemsPerPage,
@@ -337,7 +337,7 @@
         return progress.toFixed() + '%'
       },
       operateJob: function (id, operation) {
-        this.axios.get(this.$serverAddr + '/jobs/' + id + '/action', {
+        this.axios.get(this.$serverAddr + '/job/' + id + '/action', {
           params: {
             'operation': operation
           }
@@ -348,7 +348,7 @@
       },
       hideJob: function (id) {
         this.loading = true
-        this.axios.delete(this.$serverAddr + '/jobs/' + id)
+        this.axios.delete(this.$serverAddr + '/job/' + id)
         .then((response) => {
           this.loadJobs()
         })

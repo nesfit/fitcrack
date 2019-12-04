@@ -10,14 +10,14 @@
 
 /** Class representing hashcat's/PFCG manager PCFG attack */
 class AttackPCFG: public AttackCrackingBase {
-
+    std::vector<char *> PCFG_arguments_; /**< PCFG-manager arguments based on the config */
     protected:
 
         /**
          * @brief   Adds all attack specific arguments
          */
         void addSpecificArguments();
-        void addPCFGArgument(std::string argument);
+        void addPCFGArgument(const std::string &argument);
         void addPCFGRequiredFile(const std::string& file_name);
 
     public:
@@ -27,7 +27,8 @@ class AttackPCFG: public AttackCrackingBase {
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackPCFG(const ConfigTask& config, Directory& directory, bool& isPCFG);
-
+      AttackPCFG(const ConfigTask &config, Directory &directory);
+      ~AttackPCFG();
+      std::vector<char *> &getPCFGArguments();
 };
 #endif // ATTACKPCFG_HPP

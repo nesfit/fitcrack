@@ -2,14 +2,16 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-
+'''
+packageHost_parser => jobHost_parser
+'''
 import logging
 
 from flask import request
 from flask_restplus import Resource
 
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.host.argumentsParser import packageHost_parser
+from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, boincHostDetail_model
 from src.database import db
 from src.database.models import Host, FcHostActivity, FcHostStatus
@@ -23,14 +25,14 @@ ns = api.namespace('hosts', description='Operations with hosts.')
 @ns.route('')
 class hostsCollection(Resource):
 
-    @api.expect(packageHost_parser)
+    @api.expect(jobHost_parser)
     @api.marshal_with(page_of_hosts_model)
     def get(self):
         """
         Returns list of hosts.
         """
 
-        args = packageHost_parser.parse_args(request)
+        args = jobHost_parser.parse_args(request)
         page = args.get('page', None)
         per_page = args.get('per_page', None)
 

@@ -13,7 +13,7 @@ ProcessBase* ProcessPCFG::create(std::vector<char*>& arguments ,Directory& direc
   return new ProcessLinux(executable.getRelativePath(), arguments, true);
   #elif defined (PROCESSWINDOWS_HPP)
   directory.findVersionedFile("pcfg", "exe", executable);
-  return new ProcessWindows(executable.getRelativePath(), arguments);
+  return new ProcessWindows(executable.getRelativePath(), arguments, true);
   #else
   #error "No viable Process implementation. This is caused by your target platfrom. Supported platforms are __linux__, _WIN32."
   #endif

@@ -184,7 +184,7 @@ class OperationWithPackage(Resource):
                 db.session.delete(item)
             db.session.add(FcJobGraph(progress=0, job_id=package.id))
         elif action == 'kill':
-            package.status = 0
+            package.status = 10
             package.indexes_verified = 0
             package.current_index = 0
             package.cracking_time = 0

@@ -66,6 +66,6 @@ class AttackMask: public AttackCrackingBase {
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackMask(const ConfigTask& config, Directory& directory, bool &isPCFG);
+        AttackMask(const ConfigTask& config, Directory& directory);
 };
 #endif // ATTACKMASK_HPP

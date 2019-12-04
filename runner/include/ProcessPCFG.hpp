@@ -24,4 +24,4 @@ namespace ProcessPCFG {
      */
     ProcessBase* create(std::vector<char*>& arguments, Directory& directory);
 };
-#endif // PROCESS_HPP
+#endif // PROCESSPCFG_HPP

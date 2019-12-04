@@ -56,12 +56,13 @@ class PipeLinux : public PipeBase {
          * @param   target [in] New end of pipe (ie. stdout, stderr etc.)
          */
         void redirectPipeEnd(int pipe_end, int target);
-    public:
 
         /**
          * @brief   Constructor which creates the unblocking Linux pipe
          */
         PipeLinux(bool is_NONBLOCK_);
+
+    public:
 
         /**
          * @brief   Destructor which calls close on both ends of pipe
@@ -117,7 +118,8 @@ class PipeLinux : public PipeBase {
          */
         int writeMessage(std::string& message);
 
-
+        static PipeBase *createBlockingPipe();
+        static PipeBase *createNonBlockingPipe();
 };
 #endif // NAMEDPIPELINUX_HPP
 

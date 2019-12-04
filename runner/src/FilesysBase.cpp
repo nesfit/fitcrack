@@ -59,11 +59,11 @@ FilesysBase::FilesysBase() : path_delimiter_(PATH_DELIMITER) {
   initialize();
 };
 
-FilesysBase::FilesysBase(std::string path) : relative_path_(path), path_delimiter_(PATH_DELIMITER) {
+FilesysBase::FilesysBase(std::string path) : path_delimiter_(PATH_DELIMITER), relative_path_(path) {
   initialize();
 };
 
-FilesysBase::FilesysBase(std::string path, std::string name) : relative_path_(path), name_(name), path_delimiter_(PATH_DELIMITER)  {
+FilesysBase::FilesysBase(std::string path, std::string name) : path_delimiter_(PATH_DELIMITER), name_(name), relative_path_(path) {
   initialize();
 };
 
@@ -115,9 +115,10 @@ bool FilesysBase::isFile(const std::string& path) {
 
 void FilesysBase::normalizePath(std::string& path) {
   size_t found_at;
+  std::string path_delim = PATH_DELIMITER;
 
-  while (PATH_DELIMITER != "/" && (found_at = path.find("/", 0)) != std::string::npos) {
-    path.replace(found_at, 1, std::string(PATH_DELIMITER));
+  while (path_delim != "/" && (found_at = path.find("/", 0)) != std::string::npos) {
+    path.replace(found_at, 1, path_delim);
   }
 }
 

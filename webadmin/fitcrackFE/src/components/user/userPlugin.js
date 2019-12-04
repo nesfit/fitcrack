@@ -15,10 +15,10 @@ const UserPlugin = {
             'MANAGE_USERS': false,
             'ADD_NEW_JOB': false,
             'UPLOAD_DICTIONARIES': false,
-            'VIEW_ALL_PACKAGES': false,
-            'EDIT_ALL_PACKAGES': false,
-            'OPERATE_ALL_PACKAGES': false,
-            'ADD_USER_PERMISSIONS_TO_PACKAGE': false
+            'VIEW_ALL_JOBS': false,
+            'EDIT_ALL_JOBS': false,
+            'OPERATE_ALL_JOBS': false,
+            'ADD_USER_PERMISSIONS_TO_JOB': false
           }
         },
         'loggedIn': false

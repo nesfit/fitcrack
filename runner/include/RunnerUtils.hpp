@@ -8,7 +8,7 @@
 
 #include "nullptr.hpp"
 
-#include "boinc_api.h"
+#include "BoincApi.hpp"
 
 #include <cerrno>
 #include <climits>

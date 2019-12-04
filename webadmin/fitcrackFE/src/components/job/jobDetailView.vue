@@ -228,21 +228,17 @@
                     Progress:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-right jobProgress">
-                      <v-row column>
-                        <v-col class="height5 text-center xs-12">
-                          <span
-                            class="progressPercentage primary--text"
-                          >{{ progressToPercentage(data.progress) }}</span>
-                        </v-col>
-                        <v-col class="progressLinear xs-12">
-                          <v-progress-linear
-                            height="3"
-                            color="primary"
-                            :value="data.progress"
-                          />
-                        </v-col>
-                      </v-row>
+                    <v-list-item-title class="text-right jobProgress d-flex align-center">
+                      <span
+                        class="progressPercentage primary--text mr-2"
+                      >
+                        {{ progressToPercentage(data.progress) }}
+                      </span>
+                      <v-progress-linear
+                        height="3"
+                        color="primary"
+                        :value="data.progress"
+                      />
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -423,29 +419,23 @@
                 <v-data-table
                   :headers="statusHeaders"
                   :items="statusHistory"
-                  :footer-props="{itemsPerPageOptions: [25,50,100,{text: 'All', value: -1}]}"
+                  :footer-props="{itemsPerPageOptions: [5,25,50,{text: 'All', value: -1}]}"
                 >
-                  <template
-                    slot="items"
-                    slot-scope="props"
-                  >
-                    <td class="text-left">
-                      {{ $moment(props.item.time).format('DD.MM.YYYY HH:mm')
-                      }}
-                    </td>
-                    <td
-                      class="text-right text-right fw500"
-                      :class="props.item.status_type + '--text'"
-                    >
-                      <v-tooltip top>
-                        <template v-slot:activator="{ on }">
-                          <span v-on="on">
-                            {{ props.item.status_text }}
-                          </span>
-                        </template>
-                        <span>{{ props.item.status_tooltip }}</span>
-                      </v-tooltip>
-                    </td>
+                  <template v-slot:item.time="{ item }">
+                    {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+                  </template>
+                  <template v-slot:item.status="{ item }">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <span 
+                          :class="item.status_type + '--text'"
+                          v-on="on"
+                        >
+                          {{ item.status_text }}
+                        </span>
+                      </template>
+                      <span>{{ item.status_tooltip }}</span>
+                    </v-tooltip>
                   </template>
                 </v-data-table>
               </v-list>
@@ -462,6 +452,7 @@
             <div class="workunit-parent">
               <div
                 v-for="workunit in workunitsGraphical"
+                :key="workunit.id"
                 :style="{ 'flex-grow': workunit.keyspace, 'background-color': workunit.color }"
                 class="workunit-child"
               >
@@ -481,7 +472,6 @@
               :headers="workunitsHeader"
               :items="data.workunits"
               show-expand
-              expand-icon="mdi-file"
               class="width100"
             >
               <template v-slot:item.boinc_host_id="{ item }">
@@ -509,10 +499,20 @@
                 {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
               </template>
               <template v-slot:item.retry="{ item }">
-                {{ yesNo(item.retry) }}
+                <v-chip
+                  small
+                  :color="item.retry ? 'success' : 'error'"
+                >
+                  {{ yesNo(item.retry) }}
+                </v-chip>
               </template>
               <template v-slot:item.finished="{ item }">
-                {{ yesNo(item.finished) }}
+                <v-chip
+                  small
+                  :color="item.finished ? 'success' : 'error'"
+                >
+                  {{ yesNo(item.finished) }}
+                </v-chip>
               </template>
               <template
                 v-slot:expanded-item="{ headers, item }"
@@ -636,86 +636,18 @@
       max-width="800"
     >
       <v-card class="mb-5">
-        <v-data-table
-          v-model="newHostsMapping"
-          item-key="id"
-          show-select
-          class="width100"
-          :headers="hostHeaders"
-          :items="hosts"
-          :options.sync="paginationHost"
-          :server-items-length="totalHostItems"
-          :loading="loadingHosts"
-          :footer-props="{itemsPerPageOptions: [10,25,50,100], itemsPerPageText: 'Hosts per page'}"
-        >
-          <template
-            slot="headers"
-            slot-scope="props"
-          >
-            <tr>
-              <th>
-                <v-checkbox
-                  primary
-                  hide-details
-                  :input-value="props.all"
-                  :indeterminate="props.indeterminate"
-                  @click.native="toggleAll"
-                />
-              </th>
-              <th
-                v-for="header in hostHeaders"
-                :key="header.text"
-                :class="['column sortable', paginationHost.descending ? 'desc' : 'asc', header.value === paginationHost.sortBy ? 'active' : '']"
-                @click="changeSort(header.value)"
-              >
-                <v-icon small>
-                  arrow_upward
-                </v-icon>
-                {{ header.text }}
-              </th>
-            </tr>
-          </template>
-          <template
-            slot="items"
-            slot-scope="props"
-          >
-            <tr
-              :active="props.selected"
-              @click="props.selected = !props.selected"
-            >
-              <td>
-                <v-checkbox :input-value="props.selected" />
-              </td>
-              <td>
-                <router-link
-                  :to="{ name: 'hostDetail', params: { id: props.item.id}}"
-                  class="middle"
-                >
-                  {{ props.item.domain_name + ' (' + props.item.user.name + ')' }}
-                </router-link>
-              </td>
-              <td class="text-right">
-                {{ props.item.ip_address }}
-              </td>
-              <td
-                class="text-right"
-                :class="{
-                  'error--text': props.item.last_active.seconds_delta > 61,
-                  'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
-                }"
-              >
-                <v-icon
-                  :title="parseTimeDelta(props.item.last_active.last_seen)"
-                  class="inheritColor"
-                >
-                  fiber_manual_record
-                </v-icon>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
+        <host-selector 
+          v-model="newHostsMapping" 
+          select-all 
+        />
         <v-card-actions>
           <v-spacer />
+          <v-btn
+            text
+            @click="editHostsDialog = false"
+          >
+            Cancel
+          </v-btn>
           <v-btn
             color="primary"
             text
@@ -737,6 +669,7 @@
   import {DonutChart, LineChart} from 'vue-morris'
   import graph from '@/components/graph/fc_graph'
   import FcTextarea from '@/components/textarea/fc_textarea'
+  import hostSelector from '@/components/selector/hostSelector'
 
   export default {
     name: "JobDetail",
@@ -746,7 +679,8 @@
       'maskDetail': maskDetail,
       'dictionaryDetail': dictionaryDetail,
       'pcfgDetail': pcfgDetail,
-      'fc-textarea': FcTextarea
+      'fc-textarea': FcTextarea,
+      hostSelector
     },
 
     data: function () {
@@ -783,14 +717,15 @@
             value: 'boinc_host_id',
           },
           {text: 'Progress', align: 'end', value: 'progress'},
-          {text: 'Cracking time', align: 'end', value: 'cracking_time'},
+          {text: 'Cracking time', align: 'end', value: 'cracking_time_str'},
           {text: 'Generated', align: 'end', value: 'time'},
           {text: 'Start index', align: 'end', value: 'start_index'},
           {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
-          {text: 'Retry', align: 'end', value: 'retry'},
-          {text: 'Finished', align: 'end', value: 'finished'},
+          {text: 'Retry', align: 'center', value: 'retry'},
+          {text: 'Finished', align: 'center', value: 'finished'},
           {text: 'Log', align: 'center', value: 'data-table-expand'}
         ],
+        workunitsGraphical: [],
         hashHeaders: [
           {
             text: 'Hash',
@@ -801,19 +736,6 @@
         ],
         editJobDialog: false,
         editHostsDialog: false,
-        totalHostItems: 0,
-        paginationHost: {},
-        loadingHosts: true,
-        hostHeaders: [
-          {
-            text: 'Name',
-            align: 'start',
-            value: 'name'
-          },
-          {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
-          {text: 'Online', value: 'last_active', align: 'end', sortable: false}
-        ],
-        hosts: [],
         newHostsMapping: [],
         editJobValues : {
           name: '',
@@ -832,7 +754,7 @@
           case 'mask':
             return 'maskDetail'
           case 'dictionary':
-            return 'dicttionaryDetail'
+            return 'dictionaryDetail'
           case 'pcfg':
             return 'pcfgDetail'
           default:
@@ -861,7 +783,7 @@
         return val ? 'Yes' : 'No'
       },
       loadData: function () {
-        this.axios.get(this.$serverAddr + '/jobs/' + this.$route.params.id).then((response) => {
+        this.axios.get(this.$serverAddr + '/job/' + this.$route.params.id).then((response) => {
           this.data = response.data;
 
           // Computing of counts and avg keyspace
@@ -923,11 +845,11 @@
                   console.log("An error ocurred while fetching status", reason);
                 }));
 
-        // if package is finished, we dont need to send this stuffs...
+        // if job is finished, we dont need to send this stuff...
         if (this.data !== null && parseInt(this.data.status) < 5)
           return
 
-        this.axios.get(this.$serverAddr + '/graph/packagesProgress/' + this.$route.params.id).then((response) => {
+        this.axios.get(this.$serverAddr + '/graph/jobsProgress/' + this.$route.params.id).then((response) => {
           this.progressGraph = response.data
         });
 
@@ -966,7 +888,7 @@
           this.editJobValues.time_end = this.$moment(this.editJobValues.time_end, 'DDMMYYYYHHmm').format('DD/MM/YYYY HH:mm')
         }
 
-        this.axios.put(this.$serverAddr + '/jobs/' + this.data.id , this.editJobValues
+        this.axios.put(this.$serverAddr + '/job/' + this.data.id , this.editJobValues
         ).then((response) => {
           console.log(response.data);
           this.editJobDialog = false
@@ -976,25 +898,6 @@
       showMappingHostDialog() {
         this.newHostsMapping = this.data.hosts.slice()
         this.editHostsDialog = true
-        this.axios.get(this.$serverAddr + '/hosts', {
-          params: {
-            'all': true,
-            'page': this.paginationHost.page,
-            'per_page': this.paginationHost.rowsPerPage,
-            'order_by': this.paginationHost.sortBy,
-            'descending': this.paginationHost.descending,
-            'name': this.search,
-            'status': this.status
-          }
-        }).then((response) => {
-          this.hosts = response.data.items
-          this.totalItems = response.data.total
-          this.loadingHosts = false
-        })
-      },
-      toggleAll() {
-        if (this.newHostsMapping.length) this.newHostsMapping = []
-        else this.newHostsMapping = this.hosts.slice()
       },
       progressToPercentage: function (progress) {
         if(progress > 100){
@@ -1007,7 +910,7 @@
         for (let i = 0; i < this.newHostsMapping.length; i++) {
           hostIds.push(this.newHostsMapping[i].id)
         }
-        this.axios.post(this.$serverAddr + '/jobs/' + this.data.id + '/host', {
+        this.axios.post(this.$serverAddr + '/job/' + this.data.id + '/host', {
           'newHost_ids': hostIds
         }).then((response) => {
           console.log(response.data);
@@ -1017,7 +920,7 @@
 
       },
       operateJob: function (operation) {
-        this.axios.get(this.$serverAddr + '/jobs/' + this.data.id + '/action', {
+        this.axios.get(this.$serverAddr + '/job/' + this.data.id + '/action', {
           params: {
             'operation': operation
           }
@@ -1025,7 +928,7 @@
           console.log(response.data);
           this.loadData()
           if (operation === "kill") {
-            this.axios.get(this.$serverAddr + '/graph/packagesProgress/' + this.$route.params.id).then((response) => {
+            this.axios.get(this.$serverAddr + '/graph/jobsProgress/' + this.$route.params.id).then((response) => {
               this.progressGraph = response.data
             });
 

@@ -12,7 +12,7 @@ from src.api.fitcrack.responseModels import simpleResponse
 from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo
 from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
 from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument
-from src.api.fitcrack.endpoints.graph.argumentsParser import package_graph_arguments
+from src.api.fitcrack.endpoints.graph.argumentsParser import job_graph_arguments
 from src.api.fitcrack.functions import shellExec
 from src.database import db
 from src.database.models import FcServerUsage
@@ -93,14 +93,14 @@ class serverOperation(Resource):
 @ns.route('/getUsageData')
 class serverUtil(Resource):
 
-    @api.expect(package_graph_arguments)
+    @api.expect(job_graph_arguments)
     @api.marshal_with(usageinfoList)
     def get(self):
         """
-        Vraci data z tabulky fc_server_usage na zaklade zadanych casu
+        Returns data from table fc_server_usage according to a given time
         """
 
-        args = package_graph_arguments.parse_args(request)
+        args = job_graph_arguments.parse_args(request)
         fromDate = args['from_date']
         toDate = args['to_date']
 
@@ -113,7 +113,7 @@ class actualUsageData(Resource):
     @api.marshal_with(usageinfo)
     def get(self):
         """
-        Vraci posledni zaznam z tabulky fc_server_usage
+        Returns last record from table fc_server_usage
         """
 
         return FcServerUsage.query.order_by(FcServerUsage.time.desc()).limit(1).one()
@@ -127,7 +127,7 @@ class saveData(Resource):
     @api.marshal_with(simpleResponse)
     def get(self):
         """
-        Funkce pro ulozeni novych dat do tabulky fc_server_usage
+        Function for saving of new data into the table fc_server_usage
         """
         args = serverUsage_argument.parse_args(request)
 

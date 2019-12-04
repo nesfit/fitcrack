@@ -19,7 +19,7 @@ from src.database import db
 from src.database.models import FcEncryptedFile
 
 log = logging.getLogger(__name__)
-ns = api.namespace('protectedFiles', description='Endpointy ktoré slúžia na pracu so zaheslovanými súbormi.')
+ns = api.namespace('protectedFiles', description='Endpoints for operations with files with passwords.')
 
 ALLOWED_EXTENSIONS = set(["doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "rar", "zip", "7z"])
 

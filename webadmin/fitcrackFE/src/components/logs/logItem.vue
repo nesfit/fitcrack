@@ -25,8 +25,8 @@
         <v-icon>desktop_windows</v-icon>
       </v-btn>
       <v-btn
-        v-if="packageID"
-        :to="'jobs/' + packageID"
+        v-if="jobID"
+        :to="'jobs/' + jobID"
         icon
         class="btns"
       >
@@ -48,7 +48,7 @@
         type: [Number, null],
         default: null
       },
-      packageID: {
+      jobID: {
         type: [Number, null],
         default: null
       },

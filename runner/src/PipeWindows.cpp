@@ -27,7 +27,7 @@ int PipeWindows::closeEnd(HANDLE pipe_end) {
 
 /* Protected */
 
-void PipeWindows::createPipe() {
+void PipeWindows::createPipe(bool is_NONBLOCK_) {
   /** Prepare security attributes */
   SECURITY_ATTRIBUTES security_attributes;
 
@@ -37,11 +37,18 @@ void PipeWindows::createPipe() {
 
   if (!CreatePipe(&read_, &write_, &security_attributes, 0))
   RunnerUtils::runtimeException("CreatePipe() failed", GetLastError());
+
+  if (is_NONBLOCK_) {
+    DWORD mode = PIPE_NOWAIT;
+    if (!SetNamedPipeHandleState(read_, &mode, NULL, NULL)) {
+       RunnerUtils::runtimeException("SetNamedPipeHandleState() failed", GetLastError());
+    }
+  }
 }
 
 int PipeWindows::readChar(char& c) {
 
-  int read_size = READ_SIZE;
+  unsigned long read_size = READ_SIZE;
   unsigned long n_read_chars = 0;
 
   /** Try to read N chars but don't really read it yet */
@@ -73,8 +80,8 @@ int PipeWindows::readChar(char& c) {
 
 /* Public */
 
-PipeWindows::PipeWindows() : read_(NULL), write_(NULL), error_(ERROR_SUCCESS) {
-  createPipe();
+PipeWindows::PipeWindows(bool is_NONBLOCK_) : error_(ERROR_SUCCESS), read_(NULL), write_(NULL) {
+  createPipe(is_NONBLOCK_);
 }
 
 PipeWindows::~PipeWindows() {
@@ -121,4 +128,7 @@ int  PipeWindows::writeMessage(std::string& message) {
 
   return written_chars;
 }
+
+PipeBase *PipeWindows::createBlockingPipe() { return new PipeWindows(false); }
+PipeBase *PipeWindows::createNonBlockingPipe() { return new PipeWindows(true); }
 #endif // _WIN32

@@ -5,7 +5,7 @@
 
 #include "AttackCombinator.hpp"
 
-AttackCombinator::AttackCombinator(const ConfigTask& config, Directory& directory, bool& isPCFG) : AttackCrackingBase(config, directory, isPCFG) {
+AttackCombinator::AttackCombinator(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory) {
   addSpecificArguments();
 }
 
