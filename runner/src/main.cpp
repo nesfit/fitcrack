@@ -5,8 +5,7 @@
 
 #include <main.hpp>
 
-int main(void) {
-
+int main(int argc, char **argv) {
 
   BOINC_OPTIONS options;
   RunnerUtils::initializeBoinc(options);
@@ -36,9 +35,9 @@ int main(void) {
 
     directory.scanForEntities();
 
-    directory.find("config", file);
-
-    task = Task::create(directory);
+    const char *config = argc > 1 ?argv[1] : "config";
+    directory.find(config, file);
+    task = Task::create(file, directory);
 
     task->initialize();
     task->startComputation();

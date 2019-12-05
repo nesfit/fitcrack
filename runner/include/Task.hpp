@@ -27,7 +27,7 @@ namespace Task {
      * @param	directory [in] Working directory
      * @return	Pointer to the created task 
      */
-    TaskBase* create(Directory& directory);
+    TaskBase* create(File &config_file, Directory& directory);
 
     /**
      * @brief	Gets workunit name

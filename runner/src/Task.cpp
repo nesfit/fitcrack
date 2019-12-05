@@ -9,14 +9,10 @@ namespace Task {
   std::string HostConfigPath;
 }
 
-TaskBase* Task::create(Directory& directory) {
-  File config;
+TaskBase *Task::create(File &config_file, Directory &directory) {
   std::string mode;
   std::string workunit_name;
-
-  directory.find("config", config);
-
-  ConfigTask task_config(config.getRelativePath());
+  ConfigTask task_config(config_file.getRelativePath());
   task_config.parse();
 
   task_config.print();
