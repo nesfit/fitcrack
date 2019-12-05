@@ -130,15 +130,28 @@ void TaskComputeBase::initialize() {
       File hashcat_executable;
       File external_generator_executable;
       directory_.findVersionedFile("hashcat", "exe", hashcat_executable);
-      hashcat_arguments_.insert(
-          hashcat_arguments_.begin(),
-          strdup(hashcat_executable.getRelativePath().c_str()));
-      hashcat_arguments_.insert(hashcat_arguments_.begin(), strdup("|"));
-      for (std::vector<char *>::reverse_iterator it =
-               external_generator_arguments_.rbegin();
-           it != external_generator_arguments_.rend(); it++) {
-        hashcat_arguments_.insert(hashcat_arguments_.begin(), (*it));
+      std::string cmd = "cmd.exe /C";
+      std::string hashcat_relative_path = hashcat_executable.getRelativePath();
+      std::string external_generator_relative_path;
+      if (attack_type == AT_PCFG) {
+        directory_.findVersionedFile("pcfg", "exe",
+                                     external_generator_executable);
+      } else if (attack_type == AT_Prince) {
+        directory_.findVersionedFile("prince", "exe",
+                                     external_generator_executable);
       }
+      external_generator_relative_path =
+          external_generator_executable.getRelativePath();
+
+      std::vector<char *> cmd_arguments;
+      cmd_arguments.push_back(strdup(external_generator_relative_path.c_str()));
+      cmd_arguments.insert(cmd_arguments.end(),
+                           external_generator_arguments_.begin(),
+                           external_generator_arguments_.end());
+      cmd_arguments.push_back((char *)"|");
+      cmd_arguments.push_back(strdup(hashcat_relative_path.c_str()));
+      cmd_arguments.insert(cmd_arguments.end(), hashcat_arguments_.begin(),
+                           hashcat_arguments_.end());
 
       if (attack_type == AT_PCFG) {
         directory_.findVersionedFile("pcfg", "exe",
@@ -147,12 +160,8 @@ void TaskComputeBase::initialize() {
         directory_.findVersionedFile("prince", "exe",
                                      external_generator_executable);
       }
-      hashcat_arguments_.insert(
-          hashcat_arguments_.begin(),
-          strdup(external_generator_executable.getRelativePath().c_str()));
-
-      std::string cmd = "cmd.exe /C";
-      process_hashcat_ = new ProcessWindows(cmd, hashcat_arguments_, true);
+      
+      process_hashcat_ = new ProcessWindows(cmd, cmd_arguments, true);
     }
 #endif
 
