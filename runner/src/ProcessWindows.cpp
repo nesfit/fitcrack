@@ -94,6 +94,7 @@ return (int)exit_code;
 bool ProcessWindows::isRunning() {
   DWORD exit_code;
   GetExitCodeProcess(process_information_.hProcess, &exit_code);
+
   return exit_code == STILL_ACTIVE;
 }
 

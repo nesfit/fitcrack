@@ -70,7 +70,6 @@ std::string ProcessBase::readPipeAvailableLines(PipeBase* pipe) {
 /* Public */
 
 int ProcessBase::finish() {
-  while (isRunning());
   setStopTime();
   return getExitCode();
 }

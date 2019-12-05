@@ -20,7 +20,8 @@ AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory, 
     return new AttackPrince(task_config, directory);
   case AT_PCFG:
     return new AttackPCFG(task_config, directory);
-    break;
+  case AT_Benchmark:
+    return new AttackBenchmark(task_config);
   default:
     RunnerUtils::runtimeException("Invalid attack mode");
     return nullptr;

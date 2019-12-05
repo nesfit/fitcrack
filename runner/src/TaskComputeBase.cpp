@@ -104,6 +104,7 @@ void TaskComputeBase::initialize() {
   }
 
   if (process_hashcat_ == nullptr) {
+    #ifdef PROCESSLINUX_HPP
     switch (attack_type) {
     case AT_PCFG: {
       if (process_external_generator_ == nullptr) {
@@ -122,14 +123,50 @@ void TaskComputeBase::initialize() {
     default:
       break;
     }
+    #endif
 
-    process_hashcat_ = Process::create(hashcat_arguments_, directory_);
-    // TODO: Linux only!
+#ifdef PROCESSWINDOWS_HPP
+    if (attack_type == AT_PCFG || attack_type == AT_Prince) {
+      File hashcat_executable;
+      File external_generator_executable;
+      directory_.findVersionedFile("hashcat", "exe", hashcat_executable);
+      hashcat_arguments_.insert(
+          hashcat_arguments_.begin(),
+          strdup(hashcat_executable.getRelativePath().c_str()));
+      hashcat_arguments_.insert(hashcat_arguments_.begin(), strdup("|"));
+      for (std::vector<char *>::reverse_iterator it =
+               external_generator_arguments_.rbegin();
+           it != external_generator_arguments_.rend(); it++) {
+        hashcat_arguments_.insert(hashcat_arguments_.begin(), (*it));
+      }
+
+      if (attack_type == AT_PCFG) {
+        directory_.findVersionedFile("pcfg", "exe",
+                                     external_generator_executable);
+      } else if (attack_type == AT_Prince) {
+        directory_.findVersionedFile("prince", "exe",
+                                     external_generator_executable);
+      }
+      hashcat_arguments_.insert(
+          hashcat_arguments_.begin(),
+          strdup(external_generator_executable.getRelativePath().c_str()));
+
+      std::string cmd = "cmd.exe /C";
+      process_hashcat_ = new ProcessWindows(cmd, hashcat_arguments_, true);
+    }
+#endif
+
+    if (process_hashcat_ == nullptr)
+      process_hashcat_ = Process::create(hashcat_arguments_, directory_);
+
+    
+    #ifdef PROCESSLINUX_HPP
     if (process_external_generator_) {
       assert(attack_type == AT_PCFG || attack_type == AT_Prince);
       process_hashcat_->initInPipe();
       process_hashcat_->setInPipe(process_external_generator_->GetPipeOut());
     }
+    #endif
   }
 }
 
@@ -146,6 +183,7 @@ void TaskComputeBase::printProcessErr() {
 }
 
 void TaskComputeBase::startComputation() {
+  #ifdef PROCESSLINUX_HPP
   switch (attack_type) {
   case AT_Prince:
   case AT_PCFG: {
@@ -159,9 +197,9 @@ void TaskComputeBase::startComputation() {
   default:
     break;
   }
+  #endif
 
-  if (!process_hashcat_->isRunning()) {
-    process_hashcat_->run();
-    Logging::debugPrint(Logging::Detail::GeneralInfo, "Hashcat process has started.");
-  }
+  process_hashcat_->run();
+  Logging::debugPrint(Logging::Detail::GeneralInfo,
+                      "Hashcat process has started.");
 }

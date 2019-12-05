@@ -43,10 +43,8 @@ int main(void) {
     task->initialize();
     task->startComputation();
     task->progress();
-    if (task != nullptr) {
-      error_value = task->saveAndFinish();
-      error_value = (error_value == 1 ? 0 : error_value);
-    }
+    error_value = task->saveAndFinish();
+    error_value = (error_value == 1 ? 0 : error_value);
 
   }
   catch (std::runtime_error& e) {
