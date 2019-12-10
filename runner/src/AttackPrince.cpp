@@ -29,6 +29,20 @@ void AttackPrince::addSpecificArguments() {
   }
 
   addPrinceRequiredFile("wordlist"); // Add wordlist
+  addPrinceArgument("--dupe-check-disable"); // Disable checking for duplicates (faster loading)
+
+  File filePrinceResources;
+  if (directory_.find("resources", filePrinceResources)) {
+    std::fstream fs;
+    std::string skip, limit;
+    File::openReadStream(fs, filePrinceResources.getRelativePath());
+    File::readLine(fs, skip);
+    skip = "--skip=" + skip;
+    File::readLine(fs, limit);
+    limit = "--limit=" + limit;
+    addPrinceArgument(skip);
+    addPrinceArgument(limit);
+  }
 }
 
 void AttackPrince::addPrinceArgument(const std::string &argument){
