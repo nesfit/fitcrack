@@ -28,7 +28,6 @@
         <v-icon>search</v-icon>
       </v-btn>
     </v-row>
-    <v-divider />
     <div
       class="scrollCont"
       :style="style"
@@ -56,7 +55,7 @@
         v-else
         class="minheight200 mx-2"
       >
-        <div class="lineNumberCont pr-1 pl-3 pt-2">
+        <div class="lineNumberCont pr-2 pl-3 pt-2">
           <p
             v-for="index in linesCount"
             :key="index"
@@ -65,11 +64,11 @@
             {{ index }}
           </p>
         </div>
-        <div>
+        <div class="textarea-wrap">
           <textarea
             v-if="searching"
             v-model="searchData"
-            class="pt-2 pl-1"
+            class="pt-2 pl-2"
             :readonly="true"
             wrap="off"
           />
@@ -77,7 +76,7 @@
             v-else
             ref="textarea"
             v-model="textareaData"
-            class="pt-2 pl-1"
+            class="pt-2 pl-2"
             :readonly="readonly"
             wrap="off"
             @input="update"
@@ -258,33 +257,49 @@
 <style scoped>
   textarea{
     width: 100%;
-    height: calc(100% + 20px);
+    height: calc(100% - 20px);
     color: #222;
     resize: none;
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,.05) 50%, transparent 50%);
+    background-size: 100% 3.199em;
+    background-repeat: repeat-y;
+    background-position-y: -1em;
   }
-
   .theme--dark textarea {
     color: #dedede;
+    background-image: linear-gradient(to bottom, rgba(255,255,255,.05) 50%, transparent 50%);
   }
 
   .lineNumberCont {
-    opacity: .7;
-    margin-left: 1px;
+    text-align: end;
+    font-weight: bold;
+    background-color: rgba(0,0,0,.1);
   }
 
   .textAreaCont {
-    /*border: 2px solid rgba(0,0,0,.75);*/
     box-sizing: border-box;
-    min-width: 30vw;
   }
+  .theme--dark .lineNumberCont { background-color: rgba(255,255,255,.1) }
 
   .scrollCont {
     height: 100%;
     overflow: auto;
     min-height: 200px;
-    font-family: monospace,monospace;
+    font-family: 'Roboto Mono', monospace;
+    font-size: .85em;
+    line-height: 1.6em;
+  }
+
+  .scrollCont.editable {
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 4px;
+  }
+  .theme--dark .scrollCont { border-color: rgba(255,255,255,.15) }
+
+  .textarea-wrap {
+    flex: 1 1 auto;
   }
 
   .minheight200 {
