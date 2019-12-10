@@ -29,9 +29,9 @@
           class="mx-3"
         >
           <v-col>
-            <v-card class="mb-5">
+            <v-card class="mb-5 pa-4">
               <v-card-title>
-                <span>
+                <span class="display-1">
                   {{ data.name }}
                 </span>
                 <v-spacer />
@@ -45,7 +45,6 @@
               </v-card-title>
               <v-list
                 single-line
-                class="width100"
               >
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
@@ -58,13 +57,12 @@
                           <template v-slot:activator="{ on }">
                             <v-btn
                               icon
-                              class="mx-0"
                               :disabled="data.status !== '0'"
                               v-on="on"
                               @click="operateJob('start')"
                             >
                               <v-icon color="success">
-                                play_circle_outlined
+                                mdi-play
                               </v-icon>
                             </v-btn>
                           </template>
@@ -74,13 +72,12 @@
                           <template v-slot:activator="{ on }">
                             <v-btn
                               icon
-                              class="mx-0"
                               :disabled="data.status >= 10"
                               v-on="on"
                               @click="operateJob('restart')"
                             >
                               <v-icon color="info">
-                                loop
+                                mdi-restart
                               </v-icon>
                             </v-btn>
                           </template>
@@ -90,13 +87,12 @@
                           <template v-slot:activator="{ on }">
                             <v-btn
                               icon
-                              class="mx-0"
                               :disabled="data.status !== '10'"
                               v-on="on"
                               @click="operateJob('stop')"
                             >
                               <v-icon color="error">
-                                pause_circle_outlined
+                                mdi-pause
                               </v-icon>
                             </v-btn>
                           </template>
@@ -106,12 +102,11 @@
                           <template v-slot:activator="{ on }">
                             <v-btn
                               icon
-                              class="mx-0"
                               v-on="on"
                               @click="operateJob('kill')"
                             >
                               <v-icon color="error">
-                                cancel
+                                mdi-close
                               </v-icon>
                             </v-btn>
                           </template>
@@ -122,7 +117,10 @@
                   </v-list-item-content>
                 </v-list-item>
                 <v-divider />
-                <v-list-item class="px-2 py-1">
+                <v-list-item 
+                  v-if="data.comment"
+                  class="px-2 py-1"
+                >
                   <v-list-item-action class="pr-3 key">
                     Comment:
                   </v-list-item-action>
@@ -132,7 +130,7 @@
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider />
+                <v-divider v-if="data.comment" />
                 <v-list-item class="px-2 py-1">
                   <v-list-item-action class="pr-3 key">
                     Job keyspace:
@@ -175,7 +173,6 @@
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-                <v-divider />
                 <v-list-item
                   v-if="data.password !== null"
                   class="px-2 py-1"
@@ -217,8 +214,23 @@
                     Job cracking time:
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title class="text-right">
+                    <v-list-item-title 
+                      v-if="data.time_end"
+                      class="text-right"
+                    >
                       {{ $moment.utc($moment(data.time_end).diff($moment(data.time_start))).format("HH:mm:ss") }}
+                    </v-list-item-title>
+                    <v-list-item-title 
+                      v-else-if="data.time_start"
+                      class="text-right"
+                    >
+                      {{ $moment.utc($moment().diff($moment(data.time_start))).format("HH:mm:ss") }}
+                    </v-list-item-title>
+                    <v-list-item-title 
+                      v-else
+                      class="text-right"
+                    >
+                      Not started yet
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -324,7 +336,6 @@
               </v-card-title>
               <v-list
                 single-line
-                class="width100"
               >
                 <v-data-table
                   :headers="hostheaders"
@@ -404,6 +415,7 @@
               </v-card-title>
               <fc-graph
                 id="hostPercentageGraph"
+                class="py-8"
                 :data="hostPercentageGraph"
               />
             </v-card>
@@ -414,7 +426,6 @@
               </v-card-title>
               <v-list
                 single-line
-                class="width100"
               >
                 <v-data-table
                   :headers="statusHeaders"
@@ -472,7 +483,6 @@
               :headers="workunitsHeader"
               :items="data.workunits"
               show-expand
-              class="width100"
             >
               <template v-slot:item.boinc_host_id="{ item }">
                 <router-link
@@ -501,7 +511,7 @@
               <template v-slot:item.retry="{ item }">
                 <v-chip
                   small
-                  :color="item.retry ? 'success' : 'error'"
+                  :color="item.retry ? 'error' : 'success'"
                 >
                   {{ yesNo(item.retry) }}
                 </v-chip>
