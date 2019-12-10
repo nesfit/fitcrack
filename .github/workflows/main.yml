@@ -23,7 +23,7 @@ jobs:
     - name: Make ABSOLUTELY sure server address is LOCALHOST and NOTHING ELSE DEFINITELY YES REALLY
       working-directory: webadmin/fitcrackFE/static
       run: |
-        sed -i 's/serverAddress.*/serverAddress = "http://localhost:5000"/g' configuration.js
+        sed -i 's/serverAddress.*/serverAddress = "http:\/\/localhost:5000"/g' configuration.js
     - name: Install deps and build it
       working-directory: webadmin/fitcrackFE
       env:
