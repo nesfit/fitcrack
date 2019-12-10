@@ -31,10 +31,14 @@ void TaskNormal::parseHashcatProgress(std::string& progress_line) {
   }
 
   std::string total_computed_hashes;
-  if (parse_curku_) {
-    total_computed_hashes = parseCurku(progress_line);
-  } else {
+  if (attack_type == AT_PCFG || attack_type == AT_Prince) {
     total_computed_hashes = parseProgress(progress_line);
+  } else {
+    if (parse_curku_) {
+      total_computed_hashes = parseCurku(progress_line);
+    } else {
+      total_computed_hashes = parseProgress(progress_line);
+    }
   }
 
   if (!total_computed_hashes.empty()) {
