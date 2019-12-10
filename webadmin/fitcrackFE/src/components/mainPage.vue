@@ -333,6 +333,7 @@
 <script>
   import notifications from '@/components/notification/fc_notifications_wrapper'
   import { routeIcon } from '@/router'
+  import axios from 'axios'
 
   export default {
     components: {
@@ -345,12 +346,32 @@
         notificationsCount: 0
       }
     },
+    beforeRouteEnter (to, from, next) {
+      axios.get(window.serverAddress + '/user/isLoggedIn')
+        .then(response => response.data)
+        .then(userInfo => {
+          if (!userInfo.loggedIn) {
+            if (from.path === '/login') {
+              next()
+            }
+            sessionStorage.setItem('loginRedirect', to.path)
+            next('/login')
+          } else {
+            next(vm => {
+              vm.$store.user.userData = userInfo.user
+              vm.$store.user.loggedIn = true
+            })
+          }
+        })
+    },
     mounted: function () {
+      /*
       if (!this.$store.user.loggedIn) {
         this.$router.push({
           name: 'login'
         })
       }
+      */
       this.getNotificationsCount();
       this.interval = setInterval(function () {
         this.getNotificationsCount()
@@ -400,13 +421,6 @@
     font-size: 26px;
     font-weight: 300;
     text-transform: uppercase;
-  }
-
-  .textLogo {
-    // width: 100%;
-    // display: block;
-    color: inherit;
-    // text-align: center;
   }
 
   .textLogoText {

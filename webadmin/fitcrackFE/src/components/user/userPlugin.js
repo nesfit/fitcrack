@@ -4,7 +4,7 @@
 */
 
 const UserPlugin = {
-  install(Vue, options) {
+  install(Vue) {
     Vue.prototype.$logoutUser = function () {
       this.$store.user = {
         'userData': {
@@ -30,20 +30,23 @@ const UserPlugin = {
     };
 
     Vue.prototype.$logInUser = function (user) {
-      console.log(this.$store.loggedInLink);
       this.$store.user.userData = user;
       this.$store.user.loggedIn = true;
-      console.log('logged IN!!!');
-      if (this.$store.loggedInLink === null || this.$store.loggedInLink.name === 'login') {
-        this.$router.push({
+      console.log('logged IN!!!')
+      const redirect = sessionStorage.getItem('loginRedirect')
+      sessionStorage.removeItem('loginRedirect')
+      if (!redirect || redirect === '/login') {
+        this.$router.replace({
           name: 'home'
         })
       } else {
-        this.$router.push({
-          path: this.$store.loggedInLink.path
-        })
+        this.$router.replace(redirect)
       }
-    };
+    }
+
+    Vue.prototype.$currentUser = function () {
+      return this.axios.get(this.$serverAddr + '/user/isLoggedIn').then(response => response.data)
+    }
 
 
     Vue.prototype.$needLogin = true

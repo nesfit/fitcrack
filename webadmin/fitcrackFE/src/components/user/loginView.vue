@@ -98,7 +98,6 @@
           this.loading = false;
           console.log(response.data)
           this.$logInUser(response.data)
-
         })
       },
       isUserLoggedIn: function () {

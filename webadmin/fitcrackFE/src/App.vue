@@ -24,7 +24,10 @@
         {{ alertText }}
       </v-alert>
     </v-snackbar>
-    <router-view :is-dark="isDark" />
+    <router-view 
+      :is-dark="isDark" 
+      @alert="setAlert"
+    />
     <vue-progress-bar />
     <confirm ref="confirm" />
   </v-app>
@@ -46,13 +49,14 @@
       }
     },
     created: function () {
+      /*
       this.$store.loggedInLink = this.$route;
       if (this.$needLogin) {
         this.$router.push({
           name: 'login'
         })
       }
-
+      */
       this.axios.interceptors.response.use(
         function (response) {
           if (response.data.hasOwnProperty('status') && response.data.hasOwnProperty('message') && response.data.status) {
@@ -90,6 +94,13 @@
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open
+    },
+    methods: {
+      setAlert ({type, text}) {
+        this.alertType = type
+        this.alertText = text
+        this.alert = true
+      }
     }
   }
 </script>
