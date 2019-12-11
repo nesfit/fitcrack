@@ -196,7 +196,8 @@ class OperationWithJob(Resource):
                 db.session.delete(item)
             db.session.add(FcJobGraph(progress=0, job_id=job.id))
         elif action == 'kill':
-            job.status = 0
+            # Job is stopped in Generator after sending BOINC commands
+            # job.status = 0
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0
