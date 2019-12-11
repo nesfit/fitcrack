@@ -14,8 +14,8 @@
     />
 
     <v-divider />
-    <!--  <v-card-title class="pb-0"><span>Select rule file</span></v-card-title> -->
-    <!--  <rules-selector v-model="rules" @input="checkValid"></rules-selector> -->
+    <v-card-title class="pb-0"><span>Select rule file</span></v-card-title>
+    <rules-selector v-model="rules" @input="checkValidInit"></rules-selector>
     <v-card-title class="pb-0">
       <span>Edit keyspace limit</span>
     </v-card-title>
@@ -37,12 +37,12 @@
 
 <script>
   import pcfgSelector from '@/components/selector/pcfgSelector'
-//  import ruleSelector from '@/components/selector/rulesSelector'
+  import ruleSelector from '@/components/selector/rulesSelector'
   export default {
     name: "Pcfg",
     components: {
       'pcfg-selector': pcfgSelector,
-  //    'rules-selector': ruleSelector
+      'rules-selector': ruleSelector
     },
     props: {
       value: {
@@ -66,8 +66,8 @@
       value: function(){
         if (this.value.pcfg_grammar)
           this.pcfg = this.value.pcfg_grammar
-    /*    if (this.value.rules)
-          this.rules = this.value.rules */
+        if (this.value.rules)
+          this.rules = this.value.rules
         if (this.pcfg)
           this.keyspaceLimit = this.pcfg.keyspace
         //  this.pcfg.time = "2019-04-16T15:28:52"
@@ -87,7 +87,7 @@
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
-            'rules': null, //this.rules,
+            'rules': this.rules,
             'pcfg_grammar': this.pcfg,
             'keyspace_limit': this.keyspaceLimit
           })
@@ -104,7 +104,7 @@
         this.$emit('input', {
           'attack_mode': this.attackId,
           'attack_name': this.attackName,
-          'rules': null, //this.rules,
+          'rules': this.rules,
           'pcfg_grammar': this.pcfg,
           'keyspace_limit': this.keyspaceLimit
         })

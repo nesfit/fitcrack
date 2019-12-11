@@ -69,7 +69,7 @@
           this.loading = false
         })
       },
-      updateSelected(id, rule) {
+      updateSelected(rule) {
     /*    if(this.selected == id){
           this.selected = 0
           //TODO here goes something for JSON update (set rule to null)
@@ -77,7 +77,7 @@
       }
         else{*/
           //this.selected = id
-          this.$emit('input', this.selected)
+          this.$emit('input', this.selected[0])
     //    } WHAT??
       }
     },
