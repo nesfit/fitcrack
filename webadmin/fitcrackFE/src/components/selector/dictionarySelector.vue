@@ -11,7 +11,6 @@
     :search="search"
     item-key="id"
     show-select
-    :single-select="!selectAll"
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">

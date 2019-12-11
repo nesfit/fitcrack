@@ -100,6 +100,7 @@
               >
                 <v-col
                   v-for="(value, key) in hashtype.subcategories"
+                  :key="key"
                   class="d-flex"
                   cols="12"
                 >
@@ -235,6 +236,7 @@
                   >
                     <v-row
                       v-for="hashObj in validatedHashes"
+                      :key="hashObj.id"
                       justify="end"
                       class="pa-0 ma-0"
                     >
@@ -287,6 +289,16 @@
                 </fc-textarea>
               </v-col>
             </v-row>
+            <v-row>
+              <v-spacer />
+              <v-btn 
+                class="mr-6"
+                color="primary"
+                @click="step += 1" 
+              >
+                Next
+              </v-btn>
+            </v-row>
           </v-stepper-content>
 
           <v-stepper-step 
@@ -307,7 +319,7 @@
               >
                 Dictionary
               </v-tab>
-              <v-tab-item>
+              <v-tab-item eager>
                 <v-card text>
                   <dictionary
                     ref="DictAttack"
@@ -320,7 +332,7 @@
               >
                 Combination
               </v-tab>
-              <v-tab-item>
+              <v-tab-item eager>
                 <v-card text>
                   <combinator
                     ref="CombAttack"
@@ -333,7 +345,7 @@
               >
                 Brute-force
               </v-tab>
-              <v-tab-item>
+              <v-tab-item eager>
                 <v-card text>
                   <maskattack
                     ref="BruteAttack"
@@ -346,7 +358,7 @@
               >
                 Hybrid Wordlist + Mask
               </v-tab>
-              <v-tab-item>
+              <v-tab-item eager>
                 <v-card text>
                   <hybridWordlistMask
                     ref="HybridWordMaskAttack"
@@ -359,7 +371,7 @@
               >
                 Hybrid Mask + Wordlist
               </v-tab>
-              <v-tab-item>
+              <v-tab-item eager>
                 <v-card text>
                   <hybridMaskWordlist
                     ref="HybridMaskWordAttack"
@@ -372,7 +384,7 @@
               >
                 PCFG
               </v-tab>
-              <v-tab-item>
+              <v-tab-item eager>
                 <v-card text>
                   <pcfg
                     ref="pcfgAttack"
@@ -381,6 +393,16 @@
                 </v-card>
               </v-tab-item>
             </v-tabs>
+            <v-row>
+              <v-spacer />
+              <v-btn 
+                class="mr-6 mt-4"
+                color="primary"
+                @click="step += 1" 
+              >
+                Next
+              </v-btn>
+            </v-row>
           </v-stepper-content>
           <v-stepper-step 
             editable
@@ -394,6 +416,16 @@
               v-model="hosts"
               :select-all="true"
             />
+            <v-row>
+              <v-spacer />
+              <v-btn 
+                class="mr-6 mt-4"
+                color="primary"
+                @click="step += 1" 
+              >
+                Next
+              </v-btn>
+            </v-row>
           </v-stepper-content>
           <v-stepper-step 
             editable
@@ -462,6 +494,16 @@
                   label="End never"
                 />
               </v-col>
+            </v-row>
+            <v-row>
+              <v-spacer />
+              <v-btn 
+                class="mr-6"
+                color="primary"
+                @click="step += 1" 
+              >
+                Next
+              </v-btn>
             </v-row>
           </v-stepper-content>
         </v-stepper>

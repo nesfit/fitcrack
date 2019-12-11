@@ -34,8 +34,8 @@
     mixins: [selector],
     props: {
       value: {
-        type: Object,
-        default: () => ({})
+        type: Array,
+        default: () => ([])
       },
       markovSubmode: {
         type: Number,

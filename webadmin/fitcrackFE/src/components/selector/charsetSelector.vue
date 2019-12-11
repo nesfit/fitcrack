@@ -5,13 +5,12 @@
 
 <template>
   <v-data-table
-    v-model="selected"
+    :value="selected"
     :headers="headers"
     :items="items"
     :search="search"
     item-key="id"
     show-select
-    :single-select="!selectAll"
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
@@ -63,8 +62,10 @@
           this.loading = false
         })
       },
-      trySelect(isSelected) {
-        return isSelected || this.selected.length < 4
+      updateSelected(arr) {
+        if (arr.length > 4) arr = arr.slice(1).slice(-4)
+        this.selected = arr
+        this.$emit('input', arr)
       }
     },
   }

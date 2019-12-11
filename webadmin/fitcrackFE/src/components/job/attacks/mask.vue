@@ -67,8 +67,7 @@
           <span>Select charsets (max. 4)</span>
         </v-card-title>
         <charset-selector
-          v-model="charsets"
-          @input="checkValid"
+          @input="setCharsets"
         />
       </v-col>
       <v-col cols="6">
@@ -209,6 +208,10 @@
           this.loadMasksDialog = false
           this.checkValid()
         })
+      },
+      setCharsets (arr) {
+        this.charsets = arr
+        this.checkValid()
       },
       checkValid: function () {
         if (this.masks[0] !== '') {

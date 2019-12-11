@@ -351,12 +351,7 @@
                     </router-link>
                   </template>
                   <template v-slot:item.last_active="{ item }">
-                    <v-icon
-                      v-if="item.last_active.seconds_delta > 61"
-                      color="error"
-                    >
-                      mdi-power-off
-                    </v-icon>
+                    <span v-if="item.last_active.seconds_delta > 61">{{ parseTimeDelta(item.last_active.last_seen) }}</span>
                     <v-icon
                       v-else
                       color="success"
