@@ -11,7 +11,6 @@
     <v-expansion-panels
       v-model="editedMaskIdx"
       popout
-      :expand="false"
     >
       <v-row
         v-for="(mask, i) in masks"

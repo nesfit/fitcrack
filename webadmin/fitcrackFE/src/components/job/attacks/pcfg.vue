@@ -14,8 +14,13 @@
     />
 
     <v-divider />
-    <v-card-title class="pb-0"><span>Select rule file</span></v-card-title>
-    <rules-selector v-model="rules" @input="checkValidInit"></rules-selector>
+    <v-card-title class="pb-0">
+      <span>Select rule file</span>
+    </v-card-title>
+    <rules-selector 
+      v-model="rules"
+      @input="checkValidInit"
+    />
     <v-card-title class="pb-0">
       <span>Edit keyspace limit</span>
     </v-card-title>
@@ -24,11 +29,11 @@
         v-model.number="keyspaceLimit"
         text
         single-line
-        :value="this.keyspaceLimit"
+        :value="keyspaceLimit"
         required
         type="number"
         suffix="passwords"
-        :max="this.pcfg.keyspace"
+        :max="pcfg.keyspace"
         @input="checkValidEdit"
       />
     </v-card-text>

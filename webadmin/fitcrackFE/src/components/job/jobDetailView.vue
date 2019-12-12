@@ -29,7 +29,10 @@
           class="mx-3"
         >
           <v-col>
-            <v-card class="mb-5 pa-4">
+            <v-card 
+              class="mb-5 pa-4"
+              :style="{backgroundImage: accent}"
+            >
               <v-card-title>
                 <span class="display-1">
                   {{ data.name }}
@@ -765,6 +768,16 @@
           default:
             return 'combinatorDetail'
         }
+      },
+      accent () {
+        let hue = -1
+        switch (this.data.status_text) {
+          case 'finished': hue = 110; break
+          case 'ready': hue = 210; break
+          case 'exhausted': hue = 350; break
+        }
+        if (hue == -1) return 'none'
+        return `linear-gradient(to bottom, hsla(${hue}, 90%, 50%, 40%), transparent 20%)`
       }
     },
     mounted: function () {

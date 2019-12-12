@@ -54,13 +54,6 @@
         ]
       }
     },
-    watch:{
-      value: function(){
-        if (this.value) {
-          this.selected = this.value
-        }
-      }
-    },
     methods: {
       getData() {
         this.loading = true

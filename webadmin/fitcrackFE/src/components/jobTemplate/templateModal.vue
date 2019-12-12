@@ -8,15 +8,17 @@
     v-model="dialog"
     width="800"
   >
-    <v-btn
-      slot="activator"
-      large
-      color="primary"
-    >
-      <v-icon left>
-        mdi-file-plus
-      </v-icon>Make template
-    </v-btn>
+    <template #activator="{ on }">
+      <v-btn
+        large
+        color="primary"
+        v-on="on"
+      >
+        <v-icon left>
+          mdi-file-plus
+        </v-icon>Make template
+      </v-btn>
+    </template>
 
     <v-card>
       <v-card-title
