@@ -74,8 +74,15 @@ def create_job(data):
     # if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
     #     job['attack_settings']['attack_mode'] = 1
 
+
+    if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
+        attack_settings_control = 1
+
+    else:
+        attack_settings_control = job['attack_settings']['attack_mode']
+
     job['config'] += (
-                         '|||attack_mode|UInt|' + lenStr(str(job['attack_settings']['attack_mode'])) + '|' +
+                         '|||attack_mode|UInt|' + lenStr(str(attack_settings_control)) + '|' +
                          str(job['attack_settings']['attack_mode']) + '|||\n' +
                          '|||attack_submode|UInt|' + lenStr(str(job['attack_settings']['attack_submode'])) + '|' +
                          str(job['attack_settings']['attack_submode']) + '|||\n' +
