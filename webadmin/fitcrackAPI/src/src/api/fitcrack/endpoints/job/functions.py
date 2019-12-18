@@ -83,7 +83,7 @@ def create_job(data):
 
     job['config'] += (
                          '|||attack_mode|UInt|' + lenStr(str(attack_settings_control)) + '|' +
-                         str(job['attack_settings']['attack_mode']) + '|||\n' +
+                         str(attack_settings_control) + '|||\n' +
                          '|||attack_submode|UInt|' + lenStr(str(job['attack_settings']['attack_submode'])) + '|' +
                          str(job['attack_settings']['attack_submode']) + '|||\n' +
                          '|||name|String|' + lenStr(job['name']) + '|' + job['name'] + '|||\n' +
