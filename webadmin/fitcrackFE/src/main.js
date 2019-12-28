@@ -26,6 +26,8 @@ import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
 
+import store from './store'
+
 document.title = window.projectName || 'Fitcrack'
 var link = document.createElement('link');
 link.type = 'image/png';
@@ -92,5 +94,6 @@ new Vue({
     }
   },
   router,
+  store,
   template: '<App/>'
 });

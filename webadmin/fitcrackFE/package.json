@@ -35,7 +35,8 @@
     "vue-router": "^3.1.2",
     "vue-stash": "^2.0.1-beta",
     "vue-visible": "^1.0.2",
-    "vuetify": "^2.1.5"
+    "vuetify": "^2.1.5",
+    "vuex": "^3.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.5",
