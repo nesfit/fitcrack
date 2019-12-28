@@ -24,14 +24,14 @@
         class="border"
       >
         <dict-selector
-          v-model="dictionaries"
+          v-model="leftDicts"
           @input="checkValid"
         />
       </v-col>
       <v-col cols="6">
         <v-expansion-panels class="elevation-0 pt-2">
           <mask-single
-            v-model="mask"
+            v-model="hybridMask"
             :open-forever="true"
             @input="checkValid"
           />
@@ -83,48 +83,30 @@
 <script>
   import dictSelector from '@/components/selector/dictionarySelector'
   import maskSingle from '@/components/mask/maskSingle'
+
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
   export default {
     name: "HybridMaskWordlist",
     components: {
       'mask-single': maskSingle,
       'dict-selector': dictSelector
     },
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
     data: function () {
       return {
         attackId: 6,
         attackName: 'Hybrid wordlist+mask',
-        dictionaries: [],
-        valid: false,
-        mask: '',
-        ruleLeft: '',
-        ruleRight: '',
         maskRules: [
           v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
         ]
       }
     },
-    watch:{
-      value: function(){
-
-      }
-    },
+    computed: mapTwoWayState('jobForm', twoWayMap(['ruleLeft', 'leftDicts', 'ruleRight', 'hybridMask'])),
     methods: {
-      dictSelected: function (id, dictNubmer) {
-        this.selectedDict1Id = id
-        this.checkValid();
-      },
-      addCharToMask: function (char) {
-        this.mask += char
-        this.checkValid()
-      },
       checkValid: function () {
-        if (this.mask !== '' && this.dictionaries.length > 0) {
+        if (this.hybridMask !== '' && this.leftDicts.length > 0) {
+          /*
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
@@ -133,6 +115,7 @@
             'left_dictionaries': this.dictionaries,
             'mask': this.mask
           })
+          */
           return true
         }
         return false

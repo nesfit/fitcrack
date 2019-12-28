@@ -26,7 +26,7 @@
       >
         <v-expansion-panels class="elevation-0 pt-2">
           <mask-single
-            v-model="mask"
+            v-model="hybridMask"
             :open-forever="true"
             @input="checkValid"
           />
@@ -35,7 +35,7 @@
 
       <v-col cols="6">
         <dict-selector
-          v-model="dictionaries"
+          v-model="rightDicts"
           @input="checkValid"
         />
       </v-col>
@@ -85,44 +85,34 @@
 <script>
   import dictSelector from '@/components/selector/dictionarySelector'
   import maskSingle from '@/components/mask/maskSingle'
+
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
   export default {
     name: "HybridWordlistMask",
     components: {
       'mask-single': maskSingle,
       'dict-selector': dictSelector
     },
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
     data: function () {
       return {
         attackId: 7,
         attackName: 'Hybrid mask+wordlist',
-        dictionaries: [],
-        mask: '',
-        ruleLeft: '',
-        ruleRight: '',
-        charsets:null,
         maskRules: [
           v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
         ]
       }
     },
-    watch:{
-      value: function(){
-
-      }
-    },
+    computed: mapTwoWayState('jobForm', twoWayMap(['ruleLeft', 'rightDicts', 'ruleRight', 'hybridMask'])),
     methods: {
       dictSelected: function (id, dictNubmer) {
         this.selectedDict2Id = id
         this.checkValid();
       },
       checkValid: function () {
-        if (this.mask !== '' && this.dictionaries.length > 0) {
+        if (this.hybridMask !== '' && this.rightDicts.length > 0) {
+          /*
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
@@ -131,16 +121,10 @@
             'right_dictionaries': this.dictionaries,
             'mask': this.mask
           })
+          */
           return true
         }
         return false
-      },
-      loadDictionaries: function () {
-        this.dictsLoading = true
-        this.axios.get(this.$serverAddr + '/dictionary').then((response) => {
-          this.dictionaries = response.data
-          this.dictsLoading = false
-        })
       }
     }
   }

@@ -72,7 +72,7 @@
           }
         }).then((response) => {
           this.items = response.data.items
-          if (this.selectAll) {
+          if (this.selectAll && this.selected.length == 0) {
             this.selected = this.items
             this.$emit('input', this.selected)
           }

@@ -24,13 +24,13 @@
         class="border"
       >
         <dict-selector
-          v-model="leftDictionaries"
+          v-model="leftDicts"
           @input="checkValid"
         />
       </v-col>
       <v-col cols="6">
         <dict-selector
-          v-model="rightDictionaries"
+          v-model="rightDicts"
           @input="checkValid"
         />
       </v-col>
@@ -79,52 +79,19 @@
 
 <script>
   import dictSelector from '@/components/selector/dictionarySelector'
+
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
   export default {
     name: "Combinator",
     components: {
       'dict-selector': dictSelector
     },
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
-    data: function () {
-      return {
-        attackId: 1,
-        attackName: 'combinator',
-        valid: false,
-        leftDictionaries: [],
-        rightDictionaries: [],
-        ruleLeft: '',
-        ruleRight: ''
-      }
-    },
-    watch:{
-      value: function(){
-        console.log('value changed')
-        if (this.value.leftDictionaries)
-          this.leftDictionaries = this.value.leftDictionaries
-        if (this.value.rightDictionaries)
-          this.rightDictionaries = this.value.rightDictionaries
-        if (this.value.ruleLeft)
-          this.ruleLeft = this.value.ruleLeft
-        if (this.value.ruleRight)
-          this.ruleRight = this.value.ruleRight
-      }
-    },
+    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'ruleLeft', 'rightDicts', 'ruleRight'])),
     methods: {
       checkValid: function () {
-        if (this.leftDictionaries.length > 0 && this.rightDictionaries.length > 0) {
-          this.$emit('input', {
-            'attack_mode': this.attackId,
-            'attack_name': this.attackName,
-            'rule_left': this.ruleLeft,
-            'rule_right': this.ruleRight,
-            'left_dictionaries': this.leftDictionaries,
-            'right_dictionaries': this.rightDictionaries
-          })
+        if (this.leftDicts.length > 0 && this.rightDicts.length > 0) {
           return true
         }
         return false

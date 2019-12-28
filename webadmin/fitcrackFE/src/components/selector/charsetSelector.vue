@@ -47,13 +47,6 @@
         ],
       }
     },
-    watch:{
-      value: function(){
-        if (this.value) {
-          this.selected = this.value.id
-        }
-      }
-    },
     methods: {
       getData() {
         this.loading = true

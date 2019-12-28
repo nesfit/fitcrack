@@ -324,7 +324,7 @@
       class="mainToolbar"
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title>{{ $store.project }}</v-toolbar-title>
+      <v-toolbar-title>{{ $store.state.project }}</v-toolbar-title>
       <!--
       <router-link :to="{ name: 'home'}" class="textLogo">
         <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
@@ -411,15 +411,15 @@
             next('/login')
           } else {
             next(vm => {
-              vm.$store.user.userData = userInfo.user
-              vm.$store.user.loggedIn = true
+              vm.$store.state.user.userData = userInfo.user
+              vm.$store.state.user.loggedIn = true
             })
           }
         })
     },
     mounted: function () {
       /*
-      if (!this.$store.user.loggedIn) {
+      if (!this.$store.state.user.loggedIn) {
         this.$router.push({
           name: 'login'
         })

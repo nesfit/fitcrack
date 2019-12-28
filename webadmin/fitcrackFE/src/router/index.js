@@ -255,7 +255,7 @@ const rt = new Router({
 })
 
 rt.afterEach((to, from) => {
-  const project = rt.app.store.project || 'Fitcrack'
+  const project = rt.app.$store.state.project || 'Fitcrack'
   if (to.meta.title) {
     document.title = `${to.meta.title} – ${project}`
   } else {
