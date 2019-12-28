@@ -4,7 +4,26 @@
 -->
 
 <template>
-  <div class="cont">
+  <div>
+    <v-toolbar flat>
+      <v-chip>{{ jobs.length }}</v-chip>
+      <h2 class="ml-4">All jobs</h2>
+      <!--
+      <v-spacer />
+      <v-btn text>
+        <v-icon left>
+          mdi-pencil
+        </v-icon>
+        Rename
+      </v-btn>
+      <v-btn text>
+        <v-icon left>
+          mdi-delete
+        </v-icon>
+        Delete
+      </v-btn>
+      -->
+    </v-toolbar>
     <v-text-field
       v-model="search"
       class="px-2 pt-3"
@@ -47,14 +66,15 @@
       />
     </div>
 
+    <!--
     <v-toolbar
       dense
       flat
     >
-      <v-spacer />
       <v-toolbar-items>
         <v-btn
           text
+          small
           :disabled="selectedJobs.length == 0"
         >
           <v-icon left>
@@ -64,15 +84,17 @@
         </v-btn>
         <v-btn
           text
+          small
           :disabled="selectedJobs.length == 0"
         >
           <v-icon left>
-            {{ viewHidden ? 'mdi-eye' : 'mdi-eye-off' }}
+            mdi-delete-empty
           </v-icon>
-          {{ viewHidden ? 'Stop hiding' : 'Hide' }}
+          Discard
         </v-btn>
       </v-toolbar-items>
     </v-toolbar>
+    -->
 
     <v-data-table
       ref="table"

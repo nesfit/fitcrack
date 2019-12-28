@@ -28,20 +28,33 @@
       />
     </div>
 
-    <h1 class="mb-4">
-      Create a new job
-    </h1>
-
-    <v-text-field
-      v-model="name"
-      label="Name"
-      outlined
-      autofocus
-      required
-    />
+    <v-row>
+      <v-col>
+        <v-text-field
+          v-model="name"
+          outlined
+          autofocus
+          required
+          label="Name"
+          hint="Give this job a descriptive name"
+          persistent-hint
+        />
+      </v-col>
+      <v-col>
+        <v-autocomplete
+          :items="['Empty', 'Absolute brute force', 'Grammar German Soldier', 'Combinatorics', 'Dictionary worm']"
+          :value="'Empty'"
+          auto-select-first
+          outlined
+          label="Template"
+          hint="Prefill the form with a saved template"
+          persistent-hint
+        />
+      </v-col>
+    </v-row>
 
     <div>
-      <v-col class="addJobContent mx-auto">
+      <v-col>
         <v-stepper
           v-model="step"
           vertical

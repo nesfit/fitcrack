@@ -82,6 +82,15 @@ const appRoutes = [
     }
   },
   {
+    path: '/templates',
+    name: 'templates',
+    component: jobs,
+    meta: {
+      title: 'Job templates',
+      icon: 'mdi-file'
+    }
+  },
+  {
     path: '/hosts',
     name: 'hosts',
     component: hosts,

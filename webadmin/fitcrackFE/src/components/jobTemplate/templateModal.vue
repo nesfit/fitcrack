@@ -22,7 +22,6 @@
 
     <v-card>
       <v-card-title
-        class="headline grey lighten-2"
         primary-title
       >
         Job template
@@ -30,14 +29,7 @@
 
       <v-card-text>
         <!-- <json-viewer :value="data" ></json-viewer> -->
-        <v-text-field
-          id="templateName"
-          v-model="data.name"
-          name="templateName"
-          label="Template name"
-        />
-
-        <div class="flex">
+        <div class="flex mb-3">
           <v-icon left>
             info
           </v-icon>
@@ -46,9 +38,16 @@
             You can pre-fill any new job configuration with templates you saved.
           </div>
         </div>
+        <v-text-field
+          id="templateName"
+          v-model="data.name"
+          name="templateName"
+          outlined
+          dense
+          hide-details
+          label="Template name"
+        />
       </v-card-text>
-
-      <v-divider />
 
       <v-card-actions>
         <v-spacer />
