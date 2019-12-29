@@ -48,13 +48,14 @@
       </v-col>
       <v-col>
         <v-autocomplete
-          :items="['Empty', 'Absolute brute force', 'Grammar German Soldier', 'Combinatorics', 'Dictionary worm']"
-          :value="'Empty'"
+          :items="templateItems"
+          :value="0"
           auto-select-first
           outlined
           label="Template"
           hint="Prefill the form with a saved template"
           persistent-hint
+          @change="i => applyTemplate(templates[i])"
         />
       </v-col>
     </v-row>
@@ -406,7 +407,7 @@
           justify="center"
           class="mb-5"
         >
-          <template-modal :data="jobSettings" />
+          <template-modal :inherited-name="name" />
           <v-btn
             large
             color="primary"
@@ -418,7 +419,6 @@
               mdi-check
             </v-icon>Submit
           </v-btn>
-          <!--<template-modal :data="sendingJson"></template-modal>-->
         </v-row>
       </v-col>
     </div>
@@ -437,7 +437,7 @@
   import hostSelector from '@/components/selector/hostSelector'
   import templateModal from '@/components/jobTemplate/templateModal'
 
-  import {mapState, mapGetters} from 'vuex'
+  import {mapGetters, mapMutations} from 'vuex'
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
   import {twoWayMap} from '@/store'
 
@@ -466,7 +466,12 @@
         keyspace: null,
         gotBinaryHash: false,
         hashListError: false,
-        attacks
+        attacks,
+        templates: [
+          {
+            template: 'Empty'
+          }
+        ]
       }
     },
     computed: {
@@ -474,8 +479,8 @@
         'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid']),
-      knowEstimatedTime: function () {
-        return !!this.estimatedTime
+      templateItems () {
+        return this.templates.map((t, i) => ({text: t.template, value: i}))
       }
     },
     watch: {
@@ -509,17 +514,16 @@
       this.startDate = this.$moment().format('DD/MM/YYYY HH:mm')
       this.endDate = this.$moment().format('DD/MM/YYYY HH:mm')
       if (this.hashList.length > 0) this.validateHashes()
-      // this.axios.get(this.$serverAddr + '/template/1', ).then((response) => {
-      //   setTimeout(function(){
-      //     var data = JSON.parse(response.data.data)
-      //     console.log( data.attack_settings)
-      //     this.$set(this, 'attackSettings', data.attack_settings)
-      //
-      //   }.bind(this), 1000);
-      //
-      // })
+      this.axios.get(this.$serverAddr + '/template', )
+      .then((response) => {
+        if (typeof response.data === 'array') {
+          this.templates = response.data.map(JSON.parse)
+        }
+      })
+      .catch(console.error)
     },
     methods: {
+      ...mapMutations('jobForm', ['applyTemplate']),
       attackIcon (handler) {
         const map = {
           'dictionary': 'mdi-dictionary',
@@ -680,7 +684,7 @@
         this.loading = true
         this.axios.post(this.$serverAddr + '/job', this.jobSettings).then((response) => {
           this.$router.push({name: 'jobDetail', params: {id: response.data.job_id}})
-          console.log(response.data)
+          this.applyTemplate() // Clear all
         }).catch((error) => {
           this.loading = false
         })

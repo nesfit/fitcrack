@@ -10,9 +10,11 @@
   >
     <template #activator="{ on }">
       <v-btn
+        :disabled="!validTemplate"
         large
         color="primary"
         v-on="on"
+        @click="nameMe"
       >
         <v-icon left>
           mdi-file-plus
@@ -40,7 +42,7 @@
         </div>
         <v-text-field
           id="templateName"
-          v-model="data.name"
+          v-model="name"
           name="templateName"
           outlined
           dense
@@ -70,31 +72,41 @@
 </template>
 
 <script>
+  import {mapGetters} from 'vuex'
+
   export default {
     name: "TemplateModal",
     props: {
-      data: {
-        type: Object,
-        default: null
-      },
-    },
-    data() {
-      return {
-        dialog: false
+      inheritedName: {
+        type: String,
+        default: ''
       }
     },
+    data () {
+      return {
+        dialog: false,
+        name: ''
+      }
+    },
+    computed: mapGetters('jobForm', ['validTemplate']),
     methods: {
       submit() {
-        console.log(this.data)
+        const template = this.$store.getters['jobForm/makeTemplate'](this.name)
+        console.log(template)
         this.loading = true
-        this.axios.post(this.$serverAddr + '/template', this.data).then((response) => {
+        this.axios.post(this.$serverAddr + '/template', template).then((response) => {
           console.log(response.data)
         }).catch((error) => {
           this.loading = false
         })
         this.dialog = false
+      },
+      nameMe () {
+        if (this.name === '') {
+          this.name = this.inheritedName
+        }
       }
-    },
+    }
   }
 </script>
 

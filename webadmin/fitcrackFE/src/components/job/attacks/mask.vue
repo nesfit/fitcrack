@@ -16,7 +16,7 @@
     >
       <v-col>
         <mask-single
-          :value="masks[i]"
+          :value="mask"
           :custom-charsets="charset"
           @input="e => updateMask({index: i, val: e})"
         />

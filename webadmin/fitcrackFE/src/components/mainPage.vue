@@ -99,13 +99,13 @@
             <v-subheader>
               <b>JOB BINS</b>
               <v-spacer />
-              <v-btn small text>
+              <v-btn small text disabled>
                 new
                 <v-icon right>mdi-plus</v-icon>
               </v-btn>
             </v-subheader>
 
-            <!--
+            <!-- ADD BIN
             <v-list-item>
               <v-list-item-action>
                 <v-icon>mdi-folder</v-icon>
@@ -122,6 +122,7 @@
             <v-list-item 
               to="/bins/test"
               exact
+              disabled
             >
               <v-list-item-action>
                 <v-icon>mdi-folder</v-icon>
@@ -131,23 +132,12 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item 
-              to="/bins/test"
-              exact
-            >
-              <v-list-item-action>
-                <v-icon>mdi-folder</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>My PCFG tests</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
             <v-divider class="mb-1" />
 
             <v-list-item 
               to="/bins/trash"
               exact
+              disabled
             >
               <v-list-item-action>
                 <v-icon>mdi-delete</v-icon>

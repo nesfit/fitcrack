@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 // Vuex module for the Add Job view
 const mut = prop => (state, val) => { state[prop] = val }
 
@@ -12,7 +14,6 @@ function supermutator9000 (obj) {
 // Props that don't save to templates
 const base = {
   step: 1, // Form stepper step
-  attackSettingsTab: undefined, // Selected attack mode
   validatedHashes: [],
   // info
   name: '',
@@ -20,6 +21,8 @@ const base = {
   inputMethod: 'multipleHashes',
   hashList: '',
   hashType: null,
+  // hosts
+  hosts: [],
   // other
   startDate: null, // init!
   endDate: null // init!,
@@ -28,6 +31,7 @@ const base = {
 // Basic empty template
 export const empty = {
   template: 'Empty',
+  attackSettingsTab: undefined, // Selected attack mode
   // info
   comment: '',
   // settings
@@ -44,8 +48,6 @@ export const empty = {
   markovThresh: NaN,
   pcfg: [],
   keyspaceLimit: 0,
-  // hosts
-  hosts: [],
   // other
   startNow: true,
   endNever: true,
@@ -104,6 +106,27 @@ export default {
         state.hashType !== null &&
         state.name !== ''
       )
+    },
+    template (state) {
+      const keys = Object.keys(empty)
+      return Object.keys(state)
+        .filter(key => keys.includes(key))
+        .reduce((obj, key) => {
+          if (JSON.stringify(state[key]) !== JSON.stringify(empty[key])) {
+            obj[key] = state[key]
+          }
+          return obj
+        }, {})
+    },
+    validTemplate (state, { template }) {
+      return Object.keys(template).length > 0
+    },
+    makeTemplate (state, { template }) {
+      return function (name) {
+        const t = template
+        t.template = name
+        return JSON.stringify(t)
+      }
     }
   },
   mutations: {
@@ -112,32 +135,28 @@ export default {
       ...empty
     }),
     update (state, changes) {
-      state = {
-        ...state,
-        ...changes
-      }
+      Object.assign(state, changes)
     },
-    apply (state, template = '{}') {
-      state = {
-        ...base,
+    applyTemplate (state, template = '{}') {
+      Object.assign(state, {
         ...empty,
-        ...JSON.parse(template)
-      }
+        ...template
+      })
     },
     //
-    addMask (state, val = '') {
-      state.masks.push(val)
+    addMask ({ masks }, val = '') {
+      masks.push(val)
     },
-    deleteMask (state, index) {
-      if (state.masks.length <= 1) return
-      state.masks.splice(index, 1)
+    deleteMask ({ masks }, index) {
+      if (masks.length <= 1) return
+      masks.splice(index, 1)
     },
-    updateMask (state, {index, val}) {
-      state.masks[index] = val
+    updateMask ({ masks }, {index, val}) {
+      Vue.set(masks, index, val)
     },
-    mergeMasks (state, arr) {
-      if (state.masks[0] == '') state.masks.shift()
-      state.masks = [...state.masks, ...arr]
+    mergeMasks ({ masks }, arr) {
+      if (masks[0] == '') masks.shift()
+      masks = [...masks, ...arr]
     }
   }
 }
