@@ -48,14 +48,16 @@
       </v-col>
       <v-col>
         <v-autocomplete
-          :items="templateItems"
-          :value="0"
+          :items="templates"
+          item-text="name"
+          item-value="id"
+          :value="selectedTemplate"
           auto-select-first
           outlined
           label="Template"
           hint="Prefill the form with a saved template"
           persistent-hint
-          @change="i => applyTemplate(templates[i])"
+          @change="fetchAndApplyTemplate"
         />
       </v-col>
     </v-row>
@@ -407,7 +409,10 @@
           justify="center"
           class="mb-5"
         >
-          <template-modal :inherited-name="name" />
+          <template-modal 
+            :inherited-name="name"
+            @templatesUpdated="fetchTemplates"
+          />
           <v-btn
             large
             color="primary"
@@ -437,7 +442,7 @@
   import hostSelector from '@/components/selector/hostSelector'
   import templateModal from '@/components/jobTemplate/templateModal'
 
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapState, mapGetters, mapMutations} from 'vuex'
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
   import {twoWayMap} from '@/store'
 
@@ -469,12 +474,14 @@
         attacks,
         templates: [
           {
-            template: 'Empty'
+            name: 'Empty',
+            id: 0
           }
         ]
       }
     },
     computed: {
+      ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
         'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
@@ -514,16 +521,38 @@
       this.startDate = this.$moment().format('DD/MM/YYYY HH:mm')
       this.endDate = this.$moment().format('DD/MM/YYYY HH:mm')
       if (this.hashList.length > 0) this.validateHashes()
-      this.axios.get(this.$serverAddr + '/template', )
-      .then((response) => {
-        if (typeof response.data === 'array') {
-          this.templates = response.data.map(JSON.parse)
-        }
-      })
-      .catch(console.error)
+      this.fetchTemplates()
     },
     methods: {
       ...mapMutations('jobForm', ['applyTemplate']),
+      fetchTemplates () {
+        this.axios.get(this.$serverAddr + '/template', )
+        .then((response) => {
+          if (response.data && response.data.items) {
+            this.templates = [
+              { name: 'Empty', id: 0 },
+              ...response.data.items
+            ]
+          }
+        })
+        .catch(console.error)
+      },
+      fetchAndApplyTemplate (id) {
+        if (id == 0) {
+          this.applyTemplate()
+          this.$store.commit('jobForm/selectedTemplateMut', 0)
+          return
+        }
+        this.axios.get(this.$serverAddr + `/template/${id}`)
+        .then((response) => {
+          console.log(response)
+          if (response.data && response.data.template) {
+            this.applyTemplate(JSON.parse(response.data.template))
+            this.$store.commit('jobForm/selectedTemplateMut', id)
+          }
+        })
+        .catch(console.error)
+      },
       attackIcon (handler) {
         const map = {
           'dictionary': 'mdi-dictionary',

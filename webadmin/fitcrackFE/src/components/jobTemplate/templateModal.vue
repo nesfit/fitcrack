@@ -95,7 +95,7 @@
         console.log(template)
         this.loading = true
         this.axios.post(this.$serverAddr + '/template', template).then((response) => {
-          console.log(response.data)
+          this.$emit('templatesUpdated')
         }).catch((error) => {
           this.loading = false
         })

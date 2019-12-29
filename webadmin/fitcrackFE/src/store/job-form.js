@@ -13,6 +13,7 @@ function supermutator9000 (obj) {
 
 // Props that don't save to templates
 const base = {
+  selectedTemplate: 0, // empty
   step: 1, // Form stepper step
   validatedHashes: [],
   // info
@@ -112,7 +113,7 @@ export default {
       return Object.keys(state)
         .filter(key => keys.includes(key))
         .reduce((obj, key) => {
-          if (JSON.stringify(state[key]) !== JSON.stringify(empty[key])) {
+          if (JSON.stringify(state[key]) !== JSON.stringify(empty[key]) || key === 'masks') {
             obj[key] = state[key]
           }
           return obj
@@ -125,7 +126,7 @@ export default {
       return function (name) {
         const t = template
         t.template = name
-        return JSON.stringify(t)
+        return t
       }
     }
   },
@@ -154,9 +155,9 @@ export default {
     updateMask ({ masks }, {index, val}) {
       Vue.set(masks, index, val)
     },
-    mergeMasks ({ masks }, arr) {
-      if (masks[0] == '') masks.shift()
-      masks = [...masks, ...arr]
+    mergeMasks (state, arr) {
+      state.masks = [...state.masks, ...arr]
+      if (state.masks[0] == '') state.masks.shift()
     }
   }
 }
