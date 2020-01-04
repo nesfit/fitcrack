@@ -22,6 +22,6 @@ namespace ProcessPrince {
      * @param   directory [in] Working directory
      * @return  Pointer to new Process object
      */
-    ProcessBase* create(std::vector<char*>& arguments, Directory& directory);
+    ProcessBase* create(const std::vector<std::string>& arguments, Directory& directory);
 };
 #endif // PROCESSPRINCE_HPP

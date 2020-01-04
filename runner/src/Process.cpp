@@ -5,7 +5,7 @@
 
 #include "Process.hpp"
 
-ProcessBase* Process::create(std::vector<char*>& arguments, Directory& directory) {
+ProcessBase* Process::create(const std::vector<std::string>& arguments, Directory& directory) {
   File executable;
   #ifdef PROCESSLINUX_HPP
   directory.findVersionedFile("hashcat", "bin", executable);

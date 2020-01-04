@@ -29,7 +29,7 @@ class ProcessBase {
 
         std::string executable_;    /**< Path to executable or shell command */
 
-        std::vector<char*> arguments_; /**< Arguments to pass to executable */
+        std::vector<std::string> arguments_; /**< Arguments to pass to executable */
 
         /**
          * @brief   Pure virtual function containing steps leading to execution
@@ -62,12 +62,10 @@ class ProcessBase {
          * @param   exec_args [in] Arguments of the executable / shell command
          *          to be passed to it
          */
-        ProcessBase(const std::string& exec_name, std::vector<char* >& exec_args);
-         /**
-         * @brief   Destructor
-         *
-         */
-        virtual ~ProcessBase() = 0;
+        ProcessBase(const std::string& exec_name, const std::vector<std::string>& exec_args);
+
+        virtual ~ProcessBase() {}
+
         /**
          * @brief   Pure virtual function converting status to exit code
          * @return  Exit code of child process

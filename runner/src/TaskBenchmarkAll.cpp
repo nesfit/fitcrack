@@ -10,6 +10,14 @@ TaskBase(directory, task_config, host_config, output_file, workunit_name) {
   mode_ = "a";
 }
 
+TaskBenchmarkAll::~TaskBenchmarkAll()
+{
+  for(size_t i = 0; i < benchmark_tasks_.size(); ++i)
+  {
+    delete benchmark_tasks_[i];
+  }
+}
+
 std::string TaskBenchmarkAll::generateOutputMessage() {
 
   std::string output_message = "";
@@ -26,8 +34,8 @@ std::string TaskBenchmarkAll::generateOutputMessage() {
     output_message += ProjectConstants::TaskFinalStatus::Succeded + "\n";
 
     for (size_t i = 0; i < hashtypes_.size(); i++) {
-      hashtypes_speeds += hashtypes_[i] + ":" + RunnerUtils::toString(benchmark_tasks_[i].getTotalSpeed()) + "\n";
-      time_sum += benchmark_tasks_[i].getRunTime();
+      hashtypes_speeds += hashtypes_[i] + ":" + RunnerUtils::toString(benchmark_tasks_[i]->getTotalSpeed()) + "\n";
+      time_sum += benchmark_tasks_[i]->getRunTime();
     }
 
     output_message += RunnerUtils::toString(time_sum) + "\n";
@@ -37,7 +45,7 @@ std::string TaskBenchmarkAll::generateOutputMessage() {
 
     output_message += ProjectConstants::TaskFinalStatus::Error + "\n";
     output_message += RunnerUtils::toString(exit_code_) + "\n";
-    output_message += benchmark_tasks_.back().getErrorMessage() + "\n";
+    output_message += benchmark_tasks_.back()->getErrorMessage() + "\n";
     output_message += ProjectConstants::TaskFinalStatus::Error + "\n";
 
     Logging::debugPrint(Logging::Detail::ObjectContentRevision, "last benchmark exit code is " + RunnerUtils::toString(exit_code_));
@@ -70,7 +78,7 @@ void TaskBenchmarkAll::initialize() {
       ConfigTask benchmark_config = task_config_;
       benchmark_config.add("hash_type", hashtype);
 
-      benchmark_tasks_.push_back(TaskBenchmark(directory_, benchmark_config, host_config_, output_file_, workunit_name_));
+      benchmark_tasks_.push_back(new TaskBenchmark(directory_, benchmark_config, host_config_, output_file_, workunit_name_));
     }
   }
 
@@ -78,21 +86,21 @@ void TaskBenchmarkAll::initialize() {
 }
 
 void TaskBenchmarkAll::startComputation() {
-  for (std::vector<TaskBenchmark>::iterator it = benchmark_tasks_.begin(); it != benchmark_tasks_.end(); it++) {
-    it->initialize();
-    it->startComputation();
-    it->progress();
-    it->finish();
+  for (std::vector<TaskBenchmark*>::iterator it = benchmark_tasks_.begin(); it != benchmark_tasks_.end(); it++) {
+    (*it)->initialize();
+    (*it)->startComputation();
+    (*it)->progress();
+    (*it)->finish();
     Logging::debugPrint(Logging::Detail::GeneralInfo,
       "TaskBenchmarkAll : sub-result : " + RunnerUtils::toString(hashtypes_[computed_hashes_])
-      + " : " + RunnerUtils::toString(it->getTotalSpeed()));
+      + " : " + RunnerUtils::toString((*it)->getTotalSpeed()));
       actualizeComputedHashes(1);
       reportProgress();
     }
   }
 
   int TaskBenchmarkAll::finish() {
-    exit_code_ = benchmark_tasks_.back().finish();
+    exit_code_ = benchmark_tasks_.back()->finish();
     return exit_code_;
   }
 

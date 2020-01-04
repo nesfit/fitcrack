@@ -12,13 +12,6 @@ AttackPCFG::AttackPCFG(const ConfigTask &config, Directory &directory)
   addSpecificArguments();
 }
 
-AttackPCFG::~AttackPCFG() {
-  for (std::vector<char *>::iterator it = PCFG_arguments_.begin();
-       it != PCFG_arguments_.end(); it++) {
-    free(*it);
-  }
-}
-
 void AttackPCFG::addSpecificArguments() {
 
   if (attack_submode_ == "0"){
@@ -62,7 +55,7 @@ void AttackPCFG::addPCFGRequiredFile(const std::string& file_name) {
   addPCFGArgument(filePCFG.getRelativePath());
 }
 
-std::vector<char*>& AttackPCFG::getPCFGArguments() {
+const std::vector<std::string>& AttackPCFG::getPCFGArguments() {
   return PCFG_arguments_;
 }
 

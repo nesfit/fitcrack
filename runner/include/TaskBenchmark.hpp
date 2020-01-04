@@ -10,7 +10,7 @@
 
 /** Class representing benchmark task */
 class TaskBenchmark: public TaskComputeBase {
-    
+    TaskBenchmark(const TaskBenchmark&);
     protected:
 
         std::vector<unsigned long long> speeds_;    /**< Storage of speeds for all OCL deviced used by hashcat */

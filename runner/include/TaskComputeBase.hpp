@@ -14,6 +14,8 @@
 #include "Process.hpp"
 #include "ProcessPCFG.hpp"
 #include "ProcessPrince.hpp"
+#include "NamedMutex.hpp"
+
 
 /** Class representing base of the computation tasks */
 class TaskComputeBase: public TaskBase {
@@ -26,10 +28,12 @@ class TaskComputeBase: public TaskBase {
         ProcessBase *process_external_generator_; /** < Pointer to pcfg manager/princepreprocessor process executing the task */
         ProcessBase *parent_process_; /** < Pointer to parent process */
 
+        NamedMutex hashcatMutex_;
+
         enum AttackType attack_type;
 
-        std::vector<char*> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
-        std::vector<char*> external_generator_arguments_; /**<Merge pcfg-manager/princepreprocessor arguments from Attack, ConfigTask, ConfigHost */
+        std::vector<std::string> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
+        std::vector<std::string> external_generator_arguments_; /**<Merge pcfg-manager arguments from Attack, ConfigTask, ConfigHost */
 
         /**
          * @brief   Merges vectors with arguments from the member objects
@@ -63,7 +67,7 @@ class TaskComputeBase: public TaskBase {
 	 * @brief   Destructor freeint hashcat_arguments_ and attack_ and
 	 * process_
 	 */
-	~TaskComputeBase();
+	virtual ~TaskComputeBase();
 
 	/**
 	 * @brief   Getter of process_ stderr content

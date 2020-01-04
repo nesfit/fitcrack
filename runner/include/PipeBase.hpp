@@ -36,7 +36,7 @@ class PipeBase {
          */
         virtual int readChar(char &c) = 0;
     public:
-    virtual ~PipeBase() = 0;
+    virtual ~PipeBase() {}
 
 	/**
 	 * @brief   Pure virtual function stating whether it is possible to read

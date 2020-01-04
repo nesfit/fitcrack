@@ -5,7 +5,7 @@
 
 #include "ProcessBase.hpp"
 
-ProcessBase::ProcessBase(const std::string& exec_name, std::vector<char*>& exec_args) :
+ProcessBase::ProcessBase(const std::string& exec_name, const std::vector<std::string>& exec_args) :
 start_time_(0), stop_time_(0) {
 
   setExecutable(exec_name);
@@ -14,36 +14,36 @@ start_time_(0), stop_time_(0) {
   arguments_.push_back(TOCSTRING(executable_.c_str()));
 
   Logging::debugPrint(Logging::Detail::ObjectManipulation, "Process arguments: ");
-  for (std::vector<char*>::iterator it = exec_args.begin(); it != exec_args.end(); it++) {
+  for (std::vector<std::string>::const_iterator it = exec_args.begin(); it != exec_args.end(); it++) {
     arguments_.push_back(*it);
 
     Logging::debugPrint(Logging::Detail::ObjectManipulation,  + "\t argument '" + std::string(*it) + "'");
   }
   Logging::debugPrint(Logging::Detail::ObjectManipulation, "-------------------------------");
-
-  // WARNING: you can't construct std::string with NULL
-  arguments_.push_back(NULL);
 }
 
-ProcessBase::~ProcessBase() {
-  // Nothing
+std::string quoteArgIfNecessary(const std::string &arg)
+{
+  if (arg.find(" ") != std::string::npos)
+  {
+    return '\''+arg+'\'';
+  }
+  else
+  {
+    return arg;
+  }
 }
 
 std::string ProcessBase::getReadableArguments() {
-  std::string readable_arguments;
+  if(arguments_.empty())
+  {
+    return "";
+  }
+  std::string readable_arguments = quoteArgIfNecessary(arguments_[0]);
 
-  readable_arguments = std::string(*arguments_.begin());
-
-  for (std::vector<char*>::iterator it = arguments_.begin() + 1; it != arguments_.end(); it++) {
-    if (*it != NULL) {
-      std::string s(*it);
-      if (s.find(" ") != std::string::npos) {
-        // Escape arg if it contains a space
-        s = "\'" + s + "\'";
-      }
-
-      readable_arguments += " " + s;
-    }
+  for(size_t i = 1; i < arguments_.size(); ++i)
+  {
+    readable_arguments += ' '+quoteArgIfNecessary(arguments_[i]);
   }
   return readable_arguments;
 

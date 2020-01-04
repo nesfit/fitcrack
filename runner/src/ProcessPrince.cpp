@@ -5,7 +5,7 @@
 
 #include "ProcessPrince.hpp"
 
-ProcessBase* ProcessPrince::create(std::vector<char*>& arguments ,Directory& directory) {
+ProcessBase* ProcessPrince::create(const std::vector<std::string>& arguments ,Directory& directory) {
   File executable;
   #ifdef PROCESSLINUX_HPP
   directory.findVersionedFile("prince", "bin", executable);

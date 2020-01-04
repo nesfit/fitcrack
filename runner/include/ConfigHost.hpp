@@ -48,7 +48,7 @@ class ConfigHost {
          * @brief   Parses the content_ to separated arguments of hashcat
          * @param   arguments [out] Collection of hashcat arguments
          */
-        void parseArguments(std::vector<char*>& arguments);
+        void parseArguments(std::vector<std::string>& arguments);
 
 
         /**

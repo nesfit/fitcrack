@@ -13,7 +13,7 @@
 class TaskBenchmarkAll: public TaskBase {
     private:
 
-	std::vector<TaskBenchmark> benchmark_tasks_; /**< Collection with prepared benchmark task for all supported hash_types */
+	std::vector<TaskBenchmark*> benchmark_tasks_; /**< Collection with prepared benchmark task for all supported hash_types */
 	std::vector<std::string> hashtypes_; /**< Collection of hashtypes indexes correspond with benchmark_tasks_ */
 
     public:
@@ -27,6 +27,8 @@ class TaskBenchmarkAll: public TaskBase {
          * @param   workunit_name [in] Name of the BOINC project workunit
          */
         TaskBenchmarkAll(Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name);
+
+	~TaskBenchmarkAll();
 
 	/**
 	 * @brief   Generate task mode based information

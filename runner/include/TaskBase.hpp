@@ -90,7 +90,7 @@ class TaskBase {
         /**
          * @brief   Destructor
          */
-        virtual ~TaskBase () = 0;
+        virtual ~TaskBase () {};
 
         /**
          * @brief   Reads hashcat output file

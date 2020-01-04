@@ -38,7 +38,7 @@ class ProcessLinux : public ProcessBase {
          * @param   exec_name [in] Path to binary to execute
          * @param   exec_args [in] Arguments to pass when executing binary
          */
-        ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args, bool isPCFG);
+        ProcessLinux(const std::string& exec_name, const std::vector<std::string>& exec_args, bool isPCFG);
 
         /**
          * @brief   Destructor deleting pipes

@@ -45,9 +45,8 @@ void AttackBase::initializeArguments() {
 /* Protected */
 
 void AttackBase::addArgument(std::string argument){
-  std::string *new_argument = new std::string(argument);
-  arguments_.push_back(TOCSTRING(new_argument->c_str()));
-  Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding argument '" + *new_argument + "'");
+  arguments_.push_back(argument);
+  Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding argument '" + argument + "'");
 }
 
 void AttackBase::findAndAddOptional(const std::string& key) {
@@ -74,10 +73,7 @@ AttackBase::AttackBase(const ConfigTask& config) : output_file_(HashcatConstant:
   initializeArguments();
 }
 
-AttackBase::~AttackBase() {
-  // Nothing
-}
-std::vector<char*>& AttackBase::getArguments() {
+const std::vector<std::string>& AttackBase::getArguments() {
   return arguments_;
 }
 

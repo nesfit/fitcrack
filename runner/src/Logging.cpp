@@ -29,7 +29,7 @@ void Logging::log(const int debug_level, const std::string& class_name, const st
     if ((class_name_buffer = parseClassName(class_name)) == "::")
     class_name_buffer = "";
 
-    std::clog << "[" << Logging::Detail::tag[debug_level] << "]: " << class_name_buffer << ": " << message << std::endl;
+    std::clog << "[" << Logging::Detail::tag[debug_level] << "]: at " << ::time(nullptr) << ":" << class_name_buffer << ": " << message << std::endl;
   }
 }
 

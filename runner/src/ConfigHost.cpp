@@ -21,7 +21,7 @@ std::string ConfigHost::getPath() const {
   return path_;
 }
 
-void ConfigHost::parseArguments(std::vector<char*>& arguments) {
+void ConfigHost::parseArguments(std::vector<std::string>& arguments) {
   std::size_t next, last = 0;
   std::string delimeter = " ";
   std::string *argument;

@@ -10,7 +10,7 @@
 
 /** Class representing hashcat's/Prince attack */
 class AttackPrince: public AttackCrackingBase {
-    std::vector<char *> Prince_arguments_; /**< Prince preprocessor arguments based on the config */
+    std::vector<std::string> Prince_arguments_; /**< Prince preprocessor arguments based on the config */
     protected:
 
         /**
@@ -28,7 +28,6 @@ class AttackPrince: public AttackCrackingBase {
          * @param   directory [in] Working directory
          */
       AttackPrince(const ConfigTask &config, Directory &directory);
-      ~AttackPrince();
-      std::vector<char *> &getPrinceArguments();
+      const std::vector<std::string> &getPrinceArguments();
 };
 #endif // ATTACKPRINCE_HPP

@@ -32,37 +32,42 @@ void TaskComputeBase::getAllArguments() {
 }
 
 /* Public */
-TaskComputeBase::TaskComputeBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskBase(directory, task_config, host_config, output_file, workunit_name), attack_(nullptr), process_hashcat_(nullptr), process_external_generator_(nullptr), attack_type(Attack::detectAttackType(task_config_)) {  }
+TaskComputeBase::TaskComputeBase(
+  Directory& directory,
+  ConfigTask& task_config,
+  const std::string& host_config,
+  const std::string& output_file,
+  const std::string& workunit_name
+):
+  TaskBase(directory, task_config, host_config, output_file, workunit_name),
+  attack_(nullptr),
+  process_hashcat_(nullptr),
+  process_external_generator_(nullptr),
+  hashcatMutex_("FitcrackRunnerHashcatMutex"),
+  attack_type(Attack::detectAttackType(task_config_))
+{}
 
-TaskComputeBase::TaskComputeBase (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskBase(directory, task_config, host_config, output_file, workunit_name), attack_(nullptr), process_hashcat_(nullptr), process_external_generator_(nullptr), attack_type(Attack::detectAttackType(task_config_)) {  }
+TaskComputeBase::TaskComputeBase(
+  Directory& directory,
+  ConfigTask& task_config,
+  ConfigHost& host_config,
+  const std::string& output_file,
+  const std::string& workunit_name
+):
+  TaskBase(directory, task_config, host_config, output_file, workunit_name),
+  attack_(nullptr),
+  process_hashcat_(nullptr),
+  process_external_generator_(nullptr),
+  hashcatMutex_("FitcrackRunnerHashcatMutex"),
+  attack_type(Attack::detectAttackType(task_config_))
+{}
 
 TaskComputeBase::~TaskComputeBase() {
-  if (attack_ != nullptr) {
-    delete attack_;
-    attack_ = nullptr;
-  }
+  delete attack_;
 
-  if (process_hashcat_ != nullptr) {
-    delete process_hashcat_;
-    process_hashcat_ = nullptr;
-  }
+  delete process_hashcat_;
 
-  if (process_external_generator_ != nullptr) {
-    delete process_external_generator_;
-    process_external_generator_ = nullptr;
-  }
-
-  for (std::vector<char*>::iterator it = hashcat_arguments_.begin(); it != hashcat_arguments_.end(); it++) {
-    delete []*it;
-  }
-
-  if (attack_type == AT_PCFG || attack_type == AT_Prince) {
-    for (std::vector<char *>::iterator it =
-             external_generator_arguments_.begin();
-         it != external_generator_arguments_.end(); it++) {
-      delete[] * it;
-    }
-  }
+  delete process_external_generator_;
 }
 
 std::string TaskComputeBase::getErrorMessage() {
@@ -143,12 +148,12 @@ void TaskComputeBase::initialize() {
       external_generator_relative_path =
           external_generator_executable.getRelativePath();
 
-      std::vector<char *> cmd_arguments;
+      std::vector<std::string> cmd_arguments;
       cmd_arguments.push_back(strdup(external_generator_relative_path.c_str()));
       cmd_arguments.insert(cmd_arguments.end(),
                            external_generator_arguments_.begin(),
                            external_generator_arguments_.end());
-      cmd_arguments.push_back((char *)"|");
+      cmd_arguments.push_back("|");
       cmd_arguments.push_back(strdup(hashcat_relative_path.c_str()));
       cmd_arguments.insert(cmd_arguments.end(), hashcat_arguments_.begin(),
                            hashcat_arguments_.end());
@@ -208,7 +213,11 @@ void TaskComputeBase::startComputation() {
   }
   #endif
 
-  process_hashcat_->run();
-  Logging::debugPrint(Logging::Detail::GeneralInfo,
-                      "Hashcat process has started.");
+  if(!process_hashcat_->isRunning())
+  {
+    hashcatMutex_.lock();
+    process_hashcat_->run();
+    Logging::debugPrint(Logging::Detail::GeneralInfo,
+                        "Hashcat process has started.");
+  }
 }

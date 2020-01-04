@@ -5,6 +5,8 @@
 
 #include <main.hpp>
 
+#include <memory>
+
 int main(int argc, char **argv) {
 
   BOINC_OPTIONS options;
@@ -13,8 +15,6 @@ int main(int argc, char **argv) {
   int error_value = 0;
 
   std::string exception_message;
-
-  TaskBase *task = nullptr;
 
   try {
     Logging::debugPrint(Logging::Detail::Important, "Runner " RUNNER_VERSION);
@@ -37,14 +37,14 @@ int main(int argc, char **argv) {
 
     const char *config = argc > 1 ?argv[1] : "config";
     directory.find(config, file);
-    task = Task::create(file, directory);
+
+    std::auto_ptr<TaskBase> task(Task::create(file, directory));
 
     task->initialize();
     task->startComputation();
     task->progress();
     error_value = task->saveAndFinish();
     error_value = (error_value == 1 ? 0 : error_value);
-
   }
   catch (std::runtime_error& e) {
     exception_message = e.what();

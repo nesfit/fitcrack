@@ -43,7 +43,7 @@ out_pipe_->closeWrite();
 }
 /* Public */
 
-ProcessWindows::ProcessWindows(const std::string& exec_name, std::vector<char* >& exec_args, bool isExternalGenerator) : ProcessBase(exec_name, exec_args) {
+ProcessWindows::ProcessWindows(const std::string& exec_name, const std::vector<std::string>& exec_args, bool isExternalGenerator) : ProcessBase(exec_name, exec_args) {
 
   if (isExternalGenerator) {
     out_pipe_ = PipeWindows::createBlockingPipe();

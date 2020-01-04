@@ -32,7 +32,7 @@ class AttackBase {
         std::string attack_mode_;		/**< AttackBase mode from the TLV */
         std::string output_file_;		/**< Name/path to hashcat result file */
 
-        std::vector<char*> arguments_;		/**< Hashcat arguments based on the config */
+        std::vector<std::string> arguments_;		/**< Hashcat arguments based on the config */
 
         const ConfigTask& config_;              /**< Representer of configuration file */
 
@@ -102,13 +102,13 @@ class AttackBase {
         /**
          * @brief   Destructor
          */
-        virtual ~AttackBase() = 0;
+        virtual ~AttackBase() {}
 
         /**
          * @brief  Getter of arguments_
          * @return Copy of arguments_ vector
          */
-        std::vector<char*>& getArguments();
+        const std::vector<std::string>& getArguments();
 
         /**
          * @brief   Getter of arguments_ size

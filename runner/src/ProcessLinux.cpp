@@ -28,9 +28,17 @@ void ProcessLinux::launchSubprocess() {
     reinterpret_cast<PipeLinux*>(in_pipe_)->redirectRead(fileno(stdin));
   }
 
+  std::vector<const char*> linuxArgs;
+  linuxArgs.reserve(arguments_.size()+1);
+  for(size_t i = 0; i < arguments_.size(); ++i)
+  {
+    linuxArgs.push_back(arguments_[i].c_str());
+  }
+  linuxArgs.push_back(nullptr);
 
   /** Execute application */
-  execv(arguments_[0], &arguments_[0]);
+  //const cast is OK as explained here: https://stackoverflow.com/a/190208
+  execv(linuxArgs[0], const_cast<char *const*>(linuxArgs.data()));
 
   /** This shouldn't be ever executed but if it does, throw error exception */
   RunnerUtils::runtimeException("execv() failed with", errno);
@@ -38,7 +46,7 @@ void ProcessLinux::launchSubprocess() {
 
 /* Public */
 
-ProcessLinux::ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args, bool isExternalGenerator) : ProcessBase(exec_name, exec_args) {
+ProcessLinux::ProcessLinux(const std::string& exec_name, const std::vector<std::string>& exec_args, bool isExternalGenerator) : ProcessBase(exec_name, exec_args) {
   if (isExternalGenerator) {
     out_pipe_ = PipeLinux::createBlockingPipe();
   } else {
