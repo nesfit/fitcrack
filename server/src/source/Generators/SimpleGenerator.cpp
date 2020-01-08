@@ -17,6 +17,7 @@
 #include <AttackMarkov.h>
 #include <AttackRules.h>
 #include <AttackPcfg.h>
+#include <AttackPcfgRules.h>
 
 
 CSimpleGenerator::CSimpleGenerator()
@@ -167,7 +168,10 @@ void CSimpleGenerator::createRegularWorkunit(PtrJob &job, PtrHost &host)
             break;
 
         case Config::AttackMode::AttackPcfg:
-            attack = new CAttackPcfg(job, host, duration, m_sqlLoader);
+            if (job->getAttackSubmode() == 0)
+                attack = new CAttackPcfg(job, host, duration, m_sqlLoader);
+            else
+                attack = new CAttackPcfgRules(job, host, duration, m_sqlLoader);
             break;
 
         default:
