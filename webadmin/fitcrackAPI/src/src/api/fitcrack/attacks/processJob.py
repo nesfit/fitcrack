@@ -321,7 +321,7 @@ def process_job_9(job):
         job['attack_settings']['attack_submode'] = 1
         job['rules'] = rules.name
 
-        job['']
+        #job['']
     return job
 
 

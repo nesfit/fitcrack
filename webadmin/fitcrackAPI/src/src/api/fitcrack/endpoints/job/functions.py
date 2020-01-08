@@ -129,17 +129,13 @@ def create_job(data):
         cracking_time='0',
         seconds_per_workunit=job['seconds_per_job'] if job['seconds_per_job'] > 60 else 60,
         config=job['config'],
-
-        #TODO odstrániť dict1, dict2
         dict1=job['dict1'] if job.get('dict1') else '',
         dict2=job['dict2'] if job.get('dict2') else '',
-
-        #TODO možno odstrániť charset
         charset1=job['charset1'] if job.get('charset1') else '',
         charset2=job['charset2'] if job.get('charset2') else '',
         charset3=job['charset3'] if job.get('charset3') else '',
         charset4=job['charset4'] if job.get('charset4') else '',
-        rules=(job['rules'] if job.get('rules') else None),
+        rules=(job['rules']['name'] if job.get('rules') else None),
         rule_left=(job['attack_settings']['rule_left'] if job['attack_settings'].get('rule_left') else ''),
         rule_right=(job['attack_settings']['rule_right'] if job['attack_settings'].get('rule_right') else ''),
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',
