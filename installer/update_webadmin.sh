@@ -20,7 +20,7 @@ if [ -d "$APACHE_DOCUMENT_ROOT/fitcrackFE" ]; then
 
   if [ $UPDATE_FRONTEND = "y" ]; then
     # Backup original frontend config
-    BACKEND_URI=`cat $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js | grep "serverAddress" | cut -d"'" -f2`
+    BACKEND_URI=`cat $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js | grep "serverAddress" | cut -d"\"" -f2`
 
     # Delete old frontend
     rm -Rf $APACHE_DOCUMENT_ROOT/fitcrackFE
