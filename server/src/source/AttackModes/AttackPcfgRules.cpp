@@ -304,9 +304,6 @@ bool CAttackPcfgRules::generateWorkunit()
         passCount = Config::minPassCount;
     }
 
-    if (passCount + m_job->getCurrentIndex() > m_job->getHcKeyspace())
-        passCount = m_job->getHcKeyspace() - m_job->getCurrentIndex();
-
     /** Create the workunit */
     m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), m_job->getCurrentIndex(), 0, passCount, 0, 0,
                          false, 0, false);
