@@ -135,7 +135,7 @@ def create_job(data):
         charset2=job['charset2'] if job.get('charset2') else '',
         charset3=job['charset3'] if job.get('charset3') else '',
         charset4=job['charset4'] if job.get('charset4') else '',
-        rules=(job['rules']['name'] if job.get('rules') else None),
+        rules=(job['attack_settings']['rules']['name'] if job.get('rules') else None),
         rule_left=(job['attack_settings']['rule_left'] if job['attack_settings'].get('rule_left') else ''),
         rule_right=(job['attack_settings']['rule_right'] if job['attack_settings'].get('rule_right') else ''),
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',
@@ -306,10 +306,11 @@ def computeCrackingTime(data):
             keyspace = int(attackSettings['pcfg_grammar']['keyspace'])
 
         rulesKeyspace = 1
-        if attackSettings['rules']:
-            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-            rulesKeyspace = coun_file_lines(os.path.join(RULE_DIR,rules.path))
-            keyspace = keyspace * rulesKeyspace
+#        TODO
+#        if attackSettings['rules']:
+#            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+#            rulesKeyspace = coun_file_lines(os.path.join(RULE_DIR,rules.path))
+#            keyspace = keyspace * rulesKeyspace
 
         # Keyspace control
         INT_MAX = sys.maxsize - 1
