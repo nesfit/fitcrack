@@ -122,6 +122,15 @@ else
   echo "Front-end Apache configuration done"
 fi
 
+
+###################
+# Get BACKEND_URI #
+###################
+
+read -e -p "Enter WebAdmin backend URI (default: ${BOINC_URL}): " BACKEND_URI
+BACKEND_URI=${BACKEND_URI:-${BOINC_URL}}
+BACKEND_URI=${BACKEND_URI%/}
+
 #########################
 # Get back-end TCP port #
 #########################
@@ -214,7 +223,8 @@ if [ $INSTALL_FRONTEND = "y" ]; then
   mkdir $APACHE_DOCUMENT_ROOT/fitcrackFE
   cp -Rf webadmin/fitcrackFE/dist/* $APACHE_DOCUMENT_ROOT/fitcrackFE/
 
-  # set permissions to Apache user and group
+  # Set BACKEND_URI for window.serverAddress
+  sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js
 
   # Set permissions and ownership to Apache user and group
   chmod -R 775 $APACHE_DOCUMENT_ROOT/fitcrackFE
@@ -270,7 +280,7 @@ fi
 
 echo "Configuring front-end..."
 # Set port to backend
-sed -i "s|http://localhost:5000|http://localhost:$BACKEND_PORT|g" $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js
+sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js
 echo "Done."
 
 #######################

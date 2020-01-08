@@ -78,7 +78,7 @@ PROJECT_HTTPD_CONF="$BOINC_PROJECT_DIR/$BOINC_PROJECT.httpd.conf"
 
 read -e -p "Enter BOINC project URL_BASE (default: http://127.0.0.1): " BOINC_URL
 BOINC_URL=${BOINC_URL:-http://127.0.0.1}
-
+BOINC_URL=${BOINC_URL%/}
 
 #############
 # Apache user
