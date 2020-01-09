@@ -17,16 +17,16 @@ void AttackCombinator::addSpecificArguments() {
 
   } else if (attack_submode_ == "1") {
 
-    findAndAddRequired("rule_left", "--rule_left");
+    findAndAddRequired("rule_left", "--rule-left");
 
   } else if (attack_submode_ == "2") {
 
-    findAndAddRequired("rule_right", "--rule_right");
+    findAndAddRequired("rule_right", "--rule-right");
 
   } else if (attack_submode_ == "3") {
 
-    findAndAddRequired("rule_left", "--rule_left");
-    findAndAddRequired("rule_right", "--rule_right");
+    findAndAddRequired("rule_left", "--rule-left");
+    findAndAddRequired("rule_right", "--rule-right");
 
   } else {
     RunnerUtils::runtimeException("Unsupported attack_submode = " + attack_submode_ + " attack_mode = " + attack_mode_ + " has no such attack_submode");

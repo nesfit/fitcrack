@@ -37,6 +37,11 @@ std::string ProcessBase::getReadableArguments() {
   for (std::vector<char*>::iterator it = arguments_.begin() + 1; it != arguments_.end(); it++) {
     if (*it != NULL) {
       std::string s(*it);
+      if (s.find(" ") != std::string::npos) {
+        // Escape arg if it contains a space
+        s = "\'" + s + "\'";
+      }
+
       readable_arguments += " " + s;
     }
   }
