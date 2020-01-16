@@ -5,7 +5,7 @@
 
 <template>
   <div class="cont">
-    <v-card-title class="pt-2 pb-1">
+    <v-card-title class="py-2">
       <v-text-field
         v-model="search"
         clearable
@@ -32,16 +32,15 @@
         {{ item.password || '–' }}
       </template>
       <template v-slot:item.hash="{ item }">
-        <div class="d-flex align-center">
+        <div class="d-flex align-center mw-50">
           <v-dialog max-width="600">
             <template v-slot:activator="{ on }">
-              <v-btn 
-                icon
-                class="mr-2"
+              <span 
+                class="text-truncate d-inline-block"
                 v-on="on"
               >
-                <v-icon>mdi-text</v-icon>
-              </v-btn>
+                {{ item.hash }}
+              </span>
             </template>
             <v-card>
               <v-card-title primary-title>
@@ -52,7 +51,7 @@
               </v-card-text>
             </v-card>
           </v-dialog>
-          <svg 
+          <!-- <svg 
             xmlns="http://www.w3.org/2000/svg"
             height="18"
             width="100%"
@@ -66,7 +65,7 @@
               :height="char.charCodeAt(0) / 5 - 5"
               :fill="'hsla(' + (char.charCodeAt(0) * 5 - 100) + ',100%,50%,50%)'"
             />
-          </svg>
+          </svg> -->
         </div>
       </template>
       <template v-slot:item.added="{ item }">
@@ -140,8 +139,8 @@
 
 <style scoped>
 
-  .middle {
-    vertical-align: middle;
+  .mw-50 {
+    max-width: 50vw;
   }
 
   .cont {
