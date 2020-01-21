@@ -30,7 +30,6 @@ std::string PipeBase::readLine(ProcessBase* process_) {
       line += c;
       if (c == '\n') break;
     } else if (read_chars == -1) {
-    Logging::debugPrint(Logging::Detail::CustomOutput, POSITION_IN_CODE + "Pipe not read, sleeping or checking. Process and is running : "+RunnerUtils::toString(process_)+", "+RunnerUtils::toString(process_ && process_->isRunning()));
       if (process_ && !process_->isRunning()) {
         break;
       }
