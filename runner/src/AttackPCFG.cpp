@@ -39,8 +39,8 @@ void AttackPCFG::addSpecificArguments() {
 
 //
 void AttackPCFG::addPCFGArgument(const std::string &argument){
-  PCFG_arguments_.push_back(strdup(argument.c_str()));
   Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding PCFG argument '" + argument + "'");
+  PCFG_arguments_.push_back(argument);
 }
 
 void AttackPCFG::addPCFGRequiredFile(const std::string& file_name) {

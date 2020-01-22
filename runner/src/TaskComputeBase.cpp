@@ -135,7 +135,7 @@ void TaskComputeBase::initialize() {
       File hashcat_executable;
       File external_generator_executable;
       directory_.findVersionedFile("hashcat", "exe", hashcat_executable);
-      std::string cmd = "cmd.exe /C";
+      std::string cmd = "cmd.exe";
       std::string hashcat_relative_path = hashcat_executable.getRelativePath();
       std::string external_generator_relative_path;
       if (attack_type == AT_PCFG) {
@@ -149,12 +149,13 @@ void TaskComputeBase::initialize() {
           external_generator_executable.getRelativePath();
 
       std::vector<std::string> cmd_arguments;
-      cmd_arguments.push_back(strdup(external_generator_relative_path.c_str()));
+      cmd_arguments.push_back("/C");
+      cmd_arguments.push_back(external_generator_relative_path);
       cmd_arguments.insert(cmd_arguments.end(),
                            external_generator_arguments_.begin(),
                            external_generator_arguments_.end());
       cmd_arguments.push_back("|");
-      cmd_arguments.push_back(strdup(hashcat_relative_path.c_str()));
+      cmd_arguments.push_back(hashcat_relative_path);
       cmd_arguments.insert(cmd_arguments.end(), hashcat_arguments_.begin(),
                            hashcat_arguments_.end());
 
