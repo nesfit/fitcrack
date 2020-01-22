@@ -20,15 +20,15 @@ void ProcessWindows::launchSubprocess() {
   if (in_pipe_)
     startup_info_.hStdInput  = static_cast<PipeWindows*>(in_pipe_)->getReadHandle();
 
-  if (!SetHandleInformation(startup_info_.hStdError, HANDLE_FLAG_INHERIT, 1)) {
+  if (!SetHandleInformation(startup_info_.hStdError, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
     RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
   }
 
-  if (!SetHandleInformation(startup_info_.hStdOutput, HANDLE_FLAG_INHERIT, 1)) {
+  if (!SetHandleInformation(startup_info_.hStdOutput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
     RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
   }
 
-  if (!SetHandleInformation(startup_info_.hStdInput, HANDLE_FLAG_INHERIT, 1)) {
+  if (!SetHandleInformation(startup_info_.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
     RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
   }
 
