@@ -32,7 +32,7 @@ void PipeWindows::createPipe(bool is_NONBLOCK_) {
   SECURITY_ATTRIBUTES security_attributes;
 
   security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-  security_attributes.bInheritHandle = TRUE;
+  security_attributes.bInheritHandle = FALSE;
   security_attributes.lpSecurityDescriptor = NULL;
 
   if (!CreatePipe(&read_, &write_, &security_attributes, 0))
