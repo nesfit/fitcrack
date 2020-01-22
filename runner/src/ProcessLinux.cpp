@@ -54,6 +54,7 @@ ProcessLinux::ProcessLinux(const std::string& exec_name, const std::vector<std::
   }
   err_pipe_ = PipeLinux::createNonBlockingPipe();
   in_pipe_ = nullptr;
+  process_identifier_ = -1;
 }
 
 ProcessLinux::~ProcessLinux() {
@@ -70,6 +71,7 @@ int ProcessLinux::getProcessIdentifier() const {
 }
 
 bool ProcessLinux::isRunning() {
+  if (process_identifier_ == -1) return false;
   /** Waitpid with WNOHANG returns 0 when process still exists */
   return (waitpid(process_identifier_, &status_, WNOHANG) == 0);
 }
