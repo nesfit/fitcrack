@@ -6,7 +6,12 @@
 #include "ProcessBase.hpp"
 
 ProcessBase::ProcessBase(const std::string& exec_name, const std::vector<std::string>& exec_args) :
-start_time_(0), stop_time_(0) {
+  out_pipe_(nullptr),
+  err_pipe_(nullptr),
+  in_pipe_(nullptr),
+  start_time_(0),
+  stop_time_(0)
+{
 
   setExecutable(exec_name);
 
@@ -118,10 +123,6 @@ std::string ProcessBase::readOutPipeLine() {
 
 PipeBase* ProcessBase::GetPipeOut(){
   return out_pipe_;
-}
-
-void ProcessBase::initInPipe(){
-  this->in_pipe_ = nullptr;
 }
 
 void ProcessBase::setInPipe(PipeBase *in_pipe){

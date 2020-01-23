@@ -20,6 +20,18 @@ void ProcessWindows::launchSubprocess() {
   if (in_pipe_)
     startup_info_.hStdInput  = static_cast<PipeWindows*>(in_pipe_)->getReadHandle();
 
+  if (!SetHandleInformation(startup_info_.hStdError, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
+    RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
+  }
+
+  if (!SetHandleInformation(startup_info_.hStdOutput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
+    RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
+  }
+
+  if (!SetHandleInformation(startup_info_.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
+    RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
+  }
+
   /** Start the child process */
   if(!CreateProcess( NULL,   // No module name (use command line)
   (char*)(command.c_str()),        // Command line
@@ -37,9 +49,12 @@ void ProcessWindows::launchSubprocess() {
     RunnerUtils::runtimeException("CreateProcess() failed", GetLastError());
   }
 
-/* Parent doesn't write */
-err_pipe_->closeWrite();
-out_pipe_->closeWrite();
+  /* Close the pipes we passed on to the child */
+  err_pipe_->closeWrite();
+  out_pipe_->closeWrite();
+  if(in_pipe_) {
+    in_pipe_->closeRead();
+  }
 }
 /* Public */
 
@@ -52,13 +67,6 @@ ProcessWindows::ProcessWindows(const std::string& exec_name, const std::vector<s
   }
   err_pipe_ = PipeWindows::createNonBlockingPipe();
   in_pipe_ = nullptr;
-
-  if (!SetHandleInformation(static_cast<PipeWindows*>(out_pipe_)->getReadHandle(), HANDLE_FLAG_INHERIT, 0)) {
-    RunnerUtils::runtimeException("SetHandleInformation() failed", GetLastError());
-  }
-  if (!SetHandleInformation(static_cast<PipeWindows*>(err_pipe_)->getReadHandle(), HANDLE_FLAG_INHERIT, 0)) {
-    RunnerUtils::runtimeException("SetHandleInformation() failed", GetLastError());
-  }
 
   ZeroMemory(&startup_info_, sizeof(startup_info_));
   ZeroMemory(&process_information_, sizeof(process_information_));

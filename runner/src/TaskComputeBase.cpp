@@ -109,7 +109,6 @@ void TaskComputeBase::initialize() {
   }
 
   if (process_hashcat_ == nullptr) {
-    #ifdef PROCESSLINUX_HPP
     switch (attack_type) {
     case AT_PCFG: {
       if (process_external_generator_ == nullptr) {
@@ -128,60 +127,15 @@ void TaskComputeBase::initialize() {
     default:
       break;
     }
-    #endif
-
-#ifdef PROCESSWINDOWS_HPP
-    if (attack_type == AT_PCFG || attack_type == AT_Prince) {
-      File hashcat_executable;
-      File external_generator_executable;
-      directory_.findVersionedFile("hashcat", "exe", hashcat_executable);
-      std::string cmd = "cmd.exe";
-      std::string hashcat_relative_path = hashcat_executable.getRelativePath();
-      std::string external_generator_relative_path;
-      if (attack_type == AT_PCFG) {
-        directory_.findVersionedFile("pcfg", "exe",
-                                     external_generator_executable);
-      } else if (attack_type == AT_Prince) {
-        directory_.findVersionedFile("prince", "exe",
-                                     external_generator_executable);
-      }
-      external_generator_relative_path =
-          external_generator_executable.getRelativePath();
-
-      std::vector<std::string> cmd_arguments;
-      cmd_arguments.push_back("/C");
-      cmd_arguments.push_back(external_generator_relative_path);
-      cmd_arguments.insert(cmd_arguments.end(),
-                           external_generator_arguments_.begin(),
-                           external_generator_arguments_.end());
-      cmd_arguments.push_back("|");
-      cmd_arguments.push_back(hashcat_relative_path);
-      cmd_arguments.insert(cmd_arguments.end(), hashcat_arguments_.begin(),
-                           hashcat_arguments_.end());
-
-      if (attack_type == AT_PCFG) {
-        directory_.findVersionedFile("pcfg", "exe",
-                                     external_generator_executable);
-      } else if (attack_type == AT_Prince) {
-        directory_.findVersionedFile("prince", "exe",
-                                     external_generator_executable);
-      }
-      
-      process_hashcat_ = new ProcessWindows(cmd, cmd_arguments, true);
-    }
-#endif
 
     if (process_hashcat_ == nullptr)
       process_hashcat_ = Process::create(hashcat_arguments_, directory_);
 
-    
-    #ifdef PROCESSLINUX_HPP
+
     if (process_external_generator_) {
       assert(attack_type == AT_PCFG || attack_type == AT_Prince);
-      process_hashcat_->initInPipe();
       process_hashcat_->setInPipe(process_external_generator_->GetPipeOut());
     }
-    #endif
   }
 }
 
@@ -198,7 +152,6 @@ void TaskComputeBase::printProcessErr() {
 }
 
 void TaskComputeBase::startComputation() {
-  #ifdef PROCESSLINUX_HPP
   switch (attack_type) {
   case AT_Prince:
   case AT_PCFG: {
@@ -212,7 +165,6 @@ void TaskComputeBase::startComputation() {
   default:
     break;
   }
-  #endif
 
   if(!process_hashcat_->isRunning())
   {

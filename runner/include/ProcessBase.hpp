@@ -132,8 +132,6 @@ class ProcessBase {
          */
         virtual int run() = 0;
 
-        void initInPipe();
-
         void setInPipe(PipeBase *in_pipe);
 
         /**

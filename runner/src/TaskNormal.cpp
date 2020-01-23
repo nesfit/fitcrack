@@ -264,12 +264,6 @@ void TaskNormal::progress() {
     if (parseHashcatOutputLine(line)) {
 	    reportProgress();
 	  }
-
-#ifdef PROCESSWINDOWS_HPP
-    if (process_hashcat_->getExitCode() == ERROR_NO_MORE_ITEMS) {
-      break;
-    }
-#endif
   }
   PRINT_POSITION_IN_CODE();
 }
