@@ -20,6 +20,6 @@
 
 #include "boinc_api.h"
 
-#define RUNNER_VERSION "3.1.2"
+#define RUNNER_VERSION "3.1.2-" GIT_REV
 
 #endif // MAIN_HPP
