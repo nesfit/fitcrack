@@ -123,7 +123,15 @@ int  PipeWindows::writeMessage(std::string& message) {
   Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + "Pipe writing message : " + message);
 
   if (!WriteFile(write_, message.data(), message.length(), &written_chars, NULL)) {
-    RunnerUtils::runtimeException("WriteFile() failed", GetLastError());
+    DWORD error = GetLastError();
+    if(error == ERROR_BROKEN_PIPE)
+    {
+      return -1;
+    }
+    else
+    {
+      RunnerUtils::runtimeException("WriteFile() failed", GetLastError());
+    }
   }
 
   return written_chars;

@@ -84,7 +84,8 @@ class PipeBase {
         /**
          * @brief   Pure virtual function writing message to the pipe
          * @param   message [in] Message to write to pipe
-         * @return  Number of written characters
+         * @throws std::runtime_error When there is an unexpected error.
+         * @return  Number of characters written, or -1 (other end of pipe is closed).
          */
         virtual int writeMessage(std::string &message) = 0;
 };
