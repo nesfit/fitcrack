@@ -47,7 +47,7 @@
       />
     </div>
 
-    <v-toolbar
+    <!-- <v-toolbar
       dense
       flat
     >
@@ -72,7 +72,7 @@
           {{ viewHidden ? 'Stop hiding' : 'Hide' }}
         </v-btn>
       </v-toolbar-items>
-    </v-toolbar>
+    </v-toolbar> -->
 
     <v-data-table
       ref="table"

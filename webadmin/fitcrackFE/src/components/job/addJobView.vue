@@ -442,7 +442,7 @@
           justify="center"
           class="mb-5"
         >
-          <template-modal :data="jobSettings" />
+          <!-- <template-modal :data="jobSettings" /> -->
           <v-btn
             large
             color="primary"
@@ -612,6 +612,12 @@
         if (data === '') {
           return
         }
+        ///
+        const hashType = parseInt(this.hashtype.code)
+        if (hashType >= 17300 && hashType <= 18100) {
+          return // Until validator can deal with Hashcat 5 modes
+        }
+        ///
 
         this.axios.post(this.$serverAddr + '/job/verifyHash', {
           'hashtype': this.hashtype.code,
