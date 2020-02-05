@@ -138,17 +138,14 @@ void PipeLinux::redirectWrite(int target) {
 int PipeLinux::writeMessage(std::string& message) {
   Logging::debugPrint(Logging::Detail::CustomOutput, POSITION_IN_CODE + "Pipe writing message : " + message);
   int result = write(write_, message.data(), message.length());
-  if(result == -1)
-  {
-    if(errno == EPIPE)
-    {
+  if (result == -1) {
+    if (errno == EPIPE) {
       return -1;
-    }
-    else
-    {
+    } else {
       RunnerUtils::runtimeException("writeMessage: broken pipe", errno);
     }
   }
+  return result;
 }
 
 PipeBase *PipeLinux::createBlockingPipe() { return new PipeLinux(false); }

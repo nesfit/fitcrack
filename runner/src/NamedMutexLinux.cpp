@@ -15,14 +15,16 @@
 class NamedMutexHandle
 {
 public:
-	NamedMutexHandle(const std::string &name):
-		handle(open(("/tmp/FitcrackRunnerMutex_"+name).c_str(), O_CREAT|O_RDONLY|O_CLOEXEC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH))
-	{
-		if(handle == -1)
-		{
-			RunnerUtils::runtimeException("Failed to create a file for mutual exclusion purposes", errno);
-		}
-	}
+	NamedMutexHandle(const std::string &name) {
+          std::string runner_mutex = "/tmp/FitcrackRunnerMutex_" + name;
+          handle =
+              open(runner_mutex.c_str(), O_CREAT | O_RDONLY | O_CLOEXEC,
+                   S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+          if (handle == -1) {
+            RunnerUtils::runtimeException(
+                "Failed to create a file for mutual exclusion purposes", errno);
+          }
+        }
 	~NamedMutexHandle()
 	{
 		close(handle);

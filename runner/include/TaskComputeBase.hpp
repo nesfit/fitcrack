@@ -28,7 +28,7 @@ class TaskComputeBase: public TaskBase {
         ProcessBase *process_external_generator_; /** < Pointer to pcfg manager/princepreprocessor process executing the task */
         ProcessBase *parent_process_; /** < Pointer to parent process */
 
-        NamedMutex hashcatMutex_;
+        NamedMutex hashcat_mutex_;
 
         enum AttackType attack_type;
 

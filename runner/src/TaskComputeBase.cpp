@@ -43,7 +43,7 @@ TaskComputeBase::TaskComputeBase(
   attack_(nullptr),
   process_hashcat_(nullptr),
   process_external_generator_(nullptr),
-  hashcatMutex_("FitcrackRunnerHashcatMutex"),
+  hashcat_mutex_("FitcrackRunnerHashcatMutex"),
   attack_type(Attack::detectAttackType(task_config_))
 {}
 
@@ -58,7 +58,7 @@ TaskComputeBase::TaskComputeBase(
   attack_(nullptr),
   process_hashcat_(nullptr),
   process_external_generator_(nullptr),
-  hashcatMutex_("FitcrackRunnerHashcatMutex"),
+  hashcat_mutex_("FitcrackRunnerHashcatMutex"),
   attack_type(Attack::detectAttackType(task_config_))
 {}
 
@@ -168,7 +168,7 @@ void TaskComputeBase::startComputation() {
 
   if(!process_hashcat_->isRunning())
   {
-    hashcatMutex_.lock();
+    hashcat_mutex_.lock();
     process_hashcat_->run();
     Logging::debugPrint(Logging::Detail::GeneralInfo,
                         "Hashcat process has started.");
