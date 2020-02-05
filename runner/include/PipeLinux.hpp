@@ -50,6 +50,14 @@ class PipeLinux : public PipeBase {
         int readChar(char& c);
 
         /**
+         * @brief reads a char from the pipe. Blocks if it is not available
+         * 
+         * @return char The read character or EOF if the pipe has been closed
+         * @throws std::runtime_error on other errors
+         */
+        int readChar();
+
+        /**
          * @brief   Redirects end of the pipe to the target
          * @param   pipe_end [in] File descriptor of the end of pipe (write_,
          * read_)

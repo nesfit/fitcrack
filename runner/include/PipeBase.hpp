@@ -35,6 +35,14 @@ class PipeBase {
          * @return  Number of read characters
          */
         virtual int readChar(char &c) = 0;
+
+        /**
+         * @brief reads a char from the pipe. Blocks if it is not available
+         * 
+         * @return char The read character or EOF if the pipe has been closed
+         * @throws std::runtime_error on other errors
+         */
+        virtual int readChar() = 0;
     public:
     virtual ~PipeBase() {}
 
@@ -79,7 +87,7 @@ class PipeBase {
          * @brief   Reads line from the pipe
          * @return  Read line
          */
-        std::string readLine(ProcessBase* process_ = nullptr);
+        std::string readLine();
 
         /**
          * @brief   Pure virtual function writing message to the pipe
@@ -88,6 +96,7 @@ class PipeBase {
          * @return  Number of characters written, or -1 (other end of pipe is closed).
          */
         virtual int writeMessage(std::string &message) = 0;
+
 };
 
 #endif //NAMEDPIPE_HPP

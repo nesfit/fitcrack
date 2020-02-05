@@ -58,14 +58,10 @@ void ProcessWindows::launchSubprocess() {
 }
 /* Public */
 
-ProcessWindows::ProcessWindows(const std::string& exec_name, const std::vector<std::string>& exec_args, bool isExternalGenerator) : ProcessBase(exec_name, exec_args) {
+ProcessWindows::ProcessWindows(const std::string& exec_name, const std::vector<std::string>& exec_args, bool) : ProcessBase(exec_name, exec_args) {
 
-  if (isExternalGenerator) {
-    out_pipe_ = PipeWindows::createBlockingPipe();
-  } else {
-    out_pipe_ = PipeWindows::createNonBlockingPipe();
-  }
-  err_pipe_ = PipeWindows::createNonBlockingPipe();
+  out_pipe_ = PipeWindows::createBlockingPipe();
+  err_pipe_ = PipeWindows::createBlockingPipe();
   in_pipe_ = nullptr;
 
   ZeroMemory(&startup_info_, sizeof(startup_info_));

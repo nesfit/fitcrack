@@ -19,6 +19,7 @@ void ProcessLinux::launchSubprocess() {
   out_pipe_->closeRead();
   err_pipe_->closeRead();
 
+  //FD_CLOEXEC is set on the originals, but that's OK since dup doesn't copy that. New descriptors are not closed on exec
   /** Redirect childs stdout and stderr to the pipes */
   reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
   reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));

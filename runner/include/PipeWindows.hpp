@@ -50,6 +50,14 @@ class PipeWindows : public PipeBase {
          */
         int readChar(char& c);
 
+        /**
+         * @brief reads a char from the pipe. Blocks if it is not available
+         * 
+         * @return char The read character or EOF if the pipe has been closed
+         * @throws std::runtime_error on other errors
+         */
+        int readChar();
+
 
         /**
          * @brief   Constructor which creates the unblocking Linux pipe

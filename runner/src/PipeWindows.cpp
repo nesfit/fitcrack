@@ -63,19 +63,27 @@ int PipeWindows::readChar(char& c) {
   Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Characters to read: " + RunnerUtils::toString(n_read_chars));
 
   if (n_read_chars >= read_size) {
-    if (ReadFile(read_, &c, read_size, &n_read_chars, NULL) == 0) {
-      // TODO: refactor
-      if ((error_ = GetLastError()) == ERROR_BROKEN_PIPE) {
-        Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Got ERROR_BROKEN_PIPE: ");
-      } else {
-        RunnerUtils::runtimeException("ReadFile() failed", GetLastError());
-      }
-    }
+    //call the blocking version since we know a char is ready
+    c = readChar();
     Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Characters read: " + RunnerUtils::toString(n_read_chars));
     return n_read_chars;
   } else {
     return -1;
   }
+}
+
+int PipeWindows::readChar()
+{
+  DWORD n_read_chars;
+  char c;
+  if (ReadFile(read_, &c, sizeof(c), &n_read_chars, NULL) == 0) {
+    if ((error_ = GetLastError()) == ERROR_BROKEN_PIPE) {
+      return EOF;
+    } else {
+      RunnerUtils::runtimeException("ReadFile() failed", GetLastError());
+    }
+  }
+  return c;
 }
 
 /* Public */

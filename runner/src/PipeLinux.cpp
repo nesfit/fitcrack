@@ -7,6 +7,8 @@
 
 #include "PipeLinux.hpp"
 
+#include <poll.h>
+
 /* Private */
 
 bool PipeLinux::isEndOpen(int file_descriptor) const {
@@ -47,6 +49,13 @@ void PipeLinux::createPipe(bool is_NONBLOCK_) {
     }
     else{
       if (fcntl(file_descriptor[0], F_SETFL, fcntl(file_descriptor[0], F_GETFL)) < 0) {
+        RunnerUtils::runtimeException("fcntl failed", errno);
+      }
+    }
+    //make sure descriptors are not inherited accidentally
+    for(int i = 0; i < 2; ++i)
+    {
+      if (fcntl(file_descriptor[i], F_SETFD, fcntl(file_descriptor[i], F_GETFD)|FD_CLOEXEC) < 0) {
         RunnerUtils::runtimeException("fcntl failed", errno);
       }
     }
@@ -97,6 +106,33 @@ int PipeLinux::readChar(char& c) {
   }
 
   return n_read_chars;
+}
+
+int PipeLinux::readChar()
+{
+  pollfd pollstruct;
+  pollstruct.fd = read_;
+  pollstruct.events = POLLIN;
+  pollstruct.revents = 0;
+  do
+  {
+    int res = poll(&pollstruct, 1, -1);
+    if(res == -1 && errno != EINTR)
+    {
+      RunnerUtils::runtimeException("poll failed unexpectedly", errno);
+    }
+  } while((pollstruct.revents&(POLLHUP|POLLIN)) == 0);
+  char c;
+  int res;
+  if((res = readChar(c)) != 1)
+  {
+    if(res == 0)
+    {
+      return EOF;
+    }
+    RunnerUtils::runtimeException("readChar failed even when pipe should be readable", errno);
+  }
+  return c;
 }
 
 /* Public */
