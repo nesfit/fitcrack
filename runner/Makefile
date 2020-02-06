@@ -12,7 +12,7 @@ GIT_REV=$(shell git rev-parse HEAD)
 CXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -pedantic -lboinc_api -lboinc -lzip -lz -static-libgcc -static-libstdc++ 
 CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'  
 ## Release
-LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -Wno-c++11-compat -O3 -flto -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -Wno-c++11-compat -O3 -flto -s -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 ## Debug
 # LDXXFLAGS=-Wall -Wextra -Wno-c++11-compat -g -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 
