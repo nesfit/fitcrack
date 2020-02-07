@@ -705,7 +705,7 @@
           return
         }
 
-        if (this.attack_settings === false) {
+        if (this.attackSettings === false) {
           this.$error('Error in attack settings.')
           return
         }
