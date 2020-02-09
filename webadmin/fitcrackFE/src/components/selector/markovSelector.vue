@@ -18,7 +18,7 @@
       <v-simple-checkbox
         :value="isSelected"
         :disabled="markovSubmode == 0"
-        @change="select"
+        @input="select"
       />
     </template>
     <template v-slot:item.time="{ item }">
