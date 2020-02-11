@@ -82,6 +82,15 @@ const appRoutes = [
     }
   },
   {
+    path: '/templates',
+    name: 'templates',
+    component: jobs,
+    meta: {
+      title: 'Job templates',
+      icon: 'mdi-file'
+    }
+  },
+  {
     path: '/hosts',
     name: 'hosts',
     component: hosts,
@@ -246,7 +255,7 @@ const rt = new Router({
 })
 
 rt.afterEach((to, from) => {
-  const project = rt.app.store.project || 'Fitcrack'
+  const project = rt.app.$store.state.project || 'Fitcrack'
   if (to.meta.title) {
     document.title = `${to.meta.title} – ${project}`
   } else {

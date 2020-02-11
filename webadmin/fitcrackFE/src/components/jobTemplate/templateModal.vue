@@ -10,9 +10,11 @@
   >
     <template #activator="{ on }">
       <v-btn
+        :disabled="!validTemplate"
         large
         color="primary"
         v-on="on"
+        @click="nameMe"
       >
         <v-icon left>
           mdi-file-plus
@@ -22,7 +24,6 @@
 
     <v-card>
       <v-card-title
-        class="headline grey lighten-2"
         primary-title
       >
         Job template
@@ -30,14 +31,7 @@
 
       <v-card-text>
         <!-- <json-viewer :value="data" ></json-viewer> -->
-        <v-text-field
-          id="templateName"
-          v-model="data.name"
-          name="templateName"
-          label="Template name"
-        />
-
-        <div class="flex">
+        <div class="flex mb-3">
           <v-icon left>
             info
           </v-icon>
@@ -46,9 +40,16 @@
             You can pre-fill any new job configuration with templates you saved.
           </div>
         </div>
+        <v-text-field
+          id="templateName"
+          v-model="name"
+          name="templateName"
+          outlined
+          dense
+          hide-details
+          label="Template name"
+        />
       </v-card-text>
-
-      <v-divider />
 
       <v-card-actions>
         <v-spacer />
@@ -71,31 +72,41 @@
 </template>
 
 <script>
+  import {mapGetters} from 'vuex'
+
   export default {
     name: "TemplateModal",
     props: {
-      data: {
-        type: Object,
-        default: null
-      },
-    },
-    data() {
-      return {
-        dialog: false
+      inheritedName: {
+        type: String,
+        default: ''
       }
     },
+    data () {
+      return {
+        dialog: false,
+        name: ''
+      }
+    },
+    computed: mapGetters('jobForm', ['validTemplate']),
     methods: {
       submit() {
-        console.log(this.data)
+        const template = this.$store.getters['jobForm/makeTemplate'](this.name)
+        console.log(template)
         this.loading = true
-        this.axios.post(this.$serverAddr + '/template', this.data).then((response) => {
-          console.log(response.data)
+        this.axios.post(this.$serverAddr + '/template', template).then((response) => {
+          this.$emit('templatesUpdated')
         }).catch((error) => {
           this.loading = false
         })
         this.dialog = false
+      },
+      nameMe () {
+        if (this.name === '') {
+          this.name = this.inheritedName
+        }
       }
-    },
+    }
   }
 </script>
 

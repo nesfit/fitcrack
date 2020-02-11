@@ -63,10 +63,8 @@
           this.items = response.data.items
           this.loading = false
         })
-      },
-      updateSelected() {
-        this.$emit('input', this.selected[0])
       }
+      // EMIT OBJ
     }
   }
 </script>

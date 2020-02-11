@@ -6,7 +6,7 @@
 const UserPlugin = {
   install(Vue) {
     Vue.prototype.$logoutUser = function () {
-      this.$store.user = {
+      this.$store.state.user = {
         'userData': {
           'id': null,
           'username': null,
@@ -30,8 +30,8 @@ const UserPlugin = {
     };
 
     Vue.prototype.$logInUser = function (user) {
-      this.$store.user.userData = user;
-      this.$store.user.loggedIn = true;
+      this.$store.state.user.userData = user;
+      this.$store.state.user.loggedIn = true;
       console.log('logged IN!!!')
       const redirect = sessionStorage.getItem('loginRedirect')
       sessionStorage.removeItem('loginRedirect')
@@ -61,11 +61,11 @@ const UserPlugin = {
     Vue.prototype.$username = this.name;
 
     Vue.prototype.$userCanManageUsers = function () {
-      return this.$store.user.userData.role.MANAGE_USERS
+      return this.$store.state.user.userData.role.MANAGE_USERS
     };
 
     Vue.prototype.$userCanAddJob = function () {
-      return this.$store.user.userData.role.ADD_NEW_JOB
+      return this.$store.state.user.userData.role.ADD_NEW_JOB
     }
 
     Vue.prototype.$error = function (message) {

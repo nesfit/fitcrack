@@ -4,47 +4,71 @@
 '''
 
 import logging
+import json
+
+from flask import request
+
 from flask_restplus import Resource
+from flask_restplus import reqparse
 
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
-from src.api.fitcrack.endpoints.rule.responseModels import rule_model
+from src.api.fitcrack.endpoints.jobTemplate.responseModels import templates_model, template_data
 from src.api.fitcrack.responseModels import simpleResponse
+
+from src.database import db
+from src.database.models import FcTemplate
 
 log = logging.getLogger(__name__)
 ns = api.namespace('template', description='Endpoints for job templates.')
 
+add_model = api.schema_model('add_template', {'properties': {'template': {'type': 'string'}}})
 
+#add_template_args = reqparse.RequestParser()
+#add_template_args.add_argument('template', type=str, help='name of the template', required=True, location='json')
 
 @ns.route('')
-class ruleCollection(Resource):
+class template(Resource):
 
+    @api.expect(add_model)
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Upload job template on server.
+        Add a job template.
         """
-        pass
 
-    @api.marshal_with(hcStatsCollection_model)
+        data = request.json
+        template = FcTemplate(name=data['template'], template=data)
+        try:
+            db.session.add(template)
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'Couldn\'t add template.')
+        return {
+            'status': True,
+            'message': 'Template ' + data['template'] + ' added.'
+        }
+
+    @api.marshal_with(templates_model)
     def get(self):
         """
-        Returns collection of HcStats files.
+        Returns collection of job templates.
         """
-        pass
-        #return {'items': FcRule.query.filter(FcRule.deleted == False).all()}
+        return {'items': FcTemplate.query.all()}
 
 
 @ns.route('/<id>')
-class rule(Resource):
+class templateData(Resource):
 
+    @api.marshal_with(template_data)
     def get(self, id):
         """
-        Returns template.
+        Returns a template with its job settings.
         """
-
-
-        return {
-            'name': 'test',
-            'data': '{"hosts_ids":[{"id":1,"domain_name":"DESKTOP-B22HVA6","ip_address":"10.0.75.1","p_model":"Intel(R) Core(TM) i3-8350K CPU @ 4.00GHz [Family 6 Model 158 Stepping 11]","os_name":"Microsoft Windows 10","user":{"name":"Matus"},"last_active":{"last_seen":"2018-08-07 14:14:25","seconds_delta":"6","online":true},"deleted":false}],"seconds_per_job":3600,"attack_settings":{"attack_mode":0,"attack_name":"dict","rules":{"id":2,"name":"fitcrack.txt","time":"2018-08-07T13:16:33"},"left_dictionaries":[{"id":1,"name":"hashcatForumPassword.txt","keyspace":100,"time":"2018-08-07T11:52:50"},{"id":2,"name":"reverseRules.txt","keyspace":100,"time":"2018-08-07T13:26:42"}]},"hash_settings":{"hash_type":"0"}}'
-        }
+        template = FcTemplate.query.get(id)
+        if template is None:
+            abort(404, 'No such template')
+        else:
+            return {
+                'template': json.dumps(template.template) # uhm...
+            }

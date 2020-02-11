@@ -21,6 +21,7 @@ export default {
   },
   mounted() {
     this.getData()
+    if (this.value) this.selected = this.value
   },
   methods: {
     getData() {
@@ -28,6 +29,11 @@ export default {
     },
     updateSelected() {
       this.$emit('input', this.selected)
+    }
+  },
+  watch: {
+    value (val) {
+      this.selected = val
     }
   }
 }

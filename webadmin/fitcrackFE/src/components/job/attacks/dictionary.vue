@@ -9,7 +9,7 @@
       <span>Select dictionary<span class="required primary--text"> *</span></span>
     </v-card-title>
     <dict-selector
-      v-model="dictionaries"
+      v-model="leftDicts"
       @input="checkValid"
     />
 
@@ -27,45 +27,20 @@
 <script>
   import dictSelector from '@/components/selector/dictionarySelector'
   import ruleSelector from '@/components/selector/rulesSelector'
+
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
   export default {
     name: "Dictionary",
     components: {
       'dict-selector': dictSelector,
       'rules-selector': ruleSelector
     },
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
-    data: function () {
-      return {
-        attackId: 0,
-        attackName: 'dict',
-        valid: false,
-
-        dictionaries: [],
-        rules: null,
-      }
-    },
-    watch:{
-      value: function(){
-        if (this.value.left_dictionaries)
-          this.dictionaries = this.value.left_dictionaries
-        if (this.value.rules)
-          this.rules = this.value.rules
-      }
-    },
+    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules'])),
     methods: {
       checkValid: function () {
-        if (this.dictionaries.length > 0) {
-          this.$emit('input', {
-            'attack_mode': this.attackId,
-            'attack_name': this.attackName,
-            'rules': this.rules,
-            'left_dictionaries': this.dictionaries
-          })
+        if (this.leftDicts.length > 0) {
           return true
         }
         return false
