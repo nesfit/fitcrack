@@ -26,7 +26,7 @@
       </router-link>
     </template>
     <template v-slot:item.time_added="{ item }">
-      {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+      {{ $moment(item.time_added).format('DD.MM.YYYY HH:mm') }}
     </template>
   </v-data-table>
 </template>
