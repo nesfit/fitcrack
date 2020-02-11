@@ -32,6 +32,7 @@ host_status_text_to_code_dict = {
     3: 'done',
     4: 'error.'
 }
+
 statuses = {
     'ready': 0,
     'finished': 1,
@@ -41,4 +42,12 @@ statuses = {
     'running': 10,
     'validating': 11,
     'finishing': 12
+}
+
+attack_modes = {
+    'dictionary': 0,
+    'combinator': 1,
+    'mask': 3,
+    'prince': 8,
+    'pcfg': 9
 }
