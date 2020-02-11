@@ -268,7 +268,7 @@ def process_job_7(job):
     job['attack_name'] = 'hybrid (Mask + Wordlist)'
     job['hc_keyspace'] = dictsLeftKeyspace
     job['keyspace'] = keyspace
-    job['attack_settings']['attack_mode'] = 3
+    job['attack_settings']['attack_mode'] = 1
     return job
 
 
