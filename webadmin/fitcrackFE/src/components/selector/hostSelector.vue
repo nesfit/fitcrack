@@ -17,7 +17,7 @@
     <template v-slot:item.domain_name="{ item }">
       <router-link
         :to="{ name: 'hostDetail', params: {id: item.id} }"
-        class="middle"
+        class="middle" target='_blank'
       >
         {{ item.domain_name + ' (' + item.user.name + ')' }}
         <v-icon 
