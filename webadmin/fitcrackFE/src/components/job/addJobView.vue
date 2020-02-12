@@ -406,10 +406,22 @@
         </v-stepper>
 
         <v-row
+          v-if="hosts.length == 0"
+          justify="center"
+        >
+          <v-alert
+            outlined
+            type="warning"
+          >
+            This job has no hosts assigned to it and won't be able to run until edited!
+          </v-alert>
+        </v-row>
+
+        <v-row
           justify="center"
           class="mb-5"
         >
-          <template-modal 
+          <template-modal
             :inherited-name="name"
             @templatesUpdated="fetchTemplates"
           />
@@ -421,8 +433,9 @@
             @click="submit"
           >
             <v-icon left>
-              mdi-check
-            </v-icon>Submit
+              {{ hosts.length > 0 ? 'mdi-check' : 'mdi-content-save' }}
+            </v-icon>
+            {{ hosts.length > 0 ? 'Create' : 'Save for later' }}
           </v-btn>
         </v-row>
       </v-col>

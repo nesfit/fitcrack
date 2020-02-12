@@ -115,6 +115,13 @@
           :to="{ name: 'jobDetail', params: { id: item.id } }"
           class="middle"
         >
+          <v-icon
+            v-if="item.host_count == 0"
+            left
+            color="warning"
+          >
+            mdi-desktop-classic
+          </v-icon>
           {{ item.name }}
         </router-link>
       </template>
@@ -158,7 +165,7 @@
               <v-btn
                 icon
                 class="mx-0"
-                :disabled="item.status !== '0'"
+                :disabled="item.status !== '0' || item.host_count == 0"
                 v-on="on"
                 @click="operateJob(item.id, 'start')"
               >

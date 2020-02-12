@@ -48,6 +48,9 @@
   export default {
     name: "HostSelector",
     mixins: [selector],
+    props: {
+      autoRefresh: Boolean
+    },
     data() {
       return {
         headers: [
@@ -62,6 +65,14 @@
           {text: 'Online', value: 'last_active', align: 'end', sortable: false},
         ]
       }
+    },
+    mounted () {
+      this.interval = setInterval(() => {
+        if (this.autoRefresh) this.getData()
+      }, 2000)
+    },
+    beforeDestroy () {
+      clearInterval(this.interval)
     },
     methods: {
       getData() {
@@ -86,7 +97,7 @@
           return 'Unknown'
         }
       }
-    },
+    }
   }
 </script>
 

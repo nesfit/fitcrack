@@ -245,6 +245,10 @@ class FcJob(Base):
     grammar_id = Column(BigInteger, nullable=False)
 
     @hybrid_property
+    def host_count(self):
+        return len(self.hosts)
+
+    @hybrid_property
     def hash_type_name(self):
         return getHashById(str(self.hash_type))['name']
 
