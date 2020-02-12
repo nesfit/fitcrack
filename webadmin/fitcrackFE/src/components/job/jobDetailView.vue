@@ -646,7 +646,8 @@
       <v-card class="mb-5">
         <host-selector 
           v-model="newHostsMapping" 
-          select-all 
+          select-all
+          :auto-refresh="editHostsDialog"
         />
         <v-card-actions>
           <v-spacer />
