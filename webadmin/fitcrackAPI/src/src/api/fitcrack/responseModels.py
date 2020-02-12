@@ -73,6 +73,7 @@ job_short_model = api.model('Job short', {
     'priority': fields.Integer(),
     'attack_mode': fields.String(required=True),
     'attack': fields.String(required=True),
+    'host_count': fields.Integer(),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),

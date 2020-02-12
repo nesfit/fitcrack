@@ -102,7 +102,7 @@ export default {
     valid (state, { attackSettings }) {
       return (
         state.attackSettingsTab &&
-        state.hosts.length > 0 &&
+        // state.hosts.length > 0 &&
         attackSettings &&
         state.hashType !== null &&
         state.name !== ''
@@ -113,7 +113,7 @@ export default {
       return Object.keys(state)
         .filter(key => keys.includes(key))
         .reduce((obj, key) => {
-          if (JSON.stringify(state[key]) !== JSON.stringify(empty[key]) || key === 'masks') {
+          if (JSON.stringify(state[key]) !== JSON.stringify(empty[key]) || ( key === 'masks' && state.masks[0] !== '' )) {
             obj[key] = state[key]
           }
           return obj
