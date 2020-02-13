@@ -320,13 +320,13 @@ CREATE TABLE IF NOT EXISTS `fc_job_graph` (
 -- Štruktúra tabuľky pre tabuľku `fc_template`
 --
 
-CREATE TABLE `fc_template` (
+CREATE TABLE IF NOT EXISTS `fc_template` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `template` json NOT NULL,
+  `template` longtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
