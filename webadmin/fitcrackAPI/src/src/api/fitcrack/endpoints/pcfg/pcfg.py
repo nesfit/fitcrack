@@ -37,7 +37,6 @@ ns = api.namespace(
 
 ALLOWED_EXTENSIONS = set(['zip'])
 
-#dictionaryCollection -> pcfgCollection
 @ns.route('')
 class pcfgCollection(Resource):
 
@@ -46,12 +45,9 @@ class pcfgCollection(Resource):
         """
         Returns collection of pcfg
         """
-        #pcfgs = getFilesFromFolder(
-        #    PCFG_DIR, FcPcfg, readingFromFolderPostProcces)
         return {'items': FcPcfg.query.filter(FcPcfg.deleted == False).all()}
 
 
-#dictionary -> pcfg
 @ns.route('/<id>')
 class pcfg(Resource):
 

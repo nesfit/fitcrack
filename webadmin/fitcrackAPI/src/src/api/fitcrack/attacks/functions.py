@@ -10,7 +10,7 @@ import time
 from flask_restplus import abort
 from werkzeug.utils import secure_filename
 
-from settings import DICTIONARY_DIR, MASK_PROCESSOR_PATH
+from settings import DICTIONARY_DIR, MASK_PROCESSOR_PATH, HASHCAT_EXECUTABLE
 from src.api.fitcrack.functions import shellExec
 from src.database import db
 from src.database.models import FcDictionary
@@ -23,8 +23,6 @@ def make_dict_from_mask(mask, filename=None):
     filename = secure_filename(filename)
     path = os.path.join(DICTIONARY_DIR, filename)
 
-    print(MASK_PROCESSOR_PATH + ' ' + mask + ' -o ' + path)
-    print(shellExec(MASK_PROCESSOR_PATH + ' ' + mask + ' -o ' + path))
     dictionary = FcDictionary(name=filename, path=filename, keyspace=compute_keyspace_from_mask(mask), deleted=True)
     db.session.add(dictionary)
     db.session.commit()
@@ -61,6 +59,33 @@ def compute_keyspace_from_mask(mask, charsetsSize=[]):
 
     return keyspace
 
+def compute_keyspace_from_mask_with_treshold(mask, markovTreshold, charsetsSize=[]):
+
+    keyspaceWithTreshhold = 1
+    nextCharSymbol = False
+    for char in mask:
+        if nextCharSymbol:
+
+            if keyspace_dict.get(char, None) <= markovTreshold:
+                    multiplier = keyspace_dict.get(char, None)
+            else:   multiplier = markovTreshold
+            try:
+                if int(char) >= 1 and int(char) <= 4:
+                    multiplier = charsetsSize.get(int(char), None)
+            except ValueError:
+                pass
+
+            if not multiplier:
+                continue
+            keyspaceWithTreshhold *= multiplier
+            nextCharSymbol = False
+            continue
+        if char == '?':
+            nextCharSymbol = True
+        else:
+            nextCharSymbol = False
+
+    return keyspaceWithTreshhold
 
 keyspace_dict = {
     'l': 26,
@@ -79,5 +104,3 @@ def coun_file_lines(fname):
         for i, l in enumerate(f):
             pass
     return i + 1
-
-

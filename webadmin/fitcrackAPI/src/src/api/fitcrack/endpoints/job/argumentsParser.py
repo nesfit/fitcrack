@@ -3,20 +3,12 @@
    * Licence: MIT, see LICENSE
 '''
 
-'''
-packageList_parser => jobList_parser
-addPackage_model => addJob_model
-packageOperation => jobOperation
-editPackage_argument => editJob_argument
-'''
 
 from flask_restplus import reqparse, inputs
-
 from settings import SECONDS_PER_JOB
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
 
-# packageList_parser => jobList_parser
 jobList_parser = pagination.copy()
 jobList_parser.add_argument('name', type=str, required=False, help='filtrovanie balíkov podľa názvu')
 jobList_parser.add_argument('status', type=str, required=False, help='filtrovanie podľa stavu jobu',
@@ -26,7 +18,6 @@ jobList_parser.add_argument('order_by', type=str, required=False, help='zoradeni
                                 choices=['name', 'time', 'progress', 'attack_mode', 'status'])
 jobList_parser.add_argument('descending', type=inputs.boolean, required=False)
 jobList_parser.add_argument('showDeleted', type=inputs.boolean, required=False, default=False)
-
 
 jobWorkunit_parser = pagination.copy()
 
@@ -41,7 +32,6 @@ crackingTime_argument.add_argument('hash_type_code', type=str, required=True, he
 crackingTime_argument.add_argument('boinc_host_ids', type=str, required=True, help='id hostov')
 crackingTime_argument.add_argument('attack_settings', required=True)
 
-# addPackage_model => addJob_model
 addJob_model = api.schema_model('addJob', {
     "required": ["name"],
     'properties': {
@@ -230,17 +220,12 @@ addJob_model = api.schema_model('addJob', {
 })
 
 
-
-
-# packageOperation => jobOperation
 jobOperation = reqparse.RequestParser()
 jobOperation.add_argument('operation', type=str, required=True,  help='operácia s job',
                        choices=["start", "stop", "restart", "kill"])
 
 editHostMapping_argument = reqparse.RequestParser()
 editHostMapping_argument.add_argument('newHost_ids', type=list, required=True, location='json')
-
-# editPackage_argument => editJob_argument
 editJob_argument = reqparse.RequestParser()
 editJob_argument.add_argument('name', type=str, required=True)
 editJob_argument.add_argument('comment', type=str, required=True)

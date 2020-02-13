@@ -45,8 +45,6 @@ class serverInfo(Resource):
         except:
             abort(500, 'Can not load ' + url)
 
-
-
         xml = response.read().decode("utf8")
         tree = ET.ElementTree(ET.fromstring(xml)).getroot().find('daemon_status')
 
@@ -58,6 +56,7 @@ class serverInfo(Resource):
             })
 
         return {'subsystems': result}
+
 
 @ns.route('/control')
 class serverOperation(Resource):

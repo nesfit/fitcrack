@@ -116,6 +116,12 @@ class JobByID(Resource):
         """
 
         job = FcJob.query.filter(FcJob.id == id).one()
+
+        if int(job.grammar_id) != 0:
+            pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
+            job.grammar_name = pcfg.name
+            job.grammar_keyspace = pcfg.keyspace
+
         return job
 
     @api.expect(editJob_argument)
@@ -197,7 +203,9 @@ class OperationWithJob(Resource):
             db.session.add(FcJobGraph(progress=0, job_id=job.id))
         elif action == 'kill':
             # Job is stopped in Generator after sending BOINC commands
-            # job.status = 0
+            if (int(job.status) != 10) and (int(job.status) != 12):
+                job.status = 0
+                print("done")
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0
