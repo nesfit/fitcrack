@@ -358,7 +358,7 @@ function confirm($fds, $v) {
     if ($v->beta) echo "        beta\n";
     if ($v->file_prefix) echo "        file prefix: $v->file_prefix\n";
     echo "        API version: $v->api_version\n";
-    return true
+    return true;
 }
 
 function get_bool($xml_element, $name) {
