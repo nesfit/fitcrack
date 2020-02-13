@@ -34,7 +34,7 @@ from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashForma
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, job_nano_list_model
 from src.api.fitcrack.functions import shellExec
-from src.api.fitcrack.lang import statuses, job_status_text_to_code_dict
+from src.api.fitcrack.lang import statuses, job_status_text_to_code_dict, attack_modes
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg, FcJobStatus
@@ -72,6 +72,10 @@ class jobsCollection(Resource):
             statusCode = statuses[args.status]
             jobs_query = jobs_query.filter_by(status=statusCode)
 
+        if args.attack_mode:
+            attack_code = attack_modes[args.attack_mode]
+            jobs_query = jobs_query.filter_by(attack_mode=attack_code)
+
         if args.order_by:
             orderBy = getattr(FcJob, args.order_by)
             if args.descending:
@@ -99,7 +103,7 @@ class jobsCollection(Resource):
         job = create_job(data)
 
         return {
-            'message': 'Job ' + job.name + ' succesful created.',
+            'message': 'Job ' + job.name + ' succesfuly created.',
             'status': True,
             'job_id': job.id
         }

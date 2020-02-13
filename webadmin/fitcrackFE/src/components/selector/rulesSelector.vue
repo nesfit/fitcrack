@@ -15,7 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'ruleDetail', params: { id: item.id}}">
+      <router-link :to="{name: 'ruleDetail', params: { id: item.id}}" target='_blank'>
         {{ item.name }}
         <v-icon 
           small
@@ -36,12 +36,6 @@
   export default {
     name: "RulesSelector",
     mixins: [selector],
-    props: {
-      value: {
-        type: Object,
-        default: () => ({})
-      }
-    },
     data() {
       return {
         headers: [
@@ -61,18 +55,8 @@
           this.items = response.data.items
           this.loading = false
         })
-      },
-      updateSelected(rule) {
-    /*    if(this.selected == id){
-          this.selected = 0
-          //TODO here goes something for JSON update (set rule to null)
-        this.$emit('input', null)
       }
-        else{*/
-          //this.selected = id
-          this.$emit('input', this.selected[0])
-    //    } WHAT??
-      }
+      // EMIT OBJ
     },
   }
 </script>

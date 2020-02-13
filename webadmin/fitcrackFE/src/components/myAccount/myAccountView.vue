@@ -75,8 +75,8 @@
       name: "MyAccount",
       data: function() {
        return {
-          username: this.$store.user.userData.username,
-          mail: this.$store.user.userData.mail,
+          username: this.$store.state.user.userData.username,
+          mail: this.$store.state.user.userData.mail,
           oldPassword: null,
           newPassword0: null,
           newPassword1: null

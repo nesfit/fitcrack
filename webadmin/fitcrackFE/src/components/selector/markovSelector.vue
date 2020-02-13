@@ -14,7 +14,7 @@
     :single-select="!selectAll"
     @input="updateSelected"
   >
-    <template v-slot:item.data-table-select="{ select, isSelected }">
+    <template v-slot:item.data-table-select="{ select, isSelected }" target='_blank'>
       <v-simple-checkbox
         :value="isSelected"
         :disabled="markovSubmode == 0"

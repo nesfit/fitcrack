@@ -8,41 +8,36 @@
     <v-card-title class="pb-0">
       <span>Type masks<span class="required primary--text"> *</span></span>
     </v-card-title>
-    <v-expansion-panels
-      v-model="editedMaskIdx"
-      popout
+    <v-row
+      v-for="(mask, i) in masks"
+      :key="i"
+      align="center"
+      class="width100 fill-height"
     >
-      <v-row
-        v-for="(mask, i) in masks"
-        :key="i"
-        align="center"
-        class="width100 fill-height"
+      <v-col>
+        <mask-single
+          :value="mask"
+          :custom-charsets="charset"
+          @input="e => updateMask({index: i, val: e})"
+        />
+      </v-col>
+      <v-btn
+        text
+        color="error"
+        icon
+        small
+        @click="deleteMask(i)"
       >
-        <v-col>
-          <mask-single
-            v-model="masks[i]"
-            :custom-charsets="charsets"
-            @input="checkValid"
-          />
-        </v-col>
-        <v-btn
-          text
-          color="error"
-          icon
-          small
-          @click="deleteMask(i)"
-        >
-          <v-icon>close</v-icon>
-        </v-btn>
-      </v-row>
-    </v-expansion-panels>
+        <v-icon>close</v-icon>
+      </v-btn>
+    </v-row>
     <div>
       <v-btn
         class="mx-auto d-block"
         color="success"
         icon
         small
-        @click="addMask"
+        @click="addMask()"
       >
         <v-icon>add</v-icon>
       </v-btn>
@@ -66,7 +61,7 @@
           <span>Select charsets (max. 4)</span>
         </v-card-title>
         <charset-selector
-          @input="setCharsets"
+          v-model="charset"
         />
       </v-col>
       <v-col cols="6">
@@ -75,7 +70,7 @@
         </v-card-title>
         <markov-selector
           v-model="markov"
-          :markov-submode="markovSubmode"
+          :markov-submode="submode"
           @input="checkValid"
         />
 
@@ -85,7 +80,7 @@
             class="pl-2"
           >
             <v-radio-group
-              v-model="markovSubmode"
+              v-model="submode"
               column
               @change="checkValid"
             >
@@ -111,10 +106,10 @@
             class="pr-2"
           >
             <v-text-field
-              v-model="markovTreshold"
+              v-model="markovThresh"
               type="number"
-              :disabled="markovSubmode === 0"
-              label="Markov treshold"
+              :disabled="submode === 0"
+              label="Markov threshold"
               single-line
               mask="########"
               @input="checkValid"
@@ -155,6 +150,11 @@
   import CharsetSelector from '@/components/selector/charsetSelector'
   import markovSelector from '@/components/selector/markovSelector'
   import maskFileSelector from '@/components/selector/loadMaskFileSelector'
+
+  import {mapMutations} from 'vuex'
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
   export default {
     name: "FcMask",
     components: {
@@ -164,56 +164,29 @@
       'markov-selector': markovSelector,
       'maskFile-selector': maskFileSelector
     },
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
     data: function () {
       return {
         loadMasksDialog: false,
-        markovSubmode: 2,
-        attackId: 3,
-        attackName: 'mask',
-        markovTreshold: '',
-        maskFile: null,
-        charsets: null,
-        markov: null,
-        editedMaskIdx: 0,
-        masks: [''],
+        maskFile: null
       }
     },
-    watch:{
-      value: function(){
-
-      }
+    computed: {
+      ...mapTwoWayState('jobForm', twoWayMap(['masks', 'submode', 'markovThresh', 'markov', 'charset']))
     },
     methods: {
+      ...mapMutations('jobForm', ['addMask', 'deleteMask', 'updateMask', 'mergeMasks']),
       loadMasksFromFile: function () {
         this.axios.get(this.$serverAddr + '/masks/' + this.maskFile.id).then((response) => {
-          var masksToDisplay = response.data.data.split("\n")
-          if (this.masks[0] === '') {
-            this.masks[0] = masksToDisplay[0]
-          } else {
-            this.masks.push(masksToDisplay[0])
-          }
-          for (let i = 1; i < masksToDisplay.length; i++) {
-            if (masksToDisplay[i] !== '') {
-              this.masks.push(masksToDisplay[i])
-            }
-          }
+          var res = response.data.data.split("\n")
+          this.mergeMasks(res)
           this.maskFile = null
           this.loadMasksDialog = false
           this.checkValid()
         })
       },
-      setCharsets (arr) {
-        this.charsets = arr
-        this.checkValid()
-      },
       checkValid: function () {
         if (this.masks[0] !== '') {
+          /*
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
@@ -223,23 +196,11 @@
             'markov': this.markovSubmode == 0 ? null : this.markov[0],
             'charset': this.charsets
           })
+          */
           return true
         }
         return false
-      },
-      addMask: function () {
-        this.masks.push('')
-        this.checkValid()
-        this.$nextTick(() => {
-          this.editedMaskIdx = this.masks.length - 1
-        })
-      },
-      deleteMask: function (i) {
-        if (this.masks.length <= 1 )
-          return
-        this.masks.splice(i, 1)
-        this.checkValid()
-      },
+      }
     }
   }
 </script>

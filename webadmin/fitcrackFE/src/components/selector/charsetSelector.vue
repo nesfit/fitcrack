@@ -14,7 +14,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'charsetDetail', params: { id: item.id}}">
+      <router-link :to="{name: 'charsetDetail', params: { id: item.id}}" target='_blank'>
         {{ item.name }}
         <v-icon 
           small
@@ -45,13 +45,6 @@
           },
           {text: 'Added', value: 'time', align: 'end'},
         ],
-      }
-    },
-    watch:{
-      value: function(){
-        if (this.value) {
-          this.selected = this.value.id
-        }
       }
     },
     methods: {

@@ -358,8 +358,8 @@
             next('/login')
           } else {
             next(vm => {
-              vm.$store.user.userData = userInfo.user
-              vm.$store.user.loggedIn = true
+              vm.$store.state.user.userData = userInfo.user
+              vm.$store.state.user.loggedIn = true
             })
           }
         })

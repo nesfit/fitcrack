@@ -21,6 +21,7 @@
     "npm": "^5.10.0",
     "pell": "^1.0.6",
     "sass-loader": "^7.3.1",
+    "spyfu-vuex-helpers": "^0.12.4",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.4",
     "vue-clip": "^1.0.0",
@@ -33,9 +34,9 @@
     "vue-morris": "0.0.13",
     "vue-progressbar": "^0.7.5",
     "vue-router": "^3.1.2",
-    "vue-stash": "^2.0.1-beta",
     "vue-visible": "^1.0.2",
-    "vuetify": "^2.1.5"
+    "vuetify": "^2.1.5",
+    "vuex": "^3.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.5",

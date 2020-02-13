@@ -17,7 +17,7 @@
     <template v-slot:item.domain_name="{ item }">
       <router-link
         :to="{ name: 'hostDetail', params: {id: item.id} }"
-        class="middle"
+        class="middle" target='_blank'
       >
         {{ item.domain_name + ' (' + item.user.name + ')' }}
         <v-icon 
@@ -48,6 +48,9 @@
   export default {
     name: "HostSelector",
     mixins: [selector],
+    props: {
+      autoRefresh: Boolean
+    },
     data() {
       return {
         headers: [
@@ -63,6 +66,14 @@
         ]
       }
     },
+    mounted () {
+      this.interval = setInterval(() => {
+        if (this.autoRefresh) this.getData()
+      }, 2000)
+    },
+    beforeDestroy () {
+      clearInterval(this.interval)
+    },
     methods: {
       getData() {
         this.loading = true
@@ -72,7 +83,7 @@
           }
         }).then((response) => {
           this.items = response.data.items
-          if (this.selectAll) {
+          if (this.selectAll && this.selected.length == 0) {
             this.selected = this.items
             this.$emit('input', this.selected)
           }
@@ -86,7 +97,7 @@
           return 'Unknown'
         }
       }
-    },
+    }
   }
 </script>
 

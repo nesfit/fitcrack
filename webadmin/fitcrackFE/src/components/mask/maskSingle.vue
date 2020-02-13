@@ -4,36 +4,25 @@
 -->
 
 <template>
-  <v-expansion-panel
-    lazy
-    expand-icon="edit"
-    class="expaPanel"
-    :hide-default-footer="true"
-    :readonly="openForever"
-    :value="openForever"
-    @input="focus"
-  >
-    <div slot="header">
-      <v-row>
-        <v-col>
-          <div
-            class="width100 fakeInput"
-            :class="{validationError: validateError}"
-            v-html="parsedHTML"
-          />
-        </v-col>
-      </v-row>
-    </div>
-    <div>
-      <v-row>
-        <v-row justify="center">
-          <v-tooltip
-            v-for="(item, key) in represenArray"
-            :key="key"
-            top
-          >
+  <v-card>
+    <v-card-text>
+      <div slot="header">
+        <!-- <v-row>
+          <v-col>
+            <div
+              class="width100 fakeInput"
+              :class="{validationError: validateError}"
+              v-html="parsedHTML"
+            />
+          </v-col>
+        </v-row> -->
+      </div>
+      <div>
+        <v-row>
+          <v-row justify="center">
             <v-btn
-              slot="activator"
+              v-for="(item, key) in represenArray"
+              :key="key"
               color="primary"
               class="maskBtn py-0 mx-1"
               outlined
@@ -41,14 +30,9 @@
             >
               {{ item.represent }}
             </v-btn>
-            <span>{{ item.chars }}</span>
-          </v-tooltip>
-          <v-tooltip
-            v-for="(item, index) in customCharsets"
-            top
-          >
             <v-btn
-              slot="activator"
+              v-for="(item, index) in customCharsets"
+              :key="index"
               color="primary"
               class="maskBtn py-0 mx-1"
               outlined
@@ -56,24 +40,23 @@
             >
               {{ item.name }}
             </v-btn>
-            <span>{{ item.name }}</span>
-          </v-tooltip>
+          </v-row>
         </v-row>
-      </v-row>
-      <v-text-field
-        ref="maskInput"
-        autofocus
-        label="Mask"
-        outlined
-        class="primary--text px-2 mx-4"
-        single-line
-        :rules="maskRules"
-        :value="value"
-        :error="validateError"
-        @input="update"
-      />
-    </div>
-  </v-expansion-panel>
+        <v-text-field
+          ref="maskInput"
+          autofocus
+          label="Mask"
+          outlined
+          class="primary--text px-2 mx-4"
+          single-line
+          :rules="maskRules"
+          :value="value"
+          :error="validateError"
+          @input="update"
+        />
+      </div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>

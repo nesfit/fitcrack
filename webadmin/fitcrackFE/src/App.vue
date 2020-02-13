@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <v-app :dark="$store.darkAppearance">
+  <v-app>
     <v-snackbar
       v-model="alert"
       :timeout="6000"
@@ -50,7 +50,7 @@
     },
     created: function () {
       /*
-      this.$store.loggedInLink = this.$route;
+      this.$store.state.loggedInLink = this.$route;
       if (this.$needLogin) {
         this.$router.push({
           name: 'login'

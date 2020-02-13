@@ -9,7 +9,7 @@ import datetime
 import math
 
 from flask_login import UserMixin, AnonymousUserMixin
-from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, String, Text, text, ForeignKey, \
+from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, String, Text, text, JSON, ForeignKey, \
     Numeric, func, LargeBinary, select, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
@@ -245,6 +245,10 @@ class FcJob(Base):
     grammar_id = Column(BigInteger, nullable=False)
 
     @hybrid_property
+    def host_count(self):
+        return len(self.hosts)
+
+    @hybrid_property
     def hash_type_name(self):
         return getHashById(str(self.hash_type))['name']
 
@@ -292,6 +296,14 @@ class FcJob(Base):
             return 'error'
 
     hashes = relationship("FcHash", back_populates="job")
+
+class FcTemplate(Base):
+    __tablename__ = 'fc_template'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(64), nullable=False)
+    created = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    template = Column(JSON, nullable=False)
 
 
 class FcSetting(Base):

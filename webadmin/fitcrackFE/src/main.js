@@ -11,6 +11,7 @@ require('./assets/styles/icons.css')
 
 import '@mdi/font/css/materialdesignicons.css'
 import Vue from 'vue'
+import store from './store'
 import App from './App'
 import router from './router'
 import Vuetify from 'vuetify'
@@ -21,7 +22,6 @@ import VueMoment from 'vue-moment'
 import moment from 'moment-timezone'
 import VueVisible from 'vue-visible'
 import UserPlugin from '@/components/user/userPlugin'
-import VueStash from 'vue-stash'
 import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
@@ -36,9 +36,7 @@ document.querySelector('meta[name="theme-color"]').setAttribute('content', windo
 
 Vue.use(VueHighlightJS)
 Vue.use(VueClip);
-Vue.use(VueStash);
 Vue.use(VueVisible);
-
 Vue.use(VueMoment, {
   moment
 });
@@ -58,6 +56,8 @@ Vue.config.productionTip = false;
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  router,
+  store,
   vuetify: new Vuetify({
     icons: {
       iconfont: 'mdi'
@@ -68,29 +68,5 @@ new Vue({
     }
   }),
   components: { App },
-  data: {
-    store: {
-      project: window.projectName || 'Fitcrack',
-      user: {
-        'userData': {
-          'id': null,
-          'username': null,
-          'mail': null,
-          'role': {
-            'MANAGE_USERS': true,
-            'ADD_NEW_JOB': true,
-            'UPLOAD_DICTIONARIES': true,
-            'VIEW_ALL_JOBS': true,
-            'EDIT_ALL_JOBS': true,
-            'OPERATE_ALL_JOBS': true,
-            'ADD_USER_PERMISSIONS_TO_JOB': true
-          }
-        },
-        'loggedIn': false,
-        'loggedInLink': null
-      }
-    }
-  },
-  router,
   template: '<App/>'
 });

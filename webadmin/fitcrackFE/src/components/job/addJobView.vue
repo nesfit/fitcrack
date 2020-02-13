@@ -5,16 +5,22 @@
 
 <template>
   <div class="containerAddJob height100 mx-auto">
-    <v-app-bar
-      app
-      height="48px"
-      class="topToolbar"
-      :class="{scrollTop: (!knowEstimatedTime && !showEstimatedTime)}"
+    <v-toolbar
+      v-show="estimatedTime || keyspace"
+      class="infobar"
+      floating
+      dense
+      :tile="false"
     >
-      <v-toolbar-title class="estimatedTime">
-        Keyspace: {{ keyspace }}. Estimated cracking time is {{ estimatedTime || 'unknown' }}.
-      </v-toolbar-title>
-    </v-app-bar>
+      <div>
+        <span v-show="keyspace" class="mr-1">
+          Keyspace: {{ keyspace }}.
+        </span>
+        <span v-show="estimatedTime">
+          Estimated cracking time is {{ estimatedTime }}.
+        </span>
+      </div>
+    </v-toolbar>
     <div
       v-show="loading"
       class="loadingProgressCont"
@@ -28,20 +34,36 @@
       />
     </div>
 
-    <h1 class="mb-4">
-      Create a new job
-    </h1>
-
-    <v-text-field
-      v-model="name"
-      label="Name"
-      outlined
-      autofocus
-      required
-    />
+    <v-row>
+      <v-col>
+        <v-text-field
+          v-model="name"
+          outlined
+          autofocus
+          required
+          label="Name"
+          hint="Give this job a descriptive name"
+          persistent-hint
+        />
+      </v-col>
+      <v-col>
+        <v-autocomplete
+          :items="templates"
+          item-text="name"
+          item-value="id"
+          :value="selectedTemplate"
+          auto-select-first
+          outlined
+          label="Template"
+          hint="Prefill the form with a saved template"
+          persistent-hint
+          @change="fetchAndApplyTemplate"
+        />
+      </v-col>
+    </v-row>
 
     <div>
-      <v-col class="addJobContent mx-auto">
+      <v-col>
         <v-stepper
           v-model="step"
           vertical
@@ -74,7 +96,7 @@
                   </v-btn>
                 </v-btn-toggle>
                 <v-autocomplete
-                  v-model="hashtype"
+                  v-model="hashType"
                   editable
                   validate-on-blur
                   clearable
@@ -247,93 +269,38 @@
           >
             Attack settings
           </v-stepper-step>
-          <!--    <h3> Message: {{ attackSettings }} </h3> -->
           <v-stepper-content step="2">
             <v-container>
-              <v-tabs
+              <v-card-title>Attack mode</v-card-title>
+              <v-item-group 
                 v-model="attackSettingsTab"
-                grow
-                color="primary"
+                class="d-flex flex-wrap justify-space-between"
               >
-                <v-tab
-                  @click="attackTabChanged($refs.DictAttack)"
+                <v-item
+                  v-for="(type, i) in attacks"
+                  :key="i"
+                  :value="type.handler"
+                  #default="{ active, toggle }"
                 >
-                  Dictionary
-                </v-tab>
-                <v-tab-item eager>
-                  <v-card text>
-                    <dictionary
-                      ref="DictAttack"
-                      v-model="attackSettings"
-                    />
-                  </v-card>
-                </v-tab-item>
-                <v-tab
-                  @click="attackTabChanged($refs.CombAttack)"
-                >
-                  Combination
-                </v-tab>
-                <v-tab-item eager>
-                  <v-card text>
-                    <combinator
-                      ref="CombAttack"
-                      v-model="attackSettings"
-                    />
-                  </v-card>
-                </v-tab-item>
-                <v-tab
-                  @click="attackTabChanged($refs.BruteAttack)"
-                >
-                  Brute-force
-                </v-tab>
-                <v-tab-item eager>
-                  <v-card text>
-                    <maskattack
-                      ref="BruteAttack"
-                      v-model="attackSettings"
-                    />
-                  </v-card>
-                </v-tab-item>
-                <v-tab
-                  @click="attackTabChanged($refs.HybridWordMaskAttack)"
-                >
-                  Hybrid Wordlist + Mask
-                </v-tab>
-                <v-tab-item eager>
-                  <v-card text>
-                    <hybridWordlistMask
-                      ref="HybridWordMaskAttack"
-                      v-model="attackSettings"
-                    />
-                  </v-card>
-                </v-tab-item>
-                <v-tab
-                  @click="attackTabChanged($refs.HybridMaskWordAttack)"
-                >
-                  Hybrid Mask + Wordlist
-                </v-tab>
-                <v-tab-item eager>
-                  <v-card text>
-                    <hybridMaskWordlist
-                      ref="HybridMaskWordAttack"
-                      v-model="attackSettings"
-                    />
-                  </v-card>
-                </v-tab-item>
-                <v-tab
-                  @click="attackTabChanged($refs.pcfg)"
-                >
-                  PCFG
-                </v-tab>
-                <v-tab-item eager>
-                  <v-card text>
-                    <pcfg
-                      ref="pcfgAttack"
-                      v-model="attackSettings"
-                    />
-                  </v-card>
-                </v-tab-item>
-              </v-tabs>
+                  <v-btn
+                    class="mode-btn"
+                    text
+                    small
+                    :color="active ? 'primary' : ''"
+                    @click="toggle"
+                  >
+                    <div class="my-3">
+                      <v-icon class="mb-2">
+                        {{ attackIcon(type.handler) }}
+                      </v-icon>
+                      <div>{{ type.name }}</div>
+                    </div>
+                  </v-btn>
+                </v-item>
+              </v-item-group>
+
+              <v-component :is="attackSettingsTab" />
+
               <v-row>
                 <v-spacer />
                 <v-btn 
@@ -439,21 +406,37 @@
         </v-stepper>
 
         <v-row
+          v-if="hosts.length == 0"
+          justify="center"
+        >
+          <v-alert
+            outlined
+            type="warning"
+          >
+            This job has no hosts assigned to it and won't be able to run until edited!
+          </v-alert>
+        </v-row>
+
+        <v-row
           justify="center"
           class="mb-5"
         >
-          <!-- <template-modal :data="jobSettings" /> -->
+          <template-modal
+            :inherited-name="name"
+            @templatesUpdated="fetchTemplates"
+          />
           <v-btn
             large
             color="primary"
             class="ml-2"
+            :disabled="!valid"
             @click="submit"
           >
             <v-icon left>
-              mdi-check
-            </v-icon>Submit
+              {{ hosts.length > 0 ? 'mdi-check' : 'mdi-content-save' }}
+            </v-icon>
+            {{ hosts.length > 0 ? 'Create' : 'Save for later' }}
           </v-btn>
-          <!--<template-modal :data="sendingJson"></template-modal>-->
         </v-row>
       </v-col>
     </div>
@@ -466,11 +449,18 @@
   import dictionary from '@/components/job/attacks/dictionary'
   import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist'
   import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask'
-  import pcfg from '@/components/job/attacks/pcfg'
+  import pcfgAttack from '@/components/job/attacks/pcfg'
   import FileUploader from "@/components/fileUploader/fileUploader";
   import fcTextarea from '@/components/textarea/fc_textarea'
   import hostSelector from '@/components/selector/hostSelector'
   import templateModal from '@/components/jobTemplate/templateModal'
+
+  import {mapState, mapGetters, mapMutations} from 'vuex'
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
+  import { attacks } from '@/store/job-form'
+
   export default {
     name: 'AddJob',
     components: {
@@ -480,71 +470,42 @@
       'dictionary': dictionary,
       'hybridMaskWordlist': hybridMaskWordlist,
       'hybridWordlistMask': hybridWordlistMask,
-      'pcfg': pcfg,
+      'pcfgAttack': pcfgAttack,
       'fc-textarea': fcTextarea,
       'host-selector': hostSelector,
       'template-modal': templateModal
     },
     data: function () {
       return {
-        step: 1,
-        attackSettingsTab: null,
-        attackSettings: false,
         loading: false,
-        valid: true,
-        name: '',
-        comment: '',
-        hashtype: null,
         hashTypes: [],
-        timeForJob: 3600,
-        hashList: '',
-        inputMethod: null,
-        hosts: [],
         showEstimatedTime: false,
-        estimatedTime: '',
+        estimatedTime: null,
         keyspace: null,
-        startDate: this.$moment().format('DD/MM/YYYY HH:mm'),
-        startNow: true,
-        endDate: this.$moment().format('DD/MM/YYYY HH:mm'),
-        endNever: true,
-        validatedHashes: [],
         gotBinaryHash: false,
-        hashListError: false
+        hashListError: false,
+        attacks,
+        templates: [
+          {
+            name: 'Empty',
+            id: 0
+          }
+        ]
       }
     },
     computed: {
-      jobSettings () {
-        return {
-          "name": this.name,
-          "comment": this.comment,
-          "priority": 0,
-          "hosts_ids": this.hosts.map(h => h.id),
-          "seconds_per_job": parseInt(this.timeForJob),
-          "time_start": (this.startNow ? '' : this.startDate),
-          "time_end": (this.endNever ? '' : this.endDate),
-          'attack_settings': this.attackSettings,
-          "hash_settings": {
-            "hash_type": this.hashtype ? this.hashtype.code : null,
-            "hash_list": this.validatedHashes
-          }
-        }
-      },
-      sendingJson: function () {
-        return {
-          'hosts_ids': this.hosts,
-          'seconds_per_job': parseInt(this.timeForJob),
-          'attack_settings': this.attackSettings,
-          'hash_type': this.hashtype
-
-        }
-      },
-      knowEstimatedTime: function () {
-        return !!this.estimatedTime
-      },
+      ...mapState('jobForm', ['selectedTemplate']),
+      ...mapTwoWayState('jobForm', twoWayMap([
+        'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
+      ])),
+      ...mapGetters('jobForm', ['jobSettings', 'valid']),
+      templateItems () {
+        return this.templates.map((t, i) => ({text: t.template, value: i}))
+      }
     },
     watch: {
-      jobSettings () {
-        if ( typeof this.attackSettings !== 'object' || this.hashtype == null || this.hosts.length === 0) {
+      jobSettings (val) {
+        if ( typeof val.attack_settings !== 'object' || this.hashType == null || this.hosts.length === 0) {
           this.showEstimatedTime = false
         } else {
           var boincIds = []
@@ -554,12 +515,11 @@
 
           this.axios.get(this.$serverAddr + '/job/crackingTime', {
             params: {
-              'hash_type_code': this.hashtype,
+              'hash_type_code': this.hashType,
               'boinc_host_ids': boincIds.join(","),
-              'attack_settings': this.attackSettings
+              'attack_settings': val.attack_settings
             }
           }).then((response) => {
-            console.log(response)
             if (response['data']) {
               this.estimatedTime = response.data.display_time
               this.keyspace = response.data.keyspace
@@ -571,32 +531,60 @@
     },
     mounted: function () {
       this.getHashTypes()
-      // this.axios.get(this.$serverAddr + '/template/1', ).then((response) => {
-      //   setTimeout(function(){
-      //     var data = JSON.parse(response.data.data)
-      //     console.log( data.attack_settings)
-      //     this.$set(this, 'attackSettings', data.attack_settings)
-      //
-      //   }.bind(this), 1000);
-      //
-      // })
+      this.startDate = this.$moment().format('DD/MM/YYYY HH:mm')
+      this.endDate = this.$moment().format('DD/MM/YYYY HH:mm')
+      if (this.hashList.length > 0) this.validateHashes()
+      this.fetchTemplates()
     },
     methods: {
-      subHashtypeChanged: function (key, val) {
-        this.hashtype.code = this.hashtype.code.replace(key, val.code)
-        this.validateHashes(null)
+      ...mapMutations('jobForm', ['applyTemplate']),
+      fetchTemplates () {
+        this.axios.get(this.$serverAddr + '/template', )
+        .then((response) => {
+          if (response.data && response.data.items) {
+            this.templates = [
+              { name: 'Empty', id: 0 },
+              ...response.data.items
+            ]
+          }
+        })
+        .catch(console.error)
       },
-      attackTabChanged: function (tab) {
-      //  if (tab === undefined) {
-          this.attackSettings = false
-      //  } else {
-          tab.checkValid()
-      //  }
+      fetchAndApplyTemplate (id) {
+        if (id == 0) {
+          this.applyTemplate()
+          this.$store.commit('jobForm/selectedTemplateMut', 0)
+          return
+        }
+        this.axios.get(this.$serverAddr + `/template/${id}`)
+        .then((response) => {
+          console.log(response)
+          if (response.data && response.data.template) {
+            this.applyTemplate(JSON.parse(response.data.template))
+            this.$store.commit('jobForm/selectedTemplateMut', id)
+          }
+        })
+        .catch(console.error)
+      },
+      attackIcon (handler) {
+        const map = {
+          'dictionary': 'mdi-dictionary',
+          'combinator': 'mdi-vector-combine',
+          'maskattack': 'mdi-karate',
+          'hybridWordlistMask': 'mdi-vector-difference-ba',
+          'hybridMaskWordlist': 'mdi-vector-difference-ab',
+          'pcfgAttack': 'mdi-ray-start-end'
+        }
+        return map[handler] || 'mdi-checkbox-blank-outline'
+      },
+      subHashtypeChanged: function (key, val) {
+        this.hashType.code = this.hashType.code.replace(key, val.code)
+        this.validateHashes(null)
       },
       focusTextarea: function () {
         this.$refs.textarea.focus()
       },
-      validateHashes: function (data) {
+      validateHashes: function (data = null) {
         if (data === null) {
           data = this.hashList
         }
@@ -606,21 +594,21 @@
         } else {
           this.gotBinaryHash = false
         }
-        if (this.hashtype === null || isNaN(this.hashtype.code)) {
+        if (this.hashType === null || isNaN(this.hashType.code)) {
           return
         }
         if (data === '') {
           return
         }
         ///
-        const hashType = parseInt(this.hashtype.code)
+        const hashType = parseInt(this.hashType.code)
         if (hashType >= 17300 && hashType <= 18100) {
           return // Until validator can deal with Hashcat 5 modes
         }
         ///
 
         this.axios.post(this.$serverAddr + '/job/verifyHash', {
-          'hashtype': this.hashtype.code,
+          'hashtype': this.hashType.code,
           'hashes': data
         }).then((response) => {
           this.hashListError = response.data.error
@@ -639,14 +627,14 @@
         var parsedHashlist = this.hashList.split('\n')
         var lastHash = parsedHashlist[parsedHashlist.length-1]
         if (lastHash === '') {
-          this.hashList += hash
+          this.hashList = this.hashList + hash
         } else {
-          this.hashList += '\n' + hash
+          this.hashList = this.hashList + '\n' + hash
         }
       },
       uploadComplete: function (data) {
         this.$success("Successfully extracted hash form file.")
-        this.hashtype = this.hashTypes.find(h => h.code == data['hash_type'])
+        this.hashType = this.hashTypes.find(h => h.code == data['hash_type'])
         this.addHash(data['hash'])
         this.validateHashes(null)
       },
@@ -695,6 +683,7 @@
         for (var i = 0; i < this.validatedHashes.length; i++) {
           if (this.validatedHashes[i].result !== 'OK') {
             this.$error('Wrong hash format - ' + this.validatedHashes[i].hash)
+            this.step = 1
             return
           }
         }
@@ -702,11 +691,25 @@
         // TODO: maybe delete this condition
         if (this.inputMethod === 'encryptedFile' && !this.$refs.encryptedFileUploader.fileUploaded ) {
           this.$error('No file uploaded.')
+          this.step = 1
           return
         }
 
-        if (this.attackSettings === false) {
+        if (!this.attackSettingsTab) {
+          this.$error('No attack selected.')
+          this.step = 2
+          return
+        }
+
+        if (this.hosts.length <= 0) {
+          this.$error('No hosts assigned.')
+          this.step = 3
+          return
+        }
+
+        if (this.jobSettings.attack_settings === false) {
           this.$error('Error in attack settings.')
+          this.step = 2
           return
         }
 
@@ -715,8 +718,9 @@
           return
         }*/
 
-        if (this.hashtype === null) {
+        if (this.hashType === null) {
           this.$error('No hash type selected.')
+          this.step = 1
           return
         }
 
@@ -725,15 +729,10 @@
           return
         }
 
-        if (this.inputMethod === false) {
-          this.$error('No input method selected.')
-          return
-        }
-
         this.loading = true
         this.axios.post(this.$serverAddr + '/job', this.jobSettings).then((response) => {
           this.$router.push({name: 'jobDetail', params: {id: response.data.job_id}})
-          console.log(response.data)
+          this.applyTemplate() // Clear all
         }).catch((error) => {
           this.loading = false
         })
@@ -768,100 +767,11 @@
     max-width: 1000px;
   }
 
-
-  .topToolbar {
-    z-index: 2;
-    top: 64px;
-    transform: translateY(0px) !important;
-  }
-
-  .uploadBtn {
-    margin: auto;
-    display: block;
-  }
-
-  .scrollTop {
-    opacity: 0;
-    transform: translateY(-48px) !important;
-  }
-
-  .estimatedTime {
-    font-weight: normal;
-    font-size: 16px;
-  }
-
-
-  .height100 {
-    height: 100%;
-  }
-
-  .height64 {
-    height: 64px;
-  }
-
-  .hashtypeSelect {
-    height: 50px;
-  }
-
-  .noEvent {
-    pointer-events: none;
-  }
-
-  .dz-message {
-    cursor: pointer;
-  }
-
-  .width100 {
-    width: 100%;
-  }
-
-  .maskBtn {
-    min-width: 0px;
-    max-width: 40px;
-    text-transform: none;
-  }
-
-  .maskTitle {
-    font-size: 18px;
-  }
-
-  .loadingProgressCont {
+  .infobar {
     position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    margin: auto;
-    z-index: 2;
-
-  }
-
-  .loadingProgress {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    margin: auto;
-  }
-
-
-
-
-  .oneline {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    width: 200px;
-    line-height: 50px;
-    height: 50px;
-  }
-
-  .inheritColor {
-    color: inherit !important;
+    z-index: 5;
+    bottom: 1em;
+    right: 1em;
   }
 
   .hashCeckContainer {
@@ -875,27 +785,8 @@
     border-style: solid;
   }
 
-  .width15 {
-    width: 15px;
-  }
-</style>
-
-<style>
-  .selectedDict {
-    background: rgba(37, 157, 173, 0.85) !important;
-    color: white;
-  }
-
-  .selectedDict a {
-    color: white;
-  }
-
-  .clickable {
-    cursor: pointer;
-  }
-
-  .attackSettings .tabs__bar {
-    box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
-    z-index: 1;
+  .mode-btn {
+    height: initial !important;
+    margin: 1em;
   }
 </style>
