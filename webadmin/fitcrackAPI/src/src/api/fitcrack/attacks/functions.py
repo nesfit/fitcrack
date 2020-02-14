@@ -1,3 +1,4 @@
+
 '''
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
@@ -18,10 +19,15 @@ from src.database.models import FcDictionary
 
 def make_dict_from_mask(mask, filename=None):
     if not filename:
+
         filename = 'hybrid_attack' + str(int(time.time())) + '.txt'
 
     filename = secure_filename(filename)
     path = os.path.join(DICTIONARY_DIR, filename)
+
+
+    print(MASK_PROCESSOR_PATH + ' ' + mask + ' -o ' + path)
+    print(shellExec(MASK_PROCESSOR_PATH + ' ' + mask + ' -o ' + path))
 
     dictionary = FcDictionary(name=filename, path=filename, keyspace=compute_keyspace_from_mask(mask), deleted=True)
     db.session.add(dictionary)

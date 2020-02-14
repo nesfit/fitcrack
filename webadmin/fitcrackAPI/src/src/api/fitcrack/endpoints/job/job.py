@@ -121,7 +121,7 @@ class JobByID(Resource):
 
         job = FcJob.query.filter(FcJob.id == id).one()
 
-        if int(job.grammar_id) != 0:
+        if str(job.grammar_id) == "NULL":
             pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
             job.grammar_name = pcfg.name
             job.grammar_keyspace = pcfg.keyspace
