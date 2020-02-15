@@ -115,19 +115,15 @@
           :to="{ name: 'jobDetail', params: { id: item.id } }"
           class="middle"
         >
-          <v-icon
-            v-if="item.host_count == 0"
-            left
-            color="warning"
-          >
-            mdi-desktop-classic
-          </v-icon>
           {{ item.name }}
         </router-link>
       </template>
       <!-- Status text cell -->
       <template v-slot:item.status="{ item }">
-        <v-tooltip top>
+        <v-tooltip
+          v-if="item.host_count > 0"
+          top
+        >
           <template v-slot:activator="{ on }">
             <span
               :class="item.status_type + '--text'"
@@ -137,6 +133,27 @@
             </span>
           </template>
           <span>{{ item.status_tooltip }}</span>
+        </v-tooltip>
+        <v-tooltip
+          v-else
+          top
+        >
+          <template v-slot:activator="{ on }">
+            <span
+              class="warning--text"
+              v-on="on"
+            >
+              <v-icon
+                v-if="item.host_count == 0"
+                left
+                color="warning"
+              >
+                mdi-alert
+              </v-icon>
+              no hosts
+            </span>
+          </template>
+          <span>No hosts, open job detail and assign them!</span>
         </v-tooltip>
       </template>
       <!-- Progress indicator cell -->
@@ -213,6 +230,7 @@
                   </v-icon>Restart
                 </v-list-item-title>
               </v-list-item>
+              <!--
               <v-list-item @click="operateJob(item.id, 'duplicate')">
                 <v-list-item-title>
                   <v-icon left>
@@ -220,6 +238,7 @@
                   </v-icon>Duplicate
                 </v-list-item-title>
               </v-list-item>
+              -->
               <v-list-item @click="hideJob(item.id)">
                 <v-list-item-title>
                   <v-icon left>

@@ -701,12 +701,6 @@
           return
         }
 
-        if (this.hosts.length <= 0) {
-          this.$error('No hosts assigned.')
-          this.step = 3
-          return
-        }
-
         if (this.jobSettings.attack_settings === false) {
           this.$error('Error in attack settings.')
           this.step = 2

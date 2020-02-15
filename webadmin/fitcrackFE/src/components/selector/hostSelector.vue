@@ -60,7 +60,7 @@
             value: 'domain_name'
           },
           {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
-          {text: 'Operating system', value: 'os_name', align: 'end', sortable: false},
+          {text: 'OS', value: 'os_name', align: 'end', sortable: false},
           {text: 'Processor', value: 'p_model', align: 'end', width: '200', sortable: false},
           {text: 'Online', value: 'last_active', align: 'end', sortable: false},
         ]
@@ -83,10 +83,6 @@
           }
         }).then((response) => {
           this.items = response.data.items
-          if (this.selectAll && this.selected.length == 0) {
-            this.selected = this.items
-            this.$emit('input', this.selected)
-          }
           this.loading = false
         })
       },

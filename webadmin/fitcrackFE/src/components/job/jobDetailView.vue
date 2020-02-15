@@ -55,7 +55,19 @@
                   </v-list-item-action>
                   <v-list-item-content class="height100">
                     <v-list-item-title class="text-right height100">
-                      <div class="actionsBtns">
+                      <v-btn
+                        v-if="data.hosts.length == 0"
+                        class="ma-0"
+                        outlined
+                        color="warning"
+                        @click.native.stop="showMappingHostDialog"
+                      >
+                        Assign hosts
+                      </v-btn>
+                      <div
+                        v-else
+                        class="actionsBtns"
+                      >
                         <v-tooltip top>
                           <template v-slot:activator="{ on }">
                             <v-btn
@@ -155,11 +167,11 @@
                       class="text-right fw500"
                     >
                       <v-tooltip top>
-                        <span
-                          slot="activator"
-                        >
-                          {{ data.status_text }}
-                        </span>
+                        <template v-slot:activator="{ on }">
+                          <span>
+                            {{ data.status_text }}
+                          </span>
+                        </template>
                         <span>{{ data.status_tooltip }}</span>
                       </v-tooltip>
                     </v-list-item-title>
@@ -344,6 +356,7 @@
                   :headers="hostheaders"
                   :items="data.hosts"
                   hide-default-footer
+                  no-data-text="None assigned"
                 >
                   <template v-slot:item.name="{ item }">
                     <router-link
@@ -368,7 +381,7 @@
                   <v-list-item-content>
                     <v-btn
                       class="ma-0"
-                      outlined
+                      text
                       color="primary"
                       @click.native.stop="showMappingHostDialog"
                     >
@@ -542,89 +555,93 @@
 
     <v-dialog
       v-model="editJobDialog"
-      max-width="490"
-      lazy
+      max-width="500"
     >
       <v-card
         v-if="editJobValues !== null"
         class="pt-4"
       >
-        <v-row class="px-3">
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Name:
-            </v-subheader>
-          </v-col>
-          <v-col cols="8">
-            <v-text-field
-              v-model="editJobValues.name"
-              single-line
-              required
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Comment:
-            </v-subheader>
-          </v-col>
-          <v-col cols="8">
-            <v-text-field
-              v-model="editJobValues.comment"
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Start time:
-            </v-subheader>
-          </v-col>
-          <v-col cols="5">
-            <v-text-field
-              v-model="editJobValues.time_start"
-              :disabled="editJobValues.startNow"
-              text
-              single-line
-              label=""
-              mask="date-with-time"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-checkbox
-              v-model="editJobValues.startNow"
-              label="start now"
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              End time:
-            </v-subheader>
-          </v-col>
-          <v-col cols="5">
-            <v-text-field
-              v-model="editJobValues.time_end"
-              :disabled="editJobValues.endNever"
-              text
-              single-line
-              label=""
-              mask="date-with-time"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-checkbox
-              v-model="editJobValues.endNever"
-              label="End never"
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Seconds per workunit:
-            </v-subheader>
-          </v-col>
-          <v-col cols="8">
-            <v-text-field
-              v-model="editJobValues.seconds_per_job"
-            />
-          </v-col>
-        </v-row>
+        <v-card-title>
+          Edit job
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Name:
+              </v-subheader>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="editJobValues.name"
+                single-line
+                required
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Comment:
+              </v-subheader>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="editJobValues.comment"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Start time:
+              </v-subheader>
+            </v-col>
+            <v-col cols="5">
+              <v-text-field
+                v-model="editJobValues.time_start"
+                :disabled="editJobValues.startNow"
+                text
+                single-line
+                label=""
+                mask="date-with-time"
+              />
+            </v-col>
+            <v-col cols="3">
+              <v-checkbox
+                v-model="editJobValues.startNow"
+                label="Immediate"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                End time:
+              </v-subheader>
+            </v-col>
+            <v-col cols="5">
+              <v-text-field
+                v-model="editJobValues.time_end"
+                :disabled="editJobValues.endNever"
+                text
+                single-line
+                label=""
+                mask="date-with-time"
+              />
+            </v-col>
+            <v-col cols="3">
+              <v-checkbox
+                v-model="editJobValues.endNever"
+                label="Never"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Seconds per workunit:
+              </v-subheader>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="editJobValues.seconds_per_job"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn
@@ -643,12 +660,17 @@
       v-model="editHostsDialog"
       max-width="800"
     >
-      <v-card class="mb-5">
-        <host-selector 
-          v-model="newHostsMapping" 
-          select-all
-          :auto-refresh="editHostsDialog"
-        />
+      <v-card>
+        <v-card-title>
+          Host mapping
+        </v-card-title>
+        <v-card-text>
+          <host-selector 
+            v-model="newHostsMapping" 
+            select-all
+            :auto-refresh="editHostsDialog"
+          />
+        </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn
@@ -777,6 +799,7 @@
           case 'ready': hue = 210; break
           case 'exhausted': hue = 350; break
         }
+        if (this.data.hosts.length == 0) hue = 40
         if (hue == -1) return 'none'
         return `linear-gradient(to bottom, hsla(${hue}, 90%, 50%, 40%), transparent 20%)`
       }
