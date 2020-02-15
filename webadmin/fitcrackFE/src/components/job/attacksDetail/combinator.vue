@@ -5,132 +5,73 @@
 
 <template>
   <fc-tile title="Dictionaries and rules">
-    <v-list
-      single-line
-      class="width100"
+    <v-card-title>
+      Left
+    </v-card-title>
+    <v-data-table
+      :headers="headers"
+      :items="data.left_dictionaries"
+      hide-default-footer
     >
-      <v-row>
-        <v-col cols="6">
-          <v-list-item class="px-2 py-1">
-            <v-list-item-content>
-              <v-list-item-title>Left dictionaries</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-divider />
-          <v-data-table
-            :headers="headers"
-            :items="data.left_dictionaries"
-            item-key="id"
-            hide-default-footer
+      <template v-slot:item.dictionary.name="{ item: { dictionary } }">
+        <router-link :to="{name: 'dictionaryDetail', params: { id: dictionary.id}}" target='_blank'>
+          {{ dictionary.name }}
+          <v-icon 
+            small
+            color="primary"
           >
-            <template
-              slot="items"
-              slot-scope="props"
-            >
-              <td>{{ props.item.dictionary.name }}</td>
-              <td class="text-right">
-                {{ props.item.dictionary.keyspace }}
-              </td>
-              <td class="text-right">
-                {{ $moment(props.item.dictionary.time ).format('DD.MM.YYYY HH:mm') }}
-              </td>
-              <td class="text-right">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      icon
-                      class="mx-0"
-                      :to="{name: 'dictionaryDetail', params: { id: props.item.dictionary.id}}"
-                      v-on="on"
-                    >
-                      <v-icon color="primary">
-                        link
-                      </v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Go to the dictionary page</span>
-                </v-tooltip>
-              </td>
-            </template>
-          </v-data-table>
-        </v-col>
-        <v-col
-          cols="6"
-          class="borderLeft"
-        >
-          <v-list-item class="px-2 py-1">
-            <v-list-item-content>
-              <v-list-item-title>Right dictionaries</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-divider />
-          <v-data-table
-            :headers="headers"
-            :items="data.right_dictionaries"
-            item-key="id"
-            hide-default-footer
+            mdi-open-in-new
+          </v-icon>
+        </router-link>
+      </template>
+    </v-data-table>
+    <template v-if="data.rule_left !== ''">
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Left rule:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+            {{ data.rule_left }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </template>
+
+    <v-divider />
+    <v-card-title>
+      Right
+    </v-card-title>
+    <v-data-table
+      :headers="headers"
+      :items="data.right_dictionaries"
+      hide-default-footer
+    >
+      <template v-slot:item.dictionary.name="{ item: { dictionary } }">
+        <router-link :to="{name: 'dictionaryDetail', params: { id: dictionary.id}}" target='_blank'>
+          {{ dictionary.name }}
+          <v-icon 
+            small
+            color="primary"
           >
-            <template
-              slot="items"
-              slot-scope="props"
-            >
-              <td>{{ props.item.dictionary.name }}</td>
-              <td class="text-right">
-                {{ props.item.dictionary.keyspace }}
-              </td>
-              <td class="text-right">
-                {{ $moment(props.item.dictionary.time ).format('DD.MM.YYYY HH:mm') }}
-              </td>
-              <td class="text-right">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      icon
-                      class="mx-0"
-                      :to="{name: 'dictionaryDetail', params: { id: props.item.dictionary.id}}"
-                      v-on="on"
-                    >
-                      <v-icon color="primary">
-                        link
-                      </v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Go to the dictionary page</span>
-                </v-tooltip>
-              </td>
-            </template>
-          </v-data-table>
-        </v-col>
-      </v-row>
-      <v-divider />
-      <template v-if="data.rule_left !== ''">
-        <v-list-item class="px-2 py-1">
-          <v-list-item-action class="pr-3 key">
-            Left rule:
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
-              {{ data.rule_left }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-divider />
+            mdi-open-in-new
+          </v-icon>
+        </router-link>
       </template>
+    </v-data-table>
+    <template v-if="data.rule_right !== ''">
       <v-divider />
-      <template v-if="data.rule_right !== ''">
-        <v-divider />
-        <v-list-item class="px-2 py-1">
-          <v-list-item-action class="pr-3 key">
-            Right rule:
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
-              {{ data.rule_right }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-    </v-list>
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Right rule:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+            {{ data.rule_right }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </template>
   </fc-tile>
 </template>
 
@@ -148,11 +89,10 @@
           {
             text: 'Name',
             align: 'left',
-            value: 'name'
+            value: 'dictionary.name'
           },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Keyspace', value: 'dictionary.keyspace', align: 'right'},
+          /*{text: 'Time', value: 'dictionary.time', align: 'right'}*/
         ]
       }
     },

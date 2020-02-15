@@ -5,62 +5,41 @@
 
 <template>
   <fc-tile title="Dictionaries and rules">
-    <v-list
-      single-line
-      class="width100"
+    <v-data-table
+      :headers="headers"
+      :items="data.left_dictionaries"
+      hide-default-footer
     >
-      <v-data-table
-        :headers="headers"
-        :items="data.left_dictionaries"
-        item-key="id"
-        hide-default-footer
-      >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>{{ props.item.dictionary.name }}</td>
-          <td class="text-right">
-            {{ props.item.dictionary.keyspace }}
-          </td>
-          <td class="text-right">
-            {{ $moment(props.item.dictionary.time ).format('DD.MM.YYYY HH:mm') }}
-          </td>
-          <td class="text-right">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  class="mx-0"
-                  :to="{name: 'dictionaryDetail', params: { id: props.item.dictionary.id}}"
-                  v-on="on"
-                >
-                  <v-icon color="primary">
-                    link
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>Go to the dictionary page</span>
-            </v-tooltip>
-          </td>
-        </template>
-      </v-data-table>
-      <template v-if="data.rulesFile.id !== null">
-        <v-divider />
-        <v-list-item class="px-2 py-1">
-          <v-list-item-action class="pr-3 key">
-            Rules:
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
-              <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}">
-                {{ data.rulesFile.name }}
-              </router-link>
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <template v-slot:item.dictionary.name="{ item: { dictionary } }">
+        <router-link :to="{name: 'dictionaryDetail', params: { id: dictionary.id}}" target='_blank'>
+          {{ dictionary.name }}
+          <v-icon 
+            small
+            color="primary"
+          >
+            mdi-open-in-new
+          </v-icon>
+        </router-link>
       </template>
-    </v-list>
+      <template v-slot:item.dictionary.time="{ item: { dictionary } }">
+        {{ $moment(dictionary.time).format('DD.MM.YYYY HH:mm') }}
+      </template>
+    </v-data-table>
+    <template v-if="data.rulesFile.id !== null">
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Rules:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+            <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}">
+              {{ data.rulesFile.name }}
+            </router-link>
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </template>
   </fc-tile>
 </template>
 
@@ -71,18 +50,22 @@
     components: {
       'fc-tile': tile
     },
-    props: ['data'],
+    props: {
+      data: {
+        type: Object,
+        default: () => {}
+      }
+    },
     data() {
       return {
         headers: [
           {
             text: 'Name',
-            align: 'left',
-            value: 'name'
+            align: 'start',
+            value: 'dictionary.name'
           },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Keyspace', value: 'dictionary.keyspace', align: 'end'},
+          {text: 'Time', value: 'dictionary.time', align: 'end'}
         ]
       }
     },
