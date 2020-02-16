@@ -38,11 +38,11 @@ def create_job(data):
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(decoded)
                 fp.seek(0)
-                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=True)
+                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= decoded
 
         else:
-            verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=True)
+            verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= hashObj['hash'].encode()
 
     hybrid_mask_dict = False

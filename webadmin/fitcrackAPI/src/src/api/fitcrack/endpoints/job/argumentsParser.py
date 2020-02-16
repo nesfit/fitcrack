@@ -212,6 +212,11 @@ addJob_model = api.schema_model('addJob', {
                             }
                         }
                     }
+                },
+                'valid_only': {
+                    'default': False,
+                    'type': 'boolean',
+                    'description': 'Specifies whether hash validation is enforced'
                 }
             }
         }
