@@ -92,6 +92,7 @@
             align: 'start',
             value: 'name'
           },
+          {text: 'Keyspace', value: 'keyspace', align: 'end'},
           {text: 'Added', value: 'time', align: 'end'},
           {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ]

@@ -38,6 +38,17 @@
             <v-divider />
             <v-list-item>
               <v-list-item-action>
+                Keyspace:
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-right">
+                  {{ data.keyspace }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider />
+            <v-list-item>
+              <v-list-item-action>
                 Added:
               </v-list-item-action>
               <v-list-item-content>
