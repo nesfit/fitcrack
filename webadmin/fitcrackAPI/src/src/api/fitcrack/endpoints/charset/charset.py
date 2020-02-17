@@ -51,6 +51,8 @@ class charsetAdd(Resource):
             abort(500, 'No file part')
             return redirect(request.url)
         file = request.files['file']
+        file.seek(0,2)
+        keyspace = file.tell()
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
@@ -58,7 +60,7 @@ class charsetAdd(Resource):
 
         uploadedFile = fileUpload(file, CHARSET_DIR, ALLOWED_EXTENSIONS, suffix='.hcchr')
         if uploadedFile:
-            charset = FcCharset(name=uploadedFile['filename'], path=uploadedFile['path'])
+            charset = FcCharset(name=uploadedFile['filename'], path=uploadedFile['path'], keyspace=keyspace)
             try:
                 db.session.add(charset)
                 db.session.commit()
@@ -93,6 +95,7 @@ class charset(Resource):
             return {
                 'id': charset.id,
                 'name': charset.name,
+                'keyspace': charset.keyspace,
                 'time': charset.time,
                 'data': str(content),
                 'canDecode': False
@@ -102,6 +105,7 @@ class charset(Resource):
         return {
             'id': charset.id,
             'name': charset.name,
+            'keyspace': charset.keyspace,
             'time': charset.time,
             'data': content,
             'canDecode': True
