@@ -9,7 +9,7 @@
       <span>Select dictionary<span class="required primary--text"> *</span></span>
     </v-card-title>
     <dict-selector
-      v-model="dictionaries"
+      v-model="leftDicts"
       @input="checkValid"
     />
     <v-divider />
@@ -113,11 +113,11 @@
       'dict-selector': dictSelector,
       'rules-selector': ruleSelector
     },
-    computed: mapTwoWayState('jobForm', twoWayMap(['dictionaries', 'rules', 'checkDuplicates', 'casePermute', 
-    'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain'])),
+    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'checkDuplicates',
+    'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain'])),
     methods: {
       checkValid: function () {
-        if (this.dictionaries.length > 0) {
+        if (this.leftDicts.length > 0) {
           return true
         }
         return false
