@@ -25,9 +25,9 @@
               </v-icon>
             </router-link>
           </v-list-item-title>
-          <v-list-item-text>
+          <span>
             Keyspace {{ data.grammar_keyspace || 'not specified' }}
-          </v-list-item-text>
+          </span>
         </v-list-item-content>
       </v-list-item>
       <template v-if="data.rulesFile.id !== null">

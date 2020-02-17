@@ -32,6 +32,7 @@ const testView = r => require.ensure([], () => r(require('@/components/test/test
 const PageNotFound = r => require.ensure([], () => r(require('@/components/pageNotFound')))
 const EncryptedFiles = r => require.ensure([], () => r(require('@/components/encryptedFile/encryptedFilesView')))
 const Server = r => require.ensure([], () => r(require('@/components/server/serverPage')))
+const Settings = r => require.ensure([], () => r(require('@/components/settings/settingsView')))
 
 Vue.use(Router);
 
@@ -230,6 +231,15 @@ const appRoutes = [
     meta: {
       title: 'Server status',
       icon: 'mdi-server'
+    }
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: Settings,
+    meta: {
+      title: 'Settings',
+      icon: 'mdi-cogs'
     }
   },
   {

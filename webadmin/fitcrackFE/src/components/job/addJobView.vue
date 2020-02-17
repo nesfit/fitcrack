@@ -55,9 +55,9 @@
           auto-select-first
           outlined
           label="Template"
-          hint="Prefill the form with a saved template"
+          hint="Prefill the form with a saved template (use empty to quickly reset)"
           persistent-hint
-          @change="fetchAndApplyTemplate"
+          @input="fetchAndApplyTemplate"
         />
       </v-col>
     </v-row>
@@ -262,6 +262,15 @@
                   class="ml-2 mt-1"
                 />
                 <v-spacer />
+                <v-btn
+                  v-show="hashList !== ''"
+                  color="error"
+                  class="mr-2"
+                  text
+                  @click="clearInput" 
+                >
+                  Reset
+                </v-btn>
                 <v-btn
                   color="primary"
                   @click="step = 2" 
@@ -544,6 +553,7 @@
       }
     },
     mounted: function () {
+      this.loadSettings()
       this.getHashTypes()
       this.startDate = this.$moment().format('DD/MM/YYYY HH:mm')
       this.endDate = this.$moment().format('DD/MM/YYYY HH:mm')
@@ -552,8 +562,14 @@
     },
     methods: {
       ...mapMutations('jobForm', ['applyTemplate']),
+      async loadSettings () {
+        if (!this.timeForJob) {
+          const settings = await this.axios.get(this.$serverAddr + '/settings').then(r => r.data)
+          this.timeForJob = settings.default_seconds_per_workunit 
+        }
+      },
       fetchTemplates () {
-        this.axios.get(this.$serverAddr + '/template', )
+        this.axios.get(this.$serverAddr + '/template')
         .then((response) => {
           if (response.data && response.data.items) {
             this.templates = [
@@ -568,6 +584,7 @@
         if (id == 0) {
           this.applyTemplate()
           this.$store.commit('jobForm/selectedTemplateMut', 0)
+          this.loadSettings()
           return
         }
         this.axios.get(this.$serverAddr + `/template/${id}`)
@@ -694,7 +711,11 @@
         }.bind(this)
         reader.readAsText(files[0], 'utf-8')
       },
-      submit (forceInvalid) {
+      clearInput () {
+        this.hashType = null
+        this.hashList = ''
+      },
+      submit () {
         // TODO: maybe delete this condition
         if (this.inputMethod === 'encryptedFile' && !this.$refs.encryptedFileUploader.fileUploaded ) {
           this.$error('No file uploaded.')
