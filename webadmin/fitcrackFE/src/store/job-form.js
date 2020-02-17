@@ -90,12 +90,12 @@ export default {
         'pcfg_grammar': state.pcfg[0],
         'keyspace_limit': state.keyspaceLimit,
         // prince
-        'checkDuplicates': state.checkDuplicates,
-        'casePermute': state.casePermute,
-        'minPasswordLen': parseInt(state.minPasswordLen),
-        'maxPasswordLen': parseInt(state.maxPasswordLen),
-        'minElemInChain': parseInt(state.minElemInChain),
-        'maxElemInChain': parseInt(state.maxElemInChain),
+        'check_duplicates': state.checkDuplicates,
+        'case_permute': state.casePermute,
+        'min_password_len': parseInt(state.minPasswordLen),
+        'max_password_len': parseInt(state.maxPasswordLen),
+        'min_elem_in_chain': parseInt(state.minElemInChain),
+        'max_elem_in_chain': parseInt(state.maxElemInChain),
       }
     },
     jobSettings (state, { attackSettings }) {
