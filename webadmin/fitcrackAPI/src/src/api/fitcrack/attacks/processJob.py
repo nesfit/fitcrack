@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from flask_restplus import abort
 from settings import HASHCAT_DIR, HASHCAT_PATH, EXE_OR_BIN, DICTIONARY_DIR, RULE_DIR, HCSTATS_DIR, CHARSET_DIR
-from src.api.fitcrack.attacks.functions import make_dict_from_mask, check_mask_syntax, compute_keyspace_from_mask, compute_keyspace_from_mask_with_treshold, coun_file_lines
+from src.api.fitcrack.attacks.functions import make_dict_from_mask, check_mask_syntax, compute_keyspace_from_mask, compute_keyspace_from_mask_with_treshold, count_file_lines
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcMask, FcDictionary, FcRule, FcHcstat, FcCharset, FcJobDictionary
@@ -34,7 +34,7 @@ def process_job_0(job):
 
     if job['attack_settings']['rules']:
         rules = FcRule.query.filter(FcRule.id == job['attack_settings']['rules']['id']).first()
-        ruleFileMultiplier = coun_file_lines(os.path.join(RULE_DIR, rules.path))
+        ruleFileMultiplier = count_file_lines(os.path.join(RULE_DIR, rules.path))
 
         if ruleFileMultiplier == 0:
             ruleFileMultiplier = 1
@@ -327,7 +327,7 @@ def process_job_9(job):
 
     if job['attack_settings']['rules']:
         rules = FcRule.query.filter(FcRule.id == job['attack_settings']['rules']['id']).first()
-        ruleFileMultiplier = coun_file_lines(os.path.join(RULE_DIR, rules.path))
+        ruleFileMultiplier = count_file_lines(os.path.join(RULE_DIR, rules.path))
 
         if ruleFileMultiplier == 0:
             ruleFileMultiplier = 1

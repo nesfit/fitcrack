@@ -20,7 +20,7 @@ from flask_restplus import abort
 from sqlalchemy import exc
 from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
 from src.api.fitcrack.attacks import processJob as attacks
-from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, coun_file_lines
+from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace, count_file_lines
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash
@@ -244,7 +244,7 @@ def computeCrackingTime(data):
         rulesKeyspace = 1
 #        if attackSettings['rules']:
 #            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-#            rulesKeyspace = coun_file_lines(os.path.join(RULE_DIR,rules.path))
+#            rulesKeyspace = count_file_lines(os.path.join(RULE_DIR,rules.path))
 
         keyspace = dictsKeyspace * rulesKeyspace
 
@@ -276,6 +276,19 @@ def computeCrackingTime(data):
             dictsKeyspace += dict['keyspace']
         keyspace = compute_keyspace_from_mask(attackSettings['mask']) * dictsKeyspace
 
+    elif attackSettings['attack_mode'] == 8:
+        dictsKeyspace = 0
+        if len(attackSettings['left_dictionaries']) == 1:
+            dictsKeyspace = compute_prince_keyspace(attackSettings['left_dictionaries'][0], attackSettings)
+#  TODO         Adam musí pri odkliknutí rules pri requeste posielať zase rules = null
+
+        rulesKeyspace = 1
+#        if attackSettings['rules']:
+#            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+#            rulesKeyspace = count_file_lines(os.path.join(RULE_DIR,rules.path))
+
+        keyspace = dictsKeyspace * rulesKeyspace
+
     elif attackSettings['attack_mode'] == 9:
         if(attackSettings['keyspace_limit']):
             if(int(attackSettings['keyspace_limit']) > 0):
@@ -290,7 +303,7 @@ def computeCrackingTime(data):
 # TODO          Adam musí pri odkliknutí rules pri requeste posielať zase rules = null
 #        if attackSettings['rules']:
 #            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-#            rulesKeyspace = coun_file_lines(os.path.join(RULE_DIR,rules.path))
+#            rulesKeyspace = count_file_lines(os.path.join(RULE_DIR,rules.path))
         keyspace = keyspace * rulesKeyspace
 
         # Keyspace control

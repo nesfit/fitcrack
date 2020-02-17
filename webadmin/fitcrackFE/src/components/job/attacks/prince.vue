@@ -35,7 +35,7 @@
 
     <v-divider />
     <v-card-title class="pb-0">
-      <span>Minimal length of password</span>
+      <span>Minimal length of passwords</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -51,7 +51,7 @@
 
     <v-divider />
     <v-card-title class="pb-0">
-      <span>Maximal length of password</span>
+      <span>Maximal length of passwords</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -67,7 +67,7 @@
 
         <v-divider />
     <v-card-title class="pb-0">
-      <span>Minimum number of elements per chain</span>
+      <span>Minimal number of elements per chain</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -117,10 +117,44 @@
     'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain'])),
     methods: {
       checkValid: function () {
-        if (this.leftDicts.length > 0) {
-          return true
+        if (this.minPasswordLen <= 0) {
+            this.$error('Minimal length of passwords must be greater than 0.')
+            return false;
         }
-        return false
+        if (this.maxPasswordLen <= 0) {
+            this.$error('Maximal length of passwords must be greater than 0.')
+            return false;
+        }
+        if (this.maxPasswordLen > 32) {
+            this.$error('Maximal length of passwords must be smaller or equal to 32.')
+            return false;
+        }
+        if (this.minElemInChain <= 0) {
+            this.$error('Minimal number of elements per chain must be greater than 0.')
+            return false;
+        }
+        if (this.minPasswordLen > this.maxPasswordLen) {
+            this.$error('Minimal length of passwords must be greater than maximal length of passwords.')
+            return false;
+        }
+        if (this.maxElemInChain > 0 && (this.minElemInChain > this.maxElemInChain)) {
+            this.$error('Minimal number of elements per chain must be smaller or equal than maximal number of elements per chain.')
+            return false;
+        }
+        if (this.minPasswordLen <= 0) {
+            this.$error('Minimal length of passwords must be greater than 0.')
+            return false;
+        }
+        if (this.leftDicts.length != 1) {
+            this.$error('Please select one dictionary.')
+            return false
+        }
+        if (this.maxElemInChain > this.maxPasswordLen) {
+            this.$error('Maximal number of elements per chain must be smaller or equal than maximal length of passwords.')
+            return false;
+        }
+        this.$success('Attack settings are valid.')
+        return true
       }
     }
   }

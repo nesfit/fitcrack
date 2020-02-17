@@ -12,6 +12,7 @@ HASHCAT_PATH = ROOT_DIR + '/../hashcat-4.2.1/' + HASHCAT_EXECUTABLE
 HASHCAT_DIR = ROOT_DIR + '/../hashcat-4.2.1/'
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
 MASK_PROCESSOR_PATH = ROOT_DIR + '/../maskprocessor/mp64.bin'
+PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princepreprocessor/pp64.bin'
 EXE_OR_BIN = 'bin'
 DICTIONARY_DIR = '/usr/share/collections/dictionaries'
 PCFG_DIR = '/usr/share/collections/pcfg'
