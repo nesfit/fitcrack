@@ -39,11 +39,16 @@
                 </span>
                 <v-spacer />
                 <v-btn
-                  small
-                  fab
+                  rounded
                   @click.native.stop="showEditJobDialog"
                 >
-                  <v-icon>edit</v-icon>
+                  Edit
+                  <v-icon 
+                    right 
+                    small
+                  >
+                    tune
+                  </v-icon>
                 </v-btn>
               </v-card-title>
               <v-list

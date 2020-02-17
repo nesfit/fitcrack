@@ -60,7 +60,7 @@ export const empty = {
   // other
   startNow: true,
   endNever: true,
-  timeForJob: 3600
+  timeForJob: undefined
 }
 
 export default {

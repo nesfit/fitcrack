@@ -62,6 +62,7 @@
         </v-card-title>
         <charset-selector
           v-model="charset"
+          select-all
         />
       </v-col>
       <v-col cols="6">

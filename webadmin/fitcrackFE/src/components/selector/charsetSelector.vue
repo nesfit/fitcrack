@@ -11,6 +11,7 @@
     :search="search"
     item-key="id"
     show-select
+    :single-select="!selectAll"
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
@@ -43,7 +44,7 @@
             align: 'start',
             value: 'name'
           },
-          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Keyspace', value: 'keyspace', align: 'end'},
         ],
       }
     },
