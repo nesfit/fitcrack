@@ -50,6 +50,13 @@ export const empty = {
   markovThresh: NaN,
   pcfg: [],
   keyspaceLimit: 0,
+  // prince
+  checkDuplicates: false,
+  casePermute: false,
+  minPasswordLen: 1,
+  maxPasswordLen: 8,
+  minElemInChain: 1,
+  maxElemInChain: 8,
   // other
   startNow: true,
   endNever: true,
@@ -81,7 +88,14 @@ export default {
         'charset': state.charset,
         'mask': state.hybridMask,
         'pcfg_grammar': state.pcfg[0],
-        'keyspace_limit': state.keyspaceLimit
+        'keyspace_limit': state.keyspaceLimit,
+        // prince
+        'checkDuplicates': state.checkDuplicates,
+        'casePermute': state.casePermute,
+        'minPasswordLen': parseInt(state.minPasswordLen),
+        'maxPasswordLen': parseInt(state.maxPasswordLen),
+        'minElemInChain': parseInt(state.minElemInChain),
+        'maxElemInChain': parseInt(state.maxElemInChain),
       }
     },
     jobSettings (state, { attackSettings }) {
@@ -171,4 +185,5 @@ export const attacks = [
   {handler: 'hybridWordlistMask', name: 'Hybrid Wordlist + Mask', id: 6, serverName: 'Hybrid wordlist+mask'},
   {handler: 'hybridMaskWordlist', name: 'Hybrid Mask + Wordlist', id: 7, serverName: 'Hybrid mask+wordlist'},
   {handler: 'pcfgAttack', name: 'PCFG', id: 9, serverName: 'pcfg'},
+  {handler: 'princeAttack', name: 'PRINCE', id: 8, serverName: 'prince'},
 ]
