@@ -252,6 +252,15 @@
                 </v-col>
               </v-row>
               <v-row>
+                <v-checkbox
+                  v-show="invalidHashes.length > 0"
+                  v-model="ignoreHashes"
+                  label="Ignore invalid hashes"
+                  hide-details
+                  :height="15"
+                  color="error"
+                  class="ml-2 mt-1"
+                />
                 <v-spacer />
                 <v-btn
                   color="primary"
@@ -429,7 +438,7 @@
             large
             color="primary"
             class="ml-2"
-            :disabled="!valid"
+            :disabled="!valid || (invalidHashes.length > 0 && !ignoreHashes)"
             @click="submit"
           >
             <v-icon left>
@@ -496,11 +505,14 @@
     computed: {
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
-        'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
+        'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid']),
       templateItems () {
         return this.templates.map((t, i) => ({text: t.template, value: i}))
+      },
+      invalidHashes () {
+        return this.validatedHashes.filter(h => h.result !== 'OK')
       }
     },
     watch: {
@@ -679,15 +691,7 @@
         }.bind(this)
         reader.readAsText(files[0], 'utf-8')
       },
-      submit: function () {
-        for (var i = 0; i < this.validatedHashes.length; i++) {
-          if (this.validatedHashes[i].result !== 'OK') {
-            this.$error('Wrong hash format - ' + this.validatedHashes[i].hash)
-            this.step = 1
-            return
-          }
-        }
-
+      submit (forceInvalid) {
         // TODO: maybe delete this condition
         if (this.inputMethod === 'encryptedFile' && !this.$refs.encryptedFileUploader.fileUploaded ) {
           this.$error('No file uploaded.')
@@ -777,6 +781,7 @@
   .textarea.error {
     border-width: 2px;
     border-style: solid;
+    border-radius: 5px
   }
 
   .mode-btn {

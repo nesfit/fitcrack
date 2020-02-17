@@ -22,6 +22,7 @@ const base = {
   inputMethod: 'multipleHashes',
   hashList: '',
   hashType: null,
+  ignoreHashes: false,
   // hosts
   hosts: [],
   // other
@@ -95,7 +96,8 @@ export default {
         'attack_settings': attackSettings,
         "hash_settings": {
           "hash_type": state.hashType ? state.hashType.code : null,
-          "hash_list": state.validatedHashes
+          "hash_list": state.validatedHashes,
+          "valid_only": !state.ignoreHashes
         }
       }
     },
