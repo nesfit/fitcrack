@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from flask_restplus import abort
 from settings import HASHCAT_DIR, HASHCAT_PATH, EXE_OR_BIN, DICTIONARY_DIR, RULE_DIR, HCSTATS_DIR, CHARSET_DIR
-from src.api.fitcrack.attacks.functions import make_dict_from_mask, check_mask_syntax, compute_keyspace_from_mask, compute_keyspace_from_mask_with_treshold, count_file_lines
+from src.api.fitcrack.attacks.functions import make_dict_from_mask, check_mask_syntax, compute_keyspace_from_mask, compute_prince_keyspace, compute_keyspace_from_mask_with_treshold, count_file_lines
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcMask, FcDictionary, FcRule, FcHcstat, FcCharset, FcJobDictionary
@@ -314,6 +314,53 @@ def post_process_job_7(data, db_job):
     for dict in data['attack_settings']['right_dictionaries']:
         jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'], is_left=False)
         db.session.add(jobDict)
+
+# PRINCE attack
+def process_job_8(job):
+    job['attack_settings']['attack_submode'] = 0
+
+    if len(job['attack_settings']['left_dictionaries']) != 1:
+        abort(500, 'Wrong number of dictonaries selected.')
+
+    dictObj = job['attack_settings']['left_dictionaries'].first()
+    dict = FcDictionary.query.filter(FcDictionary.id == dictObj['id']).first()
+    if not dict:
+        abort(500, 'Wrong dictionary selected.')
+
+    if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
+         abort(500, 'Dictionary does not exist.')
+
+    job['hc_keyspace'] = compute_prince_keyspace(dictObj, job['attack_settings'])
+
+    ruleFileMultiplier = 1
+
+    if job['attack_settings']['rules']:
+        rules = FcRule.query.filter(FcRule.id == job['attack_settings']['rules']['id']).first()
+        ruleFileMultiplier = count_file_lines(os.path.join(RULE_DIR, rules.path))
+
+        if ruleFileMultiplier == 0:
+            ruleFileMultiplier = 1
+
+        if not rules:
+            abort(500, 'Wrong rules file selected.')
+
+        if not os.path.exists(os.path.join(RULE_DIR, rules.path)):
+            abort(500, 'Rules file does not exist.')
+
+        job['attack_settings']['attack_submode'] = 1
+        job['rules'] = rules.name
+
+    job['attack_name'] = 'prince'
+    job['keyspace'] = job['hc_keyspace'] * ruleFileMultiplier
+
+    return job
+
+def post_process_job_8(data, db_job):
+    if len(data['attack_settings']['left_dictionaries']) != 1:
+        abort(500, 'Wrong number of dictonaries selected.')
+    dict = data['attack_settings']['left_dictionaries'].first()
+    jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'])
+    db.session.add(jobDict)
 
 # pcfg attack
 def process_job_9(job):

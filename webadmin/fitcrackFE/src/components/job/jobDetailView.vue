@@ -793,6 +793,9 @@
             return 'dictionaryDetail'
           case 'pcfg':
             return 'pcfgDetail'
+          // dictionaryDetail is good enough for PRINCE
+          case 'prince':
+            return 'dictionaryDetail'
           default:
             return 'combinatorDetail'
         }
