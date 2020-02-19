@@ -621,7 +621,7 @@
           'hybridWordlistMask': 'mdi-vector-difference-ba',
           'hybridMaskWordlist': 'mdi-vector-difference-ab',
           'pcfgAttack': 'mdi-ray-start-end',
-          'princeAttack': 'mdi-dictionary'
+          'princeAttack': 'mdi-crown'
         }
         return map[handler] || 'mdi-checkbox-blank-outline'
       },
