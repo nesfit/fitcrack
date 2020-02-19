@@ -252,6 +252,17 @@
                 </v-col>
               </v-row>
               <v-row>
+                <v-btn
+                  v-if="dev"
+                  text
+                  color="success"
+                  @click="getRandomHash"
+                >
+                  <v-icon left>
+                    mdi-auto-fix
+                  </v-icon>
+                  Random SHA1
+                </v-btn>
                 <v-checkbox
                   v-show="invalidHashes.length > 0"
                   v-model="ignoreHashes"
@@ -462,6 +473,8 @@
 </template>
 
 <script>
+  import sha1 from 'sha1'
+
   import combinator from '@/components/job/attacks/combinator'
   import mask from '@/components/job/attacks/mask'
   import dictionary from '@/components/job/attacks/dictionary'
@@ -524,6 +537,9 @@
       },
       invalidHashes () {
         return this.validatedHashes.filter(h => h.result !== 'OK')
+      },
+      dev () {
+        return localStorage.getItem('testmode') == 'true'
       }
     },
     watch: {
@@ -758,6 +774,13 @@
         }).catch((error) => {
           this.loading = false
         })
+      },
+      getRandomHash () {
+        const randomPass = Math.random().toString(36).substring(2,6)
+        this.hashList += `${sha1(randomPass)}\n`
+        this.hashType = { code: '100', name: 'SHA1' },
+        this.comment += `(${randomPass}) `
+        this.validateHashes()
       }
     }
   }

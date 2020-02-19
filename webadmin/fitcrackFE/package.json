@@ -21,6 +21,7 @@
     "npm": "^5.10.0",
     "pell": "^1.0.6",
     "sass-loader": "^7.3.1",
+    "sha1": "^1.1.1",
     "spyfu-vuex-helpers": "^0.12.4",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.4",
