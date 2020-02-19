@@ -45,6 +45,17 @@
           hint="Give this job a descriptive name"
           persistent-hint
         />
+        <v-btn
+          v-if="dev"
+          text
+          color="success"
+          @click="generateJobName"
+        >
+        <v-icon left>
+            mdi-auto-fix
+        </v-icon>
+            Generate
+        </v-btn>
       </v-col>
       <v-col>
         <v-autocomplete
@@ -781,6 +792,9 @@
         this.hashType = { code: '100', name: 'SHA1' },
         this.comment += `(${randomPass}) `
         this.validateHashes()
+      },
+      generateJobName () {
+        this.name = "job-" + this.$moment().format('DD-MM-YYYY-HH-mm')
       }
     }
   }
