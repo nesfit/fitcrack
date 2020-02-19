@@ -6,18 +6,16 @@
 <template>
   <div class="mask-container">
     <transition name="toolbar-fade">
-      <v-toolbar
+      <v-sheet
         v-show="focused"
-        class="charset-toolbar"
-        dense
-        floating
+        class="charset-toolbar pa-1"
         :elevation="8"
       >
         <v-chip
           v-for="(item, key) in represenArray"
           :key="key"
           color="primary"
-          class="mx-1"
+          class="ma-1"
           @click="addSymbol(key)"
         >
           {{ item.represent }}
@@ -26,12 +24,12 @@
           v-for="(item, index) in customCharsets"
           :key="index"
           color="info"
-          class="mx-1"
+          class="ma-1"
           @click="addSymbol(index + 1)"
         >
           {{ item.name }}
         </v-chip>
-      </v-toolbar>
+      </v-sheet>
     </transition>
     <div class="mask-input">
       <v-text-field
@@ -203,11 +201,10 @@
 .charset-toolbar {
   position: absolute;
   z-index: 10;
-  top: -90%;
+  bottom: 115%;
   max-width: 100%;
-  overflow: auto;
-
-  border-radius: 1em;
+  user-select: none;
+  border-radius: 1.3em;
   padding: 0;
 }
 
@@ -216,10 +213,10 @@
   transform: translateY(1em);
 }
 .toolbar-fade-enter-active {
-  transition: .35s .05s cubic-bezier(0.19, 1, 0.22, 1);
+  transition: .35s cubic-bezier(0.19, 1, 0.22, 1);
 }
 .toolbar-fade-leave-active {
-  transition: .15s .05s ease-in;
+  transition: .15s .1s ease-in;
 }
 
 .mask-input {
