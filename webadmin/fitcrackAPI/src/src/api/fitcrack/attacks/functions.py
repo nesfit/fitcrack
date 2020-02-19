@@ -40,7 +40,7 @@ def check_mask_syntax(mask):
         abort(400, 'Wrong mask ' + mask)
 
 
-def compute_keyspace_from_mask(mask, charsetsSize=[]):
+def compute_keyspace_from_mask(mask, charsetsSize=dict()):
     keyspace = 1
     nextCharSymbol = False
     for char in mask:

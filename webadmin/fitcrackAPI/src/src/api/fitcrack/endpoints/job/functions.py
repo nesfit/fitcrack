@@ -261,8 +261,11 @@ def computeCrackingTime(data):
 
     elif attackSettings['attack_mode'] == 3:
         if attackSettings.get('masks') and len(attackSettings['masks']) > 0:
+            customCharsetDict = {}
+            for charset in attackSettings['charset']:
+                customCharsetDict[charset['id']] = charset['keyspace']
             for mask in attackSettings['masks']:
-                keyspace += compute_keyspace_from_mask(mask)
+                keyspace += compute_keyspace_from_mask(mask, customCharsetDict)
 
     elif attackSettings['attack_mode'] == 6:
         dictsKeyspace = 0
