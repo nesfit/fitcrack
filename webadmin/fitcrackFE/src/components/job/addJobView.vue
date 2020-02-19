@@ -6,7 +6,7 @@
 <template>
   <div class="containerAddJob height100 mx-auto">
     <v-toolbar
-      v-show="estimatedTime || keyspace"
+      v-show="valid"
       class="infobar"
       floating
       dense
@@ -70,7 +70,7 @@
           non-linear
           class="mb-4"
         >
-          <v-stepper-step 
+          <v-stepper-step
             editable
             step="1"
           >
@@ -267,13 +267,13 @@
                   color="error"
                   class="mr-2"
                   text
-                  @click="clearInput" 
+                  @click="clearInput"
                 >
                   Reset
                 </v-btn>
                 <v-btn
                   color="primary"
-                  @click="step = 2" 
+                  @click="step = 2"
                 >
                   Next
                 </v-btn>
@@ -281,7 +281,7 @@
             </v-container>
           </v-stepper-content>
 
-          <v-stepper-step 
+          <v-stepper-step
             editable
             step="2"
           >
@@ -290,7 +290,7 @@
           <v-stepper-content step="2">
             <v-container>
               <v-card-title>Attack mode</v-card-title>
-              <v-item-group 
+              <v-item-group
                 v-model="attackSettingsTab"
                 class="d-flex flex-wrap justify-space-between"
               >
@@ -321,17 +321,17 @@
 
               <v-row>
                 <v-spacer />
-                <v-btn 
+                <v-btn
                   class="mr-6 mt-4"
                   color="primary"
-                  @click="step = 3" 
+                  @click="step = 3"
                 >
                   Next
                 </v-btn>
               </v-row>
             </v-container>
           </v-stepper-content>
-          <v-stepper-step 
+          <v-stepper-step
             editable
             step="3"
           >
@@ -345,16 +345,16 @@
             />
             <v-row>
               <v-spacer />
-              <v-btn 
+              <v-btn
                 class="mr-6 mt-4"
                 color="primary"
-                @click="step = 4" 
+                @click="step = 4"
               >
                 Next
               </v-btn>
             </v-row>
           </v-stepper-content>
-          <v-stepper-step 
+          <v-stepper-step
             editable
             step="4"
           >
@@ -528,7 +528,7 @@
     },
     watch: {
       jobSettings (val) {
-        if ( typeof val.attack_settings !== 'object' || this.hashType == null || this.hosts.length === 0) {
+        if (!this.valid) {
           this.showEstimatedTime = false
         } else {
           var boincIds = []
@@ -565,7 +565,7 @@
       async loadSettings () {
         if (!this.timeForJob) {
           const settings = await this.axios.get(this.$serverAddr + '/settings').then(r => r.data)
-          this.timeForJob = settings.default_seconds_per_workunit 
+          this.timeForJob = settings.default_seconds_per_workunit
         }
       },
       fetchTemplates () {

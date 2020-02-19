@@ -5,52 +5,65 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0">
-      <span>Type masks<span class="required primary--text"> *</span></span>
+    <v-card-title class="pb-0 mb-2">
+      <span>Add masks<span class="required primary--text"> *</span></span>
     </v-card-title>
-    <v-row
-      v-for="(mask, i) in masks"
-      :key="i"
-      align="center"
-      class="width100 fill-height"
-    >
-      <v-col>
-        <mask-single
-          :value="mask"
-          :custom-charsets="charset"
-          @input="e => updateMask({index: i, val: e})"
-        />
-      </v-col>
+
+    <v-row class="mb-4 px-4">
       <v-btn
+        color="primary"
         text
-        color="error"
-        icon
-        small
-        @click="deleteMask(i)"
+        @click="loadMasksDialog = true"
       >
-        <v-icon>close</v-icon>
+        <v-icon left>
+          mdi-file-download
+        </v-icon>
+        Load masks
       </v-btn>
-    </v-row>
-    <div>
       <v-btn
-        class="mx-auto d-block"
+        v-show="masks.length > 1"
+        color="error"
+        text
+        @click="masks = ['']"
+      >
+        <v-icon left>
+          mdi-restart
+        </v-icon>
+        Reset masks
+      </v-btn>
+      <v-spacer />
+      <v-btn
+        v-show="masks.length < 50"
         color="success"
-        icon
-        small
         @click="addMask()"
       >
-        <v-icon>add</v-icon>
+        <v-icon left>
+          mdi-plus
+        </v-icon>
+        Add mask
       </v-btn>
-    </div>
+    </v-row>
 
-    <v-btn
-      color="primary"
-      outlined
-      text
-      @click="loadMasksDialog = true"
+    <div
+      v-if="masks.length < 50"
+      class="mask-editors"
     >
-      Load masks
-    </v-btn>
+      <mask-single
+        v-for="(mask, i) in masks"
+        :key="i"
+        :non-removable="masks.length == 1"
+        :custom-charsets="charset"
+        :value="mask"
+        @input="e => updateMask({index: i, val: e})"
+        @remove="deleteMask(i)"
+      />
+    </div>
+    <v-alert
+      v-else
+      type="info"
+    >
+      Not showing {{ masks.length }} masks to maintain performance and conciseness.
+    </v-alert>
 
     <v-row>
       <v-col
@@ -207,6 +220,11 @@
 </script>
 
 <style scoped>
+  .mask-editors {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
   .masksContainer {
     overflow: auto;
     max-height: 500px;

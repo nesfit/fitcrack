@@ -25,17 +25,16 @@
       >
         <dict-selector
           v-model="leftDicts"
+          select-all
           @input="checkValid"
         />
       </v-col>
       <v-col cols="6">
-        <v-expansion-panels class="elevation-0 pt-2">
-          <mask-single
-            v-model="hybridMask"
-            :open-forever="true"
-            @input="checkValid"
-          />
-        </v-expansion-panels>
+        <mask-single
+          v-model="hybridMask"
+          non-removable
+          @input="checkValid"
+        />
       </v-col>
 
       <v-col

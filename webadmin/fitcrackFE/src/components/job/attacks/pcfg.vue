@@ -5,38 +5,35 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Select PCFG grammar<span class="required primary--text"> *</span></span>
     </v-card-title>
     <pcfg-selector
       v-model="pcfg"
       @input="checkValidInit"
     />
-
+    <v-card-title>
+      <span>Edit keyspace limit</span>
+    </v-card-title>
+    <v-text-field
+      v-model.number="keyspaceLimit"
+      outlined
+      single-line
+      :value="keyspaceLimit"
+      required
+      type="number"
+      suffix="passwords"
+      :max="pcfg.keyspace"
+      @input="checkValidEdit"
+    />
     <v-divider />
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Select rule file</span>
     </v-card-title>
     <rules-selector 
       v-model="rules"
       @input="checkValidInit"
     />
-    <v-card-title class="pb-0">
-      <span>Edit keyspace limit</span>
-    </v-card-title>
-    <v-card-text>
-      <v-text-field
-        v-model.number="keyspaceLimit"
-        text
-        single-line
-        :value="keyspaceLimit"
-        required
-        type="number"
-        suffix="passwords"
-        :max="pcfg.keyspace"
-        @input="checkValidEdit"
-      />
-    </v-card-text>
   </div>
 </template>
 

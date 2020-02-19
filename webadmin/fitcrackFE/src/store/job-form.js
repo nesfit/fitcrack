@@ -116,13 +116,25 @@ export default {
       }
     },
     valid (state, { attackSettings }) {
-      return (
-        state.attackSettingsTab &&
-        // state.hosts.length > 0 &&
-        attackSettings &&
-        state.hashType !== null &&
-        state.name !== ''
-      )
+      if (
+        !state.attackSettingsTab ||
+        !attackSettings ||
+        state.hashType == null ||
+        state.name === ''
+      ) return false
+      
+      switch (state.attackSettingsTab) {
+        case 'dictionary':
+        case 'hybridWordlistMask':
+          return state.leftDicts.length > 0
+        case 'hybridMaskWordlist':
+          return state.rightDicts.length > 0
+        case 'pcfgAttack':
+          return state.pcfg.length > 0
+          break
+        default:
+          return true
+      }
     },
     template (state) {
       const keys = Object.keys(empty)
