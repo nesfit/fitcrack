@@ -56,6 +56,22 @@
             </div>
           </v-card-text>
         </v-card>
+        <v-card flat class="mt-6">
+          <v-card-title>
+            <v-icon left>
+              mdi-test-tube
+            </v-icon>
+            <span>Development</span>
+          </v-card-title>
+          <v-card-text>
+            <v-switch
+              v-model="testmode"
+              label="Developer mode"
+              hint="Enables useful utilities throughout the app when developing Fitcrack."
+              persistent-hint
+            />
+          </v-card-text>
+        </v-card>
       </v-col>
       <!-- // system -->
       <v-col>
@@ -124,6 +140,7 @@
       data: function() {
       return {
           appearance: localStorage.getItem('appearance') || 'auto',
+          testmode: localStorage.getItem('testmode') == 'true' || false,
           settings: {},
           loading: true,
           saving: false
@@ -149,6 +166,9 @@
           if (value == 'dark') this.$vuetify.theme.dark = true
           if (value == 'light') this.$vuetify.theme.dark = false
           if (value == 'auto') this.$vuetify.theme.dark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        },
+        testmode (value) {
+          localStorage.setItem('testmode', value)
         }
       },
       mounted () {
