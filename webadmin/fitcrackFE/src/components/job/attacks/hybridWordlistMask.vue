@@ -25,6 +25,7 @@
       >
         <dict-selector
           v-model="leftDicts"
+          select-all
           @input="checkValid"
         />
       </v-col>

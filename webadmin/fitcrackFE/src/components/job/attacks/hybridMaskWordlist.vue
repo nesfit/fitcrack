@@ -34,6 +34,7 @@
       <v-col cols="6">
         <dict-selector
           v-model="rightDicts"
+          select-all
           @input="checkValid"
         />
       </v-col>

@@ -41,7 +41,6 @@
         outlined
         dense
         single-line
-        clearable
         :rules="maskRules"
         :value="value"
         @input="e => rawValue = e"
