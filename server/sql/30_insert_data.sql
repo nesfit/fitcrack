@@ -6615,11 +6615,11 @@ INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index
 -- Insert default rules
 --
 
-INSERT INTO `fc_rule` (`id`, `name`, `path`, `time`, `deleted`) VALUES
-(1,	'best64.rule',	'best64.rule',	'2018-08-18 12:00:00',	0),
-(2,	'd3ad0ne.rule',	'd3ad0ne.rule',	'2018-08-18 12:00:00',	0),
-(3,	'leetspeak.rule',	'leetspeak.rule',	'2018-08-18 12:00:00',	0),
-(4,	'toggles1.rule',	'toggles1.rule',	'2018-08-18 12:00:00',	0);
+INSERT INTO `fc_rule` (`id`, `name`, `path`, `count`, `time`, `deleted`) VALUES
+(1,	'best64.rule',	'best64.rule',  77,  '2018-08-18 12:00:00',	0),
+(2,	'd3ad0ne.rule',	'd3ad0ne.rule', 34099,  '2018-08-18 12:00:00',	0),
+(3,	'leetspeak.rule',	'leetspeak.rule', 17, '2018-08-18 12:00:00',	0),
+(4,	'toggles1.rule',	'toggles1.rule',  15,	'2018-08-18 12:00:00',	0);
 
 
 --
