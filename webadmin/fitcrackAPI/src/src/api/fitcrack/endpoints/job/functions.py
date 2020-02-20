@@ -239,12 +239,10 @@ def computeCrackingTime(data):
         dictsKeyspace = 0
         for dict in attackSettings['left_dictionaries']:
             dictsKeyspace += dict['keyspace']
-#  TODO         Adam musí pri odkliknutí rules pri requeste posielať zase rules = null
-
         rulesKeyspace = 1
-#        if attackSettings['rules']:
-#            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-#            rulesKeyspace = count_file_lines(os.path.join(RULE_DIR,rules.path))
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = rules.count
 
         keyspace = dictsKeyspace * rulesKeyspace
 
@@ -283,12 +281,10 @@ def computeCrackingTime(data):
         dictsKeyspace = 0
         if len(attackSettings['left_dictionaries']) == 1:
             dictsKeyspace = compute_prince_keyspace(attackSettings['left_dictionaries'][0], attackSettings)
-#  TODO         Adam musí pri odkliknutí rules pri requeste posielať zase rules = null
-
         rulesKeyspace = 1
-#        if attackSettings['rules']:
-#            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-#            rulesKeyspace = count_file_lines(os.path.join(RULE_DIR,rules.path))
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = rules.count
 
         keyspace = dictsKeyspace * rulesKeyspace
 
@@ -303,10 +299,9 @@ def computeCrackingTime(data):
             keyspace = int(attackSettings['pcfg_grammar']['keyspace'])
 
         rulesKeyspace = 1
-# TODO          Adam musí pri odkliknutí rules pri requeste posielať zase rules = null
-#        if attackSettings['rules']:
-#            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-#            rulesKeyspace = count_file_lines(os.path.join(RULE_DIR,rules.path))
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = rules.count
         keyspace = keyspace * rulesKeyspace
 
         # Keyspace control

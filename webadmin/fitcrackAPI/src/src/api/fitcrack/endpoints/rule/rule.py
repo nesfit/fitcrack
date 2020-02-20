@@ -6,6 +6,7 @@
 import logging
 
 import os
+import re
 from itertools import islice
 
 from flask import request, redirect, send_from_directory
@@ -15,9 +16,8 @@ from sqlalchemy import exc
 from settings import RULE_DIR
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
-from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
 from src.api.fitcrack.endpoints.rule.argumentsParser import updateRule_parser, rule_parser
-from src.api.fitcrack.endpoints.rule.responseModels import rule_model, ruleData_model
+from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_model, ruleData_model
 from src.api.fitcrack.functions import fileUpload
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
@@ -46,10 +46,16 @@ class ruleCollection(Resource):
         # submit a empty part without filename
         if file.filename == '':
             abort(500, 'No selected file')
+        
+        # count rules
+        rule_count = 0
+        for line in file:
+            if re.match(b'^\s*(\#.*)?$', line) == None:
+                rule_count += 1
 
         uploadedFile = fileUpload(file, RULE_DIR, ALLOWED_EXTENSIONS, suffix='.rule')
         if uploadedFile:
-            rule = FcRule(name=uploadedFile['filename'], path=uploadedFile['path'])
+            rule = FcRule(name=uploadedFile['filename'], path=uploadedFile['path'], count=rule_count)
             try:
                 db.session.add(rule)
                 db.session.commit()
@@ -63,48 +69,12 @@ class ruleCollection(Resource):
         else:
             abort(500, 'Wrong file format')
 
-    @api.marshal_with(hcStatsCollection_model)
+    @api.marshal_with(rules_model)
     def get(self):
         """
         Returns collection of HcStats files.
         """
         return {'items': FcRule.query.filter(FcRule.deleted == False).all()}
-
-
-@ns.route('/add')
-class ruleAdd(Resource):
-    is_public = True
-
-    @api.marshal_with(simpleResponse)
-    def post(self):
-        """
-        Uploads reule file on server.Nahrava rule subor na server
-        """
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            abort(500, 'No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            abort(500, 'No selected file')
-
-        uploadedFile = fileUpload(file, RULE_DIR, ALLOWED_EXTENSIONS, suffix='.rule')
-        if uploadedFile:
-            rule = FcRule(name=uploadedFile['filename'], path=uploadedFile['path'])
-            try:
-                db.session.add(rule)
-                db.session.commit()
-            except exc.IntegrityError as e:
-                db.session().rollback()
-                abort(500, 'Rule with name ' + uploadedFile['filename'] + ' already exists.')
-            return {
-                'message': 'File ' + uploadedFile['filename'] + ' successfuly uploaded.',
-                'status': True
-            }
-        else:
-            abort(500, 'Wrong file format')
 
 
 @ns.route('/<id>')

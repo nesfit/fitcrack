@@ -163,6 +163,7 @@ class FcRule(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     path = Column(String(400), nullable=False)
+    count = Column(Integer, nullable=False)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
 
