@@ -37,8 +37,9 @@ class ProcessLinux : public ProcessBase {
          * @brief   Conctutor which sets name of the executable
          * @param   exec_name [in] Path to binary to execute
          * @param   exec_args [in] Arguments to pass when executing binary
+         * @param   is_external_generator [in] Whether executable is an external password generator or not
          */
-        ProcessLinux(const std::string& exec_name, const std::vector<std::string>& exec_args, bool isPCFG);
+        ProcessLinux(const std::string& exec_name, const std::vector<std::string>& exec_args, bool is_external_generator);
 
         /**
          * @brief   Destructor deleting pipes

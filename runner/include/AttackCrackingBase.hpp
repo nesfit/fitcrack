@@ -45,6 +45,7 @@ class AttackCrackingBase: public AttackBase {
          * @brief   Basic constructor
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
+         * @param   attack_mode [in] Attack mode
          */
         AttackCrackingBase(const ConfigTask& config, Directory& directory, const char* attack_mode = nullptr);
 

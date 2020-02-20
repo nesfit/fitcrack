@@ -45,6 +45,8 @@
         :value="minPasswordLen"
         required
         type="number"
+        min="1"
+        max="32"
         @input="checkValid"
       />
     </v-card-text>
@@ -61,6 +63,8 @@
         :value="maxPasswordLen"
         required
         type="number"
+        min="1"
+        max="32"
         @input="checkValid"
       />
     </v-card-text>
@@ -77,6 +81,8 @@
         :value="minElemInChain"
         required
         type="number"
+        min="1"
+        max="32"
         @input="checkValid"
       />
     </v-card-text>
@@ -93,6 +99,8 @@
         :value="maxElemInChain"
         required
         type="number"
+        min="1"
+        max="32"
         @input="checkValid"
       />
     </v-card-text>
@@ -153,7 +161,7 @@
             this.$error('Maximal number of elements per chain must be smaller or equal than maximal length of passwords.')
             return false;
         }
-        this.$success('Attack settings are valid.')
+
         return true
       }
     }

@@ -131,7 +131,10 @@ class ProcessBase {
          * @brief   Pure virtual function launching process and filling star time
          */
         virtual int run() = 0;
-
+        /**
+         * @brief   Sets process input pipe
+         * @param   in_pipe [in] Pipe
+         */
         void setInPipe(PipeBase *in_pipe);
 
         /**

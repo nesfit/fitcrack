@@ -17,7 +17,15 @@ class AttackPCFG: public AttackCrackingBase {
          * @brief   Adds all attack specific arguments
          */
         void addSpecificArguments();
+        /**
+         * @brief   Adds pcfg specific argument
+         * @param   argument [in] Argument
+         */
         void addPCFGArgument(const std::string &argument);
+        /**
+         * @brief   Adds pcfg specific file
+         * @param   file_name [in] Filename
+         */
         void addPCFGRequiredFile(const std::string& file_name);
 
     public:
@@ -28,6 +36,10 @@ class AttackPCFG: public AttackCrackingBase {
          * @param   directory [in] Working directory
          */
       AttackPCFG(const ConfigTask &config, Directory &directory);
+        /**
+         * @brief   Get pcfg attack arguments
+         * @return  Arguments
+         */
       const std::vector<std::string> &getPCFGArguments();
 };
 #endif // ATTACKPCFG_HPP

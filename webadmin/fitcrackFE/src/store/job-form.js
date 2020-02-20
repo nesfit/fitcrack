@@ -131,7 +131,31 @@ export default {
           return state.rightDicts.length > 0
         case 'pcfgAttack':
           return state.pcfg.length > 0
-          break
+        case 'princeAttack':
+          if (state.leftDicts.length == 0)
+            return false
+          if (state.minPasswordLen <= 0)
+            return false;
+          if (state.maxPasswordLen <= 0)
+            return false;
+
+          if (state.maxPasswordLen > 32)
+            return false;
+
+          if (state.minElemInChain <= 0)
+            return false;
+
+          if (state.minPasswordLen > state.maxPasswordLen)
+            return false;
+
+          if (state.maxElemInChain > 0 && (state.minElemInChain > state.maxElemInChain))
+            return false;
+
+          if (state.maxElemInChain > state.maxPasswordLen)
+            return false;
+
+          // All ok!
+          return true
         default:
           return true
       }

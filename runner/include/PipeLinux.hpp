@@ -125,8 +125,15 @@ class PipeLinux : public PipeBase {
          * @return  Number of written characters
          */
         int writeMessage(std::string& message);
-
+        /**
+         * @brief   Creates blocking pipe
+         * @return  Blocking pipe
+         */
         static PipeBase *createBlockingPipe();
+        /**
+         * @brief   Creates non-blocking pipe
+         * @return  Non-blocking pipe
+         */
         static PipeBase *createNonBlockingPipe();
 };
 #endif // NAMEDPIPELINUX_HPP
