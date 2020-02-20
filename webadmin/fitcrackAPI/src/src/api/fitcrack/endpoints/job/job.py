@@ -181,7 +181,7 @@ class OperationWithJob(Resource):
         if action == 'start':
             if job.attack_mode == 9:
                 pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
-                start_pcfg_manager(job.id, pcfg.name, pcfg.keyspace)
+                start_pcfg_manager(job.id, pcfg.name, job.hc_keyspace)
             job.status = 10
         elif action == 'stop':
             job.status = 12
