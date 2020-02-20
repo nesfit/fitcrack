@@ -115,7 +115,7 @@ class actualUsageData(Resource):
         Returns last record from table fc_server_usage
         """
 
-        return FcServerUsage.query.order_by(FcServerUsage.time.desc()).limit(1).one()
+        return FcServerUsage.query.order_by(FcServerUsage.time.desc()).limit(1).one_or_none()
 
 
 @ns.route('/saveData')
