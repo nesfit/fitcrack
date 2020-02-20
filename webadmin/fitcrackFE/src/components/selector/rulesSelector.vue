@@ -44,6 +44,7 @@
             align: 'start',
             value: 'name'
           },
+          {text: 'Count', value: 'count', align: 'end'},
           {text: 'Added', value: 'time', align: 'end'}
         ]
       }

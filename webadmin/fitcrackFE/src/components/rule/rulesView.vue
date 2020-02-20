@@ -66,7 +66,7 @@
       </v-data-table>
       <v-divider />
       <file-uploader
-        :url="this.$serverAddr + '/rule/add'"
+        :url="this.$serverAddr + '/rule'"
         @uploadComplete="loadRules"
       />
     </fc-tile>
@@ -92,6 +92,7 @@
             align: 'start',
             value: 'name'
           },
+          {text: 'Count', value: 'count', align: 'end'},
           {text: 'Added', value: 'time', align: 'end'},
           {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ]
@@ -111,7 +112,7 @@
       deleteRule: function (item) {
         this.$root.$confirm('Delete', `This will remove ${item.name} from your rules. Are you sure?`).then((confirm) => {
           this.loading = true;
-          this.axios.delete(this.$serverAddr + '/rule/' + id).then((response) => {
+          this.axios.delete(this.$serverAddr + '/rule/' + item.id).then((response) => {
             this.loadRules()
           })
         })

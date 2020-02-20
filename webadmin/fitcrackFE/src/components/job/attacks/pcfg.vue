@@ -23,7 +23,7 @@
       required
       type="number"
       suffix="passwords"
-      :max="pcfg.keyspace"
+      :max="pcfg.length > 0 ? pcfg[0].keyspace : 0"
       @input="checkValidEdit"
     />
     <v-divider />
