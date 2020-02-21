@@ -103,12 +103,14 @@ def fileUpload(file, dir, extensions, content=None, suffix=None, withTimestamp=F
 
         filename = secure_filename(file.filename)
         originalFilename = file.filename
+        originalSuffix = Path(filename).suffix
+        stem = Path(filename).stem
 
         if withTimestamp:
-            filename = Path(filename).stem + '_' + str(int(time.time())) + Path(filename).suffix
+            filename = stem + '_' + str(int(time.time())) + originalSuffix
 
         if suffix:
-            filename = Path(filename).stem + suffix
+            filename = stem + suffix
 
         path = os.path.join(dir, filename)
 
@@ -124,6 +126,8 @@ def fileUpload(file, dir, extensions, content=None, suffix=None, withTimestamp=F
             file.close()
 
         return {
+            'stem': stem,
+            'suffix': suffix if suffix else originalSuffix,
             'filename': secure_filename(originalFilename),
             'path': filename
         }

@@ -129,7 +129,7 @@ def process_job_3(job, hashcatKeyspace=True):
         if len(job['attack_settings']['charset']) > 4:
             abort(500, 'Maximum of charsets files is 4.')
         for i, charset in enumerate(job['attack_settings']['charset'], 1):
-            charsetPath = os.path.join(CHARSET_DIR, charset['name'])
+            charsetPath = os.path.join(CHARSET_DIR, charset['name'] + '.hcchr')
             charsetsSize = dict()
             with open(charsetPath, 'rb') as f:
                 content = f.read()

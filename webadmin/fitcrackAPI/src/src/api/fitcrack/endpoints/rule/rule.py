@@ -46,15 +46,14 @@ class ruleCollection(Resource):
         # submit a empty part without filename
         if file.filename == '':
             abort(500, 'No selected file')
-        
-        # count rules
-        rule_count = 0
-        for line in file:
-            if re.match(b'^\s*(\#.*)?$', line) == None:
-                rule_count += 1
 
         uploadedFile = fileUpload(file, RULE_DIR, ALLOWED_EXTENSIONS, suffix='.rule')
         if uploadedFile:
+            rule_count = 0
+            with open(os.path.join(RULE_DIR, uploadedFile['path']), encoding='latin-1') as file:
+                for line in file:
+                    if re.match('^\s*(\#.*)?$', line) == None:
+                        rule_count += 1
             rule = FcRule(name=uploadedFile['filename'], path=uploadedFile['path'], count=rule_count)
             try:
                 db.session.add(rule)

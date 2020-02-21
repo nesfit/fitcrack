@@ -6,7 +6,7 @@
 import logging
 
 import os
-from flask import request, redirect, send_from_directory
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -59,7 +59,7 @@ class charsetAdd(Resource):
         uploadedFile = fileUpload(file, CHARSET_DIR, ALLOWED_EXTENSIONS, suffix='.hcchr')
         if uploadedFile:
             size = os.path.getsize(os.path.join(CHARSET_DIR, uploadedFile['path']))
-            charset = FcCharset(name=uploadedFile['filename'], path=uploadedFile['path'], keyspace=size)
+            charset = FcCharset(name=uploadedFile['stem'], path=uploadedFile['path'], keyspace=size)
             try:
                 db.session.add(charset)
                 db.session.commit()
@@ -121,6 +121,9 @@ class charset(Resource):
         else:
             charset.deleted = True
         db.session.commit()
+        path = os.path.join(CHARSET_DIR, charset.path)
+        if os.path.exists(path):
+            os.remove(path)
         return {
             'status': True,
             'message': 'Charset sucesfully deleted.'
@@ -136,7 +139,7 @@ class downloadCharset(Resource):
         """
 
         charset = FcCharset.query.filter(FcCharset.id == id).first()
-        return send_from_directory(CHARSET_DIR, charset.path)
+        return send_file(os.path.join(CHARSET_DIR, charset.path), as_attachment=True, attachment_filename=charset.path)
 
 
 @ns.route('/<id>/update')
