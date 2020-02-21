@@ -216,7 +216,7 @@ class OperationWithPackage(Resource):
 
         return {
             'status': True,
-            'message': 'Job with name ' + package.name + ' ' + action
+            'message': 'Job \"' + package.name + '\" ' + action + "ed"
         }
 
 

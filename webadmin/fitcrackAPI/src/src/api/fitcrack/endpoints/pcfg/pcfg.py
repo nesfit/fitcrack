@@ -123,7 +123,7 @@ class pcfgAdd(Resource):
             createPcfgGrammarBin(uploadedFile['filename'])
 
             return {
-                'message': 'PCFG ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'PCFG ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
 
             }
@@ -165,7 +165,7 @@ class pcfgMakeFromDictionary(Resource):
         createPcfgGrammarBin(dict.name)
 
         return {
-            'message': 'PCFG ' + dict.name + ' successfuly uploaded.',
+            'message': 'PCFG ' + dict.name + ' successfully uploaded.',
             'status': True
 
         }

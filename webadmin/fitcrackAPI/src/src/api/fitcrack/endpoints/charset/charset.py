@@ -68,7 +68,7 @@ class charsetAdd(Resource):
                 db.session().rollback()
                 abort(500, 'Charset with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'File ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'File ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
             }
         else:
@@ -162,6 +162,6 @@ class updateCharset(Resource):
         file.close()
 
         return {
-            'message': 'File ' + charset.name + ' successfuly changed.',
+            'message': 'File ' + charset.name + ' successfully changed.',
             'status': True
         }

@@ -67,7 +67,7 @@ class markovAdd(Resource):
                 db.session().rollback()
                 abort(500, 'HcStats with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'File ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'File ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
 
             }
@@ -99,7 +99,7 @@ class markov(Resource):
         db.session.commit()
         return {
             'status': True,
-            'message': 'Markov files successfuly deleted.'
+            'message': 'Markov files successfully deleted.'
         }, 200
 
 

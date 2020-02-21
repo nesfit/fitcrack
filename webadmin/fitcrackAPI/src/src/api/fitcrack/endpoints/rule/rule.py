@@ -63,7 +63,7 @@ class ruleCollection(Resource):
                 db.session().rollback()
                 abort(500, 'Rule with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'File ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'File ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
             }
         else:
@@ -182,6 +182,6 @@ class updateRule(Resource):
         file.close()
 
         return {
-            'message': 'File ' + rule.name + ' successfuly changed.',
+            'message': 'File ' + rule.name + ' successfully changed.',
             'status': True
         }

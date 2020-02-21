@@ -319,18 +319,15 @@ def post_process_job_7(data, db_job):
 def process_job_8(job):
     job['attack_settings']['attack_submode'] = 0
 
-    if len(job['attack_settings']['left_dictionaries']) != 1:
-        abort(500, 'Wrong number of dictonaries selected.')
+    for dictObj in job['attack_settings']['left_dictionaries']:
+        dict = FcDictionary.query.filter(FcDictionary.id == dictObj['id']).first()
+        if not dict:
+            abort(500, 'Wrong dictionary selected.')
 
-    dictObj = job['attack_settings']['left_dictionaries'].first()
-    dict = FcDictionary.query.filter(FcDictionary.id == dictObj['id']).first()
-    if not dict:
-        abort(500, 'Wrong dictionary selected.')
+        if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
+            abort(500, 'Dictionary does not exist.')
 
-    if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
-         abort(500, 'Dictionary does not exist.')
-
-    job['hc_keyspace'] = compute_prince_keyspace(dictObj, job['attack_settings'])
+    job['hc_keyspace'] = compute_prince_keyspace(job['attack_settings'])
 
     ruleFileMultiplier = 1
 
@@ -350,17 +347,19 @@ def process_job_8(job):
         job['attack_settings']['attack_submode'] = 1
         job['rules'] = rules.name
 
+    prince_settings = ["case_permute", "check_duplicates", "min_password_len", "max_password_len", "min_elem_in_chain", "max_elem_in_chain"]
+    for setting in prince_settings:
+        job[setting] = job['attack_settings'][setting]
+
     job['attack_name'] = 'prince'
     job['keyspace'] = job['hc_keyspace'] * ruleFileMultiplier
 
     return job
 
 def post_process_job_8(data, db_job):
-    if len(data['attack_settings']['left_dictionaries']) != 1:
-        abort(500, 'Wrong number of dictonaries selected.')
-    dict = data['attack_settings']['left_dictionaries'].first()
-    jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'])
-    db.session.add(jobDict)
+    for dict in data['attack_settings']['left_dictionaries']:
+        jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'])
+        db.session.add(jobDict)
 
 # pcfg attack
 def process_job_9(job):

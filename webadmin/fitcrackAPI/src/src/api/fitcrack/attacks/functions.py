@@ -65,23 +65,26 @@ def compute_keyspace_from_mask(mask, charsetsSize=dict()):
 
     return keyspace
 
-def compute_prince_keyspace(dict, attackSettings):
-    dict_path = os.path.join(DICTIONARY_DIR, dict['name'])
-    princepreprocessor_args = [PRINCE_PROCESSOR_PATH, dict_path]
+def compute_prince_keyspace(attackSettings):
+    run_cmd = ["cat"]
+    for dict in attackSettings['left_dictionaries']:
+        run_cmd.append(os.path.join(DICTIONARY_DIR, dict['name']))
+    run_cmd.append("|")
+    run_cmd.append(PRINCE_PROCESSOR_PATH)
     if attackSettings['case_permute']:
-        princepreprocessor_args.append("--case-permute")
+        run_cmd.append("--case-permute")
     if not attackSettings['check_duplicates']:
-        princepreprocessor_args.append("--dupe-check-disable")
+        run_cmd.append("--dupe-check-disable")
     if attackSettings['min_password_len']:
-        princepreprocessor_args.append("--pw-min=" + str(attackSettings['min_password_len']))
+        run_cmd.append("--pw-min=" + str(attackSettings['min_password_len']))
     if attackSettings['max_password_len']:
-        princepreprocessor_args.append("--pw-max=" + str(attackSettings['max_password_len']))
+        run_cmd.append("--pw-max=" + str(attackSettings['max_password_len']))
     if attackSettings['min_elem_in_chain']:
-        princepreprocessor_args.append("--elem-cnt-min=" + str(attackSettings['min_elem_in_chain']))
+        run_cmd.append("--elem-cnt-min=" + str(attackSettings['min_elem_in_chain']))
     if attackSettings['max_elem_in_chain']:
-        princepreprocessor_args.append("--elem-cnt-max=" + str(attackSettings['max_elem_in_chain']))
-    princepreprocessor_args.append("--keyspace")
-    compute_keyspace_command = ' '.join(princepreprocessor_args)
+        run_cmd.append("--elem-cnt-max=" + str(attackSettings['max_elem_in_chain']))
+    run_cmd.append("--keyspace")
+    compute_keyspace_command = ' '.join(run_cmd)
     print(compute_keyspace_command)
     try:
         return int(shellExec(compute_keyspace_command))

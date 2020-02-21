@@ -10,6 +10,7 @@
     </v-card-title>
     <dict-selector
       v-model="leftDicts"
+      select-all
       @input="checkValid"
     />
     <v-divider />
@@ -152,10 +153,6 @@
         if (this.minPasswordLen <= 0) {
             this.$error('Minimal length of passwords must be greater than 0.')
             return false;
-        }
-        if (this.leftDicts.length != 1) {
-            this.$error('Please select one dictionary.')
-            return false
         }
         if (this.maxElemInChain > this.maxPasswordLen) {
             this.$error('Maximal number of elements per chain must be smaller or equal than maximal length of passwords.')

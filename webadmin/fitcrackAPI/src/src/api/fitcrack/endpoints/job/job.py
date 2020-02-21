@@ -103,7 +103,7 @@ class jobsCollection(Resource):
         job = create_job(data)
 
         return {
-            'message': 'Job ' + job.name + ' succesfuly created.',
+            'message': 'Job ' + job.name + ' succesfully created.',
             'status': True,
             'job_id': job.id
         }
@@ -153,7 +153,7 @@ class JobByID(Resource):
         db.session.commit()
         return {
             'status': True,
-            'message': 'Job with name ' + job.name + ' edited.'
+            'message': 'Job \"' + job.name + '\" was edited.'
         }
 
     @api.response(204, 'Job successfully deleted.')
@@ -241,7 +241,7 @@ class OperationWithJob(Resource):
 
         return {
             'status': True,
-            'message': 'Job with name ' + job.name + ' ' + action
+            'message': 'Job \"' + job.name + '\" was ' + action + "ed"
         }
 
 

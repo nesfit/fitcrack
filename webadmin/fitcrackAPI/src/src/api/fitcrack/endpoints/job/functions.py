@@ -278,9 +278,7 @@ def computeCrackingTime(data):
         keyspace = compute_keyspace_from_mask(attackSettings['mask']) * dictsKeyspace
 
     elif attackSettings['attack_mode'] == 8:
-        dictsKeyspace = 0
-        if len(attackSettings['left_dictionaries']) == 1:
-            dictsKeyspace = compute_prince_keyspace(attackSettings['left_dictionaries'][0], attackSettings)
+        dictsKeyspace = compute_prince_keyspace(attackSettings)
         rulesKeyspace = 1
         if attackSettings['rules']:
             rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()

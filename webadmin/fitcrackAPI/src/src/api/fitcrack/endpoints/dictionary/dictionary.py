@@ -152,7 +152,7 @@ class dictionaryAdd(Resource):
                 db.session().rollback()
                 abort(500, 'Dictionary with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'Dictionary ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'Dictionary ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
 
             }
@@ -191,6 +191,6 @@ class dictionary(Resource):
                 abort(500, 'Dictionary with name ' + file['filename'] + ' already exists.')
 
         return {
-            'message': 'Dictionaries successfuly uploaded.',
+            'message': 'Dictionaries successfully uploaded.',
             'status': True
         }
