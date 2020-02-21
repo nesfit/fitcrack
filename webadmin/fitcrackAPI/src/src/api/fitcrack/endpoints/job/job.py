@@ -103,7 +103,7 @@ class jobsCollection(Resource):
         job = create_job(data)
 
         return {
-            'message': 'Job ' + job.name + ' succesfully created.',
+            'message': 'Job \"' + job.name + '\" succesfully created.',
             'status': True,
             'job_id': job.id
         }
