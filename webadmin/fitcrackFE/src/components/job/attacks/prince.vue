@@ -5,7 +5,7 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Select dictionary<span class="required primary--text"> *</span></span>
     </v-card-title>
     <dict-selector
@@ -15,7 +15,7 @@
     />
     <v-divider />
 
-     <v-card-title class="pb-0">
+     <v-card-title>
       <span>Select rule file</span>
     </v-card-title>
     <rules-selector 
@@ -35,7 +35,7 @@
     />
 
     <v-divider />
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Minimal length of passwords</span>
     </v-card-title>
     <v-card-text>
@@ -53,7 +53,7 @@
     </v-card-text>
 
     <v-divider />
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Maximal length of passwords</span>
     </v-card-title>
     <v-card-text>
@@ -71,7 +71,7 @@
     </v-card-text>
 
         <v-divider />
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Minimal number of elements per chain</span>
     </v-card-title>
     <v-card-text>
@@ -89,7 +89,7 @@
     </v-card-text>
 
     <v-divider />
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Maximal number of elements per chain</span>
     </v-card-title>
     <v-card-text>

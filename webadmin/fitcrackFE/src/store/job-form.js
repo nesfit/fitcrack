@@ -115,14 +115,7 @@ export default {
         }
       }
     },
-    valid (state, { attackSettings }) {
-      if (
-        !state.attackSettingsTab ||
-        !attackSettings ||
-        state.hashType == null ||
-        state.name === ''
-      ) return false
-      
+    validSettings (state) {
       switch (state.attackSettingsTab) {
         case 'dictionary':
         case 'hybridWordlistMask':
@@ -159,6 +152,21 @@ export default {
         default:
           return true
       }
+    },
+    valid (state, { attackSettings, validSettings }) {
+      if (
+        !state.attackSettingsTab ||
+        !attackSettings ||
+        state.hashType == null ||
+        state.name === ''
+      ) {
+        return false
+      } else {
+        return validSettings
+      }
+    },
+    keyspaceKnown ({ attackSettingsTab }, { validSettings }) {
+      return attackSettingsTab && validSettings
     },
     template (state) {
       const keys = Object.keys(empty)

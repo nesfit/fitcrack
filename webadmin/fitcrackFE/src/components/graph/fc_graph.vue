@@ -121,7 +121,6 @@
     text-align: center;
     padding: 20px;
     vertical-align: middle;
-    color: #3e3e3e;
     font-weight: 200;
   }
 </style>

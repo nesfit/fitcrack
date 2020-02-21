@@ -5,7 +5,7 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Select dictionary<span class="required primary--text"> *</span></span>
     </v-card-title>
     <dict-selector
@@ -15,7 +15,7 @@
     />
 
     <v-divider />
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Select rule file</span>
     </v-card-title>
     <rules-selector
