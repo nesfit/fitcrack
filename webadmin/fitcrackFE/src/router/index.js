@@ -42,8 +42,8 @@ const appRoutes = [
     name: 'home',
     component: home,
     meta: {
-      title: 'Home',
-      icon: 'mdi-home'
+      title: 'Dashboard',
+      icon: 'mdi-view-dashboard'
     }
   },
   {
@@ -229,8 +229,8 @@ const appRoutes = [
     name: 'server',
     component: Server,
     meta: {
-      title: 'Server status',
-      icon: 'mdi-server'
+      title: 'Server monitor',
+      icon: 'mdi-gauge'
     }
   },
   {

@@ -41,7 +41,7 @@
             <v-icon>{{ routeIcon('home') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Home</v-list-item-title>
+            <v-list-item-title>Dashboard</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -233,7 +233,7 @@
             <v-icon>{{ routeIcon('server') }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Server</v-list-item-title>
+            <v-list-item-title>Server monitor</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 

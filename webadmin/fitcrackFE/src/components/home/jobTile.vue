@@ -26,9 +26,9 @@ export default {
       const colors = {
         ready: 'info',
         finished: 'success',
-        exhausted: 'warning',
+        exhausted: 'error',
         malformed: 'error',
-        finishing: ''
+        finishing: 'info'
       }
       return colors[status]
     },

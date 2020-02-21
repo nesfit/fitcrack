@@ -70,7 +70,7 @@
         cols="6"
         class="border"
       >
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Select charsets (max. 4)</span>
         </v-card-title>
         <charset-selector
@@ -79,7 +79,7 @@
         />
       </v-col>
       <v-col cols="6">
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Markov file</span>
         </v-card-title>
         <markov-selector
@@ -124,7 +124,8 @@
               type="number"
               :disabled="submode === 0"
               label="Markov threshold"
-              single-line
+              filled
+              dense
               mask="########"
               @input="checkValid"
             />
@@ -137,23 +138,24 @@
 
     <v-dialog
       v-model="loadMasksDialog"
-      max-width="400"
+      max-width="600"
     >
       <v-card>
-        <maskFile-selector
-          v-model="maskFile"
-          @input="checkValid"
-        />
-        <v-btn
-          outlined
-          text
-          class="width96"
-          color="primary"
-          :disabled="maskFile === null"
-          @click="loadMasksFromFile"
-        >
-          Load
-        </v-btn>
+        <v-card-text>
+          <maskFile-selector
+            v-model="maskFile"
+            @input="checkValid"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            :disabled="!maskFile"
+            @click="loadMasksFromFile"
+          >
+            Load
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>

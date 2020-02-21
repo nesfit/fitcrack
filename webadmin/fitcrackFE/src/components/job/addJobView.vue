@@ -5,22 +5,52 @@
 
 <template>
   <div class="containerAddJob height100 mx-auto">
-    <v-toolbar
-      v-show="valid"
-      class="infobar"
-      floating
-      dense
-      :tile="false"
-    >
-      <div>
-        <span v-show="keyspace" class="mr-1">
-          Keyspace: {{ keyspace }}.
-        </span>
-        <span v-show="estimatedTime">
-          Estimated cracking time is {{ estimatedTime }}.
-        </span>
-      </div>
-    </v-toolbar>
+    <v-scale-transition>
+      <v-sheet
+        v-show="keyspaceKnown && keyspace || estimatedTime"
+        class="infobar"
+        color="info"
+        dark
+        elevation="8"
+      >
+        <div class="d-flex">
+          <div
+            v-show="keyspace"
+            class="text-end"
+          >
+            <div class="overline">
+              <v-icon
+                x-small
+                class="mr-1"
+              >
+                mdi-key
+              </v-icon>
+              <span>
+                Keyspace
+              </span>
+            </div>
+            <div>{{ numberFormat(keyspace) }}</div>
+          </div>
+          <div
+            v-show="estimatedTime"
+            class="ml-4 text-end"
+          >
+            <div class="overline">
+              <v-icon
+                x-small
+                class="mr-1"
+              >
+                mdi-timelapse
+              </v-icon>
+              <span>
+                Est. cracking time
+              </span>
+            </div>
+            <div>{{ estimatedTime }}</div>
+          </div>
+        </div>
+      </v-sheet>
+    </v-scale-transition>
     <div
       v-show="loading"
       class="loadingProgressCont"
@@ -51,10 +81,10 @@
           color="success"
           @click="generateJobName"
         >
-        <v-icon left>
+          <v-icon left>
             mdi-auto-fix
-        </v-icon>
-            Generate
+          </v-icon>
+          Generate
         </v-btn>
       </v-col>
       <v-col>
@@ -411,7 +441,9 @@
                   />
                 </v-col>
                 <v-col>
-                  <div class="title mb-2">Desired time for each job</div>
+                  <div class="title mb-2">
+                    Desired time per workunit
+                  </div>
                   <v-text-field
                     v-model="timeForJob"
                     outlined
@@ -485,6 +517,7 @@
 
 <script>
   import sha1 from 'sha1'
+  import numberFormat from '@/assets/scripts/numberFormat'
 
   import combinator from '@/components/job/attacks/combinator'
   import mask from '@/components/job/attacks/mask'
@@ -542,7 +575,7 @@
       ...mapTwoWayState('jobForm', twoWayMap([
         'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
-      ...mapGetters('jobForm', ['jobSettings', 'valid']),
+      ...mapGetters('jobForm', ['jobSettings', 'valid', 'keyspaceKnown']),
       templateItems () {
         return this.templates.map((t, i) => ({text: t.template, value: i}))
       },
@@ -555,9 +588,7 @@
     },
     watch: {
       jobSettings (val) {
-        if (!this.valid) {
-          this.showEstimatedTime = false
-        } else {
+        if (this.valid) {
           var boincIds = []
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
@@ -573,7 +604,6 @@
             if (response['data']) {
               this.estimatedTime = response.data.display_time
               this.keyspace = response.data.keyspace
-              this.showEstimatedTime = true
             }
           })
         }
@@ -589,6 +619,7 @@
     },
     methods: {
       ...mapMutations('jobForm', ['applyTemplate']),
+      numberFormat,
       async loadSettings () {
         if (!this.timeForJob) {
           const settings = await this.axios.get(this.$serverAddr + '/settings').then(r => r.data)
@@ -628,7 +659,7 @@
         const map = {
           'dictionary': 'mdi-dictionary',
           'combinator': 'mdi-vector-combine',
-          'maskattack': 'mdi-karate',
+          'maskattack': 'mdi-boxing-glove',
           'hybridWordlistMask': 'mdi-vector-difference-ba',
           'hybridMaskWordlist': 'mdi-vector-difference-ab',
           'pcfgAttack': 'mdi-ray-start-end',
@@ -741,6 +772,7 @@
       clearInput () {
         this.hashType = null
         this.hashList = ''
+        this.unvalidateHashes()
       },
       submit () {
         // TODO: maybe delete this condition
@@ -829,8 +861,10 @@
   .infobar {
     position: fixed;
     z-index: 5;
-    bottom: 1em;
-    right: 1em;
+    bottom: 1.2em;
+    right: 1.2em;
+    padding: 0.5em 1.5em;
+    border-radius: 2em;
   }
 
   .hashCeckContainer {
