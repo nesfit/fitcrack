@@ -100,6 +100,13 @@ def check_valid_login():
             abort(401)
     return
 
+@app.after_request
+def bake_cookies(response):
+    "just a workaround"
+    if (response.headers.get('Set-Cookie')):
+        response.headers['Set-Cookie'] += '; SameSite=Lax'
+    return response
+
 
 def main():
     app.run(host='0.0.0.0', port=5000, threaded=False)
