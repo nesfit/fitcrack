@@ -126,9 +126,15 @@ def create_job(data):
         rule_right=(job['attack_settings']['rule_right'] if job['attack_settings'].get('rule_right') else ''),
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',
         markov_threshold=job['markov_threshold'] if job.get('markov_threshold') else 0,
+        grammar_id=job['attack_settings']['pcfg_grammar']['id'] if job['attack_settings'].get('pcfg_grammar') else 0,
+        case_permute=job['case_permute'] if job['attack_settings'].get('case_permute') else 0,
+        check_duplicates=job['check_duplicates'] if job['attack_settings'].get('check_duplicates') else 0,
+        min_password_len=job['min_password_len'] if job['attack_settings'].get('min_password_len') else 0,
+        max_password_len=job['max_password_len'] if job['attack_settings'].get('max_password_len') else 0,
+        min_elem_in_chain=job['min_elem_in_chain'] if job['attack_settings'].get('min_elem_in_chain') else 0,
+        max_elem_in_chain=job['max_elem_in_chain'] if job['attack_settings'].get('max_elem_in_chain') else 0,
         replicate_factor=1,
-        deleted=False,
-        grammar_id=job['attack_settings']['pcfg_grammar']['id'] if job['attack_settings'].get('pcfg_grammar') else 0
+        deleted=False
         )
 
     try:

@@ -215,6 +215,13 @@ class FcJob(Base):
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
     markov_threshold = Column(Integer, nullable=False, server_default=text("'0'"))
+    grammar_id = Column(BigInteger, nullable=False)
+    case_permute = Column(Integer, nullable=False, server_default=text("'0'"))
+    check_duplicates = Column(Integer, nullable=False, server_default=text("'0'"))
+    min_password_len = Column(Integer, nullable=False, server_default=text("'1'"))
+    max_password_len = Column(Integer, nullable=False, server_default=text("'8'"))
+    min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
+    max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
@@ -244,7 +251,6 @@ class FcJob(Base):
 
     left_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == True))
     right_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == False))
-    grammar_id = Column(BigInteger, nullable=False)
 
     @hybrid_property
     def host_count(self):
