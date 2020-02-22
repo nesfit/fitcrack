@@ -95,15 +95,18 @@ class dictionaryData(Resource):
         dict = FcDictionary.query.filter(FcDictionary.id==id).first()
         if not dict:
             abort(500, 'Can\'t open dictionary')
+        dict_path = os.path.join(DICTIONARY_DIR, dict.path)
+        if not os.path.exists(dict_path):
+            abort(500, 'Dictionary does not exist')
 
         if args.get('search', None):
-            with open(os.path.join(DICTIONARY_DIR, dict.path),  encoding='latin-1') as file:
+            with open(dict_path,  encoding='latin-1') as file:
                 head = ''
                 for line in file:
                     if line.find(args['search']) != -1:
                         head += line
         else:
-            with open(os.path.join(DICTIONARY_DIR,dict.path), encoding='latin-1') as file:
+            with open(dict_path, encoding='latin-1') as file:
                 head = list(islice(file, page * per_page, page * per_page + per_page))
 
         if len(head) == 0:
