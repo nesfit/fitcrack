@@ -97,7 +97,10 @@ class dictionaryData(Resource):
             abort(500, 'Can\'t open dictionary')
         dict_path = os.path.join(DICTIONARY_DIR, dict.path)
         if not os.path.exists(dict_path):
-            abort(500, 'Dictionary does not exist')
+            return {
+                'status': False,
+                'data': ''
+            }
 
         if args.get('search', None):
             with open(dict_path,  encoding='latin-1') as file:

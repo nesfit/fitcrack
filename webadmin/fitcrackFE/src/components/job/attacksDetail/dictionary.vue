@@ -33,7 +33,7 @@
         </v-list-item-action>
         <v-list-item-content>
           <v-list-item-title class="text-right">
-            <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}">
+            <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}" target='_blank'>
               {{ data.rulesFile.name }}
             </router-link>
           </v-list-item-title>

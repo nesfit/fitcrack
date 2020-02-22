@@ -123,15 +123,21 @@ class ruleData(Resource):
         rule = FcRule.query.filter(FcRule.id==id).first()
         if not rule:
             abort(500, 'Can\'t open rules file')
+        rule_path = os.path.join(RULE_DIR, rule.path)
+        if not os.path.exists(rule_path):
+            return {
+                'status': False,
+                'data': ''
+            }
 
         if args.get('search', None):
-            with open(os.path.join(RULE_DIR, rule.path), encoding='latin-1') as file:
+            with open(rule_path, encoding='latin-1') as file:
                 head = ''
                 for line in file:
                     if line.find(args['search']) != -1:
                         head += line
         else:
-            with open(os.path.join(RULE_DIR, rule.path), encoding='latin-1') as file:
+            with open(rule_path, encoding='latin-1') as file:
                 head = list(islice(file, page * per_page, page * per_page + per_page))
 
         if len(head) == 0:
