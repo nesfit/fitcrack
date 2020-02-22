@@ -36,7 +36,7 @@
 
     <v-divider />
     <v-card-title>
-      <span>Minimal length of passwords (1 - 32)</span>
+      <span>Minimal length of passwords (1 - 16)</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -47,14 +47,14 @@
         required
         type="number"
         min="1"
-        max="32"
+        max="16"
         @input="checkValid"
       />
     </v-card-text>
 
     <v-divider />
     <v-card-title>
-      <span>Maximal length of passwords (1 - 32)</span>
+      <span>Maximal length of passwords (1 - 16)</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -65,14 +65,14 @@
         required
         type="number"
         min="1"
-        max="32"
+        max="16"
         @input="checkValid"
       />
     </v-card-text>
 
         <v-divider />
     <v-card-title>
-      <span>Minimal number of elements per chain (1 - 32)</span>
+      <span>Minimal number of elements per chain (1 - 16)</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -83,14 +83,14 @@
         required
         type="number"
         min="1"
-        max="32"
+        max="16"
         @input="checkValid"
       />
     </v-card-text>
 
     <v-divider />
     <v-card-title>
-      <span>Maximal number of elements per chain (1 - 32)</span>
+      <span>Maximal number of elements per chain (1 - 16)</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -101,7 +101,7 @@
         required
         type="number"
         min="1"
-        max="32"
+        max="16"
         @input="checkValid"
       />
     </v-card-text>

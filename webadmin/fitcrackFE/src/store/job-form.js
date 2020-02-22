@@ -132,7 +132,7 @@ export default {
           if (state.maxPasswordLen <= 0)
             return false;
 
-          if (state.maxPasswordLen > 32)
+          if (state.maxPasswordLen > 16)
             return false;
 
           if (state.minElemInChain <= 0)
