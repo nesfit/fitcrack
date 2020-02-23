@@ -5,6 +5,12 @@
 
 #include "ConfigTask.hpp"
 
+const char *ConfigTask::HC_KEYSPACE = "hc_keyspace";
+const char *ConfigTask::MASK_HC_KEYSPACE = "mask_hc_keyspace";
+const char *ConfigTask::DICT_HC_KEYSPACE = "dict_hc_keyspace";
+const char *ConfigTask::START_INDEX = "start_index";
+const char *ConfigTask::START_HASH_INDEX = "start_hash_index";
+
 /* Private */
 
 void ConfigTask::convertLineToOption(std::string& line) {
@@ -41,10 +47,10 @@ void ConfigTask::initSupported() {
   supported_.push_back("rule_left");
   supported_.push_back("rule_right");
   supported_.push_back("mask");
-  supported_.push_back("start_index");
-  supported_.push_back("hc_keyspace");
-  supported_.push_back("mask_hc_keyspace");
-  supported_.push_back("dict_hc_keyspace");
+  supported_.push_back(ConfigTask::START_INDEX);
+  supported_.push_back(ConfigTask::HC_KEYSPACE);
+  supported_.push_back(ConfigTask::MASK_HC_KEYSPACE);
+  supported_.push_back(ConfigTask::DICT_HC_KEYSPACE);
   supported_.push_back("markov_threshold");
 }
 
