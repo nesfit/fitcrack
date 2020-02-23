@@ -52,6 +52,14 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::MASK_HC_KEYSPACE);
   supported_.push_back(ConfigTask::DICT_HC_KEYSPACE);
   supported_.push_back("markov_threshold");
+  supported_.push_back("case_permute");
+  supported_.push_back("check_duplicates");
+  supported_.push_back("min_password_len");
+  supported_.push_back("max_password_len");
+  supported_.push_back("min_elem_in_chain");
+  supported_.push_back("max_elem_in_chain");
+  supported_.push_back("range_start");
+  supported_.push_back("range_end");
 }
 
 bool ConfigTask::isSupported(const std::string& key) {
