@@ -501,7 +501,7 @@
             large
             color="primary"
             class="ml-2"
-            :disabled="!valid || (invalidHashes.length > 0 && !ignoreHashes)"
+            :disabled="!valid || keyspace > 1.8446744e+19 /* 2^64 */ || (invalidHashes.length > 0 && !ignoreHashes)"
             @click="submit"
           >
             <v-icon left>
