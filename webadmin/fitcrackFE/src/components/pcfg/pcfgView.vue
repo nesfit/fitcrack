@@ -63,7 +63,6 @@
         <v-btn
           class="d-inline-block"
           color="primary"
-          text
           outlined
           @click.native.stop="dialog = true"
         >

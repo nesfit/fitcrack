@@ -6,8 +6,15 @@
 <template>
   <div>
     <v-toolbar flat>
-      <v-chip>{{ jobs.length }}</v-chip>
-      <h2 class="ml-4">All jobs</h2>
+      <v-chip>{{ totalItems }}</v-chip>
+      <h2 class="ml-4">
+        All jobs
+        <span v-show="viewHidden">(hidden)</span>
+        <span v-show="status || attackType">that</span>
+        <span v-show="status">are {{ status }}</span>
+        <span v-show="status && attackType">and</span>
+        <span v-show="attackType">use {{ attackType }} attack</span>
+      </h2>
       <!--
       <v-spacer />
       <v-btn text>
