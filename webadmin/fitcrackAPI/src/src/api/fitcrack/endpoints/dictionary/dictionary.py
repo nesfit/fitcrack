@@ -10,6 +10,7 @@ import os
 
 import time
 from pathlib import Path
+from shutil import move
 
 from flask import request, redirect
 from flask_restplus import Resource, abort
@@ -21,7 +22,7 @@ from src.api.fitcrack.endpoints.dictionary.argumentsParser import dictionary_par
 from src.api.fitcrack.endpoints.dictionary.functions import readingFromFolderPostProcces
 from src.api.fitcrack.endpoints.dictionary.responseModels import dictionaries_model, dictData_model, \
     dictionary_model
-from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder
+from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder, sorted_cp
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcDictionary
@@ -66,14 +67,11 @@ class dictionary(Resource):
         Deletes dictionary.
         """
         dictionary = FcDictionary.query.filter(FcDictionary.id == id).one()
-        # if (dictionary.deleted):
-        #     dictionary.deleted = False
-        # else:
-        #     dictionary.deleted = True
-        # db.session.commit()
         dictFullPath = os.path.join(DICTIONARY_DIR, dictionary.path)
         if os.path.exists(dictFullPath):
             os.remove(dictFullPath)
+            dictionary.deleted = True
+            db.session.commit()
         return {
             'status': True,
             'message': 'Dictionary sucesfully deleted.'
@@ -149,7 +147,13 @@ class dictionaryAdd(Resource):
 
         uploadedFile = fileUpload(file, DICTIONARY_DIR, ALLOWED_EXTENSIONS)
         if uploadedFile:
-            hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + os.path.join(DICTIONARY_DIR, uploadedFile['path']), cwd=HASHCAT_DIR))
+            dict_path = os.path.join(DICTIONARY_DIR, uploadedFile['path'])
+            if request.form.get('sort') == 'true':
+                sorted_cp(dict_path, dict_path + '_sorted')
+                os.remove(dict_path)
+                move(dict_path + '_sorted', dict_path)
+
+            hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + dict_path, cwd=HASHCAT_DIR))
             dictionary = FcDictionary(name=uploadedFile['filename'], path=uploadedFile['path'], keyspace=hc_keyspace)
             try:
                 db.session.add(dictionary)
@@ -179,14 +183,18 @@ class dictionary(Resource):
         """
 
         args = dictionaryFromFile_parser.parse_args(request)
+        sort = args.get('sort')
         files = args.get('files')
 
         for file in files:
             if not allowed_file(file['name'], ALLOWED_EXTENSIONS):
                 abort(500, 'Wrong file format ' + file['name'])
             newName = Path(file['name']).stem + '_' + str(int(time.time())) + Path(file['name']).suffix
-            newPath = os.path.join(DICTIONARY_DIR, newName )
-            os.symlink(file['path'], newPath)
+            newPath = os.path.join(DICTIONARY_DIR, newName)
+            if sort:
+                sorted_cp(file['path'], newPath)
+            else:
+                os.symlink(file['path'], newPath)
             hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + newPath, cwd=HASHCAT_DIR))
             dictionary = FcDictionary(name=file['name'], path=newName, keyspace=hc_keyspace)
             try:
