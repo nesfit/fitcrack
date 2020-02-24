@@ -92,6 +92,8 @@ int TaskComputeBase::finish() {
 
   printProcessErr();
 
+  if (exit_code_ == 255)
+    RunnerUtils::runtimeException("Hashcat failed to run! Exit code: -1");
 
   PRINT_POSITION_IN_CODE();
 
