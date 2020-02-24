@@ -90,10 +90,16 @@ int TaskComputeBase::finish() {
 
   PRINT_POSITION_IN_CODE();
 
-  printProcessErr();
-
-  if (exit_code_ == 255)
-    RunnerUtils::runtimeException("Hashcat failed to run! Exit code: -1");
+  if (exit_code_ == (unsigned char)-1) {
+    printProcessErr();
+    RunnerUtils::runtimeException("Hashcat failed to run! Exit code: -1. "
+                                  "Invalid arguments or input files.");
+  } else if (exit_code_ == (unsigned char)-2) {
+    printProcessErr();
+    RunnerUtils::runtimeException(
+        "Hashcat failed to run! Exit code: -2. GPU-watchdog alarm - "
+        "temperature limit was reached.");
+  }
 
   PRINT_POSITION_IN_CODE();
 
@@ -149,7 +155,9 @@ void TaskComputeBase::printProcessOut() {
 
 void TaskComputeBase::printProcessErr() {
   PRINT_POSITION_IN_CODE();
-  //Logging::debugPrint(Logging::Detail::Important, "TaskComputeBase: hashcat available stderr : \n" + process_hashcat_->readErrPipeAvailableLines());
+  Logging::debugPrint(Logging::Detail::Important,
+                      "TaskComputeBase: hashcat available stderr : \n" +
+                          process_hashcat_->readErrPipeAvailableLines());
   PRINT_POSITION_IN_CODE();
 }
 
