@@ -68,6 +68,10 @@
       label: {
         type: String,
         default: 'Select files'
+      },
+      args: {
+        type: Object,
+        default: () => {}
       }
     },
     data: function () {
@@ -91,6 +95,9 @@
       },
       fileChange(fileList) {
         this.files = new FormData()
+        for (let [name, val] of Object.entries(this.args)) {
+          this.files.append(name, val)
+        }
         this.selectedFiles = []
         for (var i = 0; i < fileList.length; i++) {
           this.selectedFiles.push({

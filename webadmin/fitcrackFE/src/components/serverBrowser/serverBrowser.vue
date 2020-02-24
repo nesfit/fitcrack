@@ -88,6 +88,9 @@
     components: {
       'fc-tile': tile
     },
+    props: {
+      sort: Boolean
+    },
     data: function () {
       return {
         data: null,
@@ -129,7 +132,8 @@
           };
         }.bind(this));
         this.axios.post(this.$serverAddr + '/dictionary/fromFile', {
-          "files": files
+          files,
+          sort: this.sort
         }).then((response) => {
           this.adding = false
           this.$emit('filesuploaded', true)
