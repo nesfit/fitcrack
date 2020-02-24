@@ -23,6 +23,7 @@ jobs:
         git config --local user.name "Runner autobuilder"
         git add server/client_bin/windows_x86_64/runner1.exe -f
         git add server/client_bin/x86_64-pc-linux-gnu/runner1.bin -f
+        git add runner/testground/runner.bin -f
         git add runner/testground/runner.exe -f
         git commit -m "Build Runner binaries"
     - name: Extract branch name
