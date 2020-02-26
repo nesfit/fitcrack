@@ -525,7 +525,6 @@
   import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist'
   import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask'
   import pcfgAttack from '@/components/job/attacks/pcfg'
-  import princeAttack from '@/components/job/attacks/prince'
   import FileUploader from "@/components/fileUploader/fileUploader";
   import fcTextarea from '@/components/textarea/fc_textarea'
   import hostSelector from '@/components/selector/hostSelector'
@@ -547,7 +546,6 @@
       'hybridMaskWordlist': hybridMaskWordlist,
       'hybridWordlistMask': hybridWordlistMask,
       'pcfgAttack': pcfgAttack,
-      'princeAttack': princeAttack,
       'fc-textarea': fcTextarea,
       'host-selector': hostSelector,
       'template-modal': templateModal
@@ -662,8 +660,7 @@
           'maskattack': 'mdi-boxing-glove',
           'hybridWordlistMask': 'mdi-vector-difference-ba',
           'hybridMaskWordlist': 'mdi-vector-difference-ab',
-          'pcfgAttack': 'mdi-ray-start-end',
-          'princeAttack': 'mdi-crown'
+          'pcfgAttack': 'mdi-ray-start-end'
         }
         return map[handler] || 'mdi-checkbox-blank-outline'
       },

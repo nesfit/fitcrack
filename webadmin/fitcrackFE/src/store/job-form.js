@@ -229,5 +229,4 @@ export const attacks = [
   {handler: 'hybridWordlistMask', name: 'Hybrid Wordlist + Mask', id: 6, serverName: 'Hybrid wordlist+mask'},
   {handler: 'hybridMaskWordlist', name: 'Hybrid Mask + Wordlist', id: 7, serverName: 'Hybrid mask+wordlist'},
   {handler: 'pcfgAttack', name: 'PCFG', id: 9, serverName: 'pcfg'},
-  {handler: 'princeAttack', name: 'PRINCE', id: 8, serverName: 'prince'},
 ]
