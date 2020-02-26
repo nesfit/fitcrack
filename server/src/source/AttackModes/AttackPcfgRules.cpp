@@ -276,7 +276,7 @@ bool CAttackPcfgRules::makeWorkunit()
                           "Workunit succesfully created\n");
 
     /** Check if we reached end of PCFG keyspace */
-    if (m_job->getCurrentIndex() >= m_job->getKeyspace())
+    if (m_job->getCurrentIndex() >= m_job->getHcKeyspace())
     {
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                               "Reached end of keyspace. Setting job to finishing!\n");
