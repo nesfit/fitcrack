@@ -40,7 +40,7 @@ def check_mask_syntax(mask):
         abort(400, 'Wrong mask ' + mask)
 
 
-def compute_keyspace_from_mask(mask, charsetsSize=dict()):
+def compute_keyspace_from_mask(mask, charsetsSize=dict(), thresh=None):
     keyspace = 1
     nextCharSymbol = False
     for char in mask:
@@ -49,6 +49,8 @@ def compute_keyspace_from_mask(mask, charsetsSize=dict()):
             try:
                 if int(char) >= 1 and int(char) <= 4:
                     multiplier = charsetsSize.get(int(char), None)
+                    if thresh and multiplier > thresh:
+                        multiplier = thresh 
             except ValueError:
                 pass
 
@@ -91,34 +93,6 @@ def compute_prince_keyspace(attackSettings):
     except Exception:
         return 0
 
-def compute_keyspace_from_mask_with_treshold(mask, markovTreshold, charsetsSize=[]):
-
-    keyspaceWithTreshhold = 1
-    nextCharSymbol = False
-    for char in mask:
-        if nextCharSymbol:
-
-            if keyspace_dict.get(char, None) <= markovTreshold:
-                    multiplier = keyspace_dict.get(char, None)
-            else:   multiplier = markovTreshold
-            try:
-                if int(char) >= 1 and int(char) <= 4:
-                    multiplier = charsetsSize.get(int(char), None)
-            except ValueError:
-                pass
-
-            if not multiplier:
-                continue
-            keyspaceWithTreshhold *= multiplier
-            nextCharSymbol = False
-            continue
-        if char == '?':
-            nextCharSymbol = True
-        else:
-            nextCharSymbol = False
-
-    return keyspaceWithTreshhold
-
 keyspace_dict = {
     'l': 26,
     'u': 26,
@@ -129,10 +103,3 @@ keyspace_dict = {
     'a': 95,
     'b': 256
 }
-
-
-def count_file_lines(fname):
-    with open(fname) as f:
-        for i, l in enumerate(f):
-            pass
-    return i + 1
