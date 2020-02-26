@@ -115,6 +115,11 @@ class TaskComputeBase: public TaskBase {
 	 */
 	void startComputation();
 
+	/**
+	 * @brief   Unlocks hashcat mutex
+	 */
+	void unlockHashcatMutex();
+
 };
 
 #endif // TASKCOMPUTEBASE_HPP

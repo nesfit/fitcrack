@@ -184,3 +184,8 @@ void TaskComputeBase::startComputation() {
                         "Hashcat process has started.");
   }
 }
+
+
+void TaskComputeBase::unlockHashcatMutex() {
+  hashcat_mutex_.unlock();
+}

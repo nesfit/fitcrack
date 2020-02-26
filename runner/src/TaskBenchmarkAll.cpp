@@ -91,6 +91,7 @@ void TaskBenchmarkAll::startComputation() {
     (*it)->startComputation();
     (*it)->progress();
     (*it)->finish();
+    (*it)->unlockHashcatMutex();
     Logging::debugPrint(Logging::Detail::GeneralInfo,
       "TaskBenchmarkAll : sub-result : " + RunnerUtils::toString(hashtypes_[computed_hashes_])
       + " : " + RunnerUtils::toString((*it)->getTotalSpeed()));
