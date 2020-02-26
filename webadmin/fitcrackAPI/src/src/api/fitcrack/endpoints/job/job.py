@@ -209,6 +209,9 @@ class OperationWithJob(Resource):
             # Job is stopped in Generator after sending BOINC commands
             if (int(job.status) != 10) and (int(job.status) != 12):
                 job.status = 0
+                workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
+                for item in workunits:
+                    db.session.delete(item)
                 print("done")
             job.indexes_verified = 0
             job.current_index = 0
@@ -229,9 +232,6 @@ class OperationWithJob(Resource):
             for item in graphData:
                 db.session.delete(item)
 
-            workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
-            for item in workunits:
-                db.session.delete(item)
             job.kill = True
 
         else:
