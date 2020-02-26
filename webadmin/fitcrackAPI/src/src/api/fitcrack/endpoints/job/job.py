@@ -216,7 +216,7 @@ class OperationWithJob(Resource):
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0
-            job.time_end = None
+            job.time_start = job.time_end
             if job.attack_mode == 3:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
