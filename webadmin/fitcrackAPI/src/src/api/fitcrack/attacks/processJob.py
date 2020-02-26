@@ -373,7 +373,7 @@ def process_job_9(job):
 
     if job['attack_settings']['rules']:
         rules = FcRule.query.filter(FcRule.id == job['attack_settings']['rules']['id']).first()
-        ruleFileMultiplier = count_file_lines(os.path.join(RULE_DIR, rules.path))
+        ruleFileMultiplier = rules.count
 
         if ruleFileMultiplier == 0:
             ruleFileMultiplier = 1
@@ -403,17 +403,9 @@ def process_job_9(job):
         job['hc_keyspace'] = job['attack_settings']['pcfg_grammar']['keyspace']
 
     # Keyspace limit control
-    if (int(job['attack_settings']['pcfg_grammar']['keyspace']) * ruleFileMultiplier) >= int(job['attack_settings']['keyspace_limit']):
-        job['keyspace'] = job['attack_settings']['keyspace_limit']
-
-        if int(job['attack_settings']['pcfg_grammar']['keyspace']) >= int(job['attack_settings']['keyspace_limit']):
-            job['hc_keyspace'] = job['attack_settings']['keyspace_limit']
-
-        else:   job['hc_keyspace'] = job['attack_settings']['pcfg_grammar']['keyspace']
-
-    else:
-        job['keyspace'] = int(job['attack_settings']['pcfg_grammar']['keyspace']) * int(ruleFileMultiplier)
-        job['hc_keyspace'] = job['attack_settings']['pcfg_grammar']['keyspace']
+    if (int(job['attack_settings']['pcfg_grammar']['keyspace'])) >= int(job['attack_settings']['keyspace_limit']):
+        job['hc_keyspace'] = job['attack_settings']['keyspace_limit']
+        job['keyspace'] = job['attack_settings']['keyspace_limit'] * int(ruleFileMultiplier)
 
     print("\nKeyspace: ")
     print(str(job['keyspace']) + "\n")

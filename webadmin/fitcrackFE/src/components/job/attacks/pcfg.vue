@@ -10,7 +10,6 @@
     </v-card-title>
     <pcfg-selector
       v-model="pcfg"
-      @input="checkValidInit"
     />
     <v-card-title>
       <span>Edit keyspace limit</span>
@@ -19,20 +18,18 @@
       v-model.number="keyspaceLimit"
       outlined
       single-line
-      :value="keyspaceLimit"
       required
       type="number"
       suffix="passwords"
       :max="pcfg.length > 0 ? pcfg[0].keyspace : 0"
-      @input="checkValidEdit"
+      @blur="checkValid"
     />
     <v-divider />
     <v-card-title>
       <span>Select rule file</span>
     </v-card-title>
-    <rules-selector 
+    <rules-selector
       v-model="rules"
-      @input="checkValidInit"
     />
   </div>
 </template>
@@ -56,42 +53,19 @@
         attackName: 'pcfg',
       }
     },
+    watch: {
+      pcfg (val) {
+        if (val.length > 0) {
+          this.keyspaceLimit = val[0].keyspace
+        }
+      }
+    },
     computed: mapTwoWayState('jobForm', twoWayMap(['rules', 'pcfg', 'keyspaceLimit'])),
     methods: {
-      checkValidInit: function () {
-        if(this.keyspaceLimit !== this.pcfg[0].keyspace)
+      checkValid: function () {
+        if(this.pcfg.length > 0 && this.keyspaceLimit > this.pcfg[0].keyspace) {
           this.keyspaceLimit = this.pcfg[0].keyspace
-        if(this.keyspaceLimit > this.pcfg[0].keyspace)
-          this.keyspaceLimit = this.pcfg[0].keyspace
-          /*  if (this.pcfg[0]_grammmar.length > 0) {
-              this.$emit('input', {
-                'attack_mode': this.attackId,
-                'attack_name': this.attackName,
-                'rules': this.rules,
-                'pcfg_grammar': this.pcfg[0],
-                'keyspace_limit': this.keyspaceLimit
-              })
-              return true
-          //  }
-          //  return false
-          */
-        },
-        checkValidEdit: function () {
-          if(this.keyspaceLimit > this.pcfg[0].keyspace)
-            this.keyspaceLimit = this.pcfg[0].keyspace
-
-        /*  if (this.pcfg_grammmar.length > 0) {
-            this.$emit('input', {
-              'attack_mode': this.attackId,
-              'attack_name': this.attackName,
-              'rules': this.rules,
-              'pcfg_grammar': this.pcfg,
-              'keyspace_limit': this.keyspaceLimit
-            })
-            return true
-        //  }
-        //  return false
-        */
+        }
       }
     }
   }
