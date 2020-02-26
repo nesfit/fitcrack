@@ -83,7 +83,6 @@
           }
         }).then((response) => {
           this.items = response.data.items
-          this.selected = response.data.items
           this.loading = false
         })
       },
