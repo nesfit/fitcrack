@@ -31,7 +31,7 @@
                 {{ data.domain_name }}
               </v-list-item-title>
               <v-list-item-subtitle>
-                User: {{ data.user.name }}
+                User: {{ fixUserNameEncoding(data.user.name) }}
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
@@ -205,6 +205,7 @@
 </template>
 
 <script>
+  import iconv from 'iconv-lite'
   import tile from '@/components/tile/fc_tile'
   export default {
     name: "HostDetailView",
@@ -302,6 +303,11 @@
           console.log(response.data);
           this.loadJobs()
         })
+      },
+      fixUserNameEncoding : function(username) {
+          /* Boinc DB uses latin1_swedish encoding, which breaks names with special characters,
+          which are not supported in this encoding. Fix it by converting name to utf8. */
+          return iconv.decode(iconv.encode(username, 'latin1'), 'utf-8')
       }
     }
 

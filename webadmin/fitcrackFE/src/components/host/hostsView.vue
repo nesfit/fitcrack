@@ -91,7 +91,7 @@
 </template>
 
 <script>
-  import iconv from 'iconv-lite';
+  import iconv from 'iconv-lite'
   export default {
     name: "HostsView",
     data: function () {

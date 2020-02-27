@@ -368,7 +368,7 @@
                       :to="{ name: 'hostDetail', params: { id: item.id}}"
                       class="middle"
                     >
-                      {{ item.domain_name + ' (' + item.user.name + ')' }}
+                      {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
                     </router-link>
                   </template>
                   <template v-slot:item.last_active="{ item }">
@@ -505,7 +505,7 @@
                   :to="{ name: 'hostDetail', params: { id: item.host.id}}"
                   class="middle"
                 >
-                  {{ item.host.domain_name + ' (' + item.host.user.name + ')' }}
+                  {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user.name) + ')' }}
                 </router-link>
               </template>
               <template v-slot:item.progress="{ item }">
@@ -643,12 +643,20 @@
             <v-col cols="8">
               <v-text-field
                 v-model="editJobValues.seconds_per_job"
+                min="60"
               />
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            @click.stop="editJobDialog=false"
+          >
+            Cancel
+          </v-btn>
           <v-btn
             color="primary"
             text
@@ -698,6 +706,7 @@
 </template>
 
 <script>
+  import iconv from 'iconv-lite'
   import combinatorDetail from '@/components/job/attacksDetail/combinator'
   import maskDetail from '@/components/job/attacksDetail/mask'
   import dictionaryDetail from '@/components/job/attacksDetail/dictionary'
@@ -991,6 +1000,11 @@
             });
           }
         })
+      },
+      fixUserNameEncoding : function(username) {
+          /* Boinc DB uses latin1_swedish encoding, which breaks names with special characters,
+          which are not supported in this encoding. Fix it by converting name to utf8. */
+          return iconv.decode(iconv.encode(username, 'latin1'), 'utf-8')
       }
     }
   }
