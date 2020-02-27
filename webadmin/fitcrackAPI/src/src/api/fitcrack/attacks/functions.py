@@ -49,13 +49,14 @@ def compute_keyspace_from_mask(mask, charsetsSize=dict(), thresh=None):
             try:
                 if int(char) >= 1 and int(char) <= 4:
                     multiplier = charsetsSize.get(int(char), None)
-                    if thresh and multiplier > thresh:
-                        multiplier = thresh 
             except ValueError:
                 pass
 
             if not multiplier:
                 continue
+
+            if thresh and multiplier > thresh:
+                multiplier = thresh 
             keyspace *= multiplier
             nextCharSymbol = False
             continue
