@@ -574,7 +574,7 @@
       ...mapTwoWayState('jobForm', twoWayMap([
         'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
-      ...mapGetters('jobForm', ['jobSettings', 'valid', 'keyspaceKnown']),
+      ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
         return this.templates.map((t, i) => ({text: t.template, value: i}))
       },
@@ -587,15 +587,16 @@
     },
     watch: {
       jobSettings (val) {
-        if (this.valid) {
+        if (val.attack_settings != false && this.validAttackSpecificSettings && (this.hashType == null || this.name === '')) {
           var boincIds = []
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
           }
-
+          /* -1 means no hash entered */
+          var hash_code = this.hashType == null ? -1 : this.hashType.code
           this.axios.get(this.$serverAddr + '/job/crackingTime', {
             params: {
-              'hash_type_code': this.hashType,
+              'hash_type_code': hash_code,
               'boinc_host_ids': boincIds.join(","),
               'attack_settings': val.attack_settings
             }

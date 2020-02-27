@@ -230,7 +230,9 @@ def computeCrackingTime(data):
     attackSettings = json.loads(data['attack_settings'])
     data['boinc_host_ids'] = [x.strip() for x in data['boinc_host_ids'].split(',')]
 
-    if data.get('boinc_host_ids') and len(data['boinc_host_ids']) > 0:
+    # Check if we have valid hash type code and if we have any host
+    # -1 is indicator that no hash type was selected in webadmin
+    if data['hash_type_code'] != -1 and len(data['boinc_host_ids']) > 0:
         hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == data['hash_type_code']). \
             filter(FcBenchmark.boinc_host_id.in_(data['boinc_host_ids'])).all()
 

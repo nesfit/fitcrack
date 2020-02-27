@@ -115,7 +115,7 @@ export default {
         }
       }
     },
-    validSettings (state) {
+    validAttackSpecificSettings (state) {
       switch (state.attackSettingsTab) {
         case 'dictionary':
         case 'hybridWordlistMask':
@@ -153,7 +153,7 @@ export default {
           return true
       }
     },
-    valid (state, { attackSettings, validSettings }) {
+    valid (state, { attackSettings, validAttackSpecificSettings }) {
       if (
         !state.attackSettingsTab ||
         !attackSettings ||
@@ -162,11 +162,11 @@ export default {
       ) {
         return false
       } else {
-        return validSettings
+        return validAttackSpecificSettings
       }
     },
-    keyspaceKnown ({ attackSettingsTab }, { validSettings }) {
-      return attackSettingsTab && validSettings
+    keyspaceKnown ({ attackSettingsTab }, { validAttackSpecificSettings }) {
+      return attackSettingsTab && validAttackSpecificSettings
     },
     template (state) {
       const keys = Object.keys(empty)
