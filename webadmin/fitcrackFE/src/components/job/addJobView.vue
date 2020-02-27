@@ -393,7 +393,8 @@
             <v-subheader>Select which hosts to distribute workunits to</v-subheader>
             <host-selector
               v-model="hosts"
-              :select-all="true"
+              select-all
+              auto-refresh
             />
             <v-row>
               <v-spacer />

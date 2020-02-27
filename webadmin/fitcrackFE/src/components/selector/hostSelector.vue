@@ -69,14 +69,14 @@
     },
     mounted () {
       this.interval = setInterval(() => {
-        if (this.autoRefresh) this.getData()
+        if (this.autoRefresh) this.getData(true)
       }, 2000)
     },
     beforeDestroy () {
       clearInterval(this.interval)
     },
     methods: {
-      getData() {
+      getData(autorefreshing = false) {
         this.loading = true
         this.axios.get(this.$serverAddr + '/hosts', {
           params: {
@@ -84,6 +84,7 @@
           }
         }).then((response) => {
           this.items = response.data.items
+          if (!autorefreshing) this.selected = this.items
           this.loading = false
         })
       },
