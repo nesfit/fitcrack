@@ -505,7 +505,7 @@
                   :to="{ name: 'hostDetail', params: { id: item.host.id}}"
                   class="middle"
                 >
-                  {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user_name) + ')' }}
+                  {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user.name) + ')' }}
                 </router-link>
               </template>
               <template v-slot:item.progress="{ item }">
