@@ -587,7 +587,7 @@
     },
     watch: {
       jobSettings (val) {
-        if (val.attack_settings != false && this.validAttackSpecificSettings && (this.hashType == null || this.name === '')) {
+        if (this.valid || (val.attack_settings != false && this.validAttackSpecificSettings && (this.hashType == null || this.name === ''))) {
           var boincIds = []
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
