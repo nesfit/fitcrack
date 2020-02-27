@@ -8,9 +8,18 @@
 
 #include <windows.h>
 
+/**
+ * @brief A RAII class to manage a handle to a named mutex
+ * 
+ */
 class NamedMutexHandle
 {
 public:
+	/**
+	 * @brief Construct a new Named Mutex Handle object
+	 * 
+	 * @param name The global name of the mutex
+	 */
 	NamedMutexHandle(const std::string &name):
 		handle(CreateMutexA(nullptr, false, name.c_str()))
 	{
@@ -23,6 +32,7 @@ public:
 	{
 		CloseHandle(handle);
 	}
+	//!The handle of the named mutex
 	HANDLE handle;
 };
 
