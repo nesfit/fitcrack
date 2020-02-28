@@ -1,185 +1,296 @@
-<!--
-   * Author : see AUTHORS
-   * Licence: MIT, see LICENSE
--->
 
 <template>
   <v-container fluid>
-      <v-layout column align-center>
-        <div class="container max1000">
-          <v-layout row wrap>
-
-            <fc-tile title="Jobs" class="mx-3 mb-5 height100" :loading="jobsInfo === null">
-              <v-list single-line class="width100" v-if="jobsInfo != null">
-                <template v-for="(item, i) in jobsInfo">
-                  <v-list-tile class="px-2 py-1">
-                    <v-list-tile-action class="pr-3 key">
-                      {{item.status}}:
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                      <v-list-tile-title class="text-xs-right">
-                        {{item.count}}
-                      </v-list-tile-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                  <v-divider v-if="!(jobsInfo.length === i+1)"></v-divider>
-                </template>
-              </v-list>
-            </fc-tile>
-
-
-            <fc-tile title="Hosts" class="mx-3 mb-5 height100" :loading="hostsInfo === null">
-              <v-list single-line class="width100" v-if="hostsInfo != null">
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
-                    Total hosts:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">
-                      {{hostsInfo.totalHosts}}
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-                <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
-                    Online hosts:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">
-                      {{hostsInfo.activeHosts}}
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-                <v-divider></v-divider>
-                <v-list-tile class="px-2 py-1">
-                  <v-list-tile-action class="pr-3 key">
-                    Offline hosts:
-                  </v-list-tile-action>
-                  <v-list-tile-content>
-                    <v-list-tile-title class="text-xs-right">
-                      {{hostsInfo.inactiveHosts}}
-                    </v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-              </v-list>
-            </fc-tile>
-
-
-            <fc-tile title="Notifications" class="mx-3 mb-5 height100" :loading="notifications == null">
-              <div v-if="notifications !== null" class="notifCont">
-                <v-list class="notifContainer pa-0"
-                        v-for="(item, i) in notifications.items"
-                        :key="i"
+    <v-row>
+      <v-col>
+        <!-- Jobs overview -->
+        <v-card 
+          v-if="jobsInfo"
+          class="mb-4" 
+        >
+          <v-card-title>
+            <router-link to="/jobs">
+              Jobs
+            </router-link>
+          </v-card-title>
+          <v-card-subtitle class="text-start">
+            Status overview
+          </v-card-subtitle>
+          <v-card-text class="d-flex flex-wrap justify-space-between">
+            <job-tile 
+              v-for="(item, i) in jobsInfo" 
+              :key="i"
+              :item="item"
+            />
+          </v-card-text>
+        </v-card>
+        <!-- Latest jobs list -->
+        <v-card 
+          v-if="lastJobs"
+          class="mb-4"
+          min-width="300"
+        >
+          <v-card-title>Latest activity</v-card-title>
+          <v-card-subtitle class="text-start">
+            Last <b>{{ lastJobs.length }}</b> jobs
+          </v-card-subtitle>
+          <v-list
+            v-if="lastJobs != null"
+            dense
+          >
+            <v-list-item 
+              v-for="(item, i) in lastJobs"
+              :key="i"
+              :to="'/jobs/' + item.id"
+            >
+              <v-list-item-content>
+                <v-list-item-title class="text-start">{{ item.name }}</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-content>
+                <v-list-item-title
+                  :class="item.status_type + '--text'"
+                  class="text-end"
                 >
-                  <notification :type="item.type"
-                                :text="item.text"
-                                :seen="item.seen"
-                                :time="item.time"
-                                :job-id="item.job_id"
-                  ></notification>
-                </v-list>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on">
+                        {{ item.status_text }} ({{ progressToPercentage(item.progress) }})
+                      </span>
+                    </template>
+                    <span>{{ item.status_tooltip }}</span>
+                  </v-tooltip>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-col>
+      <v-col>
+        <!-- Server status -->
+        <v-card 
+          v-if="serverInfo && actualUsage"
+          class="mb-4" 
+        >
+          <v-card-title>
+            <router-link to="/server">
+              Server status
+            </router-link>
+          </v-card-title>
+          <v-card-subtitle class="text-start">
+            <span 
+              v-if="serverInfoUp < serverInfoUp + serverInfoDown"
+              class="warning--text"
+            >
+              <b>{{ serverInfoUp }}</b> of {{ serverInfoUp + serverInfoDown }} services running
+            </span>
+            <span v-else>All services running</span>
+          </v-card-subtitle>
+          <v-card-text class="d-flex flex-wrap justify-space-between">
+            <grid-tile 
+              icon="mdi-memory"
+              :color="usageColor(actualUsage.cpu)"
+            >
+              <b>CPU</b>
+              <span class="display-1 mt-1">{{ actualUsage.cpu }}%</span>
+            </grid-tile>
+
+            <grid-tile 
+              icon="mdi-chip"
+              :color="usageColor(actualUsage.ram)"
+            >
+              <b>Memory</b>
+              <span class="display-1 mt-1">{{ actualUsage.ram }}%</span>
+            </grid-tile>
+
+            <grid-tile icon="mdi-harddisk">
+              <div>
+                <b>Disk</b>
+                <div class="d-flex justify-space-between">
+                  <v-icon small>mdi-download</v-icon> {{ actualUsage.hdd_read }} kb/s
+                </div>
+                <div class="d-flex justify-space-between">
+                  <v-icon small>mdi-upload</v-icon> {{ actualUsage.hdd_write }} kb/s
+                </div>
               </div>
-            </fc-tile>
+            </grid-tile>
 
+            <grid-tile icon="mdi-ethernet">
+              <div>
+                <b>Network</b>
+                <div class="d-flex justify-space-between">
+                  <v-icon small>mdi-download</v-icon> {{ actualUsage.net_recv }} kb/s
+                </div>
+                <div class="d-flex justify-space-between">
+                  <v-icon small>mdi-upload</v-icon> {{ actualUsage.net_sent }} kb/s
+                </div>
+              </div>
+            </grid-tile>
+          </v-card-text>
+        </v-card>
+        <!-- Hosts overview -->
+        <v-card 
+          v-if="hostsInfo"
+          class="mb-4" 
+        >
+          <v-card-title>
+            <router-link to="/hosts">
+              Hosts
+            </router-link>
+          </v-card-title>
+          <v-card-subtitle class="text-start">
+            <b>{{ hostsInfo.activeHosts }}</b> of {{ hostsInfo.totalHosts }} online
+          </v-card-subtitle>
+          <v-card-text>
+            <div class="d-flex flex-wrap justify-space-around">
+              <v-icon
+                v-for="i in hostsInfo.activeHosts"
+                :key="'a' + i"
+                color="success"
+              >
+                mdi-desktop-classic
+              </v-icon>
+              <v-icon
+                v-for="i in hostsInfo.inactiveHosts"
+                :key="'i' + i"
+                class="inactiveHost"
+              >
+                mdi-desktop-classic
+              </v-icon>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
 
-            <fc-tile title="Server" class="mx-3 mb-5 height100" :loading="serverInfo == null">
-              <v-list single-line class="width100" v-if="serverInfo != null">
-                <template v-for="(subsystem, i) in serverInfo.subsystems">
-                  <v-list-tile class="px-2 py-1">
-                    <v-list-tile-action class="pr-3 key">
-                      {{subsystem.name}}:
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                      <v-list-tile-title class="text-xs-right error--text" v-bind:class="{'success--text': subsystem.status==='running'}">
-                        {{ subsystem.status }}
-                      </v-list-tile-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                  <v-divider v-if="!(Object.keys(serverInfo.subsystems).length === i+1)"></v-divider>
-                </template>
-              </v-list>
-            </fc-tile>
+    <v-row>
+      <v-col>
+        <v-card>
+          <v-card-title>Job activity</v-card-title>
+          <fc-graph
+            id="jobGraph"
+            :data="jobGraph"
+            type="job"
+          />
+        </v-card>
+      </v-col>
+      <v-col>
+        <v-card>
+          <v-card-title>Host activity</v-card-title>
+          <fc-graph
+            id="hostGraph"
+            :data="hostGraph"
+            type="host"
+          />
+        </v-card>
+      </v-col>
+    </v-row>
 
-          </v-layout>
-
-          <fc-tile title="Jobs progress" class="mx-3 mb-5">
-            <fc-graph
-              id="packageGraph"
-              :data='packageGraph'
-              type="job"
-            >
-            </fc-graph>
-          </fc-tile>
-
-          <fc-tile title="Hosts activity" class="mx-3">
-            <fc-graph
-              id="hostGraph"
-              :data='hostGraph'
-              type="host"
-            >
-            </fc-graph>
-          </fc-tile>
-          <v-layout class=" dateSelectCont">
-            <v-spacer></v-spacer>
-            <v-flex xs5 @click="fullDate = false">
-              <v-radio-group row class="dateSelect" v-model="hoursBefore" @change="loadData">
-                <v-radio value="1" label="last hour" :disabled="fullDate"></v-radio>
-                <v-radio value="3" label="last 3 hours" :disabled="fullDate"></v-radio>
-                <v-radio value="6" label="last 6 hours" :disabled="fullDate"></v-radio>
-              </v-radio-group>
-            </v-flex>
-            <v-flex xs6 @click="fullDate = true" class="pl-2">
-              <v-layout row>
-                <v-flex xs2>
-                  <v-subheader class="textBottom">From:</v-subheader>
-                </v-flex>
-                <v-flex xs4>
-                  <v-text-field
-                    @input="loadData"
-                    :disabled="!fullDate"
-                    v-model="fromDate"
-                    flat
-                    single-line
-                    mask="date-with-time"
-                    :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs2>
-                  <v-subheader class="textBottom">To:</v-subheader>
-                </v-flex>
-                <v-flex xs4>
-                  <v-text-field
-                    @input="loadData"
-                    :disabled="!fullDate"
-                    v-model="toDate"
-                    flat
-                    single-line
-                    mask="date-with-time"
-                    :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-                  ></v-text-field>
-                </v-flex>
-              </v-layout>
-
-            </v-flex>
-          </v-layout>
-        </div>
-
-      </v-layout>
+    <v-row class="d-flex align-center justify-end">
+      <v-col
+        @click="fullDate = false"
+      >
+        <v-radio-group
+          v-model="hoursBefore"
+          row
+          hide-details
+          class="dateSelect"
+          :disabled="fullDate"
+          @change="loadData"
+        >
+          <v-radio
+            value="1"
+            label="last hour"
+          />
+          <v-radio
+            value="3"
+            label="last 3 hours"
+          />
+          <v-radio
+            value="6"
+            label="last 6 hours"
+          />
+        </v-radio-group>
+      </v-col>
+      <v-col
+        class="pl-2"
+        @click="fullDate = true"
+      >
+        <v-row>
+          <v-col>
+            <v-subheader class="textBottom">
+              From:
+            </v-subheader>
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model="fromDate"
+              :disabled="!fullDate"
+              text
+              single-line
+              mask="date-with-time"
+              :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+              @input="loadData"
+            />
+          </v-col>
+          <v-col>
+            <v-subheader class="textBottom">
+              To:
+            </v-subheader>
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model="toDate"
+              :disabled="!fullDate"
+              text
+              single-line
+              mask="date-with-time"
+              :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+              @input="loadData"
+            />
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
-  import graph from '@/components/graph/fc_graph'
-  import tile from '@/components/tile/fc_tile'
-  import notification from '@/components/notification/fc_notification'
+  import gridTile from '@/components/home/gridTile'
+  import jobTile from '@/components/home/jobTile'
+  import fcGraph from '@/components/graph/fc_graph'
 
   export default {
-    name: 'homeView',
+    name: 'HomeView',
     components: {
-      'fc-graph': graph,
-      'fc-tile': tile,
-      'notification': notification
+      gridTile,
+      jobTile,
+      fcGraph
+    },
+    data: function () {
+      return {
+        jobGraph: null,
+        hostGraph: null,
+        interval: null,
+        hoursBefore: '6',
+        fromDate: this.$moment().format('DDMMYYYYHHmm'),
+        toDate: this.$moment().format('DDMMYYYYHHmm'),
+        fullDate: false,
+        notifications: null,
+        hostsInfo: null,
+        jobsInfo: null,
+        serverInfo: null,
+        serverInfoUp: 1,
+        serverInfoDown: 1,
+        lastJobs: null,
+        actualUsage: {
+          cpu: 0,
+          ram: 0,
+          hdd_read: 0,
+          hdd_write: 0,
+          net_recv: 0,
+          net_sent: 0
+        }
+      }
     },
     mounted: function () {
       this.loadData();
@@ -191,36 +302,46 @@
     beforeDestroy: function () {
       clearInterval(this.interval)
     },
-    data: function () {
-      return {
-        packageGraph: null,
-        hostGraph: null,
-        interval: null,
-        hoursBefore: '6',
-        fromDate: this.$moment().format('DDMMYYYYHHmm'),
-        toDate: this.$moment().format('DDMMYYYYHHmm'),
-        fullDate: false,
-        notifications: null,
-        hostsInfo: null,
-        jobsInfo: null,
-        serverInfo: null
-      }
-    },
     methods: {
+      usageColor (val) {
+        if (val < 50) {
+          return ''
+        } else if (val < 80) {
+          return 'warning'
+        } else {
+          return 'error'
+        }
+      },
       yesNo: function (val) {
         return val ? 'Yes' : 'No'
       },
+      progressToPercentage: function (progress) {
+        return progress.toFixed() + '%'
+      },
       loadData: function () {
-        var fromDate = ''
-        var toDate = ''
+
+
+        this.axios.get(this.$serverAddr + '/job/lastJobs')
+                .then((response) => {
+                  this.lastJobs = response.data.items;
+                });
+
+        this.axios.get(this.$serverAddr + '/serverInfo/actualUsageData'
+        ).then((response) => {
+          this.actualUsage = response.data;
+        });
+
+
+        var fromDate = '';
+        var toDate = '';
 
         if (this.fullDate) {
-          if (this.fromDate.length == 12) {
+          if (this.fromDate.length === 12) {
             fromDate = this.$moment(this.fromDate, 'DDMMYYYYHHmm').format('YYYY-M-D H:mm:ss');
           } else {
             return
           }
-          if (this.toDate.length == 12) {
+          if (this.toDate.length === 12) {
             toDate = this.$moment(this.toDate, 'DDMMYYYYHHmm').format('YYYY-M-D H:mm:ss');
           } else {
             return
@@ -229,27 +350,39 @@
           fromDate = this.$moment().subtract(this.hoursBefore, 'hours').format('YYYY-M-D H:mm:ss');
         }
 
-        this.axios.get(this.$serverAddr + '/graph/packagesProgress?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
-          this.packageGraph = response.data
+
+        this.axios.get(this.$serverAddr + '/graph/jobsProgress?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
+          this.jobGraph = response.data;
         });
         this.axios.get(this.$serverAddr + '/graph/hostsComputing?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
-          this.hostGraph = response.data
+          this.hostGraph = response.data;
         });
 
         this.axios.get(this.$serverAddr + '/notifications?seen=false').then((response) => {
-          this.notifications = response.data
+          this.notifications = response.data;
         });
 
         this.axios.get(this.$serverAddr + '/hosts/info').then((response) => {
-          this.hostsInfo = response.data
+          this.hostsInfo = response.data;
         });
 
-        this.axios.get(this.$serverAddr + '/jobs/info').then((response) => {
-          this.jobsInfo = response.data
+        this.axios.get(this.$serverAddr + '/job/info').then((response) => {
+          this.jobsInfo = response.data;
         });
 
         this.axios.get(this.$serverAddr + '/serverInfo/info').then((response) => {
-          this.serverInfo = response.data
+          this.serverInfo = response.data.subsystems;
+
+          const statuses = this.serverInfo.map(a => a.status);
+          this.serverInfoUp = 0;
+          this.serverInfoDown = 0;
+
+          for (let i = 0; i < statuses.length; i++) {
+            if (statuses[i] === "running")
+              this.serverInfoUp++;
+            else
+              this.serverInfoDown++;
+          }
         })
       }
     }
@@ -257,6 +390,14 @@
 </script>
 
 <style scoped>
+  .v-card__title a {
+    color: inherit;
+  }
+
+  .inactiveHost {
+    opacity: .2;
+  }
+
   .textBottom {
     align-items: flex-end;
     justify-content: flex-end;
@@ -267,14 +408,11 @@
     text-align: right;
   }
 
-  .graph {
-    width: 100%;
-  }
-
-  .dateSelect{
+  .dateSelect {
     display: inline-block;
     max-width: 450px;
   }
+
   .container {
     width: 100%;
     text-align: center;
@@ -287,7 +425,7 @@
   }
 
   .max1000 {
-    max-width: 1000px;
+    max-width: 3000px;
   }
 
   .key {
@@ -298,5 +436,11 @@
     height: 100%;
   }
 
+  .flex1 {
+    flex: 1;
+  }
 
+  .wid20 {
+    width: 20%;
+  }
 </style>

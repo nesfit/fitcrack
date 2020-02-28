@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKBASE_HPP 
+#ifndef ATTACKBASE_HPP
 #define ATTACKBASE_HPP
 
 #include "ConfigHost.hpp"
@@ -28,11 +28,11 @@ class AttackBase {
         void initializeArguments();
 
     protected:
-    
+
         std::string attack_mode_;		/**< AttackBase mode from the TLV */
         std::string output_file_;		/**< Name/path to hashcat result file */
 
-        std::vector<char*> arguments_;		/**< Hashcat arguments based on the config */
+        std::vector<std::string> arguments_;		/**< Hashcat arguments based on the config */
 
         const ConfigTask& config_;              /**< Representer of configuration file */
 
@@ -59,9 +59,9 @@ class AttackBase {
          * @brief   Searches for key in config_, if found adds it to the arguments_
          * @param   key [in] Search selector (TLV key)
          * @param   argument [in] Argument to add if found
+         * @param   override_arg_value [in] Override arg with this value
          */
-        bool findAndAdd(const std::string& key, const std::string& argument);
-
+        bool findAndAdd(const std::string& key, const std::string& argument, const char *override_arg_value = nullptr);
         /**
          * @brief   Searches for key in config_, if found adds argument and its value to arguments_,
          *          else throws exception
@@ -89,11 +89,12 @@ class AttackBase {
          *          else throws exception
          * @param   key [in] Search selector (TLV key)
          * @param   argument [in] Argument to add if found
+         * @param   override_arg_value [in] Override arg with this value
          */
-        void findAndAddRequired(const std::string& key, const std::string& argument);
+        void findAndAddRequired(const std::string& key, const std::string& argument,
+                                const char *override_arg_value = nullptr);
 
-    public: 
-
+      public:
         /**
          * @brief   Basic constructor
          * @param   config [in] Representation of config file
@@ -101,14 +102,19 @@ class AttackBase {
         AttackBase(const ConfigTask& config);
 
         /**
-         * @brief  Getter of arguments_ 
-         * @return Copy of arguments_ vector 
+         * @brief   Destructor
          */
-        std::vector<char*>& getArguments();
+        virtual ~AttackBase() {}
+
+        /**
+         * @brief  Getter of arguments_
+         * @return Copy of arguments_ vector
+         */
+        const std::vector<std::string>& getArguments();
 
         /**
          * @brief   Getter of arguments_ size
-         * @return  Size of the arguments_ 
+         * @return  Size of the arguments_
          */
         size_t getArgumentsSize();
 

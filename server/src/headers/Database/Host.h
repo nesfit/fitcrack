@@ -61,7 +61,7 @@ class CHost {
         uint64_t m_id;
         uint64_t m_boincHostId;
         uint64_t m_power;
-        uint64_t m_packageId;
+        uint64_t m_jobId;
         uint32_t m_status;
 
     public:
@@ -73,7 +73,7 @@ class CHost {
         uint64_t getId() const;
         uint64_t getBoincHostId() const;
         uint64_t getPower() const;
-        uint64_t getPackageId() const;
+        uint64_t getJobId() const;
         uint32_t getStatus() const;
 };
 

@@ -22,7 +22,7 @@ from src.database import db
 from src.database.models import FcMasksSet
 
 log = logging.getLogger(__name__)
-ns = api.namespace('masks', description='Endpointy ktoré slúžia na pracu s Masks subormi.')
+ns = api.namespace('masks', description='Endpoints for work with mask files.')
 
 ALLOWED_EXTENSIONS = set(['txt', 'hcmask'])
 
@@ -32,7 +32,7 @@ class maskCollection(Resource):
     @api.marshal_with(hcStatsCollection_model)
     def get(self):
         """
-        Vracia kolekciu HcStats suborov
+        Returns collection mask files.
         """
         return {'items': FcMasksSet.query.filter(FcMasksSet.deleted == False).all()}
 
@@ -45,7 +45,7 @@ class maskAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava mask subor na server
+        Uploads mask file on server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -75,7 +75,7 @@ class maskAdd(Resource):
                 db.session().rollback()
                 abort(500, 'Masks set with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'File ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'File ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
             }
         else:
@@ -88,7 +88,7 @@ class mask(Resource):
     @api.marshal_with(maskSet_model)
     def get(self, id):
         """
-        Vrati info o mask set spolu s datami
+        Returns information about maskset with data.
         """
 
         maskSet = FcMasksSet.query.filter(FcMasksSet.id == id).first()
@@ -105,6 +105,9 @@ class mask(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes mask.
+        """
         mask = FcMasksSet.query.filter(FcMasksSet.id == id).one()
         if (mask.deleted):
             mask.deleted = False
@@ -123,7 +126,7 @@ class downloadMask(Resource):
 
     def get(self, id):
         """
-        Stiahne maskset
+        Downloads maskset.
         """
 
         maskSet = FcMasksSet.query.filter(FcMasksSet.id == id).first()
@@ -137,7 +140,7 @@ class updateMaskSet(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        Nahradí mask set novým stringom
+        Exchanges maskset with new string.
         """
 
         args = updateMask_parser.parse_args(request)
@@ -155,6 +158,6 @@ class updateMaskSet(Resource):
         file.close()
 
         return {
-            'message': 'File ' + maskSet.name + ' successfuly changed.',
+            'message': 'File ' + maskSet.name + ' successfully changed.',
             'status': True
         }

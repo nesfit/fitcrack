@@ -4,73 +4,68 @@
 -->
 
 <template>
-    <v-expansion-panel-content
-      lazy
-      expand-icon="edit"
-      @input="focus"
-      class="expaPanel"
-      :hide-actions="true"
-      :readonly="openForever"
-      :value="openForever"
-    >
-      <div slot="header">
-        <v-layout row wrap>
-          <v-flex>
-            <div  class="width100 fakeInput" :class="{validationError: validateError}" v-html="parsedHTML"></div>
-          </v-flex>
-
-        </v-layout>
-
-      </div>
-      <div>
-        <v-layout row >
-          <v-layout row justify-center wrap>
-            <v-tooltip top v-for="(item, key) in represenArray" :key="key">
-              <v-btn slot="activator"
-                     color="primary"
-                     class="maskBtn py-0 mx-1"
-                     outline
-                     @click="addSymbol(key)"
-              >{{item.represent}}</v-btn>
-              <span>{{item.chars}}</span>
-            </v-tooltip>
-            <v-tooltip top v-for="(item, index) in customCharsets">
-              <v-btn slot="activator"
-                     color="primary"
-                     class="maskBtn py-0 mx-1"
-                     outline
-                     @click="addSymbol(index + 1)"
-              >{{item.name}}</v-btn>
-              <span>{{item.name}}</span>
-            </v-tooltip>
-          </v-layout>
-        </v-layout>
-        <v-text-field
-          ref="maskInput"
-          autofocus
-          label="Mask"
-          outline
-          class="primary--text px-2 mx-4"
-          single-line
-          :rules="maskRules"
-          :value="value"
-          :error="validateError"
-          @input="update"
-
-        ></v-text-field>
-      </div>
-    </v-expansion-panel-content>
+  <div class="mask-container">
+    <transition name="toolbar-fade">
+      <v-sheet
+        v-show="focused"
+        class="charset-toolbar pa-1"
+        :elevation="8"
+      >
+        <v-chip
+          v-for="(item, key) in represenArray"
+          :key="key"
+          color="primary"
+          class="ma-1"
+          @click="addSymbol(key)"
+        >
+          {{ item.represent }}
+        </v-chip>
+        <v-chip
+          v-for="(item, index) in customCharsets"
+          :key="index"
+          color="info"
+          class="ma-1"
+          @click="addSymbol(index + 1)"
+        >
+          {{ item.name }}
+        </v-chip>
+      </v-sheet>
+    </transition>
+    <div class="mask-input">
+      <v-text-field
+        ref="field"
+        label="Enter mask"
+        filled
+        outlined
+        dense
+        single-line
+        :rules="maskRules"
+        :value="value"
+        @input="e => rawValue = e"
+        @focus="focused = true"
+        @blur="focused = false"
+      />
+      <v-btn
+        v-show="!nonRemovable"
+        class="ml-2 remove-button"
+        icon
+        @click="$emit('remove')"
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </div>
+  </div>
 </template>
 
 <script>
   export default {
-    name: "maskSingle",
+    name: "MaskSingle",
     props: {
       value: {
         type: String,
         default: ''
       },
-      openForever: {
+      nonRemovable: {
         type: Boolean,
         default: false
       },
@@ -79,73 +74,38 @@
         default: null
       }
     },
-    computed: {
-      parsedHTML() {
-        var nextCharSymbol = false
-        var parsed = ''
-        if (this.value === '') {
-          if (this.openForever) {
-            return '<span class="grey--text">Write mask down.</span>'
-          } else {
-            return '<span class="grey--text">Empty mask. Click to edit.</span>'
-          }
-        }
-        for (var i = 0; i < this.value.length; i++) {
-          if (nextCharSymbol) {
-            if (this.value[i] === '?') {
-              parsed += '?'
-              nextCharSymbol = false
-              continue
-            }
-            var symbol = this.represenArray[this.value[i]]
-            if (symbol === undefined) {
-              if (this.customCharsets !== null && this.customCharsets[parseInt(this.value[i]) - 1] ) {
-                symbol = {
-                  represent: this.customCharsets[parseInt(this.value[i]) - 1].name
-                }
-              } else {
-                this.validateError = true
-                return '<span class="grey--text">Not valid mask.</span>'
-              }
-            }
-            parsed += '<span class="symbol primary--text">' + symbol.represent + '</span>'
-            nextCharSymbol = false
-            continue
-          }
-          if (this.value[i] === '?') {
-            nextCharSymbol = true
-          } else {
-            parsed += this.value[i]
-            nextCharSymbol = false
-          }
-        }
-        this.validateError = false
-        return parsed
-      }
-    },
-    methods: {
-      addSymbol: function (symbol) {
-        this.$emit('input', this.value + '?' + symbol)
-      },
-      update: function (e) {
-        this.$emit('input', e)
-      },
-      focus: function (e) {
-        if (e) {
-          this.$nextTick(() => {
-            this.$refs.maskInput.focus()
-          })
-        }
-      }
-    },
     data() {
       return {
-        validateError: false,
         rawValue: '',
+        focused: false,
         maskRules: [
-          v => /^(\?[ludhHsab\?]|[ -~])*$/.test(v) || ''
+          v => /^(\?[ludhHsab\?]|[ -~])*$/.test(v) || 'Invalid mask',
+          v => {
+            let nextCharSymbol = false
+            for (let c of v) {
+              if (nextCharSymbol) {
+                if (c === '?') {
+                  nextCharSymbol = false
+                  continue
+                }
+                let symbol = this.represenArray[c]
+                if (symbol === undefined) {
+                  if (this.customCharsets == null || !this.customCharsets[parseInt(c) - 1]) {
+                    return `Unknown symbol ?${c}`
+                  }
+                }
+                nextCharSymbol = false
+                continue
+              }
+              if (c === '?') {
+                nextCharSymbol = true
+              } else {
+                nextCharSymbol = false
+              }
+            }
+            return true
+          }
         ],
-        editing: true,
         represenArray: {
           'l': {
             'chars': 'abcdefghijklmnopqrstuvwxyz',
@@ -182,41 +142,84 @@
         }
       }
     },
+    computed: {
+      /*
+      parsedHTML() {
+        let nextCharSymbol = false
+        let parsed = ''
+        for (let c of this.rawValue) {
+          if (nextCharSymbol) {
+            if (c === '?') {
+              parsed += '?'
+              nextCharSymbol = false
+              continue
+            }
+            let symbol = this.represenArray[c]
+            if (symbol === undefined) {
+              if (this.customCharsets !== null && this.customCharsets[parseInt(c) - 1]) {
+                symbol = {
+                  represent: this.customCharsets[parseInt(c) - 1].name
+                }
+              } else {
+                return '<span class="grey--text">Not valid mask.</span>'
+              }
+            }
+            parsed += '<span class="symbol primary--text">' + symbol.represent + '</span>'
+            nextCharSymbol = false
+            continue
+          }
+          if (c === '?') {
+            nextCharSymbol = true
+          } else {
+            parsed += c
+            nextCharSymbol = false
+          }
+        }
+        return parsed
+      }
+      */
+    },
+    watch: {
+      rawValue (val) {
+        this.$emit('input', val)
+      }
+    },
+    methods: {
+      addSymbol: function (symbol) {
+        this.rawValue += '?' + symbol
+        this.$refs.field.$el.value = this.rawValue
+        this.$refs.field.focus()
+      }
+    },
   }
 </script>
 <style scoped>
-  .title {
-    padding: 8px;
-    font-size: 14px;
-    font-weight: 400;
-  }
+.mask-container {
+  position: relative;
+}
 
-  .maskBtn {
-    min-width: 0px;
-    text-transform: none;
-    padding: 0 10px;
-  }
+.charset-toolbar {
+  position: absolute;
+  z-index: 10;
+  bottom: 115%;
+  max-width: 100%;
+  user-select: none;
+  border-radius: 1.3em;
+  padding: 0;
+}
 
-  .fakeInput {
-    border: 2px solid rgba(0,0,0,.54);
-    border-radius: 4px;
-    padding: 6px 12px;
-    margin: 0 10px;
-  }
+.toolbar-fade-enter, .toolbar-fade-leave-to {
+  opacity: 0;
+  transform: translateY(1em);
+}
+.toolbar-fade-enter-active {
+  transition: .35s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.toolbar-fade-leave-active {
+  transition: .15s .1s ease-in;
+}
 
-  .validationError {
-    border-color: #ff5252;
-  }
-
-
-</style>
-<style >
-  .symbol {
-    margin-left: 1px;
-    margin-right: 1px;
-    border: 1px solid currentColor;
-    padding: 3px;
-    border-radius: 4px;
-    font-weight: 500;
-  }
+.mask-input {
+  display: flex;
+}
 </style>

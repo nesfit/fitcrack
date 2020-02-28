@@ -41,7 +41,7 @@ class PipeWindows : public PipeBase {
         /**
          * @brief   Creates the pipe
          */
-        void createPipe();
+        void createPipe(bool is_NONBLOCK_);
 
         /**
          * @brief   Reads content of the pipe
@@ -50,12 +50,21 @@ class PipeWindows : public PipeBase {
          */
         int readChar(char& c);
 
-    public:
+        /**
+         * @brief reads a char from the pipe. Blocks if it is not available
+         * 
+         * @return char The read character or EOF if the pipe has been closed
+         * @throws std::runtime_error on other errors
+         */
+        int readChar();
+
 
         /**
          * @brief   Constructor which creates the unblocking Linux pipe
          */
-        PipeWindows();
+        PipeWindows(bool is_NONBLOCK_);
+
+    public:
 
         /**
          * @brief   Destructor which calls close on both ends of pipe
@@ -108,6 +117,16 @@ class PipeWindows : public PipeBase {
          * @return  Number of written characters
          */
         int writeMessage(std::string& message);
+        /**
+         * @brief   Creates blocking pipe
+         * @return  Blocking pipe
+         */
+        static PipeBase *createBlockingPipe();
+        /**
+         * @brief   Creates non-blocking pipe
+         * @return  Non-blocking pipe
+         */
+        static PipeBase *createNonBlockingPipe();
 };
 #endif // NAMEDPIPEWINDOWS_HPP
 

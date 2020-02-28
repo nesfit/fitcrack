@@ -61,7 +61,7 @@ class CMask {
          */
 
         uint64_t    m_id;
-        uint64_t    m_packageId;
+        uint64_t    m_jobId;
         std::string m_mask;
         uint64_t    m_currentIndex;
         uint64_t    m_hcKeyspace;
@@ -73,7 +73,7 @@ class CMask {
          */
 
         uint64_t getId() const;
-        uint64_t getPackageId() const;
+        uint64_t getJobId() const;
         const std::string & getMask() const;
         uint64_t getCurrentIndex() const;
         uint64_t getHcKeyspace() const;

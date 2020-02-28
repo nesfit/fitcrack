@@ -24,10 +24,11 @@ namespace Task {
 
     /**
      * @brief	Function creating specific type of TaskBase based on config
+     * @param	config_file [in] Configuration file
      * @param	directory [in] Working directory
      * @return	Pointer to the created task 
      */
-    TaskBase* create(Directory& directory);
+    TaskBase* create(File &config_file, Directory& directory);
 
     /**
      * @brief	Gets workunit name

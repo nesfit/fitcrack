@@ -4,35 +4,76 @@
 -->
 
 <template>
-    <div class="pt-0 mt-0">
-      <v-alert :value="true" type="warning" class="mt-0 mb-0" >
-        Maximum size of uploaded file is 2 GB.
-      </v-alert>
-      <form enctype="multipart/form-data" class="form px-2">
-        <input type="file" class="uploadInput pt-2" name="file" :multiple="multiple" v-on:change="fileChange($event.target.files)"/>
-        <v-btn v-if="!noUpload" type="button" color="primary" class="uploadButton" outline @click="upload()" :disabled="files === null">
-          Upload
-          <span class="spacer"></span><v-icon>cloud_upload</v-icon>
-        </v-btn>
-      </form>
-      <ul v-if="multiple">
-        <li v-for="file in selectedFiles">
-          <strong>{{file.name}}</strong> - {{file.size}} bytes, last modified: {{file.modified}}
-        </li>
-      </ul>
-      <v-progress-linear
-        :query="true"
-        v-model="progress"
-        :active="showProgress"
+  <div class="pt-0 mt-0">
+    <v-alert
+      v-if="overSizeLimit"
+      type="error"
+      tile
+    >
+      Maximum size of uploaded file is 2 GB.
+    </v-alert>
+    <form
+      enctype="multipart/form-data"
+      class="form pa-2"
+    >
+      <v-file-input
+        outlined
+        chips
+        show-size
+        class="mr-2"
+        :label="label"
+        name="file"
+        :multiple="multiple"
+        @change="fileChange"
+      />
+      <v-btn
+        v-if="!noUpload"
         color="primary"
-      ></v-progress-linear>
-    </div>
+        outlined
+        :disabled="files === null || overSizeLimit"
+        @click="upload()"
+      >
+        Upload
+        <v-icon right>
+          mdi-upload
+        </v-icon>
+      </v-btn>
+    </form>
+    <!--
+    <ul v-if="multiple">
+      <li v-for="file in selectedFiles">
+        <strong>{{ file.name }}</strong> - {{ file.size }} bytes, last modified: {{ file.modified }}
+      </li>
+    </ul>
+    -->
+    <v-progress-linear
+      v-model="progress"
+      :query="true"
+      :active="showProgress"
+      color="primary"
+    />
+  </div>
 </template>
 
 <script>
   export default {
-    name: "fileUploader",
-    props: ['multiple', 'url', 'noUpload'],
+    name: "FileUploader",
+    props:{
+      multiple: Boolean,
+      url: {
+        type: String,
+        default: this.$serverAddr
+      },
+      noUpload: Boolean,
+      label: {
+        type: String,
+        default: 'Select files'
+      },
+      args: {
+        type: Object,
+        default: () => {}
+      }
+    },
     data: function () {
       return {
         selectedFiles: [],
@@ -42,6 +83,11 @@
         fileUploaded: false
       }
     },
+    computed: {
+      overSizeLimit () {
+        return this.selectedFiles.some(file => file.size > 2000000000)
+      }
+    },
     methods:{
       uploadChange(progressEvent) {
         this.progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -49,6 +95,9 @@
       },
       fileChange(fileList) {
         this.files = new FormData()
+        for (let [name, val] of Object.entries(this.args)) {
+          this.files.append(name, val)
+        }
         this.selectedFiles = []
         for (var i = 0; i < fileList.length; i++) {
           this.selectedFiles.push({

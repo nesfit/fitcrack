@@ -4,52 +4,231 @@
 -->
 
 <template>
-    <v-container>
-      <fc-tile title="Server" class="mx-auto mt-5 max500" :loading="serverInfo == null || loading">
-        <v-list single-line class="width100" v-if="serverInfo != null">
-          <template v-for="(value, key, i) in serverInfo.subsystems">
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
-                {{key}}:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right error--text" v-bind:class="{'success--text': value}">
-                  {{ yesNo(value) }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-divider></v-divider>
-          </template>
-          <v-list-tile class="px-2 py-1">
-            <v-list-tile-content class="">
-              <v-list-tile-title class="height100 text-xs-center">
-                <v-btn @click="operation('start')" flat outline color="success">Start</v-btn>
-                <v-btn @click="operation('stop')" flat outline color="error">Stop</v-btn>
-                <v-btn @click="operation('restart')" flat outline color="info">Restart</v-btn>
-              </v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
-      </fc-tile>
-    </v-container>
+  <v-container fluid>
+    <v-row>
+      <v-container class="flex1">
+        <fc-tile
+          title="Server"
+          class="mx-3 mb-5"
+          :loading="serverInfo == null"
+        >
+          <v-list
+            v-if="serverInfo != null"
+            single-line
+            class="width100"
+          >
+            <template v-for="(subsystem, i) in serverInfo.subsystems">
+              <v-list-item class="px-2 py-1">
+                <v-list-item-action class="pr-3 key">
+                  {{ subsystem.name }}:
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title
+                    class="text-right error--text"
+                    :class="{'success--text': subsystem.status==='running'}"
+                  >
+                    {{ subsystem.status }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider v-if="!(serverInfo.subsystems.length === i+1)" />
+            </template>
+            <!--                        <v-list-item class="px-2 py-1 ">-->
+            <!--                            <v-list-item-content class="">-->
+            <!--                                <v-list-item-title class="text-xs-center height60">-->
+            <!--                                    <v-btn @click="operation('start')" text outlined color="success">Start</v-btn>-->
+            <!--                                    <v-btn @click="operation('stop')" text outlined color="error">Stop</v-btn>-->
+            <!--                                    <v-btn @click="operation('restart')" text outlined color="info">Restart</v-btn>-->
+            <!--                                </v-list-item-title>-->
+            <!--                            </v-list-item-content>-->
+            <!--                        </v-list-item>-->
+          </v-list>
+        </fc-tile>
+      </v-container>
+      <v-container class="flex2">
+        <fc-tile
+          title="CPU & Memory"
+          icon="mdi-memory"
+          class="mx-3 mb-5 maxh300 flex1"
+        >
+          <fc-graph
+            id="jobGraph1"
+            :data="usageData"
+            type="job"
+            :labels="cpumemLabels"
+            :labels-text="cpumemLabelsFriendly"
+          />
+        </fc-tile>
 
+        <fc-tile
+          title="Disk usage"
+          icon="mdi-harddisk"
+          class="mx-3 mb-5 maxh300 flex1"
+        >
+          <fc-graph
+            id="jobGraph2"
+            :data="usageData"
+            type="job"
+            :labels="hddLabels"
+            :labels-text="hddLabelsFriendly"
+          />
+        </fc-tile>
+
+        <fc-tile
+          title="Network usage"
+          icon="mdi-ethernet"
+          class="mx-3 mb-5 maxh300 flex1"
+        >
+          <fc-graph
+            id="jobGraph3"
+            :data="usageData"
+            type="job"
+            :labels="netLabels"
+            :labels-text="netLabelsFriendly"
+          />
+        </fc-tile>
+
+        <v-row class=" dateSelectCont">
+          <v-spacer />
+          <v-col
+            cols="5"
+            @click="fullDate = false"
+          >
+            <v-radio-group
+              v-model="hoursBefore"
+              row
+              class="dateSelect"
+              @change="loadData"
+            >
+              <v-radio
+                value="1"
+                label="last hour"
+                :disabled="fullDate"
+              />
+              <v-radio
+                value="3"
+                label="last 3 hours"
+                :disabled="fullDate"
+              />
+              <v-radio
+                value="6"
+                label="last 6 hours"
+                :disabled="fullDate"
+              />
+            </v-radio-group>
+          </v-col>
+          <v-col
+            cols="6"
+            class="pl-2"
+            @click="fullDate = true"
+          >
+            <v-row>
+              <v-col cols="2">
+                <v-subheader class="textBottom">
+                  From:
+                </v-subheader>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model="fromDate"
+                  :disabled="!fullDate"
+                  text
+                  single-line
+                  @input="loadData"
+                  mask="date-with-time"
+                  :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+                />
+              </v-col>
+              <v-col cols="2">
+                <v-subheader class="textBottom">
+                  To:
+                </v-subheader>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model="toDate"
+                  :disabled="!fullDate"
+                  text
+                  single-line
+                  @input="loadData"
+                  mask="date-with-time"
+                  :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
   import tile from '@/components/tile/fc_tile'
+  import graph from '@/components/graph/fc_usage_graph'
+
   export default {
-    name: "serverPage",
+    name: "ServerPage",
     components: {
       'fc-tile': tile,
+      'fc-graph': graph,
     },
-    mounted: function() {
-      this.loadData()
+    data: function () {
+      return {
+        serverInfo: null,
+        usageData: null,
+        cpumemLabels: ['cpu', 'ram'],
+        cpumemLabelsFriendly: ['CPU [%]', 'RAM [%]'],
+        hddLabels: ['hdd_read', 'hdd_write'],
+        hddLabelsFriendly: ['HDD Read [Kb/s]', 'HDD Write [Kb/s]'],
+        netLabels: ['net_recv', 'net_sent'],
+        netLabelsFriendly: ['Net receive [Kb/s]', 'Net sent [Kb/s]'],
+        loading: false,
+        fullDate: false,
+        hoursBefore: '1',
+        fromDate: this.$moment().format('DDMMYYYYHHmm'),
+        toDate: this.$moment().format('DDMMYYYYHHmm'),
+      }
+    },
+    mounted: function () {
+      this.loadData();
+      this.interval = setInterval(function () {
+        this.loadData()
+      }.bind(this), 15000)
+    },
+    beforeDestroy () {
+      clearInterval(this.interval)
     },
     methods: {
       loadData: function () {
+
+        var fromDate = '';
+        var toDate = '';
+
+        if (this.fullDate) {
+          if (this.fromDate.length === 12) {
+            fromDate = this.$moment(this.fromDate, 'DDMMYYYYHHmm').format('YYYY-M-D H:mm:ss');
+          } else {
+            return
+          }
+          if (this.toDate.length === 12) {
+            toDate = this.$moment(this.toDate, 'DDMMYYYYHHmm').format('YYYY-M-D H:mm:ss');
+          } else {
+            return
+          }
+        } else {
+          fromDate = this.$moment().subtract(this.hoursBefore, 'hours').format('YYYY-M-D H:mm:ss');
+        }
+
+        this.axios.get(this.$serverAddr + '/serverInfo/getUsageData?from_date=' + fromDate + '&to_date=' + toDate).then((response) => {
+          console.log("/getUsageData", response.data.items);
+          this.usageData = response.data.items;
+        });
+
         this.axios.get(this.$serverAddr + '/serverInfo/info').then((response) => {
           this.serverInfo = response.data
-        })
+        });
+
       },
       operation: function (oper) {
         this.loading = true
@@ -63,22 +242,43 @@
       yesNo: function (val) {
         return val ? 'Yes' : 'No'
       }
-    },
-    data: function () {
-      return {
-        serverInfo: null,
-        loading: false
-      }
     }
   }
 </script>
 
 <style scoped>
-  .max500 {
-    max-width: 500px;
+  .maxh300 {
+    max-height: 300px;
   }
 
-  .height100 {
-    height: 100%;
+  .flex1 {
+    flex: 1;
+  }
+
+  .flex2 {
+    flex: 2;
+  }
+
+  .height60 {
+    height: 100px;
+  }
+
+  .textBottom {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .dateSelectCont {
+    width: 100%;
+    text-align: right;
+  }
+
+  .dateSelect {
+    display: inline-block;
+    max-width: 450px;
+  }
+
+  .key {
+    font-weight: bold;
   }
 </style>

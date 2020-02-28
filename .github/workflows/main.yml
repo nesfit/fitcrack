@@ -1,0 +1,49 @@
+name: Build webadmin FE
+
+on:
+  push:
+    paths:
+      - 'webadmin/fitcrackFE/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Extract branch name
+      shell: bash
+      run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
+    - name: Set up Node ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Make ABSOLUTELY sure server address is LOCALHOST and NOTHING ELSE DEFINITELY YES REALLY
+      working-directory: webadmin/fitcrackFE/static
+      run: |
+        sed -i 's/serverAddress.*/serverAddress = "http:\/\/localhost:5000"/g' configuration.js
+    - name: Install deps and build it
+      working-directory: webadmin/fitcrackFE
+      env:
+        CI: true
+      run: |
+        npm ci
+        npm run build --if-present
+    - name: Commit files
+      run: |
+        git config --local user.email "me@ovi.moe"
+        git config --local user.name "Webpacker"
+        git add webadmin/fitcrackFE/static/configuration.js
+        git commit -m "Fix server address derp 🔨" || true
+        git add .
+        git commit -m "Build webadmin frontend 🚀" || true
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ env.BRANCH_NAME }}

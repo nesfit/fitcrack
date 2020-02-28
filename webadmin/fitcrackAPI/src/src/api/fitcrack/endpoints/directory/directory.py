@@ -16,7 +16,7 @@ from src.api.fitcrack.endpoints.directory.responseModels import directory_model
 from src.database.models import FcMasksSet
 
 log = logging.getLogger(__name__)
-ns = api.namespace('directory', description='Endpointy ktoré slúžia na prechadzanie diskove priestoru servera.')
+ns = api.namespace('directory', description='Endpoinsts for browsing filesystem of server.')
 
 ALLOWED_EXTENSIONS = set(['txt'])
 
@@ -28,14 +28,14 @@ class maskCollection(Resource):
     @api.expect(directory_parser)
     def get(self):
         """
-        Vracia zoznam suborov a zložiek v adresari
+        Returns list of files in directory.
         """
         args = directory_parser.parse_args(request)
 
         result = {
             'path': args['path'],
-            'folders': [],
             'files': [],
+            'folders': [],
             'parent': os.path.abspath(os.path.join(args['path'], os.pardir))
         }
         try:

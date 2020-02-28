@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKMASK_HPP 
+#ifndef ATTACKMASK_HPP
 #define ATTACKMASK_HPP
 
 #include "AttackCrackingBase.hpp"
@@ -59,7 +59,7 @@ class AttackMask: public AttackCrackingBase {
          */
         void addSpecificArguments();
 
-    public: 
+    public:
 
         /**
          * @brief   Basic constructor

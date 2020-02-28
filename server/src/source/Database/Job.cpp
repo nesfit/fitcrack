@@ -1,133 +1,251 @@
 /**
- * @file Job.cpp
- * @brief Source file for fc_workunit entry
+ * @file job.cpp
+ * @brief Source file for fc_job entry
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
 
 #include <Job.h>
+#include <Dictionary.h>
 #include <SqlLoader.h>
 
 
-CJob::CJob(DbMap & jobMap)
+CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
+    :   m_sqlLoader(sqlLoader)
 {
     try
     {
         this->m_id = std::stoull(jobMap["id"]);
-        this->m_packageId = std::stoull(jobMap["job_id"]);
-        this->m_workunitId = std::stoull(jobMap["workunit_id"]);
-        this->m_hostId = std::stoull(jobMap["host_id"]);
-        this->m_boincHostId = std::stoull(jobMap["boinc_host_id"]);
-        this->m_startIndex = std::stoull(jobMap["start_index"]);
-        this->m_startIndex2 = std::stoull(jobMap["start_index_2"]);
+        this->m_attack = jobMap["attack"];
+        this->m_attackMode = std::stoul(jobMap["attack_mode"]);
+        this->m_attackSubmode = std::stoul(jobMap["attack_submode"]);
+        this->m_hashType = std::stoul(jobMap["hash_type"]);
+        this->m_hash = jobMap["hash"];
+        this->m_status = std::stoul(jobMap["status"]);
+        this->m_keyspace = std::stoull(jobMap["keyspace"]);
         this->m_hcKeyspace = std::stoull(jobMap["hc_keyspace"]);
-        this->m_maskId = std::stoull(jobMap["mask_id"]);
-        this->m_dictionaryId = std::stoull(jobMap["dictionary_id"]);
-        this->m_duplicated = true;
-        this->m_duplicate = std::stoull(jobMap["id"]);   /**< We use this only for duplicate job creation */
-        this->m_retry = false;
-        this->m_finished = false;
-        
-        this->m_finishJob = false;
+        this->m_currentIndex = std::stoull(jobMap["current_index"]);
+        this->m_currentIndex2 = std::stoull(jobMap["current_index_2"]);
+        this->m_name = jobMap["name"];
+        this->m_secondsPerWorkunit = std::stoull(jobMap["seconds_per_workunit"]);
+        this->m_config = jobMap["config"];
+        this->m_dict1 = jobMap["dict1"];
+        this->m_dict2 = jobMap["dict2"];
+        this->m_rules = jobMap["rules"];
+        if (!jobMap["grammar_id"].empty())
+            this->m_grammar_id = std::stoull(jobMap["grammar_id"]);
+        this->m_markov = jobMap["markov_hcstat"];
+        this->m_markovThreshold = std::stoul(jobMap["markov_threshold"]);
+        this->m_replicateFactor = std::stoul(jobMap["replicate_factor"]);
+        this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
+
+        /** Check for valid values */
+        if (this->m_secondsPerWorkunit < Config::minSeconds)
+        {
+            Tools::printDebugJob(Config::DebugType::Warn, this->m_id,
+                                 "Found seconds_per_workunit=%" PRIu64 ", falling back to minimum of %" PRIu64"s\n",
+                                 this->m_secondsPerWorkunit, Config::minSeconds);
+            this->m_secondsPerWorkunit = Config::minSeconds;
+        }
+
+        if (this->m_keyspace == 0 && this->m_id != Config::benchAllId)
+        {
+            Tools::printDebugJob(Config::DebugType::Error, this->m_id,
+                                 "Keyspace cannot be 0, setting job to Malformed\n");
+            m_sqlLoader->updateJobStatus(this->m_id, Config::JobState::JobMalformed);
+        }
+
+        /** Compute second dictionary size */
+        if ((this->m_attackMode == Config::AttackMode::AttackCombinator ||             /**< For combinator attacks*/
+            (this->m_attackMode == Config::AttackMode::AttackDict && this->m_attackSubmode > 0) ||    /**< and rules*/
+            (this->m_attackMode == Config::AttackMode::AttackPcfg && this->m_attackSubmode > 0)) &&   /**< and PCFG rules*/
+            this->m_hcKeyspace != 0)
+                m_combSecDictSize = this->m_keyspace / this->m_hcKeyspace;
+
+        /** Load parameters used for adaptive planning */
+        m_secondsPassed = m_sqlLoader->getSecondsPassed(this->m_id);
+        m_totalPower = m_sqlLoader->getTotalPower(this->m_id);
+
+        m_maxSeconds = m_secondsPassed + Config::minSeconds;
+
+        if(m_maxSeconds > this->m_secondsPerWorkunit)
+            m_maxSeconds = this->m_secondsPerWorkunit;
+
+        /** Load workunit timeout */
+        m_timeoutFactor = m_sqlLoader->getTimeoutFactor();
+        if (this->m_timeoutFactor < Config::minTimeoutFactor)
+        {
+            Tools::printDebugJob(Config::DebugType::Warn, this->m_id,
+                                 "Found timeout_factor=%" PRIu64 ", falling back to minimum of %" PRIu64"\n",
+                                 this->m_timeoutFactor, Config::minTimeoutFactor);
+            this->m_timeoutFactor = Config::minTimeoutFactor;
+        }
     }
     catch(std::logic_error & error)
     {
-        Tools::printDebugTimestamp("Error converting jobMap to PtrJob: %s", error.what());
+        Tools::printDebugJob(Config::DebugType::Error, this->m_id,
+                             "Error converting jobMap to PtrJob: %s\n", error.what());
         exit(1);
     }
 }
 
 
-CJob::CJob(uint64_t & packageId, uint64_t & hostId, uint64_t & boincHostId, uint64_t & startIndex,
-           uint64_t & startIndex2, uint64_t & hcKeyspace, uint64_t & maskId, uint64_t & dictionaryId,
-           bool & duplicated, uint64_t & duplicate, bool & retry)
+PtrJob CJob::create(DbMap &jobMap, CSqlLoader * sqlLoader)
 {
-    this->m_id = 0;     /**< ID will be filled by BOINC*/
-    this->m_packageId = packageId;
-    this->m_hostId = hostId;
-    this->m_boincHostId = boincHostId;
-    this->m_workunitId = 0;     /**< WUID will be filled by BOINC */
-    this->m_startIndex = startIndex;
-    this->m_startIndex2 = startIndex2;
-    this->m_hcKeyspace = hcKeyspace;
-    this->m_maskId = maskId;
-    this->m_dictionaryId = dictionaryId;
-    this->m_duplicated = duplicated;
-    this->m_duplicate = duplicate;
-    this->m_retry = retry;
-    this->m_finished = false;
-
-    this->m_finishJob = false;
-}
-
-
-PtrJob CJob::create(uint64_t packageId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
-                    uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
-                    bool duplicated, uint64_t duplicate, bool retry)
-{
-    return PtrJob(new CJob(packageId, hostId, boincHostId, startIndex, startIndex2, hcKeyspace, maskId, dictionaryId,
-                           duplicated, duplicate, retry));
-}
-
-
-PtrJob CJob::create(DbMap & jobMap, CSqlLoader * sqlLoader)
-{
-    /** sqlLoader is here just for common interface in load() function */
-    UNUSED(sqlLoader);
-    return PtrJob(new CJob(jobMap));
+    return PtrJob(new CJob(jobMap, sqlLoader));
 }
 
 
 std::string CJob::getTableName()
 {
-    return Config::tableNameWorkunit;
+    return Config::tableNameJob;
+}
+
+
+void CJob::updateIndex(uint64_t newIndex)
+{
+    /** Local update */
+    this->m_currentIndex = newIndex;
+
+    /** Database update */
+    this->m_sqlLoader->updateJobIndex(this->m_id, newIndex);
+}
+
+
+void CJob::updateIndex2(uint64_t newIndex2)
+{
+    /** Local update */
+    this->m_currentIndex2 = newIndex2;
+
+    /** Database update */
+    this->m_sqlLoader->updateJobIndex2(this->m_id, newIndex2);
+}
+
+
+void CJob::updateStatus(Config::JobState newStatus)
+{
+    /** Local update */
+    this->m_status = newStatus;
+
+    /** Database update */
+    this->m_sqlLoader->updateJobStatus(this->m_id, newStatus);
+}
+
+
+void CJob::updateStatusOfRunningJob(Config::JobState newStatus)
+{
+    /** Local update */
+    if (this->m_status >= 10)
+        this->m_status = newStatus;
+
+    /** Database update */
+    this->m_sqlLoader->updateRunningJobStatus(this->m_id, newStatus);
+}
+
+
+void CJob::updateStartTime()
+{
+    /** Database update only */
+    m_sqlLoader->updateStartTimeNow(this->m_id);
+}
+
+
+void CJob::loadMasks()
+{
+    m_masks.clear();
+    auto maskVec = m_sqlLoader->loadJobMasks(this->m_id);
+    for (auto & mask : maskVec)
+        this->addMask(mask);
+}
+
+
+void CJob::loadDictionaries()
+{
+    m_dictionaries.clear();
+    auto dictVec = m_sqlLoader->loadJobDictionaries(this->m_id);
+    for (auto & dict : dictVec)
+        this->addDictionary(dict);
+}
+
+
+bool CJob::loadHashes()
+{
+    m_hashes.clear();
+    std::vector<std::string> hashVec = m_sqlLoader->loadJobHashes(this->m_id);
+
+    if (hashVec.empty())
+        return false;
+
+    auto it = std::begin(hashVec);
+    m_hashes.append(*it);
+    ++it;
+
+    for (auto end = std::end(hashVec); it != end; ++it)
+    {
+        m_hashes.append("\n");
+        m_hashes.append(*it);
+    }
+
+    /** Debug output */
+    Tools::printDebugJob(Config::DebugType::Log, this->m_id,
+                         "Loaded hashes #: %d\n", hashVec.size());
+    /** @warning c_str() wont work for binary hashes, but we don't care in debug for now */
+    //Tools::printDebug("%s\n", m_hashes.c_str());
+
+    return true;
 }
 
 
 /**
- * @section Table attributes getters/setters
+ * @section Table attributes getters
  */
 
 uint64_t CJob::getId() const
 {
-    return m_id;
+    return this->m_id;
 }
 
 
-uint64_t CJob::getPackageId() const
+const std::string & CJob::getAttack() const
 {
-    return m_packageId;
+    return m_attack;
 }
 
 
-uint64_t CJob::getWorkunitId() const
+uint32_t CJob::getAttackMode() const
 {
-    return m_workunitId;
+    return m_attackMode;
 }
 
 
-uint64_t CJob::getHostId() const
+uint32_t CJob::getAttackSubmode() const
 {
-    return m_hostId;
+    return m_attackSubmode;
 }
 
 
-uint64_t CJob::getBoincHostId() const
+uint32_t CJob::getHashType() const
 {
-    return m_boincHostId;
+    return m_hashType;
 }
 
 
-uint64_t CJob::getStartIndex() const
+const std::string &CJob::getHash() const
 {
-    return m_startIndex;
+    return m_hash;
 }
 
 
-uint64_t CJob::getStartIndex2() const
+uint32_t CJob::getStatus() const
 {
-    return m_startIndex2;
+    return m_status;
+}
+
+
+uint64_t CJob::getKeyspace() const
+{
+    return m_keyspace;
 }
 
 
@@ -137,85 +255,167 @@ uint64_t CJob::getHcKeyspace() const
 }
 
 
-uint64_t CJob::getMaskId() const
+uint64_t CJob::getCurrentIndex() const
 {
-    return m_maskId;
+    return m_currentIndex;
 }
 
 
-uint64_t CJob::getDictionaryId() const
+uint64_t CJob::getCurrentIndex2() const
 {
-    return m_dictionaryId;
+    return m_currentIndex2;
 }
 
 
-bool CJob::isDuplicated() const
+const std::string & CJob::getName() const
 {
-    return m_duplicated;
+    return m_name;
 }
 
 
-uint64_t CJob::getDuplicate() const
+uint64_t CJob::getSecondsPerWorkunit() const
 {
-    return m_duplicate;
+    return m_secondsPerWorkunit;
 }
 
 
-bool CJob::isRetry() const
+const std::string & CJob::getConfig() const
 {
-    return m_retry;
+    return m_config;
 }
 
 
-bool CJob::isFinished() const
+const std::string & CJob::getDict1() const
 {
-    return m_finished;
+    return m_dict1;
 }
 
 
-bool CJob::isFinishJob() const
+const std::string & CJob::getDict2() const
 {
-    return m_finishJob;
+    return m_dict2;
 }
 
 
-void CJob::setWorkunitId(uint64_t workunitId)
+const std::string & CJob::getRules() const
 {
-    m_workunitId = workunitId;
+    return m_rules;
 }
 
 
-void CJob::setHcKeyspace(uint64_t hcKeyspace)
+const std::string & CJob::getGrammar() const
 {
-    m_hcKeyspace = hcKeyspace;
+    return m_grammar;
+}
+
+uint64_t CJob::getGrammarId() const
+{
+    return m_grammar_id;
+}
+
+const std::string & CJob::getMarkov() const
+{
+    return m_markov;
 }
 
 
-void CJob::setRetry(bool retry)
+uint32_t CJob::getReplicateFactor() const
 {
-    m_retry = retry;
+    return m_replicateFactor;
 }
 
 
-void CJob::setHostId(uint64_t hostId)
+bool CJob::getKillFlag() const
 {
-    m_hostId = hostId;
+    return m_killFlag;
 }
 
 
-void CJob::setBoincHostId(uint64_t boincHostId)
+/**
+ * @section Getters/Setters for other member variables
+ */
+
+std::vector<Config::Ptr<CMask>> CJob::getMasks() const
 {
-    m_boincHostId = boincHostId;
+    return m_masks;
 }
 
 
-void CJob::setDuplicated(bool duplicated)
+void CJob::addMask(Config::Ptr<CMask> mask)
 {
-    m_duplicated = duplicated;
+    m_masks.push_back(mask);
 }
 
 
-void CJob::setDuplicate(uint64_t duplicate)
+std::vector<Config::Ptr<CDictionary>> CJob::getDictionaries() const
 {
-    m_duplicate = duplicate;
+    return m_dictionaries;
+}
+
+
+std::vector<Config::Ptr<CDictionary>> CJob::getRightDictionaries() const
+{
+    std::vector<Config::Ptr<CDictionary>> result;
+
+    for (auto & dict : m_dictionaries)
+    {
+        if (!dict->isLeft())
+            result.push_back(dict);
+    }
+
+    return result;
+}
+
+
+void CJob::addDictionary(Config::Ptr<CDictionary> dictionary)
+{
+    m_dictionaries.push_back(dictionary);
+}
+
+
+std::string CJob::getHashes() const
+{
+    return m_hashes;
+}
+
+
+uint64_t CJob::getTotalPower() const
+{
+    return m_totalPower;
+}
+
+
+uint64_t CJob::getSecondsPassed() const
+{
+    return m_secondsPassed;
+}
+
+
+uint64_t CJob::getMaxSeconds() const
+{
+    return m_maxSeconds;
+}
+
+
+uint64_t CJob::getCombSecDictSize() const
+{
+    return m_combSecDictSize;
+}
+
+
+unsigned int CJob::getTimeoutFactor() const
+{
+    return m_timeoutFactor;
+}
+
+
+uint32_t CJob::getMarkovThreshold() const
+{
+    return m_markovThreshold;
+}
+
+
+void CJob::setGrammar(const std::string & grammar)
+{
+    m_grammar = grammar;
 }

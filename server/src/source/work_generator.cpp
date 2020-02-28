@@ -143,6 +143,20 @@ void parseArguments(int argc, char * argv[])
         exit(1);
     }
 
+    std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFilePcfg.c_str());
+    if (read_file_malloc(config.project_path(buf), Config::inTemplatePathPcfg))
+    {
+        log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
+        exit(1);
+    }
+
+    std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFilePcfgRules.c_str());
+    if (read_file_malloc(config.project_path(buf), Config::inTemplatePathPcfgRules))
+    {
+        log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
+        exit(1);
+    }
+
     std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileCombinator.c_str());
     if (read_file_malloc(config.project_path(buf), Config::inTemplatePathCombinator))
     {

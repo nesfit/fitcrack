@@ -5,64 +5,160 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0"><h2>Type masks<span class="required primary--text"> *</span></h2></v-card-title>
-    <v-expansion-panel   popout :expand="false" v-model="editedMaskIdx">
-          <v-layout row align-center fill-height v-for="(mask, i) in masks" class="width100">
-              <v-flex>
-                <mask-single v-model="masks[i]" @input="checkValid" :customCharsets="charsets"></mask-single>
-              </v-flex>
-              <v-btn flat color="error" icon small @click="deleteMask(i)"><v-icon>close</v-icon></v-btn>
-          </v-layout>
-    </v-expansion-panel>
-    <div>
-      <v-btn class="mx-auto d-block"  @click="addMask"  color="success" icon small>
-        <v-icon>add</v-icon>
+    <v-card-title class="pb-0 mb-2">
+      <span>Add masks<span class="required primary--text"> *</span></span>
+    </v-card-title>
+
+    <v-row class="mb-4 px-4">
+      <v-btn
+        color="primary"
+        text
+        @click="loadMasksDialog = true"
+      >
+        <v-icon left>
+          mdi-file-download
+        </v-icon>
+        Load masks
       </v-btn>
+      <v-btn
+        v-show="masks.length > 1"
+        color="error"
+        text
+        @click="masks = ['']"
+      >
+        <v-icon left>
+          mdi-restart
+        </v-icon>
+        Reset masks
+      </v-btn>
+      <v-spacer />
+      <v-btn
+        v-show="masks.length < 50"
+        color="success"
+        @click="addMask()"
+      >
+        <v-icon left>
+          mdi-plus
+        </v-icon>
+        Add mask
+      </v-btn>
+    </v-row>
+
+    <div
+      v-if="masks.length < 50"
+      class="mask-editors"
+    >
+      <mask-single
+        v-for="(mask, i) in masks"
+        :key="i"
+        :non-removable="masks.length == 1"
+        :custom-charsets="charset"
+        :value="mask"
+        @input="e => updateMask({index: i, val: e})"
+        @remove="deleteMask(i)"
+      />
     </div>
+    <v-alert
+      v-else
+      type="info"
+    >
+      Not showing {{ masks.length }} masks to maintain performance and conciseness.
+    </v-alert>
 
-    <v-btn color="primary" outline flat @click="loadMasksDialog = true">Load masks</v-btn>
+    <v-row>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title>
+          <span>Select charsets (max. 4)</span>
+        </v-card-title>
+        <charset-selector
+          v-model="charset"
+          select-all
+        />
+      </v-col>
+      <v-col cols="6">
+        <v-card-title>
+          <span>Markov file</span>
+        </v-card-title>
+        <markov-selector
+          v-model="markov"
+          :markov-submode="submode"
+          @input="checkValid"
+        />
 
-    <v-layout row wrap>
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Select charsets (max. 4)</h2></v-card-title>
-        <charset-selector v-model="charsets" @input="checkValid"></charset-selector>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Markov file</h2></v-card-title>
-        <markov-selector v-model="markov" @input="checkValid"></markov-selector>
-
-        <v-layout row wrap>
-          <v-flex xs6 class="pl-2">
-            <v-radio-group v-model="markovSubmode" column :disabled="markov === null" @change="checkValid">
-              <v-radio label="2D Markov" color="primary" :value="1" :disabled="markov === null"></v-radio>
-              <v-radio label="3D Markov" color="primary" :value="2" :disabled="markov === null"></v-radio>
+        <v-row>
+          <v-col
+            cols="6"
+            class="pl-2"
+          >
+            <v-radio-group
+              v-model="submode"
+              column
+              @change="checkValid"
+            >
+              <v-radio
+                label="Markov disabled"
+                color="primary"
+                :value="0"
+              />
+              <v-radio
+                label="2D Markov"
+                color="primary"
+                :value="1"
+              />
+              <v-radio
+                label="3D Markov"
+                color="primary"
+                :value="2"
+              />
             </v-radio-group>
-          </v-flex>
-          <v-flex xs6 class="pr-2">
+          </v-col>
+          <v-col
+            cols="6"
+            class="pr-2"
+          >
             <v-text-field
-              type="tel"
-              :disabled="markov === null"
-              label="Markov treshold"
-              single-line
+              v-model="markovThresh"
+              type="number"
+              :disabled="submode === 0"
+              label="Markov threshold"
+              filled
+              dense
               mask="########"
-              v-model="markovTreshold"
               @input="checkValid"
-            ></v-text-field>
-          </v-flex>
-        </v-layout>
-      </v-flex>
-    </v-layout>
+            />
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
 
 
 
-    <v-dialog v-model="loadMasksDialog" max-width="400">
-      <v-card >
-        <maskFile-selector v-model="maskFile" @input="checkValid"></maskFile-selector>
-        <v-btn @click="loadMasksFromFile" outline flat class="width96" color="primary" :disabled="maskFile === null">Load</v-btn>
+    <v-dialog
+      v-model="loadMasksDialog"
+      max-width="600"
+    >
+      <v-card>
+        <v-card-text>
+          <maskFile-selector
+            v-model="maskFile"
+            @input="checkValid"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            :disabled="!maskFile"
+            @click="loadMasksFromFile"
+          >
+            Load
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
-
 </template>
 
 <script>
@@ -70,19 +166,13 @@
   import CharsetSelector from '@/components/selector/charsetSelector'
   import markovSelector from '@/components/selector/markovSelector'
   import maskFileSelector from '@/components/selector/loadMaskFileSelector'
-  export default {
-    name: "fc-mask",
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
-    watch:{
-      value: function(){
 
-      }
-    },
+  import {mapMutations} from 'vuex'
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
+  export default {
+    name: "FcMask",
     components: {
       CharsetSelector,
       'mask-single': maskSingle,
@@ -90,20 +180,21 @@
       'markov-selector': markovSelector,
       'maskFile-selector': maskFileSelector
     },
+    data: function () {
+      return {
+        loadMasksDialog: false,
+        maskFile: null
+      }
+    },
+    computed: {
+      ...mapTwoWayState('jobForm', twoWayMap(['masks', 'submode', 'markovThresh', 'markov', 'charset']))
+    },
     methods: {
+      ...mapMutations('jobForm', ['addMask', 'deleteMask', 'updateMask', 'mergeMasks']),
       loadMasksFromFile: function () {
         this.axios.get(this.$serverAddr + '/masks/' + this.maskFile.id).then((response) => {
-          var masksToDisplay = response.data.data.split("\n")
-          if (this.masks[0] === '') {
-            this.masks[0] = masksToDisplay[0]
-          } else {
-            this.masks.push(masksToDisplay[0])
-          }
-          for (let i = 1; i < masksToDisplay.length; i++) {
-            if (masksToDisplay[i] !== '') {
-              this.masks.push(masksToDisplay[i])
-            }
-          }
+          var res = response.data.data.split("\n")
+          this.mergeMasks(res)
           this.maskFile = null
           this.loadMasksDialog = false
           this.checkValid()
@@ -111,51 +202,31 @@
       },
       checkValid: function () {
         if (this.masks[0] !== '') {
+          /*
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
             'masks': this.masks,
             'attack_submode': this.markovSubmode,
-            'markov_treshold': parseInt(this.markovTreshold),
-            'markov': this.markov,
+            'markov_treshold': this.markovSubmode == 0 ? null : parseInt(this.markovTreshold),
+            'markov': this.markovSubmode == 0 ? null : this.markov[0],
             'charset': this.charsets
           })
+          */
           return true
         }
         return false
-      },
-      addMask: function () {
-        this.masks.push('')
-        this.checkValid()
-        this.$nextTick(() => {
-          this.editedMaskIdx = this.masks.length - 1
-        })
-      },
-      deleteMask: function (i) {
-        if (this.masks.length <= 1 )
-          return
-        this.masks.splice(i, 1)
-        this.checkValid()
-      },
-    },
-    data: function () {
-      return {
-        loadMasksDialog: false,
-        markovSubmode: 0,
-        attackId: 3,
-        attackName: 'mask',
-        markovTreshold: '',
-        maskFile: null,
-        charsets: null,
-        markov: null,
-        editedMaskIdx: 0,
-        masks: [''],
       }
     }
   }
 </script>
 
 <style scoped>
+  .mask-editors {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
   .masksContainer {
     overflow: auto;
     max-height: 500px;

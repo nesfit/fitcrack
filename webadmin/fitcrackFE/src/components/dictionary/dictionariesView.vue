@@ -5,43 +5,102 @@
 
 <template>
   <v-container class="max500">
-    <fc-tile title="Dictionaries" class="ma-2">
+    <fc-tile
+      title="Dictionaries"
+      :icon="$route.meta.icon"
+      class="ma-2"
+    >
+      <v-alert
+        tile
+        text
+        type="warning"
+        class="mb-0"
+      >
+        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is via SFTP.
+      </v-alert>
       <v-data-table
         :headers="headers"
         :items="dictionaries.items"
         :loading="loading"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Dictionaries per page"
-        disable-initial-sort
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Dictionaries per page'}"
       >
-        <template slot="items" slot-scope="props">
-          <td>
-            <router-link :to="{name: 'dictionaryDetail', params: { id: props.item.id}}">{{ props.item.name }}</router-link>
-          </td>
-          <td class="text-xs-right">{{ props.item.keyspace }}</td>
-          <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-          <td class="text-xs-right">
-            <v-tooltip top>
-              <v-btn icon class="mx-0" @click="deleteDictionary(props.item.id)" slot="activator">
-                <v-icon color="error">delete</v-icon>
+        <template v-slot:item.name="{ item }">
+          <router-link :to="`dictionaries/${item.id}`">
+            {{ item.name }}
+          </router-link>
+        </template>
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                @click="deleteDictionary(item)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  mdi-delete-outline
+                </v-icon>
               </v-btn>
-              <span>Delete dictionary</span>
-            </v-tooltip>
-          </td>
+            </template>
+            <span>Delete dictionary</span>
+          </v-tooltip>
         </template>
       </v-data-table>
-      <v-divider></v-divider>
-      <div class="text-xs-right px-2 ">
-        <v-btn class="d-inline-block" color="primary" flat outline @click.native.stop="dialog = true">Select from drive</v-btn>
-      </div>
-      <v-alert :value="true" type="warning" class="mt-2 mb-0" >
-        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is through SFTP server.
-      </v-alert>
-      <file-uploader :url="this.$serverAddr + '/dictionary/add'" @uploadComplete="loadDictionaries"></file-uploader>
+      <v-card-actions>
+        <v-checkbox
+          v-model="sortUploaded"
+          label="Sort on upload"
+          hint="Sort by password length"
+          persistent-hint
+        />
+        <v-spacer />
+        <v-btn
+          color="primary"
+          outlined
+          @click.native.stop="browser = true"
+        >
+          Add from server
+        </v-btn>
+        <v-btn
+          color="primary"
+          outlined
+          @click.native.stop="uploader = true"
+        >
+          Upload new
+        </v-btn>
+      </v-card-actions>
     </fc-tile>
 
-    <v-dialog v-model="dialog" max-width="500" lazy >
-      <server-browser @filesuploaded="dialog = false;loadDictionaries()"></server-browser>
+    <v-dialog
+      v-model="browser"
+      max-width="500"
+    >
+      <server-browser
+        :sort="sortUploaded"
+        @filesuploaded="browser = false;loadDictionaries()"
+      />
+    </v-dialog>
+
+    <v-dialog
+      v-model="uploader"
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title>
+          Upload a dictionary file
+        </v-card-title>
+        <v-card-text>
+          <file-uploader
+            :url="this.$serverAddr + '/dictionary/add'"
+            :args="{sort: sortUploaded}"
+            @uploadComplete="uploader = false;loadDictionaries()"
+          />
+        </v-card-text>
+      </v-card>
     </v-dialog>
   </v-container>
 </template>
@@ -52,11 +111,33 @@
   import FileUploader from "@/components/fileUploader/fileUploader";
 
   export default {
-    name: "dictionariesView",
+    name: "DictionariesView",
     components: {
       FileUploader,
       'fc-tile': tile,
       'server-browser': serverBrowser
+    },
+    data: function () {
+      return {
+        loading: false,
+        headers: [
+          {
+            text: 'Name',
+            align: 'start',
+            value: 'name'
+          },
+          {text: 'Keyspace', value: 'keyspace', align: 'end'},
+          {text: 'Time', value: 'time', align: 'end'},
+          {text: 'Delete', value: 'actions', align: 'end', sortable: false}
+        ],
+        dictionaries: [],
+        browser: false,
+        uploader: false,
+        sortUploaded: false
+      }
+    },
+    mounted: function () {
+      this.loadDictionaries()
     },
     methods: {
       loadDictionaries: function () {
@@ -66,33 +147,13 @@
           this.loading = false
         })
       },
-      deleteDictionary: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+      deleteDictionary: function (item) {
+        this.$root.$confirm('Delete', `This will remove ${item.name} from your dictionaries. Are you sure?`).then((confirm) => {
           this.loading = true;
-          this.axios.delete(this.$serverAddr + '/dictionary/' + id).then((response) => {
+          this.axios.delete(this.$serverAddr + '/dictionary/' + item.id).then((response) => {
             this.loadDictionaries()
           })
         })
-      }
-    },
-    mounted: function () {
-      this.loadDictionaries()
-    },
-    data: function () {
-      return {
-        loading: false,
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
-          {text: 'Delete', align: 'right'}
-        ],
-        dictionaries: [],
-        dialog: false
       }
     }
   }

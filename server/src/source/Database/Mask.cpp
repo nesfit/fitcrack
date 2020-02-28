@@ -16,7 +16,7 @@ CMask::CMask(DbMap & maskMap, CSqlLoader * sqlLoader)
     try
     {
         this->m_id = std::stoull(maskMap["id"]);
-        this->m_packageId = std::stoull(maskMap["job_id"]);
+        this->m_jobId = std::stoull(maskMap["job_id"]);
         this->m_mask = maskMap["mask"];
         this->m_currentIndex = std::stoull(maskMap["current_index"]);
         this->m_hcKeyspace = std::stoull(maskMap["hc_keyspace"]);
@@ -61,9 +61,9 @@ uint64_t CMask::getId() const
 }
 
 
-uint64_t CMask::getPackageId() const
+uint64_t CMask::getJobId() const
 {
-    return m_packageId;
+    return m_jobId;
 }
 
 

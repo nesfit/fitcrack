@@ -5,92 +5,78 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
-    v-model="selected"
     item-key="id"
-    :select-all="selectAll"
+    show-select
+    :single-select="!selectAll"
     @input="updateSelected"
   >
-    <template slot="items" slot-scope="props">
-      <tr @click="props.selected = !props.selected">
-        <td>
-          <v-checkbox
-            v-model="props.selected"
-            primary
-            hide-details
-          ></v-checkbox>
-        </td>
-
-        <td>{{ props.item.domain_name + ' (' + props.item.user.name + ')'}}</td>
-        <td class="text-xs-right">{{ props.item.ip_address }}</td>
-        <td class="text-xs-right">{{ props.item.os_name }}</td>
-        <td class="text-xs-right oneline" :title="props.item.p_model">{{ props.item.p_model }}</td>
-        <td class="text-xs-right" >
-          <v-icon :title="parseTimeDelta(props.item.last_active.last_seen)" v-bind:class="{
-                          'error--text': props.item.last_active.seconds_delta > 61,
-                          'success--text': props.item.last_active.seconds_delta < 60 && props.item.last_active.seconds_delta !== null
-                        }">fiber_manual_record</v-icon>
-        </td>
-        <td class="text-xs-right">
-          <v-tooltip top>
-            <v-btn icon class="mx-0" :to="{name: 'hostDetail', params: { id: props.item.id}}" slot="activator">
-              <v-icon color="primary">link</v-icon>
-            </v-btn>
-            <span>Go to the host page</span>
-          </v-tooltip>
-        </td>
-      </tr>
+    <template v-slot:item.domain_name="{ item }">
+      <router-link
+        :to="{ name: 'hostDetail', params: {id: item.id} }"
+        class="middle" target='_blank'
+      >
+        {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
+        <v-icon 
+          small
+          color="primary"
+        >
+          mdi-open-in-new
+        </v-icon>
+      </router-link>
+    </template>
+    <template v-slot:item.p_model="{ item }">
+      <span class="oneline">{{ item.p_model.replace(/(?:\(R\)|\(TM\)|Intel|AMD)/g, '') }}</span>
+    </template>
+    <template v-slot:item.last_active="{ item }">
+      <span v-if="item.last_active.seconds_delta > 61">{{ parseTimeDelta(item.last_active.last_seen) }}</span>
+      <v-icon
+        v-else
+        color="success"
+      >
+        mdi-power
+      </v-icon>
     </template>
   </v-data-table>
 </template>
 
 <script>
+  import iconv from 'iconv-lite';
+  import selector from './selectorMixin'
   export default {
-    name: "hostSelector",
+    name: "HostSelector",
+    mixins: [selector],
     props: {
-      selectAll: {
-        type: Boolean,
-        default: true
-      },
-      value: {
-        type: Array,
-        default: []
-      },
-      selectAll: {
-        type: Boolean,
-        default: false
-      }
+      autoRefresh: Boolean
     },
     data() {
       return {
-        items: [],
-        loading: false,
-        search: '',
-        selected: [],
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'domain_name'
           },
-          {text: 'IP address', value: 'ip_adress', align: 'right', sortable: false},
-          {text: 'Operating system', value: 'os_name', align: 'right', sortable: false},
-          {text: 'Processor', value: 'p_model', align: 'right', width: '200', sortable: false},
-          {text: 'Online', value: 'last_seen', align: 'right', sortable: false},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
+          {text: 'OS', value: 'os_name', align: 'end', sortable: false},
+          {text: 'Processor', value: 'p_model', align: 'end', width: '200', sortable: false},
+          {text: 'Online', value: 'last_active', align: 'end', sortable: false},
         ]
       }
     },
-    mounted() {
-      if (!this.selectAll) {
-        this.headers.unshift({width: "1"})
-      }
-      this.getData()
+    mounted () {
+      this.interval = setInterval(() => {
+        if (this.autoRefresh) this.getData(true)
+      }, 2000)
+    },
+    beforeDestroy () {
+      clearInterval(this.interval)
     },
     methods: {
-      getData() {
+      getData(autorefreshing = false) {
         this.loading = true
         this.axios.get(this.$serverAddr + '/hosts', {
           params: {
@@ -98,10 +84,7 @@
           }
         }).then((response) => {
           this.items = response.data.items
-          if (this.selectAll) {
-            this.selected = this.items
-            this.$emit('input', this.selected)
-          }
+          if (!autorefreshing) this.selected = this.items
           this.loading = false
         })
       },
@@ -112,10 +95,12 @@
           return 'Unknown'
         }
       },
-      updateSelected() {
-        this.$emit('input', this.selected)
+      fixUserNameEncoding : function(username) {
+          /* Boinc DB uses latin1_swedish encoding, which breaks names with special characters,
+          which are not supported in this encoding. Fix it by converting name to utf8. */
+          return iconv.decode(iconv.encode(username, 'latin1'), 'utf-8')
       }
-    },
+    }
   }
 </script>
 

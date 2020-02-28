@@ -18,7 +18,7 @@ from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 from src.database.models import FcHashcache, FcHash
 
 log = logging.getLogger(__name__)
-ns = api.namespace('hashes', description='Operácie s databazou hashov')
+ns = api.namespace('hashes', description='Operations with hashes.')
 
 
 
@@ -30,7 +30,7 @@ class hashCache(Resource):
     @api.marshal_with(page_of_hashes_model)
     def get(self):
         """
-        Vracia list hostov
+        Returns list of hashes.
         """
 
         args = hashes_parser.parse_args(request)
@@ -57,4 +57,3 @@ class hashCache(Resource):
 
 
         return hashes.paginate(page, per_page, error_out=True)
-

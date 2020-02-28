@@ -6,7 +6,7 @@
 #ifndef CONSTANTS_HPP 
 #define CONSTANTS_HPP
 
-#include "boinc_api.h"
+#include "BoincApi.hpp"
 
 /** Namespace representing constants for hashcat arguments */
 namespace HashcatConstant {

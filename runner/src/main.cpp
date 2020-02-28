@@ -1,67 +1,65 @@
 /*
- * Author : see AUTHORS
- * Licence: MIT, see LICENSE
- */
+* Author : see AUTHORS
+* Licence: MIT, see LICENSE
+*/
 
 #include <main.hpp>
 
+#include <memory>
+
 int main(int argc, char **argv) {
 
+  BOINC_OPTIONS options;
+  RunnerUtils::initializeBoinc(options);
 
-    BOINC_OPTIONS options;
-    RunnerUtils::initializeBoinc(options);
+  int error_value = 0;
 
-    int error_value = 0;
+  std::string exception_message;
 
-    std::string exception_message;
+  try {
+    Logging::debugPrint(Logging::Detail::Important, "Runner " RUNNER_VERSION);
 
-    TaskBase *task = nullptr;
+    Directory directory(".");
+    File file;
 
-    try {
-	Logging::debugPrint(Logging::Detail::Important, "Runner " RUNNER_VERSION);
+    directory.scanForEntities();
 
-        Directory directory(".");
-        File file;
+    directory.findVersionedFile("hashcat_files", "zip", file);
 
-        directory.scanForEntities();
+    unsigned long long extraction_start = RunnerUtils::timeInMs();
+    FileZip hashcatkernels(file);
+    hashcatkernels.extract();
+    unsigned long long extraction_end = RunnerUtils::timeInMs();
 
-        directory.findVersionedFile("hashcat_files", "zip", file);
+    Logging::debugPrint(Logging::Detail::DevelDebug, " whole EXTRACTION took: " + RunnerUtils::toString(extraction_end - extraction_start) + "ms");
 
-	unsigned long long extraction_start = RunnerUtils::timeInMs();
-        FileZip hashcatkernels(file);
-        hashcatkernels.extract();
-	unsigned long long extraction_end = RunnerUtils::timeInMs();
+    directory.scanForEntities();
 
-	Logging::debugPrint(Logging::Detail::DevelDebug, " whole EXTRACTION took: " + RunnerUtils::toString(extraction_end - extraction_start) + "ms");
+    const char *config = argc > 1 ?argv[1] : "config";
+    directory.find(config, file);
 
-        directory.scanForEntities();
+    std::auto_ptr<TaskBase> task(Task::create(file, directory));
 
-        directory.find("config", file);
+    task->initialize();
+    task->startComputation();
+    task->progress();
+    error_value = task->saveAndFinish();
+    error_value = (error_value == 1 ? 0 : error_value);
+  }
+  catch (std::runtime_error& e) {
+    exception_message = e.what();
+    Logging::debugPrint(Logging::Detail::Important, "Runner failed with std::runtime_error: \n what() : " + exception_message);
+  }
 
-        task = Task::create(directory);
+  if (RunnerUtils::isStandalone()) {
+    Logging::debugPrint(Logging::Detail::Important, "Results and run outputs are stored in 'out' and 'stderr.txt' files.");
+  }
 
-        task->initialize();
-        task->startComputation();
-	task->progress();
+  if (!exception_message.empty()) {
+    boinc_finish_message(error_value, exception_message.c_str(), false); //exit(0);
+  } else {
+    boinc_finish(error_value); // exit(0);
+  }
 
-	if (task != nullptr) {
-	    error_value = task->saveAndFinish();
-	    error_value = (error_value == 1 ? 0 : error_value);
-	}
-
-    } catch (std::runtime_error& e) {
-        exception_message = e.what();
-	Logging::debugPrint(Logging::Detail::Important, "Runner failed with std::runtime_error: \n what() : " + exception_message);
-    }
-
-    if (RunnerUtils::isStandalone()) {
-	Logging::debugPrint(Logging::Detail::Important, "Results and run outputs are stored in 'out' and 'stderr.txt' files.");
-    }
-
-    if (!exception_message.empty()) {
-        boinc_finish_message(error_value, exception_message.c_str(), false); //exit(0);
-    } else {
-        boinc_finish(error_value); //exit(0);
-    }
+  return 0;
 }
-

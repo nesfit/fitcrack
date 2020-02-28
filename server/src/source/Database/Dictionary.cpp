@@ -1,6 +1,6 @@
 /**
  * @file Dictionary.cpp
- * @brief Source file for fc_[package_]dictionary entries
+ * @brief Source file for fc_[job_]dictionary entries
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
@@ -16,7 +16,7 @@ CDictionary::CDictionary(DbMap &dictMap, CSqlLoader *sqlLoader)
     try
     {
         this->m_id = std::stoull(dictMap["id"]);
-        this->m_packageId = std::stoull(dictMap["job_id"]);
+        this->m_jobId = std::stoull(dictMap["job_id"]);
         this->m_dictionaryId = std::stoull(dictMap["dictionary_id"]);
         this->m_currentIndex = std::stoull(dictMap["current_index"]);
         this->m_hcKeyspace = std::stoull(dictMap["keyspace"]);
@@ -63,9 +63,9 @@ uint64_t CDictionary::getId() const
 }
 
 
-uint64_t CDictionary::getPackageId() const
+uint64_t CDictionary::getJobId() const
 {
-    return m_packageId;
+    return m_jobId;
 }
 
 

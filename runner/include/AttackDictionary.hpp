@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKDICTIONARY_HPP 
+#ifndef ATTACKDICTIONARY_HPP
 #define ATTACKDICTIONARY_HPP
 
 #include "AttackCrackingBase.hpp"
@@ -12,13 +12,13 @@
 class AttackDictionary: public AttackCrackingBase {
 
     protected:
-    
+
         /**
          * @brief   Adds all attack specific arguments
          */
         void addSpecificArguments();
 
-    public: 
+    public:
 
         /**
          * @brief   Basic constructor

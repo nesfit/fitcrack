@@ -9,9 +9,9 @@
 #include "AttackMode.h"
 
 
-void AttackMode::setJob(PtrJob & job)
+void AttackMode::setWorkunit(PtrWorkunit &workunit)
 {
-    m_job = job;
+    m_workunit = workunit;
 }
 
 

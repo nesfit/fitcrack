@@ -8,36 +8,63 @@
     v-model="dialog"
     width="800"
   >
-    <v-btn
-      slot="activator"
-      large
-      color="primary"
-    >
-      Make template
-    </v-btn>
+    <template #activator="{ on }">
+      <v-btn
+        :disabled="!validTemplate"
+        large
+        color="primary"
+        v-on="on"
+        @click="nameMe"
+      >
+        <v-icon left>
+          mdi-file-plus
+        </v-icon>Make template
+      </v-btn>
+    </template>
 
     <v-card>
       <v-card-title
-        class="headline grey lighten-2"
         primary-title
       >
         Job template
       </v-card-title>
 
       <v-card-text>
-        <json-viewer :value="data" ></json-viewer>
+        <!-- <json-viewer :value="data" ></json-viewer> -->
+        <div class="flex mb-3">
+          <v-icon left>
+            info
+          </v-icon>
+          <div>
+            The choices you made in the job configuration will be saved as a template.<br>
+            You can pre-fill any new job configuration with templates you saved.
+          </div>
+        </div>
+        <v-text-field
+          id="templateName"
+          v-model="name"
+          name="templateName"
+          outlined
+          dense
+          hide-details
+          label="Template name"
+        />
       </v-card-text>
 
-      <v-divider></v-divider>
-
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer />
+        <v-btn
+          text
+          @click="dialog = !dialog"
+        >
+          Back to editing
+        </v-btn>
         <v-btn
           color="primary"
-          flat
+          text
           @click="submit"
         >
-          Submit template
+          Save template
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -45,38 +72,46 @@
 </template>
 
 <script>
-  import jsonViewer from '@/components/json/json-viewer'
+  import {mapGetters} from 'vuex'
+
   export default {
-    name: "templateModal",
-    components: {
-      'json-viewer': jsonViewer
-    },
+    name: "TemplateModal",
     props: {
-      data: {
-        type: Object,
-        default: null
-      },
+      inheritedName: {
+        type: String,
+        default: ''
+      }
     },
+    data () {
+      return {
+        dialog: false,
+        name: ''
+      }
+    },
+    computed: mapGetters('jobForm', ['validTemplate']),
     methods: {
       submit() {
-        console.log(this.data)
+        const template = this.$store.getters['jobForm/makeTemplate'](this.name)
+        console.log(template)
         this.loading = true
-        this.axios.post(this.$serverAddr + '/template', this.data).then((response) => {
-          console.log(response.data)
+        this.axios.post(this.$serverAddr + '/template', template).then((response) => {
+          this.$emit('templatesUpdated')
         }).catch((error) => {
           this.loading = false
         })
         this.dialog = false
+      },
+      nameMe () {
+        if (this.name === '') {
+          this.name = this.inheritedName
+        }
       }
-    },
-    data() {
-      return {
-        dialog: false
-      }
-    },
+    }
   }
 </script>
 
 <style scoped>
-
+.flex {
+  display: flex;
+}
 </style>

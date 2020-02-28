@@ -16,11 +16,12 @@ from src.api.fitcrack.endpoints.graph.graph import ns as graph_namespace
 from src.api.fitcrack.endpoints.hashcat.hashcat import ns as hashcat_namespace
 from src.api.fitcrack.endpoints.host.hosts import ns as hosts_namespace
 from src.api.fitcrack.endpoints.notifications.notifications import ns as notifications_namespace
-from src.api.fitcrack.endpoints.package.packages import ns as packages_namespace
+from src.api.fitcrack.endpoints.job.job import ns as job_namespace
 from src.api.fitcrack.endpoints.serverInfo.server import ns as server_namespace
 from src.api.fitcrack.endpoints.user.user import login_manager
 from src.api.fitcrack.endpoints.user.user import ns as user_namespace
 from src.api.fitcrack.endpoints.dictionary.dictionary import ns as dictionary_namespace
+from src.api.fitcrack.endpoints.pcfg.pcfg import ns as pcfg_namespace
 from src.api.fitcrack.endpoints.markov.markov import ns as markov_namespace
 from src.api.fitcrack.endpoints.masks.masks import ns as masks_namespace
 from src.api.fitcrack.endpoints.rule.rule import ns as rule_namespace
@@ -30,9 +31,14 @@ from src.api.fitcrack.endpoints.protectedFile.protectedFile import ns as protect
 from src.api.fitcrack.endpoints.hashCache.hashes import ns as hashes_ns
 from src.api.fitcrack.endpoints.jobTemplate.template import ns as template_ns
 from src.api.fitcrack.endpoints.logs.logs import ns as logs_ns
+from src.api.fitcrack.endpoints.status.status import ns as status_ns
+from src.api.fitcrack.endpoints.pcfg.pcfg import ns as pcfg_ns
+from src.api.fitcrack.endpoints.settings.settings import ns as settings_ns
+
 from src.database import db
 
 app = Flask(__name__)
+
 
 def configure_app(flask_app):
     flask_app.config['SECRET_KEY'] = 'fitcrack456152'
@@ -44,6 +50,7 @@ def configure_app(flask_app):
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
     flask_app.config['ERROR_404_HELP'] = settings.RESTPLUS_ERROR_404_HELP
+    # flask_app.config['DEBUG'] = True
 
 
 def initialize_app(flask_app):
@@ -51,7 +58,7 @@ def initialize_app(flask_app):
 
     blueprint = Blueprint('api',  __name__)
     api.init_app(blueprint)
-    api.add_namespace(packages_namespace)
+    api.add_namespace(job_namespace)
     api.add_namespace(hosts_namespace)
     api.add_namespace(hashcat_namespace)
     api.add_namespace(server_namespace)
@@ -59,6 +66,7 @@ def initialize_app(flask_app):
     api.add_namespace(user_namespace)
     api.add_namespace(notifications_namespace)
     api.add_namespace(dictionary_namespace)
+    api.add_namespace(pcfg_namespace)
     api.add_namespace(markov_namespace)
     api.add_namespace(masks_namespace)
     api.add_namespace(rule_namespace)
@@ -68,12 +76,14 @@ def initialize_app(flask_app):
     api.add_namespace(hashes_ns)
     api.add_namespace(template_ns)
     api.add_namespace(logs_ns)
+    api.add_namespace(status_ns)
+    api.add_namespace(pcfg_ns)
+    api.add_namespace(settings_ns)
 
     flask_app.register_blueprint(blueprint)
 
     CORS(app, supports_credentials=True)
     return flask_app
-
 
 
 @app.before_request
@@ -90,13 +100,16 @@ def check_valid_login():
             abort(401)
     return
 
+@app.after_request
+def bake_cookies(response):
+    "just a workaround"
+    if (response.headers.get('Set-Cookie')):
+        response.headers['Set-Cookie'] += '; SameSite=Lax'
+    return response
+
 
 def main():
-    app.run(host='0.0.0.0', port=5000, threaded=True)
-
-
-
-
+    app.run(host='0.0.0.0', port=5000, threaded=False)
 
 
 initialize_app(app)
@@ -107,8 +120,3 @@ db.init_app(app)
 
 if __name__ == "__main__":
     main()
-
-
-
-
-

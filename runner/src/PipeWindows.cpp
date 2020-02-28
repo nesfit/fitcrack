@@ -1,7 +1,7 @@
 /*
- * Author : see AUTHORS
- * Licence: MIT, see LICENSE
- */
+* Author : see AUTHORS
+* Licence: MIT, see LICENSE
+*/
 
 #ifdef _WIN32
 
@@ -10,115 +10,141 @@
 /* Private */
 
 bool PipeWindows::isEndOpen(HANDLE file_descriptor) const {
-    return file_descriptor != NULL;
+  return file_descriptor != NULL;
 }
 
 int PipeWindows::closeEnd(HANDLE pipe_end) {
-    /** Check if pipe end is still open before closing it */
-    int err = 0;
-    if (isEndOpen(pipe_end)) {
-	err = CloseHandle(pipe_end);
-	if (err == 0) {
-	    pipe_end = NULL;
-	}
+  /** Check if pipe end is still open before closing it */
+  int err = 0;
+  if (isEndOpen(pipe_end)) {
+    err = CloseHandle(pipe_end);
+    if (err == 0) {
+      pipe_end = NULL;
     }
-    return err;
+  }
+  return err;
 }
 
 /* Protected */
 
-void PipeWindows::createPipe() {
-    /** Prepare security attributes */
-    SECURITY_ATTRIBUTES security_attributes;
+void PipeWindows::createPipe(bool is_NONBLOCK_) {
+  /** Prepare security attributes */
+  SECURITY_ATTRIBUTES security_attributes;
 
-    security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-    security_attributes.bInheritHandle = TRUE;
-    security_attributes.lpSecurityDescriptor = NULL;
+  security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
+  security_attributes.bInheritHandle = FALSE;
+  security_attributes.lpSecurityDescriptor = NULL;
 
-    if (!CreatePipe(&read_, &write_, &security_attributes, 0))
-	RunnerUtils::runtimeException("CreatePipe() failed", GetLastError());
+  if (!CreatePipe(&read_, &write_, &security_attributes, 0))
+  RunnerUtils::runtimeException("CreatePipe() failed", GetLastError());
+
+  if (is_NONBLOCK_) {
+    DWORD mode = PIPE_NOWAIT;
+    if (!SetNamedPipeHandleState(read_, &mode, NULL, NULL)) {
+       RunnerUtils::runtimeException("SetNamedPipeHandleState() failed", GetLastError());
+    }
+  }
 }
 
 int PipeWindows::readChar(char& c) {
 
-    int read_size = READ_SIZE; 
-    unsigned long n_read_chars = 0;
+  unsigned long read_size = READ_SIZE;
+  unsigned long n_read_chars = 0;
 
-    /** Try to read N chars but don't really read it yet */
-    if (PeekNamedPipe(read_, NULL, read_size, NULL, &n_read_chars, NULL) == 0) {
-	if ((error_ = GetLastError()) == ERROR_BROKEN_PIPE) {
-	    Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Got ERROR_BROKEN_PIPE: ");
-	} else {
-	    RunnerUtils::runtimeException("PeekPipe() failed", GetLastError());
-	}
-    }
-
-    Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Characters to read: " + RunnerUtils::toString(n_read_chars));
-
-    if (n_read_chars >= read_size) {
-	if (ReadFile(read_, &c, read_size, &n_read_chars, NULL) == 0) {
-	    // TODO: refactor
-	    if ((error_ = GetLastError()) == ERROR_BROKEN_PIPE) {
-		Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Got ERROR_BROKEN_PIPE: ");
-	    } else {
-		RunnerUtils::runtimeException("ReadFile() failed", GetLastError());
-	    }
-	}
-	Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Characters read: " + RunnerUtils::toString(n_read_chars));
-	return n_read_chars;
+  /** Try to read N chars but don't really read it yet */
+  if (PeekNamedPipe(read_, NULL, read_size, NULL, &n_read_chars, NULL) == 0) {
+    if ((error_ = GetLastError()) == ERROR_BROKEN_PIPE) {
+      Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Got ERROR_BROKEN_PIPE: ");
     } else {
-	return -1;
+      RunnerUtils::runtimeException("PeekPipe() failed", GetLastError());
     }
+  }
+
+  Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Characters to read: " + RunnerUtils::toString(n_read_chars));
+
+  if (n_read_chars >= read_size) {
+    //call the blocking version since we know a char is ready
+    c = readChar();
+    Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Characters read: " + RunnerUtils::toString(n_read_chars));
+    return n_read_chars;
+  } else {
+    return -1;
+  }
+}
+
+int PipeWindows::readChar()
+{
+  DWORD n_read_chars;
+  char c;
+  if (ReadFile(read_, &c, sizeof(c), &n_read_chars, NULL) == 0) {
+    if ((error_ = GetLastError()) == ERROR_BROKEN_PIPE) {
+      return EOF;
+    } else {
+      RunnerUtils::runtimeException("ReadFile() failed", GetLastError());
+    }
+  }
+  return c;
 }
 
 /* Public */
 
-PipeWindows::PipeWindows() : read_(NULL), write_(NULL), error_(ERROR_SUCCESS) {
-    createPipe(); 
+PipeWindows::PipeWindows(bool is_NONBLOCK_) : error_(ERROR_SUCCESS), read_(NULL), write_(NULL) {
+  createPipe(is_NONBLOCK_);
 }
 
 PipeWindows::~PipeWindows() {
-    closeAll();
+  closeAll();
 }
 
 bool PipeWindows::canRead() const {
-    return error_ == ERROR_SUCCESS;
+  return error_ == ERROR_SUCCESS;
 }
 
 int PipeWindows::closeRead() {
-    return closeEnd(read_);
+  return closeEnd(read_);
 }
 
 int PipeWindows::closeWrite() {
-    return closeEnd(write_);
+  return closeEnd(write_);
 }
 
 HANDLE PipeWindows::getReadHandle () const {
-    return read_;
+  return read_;
 }
 
 HANDLE PipeWindows::getWriteHandle () const {
-    return write_;
+  return write_;
 }
 
 bool PipeWindows::isReadOpen() const {
-    return isEndOpen(read_);
+  return isEndOpen(read_);
 }
 
 bool PipeWindows::isWriteOpen() const {
-    return isEndOpen(write_);
+  return isEndOpen(write_);
 }
 
 
 int  PipeWindows::writeMessage(std::string& message) {
-    DWORD written_chars = 0;
+  DWORD written_chars = 0;
 
-    Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + "Pipe writing message : " + message);
+  Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + "Pipe writing message : " + message);
 
-    if (!WriteFile(write_, message.data(), message.length(), &written_chars, NULL)) {
-	RunnerUtils::runtimeException("WriteFile() failed", GetLastError());
+  if (!WriteFile(write_, message.data(), message.length(), &written_chars, NULL)) {
+    DWORD error = GetLastError();
+    if(error == ERROR_BROKEN_PIPE)
+    {
+      return -1;
     }
+    else
+    {
+      RunnerUtils::runtimeException("WriteFile() failed", GetLastError());
+    }
+  }
 
-    return written_chars;
+  return written_chars;
 }
+
+PipeBase *PipeWindows::createBlockingPipe() { return new PipeWindows(false); }
+PipeBase *PipeWindows::createNonBlockingPipe() { return new PipeWindows(true); }
 #endif // _WIN32

@@ -35,6 +35,15 @@ if ! [ -d "/usr/share/collections/rules" ]; then
   cp -R collections/rules /usr/share/collections/
 fi
 
+if ! [ -d "/usr/share/collections/pcfg" ]; then
+  #cp -R collections/pcfg /usr/share/collections/
+  cp collections/pcfg.tar.gz /usr/share/collections/
+  cd /usr/share/collections/
+  tar xzvf pcfg.tar.gz
+  rm pcfg.tar.gz
+  cd $INSTALLER_ROOT
+fi
+
 # Set ownership and permissions
 chown -R $APACHE_USER:$APACHE_GROUP /usr/share/collections
 chmod -R 777 /usr/share/collections

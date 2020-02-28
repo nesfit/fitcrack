@@ -9,17 +9,17 @@
 #include <AttackDict.h>
 
 
-CAttackDict::CAttackDict(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader)
-    :   AttackMode(package, host, seconds, sqlLoader)
+CAttackDict::CAttackDict(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(job, host, seconds, sqlLoader)
 {
 
 }
 
 
-bool CAttackDict::makeJob()
+bool CAttackDict::makeWorkunit()
 {
-    /** Create the job instance first */
-    if (!m_job && !generateJob())
+    /** Create the workunit instance first */
+    if (!m_workunit && !generateWorkunit())
         return false;
 
     DB_WORKUNIT wu;
@@ -27,7 +27,7 @@ bool CAttackDict::makeJob()
     const char* infiles[3];
     int retval;
 
-    /** Make a unique name for the job and its input file */
+    /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
@@ -36,9 +36,9 @@ bool CAttackDict::makeJob()
     retval = config.download_path(name1, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - config. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - config. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
@@ -46,17 +46,17 @@ bool CAttackDict::makeJob()
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open config BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open config BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    Tools::printDebug("CONFIG for new job:\n");
+    Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
-    f << m_package->getConfig();
-    Tools::printDebug(m_package->getConfig().c_str());
+    f << m_job->getConfig();
+    Tools::printDebug(m_job->getConfig().c_str());
 
     /** Output mode */
     f << "|||mode|String|1|n|||\n";
@@ -68,66 +68,66 @@ bool CAttackDict::makeJob()
     retval = config.download_path(name2, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - data. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - data. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open data BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open data BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    f << m_package->getHashes();
+    f << m_job->getHashes();
     f.close();
 
     /** Create dictionary file. */
     retval = config.download_path(name3, path);
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - dict1. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - dict1. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
     f.open(path);
     if (!f)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to open dict1 BOINC input file! Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to open dict1 BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Creating dictionary fragment\n");
 
-    /** Load current job dictionary */
-    PtrDictionary jobDict = m_sqlLoader->loadDictionary(m_job->getDictionaryId());
+    /** Load current workunit dictionary */
+    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
     std::ifstream* dictFile;
     std::string passwd;
     uint64_t currentIndex;
 
-    if(m_job->isDuplicated())
+    if(m_workunit->isDuplicated())
     {
-        /** Open new FD for retry jobs */
-        uint64_t startIndex = m_job->getStartIndex();
-        dictFile = new std::ifstream((Config::dictDir + jobDict->getDictFileName()).c_str());
+        /** Open new FD for retry workunits */
+        uint64_t startIndex = m_workunit->getStartIndex();
+        dictFile = new std::ifstream((Config::dictDir + workunitDict->getDictFileName()).c_str());
         if (!(*dictFile))
         {
-            Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                                  "Cannot find dictionary file! Setting package to malformed.\n");
-            m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                  "Cannot find dictionary file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
             return false;
         }
 
-        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                               "Skipping %" PRIu64 " passwords\n", startIndex);
 
         /** Skip passwords in dictionary */
@@ -137,34 +137,34 @@ bool CAttackDict::makeJob()
         /** No more passwords in dictionary */
         if ((*dictFile).eof())
         {
-            Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                                   "'start_index' parameter is too far away\n");
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
             {
-                jobDict->updateIndex(jobDict->getHcKeyspace());
-                m_package->updateIndex(m_package->getCurrentIndex() - m_job->getHcKeyspace());
+                workunitDict->updateIndex(workunitDict->getHcKeyspace());
+                m_job->updateIndex(m_job->getCurrentIndex() - m_workunit->getHcKeyspace());
             }
             return true;
         }
     }
     else {
 
-        dictFile = Tools::getStream(m_package->getId(), jobDict->getDictionaryId(), jobDict->getDictFileName());
+        dictFile = Tools::getStream(m_job->getId(), workunitDict->getDictionaryId(), workunitDict->getDictFileName());
         if (!(*dictFile))
         {
-            Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                                  "Cannot find dictionary file! Setting package to malformed.\n");
-            m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                  "Cannot find dictionary file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
             return false;
         }
     }
     /** Add 'keyspace' passwords to dict file */
 
-    uint64_t jobKeyspace = m_job->getHcKeyspace();
+    uint64_t workunitKeyspace = m_workunit->getHcKeyspace();
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "Adding %" PRIu64 " passwords to host dictionary file\n", jobKeyspace);
-    for (currentIndex = 0; currentIndex < jobKeyspace; ++currentIndex)
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "Adding %" PRIu64 " passwords to host dictionary file\n", workunitKeyspace);
+    for (currentIndex = 0; currentIndex < workunitKeyspace; ++currentIndex)
     {
         std::getline((*dictFile), passwd);
         if (!passwd.empty())
@@ -173,43 +173,43 @@ bool CAttackDict::makeJob()
         /** End of current dictionary */
         if ((*dictFile).eof())
         {
-            Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                    "Ate all passwords, new job keyspace: %" PRIu64 "\nSetting package to Finishing\n",
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Ate all passwords, new workunit keyspace: %" PRIu64 "\nSetting job to Finishing\n",
                               currentIndex);
 
-            if (!m_job->isDuplicated())
+            if (!m_workunit->isDuplicated())
             {
-                m_package->updateIndex(m_package->getCurrentIndex() - m_job->getHcKeyspace() + currentIndex);
-                jobDict->updateIndex(jobDict->getHcKeyspace());
+                m_job->updateIndex(m_job->getCurrentIndex() - m_workunit->getHcKeyspace() + currentIndex);
+                workunitDict->updateIndex(workunitDict->getHcKeyspace());
             }
 
-            m_job->setHcKeyspace(currentIndex);
+            m_workunit->setHcKeyspace(currentIndex);
             break;
         }
     }
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(), "Done.\n");
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(), "Done.\n");
 
-    if (m_job->isDuplicated())
+    if (m_workunit->isDuplicated())
     {
         (*dictFile).close();
-        free(dictFile);
+        delete dictFile;
     }
 
     f.close();
 
-    /** Fill in the job parameters */
+    /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
     safe_strcpy(wu.name, name1);
-    wu.delay_bound = m_package->getTimeoutFactor() * (uint32_t)(m_package->getSecondsPerJob());
+    wu.delay_bound = m_job->getTimeoutFactor() * (uint32_t)(m_job->getSecondsPerWorkunit());
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
 
     setDefaultWorkunitParams(&wu);
 
-    /** Register the job with BOINC */
+    /** Register the workunit with BOINC */
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
@@ -223,26 +223,26 @@ bool CAttackDict::makeJob()
 
     if (retval)
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_package->getId(), m_host->getBoincHostId(),
-                "Failed to create BOINC workunit. Setting package to malformed.\n");
-        m_sqlLoader->updateRunningPackageStatus(m_package->getId(), Config::PackageState::PackageMalformed);
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to create BOINC workunit. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    restrict_wu_to_host(wu, m_job->getBoincHostId());
+    restrict_wu_to_host(wu, m_workunit->getBoincHostId());
 
-    m_job->setWorkunitId(uint64_t(wu.id));
-    m_sqlLoader->addNewWorkunit(m_job);
+    m_workunit->setWorkunitId(uint64_t(wu.id));
+    m_sqlLoader->addNewWorkunit(m_workunit);
 
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                           "Workunit succesfully created\n");
     return true;
 }
 
 
-bool CAttackDict::generateJob()
+bool CAttackDict::generateWorkunit()
 {
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Generating dictionary workunit ...\n");
 
     /** Compute password count */
@@ -250,15 +250,15 @@ bool CAttackDict::generateJob()
 
     if (passCount < Config::minPassCount)
     {
-        Tools::printDebugHost(Config::DebugType::Warn, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
         passCount = Config::minPassCount;
     }
 
-    /** Load package dictionaries */
-    std::vector<PtrDictionary> dictVec = m_package->getDictionaries();
-    Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-            "Dictionaries left for this package: %" PRIu64 "\n", dictVec.size());
+    /** Load job dictionaries */
+    std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "Dictionaries left for this job: %" PRIu64 "\n", dictVec.size());
 
     /** Find the following dictionary */
     PtrDictionary currentDict;
@@ -266,8 +266,8 @@ bool CAttackDict::generateJob()
     {
         if (dict->getCurrentIndex() < dict->getHcKeyspace())
         {
-            /** Dictionary for a new job found */
-            Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+            /** Dictionary for a new workunit found */
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                     "Dict found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
                     dict->getDictFileName().c_str(), dict->getCurrentIndex(), dict->getHcKeyspace());
             currentDict = dict;
@@ -277,9 +277,9 @@ bool CAttackDict::generateJob()
 
     if (!currentDict)
     {
-        /** No dictionaries found, no job could be generated */
-        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
-                "No dictionaries found for this package\n");
+        /** No dictionaries found, no workunit could be generated */
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                "No dictionaries found for this job\n");
         return false;
     }
 
@@ -289,18 +289,18 @@ bool CAttackDict::generateJob()
     {
         /** Host is too powerful for this mask, it will finish it */
         passCount = dictHcKeyspace - dictIndex;
-        Tools::printDebugHost(Config::DebugType::Log, m_package->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                 "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n", passCount);
     }
 
-    /** Create the job */
-    m_job = CJob::create(m_package->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex, 0, passCount, 0,
+    /** Create the workunit */
+    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex, 0, passCount, 0,
                          currentDict->getId(), false, 0, false);
 
-    /** Update the package/dictionary index */
-    uint64_t currentIndex = m_package->getCurrentIndex();
+    /** Update the job/dictionary index */
+    uint64_t currentIndex = m_job->getCurrentIndex();
 
-    m_package->updateIndex(currentIndex + passCount);
+    m_job->updateIndex(currentIndex + passCount);
     currentDict->updateIndex(dictIndex + passCount);
 
     return true;

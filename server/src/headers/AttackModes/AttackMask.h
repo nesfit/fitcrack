@@ -16,11 +16,11 @@ class CAttackMask : public AttackMode {
     public:
         /**
          * @brief Constructor for Combinator Attack
-         * @param package [in] Instance of CPackage which is parent of this attack instance
+         * @param job [in] Instance of CJob which is parent of this attack instance
          * @param host [in] Instance of CHost which this attack belongs to
          * @param seconds [in] Number of seconds this instance of attack should take
          */
-        CAttackMask(PtrPackage & package, PtrHost & host, uint64_t seconds, CSqlLoader * sqlLoader);
+        CAttackMask(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
 
         /**
          * @brief Default destructor
@@ -28,17 +28,17 @@ class CAttackMask : public AttackMode {
         ~CAttackMask() override = default;
 
         /**
-         * @brief Creates BOINC workunit, adds entry to fc_job
-         * @return True if a job was planned, False otherwise
+         * @brief Creates BOINC workunit, adds entry to fc_workunit
+         * @return True if a workunit was planned, False otherwise
          */
-        bool makeJob() override ;
+        bool makeWorkunit() override ;
 
     private:
         /**
-         * @brief Function to generate new CJob for certain host for given time
-         * @return True if job was generated successfully, False otherwise
+         * @brief Function to generate new CWorkunit for certain host for given time
+         * @return True if workunit was generated successfully, False otherwise
          */
-        bool generateJob() override ;
+        bool generateWorkunit() override ;
 };
 
 #endif //WORKGENERATOR_ATTACKMASK_H

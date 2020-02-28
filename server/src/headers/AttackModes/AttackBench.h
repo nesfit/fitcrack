@@ -1,6 +1,6 @@
 /**
  * @file AttackBench.h
- * @brief Header file for creation of Benchmark job
+ * @brief Header file for creation of Benchmark workunit
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
@@ -15,11 +15,11 @@
 class CAttackBench : public AttackMode {
     public:
         /**
-         * @brief Constructor for Benchmark Job
-         * @param package [in] Instance of CPackage which is parent of this job instance
-         * @param host [in] Instance of CHost which this job belongs to
+         * @brief Constructor for Benchmark Workunit
+         * @param job [in] Instance of CJob which is parent of this workunit instance
+         * @param host [in] Instance of CHost which this workunit belongs to
          */
-        CAttackBench(PtrPackage & package, PtrHost & host, CSqlLoader * sqlLoader);
+        CAttackBench(PtrJob &job, PtrHost &host, CSqlLoader *sqlLoader);
 
         /**
          * @brief Default destructor
@@ -27,17 +27,17 @@ class CAttackBench : public AttackMode {
         ~CAttackBench() override = default;
 
         /**
-         * @brief Creates BOINC workunit, adds entry to fc_job
-         * @return True if a job was planned, False otherwise
+         * @brief Creates BOINC workunit, adds entry to fc_workunit
+         * @return True if a workunit was planned, False otherwise
          */
-        bool makeJob() override ;
+        bool makeWorkunit() override ;
 
     private:
         /**
-         * @brief Function to generate new CJob for certain host
-         * @return True if job was generated successfully, False otherwise
+         * @brief Function to generate new CWorkunit for certain host
+         * @return True if workunit was generated successfully, False otherwise
          */
-        bool generateJob() override ;
+        bool generateWorkunit() override ;
 };
 
 #endif //WORKGENERATOR_ATTACKBENCH_H

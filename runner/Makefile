@@ -7,18 +7,20 @@ DOCDIR=./doc/
 TESTDIR=./testground/
 TAB=$(shell echo -e '\t')
 
+GIT_REV=$(shell git rev-parse HEAD)
+
 CXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -pedantic -lboinc_api -lboinc -lzip -lz -static-libgcc -static-libstdc++ 
 CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'  
 ## Release
-LDXXFLAGS=-O3 -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -Wno-c++11-compat -O3 -flto -s -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 ## Debug
-# LDXXFLAGS=-pg -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+# LDXXFLAGS=-Wall -Wextra -Wno-c++11-compat -g -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 
 SRCS=$(shell find $(SRCDIR) -name *.cpp)
 OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))
 
 linux: TARGET=runner.bin
-linux: CXX=g++-4.8
+linux: CXX=g++
 linux: CXXPATHS+=-L'./lib/x86_64_linux'
 linux: ARCH=-m64
 linux: $(OBJDIR) $(BINDIR) runner
@@ -30,10 +32,10 @@ windows: CXXPATHS+=-L'./lib/windows_x86_64/'
 windows: $(OBJDIR) $(BINDIR) runner
 
 $(OBJDIR): 
-	mkdir $@
+	mkdir -p $@
 
 $(BINDIR): 
-	mkdir $@
+	mkdir -p $@
 
 $(OBJDIR)%.o: $(SRCDIR)%.cpp  
 	$(CXX) $(CXXPATHS) $(LDXXFLAGS) -c $< -o $@  

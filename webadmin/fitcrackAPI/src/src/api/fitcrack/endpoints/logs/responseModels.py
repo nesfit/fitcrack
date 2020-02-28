@@ -11,7 +11,7 @@ log_model = api.model('log', {
     'type': fields.String(readOnly=True, required=False),
     'time': fields.DateTime(readOnly=True, required=False),
     'host': fields.Integer(readOnly=True, required=False),
-    'package': fields.Integer(readOnly=True, required=False),
+    'job': fields.Integer(readOnly=True, required=False),
     'log': fields.String(readOnly=True, required=False),
     'raw': fields.String(readOnly=True, required=False)
 })

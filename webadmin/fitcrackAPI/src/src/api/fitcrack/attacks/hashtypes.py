@@ -44,10 +44,55 @@ hashtypes = [
       "category": "Raw Hash",
       "name": "SHA-512"
     },
+    # {
+    #   "code": "5000",
+    #   "category": "Raw Hash",
+    #   "name": "SHA-3 (Keccak)"
+    # },
     {
-      "code": "5000",
+      "code": "17300",
       "category": "Raw Hash",
-      "name": "SHA-3 (Keccak)"
+      "name": "SHA3-224"
+    },
+    {
+      "code": "17400",
+      "category": "Raw Hash",
+      "name": "SHA3-256"
+    },
+    {
+      "code": "17500",
+      "category": "Raw Hash",
+      "name": "SHA3-384"
+    },
+    {
+      "code": "17600",
+      "category": "Raw Hash",
+      "name": "SHA3-512"
+    },
+    {
+      "code": "17700",
+      "category": "Raw Hash",
+      "name": "Keccak-224"
+    },
+    {
+      "code": "17800",
+      "category": "Raw Hash",
+      "name": "Keccak-256"
+    },
+    {
+      "code": "17900",
+      "category": "Raw Hash",
+      "name": "Keccak-384"
+    },
+    {
+      "code": "18000",
+      "category": "Raw Hash",
+      "name": "Keccak-512"
+    },
+    {
+      "code": "18100",
+      "category": "Raw Hash",
+      "name": "TOTP (HMAC-SHA1)"
     },
     {
       "code": "600",

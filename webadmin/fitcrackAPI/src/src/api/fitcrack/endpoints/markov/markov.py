@@ -15,13 +15,14 @@ from settings import HASHCAT_UTILS_PATH, EXE_OR_BIN, HCSTATS_DIR, DICTIONARY_DIR
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.markov.argumentsParser import makeMarkovFromDictionary_parser
 from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
+from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 from src.api.fitcrack.functions import fileUpload, shellExec
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcHcstat, FcDictionary
 
 log = logging.getLogger(__name__)
-ns = api.namespace('markovChains', description='Endpointy ktoré slúžia na pracu s HcStats subormi.')
+ns = api.namespace('markovChains', description='Endpoints for work with HcStats files.')
 
 ALLOWED_EXTENSIONS = set(['hcstat2'])
 
@@ -31,7 +32,7 @@ class markovCollection(Resource):
     @api.marshal_with(hcStatsCollection_model)
     def get(self):
         """
-        Vracia kolekciu HcStats suborov
+        Returns collection of HcStats files.
         """
         return {'items': FcHcstat.query.filter(FcHcstat.deleted == False).all()}
 
@@ -44,7 +45,7 @@ class markovAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava hcstats na server
+        Uploads HcStats files on server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -66,7 +67,7 @@ class markovAdd(Resource):
                 db.session().rollback()
                 abort(500, 'HcStats with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'File ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'File ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
 
             }
@@ -79,7 +80,7 @@ class markov(Resource):
 
     def get(self, id):
         """
-        Ponukne na stiahnutie binarny hcstats subor
+        Downloads HcStat file.
         """
 
         HcStat = FcHcstat.query.filter(FcHcstat.id == id).first()
@@ -87,6 +88,9 @@ class markov(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes HcStat file.
+        """
         markov = FcHcstat.query.filter(FcHcstat.id == id).one()
         if (markov.deleted):
             markov.deleted = False
@@ -95,7 +99,7 @@ class markov(Resource):
         db.session.commit()
         return {
             'status': True,
-            'message': 'Markov file sucesfully deleted.'
+            'message': 'Markov files successfully deleted.'
         }, 200
 
 
@@ -113,7 +117,7 @@ class markovMakeFromDictionary(Resource):
         dict = FcDictionary.query.filter(FcDictionary.id == args['dictionary_id']).first()
         if not dict:
             abort(500, 'Can not find selected dictionary.')
-        filename = secure_filename(args['name'])
+        filename = secure_filename(extractNameFromZipfile(dict.name))
         path = os.path.join(HCSTATS_DIR, filename) + '.hcstat2'
 
         # make hcstat2 file
@@ -123,7 +127,7 @@ class markovMakeFromDictionary(Resource):
         # comprime hcstat2 file
         shellExec('xz --compress --format=raw --stdout -9e ' + path + '_tmp > ' + path)
         # delete non-comprimed file
-        os.remove(path + '_tmp')
+        #os.remove(path + '_tmp')
 
         hcstats = FcHcstat(name=filename + '.hcstat2', path=path)
         try:

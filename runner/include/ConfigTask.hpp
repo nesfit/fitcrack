@@ -127,6 +127,12 @@ class ConfigTask {
          * @return  Path to config file as string 
          */
         std::string getPath() const;
+
+        static const char *HC_KEYSPACE;
+        static const char *MASK_HC_KEYSPACE;
+        static const char *DICT_HC_KEYSPACE;
+        static const char *START_INDEX;
+        static const char *START_HASH_INDEX;
 };
 
 #endif // CONFIGTASK_HPP

@@ -2,20 +2,22 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-
+'''
+packageHost_parser => jobHost_parser
+'''
 import logging
 
 from flask import request
 from flask_restplus import Resource
 
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.host.argumentsParser import packageHost_parser
+from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, boincHostDetail_model
 from src.database import db
 from src.database.models import Host, FcHostActivity, FcHostStatus
 
 log = logging.getLogger(__name__)
-ns = api.namespace('hosts', description='Operácie s hostami')
+ns = api.namespace('hosts', description='Operations with hosts.')
 
 
 
@@ -23,14 +25,14 @@ ns = api.namespace('hosts', description='Operácie s hostami')
 @ns.route('')
 class hostsCollection(Resource):
 
-    @api.expect(packageHost_parser)
+    @api.expect(jobHost_parser)
     @api.marshal_with(page_of_hosts_model)
     def get(self):
         """
-        Vracia list hostov
+        Returns list of hosts.
         """
 
-        args = packageHost_parser.parse_args(request)
+        args = jobHost_parser.parse_args(request)
         page = args.get('page', None)
         per_page = args.get('per_page', None)
 
@@ -69,7 +71,7 @@ class HostByID(Resource):
     @api.marshal_with(boincHostDetail_model)
     def get(self, id):
         """
-        Vráti konkrétneho hosta
+        Returns exact host.
         """
 
         host = Host.query.filter(Host.id == id).one()
@@ -78,7 +80,7 @@ class HostByID(Resource):
 
     def delete(self, id):
         """
-        Vzmaže uzol z tabulky
+        Removes host from table
         """
         hostStatus = FcHostStatus.query.filter(FcHostStatus.boinc_host_id == id).one()
         if (hostStatus.deleted):
@@ -96,7 +98,7 @@ class hostsInfo(Resource):
     #@api.marshal_with(host_info_model)
     def get(self):
         """
-        Vráti info o hostoch
+        Returns information about hosts.
         """
 
         totalHosts = Host.query.count()

@@ -34,31 +34,20 @@ OPS_PW=${OPS_PW:-mypassword}
 
 htpasswd -cb $BOINC_PROJECT_DIR/html/ops/.htpasswd "$OPS_LOGIN" "$OPS_PW"
 
-####################################
-# Copy Fitcrack apps and templates #
-####################################
+##################################
+# Copy Fitcrack apps and daemons #
+##################################
 
-# Copy server daemon binaries
-cp -Rf boinc/sched/work_generator $BOINC_PROJECT_DIR/bin/
-cp -Rf boinc/sched/assimilator $BOINC_PROJECT_DIR/bin/
-cp -Rf boinc/sched/bitwise_validator $BOINC_PROJECT_DIR/bin/
-cp -Rf boinc/sched/trickler $BOINC_PROJECT_DIR/bin/
+# Copy server measure script
+cp -f server/server_bin/measureUsage.py $BOINC_PROJECT_DIR/bin/
 
 # Copy client binaries
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack/1
 cp -Rf server/client_bin/* $BOINC_PROJECT_DIR/apps/fitcrack/1/
 
-# Copy Fitcrack communication templates
-cp -Rf server/templates/* $BOINC_PROJECT_DIR/templates/
-
-
-#####################
-# !!! IMPORTANT !!! #
-#####################
-# Set permissions for BOINC user and BOINC group
-chmod -R g+rwx $BOINC_HOME
-chown -R $BOINC_USER:$BOINC_GROUP $BOINC_HOME/projects
+# Install server daemons
+source installer/install_daemons.sh
 
 # Add app app_versions
 MYDIR=$(pwd)
@@ -112,3 +101,26 @@ if [[ $? != 0 ]]; then
   exit
 fi
 echo "Initial data inserted."
+
+# Install startup scripts
+echo "Adding Fitcrack as a service runs the daemons automatically on startup."
+read -e -p "Add Fitcrack as a system service? [y/N] (default: y)" SERVICE_INSTALL
+SERVICE_INSTALL=${SERVICE_INSTALL:-y}
+
+if [ $SERVICE_INSTALL = "y" ]; then
+  # Add startup script
+  cp -f installer/init/fitcrack /etc/init.d/fitcrack
+  chmod +x /etc/init.d/fitcrack
+  # Add runlevel symlinks
+  case $DISTRO_ID in
+    debian|ubuntu)
+      update-rc.d fitcrack defaults
+    ;;
+    centos|redhat)
+      chkconfig --add fitcrack
+      chkconfig --level 2345 fitcrack on
+    ;;
+    suse|linux)
+    ;;
+  esac
+fi

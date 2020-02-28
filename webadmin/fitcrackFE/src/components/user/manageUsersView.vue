@@ -10,15 +10,16 @@
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in users">
-            <v-list-tile @click="">
-              <v-list-tile-content>
-                <v-list-tile-title>{{item.username}}
-                </v-list-tile-title>
-                <v-list-tile-sub-title>{{item.mail}}</v-list-tile-sub-title>
-              </v-list-tile-content>
-              <v-list-tile-action class="width150">
+            <v-list-item @click="">
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ item.username }}
+                </v-list-item-title>
+                <v-list-item-subtitle>{{ item.mail }}</v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action class="width150">
                 <v-select
-                  flat
+                  text
                   solo
                   item-text="name"
                   item-value="id"
@@ -26,23 +27,55 @@
                   label="Role"
                   :value="item.role.id"
                   @change="updateUserRole($event, item.id)"
-                ></v-select>
-              </v-list-tile-action>
-              <v-list-tile-action>
-                <v-tooltip top>
-                  <v-btn icon class="mx-0" @click="deleteUser(item.id)" slot="activator">
-                    <v-icon color="error">close</v-icon>
+                />
+              </v-list-item-action>
+              <v-list-item-action>
+                <div class="addBtnCont">
+                  <v-btn
+                    color="primary"
+                    class="addBtn"
+                    text
+                    @click="editDialog=true"
+                  >
+                    Edit
                   </v-btn>
+                </div>
+              </v-list-item-action>
+              <v-list-item-action>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      class="mx-0"
+                      @click="deleteUser(item.id)"
+                      v-on="on"
+                    >
+                      <v-icon color="error">
+                        close
+                      </v-icon>
+                    </v-btn>
+                  </template>
                   <span>Delete user</span>
                 </v-tooltip>
-              </v-list-tile-action>
-            </v-list-tile>
-            <v-divider v-if="index + 1 < users.length" :key="index"></v-divider>
+              </v-list-item-action>
+            </v-list-item>
+            <v-divider
+              v-if="index + 1 < users.length"
+              :key="index"
+            />
           </template>
         </v-list>
       </v-card>
       <div class="addBtnCont">
-        <v-btn color="primary" class="addBtn" flat outline @click="userDialog=true">Add user</v-btn>
+        <v-btn
+          color="primary"
+          class="addBtn"
+          text
+          outlined
+          @click="userDialog=true"
+        >
+          Add user
+        </v-btn>
       </div>
     </div>
     <h2>User roles</h2>
@@ -52,118 +85,316 @@
         :headers="headers"
         :items="userRoles"
         :loading="loading"
-        disable-initial-sort
-        hide-actions
+        hide-default-footer
       >
-        <template slot="items" slot-scope="props">
+        <template
+          slot="items"
+          slot-scope="props"
+        >
           <td>{{ props.item.name }}</td>
-          <td class="text-xs-right">
-            <v-checkbox @change="roleChange($event, props.item.id, 'ADD_NEW_JOB')"
-                        v-model="props.item.ADD_NEW_JOB"></v-checkbox>
+          <td class="text-right">
+            <v-checkbox
+              v-model="props.item.ADD_NEW_JOB"
+              @change="roleChange($event, props.item.id, 'ADD_NEW_JOB')"
+            />
           </td>
-          <td class="text-xs-right">
+          <td>
+            <v-checkbox
+              v-model="props.item.MANAGE_USERS"
+              @change="roleChange($event, props.item.id, 'MANAGE_USERS')"
+            />
+          </td>
+          <td class="text-right">
             <v-tooltip top>
-              <v-btn icon class="mx-0" @click="deleteRole(props.item.id)" slot="activator">
-                <v-icon color="error">close</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  class="mx-0"
+                  @click="deleteRole(props.item.id)"
+                  v-on="on"
+                >
+                  <v-icon color="error">
+                    close
+                  </v-icon>
+                </v-btn>
+              </template>
               <span>Delete role</span>
             </v-tooltip>
           </td>
         </template>
       </v-data-table>
       <div class="addBtnCont">
-        <v-btn color="primary" class="addBtn" @click="roleDialog=true" flat outline>Add role</v-btn>
+        <v-btn
+          color="primary"
+          class="addBtn"
+          text
+          outlined
+          @click="roleDialog=true"
+        >
+          Add role
+        </v-btn>
       </div>
     </div>
 
-    <v-dialog v-model="roleDialog" max-width="400px">
+    <v-dialog
+      v-model="roleDialog"
+      max-width="400px"
+    >
       <v-card>
         <v-card-title>
           <h2>Add new user role</h2>
         </v-card-title>
         <v-card-text>
           <v-text-field
-            label="Role name"
             v-model="newRoleName"
-          ></v-text-field>
+            label="Role name"
+          />
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.stop="roleDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="addRole">Add</v-btn>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            @click.stop="roleDialog=false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            :disabled="this.newRoleName=''"
+            @click.stop="addRole"
+          >
+            Add
+          </v-btn>
         </v-card-actions>
-        <div class="loadingOver" v-if="addingRole">
+        <div
+          v-if="addingRole"
+          class="loadingOver"
+        >
           <v-progress-circular
             size="50"
             :width="3"
             class="progress"
             indeterminate
-            color="primary">
-          </v-progress-circular>
+            color="primary"
+          />
         </div>
       </v-card>
     </v-dialog>
 
-
-    <v-dialog v-model="userDialog" max-width="500px">
+    <v-dialog
+      v-model="editDialog"
+      max-width="500px"
+    >
       <v-card>
         <v-card-title>
-          <h2>Add new user</h2>
+          <h2>Edit user</h2>
         </v-card-title>
         <v-card-text>
-          <v-form v-model="validNewUserForm" ref="form" lazy-validation>
+          <v-form
+            ref="form"
+            lazy-validation
+          >
             <v-text-field
-              label="Username"
               v-model="newUsername"
+              label="Username"
               :counter="10"
               required
-            ></v-text-field>
+            />
             <v-text-field
-              label="E-mail"
               v-model="newEmail"
+              label="E-mail"
               :rules="emailRules"
               required
-            ></v-text-field>
+            />
             <v-text-field
+              v-model="oldPassword"
               type="password"
-              label="Password"
-              v-model="newPassword"
+              label="Old password"
               required
-            ></v-text-field>
+            />
+            <v-text-field
+              v-model="newPassword0"
+              type="password"
+              label="New password"
+              required
+            />
+            <v-text-field
+              v-model="newPassword1"
+              type="password"
+              label="New password"
+              :rules="newPasswordRules"
+              required
+            />
             <v-select
-              label="User role"
               v-model="newUserRoleID"
+              label="User role"
               item-text="name"
               item-value="id"
               :items="userRoles"
               :rules="[v => !!v || 'Item is required']"
               required
-            ></v-select>
+            />
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.stop="userDialog=false">Cancel</v-btn>
-          <v-btn color="primary" flat @click.stop="addUser" :disabled="!validNewUserForm">Add user</v-btn>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            @click.stop="editDialog=false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            disabled="true"
+            @click.stop="editUser"
+          >
+            Edit
+          </v-btn>
         </v-card-actions>
-        <div class="loadingOver" v-if="addingUser">
+        <div
+          v-if="editingUser"
+          class="loadingOver"
+        >
           <v-progress-circular
             size="50"
             :width="3"
             class="progress"
             indeterminate
-            color="primary">
-          </v-progress-circular>
+            color="primary"
+          />
         </div>
       </v-card>
     </v-dialog>
 
+    <v-dialog
+      v-model="userDialog"
+      max-width="500px"
+    >
+      <v-card>
+        <v-card-title>
+          <h2>Add new user</h2>
+        </v-card-title>
+        <v-card-text>
+          <v-form
+            ref="form"
+            v-model="validNewUserForm"
+            lazy-validation
+          >
+            <v-text-field
+              v-model="newUsername"
+              label="Username"
+              :counter="10"
+              required
+            />
+            <v-text-field
+              v-model="newEmail"
+              label="E-mail"
+              :rules="emailRules"
+              required
+            />
+            <v-text-field
+              v-model="newPassword"
+              type="password"
+              label="Password"
+              required
+            />
+            <v-select
+              v-model="newUserRoleID"
+              label="User role"
+              item-text="name"
+              item-value="id"
+              :items="userRoles"
+              :rules="[v => !!v || 'Item is required']"
+              required
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            @click.stop="userDialog=false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            :disabled="!validNewUserForm || this.newUsername == '' || this.newEmail == '' || this.newPassword == '' || this.newUserRoleID == ''"
+            @click.stop="addUser"
+          >
+            Add user
+          </v-btn>
+        </v-card-actions>
+        <div
+          v-if="addingUser"
+          class="loadingOver"
+        >
+          <v-progress-circular
+            size="50"
+            :width="3"
+            class="progress"
+            indeterminate
+            color="primary"
+          />
+        </div>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
   export default {
-    name: 'usersView',
+    name: 'UsersView',
+    data: function () {
+      return {
+        newRoleName: null,
+        addingRole: false,
+        roleDialog: false,
+        newPassword: null,
+        newUsername: null,
+        newUserRoleID: null,
+        newEmail: null,
+        editingUser: false,
+        editDialog: false,
+        addingUser: false,
+        userDialog: false,
+        oldPassword: null,
+        newPassword0: null,
+        newpassword1: null,
+        users: [],
+        totalItems: 0,
+        pagination: {},
+        loading: true,
+        headers: [
+          {
+            text: 'Name',
+            align: 'left',
+            value: 'name'
+          },
+          {text: 'Add new job', value: 'ADD_NEW_JOB', align: 'left'},
+          {text: 'Manage users', value: 'MANAGE_USERS', align: 'left'},
+          {text: '', value: 'id', align: 'right'}
+        ],
+        userRoles: [],
+        validEditUserForm: true,
+        validNewUserForm: true,
+        emailRules: [
+          v => !!v || 'E-mail is required',
+          v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+        ],
+        newPasswordRules: [
+          v => !!v || 'Repeat new password',
+          v => this.newPassword0 != this.newPassword1 || 'match!'
+        ]
+      }
+    },
     created: function () {
       this.loadUsers();
       this.loadRoles()
@@ -235,44 +466,30 @@
           this.newUserRoleID = ''
         })
       },
+      editUser() {
+        this.editingUser = true;
+        this.axios.post(this.$serverAddr + '/user/', {
+          username: this.newUsername,
+          mail: this.newEmail,
+          password: this.newPassword,
+          role_id: this.role_id //insert anything with the same ID => rewrite row
+        }).then((response) => {
+          console.log(response.data);
+          this.loadUsers();
+          this.editDialog = false;
+          this.edittingUser = false;
+          this.newUsername = '';
+          this.newEmail = '';
+          this.newPassword = '';
+          this.newUserRoleID = ''
+        })
+      },
       deleteUser(id) {
         this.axios.delete(this.$serverAddr + '/user/' + id).then((response) => {
           console.log(response.data);
           this.loadUsers()
         })
       },
-    },
-    data: function () {
-      return {
-        newRoleName: null,
-        addingRole: false,
-        roleDialog: false,
-        newPassword: null,
-        newUsername: null,
-        newUserRoleID: null,
-        newEmail: null,
-        addingUser: false,
-        userDialog: false,
-        users: [],
-        totalItems: 0,
-        pagination: {},
-        loading: true,
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Add new job', value: 'ADD_NEW_JOB', align: 'left'},
-          {text: '', value: 'id', align: 'right'}
-        ],
-        userRoles: [],
-        validNewUserForm: true,
-        emailRules: [
-          v => !!v || 'E-mail is required',
-          v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-        ]
-      }
     }
   }
 </script>
@@ -311,7 +528,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: white;
+
   }
 
   .loadingOver .progress {

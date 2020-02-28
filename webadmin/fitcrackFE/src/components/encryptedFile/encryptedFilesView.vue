@@ -5,58 +5,106 @@
 
 <template>
   <v-container class="max500">
-    <fc-tile title="Encrypted files" class="ma-2" :loading="encryptedFiles === null">
+    <fc-tile
+      title="Encrypted files"
+      class="ma-2"
+      :loading="encryptedFiles === null"
+    >
       <v-data-table
         v-if="encryptedFiles !== null"
         :headers="headers"
         :items="encryptedFiles.items"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Files per page"
-        disable-initial-sort
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Files per page'}"
       >
-        <template slot="items" slot-scope="props">
+        <template
+          slot="items"
+          slot-scope="props"
+        >
           <td>{{ props.item.name }}</td>
-          <td class="text-xs-right">{{ props.item.hash }}</td>
-          <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-          <td class="text-xs-right">
-            <a :href="$serverAddr + '/protectedFiles/' + props.item.id" target="_blank">
-            <v-btn outline fab small color="primary">
-              <v-icon>file_download</v-icon>
-            </v-btn>
+          <td class="text-right">
+            {{ props.item.hash }}
+          </td>
+          <td class="text-right">
+            {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
+          </td>
+          <td class="text-right">
+            <a
+              :href="$serverAddr + '/protectedFiles/' + props.item.id"
+              target="_blank"
+            >
+              <v-btn
+                outlined
+                fab
+                small
+                color="primary"
+              >
+                <v-icon>file_download</v-icon>
+              </v-btn>
             </a>
           </td>
         </template>
       </v-data-table>
-      <vue-clip :options="uploadOptions" :on-total-progress="uploadProgressChanged" class="pa-2" :on-complete="uploadComplete">
+      <vue-clip
+        :options="uploadOptions"
+        :on-total-progress="uploadProgressChanged"
+        class="pa-2"
+        :on-complete="uploadComplete"
+      >
         <template slot="clip-uploader-action">
           <div class="dz-message">
-            <v-btn outline flat color="primary" class="noEvent">Upload file</v-btn>
+            <v-btn
+              outlined
+              text
+              color="primary"
+              class="noEvent"
+            >
+              Upload file
+            </v-btn>
           </div>
-          <v-progress-linear background-color="white" v-model="uploadProgress"></v-progress-linear>
+          <v-progress-linear
+            v-model="uploadProgress"
+            background-color="white"
+          />
         </template>
-        <template slot="clip-uploader-body" slot-scope="props">
+        <template
+          slot="clip-uploader-body"
+          slot-scope="props"
+        >
           <div v-for="file in props.files">
             {{ file.name }} {{ file.status }}
           </div>
         </template>
       </vue-clip>
     </fc-tile>
-
-
-
-
-
-
-
   </v-container>
 </template>
 
 <script>
   import tile from '@/components/tile/fc_tile'
   export default {
-    name: "encryptedFilesView",
+    name: "EncryptedFilesView",
     components: {
       'fc-tile': tile,
+    },
+    data: function () {
+      return {
+        uploadOptions: {
+          url: this.$serverAddr + '/protectedFiles/',
+          paramName: 'file'
+        },
+        headers: [
+          {
+            text: 'Name',
+            align: 'left',
+            value: 'name'
+          },
+          {text: 'Hash', value: 'hash', align: 'right'},
+          {text: 'Added', value: 'time', align: 'right'},
+          {text: 'Download', value: 'name', align: 'right'}
+        ],
+        encryptedFiles: [],
+        uploadProgress: 0
+      }
     },
     mounted: function () {
       this.loadFiles()
@@ -77,26 +125,6 @@
         } else {
           this.loadFiles()
         }
-      }
-    },
-    data: function () {
-      return {
-        uploadOptions: {
-          url: this.$serverAddr + '/protectedFiles/',
-          paramName: 'file'
-        },
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Hash', value: 'hash', align: 'right'},
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'}
-        ],
-        encryptedFiles: [],
-        uploadProgress: 0
       }
     }
   }

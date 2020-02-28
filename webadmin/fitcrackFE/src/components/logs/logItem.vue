@@ -4,19 +4,41 @@
 -->
 
 <template>
-  <div  :class="classes" class="logItem">
-    <v-layout  align-center row wrap :class="{new: isNew}" class="newOverlay px-2">
-      <span class="time pr-2">{{$moment(time).format('D.M.YYYY H:mm:ss') }}: </span>
-      <v-flex><slot></slot></v-flex>
-      <v-btn :to="'hosts/' + hostID" icon class="btns" v-if="hostID"><v-icon>desktop_windows</v-icon></v-btn>
-      <v-btn :to="'jobs/' + packageID" icon class="btns" v-if="packageID"><v-icon>work</v-icon></v-btn>
-    </v-layout>
+  <div
+    :class="classes"
+    class="logItem"
+  >
+    <v-row
+      align="center"
+      
+      :class="{new: isNew}"
+      class="newOverlay px-2"
+    >
+      <span class="time pr-2">{{ $moment(time).format('D.M.YYYY H:mm:ss') }}: </span>
+      <v-col><slot /></v-col>
+      <v-btn
+        v-if="hostID"
+        :to="'hosts/' + hostID"
+        icon
+        class="btns"
+      >
+        <v-icon>desktop_windows</v-icon>
+      </v-btn>
+      <v-btn
+        v-if="jobID"
+        :to="'jobs/' + jobID"
+        icon
+        class="btns"
+      >
+        <v-icon>work</v-icon>
+      </v-btn>
+    </v-row>
   </div>
 </template>
 
 <script>
   export default {
-    name: "logItem",
+    name: "LogItem",
     props: {
       type: {
         type: String,
@@ -26,7 +48,7 @@
         type: [Number, null],
         default: null
       },
-      packageID: {
+      jobID: {
         type: [Number, null],
         default: null
       },
@@ -35,8 +57,10 @@
         default: ''
       },
     },
-    mounted () {
-      setTimeout(function(){ this.isNew = false }.bind(this), 1000);
+    data() {
+      return {
+        isNew: true
+      }
     },
     computed: {
       classes () {
@@ -47,10 +71,8 @@
         }
       }
     },
-    data() {
-      return {
-        isNew: true
-      }
+    mounted () {
+      setTimeout(function(){ this.isNew = false }.bind(this), 1000);
     },
   }
 </script>

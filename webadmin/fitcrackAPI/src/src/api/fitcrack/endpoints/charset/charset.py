@@ -6,7 +6,7 @@
 import logging
 
 import os
-from flask import request, redirect, send_from_directory
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -21,7 +21,7 @@ from src.database import db
 from src.database.models import FcCharset
 
 log = logging.getLogger(__name__)
-ns = api.namespace('charset', description='Endpointy ktoré slúžia na pracu s charset subormi.')
+ns = api.namespace('charset', description='Endpoints for work with charset files.')
 
 ALLOWED_EXTENSIONS = set(['txt', 'hcchr', 'charset'])
 
@@ -32,7 +32,7 @@ class charsetCollection(Resource):
     @api.marshal_with(hcStatsCollection_model)
     def get(self):
         """
-        Vracia kolekciu HcStats suborov
+        Ruturns collection of HcStats files.
         """
         return {'items': FcCharset.query.filter(FcCharset.deleted == False).all()}
 
@@ -44,7 +44,7 @@ class charsetAdd(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         """
-        Nahrava charset subor na server
+        Uploads charset file on server.
         """
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -58,7 +58,8 @@ class charsetAdd(Resource):
 
         uploadedFile = fileUpload(file, CHARSET_DIR, ALLOWED_EXTENSIONS, suffix='.hcchr')
         if uploadedFile:
-            charset = FcCharset(name=uploadedFile['filename'], path=uploadedFile['path'])
+            size = os.path.getsize(os.path.join(CHARSET_DIR, uploadedFile['path']))
+            charset = FcCharset(name=uploadedFile['stem'], path=uploadedFile['path'], keyspace=size)
             try:
                 db.session.add(charset)
                 db.session.commit()
@@ -66,7 +67,7 @@ class charsetAdd(Resource):
                 db.session().rollback()
                 abort(500, 'Charset with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'File ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'File ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
             }
         else:
@@ -79,7 +80,7 @@ class charset(Resource):
     @api.marshal_with(charset_model)
     def get(self, id):
         """
-        Vrati info o charsete spolu s datami
+        Returns information about charset with data.
         """
 
         charset = FcCharset.query.filter(FcCharset.id == id).first()
@@ -93,6 +94,7 @@ class charset(Resource):
             return {
                 'id': charset.id,
                 'name': charset.name,
+                'keyspace': charset.keyspace,
                 'time': charset.time,
                 'data': str(content),
                 'canDecode': False
@@ -102,6 +104,7 @@ class charset(Resource):
         return {
             'id': charset.id,
             'name': charset.name,
+            'keyspace': charset.keyspace,
             'time': charset.time,
             'data': content,
             'canDecode': True
@@ -109,12 +112,18 @@ class charset(Resource):
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
+        """
+        Deletes charset.
+        """
         charset = FcCharset.query.filter(FcCharset.id == id).one()
         if (charset.deleted):
             charset.deleted = False
         else:
             charset.deleted = True
         db.session.commit()
+        path = os.path.join(CHARSET_DIR, charset.path)
+        if os.path.exists(path):
+            os.remove(path)
         return {
             'status': True,
             'message': 'Charset sucesfully deleted.'
@@ -126,11 +135,11 @@ class downloadCharset(Resource):
 
     def get(self, id):
         """
-        Stiahne charset
+        Downloads charset.
         """
 
         charset = FcCharset.query.filter(FcCharset.id == id).first()
-        return send_from_directory(CHARSET_DIR, charset.path)
+        return send_file(os.path.join(CHARSET_DIR, charset.path), as_attachment=True, attachment_filename=charset.path)
 
 
 @ns.route('/<id>/update')
@@ -140,7 +149,7 @@ class updateCharset(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        Nahradí charset novým stringom
+        Exchanges charset with new string.
         """
 
         args = updateCharset_parser.parse_args(request)
@@ -155,6 +164,6 @@ class updateCharset(Resource):
         file.close()
 
         return {
-            'message': 'File ' + charset.name + ' successfuly changed.',
+            'message': 'File ' + charset.name + ' successfully changed.',
             'status': True
         }

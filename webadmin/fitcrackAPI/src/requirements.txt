@@ -5,3 +5,5 @@ flask-cors
 flask-login
 flask-migrate
 flask_script
+psutil
+werkzeug==0.15.4

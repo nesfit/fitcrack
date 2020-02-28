@@ -5,83 +5,107 @@
 
 <template>
   <div>
-    <v-layout row wrap>
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Select dictionary<span class="required primary--text"> *</span></h2></v-card-title>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Type mask<span class="required primary--text"> *</span></h2></v-card-title>
-      </v-flex>
-      <v-flex xs6 class="border">
-        <dict-selector v-model="dictionaries" @input="checkValid"></dict-selector>
-      </v-flex>
-      <v-flex xs6>
-        <v-expansion-panel class="elevation-0 pt-2">
-          <mask-single :openForever="true" v-model="mask" @input="checkValid"></mask-single>
-        </v-expansion-panel>
-      </v-flex>
+    <v-row>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title>
+          <span>Select dictionary<span class="required primary--text"> *</span></span>
+        </v-card-title>
+      </v-col>
+      <v-col cols="6">
+        <v-card-title>
+          <span>Type mask<span class="required primary--text"> *</span></span>
+        </v-card-title>
+      </v-col>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <dict-selector
+          v-model="leftDicts"
+          select-all
+          @input="checkValid"
+        />
+      </v-col>
+      <v-col cols="6">
+        <mask-single
+          v-model="hybridMask"
+          non-removable
+          @input="checkValid"
+        />
+      </v-col>
 
-      <v-flex xs6 class="border">
-        <v-card-title class="pb-0"><h2>Type rule</h2></v-card-title>
-      </v-flex>
-      <v-flex xs6>
-        <v-card-title class="pb-0"><h2>Type rule</h2></v-card-title>
-      </v-flex>
+      <v-col
+        cols="6"
+        class="border"
+      >
+        <v-card-title>
+          <span>Type rule</span>
+        </v-card-title>
+      </v-col>
+      <v-col cols="6">
+        <v-card-title>
+          <span>Type rule</span>
+        </v-card-title>
+      </v-col>
 
-      <v-flex xs6 class="border px-2">
+      <v-col
+        cols="6"
+        class="border px-2"
+      >
         <v-text-field
-          outline
+          v-model="ruleLeft"
+          outlined
           single-line
           placeholder="Rule left"
-          v-model="ruleLeft"
           @input="checkValid"
-        ></v-text-field>
-      </v-flex>
-      <v-flex xs6  class="px-2">
+        />
+      </v-col>
+      <v-col
+        cols="6"
+        class="px-2"
+      >
         <v-text-field
-          outline
+          v-model="ruleRight"
+          outlined
           single-line
           placeholder="Rule right"
-          v-model="ruleRight"
           @input="checkValid"
-        ></v-text-field>
-      </v-flex>
-    </v-layout>
-
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
   import dictSelector from '@/components/selector/dictionarySelector'
   import maskSingle from '@/components/mask/maskSingle'
-  export default {
-    name: "hybridMaskWordlist",
-    props: {
-      value: {
-        type: [Boolean, Object],
-        default: null
-      },
-    },
-    watch:{
-      value: function(){
 
-      }
-    },
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
+  export default {
+    name: "HybridMaskWordlist",
     components: {
       'mask-single': maskSingle,
       'dict-selector': dictSelector
     },
+    data: function () {
+      return {
+        attackId: 6,
+        attackName: 'Hybrid wordlist+mask',
+        maskRules: [
+          v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
+        ]
+      }
+    },
+    computed: mapTwoWayState('jobForm', twoWayMap(['ruleLeft', 'leftDicts', 'ruleRight', 'hybridMask'])),
     methods: {
-      dictSelected: function (id, dictNubmer) {
-        this.selectedDict1Id = id
-        this.checkValid();
-      },
-      addCharToMask: function (char) {
-        this.mask += char
-        this.checkValid()
-      },
       checkValid: function () {
-        if (this.mask !== '' && this.dictionaries.length > 0) {
+        if (this.hybridMask !== '' && this.leftDicts.length > 0) {
+          /*
           this.$emit('input', {
             'attack_mode': this.attackId,
             'attack_name': this.attackName,
@@ -90,24 +114,11 @@
             'left_dictionaries': this.dictionaries,
             'mask': this.mask
           })
+          */
           return true
         }
         return false
       },
-    },
-    data: function () {
-      return {
-        attackId: 6,
-        attackName: 'Hybrid wordlist+mask',
-        dictionaries: [],
-        valid: false,
-        mask: '',
-        ruleLeft: '',
-        ruleRight: '',
-        maskRules: [
-          v => /^(\?[ludhHsab]|[ -~])+$/.test(v) || 'Not valid mask'
-        ]
-      }
     }
   }
 </script>

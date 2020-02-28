@@ -5,42 +5,71 @@
 
 <template>
   <v-container class="max500">
-    <fc-tile title="Mask sets" class="ma-2">
-      <v-alert :value="true" type="warning" class="mt-0 mb-1" >
+    <fc-tile
+      title="Mask sets"
+      class="ma-2"
+      :icon="$route.meta.icon"
+    >
+      <v-alert
+        tile
+        text
+        type="warning"
+        class="mb-0"
+      >
         Mask files must have a .txt or .hcmask extension.
       </v-alert>
       <v-data-table
         :headers="headers"
         :items="masks.items"
         :loading="loading"
-        :rows-per-page-items="[10,25,50]"
-        rows-per-page-text="Mask sets per page"
-        disable-initial-sort
+        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Masks per page'}"
       >
-        <template slot="items" slot-scope="props">
-          <td><router-link :to="{name: 'maskDetail', params: { id: props.item.id}}">{{ props.item.name }}</router-link></td>
-          <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-          <td class="text-xs-right">
-            <a :href="$serverAddr + '/masks/' + props.item.id + '/download'" target="_blank">
-              <v-btn outline fab small color="primary">
-                <v-icon>file_download</v-icon>
+        <template v-slot:item.name="{ item }">
+          <router-link :to="`masks/${item.id}`">
+            {{ item.name }}
+          </router-link>
+        </template>
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/masks/' + item.id + '/download'"
+                target="_blank"
+                download
+                v-on="on"
+              >
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
+                </v-btn>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                @click="deleteMask(item)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  mdi-delete-outline
+                </v-icon>
               </v-btn>
-            </a>
-          </td>
-          <td class="text-xs-right">
-            <v-tooltip top>
-              <v-btn icon class="mx-0" @click="deleteMask(props.item.id)" slot="activator">
-                <v-icon color="error">delete</v-icon>
-              </v-btn>
-              <span>Delete mask file</span>
-            </v-tooltip>
-          </td>
+            </template>
+            <span>Delete</span>
+          </v-tooltip>
         </template>
       </v-data-table>
-      <v-divider></v-divider>
-      <file-uploader :url="this.$serverAddr + '/masks/add'" @uploadComplete="loadMasks"></file-uploader>
+      <v-divider />
+      <file-uploader
+        :url="this.$serverAddr + '/masks/add'"
+        @uploadComplete="loadMasks"
+      />
     </fc-tile>
-
   </v-container>
 </template>
 
@@ -48,10 +77,25 @@
   import tile from '@/components/tile/fc_tile'
   import FileUploader from "@/components/fileUploader/fileUploader";
   export default {
-    name: "masksView",
+    name: "MasksView",
     components: {
       FileUploader,
       'fc-tile': tile,
+    },
+    data: function () {
+      return {
+        loading: false,
+        masks: [],
+        headers: [
+          {
+            text: 'Name',
+            align: 'start',
+            value: 'name'
+          },
+          {text: 'Added', value: 'time', align: 'end'},
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
+        ]
+      }
     },
     mounted: function () {
       this.loadMasks()
@@ -64,29 +108,13 @@
           this.loading = false
         })
       },
-      deleteMask: function (id) {
-        this.$root.$confirm('Delete', 'Are you sure?', { color: 'primary' }).then((confirm) => {
+      deleteMask: function (item) {
+        this.$root.$confirm('Delete', `This will remove ${item.name} from your masks. Are you sure?`).then((confirm) => {
           this.loading = true;
-          this.axios.delete(this.$serverAddr + '/masks/' + id).then((response) => {
+          this.axios.delete(this.$serverAddr + '/masks/' + item.id).then((response) => {
             this.loadMasks()
           })
         })
-      }
-    },
-    data: function () {
-      return {
-        loading: false,
-        masks: [],
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'},
-          {text: 'Delete', align: 'right'}
-        ]
       }
     }
   }

@@ -31,9 +31,9 @@
 +    Config.h \
 +    Dictionary.h \
 +    Host.h \
-+    Job.h \
++    Workunit.h \
 +    Mask.h \
-+    Package.h \
++    Job.h \
 +    SqlLoader.h \
 +    AbstractGenerator.h \
 +    SimpleGenerator.h \
@@ -47,9 +47,9 @@
 +    Config.cpp \
 +    Dictionary.cpp \
 +    Host.cpp \
-+    Job.cpp \
++    Workunit.cpp \
 +    Mask.cpp \
-+    Package.cpp \
++    Job.cpp \
 +    SqlLoader.cpp \
 +    AbstractGenerator.cpp \
 +    SimpleGenerator.cpp

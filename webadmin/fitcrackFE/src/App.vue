@@ -4,30 +4,32 @@
 -->
 
 <template>
-  <v-app light>
+  <v-app>
     <v-snackbar
+      v-model="alert"
       :timeout="6000"
       bottom
       right
-      v-model="alert"
       color="transparent"
       class="errorSnackbar pa-0"
-      auto-height
     >
-      <v-alert :type="alertType"
-               class="height100 ma-0 width100"
-               :value="true"
-               dismissible
-               v-model="alert"
-               transition="none"
-
+      <v-alert
+        v-model="alert"
+        :type="alertType"
+        class="height100 ma-0 width100"
+        :value="true"
+        dismissible
+        transition="none"
       >
-        {{alertText}}
+        {{ alertText }}
       </v-alert>
     </v-snackbar>
-    <router-view/>
-    <vue-progress-bar></vue-progress-bar>
-    <confirm ref="confirm"></confirm>
+    <router-view 
+      :is-dark="isDark" 
+      @alert="setAlert"
+    />
+    <vue-progress-bar />
+    <confirm ref="confirm" />
   </v-app>
 </template>
 
@@ -38,14 +40,23 @@
     components: {
       'confirm': confirm
     },
+    data: function () {
+      return {
+        alert: false,
+        alertText: '',
+        alertType: 'error',
+        isDark: false
+      }
+    },
     created: function () {
-      this.$store.loggedInLink = this.$route;
+      /*
+      this.$store.state.loggedInLink = this.$route;
       if (this.$needLogin) {
         this.$router.push({
           name: 'login'
         })
       }
-
+      */
       this.axios.interceptors.response.use(
         function (response) {
           if (response.data.hasOwnProperty('status') && response.data.hasOwnProperty('message') && response.data.status) {
@@ -74,15 +85,29 @@
           }
         }.bind(this)
       )
+
+      const mql = window.matchMedia('(prefers-color-scheme: dark)')
+      mql.addListener(e => {
+        const pref = localStorage.getItem('appearance')
+        if (!pref || pref == 'auto') {
+          this.$vuetify.theme.dark = e.matches
+        }
+      })
+      const init = localStorage.getItem('appearance')
+      if (init && init == 'dark') {
+        this.$vuetify.theme.dark = true
+      } else if (!init || init == 'auto') {
+        this.$vuetify.theme.dark = mql.matches
+      }
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open
     },
-    data: function () {
-      return {
-        alert: false,
-        alertText: '',
-        alertType: 'error'
+    methods: {
+      setAlert ({type, text}) {
+        this.alertType = type
+        this.alertText = text
+        this.alert = true
       }
     }
   }

@@ -12,6 +12,7 @@ There are four ways of deployment:
   * For **Custom build of Runner**, see [Runner README](runner/README.md)
 
 Once installed, see how to [Operate the server](#oper)
+Don't forget to activate [usage measure](#usage) of your server.
 
 <a name="instgen"></a>
 ## General installation instructions
@@ -36,6 +37,7 @@ Once installed, see how to [Operate the server](#oper)
   * rewrite
 * PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
+* Curl
 
 ### Installation
 Create a user for running BOINC server
@@ -73,7 +75,7 @@ Otherwise, in the prerequisities below, you have to choose **libmariadb-dev**, i
 
 ### Install prerequisities
 ```
-apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev
+apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev curl
 
 mysql_secure_installation # Set MySQL root password
 
@@ -184,7 +186,20 @@ boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 ```
-
+<a name="usage"></a>
+## Installing server usage measure
+First of all you need to edit line with address to your API (default is `http://localhost:5000`).
+```
+boincadm@myserver:~/projects/fitcrack$ edit ./bin/measureUsage.py
+```
+Next step is to add this script to your favorite job scheduler. Here is example for Cron.
+```
+boincadm@myserver:~/projects/fitcrack$ crontab -e
+```
+Add this text to last line (script will start every 5 minutes):
+```
+*/5 * * * * /home/boincadm/projects/fitcrack/bin/measureUsage.py
+```
 ## Optional: multiple workunits per hosts
 
 In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary ttack with big dictionaries.

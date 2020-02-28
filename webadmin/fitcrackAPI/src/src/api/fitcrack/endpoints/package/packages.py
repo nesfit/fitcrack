@@ -22,18 +22,18 @@ from src.api.fitcrack.endpoints.package.argumentsParser import packageList_parse
     packageOperation, verifyHash_argument, crackingTime_argument, addPackage_model, editHostMapping_argument, \
     editPackage_argument
 from src.api.fitcrack.endpoints.package.functions import delete_package, verifyHashFormat, create_package, \
-    computeCrackingTime
+    computeCrackingTime, start_pcfg_manager
 from src.api.fitcrack.endpoints.package.responseModels import page_of_packages_model, page_of_jobs_model, \
-    verifyHash_model, crackingTime_model, newPackage_model, package_model, verifyHashes_model
+    verifyHash_model, crackingTime_model, newPackage_model, package_model, verifyHashes_model, package_nano_list_model
 from src.api.fitcrack.functions import shellExec
 from src.api.fitcrack.lang import statuses, package_status_text_to_code_dict
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary
+from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg, FcJobStatus
 
 log = logging.getLogger(__name__)
 
-ns = api.namespace('jobs', description='Operácie s package')
+ns = api.namespace('jobs', description='Operations with jobs.')
 
 
 @ns.route('')
@@ -43,7 +43,7 @@ class packagesCollection(Resource):
     @api.marshal_with(page_of_packages_model)
     def get(self):
         """
-        Vracia list balíčkov
+        Returns list of jobs.
         """
         args = packageList_parser.parse_args(request)
         page = args.get('page', 1)
@@ -79,7 +79,7 @@ class packagesCollection(Resource):
     @api.marshal_with(newPackage_model)
     def post(self):
         """
-        Vytvorí nový package
+        Creates new job.
         """
 
         data = request.json
@@ -98,7 +98,7 @@ class PackageByID(Resource):
     @api.marshal_with(package_model)
     def get(self, id):
         """
-        Vráti konkrétny package.
+        Returns job.
         """
         package = FcJob.query.filter(FcJob.id == id).one()
         return package
@@ -106,6 +106,10 @@ class PackageByID(Resource):
     @api.expect(editPackage_argument)
     @api.marshal_with(simpleResponse)
     def put(self, id):
+        """
+        Changes created job.
+        """
+
         args = editPackage_argument.parse_args(request)
         package = FcJob.query.filter(FcJob.id == id).one()
 
@@ -130,7 +134,7 @@ class PackageByID(Resource):
     @api.response(204, 'Package successfully deleted.')
     def delete(self, id):
         """
-        Vzmaže package
+        Deletes job.
         """
         delete_package(id)
         return None, 204
@@ -143,13 +147,19 @@ class OperationWithPackage(Resource):
     @api.marshal_with(simpleResponse)
     def get(self, id):
         """
-        Operácie so package (reštart, štart,stop)
+        Operations with job(restart, start, stop).
         """
         args = packageOperation.parse_args(request)
         action = args.get('operation')
-
         package = FcJob.query.filter(FcJob.id == id).one()
+
         if action == 'start':
+            if package.attack_mode == 9:
+                pcfg = FcPcfg.query.filter(FcPcfg.id == package.grammar_id).one()
+                print(package.id)
+                print(pcfg.name)
+                print(pcfg.keyspace)
+                start_pcfg_manager(package.id, pcfg.name, pcfg.keyspace)
             package.status = 10
         elif action == 'stop':
             package.status = 12
@@ -174,7 +184,7 @@ class OperationWithPackage(Resource):
                 db.session.delete(item)
             db.session.add(FcJobGraph(progress=0, job_id=package.id))
         elif action == 'kill':
-            package.status = 0
+            package.status = 10
             package.indexes_verified = 0
             package.current_index = 0
             package.cracking_time = 0
@@ -206,7 +216,7 @@ class OperationWithPackage(Resource):
 
         return {
             'status': True,
-            'message': 'Job with name ' + package.name + ' ' + action
+            'message': 'Job \"' + package.name + '\" ' + action + "ed"
         }
 
 
@@ -219,7 +229,7 @@ class packagesHost(Resource):
     @api.marshal_with(page_of_hosts_model)
     def get(self, id):
         """
-        vráti hostov ktorí sa podielaju na crackovaní balíčka
+        Returns list of hosts that are working on job.
         """
 
         args = packageHost_parser.parse_args(request)
@@ -237,7 +247,7 @@ class packagesHost(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        mapping hostov k jobu
+        Mapping of hosts to job.
         """
 
         args = editHostMapping_argument.parse_args(request)
@@ -272,7 +282,7 @@ class packagesJob(Resource):
     @api.marshal_with(page_of_jobs_model)
     def get(self, id):
         """
-        vráti ulohy na ktore je package rozdelený
+        Returns workunits to which job was devides.
         """
 
         args = packageJob_parser.parse_args(request)
@@ -296,7 +306,7 @@ class verifyHash(Resource):
     @api.marshal_with(verifyHashes_model)
     def post(self):
         """
-        overí formát zadaného hashu
+        Verifies format of uploaded hash.
         """
 
         args = verifyHash_argument.parse_args(request)
@@ -323,7 +333,7 @@ class getCrackingTime(Resource):
     @api.marshal_with(crackingTime_model)
     def get(self):
         """
-        Vypočíta dobu crackovania
+        Calculates cracking time.
         """
         args = crackingTime_argument.parse_args(request)
         return computeCrackingTime(args)
@@ -337,7 +347,7 @@ class jobsInfo(Resource):
     #@api.marshal_with(crackingTime_model)
     def get(self):
         """
-        Vráti info o joboch
+        Returns information about jobs.
         """
 
         statusesCount = db.session.query(FcJob.status, func.count(FcJob.id)).group_by(FcJob.status).all()
@@ -350,3 +360,29 @@ class jobsInfo(Resource):
                 }
             )
         return result
+
+
+@ns.route('/lastJobs')
+class lastJobs(Resource):
+
+    @api.marshal_with(package_nano_list_model)
+    def get(self):
+        """
+        Vrati posledni ukoly, ve kterych byla zmena stavu
+        """
+
+        states = FcJobStatus.query.order_by(FcJobStatus.time.desc()).all()
+
+        ids = []
+        jobs_to_return = []
+
+        for jobStatus in states:
+            if not ids.__contains__(jobStatus.job_id) and len(ids) != 6:
+                ids.append(jobStatus.job_id)
+
+        for jobId in ids:
+            job = FcJob.query.filter(FcJob.id == jobId).one()
+            if job.deleted == 0:
+                jobs_to_return.append(job)
+
+        return {'items': jobs_to_return}

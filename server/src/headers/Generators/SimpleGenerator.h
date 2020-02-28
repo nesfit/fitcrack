@@ -1,7 +1,7 @@
 /**
  * @file SimpleGenerator.h
  * @brief Header file for simple generator
- * Keeps 2 generated jobs for each active host
+ * Keeps 2 generated workunits for each active host
  *
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
  * @date 12. 12. 2018
@@ -37,35 +37,35 @@ class CSimpleGenerator : public CAbstractGenerator {
         CSqlLoader * m_sqlLoader;   /**< SqlLoader for database access */
 
         /**
-         * @brief Creates Benchamrk job for supplied host
-         * @param package [in] Parent package of this benchmark
+         * @brief Creates Benchamrk workunit for supplied host
+         * @param job [in] Parent job of this benchmark
          * @param host [in] Host to whom the benchmark is sent
          */
-        void createBenchmark(PtrPackage & package, PtrHost & host);
+        void createBenchmark(PtrJob &job, PtrHost &host);
 
         /**
-         * @brief Creates Regular cracking job for supplied host
-         * @param package [in] Parent package of this job
-         * @param host [in] Host to whom the cracking job is sent
+         * @brief Creates Regular cracking workunit for supplied host
+         * @param job [in] Parent job of this workunit
+         * @param host [in] Host to whom the cracking workunit is sent
          */
-        void createRegularJob(PtrPackage & package, PtrHost & host);
+        void createRegularWorkunit(PtrJob &job, PtrHost &host);
 
         /**
-         * @brief Set package to timeout/exhausted/pause status
+         * @brief Set job to timeout/exhausted/pause status
          */
-        void finishPackage(PtrPackage & package);
+        void finishJob(PtrJob &job);
 
         /**
-         * Set job to attacl, copied from smallest corresponding job with retry set to 1
-         * @param package [in] Package for which we are generating
+         * Set workunit to attack, copied from smallest corresponding workunit with retry set to 1
+         * @param job [in] Job for which we are generating
          * @param host [in] Host for whom we are generating
-         * @param attack [in/out] Attack to which we set the new job
-         * @return True if job was copied from retry, False otherwise
+         * @param attack [in/out] Attack to which we set the new workunit
+         * @return True if workunit was copied from retry, False otherwise
          */
-        bool setEasiestRetry(PtrPackage & package, PtrHost & host, AttackMode * attack);
+        bool setEasiestRetry(PtrJob &job, PtrHost &host, AttackMode *attack);
 
         /**
-         * @brief Removes hosts of finished package and send them message to delete sticky files
+         * @brief Removes hosts of finished job and send them message to delete sticky files
          */
         void removeFinishedHosts();
 };

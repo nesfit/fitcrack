@@ -4,7 +4,7 @@
 -->
 
 <template>
-    <span class="json-boolean">{{jsonValue}}</span>
+  <span class="json-boolean">{{ jsonValue }}</span>
 </template>
 
 <script>

@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKCOMBINATOR_HPP 
+#ifndef ATTACKCOMBINATOR_HPP
 #define ATTACKCOMBINATOR_HPP
 
 #include "AttackCrackingBase.hpp"
@@ -18,7 +18,7 @@ class AttackCombinator: public AttackCrackingBase {
          */
         void addSpecificArguments();
 
-    public: 
+    public:
 
         /**
          * @brief   Basic constructor

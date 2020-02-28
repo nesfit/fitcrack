@@ -4,9 +4,9 @@
 */
 
 const UserPlugin = {
-  install(Vue, options) {
+  install(Vue) {
     Vue.prototype.$logoutUser = function () {
-      this.$store.user = {
+      this.$store.state.user = {
         'userData': {
           'id': null,
           'username': null,
@@ -15,10 +15,10 @@ const UserPlugin = {
             'MANAGE_USERS': false,
             'ADD_NEW_JOB': false,
             'UPLOAD_DICTIONARIES': false,
-            'VIEW_ALL_PACKAGES': false,
-            'EDIT_ALL_PACKAGES': false,
-            'OPERATE_ALL_PACKAGES': false,
-            'ADD_USER_PERMISSIONS_TO_PACKAGE': false
+            'VIEW_ALL_JOBS': false,
+            'EDIT_ALL_JOBS': false,
+            'OPERATE_ALL_JOBS': false,
+            'ADD_USER_PERMISSIONS_TO_JOB': false
           }
         },
         'loggedIn': false
@@ -30,20 +30,23 @@ const UserPlugin = {
     };
 
     Vue.prototype.$logInUser = function (user) {
-      console.log(this.$store.loggedInLink);
-      this.$store.user.userData = user;
-      this.$store.user.loggedIn = true;
-      console.log('logged IN!!!');
-      if (this.$store.loggedInLink === null || this.$store.loggedInLink.name === 'login') {
-        this.$router.push({
+      this.$store.state.user.userData = user;
+      this.$store.state.user.loggedIn = true;
+      console.log('logged IN!!!')
+      const redirect = sessionStorage.getItem('loginRedirect')
+      sessionStorage.removeItem('loginRedirect')
+      if (!redirect || redirect === '/login') {
+        this.$router.replace({
           name: 'home'
         })
       } else {
-        this.$router.push({
-          path: this.$store.loggedInLink.path
-        })
+        this.$router.replace(redirect)
       }
-    };
+    }
+
+    Vue.prototype.$currentUser = function () {
+      return this.axios.get(this.$serverAddr + '/user/isLoggedIn').then(response => response.data)
+    }
 
 
     Vue.prototype.$needLogin = true
@@ -55,12 +58,14 @@ const UserPlugin = {
       return this.user
     };
 
+    Vue.prototype.$username = this.name;
+
     Vue.prototype.$userCanManageUsers = function () {
-      return this.$store.user.userData.role.MANAGE_USERS
+      return this.$store.state.user.userData.role.MANAGE_USERS
     };
 
     Vue.prototype.$userCanAddJob = function () {
-      return this.$store.user.userData.role.ADD_NEW_JOB
+      return this.$store.state.user.userData.role.ADD_NEW_JOB
     }
 
     Vue.prototype.$error = function (message) {

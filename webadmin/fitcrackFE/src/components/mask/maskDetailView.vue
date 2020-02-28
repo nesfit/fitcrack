@@ -5,70 +5,97 @@
 
 <template>
   <div>
-    <v-breadcrumbs divider="/" class="pb-0"  v-if="data != null">
-      <v-breadcrumbs-item>
-        <router-link :to="{name: 'masks'}">Masks</router-link>
-      </v-breadcrumbs-item>
-      <v-breadcrumbs-item>
-        {{data.name}}
-      </v-breadcrumbs-item>
-    </v-breadcrumbs>
+    <v-breadcrumbs
+      v-if="data != null"
+      :items="
+        [
+          { text: 'Masks', to: { name: 'masks' }, exact: true },
+          { text: data.name }
+        ]"
+      divider="/"
+    />
 
     <v-container>
-      <v-layout row wrap justify-center>
-        <fc-tile title="Mask set" :loading="data==null" class="mx-2 dictContentContainer mb-4">
-          <v-list single-line class="width100" v-if="data != null">
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+      <v-row justify="center">
+        <fc-tile
+          title="Mask set"
+          :loading="data==null"
+          class="mx-2 dictContentContainer mb-4"
+        >
+          <v-list
+            v-if="data != null"
+          >
+            <v-list-item>
+              <v-list-item-action>
                 Name:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
-                  {{data.name}}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-action class="pr-3 key">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-right">
+                  {{ data.name }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider />
+            <v-list-item>
+              <v-list-item-action>
                 Added:
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title class="text-xs-right">
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-right">
                   {{ $moment(data.time).format('DD.MM.YYYY HH:mm') }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-divider></v-divider>
-            <v-list-tile class="px-2 py-1">
-              <v-list-tile-content>
-                <v-layout row class="width100 margintop5">
-                  <v-btn class="ma-0" outline color="primary" v-if="!edit" @click="edit=true">
-                    Edit <v-icon class="ml-2">edit</v-icon>
-                  </v-btn>
-                  <v-btn class="ma-0" outline color="primary" v-else @click="saveMask">
-                    Save <v-icon class="ml-2">save</v-icon>
-                  </v-btn>
-                  <v-spacer></v-spacer>
-                  <a :href="$serverAddr + '/masks/' + data.id + '/download'" target="_blank">
-                    <v-btn class="ma-0" outline color="primary">
-                      Download <v-icon class="ml-2">file_download</v-icon>
-                    </v-btn>
-                  </a>
-                </v-layout>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
-          <v-divider></v-divider>
-          <div class="dictContent pa-2" v-if="data != null" v-bind:class="{editing: edit}">
-            <code class="code elevation-0"
-                  @input="update"
-                  :contenteditable="edit"
-            >{{data.data}}</code>
+          <v-row class="mx-2">
+            <v-col>
+              <v-btn
+                v-if="!edit"
+                class="ma-0"
+                outlined
+                color="primary"
+                @click="edit=true"
+              >
+                Edit <v-icon class="ml-2">
+                  mdi-pencil
+                </v-icon>
+              </v-btn>
+              <v-btn
+                v-else
+                class="ma-0"
+                outlined
+                color="primary"
+                @click="saveMask"
+              >
+                Save <v-icon class="ml-2">
+                  mdi-save
+                </v-icon>
+              </v-btn>
+              <v-btn
+                class="ma-0"
+                outlined
+                color="primary"
+                :href="$serverAddr + '/masks/' + data.id + '/download'"
+                target="_blank"
+              >
+                Download <v-icon class="ml-2">mdi-download</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-divider />
+          <div
+            v-if="data != null"
+            class="dictContent pa-2"
+            :class="{editing: edit}"
+          >
+            <code
+              class="code elevation-0"
+              :contenteditable="edit"
+              @input="update"
+            >{{ data.data }}</code>
           </div>
-
         </fc-tile>
-      </v-layout>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -76,9 +103,16 @@
 <script>
   import tile from '@/components/tile/fc_tile'
   export default {
-    name: "maskDetailView",
+    name: "MaskDetailView",
     components: {
       'fc-tile': tile
+    },
+    data: function () {
+      return {
+        data: null,
+        edit: false,
+        newData: ''
+      }
     },
     mounted: function () {
       this.loadData()
@@ -104,13 +138,6 @@
           this.edit=false
         })
       }
-    },
-    data: function () {
-      return {
-        data: null,
-        edit: false,
-        newData: ''
-      }
     }
   }
 </script>
@@ -125,7 +152,7 @@
   }
 
   .dictContent.editing {
-    background: white;
+
   }
 
   .code::before {

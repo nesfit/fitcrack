@@ -321,13 +321,16 @@ fitcrack_sources = \
     AttackMask.h \
     AttackMode.h \
     AttackRules.h \
+    AttackPcfg.h \
+    AttackPcfgClient.h \
+    AttackPcfgRules.h \
     Base64.h \
     Config.h \
     Dictionary.h \
     Host.h \
-    Job.h \
+    Workunit.h \
     Mask.h \
-    Package.h \
+    Job.h \
     SqlLoader.h \
     AbstractGenerator.h \
     SimpleGenerator.h \
@@ -338,24 +341,31 @@ fitcrack_sources = \
     AttackMask.cpp \
     AttackMode.cpp \
     AttackRules.cpp \
+    AttackPcfg.cpp \
+    AttackPcfgClient.cpp \
+    AttackPcfgRules.cpp \
     Config.cpp \
     Dictionary.cpp \
     Host.cpp \
-    Job.cpp \
+    Workunit.cpp \
     Mask.cpp \
-    Package.cpp \
+    Job.cpp \
     SqlLoader.cpp \
     AbstractGenerator.cpp \
-    SimpleGenerator.cpp
+    SimpleGenerator.cpp \
+    protocol.grpc.pb.h \
+    protocol.grpc.pb.cc \
+    protocol.pb.h \
+    protocol.pb.cc
 
 assimilator_SOURCES = $(ASSIMILATOR_SOURCES) \
 	$(fitcrack_sources) \
 	work_assimilator.cpp
-assimilator_LDADD = $(SERVERLIBS)
+assimilator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
 
 work_generator_SOURCES = $(fitcrack_sources) \
 	work_generator.cpp
-work_generator_LDADD = $(SERVERLIBS)
+work_generator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
 
 bitwise_validator_SOURCES = $(VALIDATOR_SOURCES) \
 	sample_bitwise_validator.cpp

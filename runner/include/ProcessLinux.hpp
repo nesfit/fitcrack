@@ -5,7 +5,7 @@
 
 #ifdef __linux__
 
-#ifndef PROCESSLINUX_HPP 
+#ifndef PROCESSLINUX_HPP
 #define PROCESSLINUX_HPP
 
 #include "Logging.hpp"
@@ -21,12 +21,12 @@
 /** Class representing sub-process on Linux system */
 class ProcessLinux : public ProcessBase {
 
-    protected:	
+    protected:
         pid_t process_identifier_;	    /**< ProcessBase identifier */
         int status_;                    /**< Status of the process */
 
         /**
-         * @brief   Function executing another binary in new process, predefined 
+         * @brief   Function executing another binary in new process, predefined
          *          to execute saved executable with arguments
          */
         void launchSubprocess();
@@ -37,8 +37,9 @@ class ProcessLinux : public ProcessBase {
          * @brief   Conctutor which sets name of the executable
          * @param   exec_name [in] Path to binary to execute
          * @param   exec_args [in] Arguments to pass when executing binary
+         * @param   is_external_generator [in] Whether executable is an external password generator or not
          */
-        ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args);
+        ProcessLinux(const std::string& exec_name, const std::vector<std::string>& exec_args, bool is_external_generator);
 
         /**
          * @brief   Destructor deleting pipes
@@ -53,7 +54,7 @@ class ProcessLinux : public ProcessBase {
 
         /**
          * @brief   Converts status to exit code
-         * @return  exit code of child process 
+         * @return  exit code of child process
          */
         int getExitCode() const;
 
@@ -73,10 +74,11 @@ class ProcessLinux : public ProcessBase {
         /**
          * @brief   Spawns new process and execs command saved in executable
          *          with arguments set in constructor
-         * @return  0 when proceess spawns correctly 
+         * @return  0 when proceess spawns correctly
          */
         int run();
-};		
+
+};
 #endif // PROCESSLINUX_HPP
 
 #endif // __linux__

@@ -5,77 +5,49 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
-    v-model="selected"
     item-key="id"
-    :select-all="selectAll"
+    show-select
+    :single-select="!selectAll"
     @input="updateSelected"
   >
-    <template slot="items" slot-scope="props">
-      <tr @click="props.selected = !props.selected">
-        <td>
-          <v-checkbox
-            v-model="props.selected"
-            primary
-            hide-details
-          ></v-checkbox>
-        </td>
-        <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ props.item.keyspace }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-        <td class="text-xs-right">
-          <v-tooltip top>
-            <v-btn icon class="mx-0" :to="{name: 'dictionaryDetail', params: { id: props.item.id}}" slot="activator">
-              <v-icon color="primary">link</v-icon>
-            </v-btn>
-            <span>Go to the dictionary page</span>
-          </v-tooltip>
-        </td>
-      </tr>
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'dictionaryDetail', params: { id: item.id}}" target='_blank'>
+        {{ item.name }}
+        <v-icon 
+          small
+          color="primary"
+        >
+          mdi-open-in-new
+        </v-icon>
+      </router-link>
+    </template>
+    <template v-slot:item.time="{ item }">
+      {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
     </template>
   </v-data-table>
 </template>
 
 <script>
+  import selector from './selectorMixin'
   export default {
-    name: "dictionarySelector",
-    props: {
-      selectAll: {
-        type: Boolean,
-        default: false
-      },
-      value: {
-        type: Array,
-        default: function () {
-          return []
-        }
-      }
-    },
+    name: "DictionarySelector",
+    mixins: [selector],
     data() {
       return {
-        items: [],
-        loading: false,
-        search: '',
-        selected: [],
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Keyspace', value: 'keyspace', align: 'right'},
-          {text: 'Time', value: 'time', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Keyspace', value: 'keyspace', align: 'end'},
+          {text: 'Time', value: 'time', align: 'end'},
         ]
       }
-    },
-    mounted() {
-      if (!this.selectAll) {
-        this.headers.unshift({width: "1"})
-      }
-      this.getData()
     },
     methods: {
       getData() {
@@ -84,23 +56,7 @@
           this.items = response.data.items
           this.loading = false
         })
-      },
-      updateSelected() {
-        this.$emit('input', this.selected)
       }
-    },
+    }
   }
 </script>
-
-<style scoped>
-  .oneline {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    width: 200px;
-    vertical-align: middle;
-    line-height: 50px;
-    height: 50px;
-  }
-</style>

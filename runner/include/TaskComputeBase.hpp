@@ -4,7 +4,7 @@
  */
 
 
-#ifndef TASKCOMPUTEBASE_HPP 
+#ifndef TASKCOMPUTEBASE_HPP
 #define TASKCOMPUTEBASE_HPP
 
 #include "Attack.hpp"
@@ -12,17 +12,28 @@
 #include "TaskBase.hpp"
 
 #include "Process.hpp"
+#include "ProcessPCFG.hpp"
+#include "ProcessPrince.hpp"
+#include "NamedMutex.hpp"
+
 
 /** Class representing base of the computation tasks */
 class TaskComputeBase: public TaskBase {
-    
+
     protected:
 
-	AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
+	    AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
 
-        ProcessBase *process_;          /**< Pointer to process executing the task */
+        ProcessBase *process_hashcat_;          /**< Pointer to process executing the task */
+        ProcessBase *process_external_generator_; /**< Pointer to pcfg manager/princepreprocessor process executing the task */
+        ProcessBase *parent_process_; /**< Pointer to parent process */
 
-        std::vector<char*> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
+        NamedMutex hashcat_mutex_; //!< Mutex to prevent multiple hashcat instances
+
+        enum AttackType attack_type;  /**< Type of current attack */
+
+        std::vector<std::string> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
+        std::vector<std::string> external_generator_arguments_; /**<Merge pcfg-manager arguments from Attack, ConfigTask, ConfigHost */
 
         /**
          * @brief   Merges vectors with arguments from the member objects
@@ -31,18 +42,19 @@ class TaskComputeBase: public TaskBase {
 
     public:
 
+
         /**
-         * @brief   Constructor 
+         * @brief   Constructor
 	 * @param   directory [in] Working directory object
          * @param   task_config [in] Task configuration file object
-         * @param   host_config [in] Path to the host based configuration file 
+         * @param   host_config [in] Path to the host based configuration file
          * @param   output_file [in] Name of the hashcat output file
          * @param   workunit_name [in] Name of the BOINC project workunit
          */
         TaskComputeBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name);
 
         /**
-         * @brief   Constructor 
+         * @brief   Constructor
 	 * @param   directory [in] Working directory object
          * @param   task_config [in] Task configuration file object
          * @param   host_config [in] Host configuration file object
@@ -55,7 +67,7 @@ class TaskComputeBase: public TaskBase {
 	 * @brief   Destructor freeint hashcat_arguments_ and attack_ and
 	 * process_
 	 */
-	~TaskComputeBase();
+	virtual ~TaskComputeBase();
 
 	/**
 	 * @brief   Getter of process_ stderr content
@@ -65,7 +77,7 @@ class TaskComputeBase: public TaskBase {
 
 	/**
 	 * @brief   Getter of elapsed time when process was running
-	 * @return  Time in seconds 
+	 * @return  Time in seconds
 	 */
 	double getRunTime() const;
 
@@ -77,7 +89,7 @@ class TaskComputeBase: public TaskBase {
 	int finish();
 
 	/**
-	 * @brief  Initializes Task -> creates Attack, Process etc 
+	 * @brief  Initializes Task -> creates Attack, Process etc
 	 */
 	void initialize();
 
@@ -87,7 +99,7 @@ class TaskComputeBase: public TaskBase {
 	 * @return  True when line wasn't empty, False when it was empty
          */
         virtual bool parseHashcatOutputLine(std::string& output_line) = 0;
- 
+
         /**
          * @brief   Prints available lines from process's stdout
          */
@@ -102,6 +114,11 @@ class TaskComputeBase: public TaskBase {
 	 * @brief   Spawns the computation process
 	 */
 	void startComputation();
+
+	/**
+	 * @brief   Unlocks hashcat mutex
+	 */
+	void unlockHashcatMutex();
 
 };
 

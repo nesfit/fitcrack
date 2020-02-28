@@ -9,7 +9,7 @@ import datetime
 import math
 
 from flask_login import UserMixin, AnonymousUserMixin
-from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, String, Text, text, ForeignKey, \
+from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, String, Text, text, JSON, ForeignKey, \
     Numeric, func, LargeBinary, select, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
@@ -17,8 +17,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.api.fitcrack.attacks.hashtypes import getHashById
 from src.api.fitcrack.functions import getStringBetween
-from src.api.fitcrack.lang import package_status_text_to_code_dict, host_status_text_to_code_dict, \
-    package_status_text_info_to_code_dict
+from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
+    job_status_text_info_to_code_dict
 from src.database import db
 
 Base = db.Model
@@ -41,6 +41,7 @@ class FcBenchmark(Base):
             'last_update': getattr(self, 'last_update').isoformat()
         }
 
+
 class FcHashcache(Base):
     __tablename__ = 'fc_hashcache'
 
@@ -60,6 +61,7 @@ class FcHashcache(Base):
            return base64.b64decode(self.result).decode("utf-8")
        return None
 
+
 class FcHost(Base):
     __tablename__ = 'fc_host'
 
@@ -77,7 +79,6 @@ class FcHost(Base):
     #job = relationship("FcWorkunit", back_populates="hosts")
     # workunits = relationship("FcWorkunit", back_populates="host")
     boinc_host = relationship("Host", uselist=False)
-
 
 
 class FcMask(Base):
@@ -113,6 +114,18 @@ class FcDictionary(Base):
     modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
 
+class FcPcfg(Base):
+    __tablename__ = 'fc_pcfg_grammar'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    path = Column(String(400), nullable=False)
+    keyspace = Column(BigInteger, nullable=False)
+    time_added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    deleted = Column(Integer, nullable=False, server_default=text("'0'"))
+    modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+
 class FcHcstat(Base):
     __tablename__ = 'fc_hcstats'
 
@@ -139,6 +152,7 @@ class FcCharset(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     path = Column(String(400), nullable=False)
+    keyspace = Column(BigInteger, nullable=False)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
 
@@ -149,9 +163,9 @@ class FcRule(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     path = Column(String(400), nullable=False)
+    count = Column(Integer, nullable=False)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
-
 
 
 class FcJobDictionary(Base):
@@ -163,7 +177,6 @@ class FcJobDictionary(Base):
     current_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
     is_left = Column(Integer, nullable=False, server_default=text("'1'"))
     dictionary = relationship("FcDictionary")
-
 
 
 class FcJob(Base):
@@ -202,13 +215,19 @@ class FcJob(Base):
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
     markov_threshold = Column(Integer, nullable=False, server_default=text("'0'"))
+    grammar_id = Column(BigInteger, nullable=False)
+    case_permute = Column(Integer, nullable=False, server_default=text("'0'"))
+    check_duplicates = Column(Integer, nullable=False, server_default=text("'0'"))
+    min_password_len = Column(Integer, nullable=False, server_default=text("'1'"))
+    max_password_len = Column(Integer, nullable=False, server_default=text("'8'"))
+    min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
+    max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
 
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')
-
 
     charSet1 = relationship("FcCharset",
                             primaryjoin="FcJob.charset1==FcCharset.name")
@@ -225,8 +244,6 @@ class FcJob(Base):
     markov = relationship("FcHcstat",
                           primaryjoin="FcJob.markov_hcstat==FcHcstat.name")
 
-
-
     hosts = relationship("Host", secondary="fc_host_activity",
                          primaryjoin="FcJob.id == FcHostActivity.job_id",
                          secondaryjoin="FcHostActivity.boinc_host_id == Host.id",
@@ -234,6 +251,10 @@ class FcJob(Base):
 
     left_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == True))
     right_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == False))
+
+    @hybrid_property
+    def host_count(self):
+        return len(self.hosts)
 
     @hybrid_property
     def hash_type_name(self):
@@ -245,7 +266,6 @@ class FcJob(Base):
             return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
         except OverflowError:
             return 'really long'
-
 
     @hybrid_property
     def progress(self):
@@ -266,11 +286,11 @@ class FcJob(Base):
 
     @hybrid_property
     def status_text(self):
-        return package_status_text_to_code_dict.get(int(self.status))
+        return job_status_text_to_code_dict.get(int(self.status))
 
     @hybrid_property
     def status_tooltip(self):
-        return package_status_text_info_to_code_dict.get(int(self.status))
+        return job_status_text_info_to_code_dict.get(int(self.status))
 
     @hybrid_property
     def status_type(self):
@@ -285,6 +305,15 @@ class FcJob(Base):
 
     hashes = relationship("FcHash", back_populates="job")
 
+class FcTemplate(Base):
+    __tablename__ = 'fc_template'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(64), nullable=False)
+    created = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    template = Column(JSON, nullable=False)
+
+
 class FcSetting(Base):
     __tablename__ = 'fc_settings'
 
@@ -296,6 +325,7 @@ class FcSetting(Base):
     default_check_hashcache = Column(Integer, nullable=False, server_default=text("'1'"))
     default_workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
     default_bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
+
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
@@ -312,6 +342,36 @@ class FcJobGraph(Base):
             'time': str(getattr(self, 'time')),
             getattr(self.job, 'id'): round(getattr(self, 'progress'))
         }
+
+
+class FcJobStatus(Base):
+    __tablename__ = 'fc_job_status'
+
+    id = Column(BigInteger, primary_key=True)
+    job_id = Column(ForeignKey('fc_job.id'), nullable=False, index=True)
+    status = Column(SmallInteger, nullable=False, server_default=text("'0'"))
+    time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+    @hybrid_property
+    def status_text(self):
+        return job_status_text_to_code_dict.get(int(self.status))
+
+    @hybrid_property
+    def status_tooltip(self):
+        return job_status_text_info_to_code_dict.get(int(self.status))
+
+    @hybrid_property
+    def status_type(self):
+        if int(self.status) == 0 or int(self.status) == 10 or int(self.status) == 12:
+            return 'info'
+        if int(self.status) == 1:
+            return 'success'
+        if int(self.status) == 0 or int(self.status) == 4:
+            return 'warning'
+        if int(self.status) == 1 or int(self.status) == 2 or int(self.status) == 3:
+            return 'error'
+
+    job = relationship('FcJob')
 
 
 class Host(Base):
@@ -377,6 +437,11 @@ class Host(Base):
 
     last_active = relationship("FcHostStatus", uselist=False)
 
+    jobs = relationship("FcJob", secondary="fc_host_activity",
+                        primaryjoin="Host.id == FcHostActivity.boinc_host_id",
+                        secondaryjoin="FcHostActivity.job_id == FcJob.id",
+                        viewonly=True)
+
     #job = relationship("FcWorkunit", back_populates="hosts")
 
     @hybrid_property
@@ -384,7 +449,6 @@ class Host(Base):
         return True if \
             FcHostStatus.query.filter(FcHostStatus.boinc_host_id == self.id, FcHostStatus.deleted == True).first() \
             else False
-
 
     @deleted.expression
     def deleted(cls):
@@ -430,7 +494,6 @@ class FcWorkunit(Base):
         return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
 
 
-
 class FcHostActivity(Base):
     __tablename__ = 'fc_host_activity'
 
@@ -443,8 +506,6 @@ class FcHostActivity(Base):
     @hybrid_property
     def host(self):
         return self.boinc_host.fc_host
-
-
 
 
 class FcNotification(Base):
@@ -584,7 +645,6 @@ class FcEncryptedFile(Base):
         return getHashById(str(self.hash_type))['name']
 
 
-
 class FcHostStatus(Base):
     __tablename__ = 'fc_host_status'
 
@@ -611,7 +671,6 @@ class FcHostStatus(Base):
         return True if total_seconds <= 60 else False
 
 
-
 class FcHash(Base):
     __tablename__ = 'fc_hash'
 
@@ -624,7 +683,6 @@ class FcHash(Base):
     time_cracked = Column(DateTime)
 
     job = relationship("FcJob", back_populates="hashes")
-
 
     @hybrid_property
     def hashText(self):
@@ -650,7 +708,6 @@ class FcHash(Base):
 
 class Result(Base):
     __tablename__ = 'result'
-
 
     id = Column(Integer, primary_key=True)
     create_time = Column(Integer, nullable=False)
@@ -696,5 +753,14 @@ class Result(Base):
             return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' )
         except:
             return self.stderr_out.decode("utf-8")
+class FcServerUsage(Base):
+    __tablename__ = 'fc_server_usage'
 
-
+    id = Column(Integer, primary_key=True)
+    time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    cpu = Column(Float(asdecimal=True), nullable=False)
+    ram = Column(Float(asdecimal=True), nullable=False)
+    net_recv = Column(Integer, nullable=False)
+    net_sent = Column(Integer, nullable=False)
+    hdd_read = Column(Integer, nullable=False)
+    hdd_write = Column(Integer, nullable=False)

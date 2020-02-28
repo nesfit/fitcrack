@@ -4,46 +4,64 @@
 -->
 
 <template>
-    <div class="logsCont" ref="logsCont" infinite-wrapper >
-      <fc-log
-        v-for="log, i in logs"
-        v-bind:key="log.raw"
-        :type="log.type"
-        :time="log.time"
-        :hostID="log.host"
-        :packageID="log.package"
-      >{{log.log}}</fc-log>
-      <infinite-loading @infinite="loadLogs">
-        <v-progress-circular
-          slot="spinner"
-          size="50"
-          :width="3"
-          indeterminate
-          color="primary"
-        ></v-progress-circular>
-        <span slot="no-more">
-              You reached the end of file.
-            </span>
-        <span slot="no-results">
-              You reached the end of file.
-            </span>
-      </infinite-loading>
-    </div>
+  <div
+    ref="logsCont"
+    class="logsCont"
+    infinite-wrapper
+  >
+    <fc-log
+      v-for="log, i in logs"
+      :key="log.raw"
+      :type="log.type"
+      :time="log.time"
+      :host-i-d="log.host"
+      :job-i-d="log.job"
+    >
+      {{ log.log }}
+    </fc-log>
+    <infinite-loading @infinite="loadLogs">
+      <v-progress-circular
+        slot="spinner"
+        size="50"
+        :width="3"
+        indeterminate
+        color="primary"
+      />
+      <span slot="no-more">
+        You reached the end of file.
+      </span>
+      <span slot="no-results">
+        You reached the end of file.
+      </span>
+    </infinite-loading>
+  </div>
 </template>
 
 <script>
   import logItem from '@/components/logs/logItem'
   import InfiniteLoading from 'vue-infinite-loading';
   export default {
-    name: "logsView",
+    name: "LogsView",
     components: {
       'fc-log': logItem,
       InfiniteLoading
+    },
+    data() {
+      return {
+        height: 0,
+        logs: [],
+        skipCount: 0,
+        lastLog: null,
+        interval: null
+      }
     },
     mounted () {
       this.interval = setInterval(function () {
         this.loadNewLogs();
       }.bind(this), 2500);
+    },
+    beforeDestroy: function(){
+      clearInterval(this.interval);
     },
     methods: {
       loadLogs($state) {
@@ -78,18 +96,6 @@
           }
         })
       }
-    },
-    data() {
-      return {
-        height: 0,
-        logs: [],
-        skipCount: 0,
-        lastLog: null,
-        interval: null
-      }
-    },
-    beforeDestroy: function(){
-      clearInterval(this.interval);
     }
   }
 </script>

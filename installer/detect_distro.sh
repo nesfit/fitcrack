@@ -58,3 +58,6 @@ case $ID in
         DEFAULT_APACHE_SERVICE="httpd"
         ;;
 esac
+
+# Save distro ID
+DISTRO_ID=$ID

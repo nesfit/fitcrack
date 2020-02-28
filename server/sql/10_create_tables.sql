@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `fc_charset` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `path` varchar(400) NOT NULL,
+  `keyspace` bigint(20) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
@@ -277,6 +278,13 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `rule_right` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_hcstat` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_threshold` int(20) NOT NULL DEFAULT '0',
+  `grammar_id` bigint(20) unsigned DEFAULT NULL,
+  `case_permute` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `check_duplicates` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `min_password_len` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_password_len` int(10) unsigned NOT NULL DEFAULT '0',
+  `min_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
@@ -316,6 +324,20 @@ CREATE TABLE IF NOT EXISTS `fc_job_graph` (
 -- --------------------------------------------------------
 
 --
+-- Štruktúra tabuľky pre tabuľku `fc_template`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_template` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `template` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Štruktúra tabuľky pre tabuľku `fc_role`
 --
 
@@ -342,10 +364,43 @@ CREATE TABLE IF NOT EXISTS `fc_rule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `path` varchar(400) NOT NULL,
+  `count` int(11) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_pcfg_preterminals`
+--
+
+CREATE TABLE `fc_pcfg_preterminals` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `job_id` bigint(20) unsigned NOT NULL,
+  `workunit_id` bigint(20) unsigned NOT NULL,
+  `preterminals` blob DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_pcfg_grammar`
+--
+
+CREATE TABLE `fc_pcfg_grammar` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `path` varchar(400) NOT NULL,
+  `keyspace` bigint(20) unsigned NOT NULL,
+  `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
 
 -- --------------------------------------------------------
 
@@ -416,9 +471,51 @@ CREATE TABLE IF NOT EXISTS `fc_host_status` (
 
 -- --------------------------------------------------------
 
+
+--
+-- Struktura tabulky pro tabulku `fc_job_status`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_job_status` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `job_id` bigint(20) unsigned NOT NULL,
+  `status` smallint(1) unsigned NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky pro tabulku `fc_server_usage`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_server_usage` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `cpu` decimal(10,0) NOT NULL,
+  `ram` decimal(10,0) NOT NULL,
+  `net_recv` int(11) NOT NULL,
+  `net_sent` int(11) NOT NULL,
+  `hdd_read` int(11) NOT NULL,
+  `hdd_write` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+
 --
 -- Obmedzenie pre exportované tabuľky
 --
+
+
+--
+-- Omezeni pro tabulku `fc_job_status`
+--
+ALTER TABLE `fc_job_status`
+  ADD CONSTRAINT `fc_job_status_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 --
 -- Obmedzenie pre tabuľku `fc_notification`
@@ -445,5 +542,3 @@ ALTER TABLE `fc_user`
 ALTER TABLE `fc_user_permissions`
   ADD CONSTRAINT `fc_user_permissions_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fc_user_permissions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `fc_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-

@@ -9,8 +9,9 @@
 require('./assets/styles/font.css')
 require('./assets/styles/icons.css')
 
-import "vue-material-design-icons/styles.css"
+import '@mdi/font/css/materialdesignicons.css'
 import Vue from 'vue'
+import store from './store'
 import App from './App'
 import router from './router'
 import Vuetify from 'vuetify'
@@ -21,67 +22,51 @@ import VueMoment from 'vue-moment'
 import moment from 'moment-timezone'
 import VueVisible from 'vue-visible'
 import UserPlugin from '@/components/user/userPlugin'
-import VueStash from 'vue-stash'
 import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
 
-document.title = window.theme.project
+document.title = window.projectName || 'Fitcrack'
 var link = document.createElement('link');
 link.type = 'image/png';
 link.rel = 'shortcut icon';
-link.href = require(`@/assets/icons/${window.theme.project}.png`)
+link.href = require(`@/assets/icons/fitcrack.png`)
 document.getElementsByTagName('head')[0].appendChild(link);
 document.querySelector('meta[name="theme-color"]').setAttribute('content', window.theme.primary );
 
 Vue.use(VueHighlightJS)
 Vue.use(VueClip);
-Vue.use(VueStash);
 Vue.use(VueVisible);
-
 Vue.use(VueMoment, {
   moment
 });
 Vue.use(VueAxios, axios);
 Vue.axios.defaults.withCredentials = true
-Vue.use(Vuetify, { theme: window.theme});
+Vue.use(Vuetify);
 
 Vue.use(UserPlugin);
 
 Vue.use(VueProgressBar, {
-  color: window.theme.primary,
-  failedColor: window.theme.error,
+  color: window.theme.light.primary,
+  failedColor: window.theme.light.error,
   height: '2px'
 });
 
 Vue.config.productionTip = false;
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  data: {
-    store: {
-      user: {
-        'userData': {
-          'id': null,
-          'username': null,
-          'mail': null,
-          'role': {
-            'MANAGE_USERS': true,
-            'ADD_NEW_JOB': true,
-            'UPLOAD_DICTIONARIES': true,
-            'VIEW_ALL_PACKAGES': true,
-            'EDIT_ALL_PACKAGES': true,
-            'OPERATE_ALL_PACKAGES': true,
-            'ADD_USER_PERMISSIONS_TO_PACKAGE': true
-          }
-        },
-        'loggedIn': false,
-        'loggedInLink': null
-      }
-    }
-  },
   router,
+  store,
+  vuetify: new Vuetify({
+    icons: {
+      iconfont: 'mdi'
+    },
+    theme: {
+      dark: false,
+      themes: window.theme
+    }
+  }),
   components: { App },
   template: '<App/>'
 });

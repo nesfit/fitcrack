@@ -4,6 +4,7 @@
 # This file is part of Fitcrack installer
 # Author: Radek Hranicky (ihranicky@fit.vutbr.cz)
 
+
 echo "Building Fitcrack server..."
 
 # Copy server files to BOINC server Root
@@ -15,6 +16,9 @@ cp -f server/src/source/*.cpp             boinc/sched/
 cp -f server/src/source/AttackModes/*.cpp boinc/sched/
 cp -f server/src/source/Generators/*.cpp  boinc/sched/
 cp -f server/src/source/Database/*.cpp    boinc/sched/
+cp -f server/src/headers/protocol/*.cc    boinc/sched/
+cp -f server/src/headers/protocol/*.h     boinc/sched/
+cp -rf server/src/include/*               boinc/sched/
 
 rm -f tmp/built 2>/dev/null
 
@@ -33,13 +37,13 @@ if [[ $? != 0 ]]; then
   exit
 fi
 
-./configure -C --disable-client --disable-manager
+./configure --disable-client --disable-manager
 if [[ $? != 0 ]]; then
   echo "Error during configuration."
   exit
 fi
 
-make
+make -j$COMPILER_THREADS
 if [[ $? != 0 ]]; then
   echo "Error during compilation."
   exit

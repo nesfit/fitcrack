@@ -5,58 +5,73 @@
 
 <template>
   <transition name="fade-transition">
-    <v-jumbotron
-      :gradient="gradient"
-      class="jumbo"
-      height="100%"
+    <v-container
+      class="fill-height"
+      fluid
     >
-      <v-container fluid fill-height>
-        <v-layout flex align-center justify-center>
-          <v-card raised class="jumboCard px-4">
-            <img :src="require(`@/assets/${$vuetify.theme.project}.png`)" class="mx-auto pt-3 pb-2 d-block logo" alt="logo"/>
-            <div class="content">
-              <v-progress-circular
-                size="50"
-                :width="3"
-                class="progress trans"
-                indeterminate
-                color="primary"
-                v-bind:class="{hide: !loading}"
-              ></v-progress-circular>
-              <v-form ref="form" lazy-validation v-bind:class="{hide: loading}" class="trans">
-                <v-text-field
-                  label="Username"
-                  v-model="username"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  label="Password"
-                  v-model="password"
-                  required
-                  type="password"
-                ></v-text-field>
-                <v-btn
-                  class="d-block mx-auto mb-4"
-                  flat
-                  outline
-                  type="submit"
-                  color="primary"
-                  v-on:click.prevent="submit"
-                >
-                  submit
-                </v-btn>
-              </v-form>
-            </div>
-          </v-card>
-        </v-layout>
-      </v-container>
-    </v-jumbotron>
+      <img 
+        :src="require('@/assets/motive.svg')"
+        class="motive"
+      >
+      <div class="main mx-auto">
+        <img
+          v-if="$vuetify.theme.dark"
+          :src="require(`@/assets/fitcrack-glow.svg`)"
+          class="mx-auto pt-3 pb-2 d-block logo"
+          alt="logo"
+        >
+        <img
+          v-else
+          :src="require(`@/assets/fitcrack.svg`)"
+          class="mx-auto pt-3 pb-2 d-block logo"
+          alt="logo"
+        >
+        <div class="content">
+          <v-progress-circular
+            size="50"
+            :width="3"
+            class="progress trans"
+            indeterminate
+            color="primary"
+            :class="{hide: !loading}"
+          />
+          <v-form
+            ref="form"
+            lazy-validation
+            :class="{hide: loading}"
+            class="trans"
+          >
+            <v-text-field
+              v-model="username"
+              solo
+              label="Username"
+              required
+            />
+            <v-text-field
+              v-model="password"
+              solo
+              label="Password"
+              required
+              type="password"
+            />
+            <v-btn
+              class="d-block mx-auto mb-4"
+              type="submit"
+              color="primary"
+              @click.prevent="submit"
+            >
+              sign in
+            </v-btn>
+          </v-form>
+        </div>
+      </div>
+    </v-container>
   </transition>
 </template>
 
 <script>
   export default {
-    name: 'loginView',
+    name: 'LoginView',
     data: function () {
       return {
         username: null,
@@ -66,11 +81,6 @@
     },
     created: function () {
       this.isUserLoggedIn()
-    },
-    computed: {
-      gradient: function () {
-        return window.theme.gradient
-      }
     },
     methods: {
       submit() {
@@ -83,7 +93,6 @@
           this.loading = false;
           console.log(response.data)
           this.$logInUser(response.data)
-
         })
       },
       isUserLoggedIn: function () {
@@ -112,8 +121,14 @@
     transition: opacity .3s ease-in-out;
   }
 
+  .main {
+    z-index: 1;
+    min-width: 260px;
+  }
+
   .content {
     position: relative;
+    max-width: 600px;
   }
 
   .progress {
@@ -125,14 +140,18 @@
     position: absolute;
   }
 
-  .jumbo {
+  .motive {
     position: fixed;
-    z-index: 5;
+    z-index: 0;
+    opacity: .2;
+    left: 5%;
+    width: 90%;
+    transform: rotate(-10deg)
   }
 
   .logo {
     width: 100%;
-    max-width: 200px;
+    max-width: 260px;
   }
 </style>
 

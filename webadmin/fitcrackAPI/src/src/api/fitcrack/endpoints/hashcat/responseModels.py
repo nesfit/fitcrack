@@ -8,9 +8,9 @@ from src.api.apiConfig import api
 
 
 hashType = api.model('HashType', {
-    'code': fields.String(description='Kód hashu'),
-    'name': fields.String(description='Názov hashu'),
-    'category': fields.String(description='Kategória hashu'),
+    'code': fields.String(description='Code of the hash'),
+    'name': fields.String(description='Name of the hash'),
+    'category': fields.String(description='Category of the hash'),
     'subcategories': fields.Raw()
 })
 
@@ -22,8 +22,8 @@ hashType_list = api.model('HashTypeList', {
 
 
 attackMode = api.model('AttackMode', {
-    'code': fields.String(description='Kód hashu', attribute='#'),
-    'mode': fields.String(description='Názov hashu', attribute='Mode')
+    'code': fields.String(description='Code of the hash', attribute='#'),
+    'mode': fields.String(description='Name of the hash', attribute='Mode')
 })
 
 attackMode_list = api.model('AttackModeList', {

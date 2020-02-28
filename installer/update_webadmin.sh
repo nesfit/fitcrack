@@ -20,7 +20,7 @@ if [ -d "$APACHE_DOCUMENT_ROOT/fitcrackFE" ]; then
 
   if [ $UPDATE_FRONTEND = "y" ]; then
     # Backup original frontend config
-    BACKEND_URI=`cat $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js | grep "serverAddress" | cut -d"'" -f2`
+    BACKEND_URI=`cat $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js | grep "serverAddress" | cut -d"\"" -f2`
 
     # Delete old frontend
     rm -Rf $APACHE_DOCUMENT_ROOT/fitcrackFE
@@ -72,6 +72,14 @@ fi
 
 # Install backend-end
 if [ $INSTALL_BACKEND = "y" ]; then
+  echo "Building hashcat-utils"
+  cd webadmin/fitcrackAPI/hashcat-utils/src
+  make
+  cd ..
+  mkdir bin
+  cp src/*.bin bin/
+  cd $INSTALLER_ROOT
+
   echo "Updating Fitcrack WebAdmin back-end..."
   mkdir $APACHE_DOCUMENT_ROOT/fitcrackAPI
   cp -Rf webadmin/fitcrackAPI/* $APACHE_DOCUMENT_ROOT/fitcrackAPI/

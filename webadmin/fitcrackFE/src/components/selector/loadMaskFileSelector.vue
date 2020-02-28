@@ -5,71 +5,74 @@
 
 <template>
   <v-data-table
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="search"
     item-key="id"
-    :select-all="selectAll"
+    show-select
+    :single-select="!selectAll"
+    @input="updateSelected"
   >
-    <template slot="items" slot-scope="props">
-      <tr @click="updateSelected(props.item.id, props.item)">
-        <td>
-          <v-checkbox
-            :input-value="selected === props.item.id"
-            @click="updateSelected(props.item.id, props.item)"
-            primary
-            hide-details
-          ></v-checkbox>
-        </td>
-        <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}</td>
-        <td class="text-xs-right">
-          <v-tooltip top>
-            <v-btn icon class="mx-0" :to="{name: 'maskDetail', params: { id: props.item.id}}" slot="activator">
-              <v-icon color="primary">link</v-icon>
-            </v-btn>
-            <span>Go to the Markov file page</span>
-          </v-tooltip>
-        </td>
-      </tr>
+    <template v-slot:item.name="{ item }">
+      <router-link :to="{name: 'maskDetail', params: { id: item.id}}" target='_blank'>
+        {{ item.name }}
+        <v-icon 
+          small
+          color="primary"
+        >
+          mdi-open-in-new
+        </v-icon>
+      </router-link>
     </template>
+    <template v-slot:item.time="{ item }">
+      {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+    </template>
+    <!-- ???
+    <v-checkbox
+      :input-value="selected === props.item.id"
+      primary
+      hide-details
+      @click="updateSelected(props.item.id, props.item)"
+    />
+    -->
   </v-data-table>
 </template>
 
 <script>
+  import selector from './selectorMixin'
   export default {
-    name: "maskFileSelector",
+    name: "MaskFileSelector",
+    mixins: [selector],
     props: {
-      selectAll: {
-        type: Boolean,
-        default: false
-      },
       value: {
-        type: Object
+        type: Object,
+        default: function () {
+          return {}
+        }
       }
     },
     data() {
       return {
-        items: [],
-        loading: false,
-        search: '',
-        selected: 0,
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Link to', value: 'name', sortable: false, align: 'right', width: "1"}
+          {text: 'Added', value: 'time', align: 'end'},
         ]
       }
     },
-    mounted() {
-      if (!this.selectAll) {
-        this.headers.unshift({width: "1"})
+    computed: {
+      selectedId () {
+        return selected[0].id
       }
-      this.getData()
+    },
+    watch: {
+      value (val) {
+        this.selected = [val]
+      }
     },
     methods: {
       getData() {
@@ -79,11 +82,10 @@
           this.loading = false
         })
       },
-      updateSelected(id, mask) {
-        this.selected = id
-        this.$emit('input', mask)
+      updateSelected() {
+        this.$emit('input', this.selected[0])
       }
-    },
+    }
   }
 </script>
 

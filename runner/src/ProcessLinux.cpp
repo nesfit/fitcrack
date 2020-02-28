@@ -1,7 +1,7 @@
 /*
- * Author : see AUTHORS
- * Licence: MIT, see LICENSE
- */
+* Author : see AUTHORS
+* Licence: MIT, see LICENSE
+*/
 
 #ifdef __linux__
 
@@ -11,76 +11,100 @@
 
 void ProcessLinux::launchSubprocess() {
 
-    /** Execute application - print it before redirection so that it goes to
-     * stderr.txt */
-    Logging::debugPrint(Logging::Detail::GeneralInfo, "Executing: " + getReadableArguments());
+  /** Execute application - print it before redirection so that it goes to
+  * stderr.txt */
+  Logging::debugPrint(Logging::Detail::GeneralInfo, "Executing: " + getReadableArguments());
 
-    /** Child doesn't read from the pipes */
-    out_pipe_->closeRead();
-    err_pipe_->closeRead();
+  /** Child doesn't read from the pipes */
+  out_pipe_->closeRead();
+  err_pipe_->closeRead();
 
-    /** Redirect childs stdout and stderr to the pipes */
-    reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
-    reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));
+  //FD_CLOEXEC is set on the originals, but that's OK since dup doesn't copy that. New descriptors are not closed on exec
+  /** Redirect childs stdout and stderr to the pipes */
+  reinterpret_cast<PipeLinux*>(out_pipe_)->redirectWrite(fileno(stdout));
+  reinterpret_cast<PipeLinux*>(err_pipe_)->redirectWrite(fileno(stderr));
 
-    /** Execute application */
-    execv(arguments_[0], &arguments_[0]);
 
-    /** This shouldn't be ever executed but if it does, throw error exception */
-    RunnerUtils::runtimeException("execv() failed with", errno);
+  if (in_pipe_ != nullptr) {
+    reinterpret_cast<PipeLinux*>(in_pipe_)->redirectRead(fileno(stdin));
+  }
+
+  std::vector<const char*> linuxArgs;
+  linuxArgs.reserve(arguments_.size()+1);
+  for(size_t i = 0; i < arguments_.size(); ++i)
+  {
+    linuxArgs.push_back(arguments_[i].c_str());
+  }
+  linuxArgs.push_back(nullptr);
+
+  /** Execute application */
+  //const cast is OK as explained here: https://stackoverflow.com/a/190208
+  execv(linuxArgs[0], const_cast<char *const*>(linuxArgs.data()));
+
+  /** This shouldn't be ever executed but if it does, throw error exception */
+  RunnerUtils::runtimeException("execv() failed with", errno);
 }
 
 /* Public */
 
-ProcessLinux::ProcessLinux(const std::string& exec_name, std::vector<char* >& exec_args) : ProcessBase(exec_name, exec_args) {
-    out_pipe_ = new PipeLinux;
-    err_pipe_ = new PipeLinux;
+ProcessLinux::ProcessLinux(const std::string& exec_name, const std::vector<std::string>& exec_args, bool is_external_generator) : ProcessBase(exec_name, exec_args) {
+  if (is_external_generator) {
+    out_pipe_ = PipeLinux::createBlockingPipe();
+  } else {
+    out_pipe_ = PipeLinux::createNonBlockingPipe();
+  }
+  err_pipe_ = PipeLinux::createNonBlockingPipe();
+  in_pipe_ = nullptr;
+  process_identifier_ = -1;
 }
 
 ProcessLinux::~ProcessLinux() {
-    delete out_pipe_;
-    delete err_pipe_;
+  delete out_pipe_;
+  delete err_pipe_;
 }
 
 int ProcessLinux::getExitCode() const {
-    return WEXITSTATUS(status_);
+  return WEXITSTATUS(status_);
 }
 
 int ProcessLinux::getProcessIdentifier() const {
-    return process_identifier_;
+  return process_identifier_;
 }
 
 bool ProcessLinux::isRunning() {
-    /** Waitpid with WNOHANG returns 0 when process still exists */
-    return (waitpid(process_identifier_, &status_, WNOHANG) == 0);
+  if (process_identifier_ == -1) return false;
+  /** Waitpid with WNOHANG returns 0 when process still exists */
+  return (waitpid(process_identifier_, &status_, WNOHANG) == 0);
 }
 
 int ProcessLinux::run() {
-    setStartTime();
-    process_identifier_ = fork();
 
-    if (getProcessIdentifier() == -1) {
-        RunnerUtils::runtimeException("fork() failed with", errno);
-    } else if (process_identifier_ == 0){
-        try {
+  setStartTime();
+  process_identifier_ = fork();
 
-            launchSubprocess();
+  if (getProcessIdentifier() == -1) {
+    RunnerUtils::runtimeException("fork() failed with", errno);
+  } else if (process_identifier_ == 0){
+    try {
 
-        } catch (std::exception& e) {
-            std::cerr << "Child process failed with std::runtime_error:\n what() : " << e.what() << std::endl;
-            /** Exit child process on any exception, don't let child exception to be
-             *  caught by the code that should be executed only by parent 
-             */
-            exit(errno);
-        }
-    } else {
+      launchSubprocess();
 
-        /** Parrent doesn't write to pipes */
-        out_pipe_->closeWrite();
-        err_pipe_->closeWrite();
+    } catch (std::exception& e) {
+      std::cerr << "Child process failed with std::runtime_error:\n what() : " << e.what() << std::endl;
+      /** Exit child process on any exception, don't let child exception to be
+      *  caught by the code that should be executed only by parent
+      */
+      exit(errno);
     }
+  } else {
+    /** Parrent doesn't write to pipes */
+    out_pipe_->closeWrite();
+    err_pipe_->closeWrite();
+  }
 
-    return 0;
+  return 0;
 }
+
+
 
 #endif // __linux__

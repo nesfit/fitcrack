@@ -43,7 +43,7 @@ namespace Config {
     /** Table names, for easy configuration */
     extern std::string tableNameBenchmark;
     extern std::string tableNameWorkunit;
-    extern std::string tableNamePackage;
+    extern std::string tableNameJob;
     extern std::string tableNameHost;
     extern std::string tableNameHostActivity;
     extern std::string tableNameMask;
@@ -51,11 +51,13 @@ namespace Config {
     extern std::string tableNameDictionary;
     extern std::string tableNamePckgDictionary;
     extern std::string tableNameHash;
+    extern std::string tableNamePcfgGrammar;
 
     /** Path to dictionaries/markov/rules */
     extern std::string dictDir;
     extern std::string markovDir;
     extern std::string rulesDir;
+    extern std::string pcfgDir;
     extern std::string projectDir;
 
     /** Template names */
@@ -65,6 +67,8 @@ namespace Config {
     extern std::string inTemplateFileDict;
     extern std::string inTemplateFileCombinator;
     extern std::string inTemplateFileRule;
+    extern std::string inTemplateFilePcfg;
+    extern std::string inTemplateFilePcfgRules;
     extern std::string outTemplateFile;
 
     /** Other parameters filled by BOINC arg parsing */
@@ -74,6 +78,8 @@ namespace Config {
     extern char * inTemplatePathDict;
     extern char * inTemplatePathCombinator;
     extern char * inTemplatePathRule;
+    extern char * inTemplatePathPcfg;
+    extern char * inTemplatePathPcfgRules;
     extern DB_APP * app;
     extern int startTime;
     extern int seqNo;
@@ -87,22 +93,23 @@ namespace Config {
         HostError =  4      /**< Host is not able to work */
     };
 
-    /** Package states */
-    enum PackageState {
-        PackageReady      =  0,   /**< Package is not running */
-        PackageFinished   =  1,   /**< Password was found */
-        PackageExhausted  =  2,   /**< Keyspace was exhausted, pass not found */
-        PackageMalformed  =  3,   /**< Package has incorrect input */
-        PackageTimeout    =  4,   /**< time_end of the package was reached, cracking stopped */
-        PackageRunning    = 10,   /**< Package is running */
-        PackageFinishing  = 12    /**< Package is running, but all jobs has been generated, ending soon */
+    /** Job states */
+    enum JobState {
+        JobReady      =  0,   /**< Job is not running */
+        JobFinished   =  1,   /**< Password was found */
+        JobExhausted  =  2,   /**< Keyspace was exhausted, pass not found */
+        JobMalformed  =  3,   /**< Job has incorrect input */
+        JobTimeout    =  4,   /**< time_end of the job was reached, cracking stopped */
+        JobRunning    = 10,   /**< Job is running */
+        JobFinishing  = 12    /**< Job is running, but all workunits has been generated, ending soon */
     };
 
     /** Attack modes in haschat*/
     enum AttackMode {
         AttackDict = 0,
         AttackCombinator = 1,
-        AttackMask = 3
+        AttackMask = 3,
+        AttackPcfg = 9
     };
 
     /** Types of debug output */
@@ -115,16 +122,19 @@ namespace Config {
     /** Buffer size for SQL queries */
     const unsigned int SQL_BUF_SIZE = 4096;
 
-    /** Minimum job time in seconds */
+    /** Maximum keyspace in PCFG Attack */
+    const uint64_t MAX_PCFG_KEYSPACE = 60000000;
+
+    /** Minimum workunit time in seconds */
     const uint64_t minSeconds = 60;
 
-    /** Minimum timeout factor of seconds_per_job */
+    /** Minimum timeout factor of seconds_per_workunit */
     const uint64_t minTimeoutFactor = 5;
 
-    /** ID of bench_all package */
+    /** ID of bench_all job */
     const uint64_t benchAllId = 1;
 
-    /** Job replication factor, must be 1 */
+    /** Workunit replication factor, must be 1 */
     const int replicationFactor = 1;
 
     /** Minimum passwords in attack */
@@ -147,21 +157,21 @@ class Tools {
         static void printDebugTimestamp(const char* format, ...);
 
         /**
-         * @brief Prints formatted string to stderr, with web-admin package tags
+         * @brief Prints formatted string to stderr, with web-admin job tags
          * @param type [in] Type of message
-         * @param packageId [in] ID of package
+         * @param jobId [in] ID of job
          * @param format [in] List of arguments
          */
-        static void printDebugPackage(Config::DebugType type, uint64_t packageId, const char* format, ...);
+        static void printDebugJob(Config::DebugType type, uint64_t jobId, const char *format, ...);
 
         /**
-         * @brief Prints formatted string to stderr, with web-admin package+host tags
+         * @brief Prints formatted string to stderr, with web-admin job+host tags
          * @param type [in] Type of message
-         * @param packageId [in] ID of package
+         * @param jobId [in] ID of job
          * @param hostId [in] ID of boinc host
          * @param format [in] List of arguments
          */
-        static void printDebugHost(Config::DebugType type, uint64_t packageId, uint64_t hostId, const char* format, ...);
+        static void printDebugHost(Config::DebugType type, uint64_t jobId, uint64_t hostId, const char* format, ...);
 
         /**
          * Prints out contents of database map
@@ -171,11 +181,11 @@ class Tools {
 
         /**
          * Opens the input stream or uses an opened one
-         * @param packageId ID of the package
+         * @param jobId ID of the job
          * @param dictId ID of the dictionary
          * @return Input stream to read dictionary
          */
-        static std::ifstream * getStream(uint64_t packageId, uint64_t dictId, std::string dictFileName);
+        static std::ifstream * getStream(uint64_t jobId, uint64_t dictId, std::string dictFileName);
 
         /**
          * @brief Releases the memory allocated for file descriptors

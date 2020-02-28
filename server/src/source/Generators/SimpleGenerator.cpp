@@ -16,7 +16,8 @@
 #include <AttackMask.h>
 #include <AttackMarkov.h>
 #include <AttackRules.h>
-
+#include <AttackPcfg.h>
+#include <AttackPcfgRules.h>
 
 
 CSimpleGenerator::CSimpleGenerator()
@@ -41,39 +42,50 @@ void CSimpleGenerator::run()
 
     while(true)
     {
-        /** Set packages with passed time_out to finishing status*/
-        m_sqlLoader->finishTimeoutPackages();
+        /** Set jobs with passed time_out to finishing status*/
+        m_sqlLoader->finishTimeoutJobs();
 
-        /** Load running packages */
-        std::vector<PtrPackage> runningPackages = m_sqlLoader->loadRunningPackages();
+        /** Load running jobs */
+        std::vector<PtrJob> runningJobs = m_sqlLoader->loadRunningJobs();
 
-        /** Remove finished package hosts */
+        /** Remove finished job hosts */
         removeFinishedHosts();
 
-        /** Generate jobs for each package */
-        for (PtrPackage & package : runningPackages)
+        /** Generate workunits for each job */
+        for (PtrJob & job : runningJobs)
         {
-            uint64_t packageId = package->getId();
+            /** Process kill requests */
+            if (job->getKillFlag())
+            {
+                m_sqlLoader->killJob(job);
+                continue;
+            }
 
-            /** Update start_time of package */
-            package->updateStartTime();
+            uint64_t jobId = job->getId();
 
-            /** Generate job for each host */
-            std::vector<PtrHost> activeHosts = m_sqlLoader->loadActiveHosts(packageId);
+            /** Update start_time of job */
+            job->updateStartTime();
+
+            /** Load separate grammar name */
+            if (job->getAttackMode() == Config::AttackMode::AttackPcfg)
+                job->setGrammar(m_sqlLoader->loadGrammarName(job->getGrammarId()));
+
+            /** Generate workunit for each host */
+            std::vector<PtrHost> activeHosts = m_sqlLoader->loadActiveHosts(jobId);
             for (PtrHost & host : activeHosts)
             {
                 uint32_t hostStatus = host->getStatus();
 
                 if (hostStatus == Config::HostState::HostBench)
-                    createBenchmark(package, host);
+                    createBenchmark(job, host);
                 else if (hostStatus == Config::HostState::HostNormal)
-                    createRegularJob(package, host);
+                    createRegularWorkunit(job, host);
             }
 
             /** Check timeout/pause/exhausted status */
-            if (package->getStatus() == Config::PackageState::PackageFinishing &&
-                    m_sqlLoader->getJobCount(packageId) == 0)
-                finishPackage(package);
+            if (job->getStatus() == Config::JobState::JobFinishing &&
+                    m_sqlLoader->getWorkunitCount(jobId) == 0)
+                finishJob(job);
         }
 
         /** Wait for BOINC Transitioner */
@@ -82,167 +94,175 @@ void CSimpleGenerator::run()
 }
 
 
-void CSimpleGenerator::createBenchmark(PtrPackage & package, PtrHost & host)
+void CSimpleGenerator::createBenchmark(PtrJob &job, PtrHost &host)
 {
-    if (m_sqlLoader->getBenchCount(package->getId(), host->getId()) == 0 &&
-        package->getStatus() == Config::PackageState::PackageRunning)   /**< Do not create bench when Finishing,
+    if (m_sqlLoader->getBenchCount(job->getId(), host->getId()) == 0 &&
+        job->getStatus() == Config::JobState::JobRunning)   /**< Do not create bench when Finishing,
                                                                           * causes cycles when bench error occurs */
     {
         /** Check if status is still bench in DB */
         if (m_sqlLoader->getHostStatus(host->getId()) != Config::HostState::HostBench)
             return;
 
-        /** Create Benchmark job */
-        CAttackBench bench(package, host, m_sqlLoader);
-        bench.makeJob();
+        /** Create Benchmark workunit */
+        CAttackBench bench(job, host, m_sqlLoader);
+        bench.makeWorkunit();
     }
 }
 
 
-void CSimpleGenerator::createRegularJob(PtrPackage & package, PtrHost & host)
+void CSimpleGenerator::createRegularWorkunit(PtrJob &job, PtrHost &host)
 {
-    uint64_t packageId = package->getId();
+    uint64_t jobId = job->getId();
     uint64_t hostBoincId = host->getBoincHostId();
 
-    if (m_sqlLoader->getJobCount(packageId, host->getId()) >= 2)
+    if (m_sqlLoader->getWorkunitCount(jobId, host->getId()) >= 2)
     {
-        Tools::printDebugHost(Config::DebugType::Log, packageId, hostBoincId,
+        Tools::printDebugHost(Config::DebugType::Log, jobId, hostBoincId,
                 "Host has enough workunits\n");
         return;
     }
 
-    /** Load package uncracked hashes */
-    if (!package->loadHashes())
+    /** Load job uncracked hashes */
+    if (!job->loadHashes())
     {
-        /** All hashes cracked, wait for assimilator to Finish package */
-        Tools::printDebugHost(Config::DebugType::Warn, packageId, hostBoincId,
-                                 "No hashes found for the package, Assimilator should have already Finished the package\n");
+        /** All hashes cracked, wait for assimilator to Finish job */
+        Tools::printDebugHost(Config::DebugType::Warn, jobId, hostBoincId,
+                                 "No hashes found for the job, Assimilator should have already Finished the job\n");
 
-        package->updateStatusOfRunningPackage(Config::PackageState::PackageFinished);
+        job->updateStatusOfRunningJob(Config::JobState::JobFinished);
 
         return;
     }
 
     /** Load non-exhausted masks/dictionaries */
-    if (package->getAttackMode() == Config::AttackMode::AttackMask)
-        package->loadMasks();
+    if (job->getAttackMode() == Config::AttackMode::AttackMask)
+        job->loadMasks();
     else
-        package->loadDictionaries();
+        job->loadDictionaries();
 
     /** Calculate workunit duration */
-    uint64_t duration = calculateSecondsIcdf2c(package);
+    uint64_t duration = calculateSecondsIcdf2c(job);
 
     /** Create the workunit */
     AttackMode * attack = nullptr;
 
-    switch (package->getAttackMode())
+    switch (job->getAttackMode())
     {
         case Config::AttackMode::AttackDict:
-            if (package->getAttackSubmode() == 0)
-                attack = new CAttackDict(package, host, duration, m_sqlLoader);
+            if (job->getAttackSubmode() == 0)
+                attack = new CAttackDict(job, host, duration, m_sqlLoader);
             else
-                attack = new CAttackRules(package, host, duration, m_sqlLoader);
+                attack = new CAttackRules(job, host, duration, m_sqlLoader);
             break;
 
         case Config::AttackMode::AttackCombinator:
-            attack = new CAttackCombinator(package, host, duration, m_sqlLoader);
+            attack = new CAttackCombinator(job, host, duration, m_sqlLoader);
             break;
 
         case Config::AttackMode::AttackMask:
-            if (package->getAttackSubmode() == 0)
-                attack = new CAttackMask(package, host, duration, m_sqlLoader);
+            if (job->getAttackSubmode() == 0)
+                attack = new CAttackMask(job, host, duration, m_sqlLoader);
             else
-                attack = new CAttackMarkov(package, host, duration, m_sqlLoader);
+                attack = new CAttackMarkov(job, host, duration, m_sqlLoader);
+            break;
+
+        case Config::AttackMode::AttackPcfg:
+            if (job->getAttackSubmode() == 0)
+                attack = new CAttackPcfg(job, host, duration, m_sqlLoader);
+            else
+                attack = new CAttackPcfgRules(job, host, duration, m_sqlLoader);
             break;
 
         default:
-            Tools::printDebugHost(Config::DebugType::Error, packageId, hostBoincId,
-                    "Attack mode not recognized (%d). Setting package to malformed.\n", package->getAttackMode());
-            package->updateStatusOfRunningPackage(Config::PackageState::PackageMalformed);
+            Tools::printDebugHost(Config::DebugType::Error, jobId, hostBoincId,
+                    "Attack mode not recognized (%d). Setting job to malformed.\n", job->getAttackMode());
+            job->updateStatusOfRunningJob(Config::JobState::JobMalformed);
             return;
     }
 
-    /** Try to set a job from retry */
-    bool retryFlag = setEasiestRetry(package, host, attack);
+    /** Try to set a workunit from retry */
+    bool retryFlag = setEasiestRetry(job, host, attack);
 
-    if (package->getStatus() == Config::PackageState::PackageFinishing && !retryFlag)
+    if (job->getStatus() == Config::JobState::JobFinishing && !retryFlag)
     {
-        Tools::printDebugHost(Config::DebugType::Log, packageId, hostBoincId,
-                              "No more retry jobs available. Job will end soon.\n");
+        Tools::printDebugHost(Config::DebugType::Log, jobId, hostBoincId,
+                              "No more retry workunits available. Job will end soon.\n");
     }
-    else if (!attack->makeJob() && package->getStatus() != Config::PackageState::PackageFinishing)
+    else if (!attack->makeWorkunit() && job->getStatus() != Config::JobState::JobFinishing)
     {
-        /** No job could be generated, setting package to finishing */
-        Tools::printDebugPackage(Config::DebugType::Log, packageId,
-                "No more jobs available. Setting package to finishing\n");
-        package->updateStatusOfRunningPackage(Config::PackageState::PackageFinishing);
+        /** No workunit could be generated, setting job to finishing */
+        Tools::printDebugJob(Config::DebugType::Log, jobId,
+                             "No more workunits available. Setting job to finishing\n");
+        job->updateStatusOfRunningJob(Config::JobState::JobFinishing);
     }
 
     delete attack;
 }
 
 
-void CSimpleGenerator::finishPackage(PtrPackage & package)
+void CSimpleGenerator::finishJob(PtrJob &job)
 {
-    uint64_t packageId = package->getId();
-    uint32_t attackMode = package->getAttackMode();
+    uint64_t jobId = job->getId();
+    uint32_t attackMode = job->getAttackMode();
 
-    if (m_sqlLoader->isPackageTimeout(packageId))
+    if (m_sqlLoader->isJobTimeout(jobId))
     {
-        Tools::printDebugPackage(Config::DebugType::Log, packageId,
-                "Timeouted package has finished all jobs. Setting state to timeout.\n", packageId);
-        package->updateStatusOfRunningPackage(Config::PackageState::PackageTimeout);
+        Tools::printDebugJob(Config::DebugType::Log, jobId,
+                             "Timeouted job has finished all workunits. Setting state to timeout.\n", jobId);
+        job->updateStatusOfRunningJob(Config::JobState::JobTimeout);
     }
-    else if ((attackMode == Config::AttackMode::AttackCombinator && (package->getCurrentIndex() * package->getHcKeyspace() >= package->getKeyspace())) ||
-             (attackMode != Config::AttackMode::AttackCombinator && (package->getCurrentIndex() >= package->getHcKeyspace())))
+    else if ((attackMode == Config::AttackMode::AttackCombinator && (job->getCurrentIndex() * job->getHcKeyspace() >= job->getKeyspace())) ||
+             (attackMode != Config::AttackMode::AttackCombinator && (job->getCurrentIndex() >= job->getHcKeyspace())))
     {
-        if (m_sqlLoader->isAnythingCracked(packageId))
+        if (m_sqlLoader->isAnythingCracked(jobId))
         {
-            Tools::printDebugPackage(Config::DebugType::Log, packageId,
-                                     "Package is exhausted but found some passwords. Setting state to finished.\n", packageId);
-            package->updateStatusOfRunningPackage(Config::PackageState::PackageFinished);
-            m_sqlLoader->updateEndTimeNow(packageId);
+            Tools::printDebugJob(Config::DebugType::Log, jobId,
+                                 "Job is exhausted but found some passwords. Setting state to finished.\n",
+                                 jobId);
+            job->updateStatusOfRunningJob(Config::JobState::JobFinished);
+            m_sqlLoader->updateEndTimeNow(jobId);
         }
         else
         {
-            Tools::printDebugPackage(Config::DebugType::Log, packageId,
-                                     "Package is exhausted. Setting state to exhausted.\n", packageId);
-            package->updateStatusOfRunningPackage(Config::PackageState::PackageExhausted);
-            m_sqlLoader->updateEndTimeNow(packageId);
+            Tools::printDebugJob(Config::DebugType::Log, jobId,
+                                 "Job is exhausted. Setting state to exhausted.\n", jobId);
+            job->updateStatusOfRunningJob(Config::JobState::JobExhausted);
+            m_sqlLoader->updateEndTimeNow(jobId);
         }
     }
     else
     {
-        Tools::printDebugPackage(Config::DebugType::Log, packageId,
-                "Package finished all workunits and was paused.\n", packageId);
-        package->updateStatusOfRunningPackage(Config::PackageState::PackageReady);
+        Tools::printDebugJob(Config::DebugType::Log, jobId,
+                             "Job finished all workunits and was paused.\n", jobId);
+        job->updateStatusOfRunningJob(Config::JobState::JobReady);
     }
 }
 
 
-bool CSimpleGenerator::setEasiestRetry(PtrPackage & package, PtrHost & host, AttackMode * attack)
+bool CSimpleGenerator::setEasiestRetry(PtrJob &job, PtrHost &host, AttackMode *attack)
 {
-    PtrJob retryJob = m_sqlLoader->getEasiestRetry(package->getId());
+    PtrWorkunit retryWorkunit = m_sqlLoader->getEasiestRetry(job->getId());
 
-    if (!retryJob || retryJob->getHcKeyspace() == 0)
+    if (!retryWorkunit || retryWorkunit->getHcKeyspace() == 0)
         return false;
 
-    Tools::printDebugHost(Config::DebugType::Log, package->getId(), host->getBoincHostId(),
-            "Setting attack job from retry.\n");
+    Tools::printDebugHost(Config::DebugType::Log, job->getId(), host->getBoincHostId(),
+            "Setting attack workunit from retry.\n");
 
-    /** Modify attributes of new job */
-    retryJob->setHostId(host->getId());
-    retryJob->setBoincHostId(host->getBoincHostId());
+    /** Modify attributes of new workunit */
+    retryWorkunit->setHostId(host->getId());
+    retryWorkunit->setBoincHostId(host->getBoincHostId());
 
     /** For rules attack, multiply keyspace by rules size */
-    if (package->getAttackMode() == Config::AttackMode::AttackDict && package->getAttackSubmode() != 0)
-        retryJob->setHcKeyspace(retryJob->getHcKeyspace() * package->getCombSecDictSize());
+    if (job->getAttackMode() == Config::AttackMode::AttackDict && job->getAttackSubmode() != 0)
+        retryWorkunit->setHcKeyspace(retryWorkunit->getHcKeyspace() * job->getCombSecDictSize());
 
-    /** Set the old retry job to finished */
-    m_sqlLoader->setJobFinished(retryJob->getId());
+    /** Set the old retry workunit to finished */
+    m_sqlLoader->setWorkunitFinished(retryWorkunit->getId());
 
-    // TODO: Use some intelligent thresholds to split retry job (if it is too large)
-    attack->setJob(retryJob);
+    // TODO: Use some intelligent thresholds to split retry workunit (if it is too large)
+    attack->setWorkunit(retryWorkunit);
     return true;
 }
 
@@ -252,13 +272,13 @@ void CSimpleGenerator::removeFinishedHosts()
     /** Send them message to delete sticky files */
     std::vector<PtrHost > finishedHosts = m_sqlLoader->loadFinishedHosts();
 
-    PtrPackage tmpPackage;
+    PtrJob tmpJob;
     std::vector<PtrHost> hostVec;
     for (PtrHost & host : finishedHosts)
     {
         hostVec.push_back(host);
-        tmpPackage = m_sqlLoader->loadPackage(host->getPackageId());
-        deleteStickyFiles(tmpPackage, hostVec);
+        tmpJob = m_sqlLoader->loadJob(host->getJobId());
+        deleteStickyFiles(tmpJob, hostVec);
     }
 
     /** Remove them from database */

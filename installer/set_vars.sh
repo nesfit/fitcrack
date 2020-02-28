@@ -4,6 +4,21 @@
 # This file is part of Fitcrack installer
 # Author: Radek Hranicky (ihranicky@fit.vutbr.cz)
 
+# Save installer root
+INSTALLER_ROOT=$(pwd)
+
+###################
+# Compiler threads
+###################
+read -e -p "Enter the number of compiler threads (default: 8): " COMPILER_THREADS
+COMPILER_THREADS=${COMPILER_THREADS:-8}
+
+re='^[0-9]+$'
+if ! [[ $COMPILER_THREADS =~ $re ]] ; then
+   echo "Error: Entered value is not a number!"
+   exit 1
+fi
+
 #############
 # BOINC user
 #############
@@ -63,7 +78,7 @@ PROJECT_HTTPD_CONF="$BOINC_PROJECT_DIR/$BOINC_PROJECT.httpd.conf"
 
 read -e -p "Enter BOINC project URL_BASE (default: http://127.0.0.1): " BOINC_URL
 BOINC_URL=${BOINC_URL:-http://127.0.0.1}
-
+BOINC_URL=${BOINC_URL%/}
 
 #############
 # Apache user

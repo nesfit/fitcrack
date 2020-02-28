@@ -76,16 +76,5 @@ namespace Logging {
      * @param 	line [in] Line in the file 
      */
     void positionInCode(const std::string file, const int line);
-
-//    /**
-//     * @brief	Sets std::cerr to be in buffered mode to increase performance
-//     */
-//    void setBuffered();
-//
-//    /**
-//     * @brief   Sets std::cerr to be in unbuffed mode with flushing in write
-//     */
-//    void setUnbuffered();
-
 }
 #endif // LOGGING_HPP

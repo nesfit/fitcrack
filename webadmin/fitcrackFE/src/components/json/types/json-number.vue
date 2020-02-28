@@ -4,7 +4,7 @@
 -->
 
 <template>
-    <span class="json-number">{{jsonValue}}</span>
+  <span class="json-number">{{ jsonValue }}</span>
 </template>
 
 <script>

@@ -12,7 +12,7 @@ from src.api.fitcrack.endpoints.hashcat.functions import getTable
 from src.api.fitcrack.endpoints.hashcat.responseModels import hashType_list, attackMode_list
 
 log = logging.getLogger(__name__)
-ns = api.namespace('hashcat', description='Endpointy ktoré priamo využívajú nástroj hashcat')
+ns = api.namespace('hashcat', description='Endpoints for hashcat usage.')
 
 
 
@@ -22,7 +22,7 @@ class hashTypesCollection(Resource):
     @api.marshal_with(hashType_list)
     def get(self):
         """
-        Vracia zoznam podporovaných hashov
+        Returns list of supported hashes.
         """
         # hashtype = getTable("Hash modes")
 
@@ -35,11 +35,8 @@ class attackModes(Resource):
     @api.marshal_with(attackMode_list)
     def get(self):
         """
-        Vracia zoznam podporovaných utokov
+        Returns list of supported attacks.
         """
         attackModes = getTable("Attack Modes")
 
         return {"attackmodes": attackModes}
-
-
-

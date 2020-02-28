@@ -5,37 +5,71 @@
 
 <template>
   <div class="cont">
-    <v-card-title class="pt-2 pb-1">
+    <v-card-title class="py-2">
       <v-text-field
+        v-model="search"
         clearable
-        solo
         flat
-        append-icon="search"
+        outlined
+        prepend-inner-icon="mdi-database-search"
         label="Search by password or hash"
         single-line
         hide-details
-        v-model="search"
-      ></v-text-field>
-      <v-spacer></v-spacer>
+      />
     </v-card-title>
-    <v-divider></v-divider>
+    <v-divider />
     <v-data-table
       ref="table"
       :headers="headers"
       :items="hashes"
       :search="search"
-      :pagination.sync="pagination"
-      :total-items="totalItems"
+      :options.sync="pagination"
+      :server-items-length="totalItems"
       :loading="loading"
-      :rows-per-page-items="[25,50,100]"
-      rows-per-page-text="Passwords per page"
-      disable-initial-sort
+      :footer-props="{itemsPerPageOptions: [25,50,100], itemsPerPageText: 'Passwords per page'}"
     >
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.password}} </td>
-        <td class="text-xs-right">{{ props.item.hash_type_name }}</td>
-        <td class="text-xs-right">{{ props.item.hash }}</td>
-        <td class="text-xs-right">{{ $moment(props.item.added).format('D.M.YYYY H:mm:ss')}}</td>
+      <template v-slot:item.password="{ item }">
+        {{ item.password || '–' }}
+      </template>
+      <template v-slot:item.hash="{ item }">
+        <div class="d-flex align-center mw-50">
+          <v-dialog max-width="600">
+            <template v-slot:activator="{ on }">
+              <span 
+                class="text-truncate d-inline-block"
+                v-on="on"
+              >
+                {{ item.hash }}
+              </span>
+            </template>
+            <v-card>
+              <v-card-title primary-title>
+                {{ item.hash_type_name }}
+              </v-card-title>
+              <v-card-text>
+                {{ item.hash }}
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+          <!-- <svg 
+            xmlns="http://www.w3.org/2000/svg"
+            height="18"
+            width="100%"
+          >
+            <rect
+              v-for="(char, i) in item.hash"
+              :key="i"
+              :x="i"
+              :y="18 + 5 - char.charCodeAt(0) / 5"
+              width="1"
+              :height="char.charCodeAt(0) / 5 - 5"
+              :fill="'hsla(' + (char.charCodeAt(0) * 5 - 100) + ',100%,50%,50%)'"
+            />
+          </svg> -->
+        </div>
+      </template>
+      <template v-slot:item.added="{ item }">
+        {{ $moment(item.added).format('D.M.YYYY H:mm:ss') }}
       </template>
     </v-data-table>
   </div>
@@ -44,6 +78,24 @@
 <script>
   export default {
     name: "HashesView",
+    data: function () {
+      return {
+        interval: null,
+        status: 'active',
+        search: '',
+        totalItems: 0,
+        pagination: {},
+        loading: true,
+        headers: [
+          {text: 'Password', value: 'password', align: 'start', sortable: true},
+          {text: 'Hash type', value: 'hash_type_name', align: 'end', sortable: true},
+          {text: 'Hash', value: 'hash', align: 'start', sortable: true},
+          {text: 'Added', value: 'added', align: 'end', sortable: true}
+        ],
+        hashes:
+          []
+      }
+    },
     watch: {
       pagination: {
         handler() {
@@ -81,37 +133,19 @@
         this.status = e;
         this.$refs.table.updatePagination({page: 1, totalItems: this.totalItems})
       }
-    },
-    data: function () {
-      return {
-        interval: null,
-        status: 'active',
-        search: '',
-        totalItems: 0,
-        pagination: {},
-        loading: true,
-        headers: [
-          {text: 'Password', value: 'result', align: 'left', sortable: true},
-          {text: 'Hash type', value: 'hash_type', align: 'right', sortable: true},
-          {text: 'Hash', value: 'hash', align: 'right', sortable: true},
-          {text: 'Added', value: 'added', align: 'right', sortable: true}
-        ],
-        hashes:
-          []
-      }
     }
   }
 </script>
 
 <style scoped>
 
-  .middle {
-    vertical-align: middle;
+  .mw-50 {
+    max-width: 50vw;
   }
 
   .cont {
     height: 100%;
-    background: white;
+
   }
 
 </style>
