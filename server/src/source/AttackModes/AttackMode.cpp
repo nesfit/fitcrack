@@ -27,3 +27,12 @@ void AttackMode::setDefaultWorkunitParams(DB_WORKUNIT * wu)
     wu->max_total_results = Config::replicationFactor * 8;
     wu->max_success_results = Config::replicationFactor * 4;
 }
+
+
+std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType,
+                                            std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
+                                            std::string charset3, std::string charset4)
+{
+    return std::string();
+}
+
