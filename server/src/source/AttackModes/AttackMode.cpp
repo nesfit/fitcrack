@@ -29,7 +29,7 @@ void AttackMode::setDefaultWorkunitParams(DB_WORKUNIT * wu)
 }
 
 
-std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType,
+std::string AttackMode::generateBasicConfig(char wuMode, unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType,
                                             std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
                                             std::string charset3, std::string charset4)
 {
