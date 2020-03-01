@@ -59,6 +59,7 @@ namespace Config {
     extern std::string rulesDir;
     extern std::string pcfgDir;
     extern std::string projectDir;
+    extern std::string charsetDir;
 
     /** Template names */
     extern std::string inTemplateFileBench;
@@ -118,6 +119,10 @@ namespace Config {
         Warn,
         Error
     };
+
+    /** Quick binary2hex conversion */
+    constexpr char hexmap[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                               '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     /** Buffer size for SQL queries */
     const unsigned int SQL_BUF_SIZE = 4096;
@@ -191,6 +196,13 @@ class Tools {
          * @brief Releases the memory allocated for file descriptors
          */
         static void releaseFdMemory();
+
+        /**
+         * @brief Converts binary data to hex string
+         * @param binaryData Binary data
+         * @return Hex string
+         */
+        static std::string toHex(char *binaryData, int len);
 
     private:
         static std::map<std::pair<uint64_t, uint64_t>, std::ifstream* > m_fd_map;
