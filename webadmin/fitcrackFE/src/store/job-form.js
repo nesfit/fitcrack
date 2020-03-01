@@ -118,10 +118,16 @@ export default {
     validAttackSpecificSettings (state) {
       switch (state.attackSettingsTab) {
         case 'dictionary':
-        case 'hybridWordlistMask':
           return state.leftDicts.length > 0
+        case 'combinator':
+          return state.leftDicts.length > 0 && state.rightDicts.length > 0
+        case 'maskattack':
+          if (state.submode > 0 && state.markov.length == 0) return false 
+          return state.masks.filter(m => m !== '').length > 0
+        case 'hybridWordlistMask':
+          return state.leftDicts.length > 0 && state.hybridMask !== ''
         case 'hybridMaskWordlist':
-          return state.rightDicts.length > 0
+          return state.rightDicts.length > 0 && state.hybridMask !== ''
         case 'pcfgAttack':
           return state.pcfg.length > 0
         case 'princeAttack':

@@ -58,7 +58,7 @@ class pcfg(Resource):
 
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
         if not pcfg:
-            abort(500, 'Can\'t open dictionary')
+            abort(500, 'Can\'t find PCFG grammar')
         path = os.path.join(PCFG_DIR, pcfg.path)
         is_dir = os.path.isdir(path)
         if not is_dir:

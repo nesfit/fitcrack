@@ -41,7 +41,7 @@ class Rules:
     def load_grammar(self):
         file_path = self.config.input_dir + '/Grammar/Grammar.txt'
         try:
-            with open(file_path, 'r') as grammar_file:
+            with open(file_path, 'r', encoding='utf-8') as grammar_file:
                 for rule in grammar_file:
                     self.append_base_structure(rule)
 
@@ -56,7 +56,7 @@ class Rules:
         for file in os.listdir(dir_path):
             self.rulesets["Capitalization"][file] = []
             try:
-                with open(dir_path + file, 'r') as f:
+                with open(dir_path + file, 'r', encoding='utf-8') as f:
                     for rule in f:
                         self.append_rule_from_file(file, rule, "Capitalization")
 
@@ -70,7 +70,7 @@ class Rules:
         for file in os.listdir(dir_path):
             self.rulesets["Alpha"][file] = []
             try:
-                with open(dir_path + file, 'r') as f:
+                with open(dir_path + file, 'r', encoding='utf-8') as f:
                     for rule in f:
                         self.append_rule_from_file(file, rule, "Alpha")
 
@@ -85,7 +85,7 @@ class Rules:
             dir_path = self.config.input_dir + '/' + rule_type + '/'
             for file in os.listdir(dir_path):
                 try:
-                    with open(dir_path + file, 'r') as f:
+                    with open(dir_path + file, 'r', encoding='utf-8') as f:
                         num_lines = sum(1 for line in f)
                         self.rulesets["Sizes"][rule_type][file] = num_lines
 

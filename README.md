@@ -202,9 +202,9 @@ Add this text to last line (script will start every 5 minutes):
 ```
 ## Optional: multiple workunits per hosts
 
-In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary ttack with big dictionaries.
+In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary attack with big dictionaries.
 
-To achieve this behavior, in your project config, e.g. `/home/boincadm/fitcrack/config.xml` add in `<boinc><config>` section find the following line:
+To achieve this behavior, in your project config, e.g. `/home/boincadm/projects/fitcrack/config.xml` add in `<boinc><config>` section find the following line:
 ```
 <max_wus_in_progress>1</max_wus_in_progress>
 ```

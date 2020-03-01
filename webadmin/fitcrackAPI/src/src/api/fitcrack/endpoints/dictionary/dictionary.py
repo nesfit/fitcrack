@@ -12,7 +12,7 @@ import time
 from pathlib import Path
 from shutil import move
 
-from flask import request, redirect
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -77,6 +77,18 @@ class dictionary(Resource):
             'message': 'Dictionary sucesfully deleted.'
         }, 200
 
+@ns.route('/<id>/download')
+class dictionaryDownload(Resource):
+    def get(self, id):
+        """
+        Sends zipped PCFG as attachment
+        """
+
+        dictionary = FcDictionary.query.filter(FcDictionary.id == id).one()
+        if not dictionary:
+            abort(500, 'Can\'t find dictionary')
+        path = os.path.join(DICTIONARY_DIR, dictionary.path)
+        return send_file(path, attachment_filename=dictionary.path, as_attachment=True)
 
 @ns.route('/<id>/data')
 class dictionaryData(Resource):
