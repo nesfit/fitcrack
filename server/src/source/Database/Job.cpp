@@ -33,6 +33,12 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_dict1 = jobMap["dict1"];
         this->m_dict2 = jobMap["dict2"];
         this->m_rules = jobMap["rules"];
+        this->m_ruleLeft = jobMap["rule_left"];
+        this->m_ruleRight = jobMap["rule_right"];
+        this->m_charset1 = jobMap["charset1"];
+        this->m_charset2 = jobMap["charset2"];
+        this->m_charset3 = jobMap["charset3"];
+        this->m_charset4 = jobMap["charset4"];
         if (!jobMap["grammar_id"].empty())
             this->m_grammar_id = std::stoull(jobMap["grammar_id"]);
         this->m_markov = jobMap["markov_hcstat"];
@@ -300,6 +306,18 @@ const std::string & CJob::getDict2() const
 const std::string & CJob::getRules() const
 {
     return m_rules;
+}
+
+
+const std::string & CJob::getRuleLeft() const
+{
+    return m_ruleLeft;
+}
+
+
+const std::string & CJob::getRuleRight() const
+{
+    return m_ruleRight;
 }
 
 

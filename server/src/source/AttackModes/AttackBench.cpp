@@ -29,7 +29,7 @@ bool CAttackBench::makeWorkunit()
     /** Make a unique name for the workunit and its config file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
 
-    /** Append bech mode to the config file */
+    /** Create the config file */
     retval = config.download_path(name1, path);
     if (retval)
     {
@@ -41,7 +41,7 @@ bool CAttackBench::makeWorkunit()
 
     std::ofstream f;
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open config BOINC input file! Setting job to malformed.\n");
@@ -49,24 +49,8 @@ bool CAttackBench::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new workunit:\n");
-
-    /** Output original config from DB */
-    f << m_job->getConfig();
-    Tools::printDebug(m_job->getConfig().c_str());
-
-    /** Output mode */
-    if (m_job->getId() == Config::benchAllId)
-    {
-        /** Benchmark all hash types */
-        f << "|||mode|String|1|a|||\n";
-        Tools::printDebug("|||mode|String|1|a|||\n");
-    }
-    else
-    {
-        f << "|||mode|String|1|b|||\n";
-        Tools::printDebug("|||mode|String|1|b|||\n");
-    }
+    f << generateBasicConfig(m_job->getId() == Config::benchAllId ? 'a' : 'b', m_job->getAttackMode(),
+            m_job->getAttackSubmode(), m_job->getName(), m_job->getHashType());
     f.close();
 
     /** Fill in the workunit parameters */

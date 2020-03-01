@@ -116,6 +116,12 @@ class CJob {
         std::string m_dict1;
         std::string m_dict2;
         std::string m_rules;
+        std::string m_ruleLeft;
+        std::string m_ruleRight;
+        std::string m_charset1;
+        std::string m_charset2;
+        std::string m_charset3;
+        std::string m_charset4;
         std::string m_grammar;
         uint64_t    m_grammar_id;
         std::string m_markov;
@@ -160,6 +166,12 @@ class CJob {
         const std::string & getDict1() const;
         const std::string & getDict2() const;
         const std::string & getRules() const;
+        const std::string & getRuleLeft() const;
+        const std::string & getRuleRight() const;
+        const std::string & getCharset1() const;
+        const std::string & getCharset2() const;
+        const std::string & getCharset3() const;
+        const std::string & getCharset4() const;
         uint64_t getGrammarId() const;
         const std::string & getMarkov() const;
         uint32_t getMarkovThreshold() const;
