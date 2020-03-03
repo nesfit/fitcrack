@@ -10,7 +10,7 @@ import re
 # Prepare OS specific stuff
 is_win = platform.system() == 'Windows'
 sep = ';' if is_win else ':'
-excl = '\_' if is_win else '/_'
+excl = '\\_' if is_win else '/_'
 
 # Get paths where markdown files are referencing images from (e.g. everywhere)
 resource_paths = [ x[0] for x in os.walk('.') if not excl in x[0] ]
@@ -19,7 +19,9 @@ resource_paths = [ x[0] for x in os.walk('.') if not excl in x[0] ]
 files = []
 with open('_sidebar.md') as toc:
   for line in toc:
-    md = re.search('\((.*)\)', line)
+    if re.search(r'<!--', line):
+      continue
+    md = re.search(r'\((.*)\)', line)
     if md:
       files.append(md.group(1))
       # if not os.path.exists(md.group(1)):
@@ -34,5 +36,5 @@ existing_files = [ f for f in files if os.path.exists(f) ]
 res_path_arg = sep.join(resource_paths)
 input_arg = ' '.join(existing_files)
 
-# Fire it up
-os.system(f'pandoc --toc -V documentclass=report --resource-path={res_path_arg} -o manual.pdf .\README.md {input_arg}')
+# Fire it up (leaving out README.md as it's useless)
+os.system(f'pandoc --toc -V documentclass=report --resource-path={res_path_arg} -o manual.pdf {input_arg}')
