@@ -117,7 +117,7 @@ gpgcheck = 1
 ```
 
 ### Install prerequisities
-Enable IUS, EPEL, and IUS repositories
+Enable IUS, EPEL, and SCL repositories
 ```
 yum install -y https://$(rpm -E '%{?centos:centos}%{!?centos:rhel}%{rhel}').iuscommunity.org/ius-release.rpm
 yum install -y epel-release centos-release-scl
@@ -125,7 +125,7 @@ yum install -y epel-release centos-release-scl
 
 Install necessary packages:
 ```
-yum install -y devtoolset-7 m4 libtool autoconf automake  git vim httpd php php-mysql mod_wsgi mariadb-server mariadb-devel zlib libcurl-devel openssl-libs python python36 python36u-mod_wsgi python36u-setuptools  MySQL-python python2-PyMySQL  boost* pkgconfig libnotify
+yum install -y devtoolset-7 m4 libtool autoconf automake  git vim httpd php php-mysql mod_wsgi mariadb-server mariadb-devel zlib libcurl-devel openssl-libs openssl-devel python python36 python36u-mod_wsgi python36u-setuptools  MySQL-python python2-PyMySQL  boost* pkgconfig libnotify
 ```
 Set Python 3.6 as default Python3 version:
 ```
@@ -146,7 +146,7 @@ systemctl enable mariadb.service
 useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
 mysql -u root -p
 mysql> create database fitcrack;
-mysql> GRANT ALL PRIVILES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
 ```
 
 ### Switch to GCC6 and Install Fitcrack
