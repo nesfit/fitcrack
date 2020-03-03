@@ -10,6 +10,11 @@ if ! [ -d "/usr/share/collections" ]; then
   mkdir /usr/share/collections
 fi
 
+# Create default import destination
+if ! [ -d "/usr/share/collections/import" ]; then
+  mkdir /usr/share/collections/import
+fi
+
 # Create collections subdirs
 if ! [ -d "/usr/share/collections/charsets" ]; then
   cp -R collections/charsets /usr/share/collections/
