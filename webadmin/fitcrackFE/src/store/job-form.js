@@ -115,13 +115,19 @@ export default {
         }
       }
     },
-    validSettings (state) {
+    validAttackSpecificSettings (state) {
       switch (state.attackSettingsTab) {
         case 'dictionary':
-        case 'hybridWordlistMask':
           return state.leftDicts.length > 0
+        case 'combinator':
+          return state.leftDicts.length > 0 && state.rightDicts.length > 0
+        case 'maskattack':
+          if (state.submode > 0 && state.markov.length == 0) return false 
+          return state.masks.filter(m => m !== '').length > 0
+        case 'hybridWordlistMask':
+          return state.leftDicts.length > 0 && state.hybridMask !== ''
         case 'hybridMaskWordlist':
-          return state.rightDicts.length > 0
+          return state.rightDicts.length > 0 && state.hybridMask !== ''
         case 'pcfgAttack':
           return state.pcfg.length > 0
         case 'princeAttack':
@@ -153,20 +159,21 @@ export default {
           return true
       }
     },
-    valid (state, { attackSettings, validSettings }) {
+    valid (state, { attackSettings, validAttackSpecificSettings }) {
       if (
         !state.attackSettingsTab ||
         !attackSettings ||
         state.hashType == null ||
+        state.timeForJob < 60 ||
         state.name === ''
       ) {
         return false
       } else {
-        return validSettings
+        return validAttackSpecificSettings
       }
     },
-    keyspaceKnown ({ attackSettingsTab }, { validSettings }) {
-      return attackSettingsTab && validSettings
+    keyspaceKnown ({ attackSettingsTab }, { validAttackSpecificSettings }) {
+      return attackSettingsTab && validAttackSpecificSettings
     },
     template (state) {
       const keys = Object.keys(empty)
@@ -229,5 +236,4 @@ export const attacks = [
   {handler: 'hybridWordlistMask', name: 'Hybrid Wordlist + Mask', id: 6, serverName: 'Hybrid wordlist+mask'},
   {handler: 'hybridMaskWordlist', name: 'Hybrid Mask + Wordlist', id: 7, serverName: 'Hybrid mask+wordlist'},
   {handler: 'pcfgAttack', name: 'PCFG', id: 9, serverName: 'pcfg'},
-  {handler: 'princeAttack', name: 'PRINCE', id: 8, serverName: 'prince'},
 ]

@@ -19,7 +19,7 @@
         :to="{ name: 'hostDetail', params: {id: item.id} }"
         class="middle" target='_blank'
       >
-        {{ item.domain_name + ' (' + item.user.name + ')' }}
+        {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
         <v-icon 
           small
           color="primary"
@@ -44,6 +44,7 @@
 </template>
 
 <script>
+  import iconv from 'iconv-lite';
   import selector from './selectorMixin'
   export default {
     name: "HostSelector",
@@ -68,14 +69,14 @@
     },
     mounted () {
       this.interval = setInterval(() => {
-        if (this.autoRefresh) this.getData()
+        if (this.autoRefresh) this.getData(true)
       }, 2000)
     },
     beforeDestroy () {
       clearInterval(this.interval)
     },
     methods: {
-      getData() {
+      getData(autorefreshing = false) {
         this.loading = true
         this.axios.get(this.$serverAddr + '/hosts', {
           params: {
@@ -83,7 +84,7 @@
           }
         }).then((response) => {
           this.items = response.data.items
-          this.selected = response.data.items
+          if (!autorefreshing) this.selected = this.items
           this.loading = false
         })
       },
@@ -93,6 +94,11 @@
         } else {
           return 'Unknown'
         }
+      },
+      fixUserNameEncoding : function(username) {
+          /* Boinc DB uses latin1_swedish encoding, which breaks names with special characters,
+          which are not supported in this encoding. Fix it by converting name to utf8. */
+          return iconv.decode(iconv.encode(username, 'latin1'), 'utf-8')
       }
     }
   }

@@ -380,6 +380,10 @@ void CSqlLoader::killJob(PtrJob &job)
     for (PtrWorkunit & wu : jobWorkunits)
         cancel_jobs(wu->getWorkunitId(), wu->getWorkunitId());
 
+    /** Wipe the workunits */
+    updateSql(formatQuery("DELETE FROM `%s` WHERE job_id = %" PRIu64 " ;",
+                          CWorkunit::getTableName().c_str(), jobId));
+
     /** Put down the kill flag */
     updateSql(formatQuery("UPDATE `%s` SET `kill` = 0 WHERE `id` = %" PRIu64 " LIMIT 1;",
                           CJob::getTableName().c_str(), jobId));

@@ -3,6 +3,7 @@
 * Licence: MIT, see LICENSE
 */
 
+#include "Attack.hpp"
 #include "TaskBase.hpp"
 
 /* Protected */
@@ -21,8 +22,14 @@ TaskBase::TaskBase (Directory& directory, ConfigTask& task_config, ConfigHost& h
 
 double TaskBase::fractionDone() {
   if (computed_hashes_ > total_hashes_)
-  return 0.0;
+    return 0.0;
   // RunnerUtils::runtimeException("portion_done is bigger than total");
+  if (computed_hashes_ == 0) {
+    enum AttackType attack_type = Attack::detectAttackType(task_config_);
+    if (attack_type == AT_PCFG || attack_type == AT_Prince)
+      RunnerUtils::runtimeException(
+          "No computed hashes. Broken external generator?");
+  }
   double fraction_done = computed_hashes_ / (double)total_hashes_;
   return (fraction_done != fraction_done ? 0.0 : fraction_done); // NaN test
 }

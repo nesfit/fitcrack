@@ -209,11 +209,14 @@ class OperationWithJob(Resource):
             # Job is stopped in Generator after sending BOINC commands
             if (int(job.status) != 10) and (int(job.status) != 12):
                 job.status = 0
+                workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
+                for item in workunits:
+                    db.session.delete(item)
                 print("done")
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0
-            job.time_end = None
+            job.time_start = job.time_end
             if job.attack_mode == 3:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
@@ -229,9 +232,6 @@ class OperationWithJob(Resource):
             for item in graphData:
                 db.session.delete(item)
 
-            workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
-            for item in workunits:
-                db.session.delete(item)
             job.kill = True
 
         else:

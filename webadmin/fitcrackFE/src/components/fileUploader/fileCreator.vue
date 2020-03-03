@@ -55,6 +55,7 @@
                 hide-details
                 label="Name"
                 class="mr-2"
+                @input="customName = true"
               />
               <v-btn
                 color="primary"
@@ -98,6 +99,7 @@ export default {
       active: null,
       // Dictionary selection
       newName: '',
+      customName: false,
       selectedDict: []
     }
   },
@@ -108,6 +110,16 @@ export default {
       },
       set (newValue) {
         this.$emit('input', newValue)
+      }
+    }
+  },
+  watch: {
+    selectedDict (val) {
+      if (this.newName.length == 0) {
+        this.customName = false
+      }
+      if (val.length > 0 && !this.customName) {
+        this.newName = val[0].name
       }
     }
   },

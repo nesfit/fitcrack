@@ -38,7 +38,6 @@ Don't forget to activate [usage measure](#usage) of your server.
 * PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
 * Curl
-* gRPC + protocol buffers (3.7+)
 
 ### Installation
 Create a user for running BOINC server
@@ -118,7 +117,7 @@ gpgcheck = 1
 ```
 
 ### Install prerequisities
-Enable IUS, EPEL, and IUS repositories
+Enable IUS, EPEL, and SCL repositories
 ```
 yum install -y https://$(rpm -E '%{?centos:centos}%{!?centos:rhel}%{rhel}').iuscommunity.org/ius-release.rpm
 yum install -y epel-release centos-release-scl
@@ -126,7 +125,7 @@ yum install -y epel-release centos-release-scl
 
 Install necessary packages:
 ```
-yum install -y devtoolset-7 m4 libtool autoconf automake  git vim httpd php php-mysql mod_wsgi mariadb-server mariadb-devel zlib libcurl-devel openssl-libs python python36 python36u-mod_wsgi python36u-setuptools  MySQL-python python2-PyMySQL  boost* pkgconfig libnotify
+yum install -y devtoolset-7 m4 libtool autoconf automake  git vim httpd php php-mysql mod_wsgi mariadb-server mariadb-devel zlib libcurl-devel openssl-libs openssl-devel python python36 python36u-mod_wsgi python36u-setuptools  MySQL-python python2-PyMySQL  boost* pkgconfig libnotify
 ```
 Set Python 3.6 as default Python3 version:
 ```
@@ -147,7 +146,7 @@ systemctl enable mariadb.service
 useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
 mysql -u root -p
 mysql> create database fitcrack;
-mysql> GRANT ALL PRIVILES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
 ```
 
 ### Switch to GCC6 and Install Fitcrack
@@ -203,9 +202,9 @@ Add this text to last line (script will start every 5 minutes):
 ```
 ## Optional: multiple workunits per hosts
 
-In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary ttack with big dictionaries.
+In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary attack with big dictionaries.
 
-To achieve this behavior, in your project config, e.g. `/home/boincadm/fitcrack/config.xml` add in `<boinc><config>` section find the following line:
+To achieve this behavior, in your project config, e.g. `/home/boincadm/projects/fitcrack/config.xml` add in `<boinc><config>` section find the following line:
 ```
 <max_wus_in_progress>1</max_wus_in_progress>
 ```

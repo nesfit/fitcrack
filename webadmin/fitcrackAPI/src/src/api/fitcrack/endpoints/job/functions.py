@@ -20,7 +20,7 @@ from flask_restplus import abort
 from sqlalchemy import exc
 from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
 from src.api.fitcrack.attacks import processJob as attacks
-from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace, count_file_lines
+from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash
@@ -230,7 +230,9 @@ def computeCrackingTime(data):
     attackSettings = json.loads(data['attack_settings'])
     data['boinc_host_ids'] = [x.strip() for x in data['boinc_host_ids'].split(',')]
 
-    if data.get('boinc_host_ids') and len(data['boinc_host_ids']) > 0:
+    # Check if we have valid hash type code and if we have any host
+    # -1 is indicator that no hash type was selected in webadmin
+    if data['hash_type_code'] != -1 and len(data['boinc_host_ids']) > 0:
         hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == data['hash_type_code']). \
             filter(FcBenchmark.boinc_host_id.in_(data['boinc_host_ids'])).all()
 
@@ -265,11 +267,12 @@ def computeCrackingTime(data):
 
     elif attackSettings['attack_mode'] == 3:
         if attackSettings.get('masks') and len(attackSettings['masks']) > 0:
+            thresh = attackSettings.get('markov_treshold', None)
             customCharsetDict = {}
-            for charset in attackSettings['charset']:
-                customCharsetDict[charset['id']] = charset['keyspace']
+            for i, charset in enumerate(attackSettings['charset']):
+                customCharsetDict[i + 1] = charset['keyspace']
             for mask in attackSettings['masks']:
-                keyspace += compute_keyspace_from_mask(mask, customCharsetDict)
+                keyspace += compute_keyspace_from_mask(mask, customCharsetDict, thresh)
 
     elif attackSettings['attack_mode'] == 6:
         dictsKeyspace = 0

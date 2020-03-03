@@ -158,3 +158,21 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
             if not DBrecord.deleted:
                 result.append(DBrecord)
     return result
+
+
+def sorted_cp (src, dst):
+    "Sort source text file by line length and output to destination"
+    lengths = []
+    with open(src, 'r') as i, open(dst, 'w') as o:
+        while True:
+            off = i.tell()
+            l = i.readline()
+            if not l: break
+            lengths.append(( off, len(l), len(l.rstrip()) ))
+        lengths = sorted(lengths, key=lambda x:x[2])
+        for off, ln, _ in lengths:
+            i.seek(off)
+            line = i.read(ln)
+            if not line.endswith('\n'):
+                line += '\n'
+            o.write(line)

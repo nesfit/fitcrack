@@ -393,7 +393,8 @@
             <v-subheader>Select which hosts to distribute workunits to</v-subheader>
             <host-selector
               v-model="hosts"
-              :select-all="true"
+              select-all
+              auto-refresh
             />
             <v-row>
               <v-spacer />
@@ -501,7 +502,7 @@
             large
             color="primary"
             class="ml-2"
-            :disabled="!valid || (invalidHashes.length > 0 && !ignoreHashes)"
+            :disabled="!valid || keyspace > 1.8446744e+19 /* 2^64 */ || (invalidHashes.length > 0 && !ignoreHashes)"
             @click="submit"
           >
             <v-icon left>
@@ -525,7 +526,6 @@
   import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist'
   import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask'
   import pcfgAttack from '@/components/job/attacks/pcfg'
-  import princeAttack from '@/components/job/attacks/prince'
   import FileUploader from "@/components/fileUploader/fileUploader";
   import fcTextarea from '@/components/textarea/fc_textarea'
   import hostSelector from '@/components/selector/hostSelector'
@@ -547,7 +547,6 @@
       'hybridMaskWordlist': hybridMaskWordlist,
       'hybridWordlistMask': hybridWordlistMask,
       'pcfgAttack': pcfgAttack,
-      'princeAttack': princeAttack,
       'fc-textarea': fcTextarea,
       'host-selector': hostSelector,
       'template-modal': templateModal
@@ -575,7 +574,7 @@
       ...mapTwoWayState('jobForm', twoWayMap([
         'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
-      ...mapGetters('jobForm', ['jobSettings', 'valid', 'keyspaceKnown']),
+      ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
         return this.templates.map((t, i) => ({text: t.template, value: i}))
       },
@@ -588,15 +587,16 @@
     },
     watch: {
       jobSettings (val) {
-        if (this.valid) {
+        if (val.attack_settings != false && this.validAttackSpecificSettings) {
           var boincIds = []
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
           }
-
+          /* -1 means no hash entered */
+          var hash_code = this.hashType == null ? -1 : this.hashType.code
           this.axios.get(this.$serverAddr + '/job/crackingTime', {
             params: {
-              'hash_type_code': this.hashType,
+              'hash_type_code': hash_code,
               'boinc_host_ids': boincIds.join(","),
               'attack_settings': val.attack_settings
             }
@@ -662,8 +662,7 @@
           'maskattack': 'mdi-boxing-glove',
           'hybridWordlistMask': 'mdi-vector-difference-ba',
           'hybridMaskWordlist': 'mdi-vector-difference-ab',
-          'pcfgAttack': 'mdi-ray-start-end',
-          'princeAttack': 'mdi-crown'
+          'pcfgAttack': 'mdi-ray-start-end'
         }
         return map[handler] || 'mdi-checkbox-blank-outline'
       },

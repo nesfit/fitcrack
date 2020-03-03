@@ -33,6 +33,21 @@
           {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
         </template>
         <template v-slot:item.actions="{ item }">
+           <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/dictionary/' + item.id + '/download'"
+                target="_blank"
+                download
+                v-on="on"
+              >
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
+                </v-btn>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
@@ -50,27 +65,57 @@
           </v-tooltip>
         </template>
       </v-data-table>
-      <v-btn
-        color="primary"
-        block
-        text
-        @click.native.stop="dialog = true"
-      >
-        Select from server
-      </v-btn>
-      <v-divider />
-
-      <file-uploader
-        :url="this.$serverAddr + '/dictionary/add'"
-        @uploadComplete="loadDictionaries"
-      />
+      <v-card-actions>
+        <v-checkbox
+          v-model="sortUploaded"
+          label="Sort on upload"
+          hint="Sort by password length"
+          persistent-hint
+        />
+        <v-spacer />
+        <v-btn
+          color="primary"
+          outlined
+          @click.native.stop="browser = true"
+        >
+          Add from server
+        </v-btn>
+        <v-btn
+          color="primary"
+          outlined
+          @click.native.stop="uploader = true"
+        >
+          Upload new
+        </v-btn>
+      </v-card-actions>
     </fc-tile>
 
     <v-dialog
-      v-model="dialog"
+      v-model="browser"
       max-width="500"
     >
-      <server-browser @filesuploaded="dialog = false;loadDictionaries()" />
+      <server-browser
+        :sort="sortUploaded"
+        @filesuploaded="browser = false;loadDictionaries()"
+      />
+    </v-dialog>
+
+    <v-dialog
+      v-model="uploader"
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title>
+          Upload a dictionary file
+        </v-card-title>
+        <v-card-text>
+          <file-uploader
+            :url="this.$serverAddr + '/dictionary/add'"
+            :args="{sort: sortUploaded}"
+            @uploadComplete="uploader = false;loadDictionaries()"
+          />
+        </v-card-text>
+      </v-card>
     </v-dialog>
   </v-container>
 </template>
@@ -98,10 +143,12 @@
           },
           {text: 'Keyspace', value: 'keyspace', align: 'end'},
           {text: 'Time', value: 'time', align: 'end'},
-          {text: 'Delete', value: 'actions', align: 'end', sortable: false}
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ],
         dictionaries: [],
-        dialog: false
+        browser: false,
+        uploader: false,
+        sortUploaded: false
       }
     },
     mounted: function () {
@@ -139,7 +186,7 @@
   }
 
   .max500 {
-    max-width: 550px;
+    max-width: 770px;
   }
 
 </style>

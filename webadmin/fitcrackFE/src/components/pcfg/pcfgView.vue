@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <v-container class="max500">
+  <v-container class="max700">
     <fc-tile
       title="PCFGs"
       class="ma-2"
@@ -63,7 +63,6 @@
         <v-btn
           class="d-inline-block"
           color="primary"
-          text
           outlined
           @click.native.stop="dialog = true"
         >
@@ -157,8 +156,8 @@
     text-align: center;
   }
 
-  .max500 {
-    max-width: 600px;
+  .max700 {
+    max-width: 700px;
   }
 
 </style>

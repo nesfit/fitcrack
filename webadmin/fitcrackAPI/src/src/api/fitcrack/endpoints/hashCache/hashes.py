@@ -41,9 +41,9 @@ class hashCache(Resource):
 
 
         if args.search:
-            print('%' + base64.b64encode(args.search.encode()).decode('ascii').rstrip("=") + '%')
-            hashes = hashes.filter(or_(FcHash.result.like('%' + base64.b64encode(args.search.encode()).decode('ascii').rstrip("=") + '%'),
-                                       FcHash.hash.like('%' + args.search + '%')))
+            print('%' + args.search.encode().hex() + '%')
+            hashes = hashes.filter(or_(FcHash.result.like(bytes('%' + args.search.encode().hex() + '%', "ascii")),
+                                       FcHash.hash.like(bytes('%' + args.search + '%', "utf-8"))))
 
         if args.order_by:
             orderBy = getattr(FcHash, args.order_by)

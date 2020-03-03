@@ -12,9 +12,18 @@
 
 //we will be using the flock() approach, since POSIX mutexes stay locked if the process dies unexpectedly
 
+/**
+ * @brief A RAII class to manage a handle to a named mutex
+ * 
+ */
 class NamedMutexHandle
 {
 public:
+	/**
+	 * @brief Construct a new Named Mutex Handle object
+	 * 
+	 * @param name The global name of the mutex
+	 */
 	NamedMutexHandle(const std::string &name) {
           std::string runner_mutex = "/tmp/FitcrackRunnerMutex_" + name;
           handle =
@@ -25,10 +34,12 @@ public:
                 "Failed to create a file for mutual exclusion purposes", errno);
           }
         }
+	//!Destructor
 	~NamedMutexHandle()
 	{
 		close(handle);
 	}
+	//!The file descriptor
 	int handle;
 };
 

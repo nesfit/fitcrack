@@ -249,7 +249,7 @@ void Tools::releaseFdMemory()
         if(fd.second)
         {
             fd.second->close();
-            free(fd.second);
+            delete fd.second;
         }
     }
 }
