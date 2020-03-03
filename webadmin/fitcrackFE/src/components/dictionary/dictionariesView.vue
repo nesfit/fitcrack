@@ -16,7 +16,7 @@
         type="warning"
         class="mb-0"
       >
-        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is via SFTP.
+        Dictionaries must have a .txt extension.
       </v-alert>
       <v-data-table
         :headers="headers"

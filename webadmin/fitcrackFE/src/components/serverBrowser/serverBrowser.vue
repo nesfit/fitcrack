@@ -5,7 +5,7 @@
 
 <template>
   <fc-tile
-    title="Server browser"
+    :title="data.path || 'Server browser'"
     icon="mdi-server-network"
     class="mx-auto dictContentContainer"
   >
@@ -16,6 +16,7 @@
       class="filesCont"
     >
       <v-list-item
+        v-show="data.parent !== ''"
         @click="loadDirectory(data.parent)"
       >
         <v-list-item-action>
