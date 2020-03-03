@@ -38,6 +38,9 @@ class maskCollection(Resource):
         realpath = ipath if ipath.startswith(prefix) else prefix + ipath
         is_root_dir = os.path.abspath(realpath) == os.path.abspath(prefix)
 
+        if not os.path.realpath(realpath).startswith(prefix):
+            abort(500, 'Folder not accessible')
+
         result = {
             'path': realpath,
             'files': [],
