@@ -133,6 +133,7 @@ class ConfigTask {
         static const char *DICT_HC_KEYSPACE;
         static const char *START_INDEX;
         static const char *START_HASH_INDEX;
+        static const char *SKIP_FROM_START;
 };
 
 #endif // CONFIGTASK_HPP

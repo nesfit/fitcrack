@@ -321,6 +321,7 @@ fitcrack_sources = \
     AttackMask.h \
     AttackMode.h \
     AttackRules.h \
+    AttackPrince.h \
     AttackPcfg.h \
     AttackPcfgClient.h \
     AttackPcfgRules.h \
@@ -341,6 +342,7 @@ fitcrack_sources = \
     AttackMask.cpp \
     AttackMode.cpp \
     AttackRules.cpp \
+    AttackPrince.cpp \
     AttackPcfg.cpp \
     AttackPcfgClient.cpp \
     AttackPcfgRules.cpp \

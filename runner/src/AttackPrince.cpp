@@ -13,8 +13,11 @@ AttackPrince::AttackPrince(const ConfigTask &config, Directory &directory)
 }
 
 void AttackPrince::addSpecificArguments() {
-  if (attack_submode_ == "0" || attack_submode_ == "1") {
-    // Do nothing
+  if (attack_submode_ == "0") {
+    // Do nothing.
+  } else if (attack_submode_ == "1") {
+    addArgument("--rules-file");
+    addRequiredFile("rules");
   } else {
     RunnerUtils::runtimeException(
         "Unsupported attack_submode = " + attack_submode_ +

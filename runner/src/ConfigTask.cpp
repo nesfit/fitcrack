@@ -10,6 +10,7 @@ const char *ConfigTask::MASK_HC_KEYSPACE = "mask_hc_keyspace";
 const char *ConfigTask::DICT_HC_KEYSPACE = "dict_hc_keyspace";
 const char *ConfigTask::START_INDEX = "start_index";
 const char *ConfigTask::START_HASH_INDEX = "start_hash_index";
+const char *ConfigTask::SKIP_FROM_START = "skip_from_start";
 
 /* Private */
 
@@ -39,19 +40,28 @@ void ConfigTask::initSupported() {
   supported_.push_back("attack_mode");
   supported_.push_back("attack_submode");
   supported_.push_back("hash_type");
-  supported_.push_back("name");
-  supported_.push_back("charset1");
-  supported_.push_back("charset2");
-  supported_.push_back("charset3");
-  supported_.push_back("charset4");
-  supported_.push_back("rule_left");
-  supported_.push_back("rule_right");
-  supported_.push_back("mask");
+  supported_.push_back("name");const char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
+  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
+  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
+  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
+  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
+  supported_.push_back("rule_leconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
+  supported_.push_back("rule_riconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
+  supported_.push_back("mask");const char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+
   supported_.push_back(ConfigTask::START_INDEX);
   supported_.push_back(ConfigTask::HC_KEYSPACE);
   supported_.push_back(ConfigTask::MASK_HC_KEYSPACE);
   supported_.push_back(ConfigTask::DICT_HC_KEYSPACE);
   supported_.push_back("markov_threshold");
+  supported_.push_back(ConfigTask::SKIP_FROM_START);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

@@ -119,9 +119,15 @@ class CJob {
         std::string m_grammar;
         uint64_t    m_grammar_id;
         std::string m_markov;
-        uint32_t    m_markovThreshold;
-        uint32_t    m_replicateFactor;
-        bool        m_killFlag;
+        uint32_t m_markovThreshold;
+        uint32_t m_replicateFactor;
+        bool m_casePermute;
+        bool m_checkDuplicates;
+        uint32_t m_minPasswordLen;
+        uint32_t m_maxPasswordLen;
+        uint32_t m_minElemInChain;
+        uint32_t m_maxElemInChain;
+        bool m_killFlag;
 
         /**
          * @section Other member variables
@@ -164,6 +170,12 @@ class CJob {
         const std::string & getMarkov() const;
         uint32_t getMarkovThreshold() const;
         uint32_t getReplicateFactor() const;
+        bool getCasePermuteFlag() const;
+        bool getCheckDuplicatesFlag() const;
+        uint32_t getMinPasswordLen() const;
+        uint32_t getMaxPasswordLen() const;
+        uint32_t getMinElemInChain() const;
+        uint32_t getMaxElemInChain() const;
         bool getKillFlag() const;
 
         void setGrammar(const std::string & grammar);
