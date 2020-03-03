@@ -4,6 +4,7 @@
 # This file is part of Fitcrack installer
 # Author: David Bolvansky
 
+INSTALLER_ROOT=$(pwd)
 COMPILER_THREADS=${COMPILER_THREADS:-8}
 BOINC_USER=${BOINC_USER:-boincadm}
 BOINC_GROUP=${BOINC_GROUP:-$BOINC_USER}

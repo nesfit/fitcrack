@@ -24,21 +24,22 @@ void AttackPrince::addSpecificArguments() {
         " attack_mode = " + attack_mode_ + " has no such attack_submode");
   }
 
-  addPrinceRequiredFile("wordlist"); // Add wordlist
-  addPrinceArgument("--dupe-check-disable"); // Disable checking for duplicates (faster loading)
+  addPrinceRequiredFile("dict1"); // Add wordlist
 
-  File filePrinceResources;
-  if (directory_.find("resources", filePrinceResources)) {
-    std::fstream fs;
-    std::string skip, limit;
-    File::openReadStream(fs, filePrinceResources.getRelativePath());
-    File::readLine(fs, skip);
-    skip = "--skip=" + skip;
-    File::readLine(fs, limit);
-    limit = "--limit=" + limit;
-    addPrinceArgument(skip);
-    addPrinceArgument(limit);
-  }
+  // Add PRINCE specific settings
+  std::string value;
+  if (config_.find(ConfigTask::CASE_PERMUTE, value) && value == "1")
+    addPrinceArgument("--case-permute");
+  if (config_.find(ConfigTask::CHECK_DUPLICATES, value) && value == "0")
+    addPrinceArgument("--disable-dupe-check");
+  if (config_.find(ConfigTask::MIN_PASSWORD_LEN, value))
+    addPrinceArgument("--pw-min=" + value);
+  if (config_.find(ConfigTask::MAX_PASSWORD_LEN, value))
+    addPrinceArgument("--pw-max=" + value);
+  if (config_.find(ConfigTask::MIN_ELEM_IN_CHAIN, value))
+    addPrinceArgument("--elem-cnt-min==" + value);
+  if (config_.find(ConfigTask::MAX_ELEM_IN_CHAIN, value))
+    addPrinceArgument("--elem-cnt-max=" + value);
 }
 
 void AttackPrince::addPrinceArgument(const std::string &argument){

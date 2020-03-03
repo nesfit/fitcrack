@@ -11,6 +11,12 @@ const char *ConfigTask::DICT_HC_KEYSPACE = "dict_hc_keyspace";
 const char *ConfigTask::START_INDEX = "start_index";
 const char *ConfigTask::START_HASH_INDEX = "start_hash_index";
 const char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+const char *ConfigTask::CASE_PERMUTE = "case_permute";
+const char *ConfigTask::CHECK_DUPLICATES = "check_duplicates";
+const char *ConfigTask::MIN_PASSWORD_LEN = "min_password_len";
+const char *ConfigTask::MAX_PASSWORD_LEN = "max_password_len";
+const char *ConfigTask::MIN_ELEM_IN_CHAIN = "min_elem_in_chain";
+const char *ConfigTask::MAX_ELEM_IN_CHAIN = "max_elem_in_chain";
 
 /* Private */
 
@@ -40,33 +46,25 @@ void ConfigTask::initSupported() {
   supported_.push_back("attack_mode");
   supported_.push_back("attack_submode");
   supported_.push_back("hash_type");
-  supported_.push_back("name");const char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
-  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
-  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
-  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
-  supported_.push_back("charsetconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
-  supported_.push_back("rule_leconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
-  supported_.push_back("rule_riconst char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
-  supported_.push_back("mask");const char *ConfigTask::SKIP_FROM_START = "skip_from_start";
-
+  supported_.push_back("name");
+  supported_.push_back("charset1");
+  supported_.push_back("charset2");
+  supported_.push_back("charset3");
+  supported_.push_back("charset4");
+  supported_.push_back("rule_left");
+  supported_.push_back("rule_right");
+  supported_.push_back("mask");
   supported_.push_back(ConfigTask::START_INDEX);
   supported_.push_back(ConfigTask::HC_KEYSPACE);
   supported_.push_back(ConfigTask::MASK_HC_KEYSPACE);
   supported_.push_back(ConfigTask::DICT_HC_KEYSPACE);
   supported_.push_back("markov_threshold");
-  supported_.push_back("case_permute");
-  supported_.push_back("check_duplicates");
-  supported_.push_back("min_password_len");
-  supported_.push_back("max_password_len");
-  supported_.push_back("min_elem_in_chain");
-  supported_.push_back("max_elem_in_chain");
+  supported_.push_back(ConfigTask::CASE_PERMUTE);
+  supported_.push_back(ConfigTask::CHECK_DUPLICATES);
+  supported_.push_back(ConfigTask::MIN_PASSWORD_LEN);
+  supported_.push_back(ConfigTask::MAX_PASSWORD_LEN);
+  supported_.push_back(ConfigTask::MIN_ELEM_IN_CHAIN);
+  supported_.push_back(ConfigTask::MAX_ELEM_IN_CHAIN);
   supported_.push_back(ConfigTask::SKIP_FROM_START);
 }
 
