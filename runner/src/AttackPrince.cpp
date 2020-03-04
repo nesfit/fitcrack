@@ -31,13 +31,13 @@ void AttackPrince::addSpecificArguments() {
   if (config_.find(ConfigTask::CASE_PERMUTE, value) && value == "1")
     addPrinceArgument("--case-permute");
   if (config_.find(ConfigTask::CHECK_DUPLICATES, value) && value == "0")
-    addPrinceArgument("--disable-dupe-check");
+    addPrinceArgument("--dupe-check-disable");
   if (config_.find(ConfigTask::MIN_PASSWORD_LEN, value))
     addPrinceArgument("--pw-min=" + value);
   if (config_.find(ConfigTask::MAX_PASSWORD_LEN, value))
     addPrinceArgument("--pw-max=" + value);
   if (config_.find(ConfigTask::MIN_ELEM_IN_CHAIN, value))
-    addPrinceArgument("--elem-cnt-min==" + value);
+    addPrinceArgument("--elem-cnt-min=" + value);
   if (config_.find(ConfigTask::MAX_ELEM_IN_CHAIN, value))
     addPrinceArgument("--elem-cnt-max=" + value);
 }

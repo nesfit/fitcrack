@@ -20,20 +20,28 @@ bool CAttackPrince::makeWorkunit()
     /** Create the workunit instance first */
     std::string princeDictPath =
         Config::dictDir + ".prince_" + std::to_string(m_job->getId()) + ".txt";
-    if (!generateWorkunit() || !m_workunit) {
+    if (!generateWorkunit()) {
       remove(princeDictPath.c_str());
       return false;
     }
 
+    bool with_rules = m_job->getAttackSubmode() == 1;
     DB_WORKUNIT wu;
-    char name1[Config::SQL_BUF_SIZE],name2[Config::SQL_BUF_SIZE],name3[Config::SQL_BUF_SIZE], path[Config::SQL_BUF_SIZE];
-    const char* infiles[3];
+    char name1[Config::SQL_BUF_SIZE], name2[Config::SQL_BUF_SIZE],
+        name3[Config::SQL_BUF_SIZE], name4[Config::SQL_BUF_SIZE],
+        path[Config::SQL_BUF_SIZE];
+    const char *infiles[with_rules ? 4 : 3];
     int retval;
 
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
+    if (with_rules) {
+      /** Same name of rules file - for sticky flag to work */
+      std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "",
+                    Config::appName, m_job->getId());
+    }
 
     /** Append mode to config */
     retval = config.download_path(name1, path);
@@ -47,7 +55,7 @@ bool CAttackPrince::makeWorkunit()
 
     std::ofstream configFile;
     configFile.open(path);
-    if (!configFile)
+    if (!configFile.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open config BOINC input file! Setting job to malformed.\n");
@@ -95,7 +103,7 @@ bool CAttackPrince::makeWorkunit()
 
     std::ofstream hashesFile;
     hashesFile.open(path);
-    if (!hashesFile)
+    if (!hashesFile.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open data BOINC input file! Setting job to malformed.\n");
@@ -111,7 +119,7 @@ bool CAttackPrince::makeWorkunit()
       Tools::printDebug("Creating PRINCE dictionary.\n");
       std::ofstream princeDictFile;
       princeDictFile.open(princeDictPath);
-      if (!princeDictFile) {
+      if (!princeDictFile.is_open()) {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
                               m_host->getBoincHostId(),
                               "Failed to open PRINCE attack dictionary! "
@@ -124,7 +132,7 @@ bool CAttackPrince::makeWorkunit()
           std::ifstream dictFile;
           std::string dictPath = Config::dictDir + dict->getDictFileName();
           dictFile.open(dictPath);
-          if (!dictFile) {
+          if (!dictFile.is_open()) {
             Tools::printDebugHost(
                 Config::DebugType::Error, m_job->getId(),
                 m_host->getBoincHostId(),
@@ -154,7 +162,7 @@ bool CAttackPrince::makeWorkunit()
 
     std::ofstream dictFile;
     dictFile.open(path);
-    if (!dictFile) {
+    if (!dictFile.is_open()) {
       Tools::printDebugHost(
           Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
           "Failed to open dict1 BOINC input file! Setting job to malformed.\n");
@@ -165,7 +173,7 @@ bool CAttackPrince::makeWorkunit()
 
     std::ifstream princeDictFile;
     princeDictFile.open(princeDictPath);
-    if (!princeDictFile) {
+    if (!princeDictFile.is_open()) {
       Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
                             m_host->getBoincHostId(),
                             "Failed to open PRINCE attack dictionary! "
@@ -176,6 +184,56 @@ bool CAttackPrince::makeWorkunit()
     dictFile.close();
     princeDictFile.close();
 
+    if (with_rules) {
+      std::ofstream rulesFile;
+      /** Create rules file */
+      retval = config.download_path(name4, path);
+      if (retval) {
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                              m_host->getBoincHostId(),
+                              "Failed to receive BOINC filename - rules. "
+                              "Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                            Config::JobState::JobMalformed);
+        return false;
+      }
+
+      rulesFile.open(path);
+      if (!rulesFile.is_open()) {
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                              m_host->getBoincHostId(),
+                              "Failed to open rules BOINC input file! Setting "
+                              "job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                            Config::JobState::JobMalformed);
+        return false;
+      }
+
+      if (m_job->getRules().empty()) {
+        Tools::printDebugHost(
+            Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+            "Rules is not set in database! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                            Config::JobState::JobMalformed);
+        return false;
+      }
+
+      std::ifstream rules;
+      rules.open((Config::rulesDir + m_job->getRules()).c_str());
+      if (!rules) {
+        Tools::printDebugHost(
+            Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+            "Failed to open rules file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                            Config::JobState::JobMalformed);
+        return false;
+      }
+
+      rulesFile << rules.rdbuf();
+      rulesFile.close();
+      rules.close();
+    }
+
     /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
@@ -184,6 +242,8 @@ bool CAttackPrince::makeWorkunit()
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
+    if (with_rules)
+      infiles[3] = name4;
 
     setDefaultWorkunitParams(&wu);
 
@@ -191,11 +251,11 @@ bool CAttackPrince::makeWorkunit()
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
-            Config::inTemplatePathPrince,
+            with_rules ? Config::inTemplatePathPrinceRules : Config::inTemplatePathPrince,
             path,
             config.project_path(path),
             infiles,
-            3,
+            with_rules ? 4 : 3,
             config
     );
 
@@ -253,7 +313,8 @@ bool CAttackPrince::generateWorkunit() {
   m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
                                  m_host->getBoincHostId(), currentIndex, 0,
                                  passwordsRange, 0, 0, false, 0, false);
-
+  if (!m_workunit)
+    return false;
   /** Update the job index */
   m_job->updateIndex(currentIndex + passwordsRange);
 
