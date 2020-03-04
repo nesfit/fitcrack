@@ -139,7 +139,7 @@ def process_job_3(job, hashcatKeyspace=True):
             hexCharset = content.hex()
             job['config'] += '|||charset' + str(i) + '|String|' + lenStr(
                 hexCharset) + '|' + hexCharset + '|||\n'
-            job['charset' + str(i) + '_id'] = charset['id']
+            job['charset' + str(i)] = hexCharset
 
     # compute keyspace
     if job['attack_settings'].get(
