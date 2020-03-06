@@ -10,8 +10,9 @@ import os
 
 import time
 from pathlib import Path
+from shutil import move
 
-from flask import request, redirect
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -21,7 +22,7 @@ from src.api.fitcrack.endpoints.dictionary.argumentsParser import dictionary_par
 from src.api.fitcrack.endpoints.dictionary.functions import readingFromFolderPostProcces
 from src.api.fitcrack.endpoints.dictionary.responseModels import dictionaries_model, dictData_model, \
     dictionary_model
-from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder
+from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder, sorted_cp
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcDictionary
@@ -66,19 +67,28 @@ class dictionary(Resource):
         Deletes dictionary.
         """
         dictionary = FcDictionary.query.filter(FcDictionary.id == id).one()
-        # if (dictionary.deleted):
-        #     dictionary.deleted = False
-        # else:
-        #     dictionary.deleted = True
-        # db.session.commit()
         dictFullPath = os.path.join(DICTIONARY_DIR, dictionary.path)
         if os.path.exists(dictFullPath):
             os.remove(dictFullPath)
+            dictionary.deleted = True
+            db.session.commit()
         return {
             'status': True,
             'message': 'Dictionary sucesfully deleted.'
         }, 200
 
+@ns.route('/<id>/download')
+class dictionaryDownload(Resource):
+    def get(self, id):
+        """
+        Sends zipped PCFG as attachment
+        """
+
+        dictionary = FcDictionary.query.filter(FcDictionary.id == id).one()
+        if not dictionary:
+            abort(500, 'Can\'t find dictionary')
+        path = os.path.join(DICTIONARY_DIR, dictionary.path)
+        return send_file(path, attachment_filename=dictionary.path, as_attachment=True)
 
 @ns.route('/<id>/data')
 class dictionaryData(Resource):
@@ -95,15 +105,21 @@ class dictionaryData(Resource):
         dict = FcDictionary.query.filter(FcDictionary.id==id).first()
         if not dict:
             abort(500, 'Can\'t open dictionary')
+        dict_path = os.path.join(DICTIONARY_DIR, dict.path)
+        if not os.path.exists(dict_path):
+            return {
+                'status': False,
+                'data': ''
+            }
 
         if args.get('search', None):
-            with open(os.path.join(DICTIONARY_DIR, dict.path),  encoding='latin-1') as file:
+            with open(dict_path,  encoding='latin-1') as file:
                 head = ''
                 for line in file:
                     if line.find(args['search']) != -1:
                         head += line
         else:
-            with open(os.path.join(DICTIONARY_DIR,dict.path), encoding='latin-1') as file:
+            with open(dict_path, encoding='latin-1') as file:
                 head = list(islice(file, page * per_page, page * per_page + per_page))
 
         if len(head) == 0:
@@ -143,7 +159,13 @@ class dictionaryAdd(Resource):
 
         uploadedFile = fileUpload(file, DICTIONARY_DIR, ALLOWED_EXTENSIONS)
         if uploadedFile:
-            hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + os.path.join(DICTIONARY_DIR, uploadedFile['path']), cwd=HASHCAT_DIR))
+            dict_path = os.path.join(DICTIONARY_DIR, uploadedFile['path'])
+            if request.form.get('sort') == 'true':
+                sorted_cp(dict_path, dict_path + '_sorted')
+                os.remove(dict_path)
+                move(dict_path + '_sorted', dict_path)
+
+            hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + dict_path, cwd=HASHCAT_DIR))
             dictionary = FcDictionary(name=uploadedFile['filename'], path=uploadedFile['path'], keyspace=hc_keyspace)
             try:
                 db.session.add(dictionary)
@@ -152,7 +174,7 @@ class dictionaryAdd(Resource):
                 db.session().rollback()
                 abort(500, 'Dictionary with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'Dictionary ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'Dictionary ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
 
             }
@@ -173,14 +195,18 @@ class dictionary(Resource):
         """
 
         args = dictionaryFromFile_parser.parse_args(request)
+        sort = args.get('sort')
         files = args.get('files')
 
         for file in files:
             if not allowed_file(file['name'], ALLOWED_EXTENSIONS):
                 abort(500, 'Wrong file format ' + file['name'])
             newName = Path(file['name']).stem + '_' + str(int(time.time())) + Path(file['name']).suffix
-            newPath = os.path.join(DICTIONARY_DIR, newName )
-            os.symlink(file['path'], newPath)
+            newPath = os.path.join(DICTIONARY_DIR, newName)
+            if sort:
+                sorted_cp(file['path'], newPath)
+            else:
+                os.symlink(file['path'], newPath)
             hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + newPath, cwd=HASHCAT_DIR))
             dictionary = FcDictionary(name=file['name'], path=newName, keyspace=hc_keyspace)
             try:
@@ -191,6 +217,6 @@ class dictionary(Resource):
                 abort(500, 'Dictionary with name ' + file['filename'] + ' already exists.')
 
         return {
-            'message': 'Dictionaries successfuly uploaded.',
+            'message': 'Dictionaries successfully uploaded.',
             'status': True
         }

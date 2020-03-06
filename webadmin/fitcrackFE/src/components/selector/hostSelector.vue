@@ -17,9 +17,9 @@
     <template v-slot:item.domain_name="{ item }">
       <router-link
         :to="{ name: 'hostDetail', params: {id: item.id} }"
-        class="middle"
+        class="middle" target='_blank'
       >
-        {{ item.domain_name + ' (' + item.user.name + ')' }}
+        {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
         <v-icon 
           small
           color="primary"
@@ -44,10 +44,14 @@
 </template>
 
 <script>
+  import iconv from 'iconv-lite';
   import selector from './selectorMixin'
   export default {
     name: "HostSelector",
     mixins: [selector],
+    props: {
+      autoRefresh: Boolean
+    },
     data() {
       return {
         headers: [
@@ -57,14 +61,22 @@
             value: 'domain_name'
           },
           {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
-          {text: 'Operating system', value: 'os_name', align: 'end', sortable: false},
+          {text: 'OS', value: 'os_name', align: 'end', sortable: false},
           {text: 'Processor', value: 'p_model', align: 'end', width: '200', sortable: false},
           {text: 'Online', value: 'last_active', align: 'end', sortable: false},
         ]
       }
     },
+    mounted () {
+      this.interval = setInterval(() => {
+        if (this.autoRefresh) this.getData(true)
+      }, 2000)
+    },
+    beforeDestroy () {
+      clearInterval(this.interval)
+    },
     methods: {
-      getData() {
+      getData(autorefreshing = false) {
         this.loading = true
         this.axios.get(this.$serverAddr + '/hosts', {
           params: {
@@ -72,10 +84,7 @@
           }
         }).then((response) => {
           this.items = response.data.items
-          if (this.selectAll && this.selected.length == 0) {
-            this.selected = this.items
-            this.$emit('input', this.selected)
-          }
+          if (!autorefreshing) this.selected = this.items
           this.loading = false
         })
       },
@@ -85,8 +94,13 @@
         } else {
           return 'Unknown'
         }
+      },
+      fixUserNameEncoding : function(username) {
+          /* Boinc DB uses latin1_swedish encoding, which breaks names with special characters,
+          which are not supported in this encoding. Fix it by converting name to utf8. */
+          return iconv.decode(iconv.encode(username, 'latin1'), 'utf-8')
       }
-    },
+    }
   }
 </script>
 

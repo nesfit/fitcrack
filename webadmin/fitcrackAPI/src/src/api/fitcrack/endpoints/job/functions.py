@@ -3,15 +3,6 @@
    * Licence: MIT, see LICENSE
 '''
 
-'''
-create_package => create_job
-delete_package => delete_job
-package => job
-process_package_ => process_job_
-db_package => db_job
-post_process_package_ => post_process_job_
-processPackage => processJob
-'''
 
 import base64
 import datetime
@@ -19,62 +10,57 @@ import json
 import math
 import tempfile
 import time
-from os.path import basename
-from uuid import uuid1
-
 import sys
 import subprocess
 import os
 
+from os.path import basename
+from uuid import uuid1
 from flask_restplus import abort
 from sqlalchemy import exc
 from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
 from src.api.fitcrack.attacks import processJob as attacks
-from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, coun_file_lines
+from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
-# create_package => create_job
 def create_job(data):
     if data['name'] == '':
         abort(500, 'Name can not be empty.')
 
-
     for idx, hashObj in enumerate(data['hash_settings']['hash_list']):
+
         if hashObj['hash'].startswith('BASE64:'):
             decoded = base64.decodebytes(hashObj['hash'][7:].encode())
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(decoded)
                 fp.seek(0)
-                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=True)
+                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= decoded
+
         else:
-            verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=True)
+            verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= hashObj['hash'].encode()
 
-# process_package_ => process_job_
+    hybrid_mask_dict = False
+    #Hybrid attack mask-wordlist
+    if int(data['attack_settings']['attack_mode']) == 7:    hybrid_mask_dict = True
+
     process_func = getattr(attacks, 'process_job_' + str(data['attack_settings']['attack_mode']))
 
     if not process_func:
         abort(400, "Unsupported attack type")
 
     data['config'] = ''
-    # package => job
     job = process_func(data)
 
-    # nastavenie submodu pre markov
     if job['attack_settings']['attack_mode'] == 3:
-        print(data['attack_settings']['attack_submode'])
         job['attack_settings']['attack_submode'] = data['attack_settings']['attack_submode']
 
     # nastavenie attack modu pre hybrid
-    # if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
-    #     job['attack_settings']['attack_mode'] = 1
-
-
     if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
         attack_settings_control = 1
 
@@ -140,12 +126,17 @@ def create_job(data):
         rule_right=(job['attack_settings']['rule_right'] if job['attack_settings'].get('rule_right') else ''),
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',
         markov_threshold=job['markov_threshold'] if job.get('markov_threshold') else 0,
+        grammar_id=job['attack_settings']['pcfg_grammar']['id'] if job['attack_settings'].get('pcfg_grammar') else 0,
+        case_permute=job['case_permute'] if job['attack_settings'].get('case_permute') else 0,
+        check_duplicates=job['attack_settings'].get('check_duplicates', 0),
+        min_password_len=job['attack_settings'].get('min_password_len', 0),
+        max_password_len=job['attack_settings'].get('max_password_len', 0),
+        min_elem_in_chain=job['attack_settings'].get('min_elem_in_chain', 0),
+        max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         replicate_factor=1,
-        deleted=False,
-        grammar_id=job['attack_settings']['pcfg_grammar']['id'] if job['attack_settings'].get('pcfg_grammar') else 0
+        deleted=False
         )
 
-    # db_package => db_job
     try:
         db.session.add(db_job)
         db.session.commit()
@@ -153,8 +144,11 @@ def create_job(data):
         print(err,  file=sys.stderr)
         abort(400, 'Unable to add job due to internal error!')
 
-    # post_process_package_ => post_process_job_
-    post_process_func = getattr(attacks, 'post_process_job_' + str(job['attack_settings']['attack_mode']))
+    #Hybrid attack mask-wordlist
+    if hybrid_mask_dict:    post_process_func = getattr(attacks, 'post_process_job_' + str(7))
+
+    else:   post_process_func = getattr(attacks, 'post_process_job_' + str(job['attack_settings']['attack_mode']))
+
     if not post_process_func:
         abort(400, "Unsupported attack type")
 
@@ -174,12 +168,6 @@ def create_job(data):
     db.session.commit()
     return db_job
 
-
-
-
-
-#delete_package => delete_job
-#package => job
 def delete_job(id):
     job = FcJob.query.filter(FcJob.id == id).one()
     if (job.deleted):
@@ -242,13 +230,16 @@ def computeCrackingTime(data):
     attackSettings = json.loads(data['attack_settings'])
     data['boinc_host_ids'] = [x.strip() for x in data['boinc_host_ids'].split(',')]
 
-    if data.get('boinc_host_ids') and len(data['boinc_host_ids']) > 0:
+    # Check if we have valid hash type code and if we have any host
+    # -1 is indicator that no hash type was selected in webadmin
+    if data['hash_type_code'] != -1 and len(data['boinc_host_ids']) > 0:
         hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == data['hash_type_code']). \
             filter(FcBenchmark.boinc_host_id.in_(data['boinc_host_ids'])).all()
 
         for host in hosts:
             total_power += host.power
             hosts_dict.append(host.as_dict())
+
     else:
         abort(500, 'No hosts selected.')
 
@@ -256,12 +247,10 @@ def computeCrackingTime(data):
         dictsKeyspace = 0
         for dict in attackSettings['left_dictionaries']:
             dictsKeyspace += dict['keyspace']
-
-
         rulesKeyspace = 1
         if attackSettings['rules']:
             rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-            rulesKeyspace = coun_file_lines(os.path.join(RULE_DIR,rules.path))
+            rulesKeyspace = rules.count
 
         keyspace = dictsKeyspace * rulesKeyspace
 
@@ -278,8 +267,12 @@ def computeCrackingTime(data):
 
     elif attackSettings['attack_mode'] == 3:
         if attackSettings.get('masks') and len(attackSettings['masks']) > 0:
+            thresh = attackSettings.get('markov_treshold', None)
+            customCharsetDict = {}
+            for i, charset in enumerate(attackSettings['charset']):
+                customCharsetDict[i + 1] = charset['keyspace']
             for mask in attackSettings['masks']:
-                keyspace += compute_keyspace_from_mask(mask)
+                keyspace += compute_keyspace_from_mask(mask, customCharsetDict, thresh)
 
     elif attackSettings['attack_mode'] == 6:
         dictsKeyspace = 0
@@ -293,9 +286,16 @@ def computeCrackingTime(data):
             dictsKeyspace += dict['keyspace']
         keyspace = compute_keyspace_from_mask(attackSettings['mask']) * dictsKeyspace
 
-    # TODO Calculate PCFG keyspace
+    elif attackSettings['attack_mode'] == 8:
+        dictsKeyspace = compute_prince_keyspace(attackSettings)
+        rulesKeyspace = 1
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = rules.count
+
+        keyspace = dictsKeyspace * rulesKeyspace
+
     elif attackSettings['attack_mode'] == 9:
-        #keyspace = compute_keyspace_from_pcfg("atom")
         if(attackSettings['keyspace_limit']):
             if(int(attackSettings['keyspace_limit']) > 0):
                 keyspace = int(attackSettings['keyspace_limit'])
@@ -306,11 +306,10 @@ def computeCrackingTime(data):
             keyspace = int(attackSettings['pcfg_grammar']['keyspace'])
 
         rulesKeyspace = 1
-#        TODO
-#        if attackSettings['rules']:
-#            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-#            rulesKeyspace = coun_file_lines(os.path.join(RULE_DIR,rules.path))
-#            keyspace = keyspace * rulesKeyspace
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = rules.count
+        keyspace = keyspace * rulesKeyspace
 
         # Keyspace control
         INT_MAX = sys.maxsize - 1
@@ -336,9 +335,6 @@ def computeCrackingTime(data):
 
     return result
 
-#def compute_keyspace_from_pcfg(pcfg_name):
-#    return 0
-
 def calculate_port_number(job_id):
 
     portNumber = 50050 + job_id
@@ -348,11 +344,5 @@ def calculate_port_number(job_id):
 def start_pcfg_manager(job_id, grammar_name, keyspace):
 
     manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
-    print("\n")
-    print(manager)
     test = PCFG_MANAGER_DIR + " server " + "-p " + str(calculate_port_number(job_id)) + " -m " + str(keyspace) + " --hashlist " + PCFG_MANAGER + "/README.md" + " -r " + PCFG_DIR + "/" + grammar_name
-    print(test)
-    #process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", calculate_port_number(job_id), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])
     process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", str(calculate_port_number(job_id)), "-m", str(keyspace), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])
-
-    print('Manager started')

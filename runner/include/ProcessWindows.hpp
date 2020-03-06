@@ -33,8 +33,9 @@ class ProcessWindows : public ProcessBase {
 	 * @brief   Conctutor which sets name of the executable
 	 * @param   exec_name [in] Name of the executable
 	 * @param   exec_args [in] Arguments which to pass to executable
+     * @param   is_external_generator [in] Whether executable is an external password generator or not
 	 */
-	ProcessWindows(const std::string& exec_name, const std::vector<std::string>& exec_args, bool isPCFG);
+	ProcessWindows(const std::string& exec_name, const std::vector<std::string>& exec_args, bool is_external_generator);
 
 	/**
 	 * @brief Destructor closing the process and thread handles

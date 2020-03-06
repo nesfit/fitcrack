@@ -10,7 +10,7 @@ pcfg_model = api.model('PCFG', {
     'id': fields.Integer(readOnly=True, required=False),
     'name': fields.String(readOnly=True, required=False),
     'keyspace': fields.Integer(readOnly=True, required=False),
-    'time': fields.DateTime(readOnly=True, required=False)
+    'time_added': fields.DateTime(readOnly=True, required=False)
 })
 
 pcfgs_model = api.inherit('PCFGs collection', {

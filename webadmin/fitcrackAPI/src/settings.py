@@ -8,10 +8,11 @@ import os
 # HashCat settings
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 HASHCAT_EXECUTABLE = 'hashcat64.bin'
-HASHCAT_PATH = ROOT_DIR + '/../hashcat-4.2.1/' + HASHCAT_EXECUTABLE
-HASHCAT_DIR = ROOT_DIR + '/../hashcat-4.2.1/'
+HASHCAT_DIR = ROOT_DIR + '/../hashcat-5.1.0/'
+HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
 MASK_PROCESSOR_PATH = ROOT_DIR + '/../maskprocessor/mp64.bin'
+PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princepreprocessor/pp64.bin'
 EXE_OR_BIN = 'bin'
 DICTIONARY_DIR = '/usr/share/collections/dictionaries'
 PCFG_DIR = '/usr/share/collections/pcfg'
@@ -32,7 +33,7 @@ MASKS_DIR = '/usr/share/collections/masks'
 CHARSET_DIR = '/usr/share/collections/charsets'
 RULE_DIR = '/usr/share/collections/rules'
 PROTECTEDFILES_DIR = '/usr/share/collections/encrypted-files'
-SERVER_BROWSER_ROOT = '/usr/share/collections/'
+SERVER_BROWSER_ROOT = '/usr/share/collections/import'
 
 #XtoHashCat settings
 XTOHASHCAT_EXECUTABLE = ROOT_DIR + '/../xtohashcat/XtoHashcat.py'

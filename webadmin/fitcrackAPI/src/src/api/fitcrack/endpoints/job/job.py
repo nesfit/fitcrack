@@ -10,7 +10,7 @@ packages_page => jobs_page
 packagess_query => jobs_query
 packagesJob => workunitsJob
 '''
-
+import os
 import base64
 import logging
 
@@ -21,6 +21,8 @@ from flask import request
 from flask_restplus import Resource
 from flask_restplus import abort
 from sqlalchemy import func
+
+from settings import DICTIONARY_DIR
 
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
@@ -103,7 +105,7 @@ class jobsCollection(Resource):
         job = create_job(data)
 
         return {
-            'message': 'Job ' + job.name + ' succesfuly created.',
+            'message': 'Job \"' + job.name + '\" successfully created.',
             'status': True,
             'job_id': job.id
         }
@@ -120,6 +122,12 @@ class JobByID(Resource):
         """
 
         job = FcJob.query.filter(FcJob.id == id).one()
+
+        if job.grammar_id:
+            pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
+            job.grammar_name = pcfg.name
+            job.grammar_keyspace = pcfg.keyspace
+
         return job
 
     @api.expect(editJob_argument)
@@ -147,7 +155,7 @@ class JobByID(Resource):
         db.session.commit()
         return {
             'status': True,
-            'message': 'Job with name ' + job.name + ' edited.'
+            'message': 'Job \"' + job.name + '\" edited.'
         }
 
     @api.response(204, 'Job successfully deleted.')
@@ -175,7 +183,12 @@ class OperationWithJob(Resource):
         if action == 'start':
             if job.attack_mode == 9:
                 pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
-                start_pcfg_manager(job.id, pcfg.name, pcfg.keyspace)
+                start_pcfg_manager(job.id, pcfg.name, job.hc_keyspace)
+            elif job.attack_mode == 8:
+                prince_temp_job_dict = os.path.join(DICTIONARY_DIR, ".prince_" + str(id) + ".txt")
+                if os.path.exists(prince_temp_job_dict):
+                    os.remove(prince_temp_job_dict)
+
             job.status = 10
         elif action == 'stop':
             job.status = 12
@@ -201,11 +214,16 @@ class OperationWithJob(Resource):
             db.session.add(FcJobGraph(progress=0, job_id=job.id))
         elif action == 'kill':
             # Job is stopped in Generator after sending BOINC commands
-            # job.status = 0
+            if (int(job.status) != 10) and (int(job.status) != 12):
+                job.status = 0
+                workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
+                for item in workunits:
+                    db.session.delete(item)
+                print("done")
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0
-            job.time_end = None
+            job.time_start = job.time_end
             if job.attack_mode == 3:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
@@ -221,9 +239,6 @@ class OperationWithJob(Resource):
             for item in graphData:
                 db.session.delete(item)
 
-            workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
-            for item in workunits:
-                db.session.delete(item)
             job.kill = True
 
         else:
@@ -233,7 +248,7 @@ class OperationWithJob(Resource):
 
         return {
             'status': True,
-            'message': 'Job with name ' + job.name + ' ' + action
+            'message': 'Job \"' + job.name + '\" ' + action + "ed."
         }
 
 

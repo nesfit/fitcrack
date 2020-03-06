@@ -3,4 +3,4 @@
 |||attack_submode|UInt|1|0|||
 |||hash_type|UInt|1|0|||
 |||mode|String|1|n|||
-|||hc_keyspace|BigUInt|7|2015538|||
+|||dict_hc_keyspace|BigUInt|7|2015538|||

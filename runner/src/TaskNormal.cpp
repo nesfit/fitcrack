@@ -213,16 +213,16 @@ void TaskNormal::initializeTotalHashes() {
   std::string start_index;
 
   // --limit or total keyspace of mask
-  if (task_config_.find("hc_keyspace", total_hc_keyspace) ||
-  task_config_.find("dict_hc_keyspace", total_hc_keyspace) ||
-  task_config_.find("maks_hc_keyspace", total_hc_keyspace)) {
+  if (task_config_.find(ConfigTask::HC_KEYSPACE, total_hc_keyspace) ||
+  task_config_.find(ConfigTask::DICT_HC_KEYSPACE, total_hc_keyspace) ||
+  task_config_.find(ConfigTask::MASK_HC_KEYSPACE, total_hc_keyspace)) {
 
     parse_curku_ = true;
     total_hashes_ = RunnerUtils::stoull(total_hc_keyspace);
 
   } // else { when not specified in config parse from Hashcat progress_line }
 
-  if (task_config_.find("start_index", start_index)) {
+  if (task_config_.find(ConfigTask::START_INDEX, start_index)) {
     start_index_ = RunnerUtils::stoull(start_index);
   }
 
@@ -231,7 +231,7 @@ void TaskNormal::initializeTotalHashes() {
   } else {
     std::string start_computed_index;
 
-    if (task_config_.find("start_hash_index", start_computed_index)) {
+    if (task_config_.find(ConfigTask::START_HASH_INDEX, start_computed_index)) {
       start_computed_index_ = RunnerUtils::stoull(start_computed_index);
     }
   }

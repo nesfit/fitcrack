@@ -11,10 +11,11 @@
     :search="search"
     item-key="id"
     show-select
+    :single-select="!selectAll"
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'dictionaryDetail', params: { id: item.id}}">
+      <router-link :to="{name: 'dictionaryDetail', params: { id: item.id}}" target='_blank'>
         {{ item.name }}
         <v-icon 
           small

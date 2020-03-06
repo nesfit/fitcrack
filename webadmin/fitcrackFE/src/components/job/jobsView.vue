@@ -6,8 +6,15 @@
 <template>
   <div>
     <v-toolbar flat>
-      <v-chip>{{ jobs.length }}</v-chip>
-      <h2 class="ml-4">All jobs</h2>
+      <v-chip>{{ totalItems }}</v-chip>
+      <h2 class="ml-4">
+        All jobs
+        <span v-show="viewHidden">(hidden)</span>
+        <span v-show="status || attackType">that</span>
+        <span v-show="status">are {{ status }}</span>
+        <span v-show="status && attackType">and</span>
+        <span v-show="attackType">use {{ attackType }} attack</span>
+      </h2>
       <!--
       <v-spacer />
       <v-btn text>
@@ -120,7 +127,10 @@
       </template>
       <!-- Status text cell -->
       <template v-slot:item.status="{ item }">
-        <v-tooltip top>
+        <v-tooltip
+          v-if="item.host_count > 0"
+          top
+        >
           <template v-slot:activator="{ on }">
             <span
               :class="item.status_type + '--text'"
@@ -130,6 +140,27 @@
             </span>
           </template>
           <span>{{ item.status_tooltip }}</span>
+        </v-tooltip>
+        <v-tooltip
+          v-else
+          top
+        >
+          <template v-slot:activator="{ on }">
+            <span
+              class="warning--text"
+              v-on="on"
+            >
+              <v-icon
+                v-if="item.host_count == 0"
+                left
+                color="warning"
+              >
+                mdi-alert
+              </v-icon>
+              no hosts
+            </span>
+          </template>
+          <span>No hosts, open job detail and assign them!</span>
         </v-tooltip>
       </template>
       <!-- Progress indicator cell -->
@@ -158,7 +189,7 @@
               <v-btn
                 icon
                 class="mx-0"
-                :disabled="item.status !== '0'"
+                :disabled="item.status !== '0' || item.host_count == 0"
                 v-on="on"
                 @click="operateJob(item.id, 'start')"
               >
@@ -206,6 +237,7 @@
                   </v-icon>Restart
                 </v-list-item-title>
               </v-list-item>
+              <!--
               <v-list-item @click="operateJob(item.id, 'duplicate')">
                 <v-list-item-title>
                   <v-icon left>
@@ -213,6 +245,7 @@
                   </v-icon>Duplicate
                 </v-list-item-title>
               </v-list-item>
+              -->
               <v-list-item @click="hideJob(item.id)">
                 <v-list-item-title>
                   <v-icon left>
@@ -301,6 +334,10 @@
           {
             'text': 'pcfg',
             'code': 3
+          },
+          {
+            'text': 'prince',
+            'code': 4
           }
         ],
         jobs:

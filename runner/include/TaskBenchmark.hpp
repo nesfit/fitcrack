@@ -10,6 +10,7 @@
 
 /** Class representing benchmark task */
 class TaskBenchmark: public TaskComputeBase {
+    //! No copying
     TaskBenchmark(const TaskBenchmark&);
     protected:
 

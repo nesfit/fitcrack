@@ -103,12 +103,14 @@ def fileUpload(file, dir, extensions, content=None, suffix=None, withTimestamp=F
 
         filename = secure_filename(file.filename)
         originalFilename = file.filename
+        originalSuffix = Path(filename).suffix
+        stem = Path(filename).stem
 
         if withTimestamp:
-            filename = Path(filename).stem + '_' + str(int(time.time())) + Path(filename).suffix
+            filename = stem + '_' + str(int(time.time())) + originalSuffix
 
         if suffix:
-            filename = Path(filename).stem + suffix
+            filename = stem + suffix
 
         path = os.path.join(dir, filename)
 
@@ -124,6 +126,8 @@ def fileUpload(file, dir, extensions, content=None, suffix=None, withTimestamp=F
             file.close()
 
         return {
+            'stem': stem,
+            'suffix': suffix if suffix else originalSuffix,
             'filename': secure_filename(originalFilename),
             'path': filename
         }
@@ -138,6 +142,8 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
 
     result = []
     for file in os.listdir(folder):
+        if file.startswith('.'):
+            continue
         filePath = os.path.join(folder, file)
         if os.path.isfile(filePath):
             modificationTime = datetime.datetime.fromtimestamp(os.path.getmtime(filePath)).strftime('%Y-%m-%d %H:%M:%S')
@@ -154,3 +160,21 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
             if not DBrecord.deleted:
                 result.append(DBrecord)
     return result
+
+
+def sorted_cp (src, dst):
+    "Sort source text file by line length and output to destination"
+    lengths = []
+    with open(src, 'r') as i, open(dst, 'w') as o:
+        while True:
+            off = i.tell()
+            l = i.readline()
+            if not l: break
+            lengths.append(( off, len(l), len(l.rstrip()) ))
+        lengths = sorted(lengths, key=lambda x:x[2])
+        for off, ln, _ in lengths:
+            i.seek(off)
+            line = i.read(ln)
+            if not line.endswith('\n'):
+                line += '\n'
+            o.write(line)

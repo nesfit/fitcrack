@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `fc_charset` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `path` varchar(400) NOT NULL,
+  `keyspace` bigint(20) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
@@ -278,6 +279,12 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `markov_hcstat` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_threshold` int(20) NOT NULL DEFAULT '0',
   `grammar_id` bigint(20) unsigned DEFAULT NULL,
+  `case_permute` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `check_duplicates` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `min_password_len` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_password_len` int(10) unsigned NOT NULL DEFAULT '0',
+  `min_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
@@ -320,13 +327,13 @@ CREATE TABLE IF NOT EXISTS `fc_job_graph` (
 -- Štruktúra tabuľky pre tabuľku `fc_template`
 --
 
-CREATE TABLE `fc_template` (
+CREATE TABLE IF NOT EXISTS `fc_template` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `template` json NOT NULL,
+  `template` longtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -357,6 +364,7 @@ CREATE TABLE IF NOT EXISTS `fc_rule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `path` varchar(400) NOT NULL,
+  `count` int(11) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)

@@ -15,7 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'ruleDetail', params: { id: item.id}}">
+      <router-link :to="{name: 'ruleDetail', params: { id: item.id}}" target='_blank'>
         {{ item.name }}
         <v-icon 
           small
@@ -44,6 +44,7 @@
             align: 'start',
             value: 'name'
           },
+          {text: 'Count', value: 'count', align: 'end'},
           {text: 'Added', value: 'time', align: 'end'}
         ]
       }

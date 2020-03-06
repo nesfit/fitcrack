@@ -10,12 +10,12 @@
         cols="6"
         class="border"
       >
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Type mask<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Select dictionary<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
@@ -24,18 +24,17 @@
         cols="6"
         class="border"
       >
-        <v-expansion-panels class="elevation-0 pt-2">
-          <mask-single
-            v-model="hybridMask"
-            :open-forever="true"
-            @input="checkValid"
-          />
-        </v-expansion-panels>
+        <mask-single
+          v-model="hybridMask"
+          non-removable
+          @input="checkValid"
+        />
       </v-col>
 
       <v-col cols="6">
         <dict-selector
           v-model="rightDicts"
+          select-all
           @input="checkValid"
         />
       </v-col>
@@ -44,12 +43,12 @@
         cols="6"
         class="border"
       >
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Type rule</span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Type rule</span>
         </v-card-title>
       </v-col>

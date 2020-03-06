@@ -320,29 +320,38 @@
         <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
       </router-link>
       -->
-      <v-spacer />
-      <v-btn
-        icon
-        @click.stop="$vuetify.theme.dark = !$vuetify.theme.dark"
-      >
-        <v-icon>mdi-theme-light-dark</v-icon>
-      </v-btn>
+      <v-spacer />      
       <v-badge
         color="red"
         overlap
+        top
+        left
       >
         <span
           v-if="notificationsCount > 0"
           slot="badge"
         >{{ notificationsCount }}</span>
         <v-btn
-          icon
-          class="ma-0"
+          :icon="$vuetify.breakpoint.xsOnly"
+          text
           @click.stop="toggleNotifications"
         >
-          <v-icon>{{ notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell' }}</v-icon>
+          <v-icon :left="$vuetify.breakpoint.smAndUp">
+            {{ notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell-outline' }}
+          </v-icon>
+          <span v-show="$vuetify.breakpoint.smAndUp">Alerts</span>
         </v-btn>
       </v-badge>
+      <v-btn
+        :icon="$vuetify.breakpoint.xsOnly"
+        text
+        @click.stop="logout"
+      >
+        <v-icon :left="$vuetify.breakpoint.smAndUp">
+          mdi-logout-variant
+        </v-icon>
+        <span v-show="$vuetify.breakpoint.smAndUp">Sign out</span>
+      </v-btn>
     </v-app-bar>
     <v-content class="height100 main">
       <router-view />

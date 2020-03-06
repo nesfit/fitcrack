@@ -39,11 +39,16 @@
                 </span>
                 <v-spacer />
                 <v-btn
-                  small
-                  fab
+                  rounded
                   @click.native.stop="showEditJobDialog"
                 >
-                  <v-icon>edit</v-icon>
+                  Edit
+                  <v-icon 
+                    right 
+                    small
+                  >
+                    tune
+                  </v-icon>
                 </v-btn>
               </v-card-title>
               <v-list
@@ -55,7 +60,19 @@
                   </v-list-item-action>
                   <v-list-item-content class="height100">
                     <v-list-item-title class="text-right height100">
-                      <div class="actionsBtns">
+                      <v-btn
+                        v-if="data.hosts.length == 0"
+                        class="ma-0"
+                        outlined
+                        color="warning"
+                        @click.native.stop="showMappingHostDialog"
+                      >
+                        Assign hosts
+                      </v-btn>
+                      <div
+                        v-else
+                        class="actionsBtns"
+                      >
                         <v-tooltip top>
                           <template v-slot:activator="{ on }">
                             <v-btn
@@ -155,11 +172,11 @@
                       class="text-right fw500"
                     >
                       <v-tooltip top>
-                        <span
-                          slot="activator"
-                        >
-                          {{ data.status_text }}
-                        </span>
+                        <template v-slot:activator="{ on }">
+                          <span>
+                            {{ data.status_text }}
+                          </span>
+                        </template>
                         <span>{{ data.status_tooltip }}</span>
                       </v-tooltip>
                     </v-list-item-title>
@@ -344,13 +361,14 @@
                   :headers="hostheaders"
                   :items="data.hosts"
                   hide-default-footer
+                  no-data-text="None assigned"
                 >
                   <template v-slot:item.name="{ item }">
                     <router-link
                       :to="{ name: 'hostDetail', params: { id: item.id}}"
                       class="middle"
                     >
-                      {{ item.domain_name + ' (' + item.user.name + ')' }}
+                      {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
                     </router-link>
                   </template>
                   <template v-slot:item.last_active="{ item }">
@@ -368,7 +386,7 @@
                   <v-list-item-content>
                     <v-btn
                       class="ma-0"
-                      outlined
+                      text
                       color="primary"
                       @click.native.stop="showMappingHostDialog"
                     >
@@ -487,7 +505,7 @@
                   :to="{ name: 'hostDetail', params: { id: item.host.id}}"
                   class="middle"
                 >
-                  {{ item.host.domain_name + ' (' + item.host.user.name + ')' }}
+                  {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user.name) + ')' }}
                 </router-link>
               </template>
               <template v-slot:item.progress="{ item }">
@@ -542,91 +560,103 @@
 
     <v-dialog
       v-model="editJobDialog"
-      max-width="490"
-      lazy
+      max-width="500"
     >
       <v-card
         v-if="editJobValues !== null"
         class="pt-4"
       >
-        <v-row class="px-3">
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Name:
-            </v-subheader>
-          </v-col>
-          <v-col cols="8">
-            <v-text-field
-              v-model="editJobValues.name"
-              single-line
-              required
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Comment:
-            </v-subheader>
-          </v-col>
-          <v-col cols="8">
-            <v-text-field
-              v-model="editJobValues.comment"
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Start time:
-            </v-subheader>
-          </v-col>
-          <v-col cols="5">
-            <v-text-field
-              v-model="editJobValues.time_start"
-              :disabled="editJobValues.startNow"
-              text
-              single-line
-              label=""
-              mask="date-with-time"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-checkbox
-              v-model="editJobValues.startNow"
-              label="start now"
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              End time:
-            </v-subheader>
-          </v-col>
-          <v-col cols="5">
-            <v-text-field
-              v-model="editJobValues.time_end"
-              :disabled="editJobValues.endNever"
-              text
-              single-line
-              label=""
-              mask="date-with-time"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-checkbox
-              v-model="editJobValues.endNever"
-              label="End never"
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-subheader class="height64">
-              Seconds per workunit:
-            </v-subheader>
-          </v-col>
-          <v-col cols="8">
-            <v-text-field
-              v-model="editJobValues.seconds_per_job"
-            />
-          </v-col>
-        </v-row>
+        <v-card-title>
+          Edit job
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Name:
+              </v-subheader>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="editJobValues.name"
+                single-line
+                required
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Comment:
+              </v-subheader>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="editJobValues.comment"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Start time:
+              </v-subheader>
+            </v-col>
+            <v-col cols="5">
+              <v-text-field
+                v-model="editJobValues.time_start"
+                :disabled="editJobValues.startNow"
+                text
+                single-line
+                label=""
+                mask="date-with-time"
+              />
+            </v-col>
+            <v-col cols="3">
+              <v-checkbox
+                v-model="editJobValues.startNow"
+                label="Immediate"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                End time:
+              </v-subheader>
+            </v-col>
+            <v-col cols="5">
+              <v-text-field
+                v-model="editJobValues.time_end"
+                :disabled="editJobValues.endNever"
+                text
+                single-line
+                label=""
+                mask="date-with-time"
+              />
+            </v-col>
+            <v-col cols="3">
+              <v-checkbox
+                v-model="editJobValues.endNever"
+                label="Never"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-subheader class="height64">
+                Seconds per workunit:
+              </v-subheader>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="editJobValues.seconds_per_job"
+                min="60"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
         <v-card-actions>
           <v-spacer />
+          <v-btn
+            color="primary"
+            text
+            @click.stop="editJobDialog=false"
+          >
+            Cancel
+          </v-btn>
           <v-btn
             color="primary"
             text
@@ -643,11 +673,17 @@
       v-model="editHostsDialog"
       max-width="800"
     >
-      <v-card class="mb-5">
-        <host-selector 
-          v-model="newHostsMapping" 
-          select-all 
-        />
+      <v-card>
+        <v-card-title>
+          Host mapping
+        </v-card-title>
+        <v-card-text>
+          <host-selector 
+            v-model="newHostsMapping" 
+            select-all
+            :auto-refresh="editHostsDialog"
+          />
+        </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn
@@ -670,6 +706,7 @@
 </template>
 
 <script>
+  import iconv from 'iconv-lite'
   import combinatorDetail from '@/components/job/attacksDetail/combinator'
   import maskDetail from '@/components/job/attacksDetail/mask'
   import dictionaryDetail from '@/components/job/attacksDetail/dictionary'
@@ -765,6 +802,9 @@
             return 'dictionaryDetail'
           case 'pcfg':
             return 'pcfgDetail'
+          // dictionaryDetail is good enough for PRINCE
+          case 'prince':
+            return 'dictionaryDetail'
           default:
             return 'combinatorDetail'
         }
@@ -776,6 +816,7 @@
           case 'ready': hue = 210; break
           case 'exhausted': hue = 350; break
         }
+        if (this.data.hosts.length == 0) hue = 40
         if (hue == -1) return 'none'
         return `linear-gradient(to bottom, hsla(${hue}, 90%, 50%, 40%), transparent 20%)`
       }
@@ -819,11 +860,13 @@
 
             // If Job is finished
             else if (validWorkunits.length > 0) {
+              if (this.data.cracking_time == 0) {
+                this.efficiency = "-";
+              } else {
+                const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.cracking_time);
 
-              const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.cracking_time);
-
-              this.efficiency = (efficiency * 100).toFixed(2) + ' %';
-              //console.log("Efectivity:", this.efficiency);
+                this.efficiency = (efficiency * 100).toFixed(2) + ' %';
+              }
             } else {
               this.efficiency = "No workunits yet";
             }
@@ -959,6 +1002,11 @@
             });
           }
         })
+      },
+      fixUserNameEncoding : function(username) {
+          /* Boinc DB uses latin1_swedish encoding, which breaks names with special characters,
+          which are not supported in this encoding. Fix it by converting name to utf8. */
+          return iconv.decode(iconv.encode(username, 'latin1'), 'utf-8')
       }
     }
   }

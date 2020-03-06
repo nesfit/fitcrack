@@ -33,6 +33,7 @@ from src.api.fitcrack.endpoints.jobTemplate.template import ns as template_ns
 from src.api.fitcrack.endpoints.logs.logs import ns as logs_ns
 from src.api.fitcrack.endpoints.status.status import ns as status_ns
 from src.api.fitcrack.endpoints.pcfg.pcfg import ns as pcfg_ns
+from src.api.fitcrack.endpoints.settings.settings import ns as settings_ns
 
 from src.database import db
 
@@ -77,6 +78,7 @@ def initialize_app(flask_app):
     api.add_namespace(logs_ns)
     api.add_namespace(status_ns)
     api.add_namespace(pcfg_ns)
+    api.add_namespace(settings_ns)
 
     flask_app.register_blueprint(blueprint)
 
@@ -97,6 +99,13 @@ def check_valid_login():
         if not login_valid:
             abort(401)
     return
+
+@app.after_request
+def bake_cookies(response):
+    "just a workaround"
+    if (response.headers.get('Set-Cookie')):
+        response.headers['Set-Cookie'] += '; SameSite=Lax'
+    return response
 
 
 def main():

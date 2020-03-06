@@ -36,9 +36,15 @@ namespace Attack {
      * @brief	Creates new config based attack
      * @param   task_config [in] Structure with sent parameters
      * @param   directory [in] Working directory with found files
+     * @param   attack_type [in] Attack type
      * @return  Specific type of attack object base on config parameters
      */
 AttackBase *create(const ConfigTask &task_config, Directory &directory, enum AttackType attack_type);
+    /**
+     * @brief	Detects attack type from task configuration
+     * @param   task_config [in] Structure with sent parameters
+     * @return  Attack type
+     */
 enum AttackType detectAttackType(const ConfigTask &task_config);
 };
 

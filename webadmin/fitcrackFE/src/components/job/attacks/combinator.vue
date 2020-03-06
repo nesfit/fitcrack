@@ -10,12 +10,12 @@
         cols="6"
         class="border"
       >
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Select left dictionary<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Select right dictionary<span class="required primary--text"> *</span></span>
         </v-card-title>
       </v-col>
@@ -25,12 +25,14 @@
       >
         <dict-selector
           v-model="leftDicts"
+          select-all
           @input="checkValid"
         />
       </v-col>
       <v-col cols="6">
         <dict-selector
           v-model="rightDicts"
+          select-all
           @input="checkValid"
         />
       </v-col>
@@ -39,12 +41,12 @@
         cols="6"
         class="border"
       >
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Type left rule</span>
         </v-card-title>
       </v-col>
       <v-col cols="6">
-        <v-card-title class="pb-0">
+        <v-card-title>
           <span>Type right rule</span>
         </v-card-title>
       </v-col>

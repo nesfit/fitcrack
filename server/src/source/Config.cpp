@@ -47,6 +47,8 @@ namespace Config {
     std::string inTemplateFileDict =       "dict_in";
     std::string inTemplateFileCombinator = "combinator_in";
     std::string inTemplateFileRule =       "rule_in";
+    std::string inTemplateFilePrince =     "prince_in";
+    std::string inTemplateFilePrinceRules ="prince_rules_in";
     std::string inTemplateFilePcfg =       "pcfg_in";
     std::string inTemplateFilePcfgRules =  "pcfg_rules_in";
     std::string outTemplateFile =          "app_out";
@@ -56,6 +58,8 @@ namespace Config {
     char * inTemplatePathMask = nullptr;
     char * inTemplatePathMarkov = nullptr;
     char * inTemplatePathDict = nullptr;
+    char * inTemplatePathPrince = nullptr;
+    char * inTemplatePathPrinceRules = nullptr;
     char * inTemplatePathPcfg = nullptr;
     char * inTemplatePathPcfgRules = nullptr;
     char * inTemplatePathCombinator = nullptr;
@@ -249,7 +253,7 @@ void Tools::releaseFdMemory()
         if(fd.second)
         {
             fd.second->close();
-            free(fd.second);
+            delete fd.second;
         }
     }
 }

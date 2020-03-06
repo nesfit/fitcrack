@@ -88,9 +88,17 @@
 
       const mql = window.matchMedia('(prefers-color-scheme: dark)')
       mql.addListener(e => {
-        this.$vuetify.theme.dark = e.matches
+        const pref = localStorage.getItem('appearance')
+        if (!pref || pref == 'auto') {
+          this.$vuetify.theme.dark = e.matches
+        }
       })
-      this.$vuetify.theme.dark = mql.matches
+      const init = localStorage.getItem('appearance')
+      if (init && init == 'dark') {
+        this.$vuetify.theme.dark = true
+      } else if (!init || init == 'auto') {
+        this.$vuetify.theme.dark = mql.matches
+      }
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open

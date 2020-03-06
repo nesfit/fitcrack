@@ -5,16 +5,17 @@
 
 <template>
   <div>
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Select dictionary<span class="required primary--text"> *</span></span>
     </v-card-title>
     <dict-selector
       v-model="leftDicts"
+      select-all
       @input="checkValid"
     />
 
     <v-divider />
-    <v-card-title class="pb-0">
+    <v-card-title>
       <span>Select rule file</span>
     </v-card-title>
     <rules-selector

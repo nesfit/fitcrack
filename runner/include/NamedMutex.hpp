@@ -37,9 +37,20 @@ public:
 	 */
 	void unlock();
 private:
+	//! The mutex handle
 	NamedMutexHandle *m_handle;
+	//! Is mutext locked?
 	bool m_locked;
+	/**
+	 * @brief No copy
+	 * 
+	 */
 	NamedMutex(const NamedMutex&);
+	/**
+	 * @brief No assignment
+	 * 
+	 * @return NamedMutex& 
+	 */
 	NamedMutex &operator=(NamedMutex);
 };
 

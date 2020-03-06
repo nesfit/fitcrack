@@ -6,12 +6,12 @@ import logging
 from itertools import islice
 
 import os
-
+import shutil
 
 import time
 from pathlib import Path
 
-from flask import request, redirect
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -37,7 +37,6 @@ ns = api.namespace(
 
 ALLOWED_EXTENSIONS = set(['zip'])
 
-#dictionaryCollection -> pcfgCollection
 @ns.route('')
 class pcfgCollection(Resource):
 
@@ -46,26 +45,28 @@ class pcfgCollection(Resource):
         """
         Returns collection of pcfg
         """
-        #pcfgs = getFilesFromFolder(
-        #    PCFG_DIR, FcPcfg, readingFromFolderPostProcces)
         return {'items': FcPcfg.query.filter(FcPcfg.deleted == False).all()}
 
 
-#dictionary -> pcfg
 @ns.route('/<id>')
 class pcfg(Resource):
 
-    @api.marshal_with(pcfg_model)
     def get(self, id):
         """
-        Returns information about pcfg
+        Sends zipped PCFG as attachment
         """
 
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
         if not pcfg:
-            abort(500, 'Can\'t open dictionary')
-
-        return pcfg
+            abort(500, 'Can\'t find PCFG grammar')
+        path = os.path.join(PCFG_DIR, pcfg.path)
+        is_dir = os.path.isdir(path)
+        if not is_dir:
+            return send_file(path, attachment_filename=pcfg.path, as_attachment=True)
+        else:
+            makeshift_zip = '/tmp/pcfg/' + pcfg.path
+            shutil.make_archive(makeshift_zip, 'zip', path)
+            return send_file(makeshift_zip + '.zip', attachment_filename=pcfg.path + '.zip', as_attachment=True)
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
@@ -127,7 +128,7 @@ class pcfgAdd(Resource):
             createPcfgGrammarBin(uploadedFile['filename'])
 
             return {
-                'message': 'PCFG ' + uploadedFile['filename'] + ' successfuly uploaded.',
+                'message': 'PCFG ' + uploadedFile['filename'] + ' successfully uploaded.',
                 'status': True
 
             }
@@ -169,7 +170,7 @@ class pcfgMakeFromDictionary(Resource):
         createPcfgGrammarBin(dict.name)
 
         return {
-            'message': 'PCFG ' + dict.name + ' successfuly uploaded.',
+            'message': 'PCFG ' + dict.name + ' successfully uploaded.',
             'status': True
 
         }

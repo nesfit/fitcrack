@@ -22,6 +22,7 @@ const base = {
   inputMethod: 'multipleHashes',
   hashList: '',
   hashType: null,
+  ignoreHashes: false,
   // hosts
   hosts: [],
   // other
@@ -49,10 +50,17 @@ export const empty = {
   markovThresh: NaN,
   pcfg: [],
   keyspaceLimit: 0,
+  // prince
+  checkDuplicates: false,
+  casePermute: false,
+  minPasswordLen: 1,
+  maxPasswordLen: 8,
+  minElemInChain: 1,
+  maxElemInChain: 8,
   // other
   startNow: true,
   endNever: true,
-  timeForJob: 3600
+  timeForJob: undefined
 }
 
 export default {
@@ -80,7 +88,14 @@ export default {
         'charset': state.charset,
         'mask': state.hybridMask,
         'pcfg_grammar': state.pcfg[0],
-        'keyspace_limit': state.keyspaceLimit
+        'keyspace_limit': state.keyspaceLimit,
+        // prince
+        'check_duplicates': state.checkDuplicates,
+        'case_permute': state.casePermute,
+        'min_password_len': parseInt(state.minPasswordLen),
+        'max_password_len': parseInt(state.maxPasswordLen),
+        'min_elem_in_chain': parseInt(state.minElemInChain),
+        'max_elem_in_chain': parseInt(state.maxElemInChain),
       }
     },
     jobSettings (state, { attackSettings }) {
@@ -95,25 +110,77 @@ export default {
         'attack_settings': attackSettings,
         "hash_settings": {
           "hash_type": state.hashType ? state.hashType.code : null,
-          "hash_list": state.validatedHashes
+          "hash_list": state.validatedHashes,
+          "valid_only": !state.ignoreHashes
         }
       }
     },
-    valid (state, { attackSettings }) {
-      return (
-        state.attackSettingsTab &&
-        state.hosts.length > 0 &&
-        attackSettings &&
-        state.hashType !== null &&
-        state.name !== ''
-      )
+    validAttackSpecificSettings (state) {
+      switch (state.attackSettingsTab) {
+        case 'dictionary':
+          return state.leftDicts.length > 0
+        case 'combinator':
+          return state.leftDicts.length > 0 && state.rightDicts.length > 0
+        case 'maskattack':
+          if (state.submode > 0 && state.markov.length == 0) return false 
+          return state.masks.filter(m => m !== '').length > 0
+        case 'hybridWordlistMask':
+          return state.leftDicts.length > 0 && state.hybridMask !== ''
+        case 'hybridMaskWordlist':
+          return state.rightDicts.length > 0 && state.hybridMask !== ''
+        case 'pcfgAttack':
+          return state.pcfg.length > 0
+        case 'princeAttack':
+          if (state.leftDicts.length == 0)
+            return false
+          if (state.minPasswordLen <= 0)
+            return false;
+          if (state.maxPasswordLen <= 0)
+            return false;
+
+          if (state.maxPasswordLen > 16)
+            return false;
+
+          if (state.minElemInChain <= 0)
+            return false;
+
+          if (state.minPasswordLen > state.maxPasswordLen)
+            return false;
+
+          if (state.maxElemInChain > 0 && (state.minElemInChain > state.maxElemInChain))
+            return false;
+
+          if (state.maxElemInChain > state.maxPasswordLen)
+            return false;
+
+          // All ok!
+          return true
+        default:
+          return true
+      }
+    },
+    valid (state, { attackSettings, validAttackSpecificSettings }) {
+      if (
+        !state.attackSettingsTab ||
+        !attackSettings ||
+        state.hashType == null ||
+        state.timeForJob < 60 ||
+        state.name === ''
+      ) {
+        return false
+      } else {
+        return validAttackSpecificSettings
+      }
+    },
+    keyspaceKnown ({ attackSettingsTab }, { validAttackSpecificSettings }) {
+      return attackSettingsTab && validAttackSpecificSettings
     },
     template (state) {
       const keys = Object.keys(empty)
       return Object.keys(state)
         .filter(key => keys.includes(key))
         .reduce((obj, key) => {
-          if (JSON.stringify(state[key]) !== JSON.stringify(empty[key]) || key === 'masks') {
+          if (JSON.stringify(state[key]) !== JSON.stringify(empty[key]) || ( key === 'masks' && state.masks[0] !== '' )) {
             obj[key] = state[key]
           }
           return obj
@@ -169,4 +236,5 @@ export const attacks = [
   {handler: 'hybridWordlistMask', name: 'Hybrid Wordlist + Mask', id: 6, serverName: 'Hybrid wordlist+mask'},
   {handler: 'hybridMaskWordlist', name: 'Hybrid Mask + Wordlist', id: 7, serverName: 'Hybrid mask+wordlist'},
   {handler: 'pcfgAttack', name: 'PCFG', id: 9, serverName: 'pcfg'},
+  {handler: 'princeAttack', name: 'PRINCE', id: 8, serverName: 'prince'},
 ]

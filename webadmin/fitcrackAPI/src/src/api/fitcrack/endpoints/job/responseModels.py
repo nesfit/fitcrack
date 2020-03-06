@@ -2,16 +2,6 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-'''
-package_short_model => job_short_model
-package_nano_list_model => job_nano_list_model
-package_nano_model => job_nano_model
-package_model => job_big_model
-dictionary_package_model => dictionary_job_model
-newPackage_model => newJob_model
-page_of_packages_model => page_of_jobs_model
-
-'''
 
 from flask_restplus import fields
 
@@ -68,12 +58,10 @@ hash_model = api.model('Hash', {
     'time_cracked': fields.DateTime()
 })
 
-# page_of_packages_model => page_of_jobs_model
 page_of_jobs_model = api.inherit('Page of jobs', pagination, {
     'items': fields.List(fields.Nested(job_short_model))
 })
 
-# page_of_jobs_model => page_of_workunits_model
 page_of_workunits_model = api.inherit('Page of workunits', pagination, {
     'items': fields.List(fields.Nested(workunit_model))
 })
@@ -104,12 +92,10 @@ crackingTime_model = api.model('Cracking time', {
     'hosts': fields.List(fields.Nested(host_cracking_time))
 })
 
-# newPackage_model => newJob_model
 newJob_model = api.inherit('new job', simpleResponse, {
     'job_id': fields.Integer()
 })
 
-# dictionary_job_model => dictionary_job_model
 dictionary_job_model = api.model('Dictionary job', {
     'current_index': fields.Integer(),
     'is_left': fields.Boolean(),
@@ -122,13 +108,13 @@ pcfgGrammar_model = api.model('PCFG job', {
 '''
 
 
-# package_model => job_big_model
 job_big_model = api.model('Job', {
     'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
     'name': fields.String(required=True, description='name of the job'),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
     'attack_mode': fields.String(required=True),
+    'attack_submode': fields.Integer(),
     'attack': fields.String(required=True),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
@@ -161,6 +147,7 @@ job_big_model = api.model('Job', {
     'rule_left': fields.String(),
     'rule_right': fields.String(),
     'markov': fields.Nested(hcStat_model),
+    'markov_threshold': fields.Integer(),
     'replicate_factor': fields.String(required=True),
     'hosts': fields.List(fields.Nested(boincHost_model)),
     'workunits': fields.List(fields.Nested(workunit_model)),
@@ -169,10 +156,13 @@ job_big_model = api.model('Job', {
     'hashes': fields.List(fields.Nested(hash_model)),
     'left_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
-    'grammar_id': fields.List(fields.Nested(pcfg_model))
+    'grammar_id': fields.Integer(),
+    'grammar_name': fields.String(),
+    'grammar_keyspace': fields.Integer()
+
+    #'grammar_id': fields.List(fields.Nested(pcfg_model))
 })
 
-# package_nano_model => job_nano_model
 job_nano_model = api.model('Package nano', {
     'id': fields.Integer(readOnly=True, required=False, description='id package'),
     'name': fields.String(required=True, description='meno package'),
@@ -183,7 +173,6 @@ job_nano_model = api.model('Package nano', {
     'progress': fields.Float(required=False),
 })
 
-# package_nano_list_model => job_nano_list_model
 job_nano_list_model = api.inherit('Package nano list', {
     'items': fields.List(fields.Nested(job_nano_model))
 })

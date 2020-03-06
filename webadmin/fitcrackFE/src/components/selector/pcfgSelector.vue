@@ -15,7 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'pcfgDetail', params: { id: item.id}}">
+      <router-link :to="{name: 'pcfgDetail', params: { id: item.id}}" target='_blank'>
         {{ item.name }}
         <v-icon 
           small
@@ -26,7 +26,7 @@
       </router-link>
     </template>
     <template v-slot:item.time_added="{ item }">
-      {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+      {{ $moment(item.time_added).format('DD.MM.YYYY HH:mm') }}
     </template>
   </v-data-table>
 </template>

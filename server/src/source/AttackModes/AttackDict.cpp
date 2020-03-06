@@ -193,7 +193,7 @@ bool CAttackDict::makeWorkunit()
     if (m_workunit->isDuplicated())
     {
         (*dictFile).close();
-        free(dictFile);
+        delete dictFile;
     }
 
     f.close();

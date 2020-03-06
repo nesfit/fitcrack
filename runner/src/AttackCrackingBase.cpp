@@ -19,8 +19,8 @@ void AttackCrackingBase::addSpecificArguments() {
 
   addRequiredFile("data");
 
-  findAndAddOptional("start_index", "-s");
-  findAndAddOptional("hc_keyspace", "-l");
+  findAndAddOptional(ConfigTask::START_INDEX, "-s");
+  findAndAddOptional(ConfigTask::HC_KEYSPACE, "-l");
 
   addArgument("--status-timer="+RunnerUtils::toString(HashcatConstant::ProgressPeriod));
 

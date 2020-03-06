@@ -8,7 +8,11 @@
           v-if="jobsInfo"
           class="mb-4" 
         >
-          <v-card-title>Jobs</v-card-title>
+          <v-card-title>
+            <router-link to="/jobs">
+              Jobs
+            </router-link>
+          </v-card-title>
           <v-card-subtitle class="text-start">
             Status overview
           </v-card-subtitle>
@@ -67,9 +71,16 @@
           v-if="serverInfo && actualUsage"
           class="mb-4" 
         >
-          <v-card-title>Server status</v-card-title>
+          <v-card-title>
+            <router-link to="/server">
+              Server status
+            </router-link>
+          </v-card-title>
           <v-card-subtitle class="text-start">
-            <span v-if="serverInfoUp < serverInfoUp + serverInfoDown">
+            <span 
+              v-if="serverInfoUp < serverInfoUp + serverInfoDown"
+              class="warning--text"
+            >
               <b>{{ serverInfoUp }}</b> of {{ serverInfoUp + serverInfoDown }} services running
             </span>
             <span v-else>All services running</span>
@@ -121,7 +132,11 @@
           v-if="hostsInfo"
           class="mb-4" 
         >
-          <v-card-title>Hosts</v-card-title>
+          <v-card-title>
+            <router-link to="/hosts">
+              Hosts
+            </router-link>
+          </v-card-title>
           <v-card-subtitle class="text-start">
             <b>{{ hostsInfo.activeHosts }}</b> of {{ hostsInfo.totalHosts }} online
           </v-card-subtitle>
@@ -375,6 +390,10 @@
 </script>
 
 <style scoped>
+  .v-card__title a {
+    color: inherit;
+  }
+
   .inactiveHost {
     opacity: .2;
   }

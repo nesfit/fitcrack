@@ -9,55 +9,48 @@
       single-line
       class="width100"
     >
-      <v-data-table
-        :headers="headers"
-        :items="data.pcfg_grammar"
-        item-key="id"
-        hide-default-footer
-      >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>{{ props.item.pcfg.name }}</td>
-          <td class="text-right">
-            {{ props.item.pcfg.keyspace }}
-          </td>
-          <td class="text-right">
-            {{ $moment(props.item.pcfg.time_added ).format('DD.MM.YYYY HH:mm') }}
-          </td>
-          <td class="text-right">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  class="mx-0"
-                  :to="{name: 'pcfgDetail', params: { id: props.item.pcfg.id}}"
-                  v-on="on"
-                >
-                  <v-icon color="primary">
-                    link
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>Go to the PCFG page</span>
-            </v-tooltip>
-          </td>
-        </template>
-      </v-data-table>
-    <!--  <template v-if="data.rulesFile.id !== null">
-        <v-divider></v-divider>
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Grammar:
+        </v-list-item-action>
+        <v-list-item-content class="text-right">
+          <v-list-item-title>
+            <router-link :to="{name: 'pcfg', params: { id: data.grammar_id }}">
+              {{ data.grammar_name || `ID ${data.grammar_id}` }}
+              <v-icon 
+                small
+                color="primary"
+              >
+                mdi-open-in-new
+              </v-icon>
+            </router-link>
+          </v-list-item-title>
+          <span>
+            Keyspace {{ data.grammar_keyspace || 'not specified' }}
+          </span>
+        </v-list-item-content>
+      </v-list-item>
+      <template v-if="data.rulesFile.id !== null">
+        <v-divider />
         <v-list-item class="px-2 py-1">
           <v-list-item-action class="pr-3 key">
             Rules:
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title class="text-xs-right">
-              <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}">{{ data.rulesFile.name  }}</router-link>
+            <v-list-item-title class="text-right">
+              <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}" target='_blank'>
+                {{ data.rulesFile.name }}
+                <v-icon 
+                  small
+                  color="primary"
+                >
+                  mdi-open-in-new
+                </v-icon>
+              </router-link>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-      </template> -->
+      </template>
     </v-list>
   </fc-tile>
 </template>

@@ -17,7 +17,15 @@ class AttackPrince: public AttackCrackingBase {
          * @brief   Adds all attack specific arguments
          */
         void addSpecificArguments();
+        /**
+         * @brief   Adds prince specific argument
+         * @param   argument [in] Argument
+         */
         void addPrinceArgument(const std::string &argument);
+        /**
+         * @brief   Adds prince specific file
+         * @param   file_name [in] Filename
+         */
         void addPrinceRequiredFile(const std::string& file_name);
 
     public:
@@ -28,6 +36,10 @@ class AttackPrince: public AttackCrackingBase {
          * @param   directory [in] Working directory
          */
       AttackPrince(const ConfigTask &config, Directory &directory);
+        /**
+         * @brief   Get prince attack arguments
+         * @return  Arguments
+         */
       const std::vector<std::string> &getPrinceArguments();
 };
 #endif // ATTACKPRINCE_HPP

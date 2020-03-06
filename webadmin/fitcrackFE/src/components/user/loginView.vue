@@ -9,67 +9,62 @@
       class="fill-height"
       fluid
     >
-      <v-row
-        class="flex"
-        align="center"
-        justify="center"
+      <img 
+        :src="require('@/assets/motive.svg')"
+        class="motive"
       >
-        <v-card
-          raised
-          class="jumboCard px-4"
+      <div class="main mx-auto">
+        <img
+          v-if="$vuetify.theme.dark"
+          :src="require(`@/assets/fitcrack-glow.svg`)"
+          class="mx-auto pt-3 pb-2 d-block logo"
+          alt="logo"
         >
-          <img
-            v-if="$vuetify.theme.dark"
-            :src="require(`@/assets/fitcrack-glow.svg`)"
-            class="mx-auto pt-3 pb-2 d-block logo"
-            alt="logo"
+        <img
+          v-else
+          :src="require(`@/assets/fitcrack.svg`)"
+          class="mx-auto pt-3 pb-2 d-block logo"
+          alt="logo"
+        >
+        <div class="content">
+          <v-progress-circular
+            size="50"
+            :width="3"
+            class="progress trans"
+            indeterminate
+            color="primary"
+            :class="{hide: !loading}"
+          />
+          <v-form
+            ref="form"
+            lazy-validation
+            :class="{hide: loading}"
+            class="trans"
           >
-          <img
-            v-else
-            :src="require(`@/assets/fitcrack.svg`)"
-            class="mx-auto pt-3 pb-2 d-block logo"
-            alt="logo"
-          >
-          <div class="content">
-            <v-progress-circular
-              size="50"
-              :width="3"
-              class="progress trans"
-              indeterminate
-              color="primary"
-              :class="{hide: !loading}"
+            <v-text-field
+              v-model="username"
+              solo
+              label="Username"
+              required
             />
-            <v-form
-              ref="form"
-              lazy-validation
-              :class="{hide: loading}"
-              class="trans"
+            <v-text-field
+              v-model="password"
+              solo
+              label="Password"
+              required
+              type="password"
+            />
+            <v-btn
+              class="d-block mx-auto mb-4"
+              type="submit"
+              color="primary"
+              @click.prevent="submit"
             >
-              <v-text-field
-                v-model="username"
-                label="Username"
-                required
-              />
-              <v-text-field
-                v-model="password"
-                label="Password"
-                required
-                type="password"
-              />
-              <v-btn
-                class="d-block mx-auto mb-4"
-                text
-                outlined
-                type="submit"
-                color="primary"
-                @click.prevent="submit"
-              >
-                submit
-              </v-btn>
-            </v-form>
-          </div>
-        </v-card>
-      </v-row>
+              sign in
+            </v-btn>
+          </v-form>
+        </div>
+      </div>
     </v-container>
   </transition>
 </template>
@@ -126,8 +121,14 @@
     transition: opacity .3s ease-in-out;
   }
 
+  .main {
+    z-index: 1;
+    min-width: 260px;
+  }
+
   .content {
     position: relative;
+    max-width: 600px;
   }
 
   .progress {
@@ -139,14 +140,18 @@
     position: absolute;
   }
 
-  .jumbo {
+  .motive {
     position: fixed;
-    z-index: 5;
+    z-index: 0;
+    opacity: .2;
+    left: 5%;
+    width: 90%;
+    transform: rotate(-10deg)
   }
 
   .logo {
     width: 100%;
-    max-width: 200px;
+    max-width: 260px;
   }
 </style>
 

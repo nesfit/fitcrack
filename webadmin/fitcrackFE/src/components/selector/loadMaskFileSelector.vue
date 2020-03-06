@@ -15,7 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'maskDetail', params: { id: item.id}}">
+      <router-link :to="{name: 'maskDetail', params: { id: item.id}}" target='_blank'>
         {{ item.name }}
         <v-icon 
           small
@@ -44,6 +44,14 @@
   export default {
     name: "MaskFileSelector",
     mixins: [selector],
+    props: {
+      value: {
+        type: Object,
+        default: function () {
+          return {}
+        }
+      }
+    },
     data() {
       return {
         headers: [
@@ -61,6 +69,11 @@
         return selected[0].id
       }
     },
+    watch: {
+      value (val) {
+        this.selected = [val]
+      }
+    },
     methods: {
       getData() {
         this.loading = true
@@ -72,7 +85,7 @@
       updateSelected() {
         this.$emit('input', this.selected[0])
       }
-    },
+    }
   }
 </script>
 

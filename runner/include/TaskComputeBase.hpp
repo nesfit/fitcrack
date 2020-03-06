@@ -22,15 +22,15 @@ class TaskComputeBase: public TaskBase {
 
     protected:
 
-	      AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
+	    AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
 
         ProcessBase *process_hashcat_;          /**< Pointer to process executing the task */
-        ProcessBase *process_external_generator_; /** < Pointer to pcfg manager/princepreprocessor process executing the task */
-        ProcessBase *parent_process_; /** < Pointer to parent process */
+        ProcessBase *process_external_generator_; /**< Pointer to pcfg manager/princepreprocessor process executing the task */
+        ProcessBase *parent_process_; /**< Pointer to parent process */
 
-        NamedMutex hashcat_mutex_;
+        NamedMutex hashcat_mutex_; //!< Mutex to prevent multiple hashcat instances
 
-        enum AttackType attack_type;
+        enum AttackType attack_type;  /**< Type of current attack */
 
         std::vector<std::string> hashcat_arguments_;  /**< Merge arguments form Attack, ConfigTask, ConfigHost */
         std::vector<std::string> external_generator_arguments_; /**<Merge pcfg-manager arguments from Attack, ConfigTask, ConfigHost */
@@ -114,6 +114,11 @@ class TaskComputeBase: public TaskBase {
 	 * @brief   Spawns the computation process
 	 */
 	void startComputation();
+
+	/**
+	 * @brief   Unlocks hashcat mutex
+	 */
+	void unlockHashcatMutex();
 
 };
 
