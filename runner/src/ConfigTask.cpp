@@ -10,6 +10,13 @@ const char *ConfigTask::MASK_HC_KEYSPACE = "mask_hc_keyspace";
 const char *ConfigTask::DICT_HC_KEYSPACE = "dict_hc_keyspace";
 const char *ConfigTask::START_INDEX = "start_index";
 const char *ConfigTask::START_HASH_INDEX = "start_hash_index";
+const char *ConfigTask::SKIP_FROM_START = "skip_from_start";
+const char *ConfigTask::CASE_PERMUTE = "case_permute";
+const char *ConfigTask::CHECK_DUPLICATES = "check_duplicates";
+const char *ConfigTask::MIN_PASSWORD_LEN = "min_password_len";
+const char *ConfigTask::MAX_PASSWORD_LEN = "max_password_len";
+const char *ConfigTask::MIN_ELEM_IN_CHAIN = "min_elem_in_chain";
+const char *ConfigTask::MAX_ELEM_IN_CHAIN = "max_elem_in_chain";
 
 /* Private */
 
@@ -52,6 +59,13 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::MASK_HC_KEYSPACE);
   supported_.push_back(ConfigTask::DICT_HC_KEYSPACE);
   supported_.push_back("markov_threshold");
+  supported_.push_back(ConfigTask::CASE_PERMUTE);
+  supported_.push_back(ConfigTask::CHECK_DUPLICATES);
+  supported_.push_back(ConfigTask::MIN_PASSWORD_LEN);
+  supported_.push_back(ConfigTask::MAX_PASSWORD_LEN);
+  supported_.push_back(ConfigTask::MIN_ELEM_IN_CHAIN);
+  supported_.push_back(ConfigTask::MAX_ELEM_IN_CHAIN);
+  supported_.push_back(ConfigTask::SKIP_FROM_START);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

@@ -68,6 +68,8 @@ namespace Config {
     extern std::string inTemplateFileDict;
     extern std::string inTemplateFileCombinator;
     extern std::string inTemplateFileRule;
+    extern std::string inTemplateFilePrince;
+    extern std::string inTemplateFilePrinceRules;
     extern std::string inTemplateFilePcfg;
     extern std::string inTemplateFilePcfgRules;
     extern std::string outTemplateFile;
@@ -79,6 +81,8 @@ namespace Config {
     extern char * inTemplatePathDict;
     extern char * inTemplatePathCombinator;
     extern char * inTemplatePathRule;
+    extern char * inTemplatePathPrince;
+    extern char * inTemplatePathPrinceRules;
     extern char * inTemplatePathPcfg;
     extern char * inTemplatePathPcfgRules;
     extern DB_APP * app;
@@ -110,6 +114,7 @@ namespace Config {
         AttackDict = 0,
         AttackCombinator = 1,
         AttackMask = 3,
+        AttackPrince = 8,
         AttackPcfg = 9
     };
 

@@ -44,6 +44,12 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_markov = jobMap["markov_hcstat"];
         this->m_markovThreshold = std::stoul(jobMap["markov_threshold"]);
         this->m_replicateFactor = std::stoul(jobMap["replicate_factor"]);
+        this->m_casePermute = std::stoul(jobMap["case_permute"]);
+        this->m_checkDuplicates = std::stoul(jobMap["check_duplicates"]);
+        this->m_minPasswordLen = std::stoul(jobMap["min_password_len"]);
+        this->m_maxPasswordLen = std::stoul(jobMap["max_password_len"]);
+        this->m_minElemInChain = std::stoul(jobMap["min_elem_in_chain"]);
+        this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         /** Check for valid values */
@@ -348,6 +354,16 @@ bool CJob::getKillFlag() const
     return m_killFlag;
 }
 
+bool CJob::getCasePermuteFlag() const
+{
+    return m_casePermute;
+}
+
+bool CJob::getCheckDuplicatesFlag() const
+{
+    return m_checkDuplicates;
+}
+
 
 /**
  * @section Getters/Setters for other member variables
@@ -460,4 +476,28 @@ const std::string &CJob::getCharset3() const
 const std::string &CJob::getCharset4() const
 {
     return m_charset4;
+}
+
+
+uint32_t CJob::getMinPasswordLen() const
+{
+    return m_minPasswordLen;
+}
+
+
+uint32_t CJob::getMaxPasswordLen() const
+{
+    return m_maxPasswordLen;
+}
+
+
+uint32_t CJob::getMinElemInChain() const
+{
+    return m_minElemInChain;
+}
+
+
+uint32_t CJob::getMaxElemInChain() const
+{
+    return m_maxElemInChain;
 }

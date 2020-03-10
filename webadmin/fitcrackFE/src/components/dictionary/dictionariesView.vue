@@ -16,7 +16,7 @@
         type="warning"
         class="mb-0"
       >
-        Dictionaries must have a .txt extension. The preferred way to upload dictionaries is via SFTP.
+        Dictionaries must have a .txt extension.
       </v-alert>
       <v-data-table
         :headers="headers"
@@ -33,6 +33,21 @@
           {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
         </template>
         <template v-slot:item.actions="{ item }">
+           <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/dictionary/' + item.id + '/download'"
+                target="_blank"
+                download
+                v-on="on"
+              >
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
+                </v-btn>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
@@ -128,7 +143,7 @@
           },
           {text: 'Keyspace', value: 'keyspace', align: 'end'},
           {text: 'Time', value: 'time', align: 'end'},
-          {text: 'Delete', value: 'actions', align: 'end', sortable: false}
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ],
         dictionaries: [],
         browser: false,
@@ -171,7 +186,7 @@
   }
 
   .max500 {
-    max-width: 550px;
+    max-width: 770px;
   }
 
 </style>

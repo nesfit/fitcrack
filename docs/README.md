@@ -1,10 +1,8 @@
-# Fitcrack Webadmin user manual
+# Fitcrack Webadmin User's Guide
 
-Blah blah blah this is **a user manual**. It shows you how to do things.
+Welcome to the Fitcrack User's Guide. A comprehensive documentation of the Webadmin app used to control the password cracking system developed at BUT FIT.
 
 ![App preview](./_media/img/frontpage.png)
-
-!> Look at the screenshot! It's important.
 
 ## Fitcrack — Distributed password cracking system
 
@@ -14,4 +12,4 @@ Thanks to the integration with [Hashcat](https://hashcat.net/) tool, Fitcrack pr
 
 Our system is based on [BOINC](http://boinc.berkeley.edu/) framework for distributed computing which allows Fitcrack to provide a relatively high level of automatization whithout limiting the flexibility of the system, or administrator’s freedom of creating a custom design and configuration of a distributed network.
 
-Fitcrack was created within the [NES@FIT](http://www.fit.vutbr.cz/research/groups/nes@fit/index.php.en) reasearch group on [Faculty of Information Technology, Brno University of Technology](http://www.fit.vutbr.cz/.en). Rather than a ready-made product, it represents an experimental prototype primarily used for research and testing of new password recovery techniques. It is freely available under [MIT license](https://opensource.org/licenses/MIT) Since Fitcrack is an experimental prototype, you can only use it at your own risk. We will not be held in any way responsible for your decision. For using Wrathion we provide no support, or assistance.
+Fitcrack was created within the [NES@FIT](http://www.fit.vutbr.cz/research/groups/nes@fit/index.php.en) reasearch group on [Faculty of Information Technology, Brno University of Technology](http://www.fit.vutbr.cz/.en). Rather than a ready-made product, it represents an experimental prototype primarily used for research and testing of new password recovery techniques. It is freely available under [MIT license](https://opensource.org/licenses/MIT) Since Fitcrack is an experimental prototype, you can only use it at your own risk. We will not be held in any way responsible for your decision.
