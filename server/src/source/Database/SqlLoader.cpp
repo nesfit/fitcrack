@@ -259,8 +259,6 @@ std::vector<std::string> CSqlLoader::loadJobHashes(uint64_t jobId)
             std::string input(row[0]);
             CodeTools::Base64::Decode(input, output);
             result.emplace_back(output);
-            Tools::printDebugJob(Config::DebugType::Log, jobId,
-                                 "Decoded hash: %s\n", output.c_str());
         }
     }
 

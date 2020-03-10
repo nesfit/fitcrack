@@ -437,3 +437,27 @@ void CJob::setGrammar(const std::string & grammar)
 {
     m_grammar = grammar;
 }
+
+
+const std::string &CJob::getCharset1() const
+{
+    return m_charset1;
+}
+
+
+const std::string &CJob::getCharset2() const
+{
+    return m_charset2;
+}
+
+
+const std::string &CJob::getCharset3() const
+{
+    return m_charset3;
+}
+
+
+const std::string &CJob::getCharset4() const
+{
+    return m_charset4;
+}
