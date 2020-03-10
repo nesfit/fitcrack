@@ -95,9 +95,6 @@
       },
       fileChange(fileList) {
         this.files = new FormData()
-        for (let [name, val] of Object.entries(this.args)) {
-          this.files.append(name, val)
-        }
         this.selectedFiles = []
         for (var i = 0; i < fileList.length; i++) {
           this.selectedFiles.push({
@@ -107,6 +104,11 @@
               'modified': fileList[i].lastModifiedDate ? fileList[i].lastModifiedDate.toLocaleDateString() : 'n/a'
             })
           this.files.append("file", fileList[i], fileList[i].name);
+        }
+        if (this.args) {
+          for (let [name, val] of Object.entries(this.args)) {
+            this.files.append(name, val)
+          }
         }
         this.fileUploaded = false
         this.progress = 0
