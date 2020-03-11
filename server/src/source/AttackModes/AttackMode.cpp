@@ -51,71 +51,17 @@ std::string AttackMode::generateBasicConfig(char wuMode, unsigned attackMode, un
     if (!ruleRight.empty())
         result += "|||rule_right|String|" + std::to_string(ruleRight.length()) + "|" + ruleRight + "|||\n";
 
-    std::ifstream::pos_type size;
-    char * contents;
     if (!charset1.empty())
-    {
-        std::ifstream charsetFile((Config::charsetDir + charset1).c_str(), std::ios::in|std::ios::binary|std::ios::ate);
-        if (charsetFile.is_open())
-        {
-            size = charsetFile.tellg();
-            contents = new char[size];
-            charsetFile.seekg(0, std::ios::beg);
-            charsetFile.read(contents, size);
-            charsetFile.close();
-
-            result += "|||charset1|String|" + std::to_string(2 * size) + "|" + Tools::toHex(contents, int(size)) + "|||\n";
-            delete[] contents;
-        }
-    }
+        result += "|||charset1|String|" + std::to_string(charset1.length()) + "|" + charset1 + "|||\n";
 
     if (!charset2.empty())
-    {
-        std::ifstream charsetFile((Config::charsetDir + charset2).c_str(), std::ios::in|std::ios::binary|std::ios::ate);
-        if (charsetFile.is_open())
-        {
-            size = charsetFile.tellg();
-            contents = new char[size];
-            charsetFile.seekg(0, std::ios::beg);
-            charsetFile.read(contents, size);
-            charsetFile.close();
-
-            result += "|||charset2|String|" + std::to_string(2 * size) + "|" + Tools::toHex(contents, int(size)) + "|||\n";
-            delete[] contents;
-        }
-    }
+        result += "|||charset1|String|" + std::to_string(charset2.length()) + "|" + charset2 + "|||\n";
 
     if (!charset3.empty())
-    {
-        std::ifstream charsetFile((Config::charsetDir + charset3).c_str(), std::ios::in|std::ios::binary|std::ios::ate);
-        if (charsetFile.is_open())
-        {
-            size = charsetFile.tellg();
-            contents = new char[size];
-            charsetFile.seekg(0, std::ios::beg);
-            charsetFile.read(contents, size);
-            charsetFile.close();
-
-            result += "|||charset3|String|" + std::to_string(2 * size) + "|" + Tools::toHex(contents, int(size)) + "|||\n";
-            delete[] contents;
-        }
-    }
+        result += "|||charset1|String|" + std::to_string(charset3.length()) + "|" + charset3 + "|||\n";
 
     if (!charset4.empty())
-    {
-        std::ifstream charsetFile((Config::charsetDir + charset4).c_str(), std::ios::in|std::ios::binary|std::ios::ate);
-        if (charsetFile.is_open())
-        {
-            size = charsetFile.tellg();
-            contents = new char[size];
-            charsetFile.seekg(0, std::ios::beg);
-            charsetFile.read(contents, size);
-            charsetFile.close();
-
-            result += "|||charset4|String|" + std::to_string(2 * size) + "|" + Tools::toHex(contents, int(size)) + "|||\n";
-            delete[] contents;
-        }
-    }
+        result += "|||charset1|String|" + std::to_string(charset4.length()) + "|" + charset4 + "|||\n";
 
     return result;
 }
