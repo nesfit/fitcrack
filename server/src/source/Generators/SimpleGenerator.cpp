@@ -169,11 +169,7 @@ void CSimpleGenerator::createRegularWorkunit(PtrJob &job, PtrHost &host)
             break;
 
         case Config::AttackMode::AttackPrince:
-          if (job->getAttackSubmode() == 0)
-            attack = new CAttackPrince(job, host, duration, m_sqlLoader);
-          else
-            abort();
-          // attack = new CAttackRules(job, host, duration, m_sqlLoader);
+          attack = new CAttackPrince(job, host, duration, m_sqlLoader);
           break;
 
         case Config::AttackMode::AttackPcfg:
