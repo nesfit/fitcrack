@@ -4,13 +4,13 @@
 -->
 
 <template>
-  <v-container fluid>
+  <div>
     <div class="users mx-auto mb-5">
       <h2>Users</h2>
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in users">
-            <v-list-item @click="">
+            <v-list-item :key="index">
               <v-list-item-content>
                 <v-list-item-title>
                   {{ item.username }}
@@ -19,8 +19,10 @@
               </v-list-item-content>
               <v-list-item-action class="width150">
                 <v-select
-                  text
-                  solo
+                  class="tinyselect"
+                  outlined
+                  hide-details
+                  dense
                   item-text="name"
                   item-value="id"
                   :items="userRoles"
@@ -61,7 +63,7 @@
             </v-list-item>
             <v-divider
               v-if="index + 1 < users.length"
-              :key="index"
+              :key="index + 'd'"
             />
           </template>
         </v-list>
@@ -71,7 +73,6 @@
           color="primary"
           class="addBtn"
           text
-          outlined
           @click="userDialog=true"
         >
           Add user
@@ -87,40 +88,34 @@
         :loading="loading"
         hide-default-footer
       >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>{{ props.item.name }}</td>
-          <td class="text-right">
-            <v-checkbox
-              v-model="props.item.ADD_NEW_JOB"
-              @change="roleChange($event, props.item.id, 'ADD_NEW_JOB')"
-            />
-          </td>
-          <td>
-            <v-checkbox
-              v-model="props.item.MANAGE_USERS"
-              @change="roleChange($event, props.item.id, 'MANAGE_USERS')"
-            />
-          </td>
-          <td class="text-right">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  class="mx-0"
-                  @click="deleteRole(props.item.id)"
-                  v-on="on"
-                >
-                  <v-icon color="error">
-                    close
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>Delete role</span>
-            </v-tooltip>
-          </td>
+        <template v-slot:item.ADD_NEW_JOB="{ item }">
+          <v-checkbox
+            v-model="item.ADD_NEW_JOB"
+            @change="roleChange($event, item.id, 'ADD_NEW_JOB')"
+          />
+        </template>
+        <template v-slot:item.MANAGE_USERS="{ item }">
+          <v-checkbox
+            v-model="item.MANAGE_USERS"
+            @change="roleChange($event, item.id, 'MANAGE_USERS')"
+          />
+        </template>
+        <template v-slot:item.id="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                @click="deleteRole(item.id)"
+                v-on="on"
+              >
+                <v-icon color="error">
+                  close
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Delete role</span>
+          </v-tooltip>
         </template>
       </v-data-table>
       <div class="addBtnCont">
@@ -128,7 +123,6 @@
           color="primary"
           class="addBtn"
           text
-          outlined
           @click="roleDialog=true"
         >
           Add role
@@ -162,7 +156,7 @@
           <v-btn
             color="primary"
             text
-            :disabled="this.newRoleName=''"
+            :disabled="newRoleName==''"
             @click.stop="addRole"
           >
             Add
@@ -326,7 +320,7 @@
           <v-btn
             color="primary"
             text
-            :disabled="!validNewUserForm || this.newUsername == '' || this.newEmail == '' || this.newPassword == '' || this.newUserRoleID == ''"
+            :disabled="!validNewUserForm || newUsername == '' || newEmail == '' || newPassword == '' || newUserRoleID == ''"
             @click.stop="addUser"
           >
             Add user
@@ -346,7 +340,7 @@
         </div>
       </v-card>
     </v-dialog>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -367,7 +361,7 @@
         userDialog: false,
         oldPassword: null,
         newPassword0: null,
-        newpassword1: null,
+        newPassword1: null,
         users: [],
         totalItems: 0,
         pagination: {},
@@ -375,12 +369,12 @@
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Add new job', value: 'ADD_NEW_JOB', align: 'left'},
-          {text: 'Manage users', value: 'MANAGE_USERS', align: 'left'},
-          {text: '', value: 'id', align: 'right'}
+          {text: 'Add new job', value: 'ADD_NEW_JOB', align: 'start'},
+          {text: 'Manage users', value: 'MANAGE_USERS', align: 'start'},
+          {text: '', value: 'id', align: 'end'}
         ],
         userRoles: [],
         validEditUserForm: true,
@@ -495,7 +489,12 @@
 </script>
 
 <style scoped>
+  .tinyselect {
+    max-width: 20ch;
+  }
+
   .users {
+    margin-top: 2em;
     max-width: 550px;
   }
 
@@ -505,7 +504,7 @@
   }
 
   .roleTable {
-    max-width: 500px;
+    max-width: 550px;
     margin: auto;
   }
 

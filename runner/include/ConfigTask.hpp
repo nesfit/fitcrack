@@ -133,6 +133,13 @@ class ConfigTask {
         static const char *DICT_HC_KEYSPACE;
         static const char *START_INDEX;
         static const char *START_HASH_INDEX;
+        static const char *SKIP_FROM_START;
+        static const char *CASE_PERMUTE;
+        static const char *CHECK_DUPLICATES;
+        static const char *MIN_PASSWORD_LEN;
+        static const char *MAX_PASSWORD_LEN;
+        static const char *MIN_ELEM_IN_CHAIN;
+        static const char *MAX_ELEM_IN_CHAIN;
 };
 
 #endif // CONFIGTASK_HPP

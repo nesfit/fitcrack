@@ -142,6 +142,8 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
 
     result = []
     for file in os.listdir(folder):
+        if file.startswith('.'):
+            continue
         filePath = os.path.join(folder, file)
         if os.path.isfile(filePath):
             modificationTime = datetime.datetime.fromtimestamp(os.path.getmtime(filePath)).strftime('%Y-%m-%d %H:%M:%S')

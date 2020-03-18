@@ -47,7 +47,7 @@ bool CAttackMarkov::makeWorkunit()
 
     std::ofstream f;
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open config BOINC input file! Setting job to malformed.\n");
@@ -55,15 +55,10 @@ bool CAttackMarkov::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new workunit:\n");
-
-    /** Output original config from DB */
-    f << m_job->getConfig();
-    Tools::printDebug(m_job->getConfig().c_str());
-
-    /** Output mode */
-    f << "|||mode|String|1|n|||\n";
-    Tools::printDebug("|||mode|String|1|n|||\n");
+    f << generateBasicConfig('n', m_job->getAttackMode(), m_job->getAttackSubmode(),
+                             m_job->getName(), m_job->getHashType(), "", "",
+                             m_job->getCharset1(), m_job->getCharset2(), m_job->getCharset3(),
+                             m_job->getCharset4());
 
     /** Output mask */
     f << "|||mask|String|" << workunitMask->getMask().length() << "|" << workunitMask->getMask() << "|||\n";
@@ -123,7 +118,7 @@ bool CAttackMarkov::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open data BOINC input file! Setting job to malformed.\n");
@@ -146,7 +141,7 @@ bool CAttackMarkov::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open markov BOINC input file! Setting job to malformed.\n");
@@ -164,7 +159,7 @@ bool CAttackMarkov::makeWorkunit()
 
     std::ifstream markovFile;
     markovFile.open((Config::markovDir + m_job->getMarkov()).c_str());
-    if (!markovFile)
+    if (!markovFile.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open markov file! Setting job to malformed.\n");

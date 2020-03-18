@@ -71,6 +71,25 @@ protected:
 
         }
 
+        /**
+         * @brief Generates a basic config file for all attack_types
+         * @param wuMode Mode of the WU (b/n/a)
+         * @param attackMode Attack number
+         * @param attackSubmode Attack submode
+         * @param name Name of the Job
+         * @param hashType Hashcat hash type
+         * @param ruleLeft Left rule if present
+         * @param ruleRight Right rule if present
+         * @param charset1 Charset 1 if being used
+         * @param charset2 Charset 2 if being used
+         * @param charset3 Charset 3 if being used
+         * @param charset4 Charset 4 if being used
+         * @return Config string with newline at the end
+         */
+        std::string generateBasicConfig(char wuMode, unsigned attackMode, unsigned attackSubmode, std::string name,
+                unsigned hashType, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
+                std::string charset2="", std::string charset3="", std::string charset4="");
+
 
         PtrWorkunit m_workunit; /**< Instance of CWorkunit which is used to create this attack instance */
         PtrJob m_job;           /**< Instance of CJob which is parent of this attack instance */

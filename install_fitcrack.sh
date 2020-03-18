@@ -25,8 +25,23 @@ fi
 # Detect Linux distro and set distro-specific defaults
 source installer/detect_distro.sh
 
-# Read and set user variables
-source installer/set_vars.sh
+if [[ $1 == "-s" ]]; then
+    # Set user variables (default values)
+    source installer/set_default_vars.sh
+    if [[ $2 == "-2" ]]; then
+        source installer/update_daemons.sh
+        exit
+    elif [[ $2 == "-3" ]]; then
+        source installer/update_webadmin.sh
+        exit
+    elif [[ $2 == "-4" ]]; then
+        source installer/uninstall.sh
+        exit
+    fi
+else
+    # Read and set user variables
+    source installer/set_vars.sh
+fi
 
 # Installer menu
 finished=false

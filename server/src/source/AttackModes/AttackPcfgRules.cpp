@@ -55,7 +55,7 @@ bool CAttackPcfgRules::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open data BOINC input file! Setting job to malformed.\n");
@@ -126,7 +126,7 @@ bool CAttackPcfgRules::makeWorkunit()
 
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open config BOINC input file! Setting job to malformed.\n");
@@ -134,15 +134,8 @@ bool CAttackPcfgRules::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new workunit:\n");
-
-    /** Output original config from DB */
-    f << m_job->getConfig();
-    Tools::printDebug(m_job->getConfig().c_str());
-
-    /** Output mode */
-    f << "|||mode|String|1|n|||\n";
-    Tools::printDebug("|||mode|String|1|n|||\n");
+    f << generateBasicConfig('n', m_job->getAttackMode(), m_job->getAttackSubmode(),
+                             m_job->getName(), m_job->getHashType());
 
     /** Output hc_keyspace */
     int digits = 0;
@@ -164,7 +157,7 @@ bool CAttackPcfgRules::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open grammar BOINC input file! Skipping workunit.\n");
@@ -201,7 +194,7 @@ bool CAttackPcfgRules::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open rules BOINC input file! Setting job to malformed.\n");

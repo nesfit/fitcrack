@@ -10,7 +10,7 @@ packages_page => jobs_page
 packagess_query => jobs_query
 packagesJob => workunitsJob
 '''
-
+import os
 import base64
 import logging
 
@@ -21,6 +21,8 @@ from flask import request
 from flask_restplus import Resource
 from flask_restplus import abort
 from sqlalchemy import func
+
+from settings import DICTIONARY_DIR
 
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
@@ -182,6 +184,11 @@ class OperationWithJob(Resource):
             if job.attack_mode == 9:
                 pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
                 start_pcfg_manager(job.id, pcfg.name, job.hc_keyspace)
+            elif job.attack_mode == 8:
+                prince_temp_job_dict = os.path.join(DICTIONARY_DIR, ".prince_" + str(id) + ".txt")
+                if os.path.exists(prince_temp_job_dict):
+                    os.remove(prince_temp_job_dict)
+
             job.status = 10
         elif action == 'stop':
             job.status = 12

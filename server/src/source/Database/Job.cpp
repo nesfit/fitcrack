@@ -33,11 +33,23 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_dict1 = jobMap["dict1"];
         this->m_dict2 = jobMap["dict2"];
         this->m_rules = jobMap["rules"];
+        this->m_ruleLeft = jobMap["rule_left"];
+        this->m_ruleRight = jobMap["rule_right"];
+        this->m_charset1 = jobMap["charset1"];
+        this->m_charset2 = jobMap["charset2"];
+        this->m_charset3 = jobMap["charset3"];
+        this->m_charset4 = jobMap["charset4"];
         if (!jobMap["grammar_id"].empty())
             this->m_grammar_id = std::stoull(jobMap["grammar_id"]);
         this->m_markov = jobMap["markov_hcstat"];
         this->m_markovThreshold = std::stoul(jobMap["markov_threshold"]);
         this->m_replicateFactor = std::stoul(jobMap["replicate_factor"]);
+        this->m_casePermute = std::stoul(jobMap["case_permute"]);
+        this->m_checkDuplicates = std::stoul(jobMap["check_duplicates"]);
+        this->m_minPasswordLen = std::stoul(jobMap["min_password_len"]);
+        this->m_maxPasswordLen = std::stoul(jobMap["max_password_len"]);
+        this->m_minElemInChain = std::stoul(jobMap["min_elem_in_chain"]);
+        this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         /** Check for valid values */
@@ -303,6 +315,18 @@ const std::string & CJob::getRules() const
 }
 
 
+const std::string & CJob::getRuleLeft() const
+{
+    return m_ruleLeft;
+}
+
+
+const std::string & CJob::getRuleRight() const
+{
+    return m_ruleRight;
+}
+
+
 const std::string & CJob::getGrammar() const
 {
     return m_grammar;
@@ -328,6 +352,16 @@ uint32_t CJob::getReplicateFactor() const
 bool CJob::getKillFlag() const
 {
     return m_killFlag;
+}
+
+bool CJob::getCasePermuteFlag() const
+{
+    return m_casePermute;
+}
+
+bool CJob::getCheckDuplicatesFlag() const
+{
+    return m_checkDuplicates;
 }
 
 
@@ -418,4 +452,52 @@ uint32_t CJob::getMarkovThreshold() const
 void CJob::setGrammar(const std::string & grammar)
 {
     m_grammar = grammar;
+}
+
+
+const std::string &CJob::getCharset1() const
+{
+    return m_charset1;
+}
+
+
+const std::string &CJob::getCharset2() const
+{
+    return m_charset2;
+}
+
+
+const std::string &CJob::getCharset3() const
+{
+    return m_charset3;
+}
+
+
+const std::string &CJob::getCharset4() const
+{
+    return m_charset4;
+}
+
+
+uint32_t CJob::getMinPasswordLen() const
+{
+    return m_minPasswordLen;
+}
+
+
+uint32_t CJob::getMaxPasswordLen() const
+{
+    return m_maxPasswordLen;
+}
+
+
+uint32_t CJob::getMinElemInChain() const
+{
+    return m_minElemInChain;
+}
+
+
+uint32_t CJob::getMaxElemInChain() const
+{
+    return m_maxElemInChain;
 }

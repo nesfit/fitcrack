@@ -860,11 +860,13 @@
 
             // If Job is finished
             else if (validWorkunits.length > 0) {
+              if (this.data.cracking_time == 0) {
+                this.efficiency = "-";
+              } else {
+                const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.cracking_time);
 
-              const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.cracking_time);
-
-              this.efficiency = (efficiency * 100).toFixed(2) + ' %';
-              //console.log("Efectivity:", this.efficiency);
+                this.efficiency = (efficiency * 100).toFixed(2) + ' %';
+              }
             } else {
               this.efficiency = "No workunits yet";
             }

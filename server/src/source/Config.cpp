@@ -39,6 +39,7 @@ namespace Config {
     std::string markovDir = "/usr/share/collections/markov/";
     std::string rulesDir = "/usr/share/collections/rules/";
     std::string pcfgDir = "/usr/share/collections/pcfg/";
+    std::string charsetDir = "/usr/share/collections/charsets/";
 
     /** Template names*/
     std::string inTemplateFileBench =      "bench_in";
@@ -47,6 +48,8 @@ namespace Config {
     std::string inTemplateFileDict =       "dict_in";
     std::string inTemplateFileCombinator = "combinator_in";
     std::string inTemplateFileRule =       "rule_in";
+    std::string inTemplateFilePrince =     "prince_in";
+    std::string inTemplateFilePrinceRules ="prince_rules_in";
     std::string inTemplateFilePcfg =       "pcfg_in";
     std::string inTemplateFilePcfgRules =  "pcfg_rules_in";
     std::string outTemplateFile =          "app_out";
@@ -56,6 +59,8 @@ namespace Config {
     char * inTemplatePathMask = nullptr;
     char * inTemplatePathMarkov = nullptr;
     char * inTemplatePathDict = nullptr;
+    char * inTemplatePathPrince = nullptr;
+    char * inTemplatePathPrinceRules = nullptr;
     char * inTemplatePathPcfg = nullptr;
     char * inTemplatePathPcfgRules = nullptr;
     char * inTemplatePathCombinator = nullptr;
@@ -252,4 +257,15 @@ void Tools::releaseFdMemory()
             delete fd.second;
         }
     }
+}
+
+
+std::string Tools::toHex(char *binaryData, int len)
+{
+    std::string s(len * 2, ' ');
+    for (int i = 0; i < len; ++i) {
+        s[2 * i]     = Config::hexmap[(binaryData[i] & 0xF0) >> 4];
+        s[2 * i + 1] = Config::hexmap[binaryData[i] & 0x0F];
+    }
+    return s;
 }
