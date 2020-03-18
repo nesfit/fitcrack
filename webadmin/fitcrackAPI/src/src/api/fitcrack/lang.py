@@ -22,7 +22,8 @@ job_status_text_info_to_code_dict = {
     12: 'The job is still running, but no more workunits will be assigned to hosts.',
     1: 'The job is not running anymore, and at least one hash has been cracked.',
     2: 'The job is not running anymore, and no hash has been cracked.',
-    3: 'The job has been malformed by a computation error.'
+    3: 'The job has been malformed by a computation error.',
+    4: 'The job was stopped due to passed timeout deadline.'
 }
 
 host_status_text_to_code_dict = {
