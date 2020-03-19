@@ -29,7 +29,6 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_currentIndex2 = std::stoull(jobMap["current_index_2"]);
         this->m_name = jobMap["name"];
         this->m_secondsPerWorkunit = std::stoull(jobMap["seconds_per_workunit"]);
-        this->m_config = jobMap["config"];
         this->m_dict1 = jobMap["dict1"];
         this->m_dict2 = jobMap["dict2"];
         this->m_rules = jobMap["rules"];
@@ -288,12 +287,6 @@ const std::string & CJob::getName() const
 uint64_t CJob::getSecondsPerWorkunit() const
 {
     return m_secondsPerWorkunit;
-}
-
-
-const std::string & CJob::getConfig() const
-{
-    return m_config;
 }
 
 

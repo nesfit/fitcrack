@@ -266,7 +266,6 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `time_end` timestamp NULL DEFAULT NULL,
   `cracking_time` double NOT NULL DEFAULT '0',
   `seconds_per_workunit` bigint(20) unsigned NOT NULL DEFAULT '3600',
-  `config` longtext COLLATE utf8_bin NOT NULL,
   `dict1` varchar(255) COLLATE utf8_bin NOT NULL,
   `dict2` varchar(255) COLLATE utf8_bin NOT NULL,
   `charset1` varchar(4096) COLLATE utf8_bin DEFAULT NULL,

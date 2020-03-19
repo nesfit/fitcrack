@@ -112,7 +112,6 @@ class CJob {
         uint64_t    m_currentIndex2;
         std::string m_name;
         uint64_t    m_secondsPerWorkunit;
-        std::string m_config;
         std::string m_dict1;
         std::string m_dict2;
         std::string m_rules;
@@ -170,7 +169,6 @@ class CJob {
         uint64_t getCurrentIndex2() const;
         const std::string & getName() const;
         uint64_t getSecondsPerWorkunit() const;
-        const std::string & getConfig() const;
         const std::string & getDict1() const;
         const std::string & getDict2() const;
         const std::string & getRules() const;

@@ -203,7 +203,6 @@ class FcJob(Base):
     time_end = Column(DateTime)
     cracking_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
-    config = Column(String(400, collation='utf8_bin'), nullable=False)
     dict1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
     dict2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
     charset1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
