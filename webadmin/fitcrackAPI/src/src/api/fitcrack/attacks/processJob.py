@@ -137,8 +137,6 @@ def process_job_3(job, hashcatKeyspace=True):
 
             hashcatArgs += ' -' + str(i) + ' ' + charsetPath
             hexCharset = content.hex()
-            job['config'] += '|||charset' + str(i) + '|String|' + lenStr(
-                hexCharset) + '|' + hexCharset + '|||\n'
             job['charset' + str(i)] = hexCharset
 
     # compute keyspace

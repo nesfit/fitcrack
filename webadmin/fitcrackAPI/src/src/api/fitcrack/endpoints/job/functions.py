@@ -54,7 +54,6 @@ def create_job(data):
     if not process_func:
         abort(400, "Unsupported attack type")
 
-    data['config'] = ''
     job = process_func(data)
 
     if job['attack_settings']['attack_mode'] == 3:
@@ -66,24 +65,6 @@ def create_job(data):
 
     else:
         attack_settings_control = job['attack_settings']['attack_mode']
-
-    job['config'] += (
-                         '|||attack_mode|UInt|' + lenStr(str(attack_settings_control)) + '|' +
-                         str(attack_settings_control) + '|||\n' +
-                         '|||attack_submode|UInt|' + lenStr(str(job['attack_settings']['attack_submode'])) + '|' +
-                         str(job['attack_settings']['attack_submode']) + '|||\n' +
-                         '|||name|String|' + lenStr(job['name']) + '|' + job['name'] + '|||\n' +
-                         '|||hash_type|UInt|' + lenStr(job['hash_settings']['hash_type']) + '|' +
-                         job['hash_settings']['hash_type'] + '|||\n'
-                         )
-
-    if job['attack_settings'].get('rule_left') and job['attack_settings']['rule_left'] != '':
-        job['config'] += '|||rule_left|String|' + lenStr(str(job['attack_settings']['rule_left'])) + '|' + \
-                             job['attack_settings']['rule_left'] + '|||\n'
-
-    if job['attack_settings'].get('rule_right') and job['attack_settings']['rule_right'] != '':
-        job['config'] += '|||rule_right|String|' + lenStr(str(job['attack_settings']['rule_right'])) + '|' + \
-                             job['attack_settings']['rule_right'] + '|||\n'
 
     token = uuid1()
 
