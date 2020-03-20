@@ -1,9 +1,10 @@
-name: Build webadmin FE
+name: Build webadmin FE and Runner
 
 on:
   push:
     paths:
       - 'webadmin/fitcrackFE/**'
+      - 'runner/**'
 
 jobs:
   build:
@@ -15,7 +16,7 @@ jobs:
         node-version: [12.x]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Extract branch name
       shell: bash
       run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
@@ -34,14 +35,22 @@ jobs:
       run: |
         npm ci
         npm run build --if-present
+    - name: Install mingw g++
+      run: sudo apt-get install g++-mingw-w64-x86-64
+    - name: Build Runner
+      working-directory: runner
+      run: |
+        bash update_client_libs.sh
+        make clean
     - name: Commit files
       run: |
         git config --local user.email "me@ovi.moe"
         git config --local user.name "Webpacker"
         git add webadmin/fitcrackFE/static/configuration.js
-        git commit -m "Fix server address derp 🔨" || true
+        git add server/client_bin/windows_x86_64/runner1.exe -f
+        git add server/client_bin/x86_64-pc-linux-gnu/runner1.bin -f
         git add .
-        git commit -m "Build webadmin frontend 🚀" || true
+        git commit -m "Build webadmin frontend and Runner 🚀"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
