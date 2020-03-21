@@ -297,7 +297,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
 -- Štruktúra tabuľky pre tabuľku `fc_job_dictionary`
 --
 
-CREATE TABLE `fc_job_dictionary` (
+CREATE TABLE IF NOT EXISTS `fc_job_dictionary` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `job_id` bigint(20) unsigned NOT NULL,
   `dictionary_id` bigint(20) unsigned NOT NULL,
