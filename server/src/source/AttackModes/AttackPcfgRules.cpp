@@ -10,10 +10,10 @@
 #include <AttackPcfgClient.h>
 #include <cmath>
 
-CAttackPcfgRules::CAttackPcfgRules(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-        :   AttackMode(job, host, seconds, sqlLoader)
+CAttackPcfgRules::CAttackPcfgRules(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+        :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
-    m_client = PretermClient(job->getId());
+    m_client = PretermClient(m_job->getId());
 }
 
 
@@ -101,9 +101,7 @@ bool CAttackPcfgRules::makeWorkunit()
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                           "Expected terminals: %" PRIu64 "\n", newKeyspace);
 
-    loadNextPreterminals(preterminals, newKeyspace);
-
-    if (preterminals.empty() || newKeyspace == 0)
+    if(!loadNextPreterminals(preterminals, newKeyspace))
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to fetch response from PCFG Manager!\n");
@@ -134,15 +132,13 @@ bool CAttackPcfgRules::makeWorkunit()
         return false;
     }
 
-    f << generateBasicConfig('n', m_job->getAttackMode(), m_job->getAttackSubmode(),
+    f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
                              m_job->getName(), m_job->getHashType());
 
     /** Output hc_keyspace */
-    int digits = 0;
-    uint64_t num = newKeyspace;
-    do { num /= 10; ++digits; } while (num != 0);    // Count digits
-    f << "|||hc_keyspace|BigUInt|" << digits << "|" << newKeyspace << "|||\n";
-    Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, newKeyspace);
+    auto limitLine = makeLimitConfigLine(newKeyspace);
+    f << limitLine;
+    Tools::printDebug(limitLine.c_str());
 
     f.close();
 
@@ -288,7 +284,7 @@ bool CAttackPcfgRules::generateWorkunit()
                           "Generating PCFG workunit ...\n");
 
     /** Compute password count */
-    uint64_t passCount = m_host->getPower() * m_seconds;
+    uint64_t passCount = getPasswordCountToProcess();
 
     if (passCount < Config::minPassCount)
     {
@@ -309,12 +305,13 @@ bool CAttackPcfgRules::generateWorkunit()
 }
 
 
-void CAttackPcfgRules::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
+bool CAttackPcfgRules::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
 {
     /** Run gRPC query to get preterminals */
     if (!m_client.Connect())
-        return;
+        return false;
 
     preterminals = m_client.GetNextItems(realKeyspace);
     m_client.Acknowledge();
+    return !preterminals.empty() && realKeyspace != 0;
 }

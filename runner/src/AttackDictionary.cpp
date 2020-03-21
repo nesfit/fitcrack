@@ -6,10 +6,11 @@
 #include "AttackDictionary.hpp"
 
 AttackDictionary::AttackDictionary(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory) {
-  addSpecificArguments();
+  
 }
 
 void AttackDictionary::addSpecificArguments() {
+  AttackCrackingBase::addSpecificArguments();
 
   if (attack_submode_ == "0") {
 

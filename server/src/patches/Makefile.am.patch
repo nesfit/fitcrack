@@ -31,13 +31,14 @@
 +    Config.h \
 +    Dictionary.h \
 +    Host.h \
++    InfileArray.h \
++    InputDict.h \
 +    Workunit.h \
 +    Mask.h \
 +    Job.h \
 +    SqlLoader.h \
 +    AbstractGenerator.h \
 +    SimpleGenerator.h \
-+    AttackBench.cpp \
 +    AttackCombinator.cpp \
 +    AttackDict.cpp \
 +    AttackMarkov.cpp \
@@ -47,6 +48,8 @@
 +    Config.cpp \
 +    Dictionary.cpp \
 +    Host.cpp \
++    InfileArray.cpp \
++    InputDict.cpp \
 +    Workunit.cpp \
 +    Mask.cpp \
 +    Job.cpp \

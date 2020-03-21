@@ -45,6 +45,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#include "Config.h"
 #include "backend_lib.h"
 #include "boinc_db.h"
 #include "error_numbers.h"
@@ -63,7 +64,7 @@
 #define MAX_HASH_SIZE 8192
 
 /** Benchmark is usually much faster than real cracking, shrink the first 2 workunits times-: */
-#define FIRST_WU_SHRINK_FACTOR 3
+#define FIRST_WU_SHRINK_FACTOR 1
 
 /** Special ID of special bench_all job in fc_job */
 #define BENCHALL_JOB_ID 1
@@ -629,7 +630,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
         OUTPUT_FILE_INFO& fi = output_files[i];
 
         /** Debug output elapsed time */
-        std::cerr << __LINE__ << "Elapsed time: " << canonical_result.elapsed_time << std::endl;
+        std::cerr << __LINE__ << " - Elapsed time: " << canonical_result.elapsed_time << std::endl;
 
         /** Open the output file */
         FILE* f = std::fopen(fi.path.c_str(), "rb");
@@ -682,14 +683,18 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                     break;
                 }
 
-                std::cerr << __LINE__ << " - New host power: " << power << std::endl;
-
                 /** In case of mask attack, convert power to mask indices/s */
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_mode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
                 uint64_t attack_mode = get_num_from_mysql(buf);
 
                 /** Save original power for fc_benchmark */
                 long long unsigned int original_power = power;
+
+                std::snprintf(buf, SQL_BUF_SIZE, "SELECT COUNT(*) FROM `%s` WHERE job_id = %" PRIu64 " LIMIT 1;", mysql_table_hash.c_str(), job_id);
+                uint64_t hashcount = get_num_from_mysql(buf);
+                std::cerr<<__LINE__<<" - There are "<<hashcount<<" hashes, dividing power\n";
+                //benchmark sends hashes/second, so if there are more we need to divide by that to get keys/second
+                power /= hashcount;
 
                 if (attack_mode == 3)
                 {
@@ -716,12 +721,26 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                         std::cerr << __LINE__ << " - Updating power for mask-attack with ratio: 1/" << factor << ", new power: " << power << std::endl;
                     }
                 }
-                else if (attack_mode == 0)
+
+                //power is in hashes per second, and rules multiply the keyspace
+                std::snprintf(buf, SQL_BUF_SIZE, "SELECT rules FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
+                std::string rulesFilename = get_str_from_mysql(buf);
+                if(!rulesFilename.empty())
                 {
-                    // Speed of dictionary attack usually does not exceed 1mil h/s
-                    // Shrink the first workunit and adapt later
-                    if (power > 1000000)
-                        power = 1000000;
+                    std::ifstream rulesFile(Config::rulesDir+rulesFilename);
+                    if(rulesFile)
+                    {
+                        size_t ruleCount = 0;
+                        std::string line;
+                        while(std::getline(rulesFile, line))
+                        {
+                            if(!line.empty())
+                            {
+                                ruleCount += 1;
+                            }
+                        }
+                        power /= ruleCount;
+                    }
                 }
 
                 /** Update fc_benchmark power */
@@ -747,6 +766,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 }
 
                 /** Update fc_host power */
+                std::cerr << __LINE__ << " - New host power: " << power << std::endl;
                 std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET power = %llu, status = %d, time = now() WHERE id = %" PRIu64 " ;", mysql_table_host.c_str(), power, Host_normal, host_id);
                 update_mysql(buf);
 
@@ -944,7 +964,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                     /** Update the host power, if workunit was large enough (more then 1/2 benchmarked power) */
                     if (power_keyspace > (0.5 * seconds_per_workunit * old_power))
-                        update_power(host_id, power_keyspace, canonical_result.elapsed_time);
+                        update_power(host_id, power_keyspace, cracking_time);
                     else
                         std::cerr << __LINE__ << " - WARNING: Assimilated workunit is too small for update_power calculation" << std::endl;
                 }
@@ -972,7 +992,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                     /** Update the host power, if workunit was large enough (more then 1/2 benchmarked power) */
                     if (power_keyspace > (0.15 * seconds_per_workunit * old_power))
-                        update_power(host_id, power_keyspace, canonical_result.elapsed_time);
+                        update_power(host_id, power_keyspace, cracking_time);
                     else
                         std::cerr << __LINE__ << " - WARNING: Assimilated workunit is too small for update_power calculation" << std::endl;
                 }

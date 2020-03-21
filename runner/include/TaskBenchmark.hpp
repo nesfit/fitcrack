@@ -7,6 +7,7 @@
 #define TASKBENCHMARK_HPP
 
 #include "TaskComputeBase.hpp"
+#include <set>
 
 /** Class representing benchmark task */
 class TaskBenchmark: public TaskComputeBase {
@@ -14,7 +15,9 @@ class TaskBenchmark: public TaskComputeBase {
     TaskBenchmark(const TaskBenchmark&);
     protected:
 
-        std::vector<unsigned long long> speeds_;    /**< Storage of speeds for all OCL deviced used by hashcat */
+        std::vector<unsigned long long> device_speeds_;    /**< Storage of speeds for all OCL deviced used by hashcat */
+
+	std::set<uint64_t> m_benchmarked_speeds;
 
 	/**
 	 * @brief Parse hashcat benchmark line  
@@ -56,6 +59,8 @@ class TaskBenchmark: public TaskComputeBase {
          * @return  Total speed
          */
         unsigned long long getTotalSpeed();
+
+        uint64_t getBenchmarkedSpeed();
 	
         /**
          * @brief   Sets total_keyspace_ value to 1 since each benchmark task

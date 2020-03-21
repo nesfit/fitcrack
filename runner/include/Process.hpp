@@ -7,11 +7,7 @@
 #define PROCESS_HPP
 
 #include "Directory.hpp"
-
-#include "File.hpp"
-
-#include "ProcessLinux.hpp"
-#include "ProcessWindows.hpp"
+#include "ProcessBase.hpp"
 
 /** Namespace for creating new process via function */
 namespace Process {
@@ -23,5 +19,6 @@ namespace Process {
      * @return  Pointer to new Process object
      */
     ProcessBase* create(const std::vector<std::string>& arguments, Directory& directory);
+    ProcessBase* create(std::string prefix, const std::vector<std::string>& arguments, Directory &directory);
 };
 #endif // PROCESS_HPP

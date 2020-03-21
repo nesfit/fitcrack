@@ -12,6 +12,7 @@
 #include "File.hpp"
 #include "Logging.hpp"
 #include "RunnerUtils.hpp"
+#include "Attack.hpp"
 
 #include <vector>
 #include <string>
@@ -20,6 +21,8 @@
 class AttackBase {
 
     private:
+
+        friend AttackBase *Attack::create(const ConfigTask&, Directory&);
 
         /**
          * @brief   Fills member vector with basic arguments shared by all
@@ -111,6 +114,10 @@ class AttackBase {
          * @return Copy of arguments_ vector
          */
         const std::vector<std::string>& getArguments();
+
+        virtual std::string getExternalGeneratorName() {return "";}
+
+        virtual std::vector<std::string> getExternalGeneratorArguments() const {return std::vector<std::string>();}
 
         /**
          * @brief   Getter of arguments_ size

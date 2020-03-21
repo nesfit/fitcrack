@@ -111,6 +111,8 @@ class PipeWindows : public PipeBase {
          */
         bool isWriteOpen() const;
 
+        virtual void waitForAvailableOutput() const;
+
         /**
          * @brief   Writes message to the pipe
          * @param   message [in] String to be written to pipe

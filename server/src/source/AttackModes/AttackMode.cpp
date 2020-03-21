@@ -11,6 +11,8 @@
 
 #include <fstream>
 
+#include <algorithm>
+#include <sstream>
 
 void AttackMode::setWorkunit(PtrWorkunit &workunit)
 {
@@ -32,11 +34,11 @@ void AttackMode::setDefaultWorkunitParams(DB_WORKUNIT * wu)
 }
 
 
-std::string AttackMode::generateBasicConfig(char wuMode, unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType,
+std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType,
                                             std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
                                             std::string charset3, std::string charset4)
 {
-    std::string result = "|||mode|String|1|" + std::string(1, wuMode) + "|||\n";
+    std::string result = "|||mode|String|1|" + std::string(1, getModeLetter()) + "|||\n";
     result += "|||attack_mode|UInt|" + std::to_string(std::to_string(attackMode).length()) + "|" + std::to_string(attackMode) + "|||\n";
     result += "|||attack_submode|UInt|" + std::to_string(std::to_string(attackSubmode).length()) + "|" + std::to_string(attackSubmode) + "|||\n";
     result += "|||name|String|" + std::to_string(name.length()) + "|" + name + "|||\n";
@@ -63,6 +65,71 @@ std::string AttackMode::generateBasicConfig(char wuMode, unsigned attackMode, un
     if (!charset4.empty())
         result += "|||charset1|String|" + std::to_string(charset4.length()) + "|" + charset4 + "|||\n";
 
+    Tools::printDebug("%s", result.c_str());
     return result;
 }
 
+template <typename Integral>
+uint64_t GetDecimalDigitCount(Integral num)
+{
+    uint64_t digits = 0;
+    do { num /= 10; ++digits; } while (num != 0);
+    return digits;
+}
+
+std::string AttackMode::makeSkipConfigLine(uint64_t toSkip)
+{
+    std::ostringstream stream;
+    stream << "|||start_index|BigUInt|" << GetDecimalDigitCount(toSkip) << "|" << toSkip << "|||\n";
+    return stream.str();
+}
+
+std::string AttackMode::makeLimitConfigLine(uint64_t limit)
+{
+    std::ostringstream stream;
+    stream << "|||hc_keyspace|BigUInt|" << GetDecimalDigitCount(limit) << "|" << limit << "|||\n";
+    return stream.str();
+}
+
+std::unique_ptr<InputDict> AttackMode::makeInputDict(PtrDictionary dict, uint64_t startIndex)
+{
+    return std::make_unique<InputDict>(dict, startIndex);
+}
+
+PtrDictionary AttackMode::FindCurrentDict(std::vector<PtrDictionary> &dicts) const
+{
+    for (PtrDictionary & dict : dicts)
+    {
+        if (dict->getCurrentIndex() < dict->getHcKeyspace())
+        {
+            /** Dictionary for a new workunit found */
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Dict found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
+                    dict->getDictFileName().c_str(), dict->getCurrentIndex(), dict->getHcKeyspace());
+            return dict;
+        }
+    }
+    return nullptr;
+}
+
+PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks) const
+{
+    for (PtrMask & mask : masks)
+    {
+        if (mask->getCurrentIndex() < mask->getHcKeyspace())
+        {
+            /** Mask for a new workunit found */
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Mask found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
+                    mask->getMask().c_str(), mask->getCurrentIndex(), mask->getHcKeyspace());
+            return mask;
+        }
+    }
+    return nullptr;
+}
+
+uint64_t AttackMode::getPasswordCountToProcess() const
+{
+    auto hashes = m_job->getHashes();
+    return m_host->getPower()*m_seconds;
+}

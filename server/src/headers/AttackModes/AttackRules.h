@@ -22,7 +22,7 @@ class CAttackRules : public AttackMode {
          * @param host [in] Instance of CHost which this attack belongs to
          * @param seconds [in] Number of seconds this instance of attack should take
          */
-        CAttackRules(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
+        CAttackRules(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
 
         /**
          * @brief Default destructor

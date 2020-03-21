@@ -28,7 +28,7 @@ class CDictionary {
 
     public:
         /** Default destructor */
-        ~CDictionary() = default;
+        virtual ~CDictionary() = default;
 
 
         /**
@@ -49,7 +49,7 @@ class CDictionary {
          * @brief Updates index of this dictionary object and database entry
          * @param newIndex [in] New dictionary current index
          */
-        void updateIndex(uint64_t newIndex);
+        virtual void updateIndex(uint64_t newIndex);
 
 
     private:

@@ -61,6 +61,8 @@ void ConfigTask::initSupported() {
   supported_.push_back("markov_threshold");
   supported_.push_back(ConfigTask::CASE_PERMUTE);
   supported_.push_back(ConfigTask::CHECK_DUPLICATES);
+  supported_.push_back("benchmark_dict1");
+  supported_.push_back("benchmark_dict2");
   supported_.push_back(ConfigTask::MIN_PASSWORD_LEN);
   supported_.push_back(ConfigTask::MAX_PASSWORD_LEN);
   supported_.push_back(ConfigTask::MIN_ELEM_IN_CHAIN);

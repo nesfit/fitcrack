@@ -326,16 +326,17 @@ fitcrack_sources = \
     AttackPcfgClient.h \
     AttackPcfgRules.h \
     Base64.h \
+    BenchmarkClasses.h \
     Config.h \
     Dictionary.h \
     Host.h \
+    InputDict.h \
     Workunit.h \
     Mask.h \
     Job.h \
     SqlLoader.h \
     AbstractGenerator.h \
     SimpleGenerator.h \
-    AttackBench.cpp \
     AttackCombinator.cpp \
     AttackDict.cpp \
     AttackMarkov.cpp \
@@ -346,9 +347,11 @@ fitcrack_sources = \
     AttackPcfg.cpp \
     AttackPcfgClient.cpp \
     AttackPcfgRules.cpp \
+    BenchmarkClasses.cpp \
     Config.cpp \
     Dictionary.cpp \
     Host.cpp \
+    InputDict.cpp \
     Workunit.cpp \
     Mask.cpp \
     Job.cpp \

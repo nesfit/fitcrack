@@ -27,6 +27,8 @@
 /** System headers*/
 #include <fstream>
 
+#include <InputDict.h>
+
 
 class AttackMode {
     public:
@@ -62,7 +64,7 @@ protected:
         * @param host [in] Instance of CHost which this attack belongs to
         * @param seconds [in] Number of seconds this instance of attack should take
         */
-        AttackMode(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+        AttackMode(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
         :   m_job(job),
             m_host(host),
             m_seconds(seconds),
@@ -86,10 +88,28 @@ protected:
          * @param charset4 Charset 4 if being used
          * @return Config string with newline at the end
          */
-        std::string generateBasicConfig(char wuMode, unsigned attackMode, unsigned attackSubmode, std::string name,
+        virtual std::string generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name,
                 unsigned hashType, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
                 std::string charset2="", std::string charset3="", std::string charset4="");
 
+        /**
+         * @brief Get the Mode Letter. This is 'n' for normal attack modes.
+         * 
+         * @return char The mode letter
+         */
+        virtual char getModeLetter() {return 'n';}
+
+        virtual std::string makeSkipConfigLine(uint64_t toSkip);
+
+        virtual std::string makeLimitConfigLine(uint64_t limit);
+
+        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex);
+
+        virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const;
+
+        virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks) const;
+
+        uint64_t getPasswordCountToProcess() const;
 
         PtrWorkunit m_workunit; /**< Instance of CWorkunit which is used to create this attack instance */
         PtrJob m_job;           /**< Instance of CJob which is parent of this attack instance */

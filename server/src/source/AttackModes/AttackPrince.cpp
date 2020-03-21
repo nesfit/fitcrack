@@ -66,7 +66,7 @@ bool CAttackPrince::makeWorkunit()
     Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
-    configFile << generateBasicConfig('n', m_job->getAttackMode(),
+    configFile << generateBasicConfig(m_job->getAttackMode(),
                                       m_job->getAttackSubmode(),
                                       m_job->getName(), m_job->getHashType());
 

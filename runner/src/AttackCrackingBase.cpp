@@ -12,7 +12,7 @@ AttackCrackingBase::AttackCrackingBase(const ConfigTask& config, Directory& dire
 
   if (!config_.find("attack_submode", attack_submode_))
   RunnerUtils::runtimeException("attack_submode is missing in config");
-  addSpecificArguments();
+  
 }
 
 void AttackCrackingBase::addSpecificArguments() {

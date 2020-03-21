@@ -1,2 +1,2 @@
 
-patch -p0 /home/boincadm/boinc-src/sched/Makefile.am Makefile.am.patch
+patch -p0 $(dirname ${BASH_SOURCE[0]})/../../../boinc/sched/Makefile.am Makefile.am.patch

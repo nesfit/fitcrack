@@ -23,7 +23,7 @@ class CAttackPcfg : public AttackMode {
          * @param host [in] Instance of CHost which this attack belongs to
          * @param seconds [in] Number of seconds this instance of attack should take
          */
-        CAttackPcfg(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
+        CAttackPcfg(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
 
         /**
          * @brief Default destructor
@@ -48,7 +48,7 @@ class CAttackPcfg : public AttackMode {
          * @param preterminals List of preterminals as a single string
          * @param realKeyspace Number of passwords that are represented by those preterminals
          */
-        void loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace);
+        virtual bool loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace);
 
 
         /** gRPC channel */

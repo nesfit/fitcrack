@@ -19,4 +19,4 @@ for PLATFORM in x86_64-pc-linux-gnu windows_x86_64
 do
 	sed -i 's/\(runner[0-9]\+.\(bin\|exe\)\)/runner'$NNUM'.\2/g' $OUTDIR/$PLATFORM/version.xml
 done
-cd /home/boincadm/projects/fitcrack/apps/fitcrack/../../ && ./bin/update_versions
+cd /home/boincadm/projects/fitcrack/apps/fitcrack/../../ && yes | ./bin/update_versions
