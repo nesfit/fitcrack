@@ -28,6 +28,10 @@ void AttackPrince::addSpecificArguments() {
     addGeneratorArgument("--case-permute");
   if (config_.find(ConfigTask::CHECK_DUPLICATES, value) && value == "0")
     addGeneratorArgument("--dupe-check-disable");
+  if (config_.find(ConfigTask::SKIP_FROM_START, value))
+    addGeneratorLimitingArgument("--skip=" + value);
+  if (config_.find(ConfigTask::DICT_HC_KEYSPACE, value))
+    addGeneratorLimitingArgument("--limit=" + value);
   if (config_.find(ConfigTask::MIN_PASSWORD_LEN, value))
     addGeneratorArgument("--pw-min=" + value);
   if (config_.find(ConfigTask::MAX_PASSWORD_LEN, value))
