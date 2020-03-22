@@ -95,7 +95,6 @@ def create_job(data):
         time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%d/%m/%Y %H:%M'),
         cracking_time='0',
         seconds_per_workunit=job['seconds_per_job'] if job['seconds_per_job'] > 60 else 60,
-        config=job['config'],
         dict1=job['dict1'] if job.get('dict1') else '',
         dict2=job['dict2'] if job.get('dict2') else '',
         charset1=job['charset1'] if job.get('charset1') else '',
