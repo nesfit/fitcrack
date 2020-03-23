@@ -68,9 +68,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         }
 
         /** Compute second dictionary size */
-        if ((this->m_attackMode == Config::AttackMode::AttackCombinator ||             /**< For combinator attacks*/
-            (this->m_attackMode == Config::AttackMode::AttackDict && this->m_attackSubmode > 0) ||    /**< and rules*/
-            (this->m_attackMode == Config::AttackMode::AttackPcfg && this->m_attackSubmode > 0)) &&   /**< and PCFG rules*/
+        if (this->m_attackMode == Config::AttackMode::AttackCombinator &&
             this->m_hcKeyspace != 0)
                 m_combSecDictSize = this->m_keyspace / this->m_hcKeyspace;
 

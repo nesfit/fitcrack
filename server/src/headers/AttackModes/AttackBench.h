@@ -37,13 +37,13 @@ class CAttackBench : public BaseAttack {
                 unsigned hashType, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
                 std::string charset2="", std::string charset3="", std::string charset4="") override;
 
-        virtual std::string makeSkipConfigLine(uint64_t toSkip) override;
-
-        virtual std::string makeLimitConfigLine(uint64_t limit) override;
+        virtual std::string makeLimitingConfigLine(const std::string &, const std::string &, const std::string &) override {return "";}
 
         virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex) override;
 
         virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const override;
+
+        virtual PtrDictionary GetWorkunitDict() const override;
 
         virtual bool loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace);
 };
@@ -133,18 +133,6 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
 }
 
 template <typename BaseAttack>
-std::string CAttackBench<BaseAttack>::makeSkipConfigLine(uint64_t)
-{
-    return "";
-}
-
-template <typename BaseAttack>
-std::string CAttackBench<BaseAttack>::makeLimitConfigLine(uint64_t)
-{
-    return "";
-}
-
-template <typename BaseAttack>
 std::unique_ptr<InputDict> CAttackBench<BaseAttack>::makeInputDict(PtrDictionary dict, uint64_t startIndex)
 {
     return std::make_unique<InputDictBenchmark>(dict, startIndex);
@@ -159,6 +147,12 @@ PtrDictionary CAttackBench<BaseAttack>::FindCurrentDict(std::vector<PtrDictionar
     });
     if(maxElem == dicts.end()) return nullptr;
     return *maxElem;
+}
+
+template <typename BaseAttack>
+PtrDictionary CAttackBench<BaseAttack>::GetWorkunitDict() const
+{
+    return std::make_shared<CBenchmarkDictionary>(*BaseAttack::GetWorkunitDict());
 }
 
 template <typename BaseAttack>

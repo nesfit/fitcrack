@@ -63,7 +63,7 @@ bool CAttackRules::makeWorkunit() {
     f.close();
 
     /** Load current workunit dictionary */
-    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+    PtrDictionary workunitDict = GetWorkunitDict();
 
     /** Debug */
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
@@ -89,25 +89,21 @@ bool CAttackRules::makeWorkunit() {
 
         auto inputDict = makeInputDict(workunitDict, m_workunit->getStartIndex());
 
-        uint64_t dictKeyspace = (uint64_t)(std::round(m_workunit->getHcKeyspace() / (float)(m_job->getCombSecDictSize())));
-
-        /** Always send at least one password */
-        if (dictKeyspace < 1)
-                dictKeyspace = 1;
+        uint64_t dictKeyspace = m_workunit->getHcKeyspace();
 
         uint64_t newCurrentIndex = m_workunit->getStartIndex() + dictKeyspace;
         if (!m_workunit->isDuplicated())
-                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                        "New dictionary current index: %" PRIu64 "\n", newCurrentIndex);
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "New dictionary current index: %" PRIu64 "\n", newCurrentIndex);
 
         /** Check if we reached end of keyspace */
         if (newCurrentIndex >= workunitDict->getHcKeyspace())
         {
-                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                        "We reached the end of current dictionary, modifiyng workunit keyspace\n");
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "We reached the end of current dictionary, modifiyng workunit keyspace\n");
 
-                dictKeyspace = workunitDict->getHcKeyspace() - m_workunit->getStartIndex();
-                newCurrentIndex = workunitDict->getHcKeyspace();
+            dictKeyspace = workunitDict->getHcKeyspace() - m_workunit->getStartIndex();
+            newCurrentIndex = workunitDict->getHcKeyspace();
         }
 
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
@@ -115,8 +111,8 @@ bool CAttackRules::makeWorkunit() {
 
         if (!m_workunit->isDuplicated())
         {
-                workunitDict->updateIndex(newCurrentIndex);
-                m_job->updateIndex(m_job->getCurrentIndex() + dictKeyspace);
+            workunitDict->updateIndex(newCurrentIndex);
+            m_job->updateIndex(m_job->getCurrentIndex() + dictKeyspace);
         }
 
         m_workunit->setHcKeyspace(dictKeyspace);
@@ -134,23 +130,23 @@ bool CAttackRules::makeWorkunit() {
         auto writtenPasswords = inputDict->WritePasswordsTo(dictKeyspace, path);
         if(writtenPasswords == 0)
         {
-                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                        "'start_index' parameter is too far away\n");
-                workunitDict->updateIndex(workunitDict->getHcKeyspace());
-                m_job->updateIndex(m_job->getCurrentIndex() - dictKeyspace);
-                return true;
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "'start_index' parameter is too far away\n");
+            workunitDict->updateIndex(workunitDict->getHcKeyspace());
+            m_job->updateIndex(m_job->getCurrentIndex() - dictKeyspace);
+            return true;
         }
         else if(writtenPasswords < dictKeyspace)
         {
-                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                        "Ate all passwords from current dictionary\n");
-                m_workunit->setHcKeyspace(writtenPasswords);
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Ate all passwords from current dictionary\n");
+            m_workunit->setHcKeyspace(writtenPasswords);
 
-                if (!m_workunit->isDuplicated())
-                {
+            if (!m_workunit->isDuplicated())
+            {
                 workunitDict->updateIndex(workunitDict->getHcKeyspace());
                 m_job->updateIndex(m_job->getCurrentIndex() - dictKeyspace + writtenPasswords);
-                }
+            }
         }
     }
     catch(const InputDict::Exception &e)

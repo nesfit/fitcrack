@@ -69,25 +69,10 @@ std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attack
     return result;
 }
 
-template <typename Integral>
-uint64_t GetDecimalDigitCount(Integral num)
-{
-    uint64_t digits = 0;
-    do { num /= 10; ++digits; } while (num != 0);
-    return digits;
-}
-
-std::string AttackMode::makeSkipConfigLine(uint64_t toSkip)
+std::string AttackMode::makeConfigLine(const std::string &option, const std::string &type, const std::string &value)
 {
     std::ostringstream stream;
-    stream << "|||start_index|BigUInt|" << GetDecimalDigitCount(toSkip) << "|" << toSkip << "|||\n";
-    return stream.str();
-}
-
-std::string AttackMode::makeLimitConfigLine(uint64_t limit)
-{
-    std::ostringstream stream;
-    stream << "|||hc_keyspace|BigUInt|" << GetDecimalDigitCount(limit) << "|" << limit << "|||\n";
+    stream << "|||" << option << '|' << type << '|' << value.length() << '|' << value << "|||\n";
     return stream.str();
 }
 
@@ -110,6 +95,11 @@ PtrDictionary AttackMode::FindCurrentDict(std::vector<PtrDictionary> &dicts) con
         }
     }
     return nullptr;
+}
+
+PtrDictionary AttackMode::GetWorkunitDict() const
+{
+    return m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
 }
 
 PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks) const

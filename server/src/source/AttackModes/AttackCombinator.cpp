@@ -65,7 +65,7 @@ bool CAttackCombinator::makeWorkunit()
                              m_job->getRuleRight());
 
     /** Load current workunit dictionary */
-    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+    PtrDictionary workunitDict = GetWorkunitDict();
 
     // Debug
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
@@ -121,7 +121,7 @@ bool CAttackCombinator::makeWorkunit()
             Tools::printDebug("Adding additional info to CONFIG:\n");
 
             uint64_t workunitStartIndex2 = m_workunit->getStartIndex2();
-            auto skipLine = makeSkipConfigLine(workunitStartIndex2);
+            auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(workunitStartIndex2));
             f << skipLine;
             Tools::printDebug(skipLine.c_str());
 
@@ -143,7 +143,7 @@ bool CAttackCombinator::makeWorkunit()
                 if (!m_workunit->isDuplicated())
                         m_job->updateIndex2(workunitStartIndex2 + workunitHcKeyspace);
 
-                auto limitLine = makeLimitConfigLine(workunitHcKeyspace);
+                auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
                 f << limitLine;
                 Tools::printDebug(limitLine.c_str());
             }
@@ -238,12 +238,12 @@ bool CAttackCombinator::makeWorkunit()
             /** Append skip and limit to config */
             Tools::printDebug("Adding additional info to CONFIG:\n");
 
-            auto skipLine = makeSkipConfigLine(0);
+            auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(0));
             f << skipLine;
             Tools::printDebug(skipLine.c_str());
 
             auto workunitHcKeyspace = m_workunit->getHcKeyspace();
-            auto limitLine = makeLimitConfigLine(workunitHcKeyspace);
+            auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
             f << limitLine;
             Tools::printDebug(limitLine.c_str());
 

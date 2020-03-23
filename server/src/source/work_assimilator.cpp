@@ -821,24 +821,6 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
             /** In case of rules attack, multiply the keyspace by number of rules */
             std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_mode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
             uint64_t attack_mode = get_num_from_mysql(buf);
-            std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_submode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-            uint64_t attack_submode = get_num_from_mysql(buf);
-
-            if (attack_mode == 0 && attack_submode != 0)
-            {
-                std::snprintf(buf, SQL_BUF_SIZE, "SELECT hc_keyspace FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-                uint64_t job_hc_keyspace = get_num_from_mysql(buf);
-                std::snprintf(buf, SQL_BUF_SIZE, "SELECT keyspace FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-                uint64_t job_keyspace = get_num_from_mysql(buf);
-
-                uint64_t rules_size = job_keyspace / job_hc_keyspace;
-                if (rules_size > 0)
-                {
-                    std::cerr << __LINE__ << " -Updating rules workunit size- Old #" << hc_keyspace;
-                    power_keyspace = hc_keyspace * rules_size;
-                    std::cerr << ", New #" << power_keyspace << std::endl;
-                }
-            }
 
             /** Read workunit properties */
             std::snprintf(buf, SQL_BUF_SIZE, "SELECT seconds_per_workunit FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);

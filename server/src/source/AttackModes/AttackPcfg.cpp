@@ -123,7 +123,7 @@ bool CAttackPcfg::makeWorkunit()
                              m_job->getName(), m_job->getHashType());
 
     /** Output hc_keyspace */
-    auto limitLine = makeLimitConfigLine(newKeyspace);
+    auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(newKeyspace));
     f << limitLine;
     Tools::printDebug(limitLine.c_str());
 

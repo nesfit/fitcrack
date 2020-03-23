@@ -93,7 +93,7 @@ bool CAttackDict::makeWorkunit()
             "Creating dictionary fragment\n");
 
     /** Load current workunit dictionary */
-    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+    PtrDictionary workunitDict = GetWorkunitDict();
 
     try
     {

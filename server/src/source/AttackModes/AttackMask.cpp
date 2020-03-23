@@ -64,7 +64,7 @@ bool CAttackMask::makeWorkunit()
     Tools::printDebug("|||mask|String|%d|%s|||\n", workunitMask->getMask().length(), workunitMask->getMask().c_str());
 
     /** Output start_index */
-    auto skipLine = makeSkipConfigLine(m_workunit->getStartIndex());
+    auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(m_workunit->getStartIndex()));
     f << skipLine;
     Tools::printDebug(skipLine.c_str());
 
@@ -74,7 +74,7 @@ bool CAttackMask::makeWorkunit()
     /** Output stop_index - only if it is not the last workunit in the current mask */
     if (m_workunit->getStartIndex() + workunitHcKeyspace < maskHcKeyspace)
     {
-        auto limitLine = makeLimitConfigLine(workunitHcKeyspace);
+        auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
         f << limitLine;
         Tools::printDebug(limitLine.c_str());
     }

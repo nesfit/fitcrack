@@ -9,8 +9,8 @@
 #include <AttackPrince.h>
 
 
-CAttackPrince::CAttackPrince(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-    :   AttackMode(job, host, seconds, sqlLoader)
+CAttackPrince::CAttackPrince(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
 }
 

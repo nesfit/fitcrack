@@ -99,13 +99,16 @@ protected:
          */
         virtual char getModeLetter() {return 'n';}
 
-        virtual std::string makeSkipConfigLine(uint64_t toSkip);
+        std::string makeConfigLine(const std::string &option, const std::string &type, const std::string &value);
 
-        virtual std::string makeLimitConfigLine(uint64_t limit);
+        virtual std::string makeLimitingConfigLine(const std::string &option, const std::string &type, const std::string &value)
+        {return makeConfigLine(option, type, value);}
 
         virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex);
 
         virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const;
+
+        virtual PtrDictionary GetWorkunitDict() const;
 
         virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks) const;
 

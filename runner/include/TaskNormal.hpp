@@ -30,7 +30,7 @@ class TaskNormal: public TaskComputeBase {
 	 * @brief   Parses Hashcat's progress output line
 	 * @param   progress_line [in] Line of the hashcat's output
 	 */
-	void parseHashcatProgress(std::string& progress_line);
+	bool parseHashcatProgress(std::string& progress_line);
 
 	/**
 	 * @brief   Reads password/s from the file

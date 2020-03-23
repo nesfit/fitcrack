@@ -90,9 +90,7 @@ bool CAttackPcfgRules::makeWorkunit()
 
     /** gRPC call to collect preterminals and update current index + keyspace */
     std::string preterminals;
-    uint64_t newKeyspace = (uint64_t)(std::round(m_workunit->getHcKeyspace() / (float)(m_job->getCombSecDictSize())));
-    if (newKeyspace < 1)
-        newKeyspace = 1;
+    uint64_t newKeyspace = m_workunit->getHcKeyspace();
 
     /** @workaround Limit keyspace because of client memory problems */
     if (newKeyspace > Config::MAX_PCFG_KEYSPACE)
@@ -136,7 +134,7 @@ bool CAttackPcfgRules::makeWorkunit()
                              m_job->getName(), m_job->getHashType());
 
     /** Output hc_keyspace */
-    auto limitLine = makeLimitConfigLine(newKeyspace);
+    auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(newKeyspace));
     f << limitLine;
     Tools::printDebug(limitLine.c_str());
 

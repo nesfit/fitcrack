@@ -15,7 +15,7 @@ std::string TaskNormal::getPasswords() {
   return passwords_;
 }
 
-void TaskNormal::parseHashcatProgress(std::string& progress_line) {
+bool TaskNormal::parseHashcatProgress(std::string& progress_line) {
   /* example for parsing
   * STATUS	2	SPEED	0	1	EXEC_RUNTIME	0.182546	CURKU	0	PROGRESS	2028	17675	RECHASH 0	1	RECSALT 0	1	REJECTED	0
   * STATUS\t	%d\tSPEED\t<N x %PRIu64\t>1000\tEXEC_RUNTIME\t<N x %f\t>CURKU\t%PRIu64\tPROGRESS\t%PRIu64\t%PRIu64\tRECHASH\t%d\t%d\tRECSALT\t%d\t%d\tTEMP\t<N x %d\t>REJECTED\t%PRIu64\tUTIL\t<N x %d\t>
@@ -24,18 +24,19 @@ void TaskNormal::parseHashcatProgress(std::string& progress_line) {
   */
 
   //Logging::debugPrint(Logging::Detail::CustomOutput, "Progress line : " + progress_line);
-  if (progress_line.find("STATUS", 0) != 0) {
+  if (progress_line.find("STATUS") != 0) {
     static const std::string invalidRuleMessageStart = "Cannot convert rule for use on OpenCL device in file";
     if(progress_line.substr(0, invalidRuleMessageStart.length()) == invalidRuleMessageStart)
     {
       invalidRuleCount += 1;
     }
+    return false;
   }
 
   ProgressPair progress = parseProgress(progress_line);
   if(progress.second == 0 && progress.first == 0)
   {
-    return;
+    return false;
   }
 
   /** When this is the first parsed line */
@@ -44,6 +45,7 @@ void TaskNormal::parseHashcatProgress(std::string& progress_line) {
   }
 
   saveParsedProgress(progress.first);
+  return true;
 }
 
 TaskNormal::ProgressPair TaskNormal::parseProgress(const std::string& progress_line) {
@@ -245,8 +247,7 @@ bool TaskNormal::parseHashcatOutputLine(std::string& output_line) {
     return false;
   }
 
-  parseHashcatProgress(output_line);
-  return true;
+  return parseHashcatProgress(output_line);
 }
 
 void TaskNormal::progress() {
