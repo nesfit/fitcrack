@@ -77,6 +77,7 @@
         class="middle"
       >
         {{ item.job.name }}
+      </router-link>
       </template>
     </v-data-table>
   </div>
