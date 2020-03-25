@@ -46,7 +46,7 @@
         </v-list-item>
 
         <v-list-item
-          v-if="$userCanAddJob()"
+          v-if="$store.getters.can('ADD_NEW_JOB')"
           :to="{ name: 'addJob'}"
         >
           <v-list-item-action>
@@ -81,7 +81,7 @@
           </template>
 
           <v-list-item
-            v-if="$userCanAddJob()"
+            v-if="$store.getters.can('ADD_NEW_JOB')"
             :to="{ name: 'addJob'}"
           >
             <v-list-item-action>
@@ -199,7 +199,7 @@
         <v-divider class="mb-1" />
 
         <v-list-item
-          v-if="$userCanManageUsers()"
+          v-if="$store.getters.can('MANAGE_USERS')"
           :to="{ name: 'manageUsers'}"
         >
           <v-list-item-action>
@@ -246,7 +246,7 @@
         <!--<v-list-item-title>User</v-list-item-title>-->
         <!--</v-list-item-content>-->
         <!--</v-list-item>-->
-        <!--<v-list-item :to="{ name: 'manageUsers'}" v-if="$userCanManageUsers()">-->
+        <!--<v-list-item :to="{ name: 'manageUsers'}" v-if="$store.getters.can('MANAGE_USERS')">-->
         <!--<v-list-item-action>-->
         <!--<v-icon>group</v-icon>-->
         <!--</v-list-item-action>-->
@@ -305,7 +305,7 @@
       <v-btn
         :icon="$vuetify.breakpoint.xsOnly"
         text
-        @click.stop="logout"
+        @click.stop="$store.dispatch('signOut')"
       >
         <v-icon :left="$vuetify.breakpoint.smAndUp">
           mdi-logout-variant
@@ -339,7 +339,7 @@
 <script>
   import notifications from '@/components/notification/fc_notifications_wrapper'
   import { routeIcon } from '@/router'
-  import axios from 'axios'
+  import store from '@/store'
 
   export default {
     components: {
@@ -352,23 +352,17 @@
         notificationsCount: 0
       }
     },
-    beforeRouteEnter (to, from, next) {
-      axios.get(window.serverAddress + '/user/isLoggedIn')
-        .then(response => response.data)
-        .then(userInfo => {
-          if (!userInfo.loggedIn) {
-            if (from.path === '/login') {
-              next()
-            }
-            sessionStorage.setItem('loginRedirect', to.path)
-            next('/login')
-          } else {
-            next(vm => {
-              vm.$store.state.user.userData = userInfo.user
-              vm.$store.state.user.loggedIn = true
-            })
-          }
-        })
+    async beforeRouteEnter (to, from, next) {
+      const loggedIn = await store.dispatch('resume')
+      if (!loggedIn) {
+        if (from.path === '/login') {
+          next()
+        }
+        sessionStorage.setItem('loginRedirect', to.path)
+        next('/login')
+      } else {
+        next()
+      }
     },
     mounted: function () {
       /*
@@ -388,11 +382,6 @@
     },
     methods: {
       routeIcon,
-      logout: function () {
-        this.axios.get(this.$serverAddr + '/user/logout').then((response) => {
-          this.$logoutUser()
-        })
-      },
       toggleNotifications: function () {
         this.rightDrawer = !this.rightDrawer;
         if (this.rightDrawer) {

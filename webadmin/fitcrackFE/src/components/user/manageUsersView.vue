@@ -91,12 +91,14 @@
         <template v-slot:item.ADD_NEW_JOB="{ item }">
           <v-checkbox
             v-model="item.ADD_NEW_JOB"
+            :disabled="item.id == 1"
             @change="roleChange($event, item.id, 'ADD_NEW_JOB')"
           />
         </template>
         <template v-slot:item.MANAGE_USERS="{ item }">
           <v-checkbox
             v-model="item.MANAGE_USERS"
+            :disabled="item.id == 1"
             @change="roleChange($event, item.id, 'MANAGE_USERS')"
           />
         </template>
@@ -104,6 +106,7 @@
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
+                v-show="item.id > 1"
                 icon
                 class="mx-0"
                 @click="deleteRole(item.id)"
@@ -420,6 +423,7 @@
           key: key,
           value: value
         }).then((response) => {
+          this.$store.dispatch('refreshUser')
           console.log(response.data);
           console.log('user role changed')
         })
