@@ -2,9 +2,7 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-'''
-packageHost_parser => jobHost_parser
-'''
+
 import logging
 
 from flask import request
