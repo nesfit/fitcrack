@@ -314,6 +314,7 @@ sched_driver_LDADD = $(SERVERLIBS)
 # find . -name '*.h'
 # find . -name '*.cpp'
 fitcrack_sources = \
+    AttackBenchAll.h \
     AttackBench.h \
     AttackCombinator.h \
     AttackDict.h \
@@ -337,6 +338,7 @@ fitcrack_sources = \
     SqlLoader.h \
     AbstractGenerator.h \
     SimpleGenerator.h \
+    AttackBenchAll.cpp \
     AttackCombinator.cpp \
     AttackDict.cpp \
     AttackMarkov.cpp \

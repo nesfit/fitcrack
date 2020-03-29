@@ -33,7 +33,7 @@ TaskComputeBase::TaskComputeBase(
   attack_(nullptr),
   process_hashcat_(nullptr),
   process_external_generator_(nullptr),
-  hashcat_mutex_("FitcrackRunnerHashcatMutex"),
+  hashcat_mutex_(RunnerConstants::HashcatMutexName),
   attack_type(Attack::detectAttackType(task_config_))
 {}
 
@@ -48,7 +48,7 @@ TaskComputeBase::TaskComputeBase(
   attack_(nullptr),
   process_hashcat_(nullptr),
   process_external_generator_(nullptr),
-  hashcat_mutex_("FitcrackRunnerHashcatMutex"),
+  hashcat_mutex_(RunnerConstants::HashcatMutexName),
   attack_type(Attack::detectAttackType(task_config_))
 {}
 

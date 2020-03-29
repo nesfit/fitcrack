@@ -19,6 +19,7 @@
 #include <AttackPcfg.h>
 #include <AttackPcfgRules.h>
 #include <AttackPrince.h>
+#include <AttackBenchAll.h>
 
 
 CSimpleGenerator::CSimpleGenerator()
@@ -158,43 +159,57 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
     uint64_t jobId = job->getId();
     uint64_t hostBoincId = host->getBoincHostId();
 
-    if (m_sqlLoader->getWorkunitCount(jobId, host->getId()) >= (isBenchmark ? 1 : 2))
-    {
-        Tools::printDebugHost(Config::DebugType::Log, jobId, hostBoincId,
-                "Host has enough workunits\n");
-        return;
-    }
-
-    /** Load job uncracked hashes */
-    if (!job->loadHashes())
-    {
-        /** All hashes cracked, wait for assimilator to Finish job */
-        Tools::printDebugHost(Config::DebugType::Warn, jobId, hostBoincId,
-                                 "No hashes found for the job, Assimilator should have already Finished the job\n");
-
-        job->updateStatusOfRunningJob(Config::JobState::JobFinished);
-
-        return;
-    }
-
-    /** Load non-exhausted masks/dictionaries */
-    if (job->getAttackMode() == Config::AttackMode::AttackMask)
-        job->loadMasks();
-    else
-        job->loadDictionaries();
-
-    /** Calculate workunit duration */
-    uint64_t duration = calculateSecondsIcdf2c(job);
-
-    /** Create the workunit */
     AttackMode * attack;
-    if(isBenchmark)
+    
+    if(job->getId() == Config::benchAllId)
     {
-        attack = CreateAttack<BenchmarkAttackMaker>(job, host, duration, m_sqlLoader);
+        if(m_sqlLoader->getTotalWorkunitCount(jobId, host->getId()) > 0)
+        {
+            Tools::printDebugHost(Config::DebugType::Log, jobId, hostBoincId,
+                    "Host has already been benchmarked or is being benchmarked\n");
+            return;
+        }
+        attack = new CAttackBenchAll(job, host, m_sqlLoader);
     }
     else
     {
-        attack = CreateAttack<NormalAttackMaker>(job, host, duration, m_sqlLoader);
+        if (m_sqlLoader->getWorkunitCount(jobId, host->getId()) >= (isBenchmark ? 1 : 2))
+        {
+            Tools::printDebugHost(Config::DebugType::Log, jobId, hostBoincId,
+                    "Host has enough workunits\n");
+            return;
+        }
+
+        /** Load job uncracked hashes */
+        if (!job->loadHashes())
+        {
+            /** All hashes cracked, wait for assimilator to Finish job */
+            Tools::printDebugHost(Config::DebugType::Warn, jobId, hostBoincId,
+                                    "No hashes found for the job, Assimilator should have already Finished the job\n");
+
+            job->updateStatusOfRunningJob(Config::JobState::JobFinished);
+
+            return;
+        }
+
+        /** Load non-exhausted masks/dictionaries */
+        if (job->getAttackMode() == Config::AttackMode::AttackMask)
+            job->loadMasks();
+        else
+            job->loadDictionaries();
+
+        /** Calculate workunit duration */
+        uint64_t duration = calculateSecondsIcdf2c(job);
+
+        /** Create the workunit */
+        if(isBenchmark)
+        {
+            attack = CreateAttack<BenchmarkAttackMaker>(job, host, duration, m_sqlLoader);
+        }
+        else
+        {
+            attack = CreateAttack<NormalAttackMaker>(job, host, duration, m_sqlLoader);
+        }
     }
     /** Try to set a workunit from retry */
     bool retryFlag = setEasiestRetry(job, host, attack);

@@ -94,6 +94,13 @@ uint64_t CSqlLoader::getWorkunitCount(uint64_t jobId, uint64_t hostId)
             hostId, jobId));
 }
 
+uint64_t CSqlLoader::getTotalWorkunitCount(uint64_t jobId, uint64_t hostId)
+{
+    return getRowCount<CWorkunit>(formatQuery(
+            "WHERE `host_id` = %" PRIu64 " AND `job_id` = %" PRIu64,
+            hostId, jobId));
+}
+
 
 uint64_t CSqlLoader::getWorkunitCount(uint64_t jobId)
 {

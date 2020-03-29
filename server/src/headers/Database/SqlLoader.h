@@ -77,6 +77,15 @@ class CSqlLoader {
         uint64_t getWorkunitCount(uint64_t jobId, uint64_t hostId);
 
         /**
+         * @brief Get the number of workunits created for this host-job combo. Counts @em all workunits, regardless of status
+         * 
+         * @param jobId 
+         * @param hostId 
+         * @return uint64_t 
+         */
+        uint64_t getTotalWorkunitCount(uint64_t jobId, uint64_t hostId);
+
+        /**
          * @brief Return number of workunits in fc_workunit for supplied job
          * @param jobId Job ID used for filtering
          * @return Number of workunit entries
