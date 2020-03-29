@@ -460,7 +460,7 @@ void plan_new_benchamrk(uint64_t host_id)
 void update_power(uint64_t host_id, uint64_t count, double elapsed_time)
 {
     char buf[SQL_BUF_SIZE];
-    uint64_t power = count / elapsed_time;
+    uint64_t power = std::round(count / elapsed_time);
     //uint64_t actualPower;
     /*
     std::snprintf(buf, SQL_BUF_SIZE, "SELECT `power` FROM `fc_host` WHERE id = %" PRIu64 " LIMIT 1;", host_id);
