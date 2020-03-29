@@ -104,22 +104,15 @@
         :items="data.masks"
         hide-default-footer
       >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td v-html="parseHTML(props.item.mask)" />
-          <td class="text-right">
-            <v-progress-circular
-              size="35"
-              :width="1.5"
-              :rotate="270"
-              color="primary"
-              :value="props.item.progress"
-            >
-              <span class="progressPercentageMask">{{ progressToPercentage(props.item.progress) }}</span>
-            </v-progress-circular>
-          </td>
+        <template v-slot:item.progress="{ item }">
+          <v-progress-circular
+            size="16"
+            :width="3"
+            :rotate="270"
+            color="primary"
+            :value="item.progress"
+          />
+          <span class="progressPercentageMask">{{ progressToPercentage(item.progress) }}</span>
         </template>
       </v-data-table>
     </v-list>

@@ -7,7 +7,6 @@ from flask_restplus import inputs
 
 from src.api.fitcrack.argumentsParser import pagination
 
-# packageHost_parser => jobHost_parser
 jobHost_parser = pagination.copy()
 jobHost_parser.add_argument('name', type=str, required=False, help='Filter according to name')
 

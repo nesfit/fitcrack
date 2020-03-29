@@ -2,10 +2,6 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-'''
-job_short_model => job_short_model
-package_nano_model => job_nano_model
-'''
 
 """response models which are used in multiple endpoints"""
 
@@ -46,7 +42,6 @@ boincHostActivity_model = api.model('Host activity', {
     'online': fields.Boolean()
 })
 
-#package_nano_model => job_nano_model
 job_nano_model = api.model('Job nano', {
     'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
     'name': fields.String(required=True, description='nazev ukolu'),
@@ -65,7 +60,6 @@ boincHost_model = api.model('Host boinc', {
     'jobs': fields.Nested(job_nano_model)
 })
 
-# job_short_model => job_short_model
 job_short_model = api.model('Job short', {
     'id': fields.Integer(readOnly=True, required=False, description='id job'),
     'name': fields.String(required=True, description='name of the job'),

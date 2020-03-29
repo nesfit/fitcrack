@@ -14,9 +14,8 @@ page_of_hosts_model = api.inherit('Page of hosts', pagination, {
     'items': fields.List(fields.Nested(boincHost_model))
 })
 
-# jobWithPackage_model => workunitWithJob_model
-workunitWithJob_model = api.inherit('Job with package', workunit_model, {
-    'job': fields.Nested(job_short_model, attribute='package')
+workunitWithJob_model = api.inherit('Workunit with job', workunit_model, {
+    'job': fields.Nested(job_short_model, attribute='job')
 })
 
 boincHostDetail_model = api.model('Host detail boinc', {

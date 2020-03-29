@@ -74,7 +74,6 @@ def create_job(data):
     if job['time_end'] == '':
         job['time_end'] = None
 
-# db_package => db_job
     db_job = FcJob(
         token=token.hex,
         attack=job['attack_name'],

@@ -2,11 +2,6 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-'''
-package_graph_arguments => job_graph_arguments
-package_graph_model => job_graph_model
-computePackagesGraph => computeJobsGraph
-'''
 
 import logging
 
@@ -40,7 +35,6 @@ class runningPackages(Resource):
         graphData = computeJobsGraph(fromDate, toDate)
         return graphData
 
-#/packagesProgress/<int:id> => /jobsProgress/<int:id>
 @ns.route('/jobsProgress/<int:id>')
 class runningPackage(Resource):
 

@@ -3,7 +3,6 @@
    * Licence: MIT, see LICENSE
 '''
 
-# package_status_text_to_code_dict => job_status_text_to_code_dict
 job_status_text_to_code_dict = {
     0: 'ready',
     1: 'finished',
@@ -15,7 +14,6 @@ job_status_text_to_code_dict = {
     12: 'finishing'
 }
 
-# package_status_text_info_to_code_dict => job_status_text_info_to_code_dict
 job_status_text_info_to_code_dict = {
     0: 'The job has been created and waits for the start.',
     10: 'The job is running and new workunits will assigned to hosts.',

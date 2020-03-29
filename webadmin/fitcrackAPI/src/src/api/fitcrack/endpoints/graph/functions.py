@@ -11,15 +11,12 @@ from sqlalchemy import func, Integer, desc
 from src.database import db
 from src.database.models import FcJobGraph, FcWorkunit, Host
 
-# computePackagesGraph => computeJobsGraph
-# packageId=> jobId
 def computeJobsGraph(fromDate=None, toDate=None, jobId=None):
     x = "time"
     y = set()
     data = []
     labels = []
 
-# packagesGraphData => jobsGraphData
     jobsGraphData = FcJobGraph.query
 
     if toDate:
@@ -38,7 +35,7 @@ def computeJobsGraph(fromDate=None, toDate=None, jobId=None):
 
     if jobId:
         jobsGraphData = jobsGraphData.filter_by(job_id=jobId)
-# packageProgress => jobProgress
+
     jobsGraphData.order_by(desc(FcJobGraph.id))
     for jobProgress in jobsGraphData:
         data.append(jobProgress.as_graph())

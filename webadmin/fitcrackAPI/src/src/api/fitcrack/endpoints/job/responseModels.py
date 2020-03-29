@@ -159,13 +159,11 @@ job_big_model = api.model('Job', {
     'grammar_id': fields.Integer(),
     'grammar_name': fields.String(),
     'grammar_keyspace': fields.Integer()
-
-    #'grammar_id': fields.List(fields.Nested(pcfg_model))
 })
 
-job_nano_model = api.model('Package nano', {
-    'id': fields.Integer(readOnly=True, required=False, description='id package'),
-    'name': fields.String(required=True, description='meno package'),
+job_nano_model = api.model('Job nano', {
+    'id': fields.Integer(readOnly=True, required=False, description='job id'),
+    'name': fields.String(required=True, description='job name'),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),
@@ -173,6 +171,6 @@ job_nano_model = api.model('Package nano', {
     'progress': fields.Float(required=False),
 })
 
-job_nano_list_model = api.inherit('Package nano list', {
+job_nano_list_model = api.inherit('Job nano list', {
     'items': fields.List(fields.Nested(job_nano_model))
 })

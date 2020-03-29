@@ -688,7 +688,7 @@ class FcHash(Base):
         try:
             return self.hash.decode("utf-8")
         except UnicodeDecodeError:
-            return 'BASE64:' + base64.encodebytes(self.hash).decode("utf-8")
+            return "BASE64<{}>".format(base64.encodebytes(self.hash).decode("utf-8"))
 
     @hybrid_property
     def password(self):
@@ -698,7 +698,7 @@ class FcHash(Base):
             else:
                 return None
         except (UnicodeDecodeError, ValueError) as e:
-            return self.result
+            return "HEX<{}>".format(self.result)
 
     @hybrid_property
     def hash_type_name(self):
