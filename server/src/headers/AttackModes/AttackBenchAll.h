@@ -5,7 +5,8 @@
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
-#pragma once
+#ifndef SERVER_ATTACK_BENCH_ALL_H
+#define SERVER_ATTACK_BENCH_ALL_H
 
 #include <AttackMode.h>
 
@@ -40,3 +41,5 @@ private:
 		*/
 	bool generateWorkunit() override ;
 };
+
+#endif //SERVER_ATTACK_BENCH_ALL_H

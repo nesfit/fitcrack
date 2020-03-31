@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SERVER_INPUT_DICT_H
+#define SERVER_INPUT_DICT_H
 
 #include "Dictionary.h"
 
@@ -39,3 +40,5 @@ public:
 	virtual uint64_t WritePasswordsTo(uint64_t passCount, const std::string &dst) override {std::ofstream{dst}; return passCount;}
 	virtual void CopyTo(const std::string &dst) override {std::ofstream{dst};}
 };
+
+#endif //SERVER_INPUT_DICT_H

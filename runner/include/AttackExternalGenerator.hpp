@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RUNNER_ATTACK_EXTERNAL_GENERATOR_HPP
+#define RUNNER_ATTACK_EXTERNAL_GENERATOR_HPP
 
 #include "AttackCrackingBase.hpp"
 
@@ -28,3 +29,5 @@ class AttackExternalGenerator: public AttackCrackingBase {
 
 		virtual std::vector<std::string> getExternalGeneratorArguments() const {return generator_arguments_;}
 };
+
+#endif //RUNNER_ATTACK_EXTERNAL_GENERATOR_HPP

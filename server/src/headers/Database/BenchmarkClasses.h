@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SERVER_BENCHMARK_CLASSES_H
+#define SERVER_BENCHMARK_CLASSES_H
 
 #include "Dictionary.h"
 #include "Job.h"
@@ -31,3 +32,5 @@ public:
 	//noop
 	virtual void updateIndex(uint64_t) override {}
 };
+
+#endif //SERVER_BENCHMARK_CLASSES_H
