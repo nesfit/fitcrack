@@ -427,14 +427,13 @@
               <v-row>
                 <v-col>
                   <div class="title mb-2">Planned start</div>
-                  <v-text-field
+                  <dt-picker
                     v-model="startDate"
                     outlined
                     hide-details
                     :disabled="startNow"
                     single-line
                     label=""
-                    mask="date-with-time"
                   />
                   <v-checkbox
                     v-model="startNow"
@@ -459,14 +458,12 @@
                 </v-col>
                 <v-col>
                   <div class="title mb-2">Planned end</div>
-                  <v-text-field
+                  <dt-picker
                     v-model="endDate"
                     outlined
                     hide-details
                     :disabled="endNever"
                     single-line
-                    label=""
-                    mask="date-with-time"
                   />
                   <v-checkbox
                     v-model="endNever"
@@ -530,6 +527,7 @@
   import fcTextarea from '@/components/textarea/fc_textarea'
   import hostSelector from '@/components/selector/hostSelector'
   import templateModal from '@/components/jobTemplate/templateModal'
+  import dtPicker from '@/components/picker/datetime'
 
   import {mapState, mapGetters, mapMutations} from 'vuex'
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
@@ -549,7 +547,8 @@
       'pcfgAttack': pcfgAttack,
       'fc-textarea': fcTextarea,
       'host-selector': hostSelector,
-      'template-modal': templateModal
+      'template-modal': templateModal,
+      dtPicker
     },
     data: function () {
       return {
@@ -612,8 +611,8 @@
     mounted: function () {
       this.loadSettings()
       this.getHashTypes()
-      this.startDate = this.$moment().format('DD/MM/YYYY HH:mm')
-      this.endDate = this.$moment().format('DD/MM/YYYY HH:mm')
+      this.startDate = new Date().toJSON().slice(0,19)
+      this.endDate = new Date().toJSON().slice(0,19)
       if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
     },

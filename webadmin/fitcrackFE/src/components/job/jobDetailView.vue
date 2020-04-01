@@ -598,20 +598,18 @@
                 Start time:
               </v-subheader>
             </v-col>
-            <v-col cols="5">
-              <v-text-field
+            <v-col cols="6">
+              <dt-picker
                 v-model="editJobValues.time_start"
                 :disabled="editJobValues.startNow"
                 text
                 single-line
-                label=""
-                mask="date-with-time"
               />
             </v-col>
-            <v-col cols="3">
+            <v-col cols="2">
               <v-checkbox
                 v-model="editJobValues.startNow"
-                label="Immediate"
+                label="None"
               />
             </v-col>
             <v-col cols="4">
@@ -619,17 +617,15 @@
                 End time:
               </v-subheader>
             </v-col>
-            <v-col cols="5">
-              <v-text-field
+            <v-col cols="6">
+              <dt-picker
                 v-model="editJobValues.time_end"
                 :disabled="editJobValues.endNever"
                 text
                 single-line
-                label=""
-                mask="date-with-time"
               />
             </v-col>
-            <v-col cols="3">
+            <v-col cols="2">
               <v-checkbox
                 v-model="editJobValues.endNever"
                 label="Never"
@@ -715,6 +711,7 @@
   import graph from '@/components/graph/fc_graph'
   import FcTextarea from '@/components/textarea/fc_textarea'
   import hostSelector from '@/components/selector/hostSelector'
+  import dtPicker from '@/components/picker/datetime'
 
   export default {
     name: "JobDetail",
@@ -725,7 +722,8 @@
       'dictionaryDetail': dictionaryDetail,
       'pcfgDetail': pcfgDetail,
       'fc-textarea': FcTextarea,
-      hostSelector
+      hostSelector,
+      dtPicker
     },
 
     data: function () {
@@ -786,8 +784,8 @@
           name: '',
           comment: '',
           seconds_per_job: 3600,
-          time_start: this.$moment().format('DD/MM/YYYY HH:mm'),
-          time_end:   this.$moment().format('DD/MM/YYYY HH:mm'),
+          time_start: this.$moment().toISOString(true).slice(0, 16),
+          time_end:   this.$moment().toISOString(true).slice(0, 16),
           startNow: false,
           endNever: false
         }
@@ -927,10 +925,10 @@
           name: this.data.name,
           comment: this.data.comment,
           seconds_per_job: this.data.seconds_per_job,
-          time_start: this.$moment(this.data.time_start).format('DD/MM/YYYY HH:mm'),
+          time_start: this.$moment(this.data.time_start).toISOString(true).slice(0, 16),
           time_end: this.data.time_end === null ?
-            this.$moment().format('DD/MM/YYYY HH:mm') :
-            this.$moment(this.data.time_end).format('DD/MM/YYYY HH:mm'),
+            this.$moment().toISOString(true).slice(0, 16) :
+            this.$moment(this.data.time_end).toISOString(true).slice(0, 16),
           startNow: (this.data.time_start === null),
           endNever: (this.data.time_end === null)
         }
@@ -939,14 +937,10 @@
       changeJobSettings: function() {
         if (this.editJobValues.startNow) {
           this.editJobValues.time_start = ''
-        } else {
-          this.editJobValues.time_start = this.$moment(this.editJobValues.time_start, 'DDMMYYYYHHmm').format('DD/MM/YYYY HH:mm')
         }
 
         if (this.editJobValues.endNever) {
           this.editJobValues.time_end = ''
-        } else {
-          this.editJobValues.time_end = this.$moment(this.editJobValues.time_end, 'DDMMYYYYHHmm').format('DD/MM/YYYY HH:mm')
         }
 
         this.axios.put(this.$serverAddr + '/job/' + this.data.id , this.editJobValues
