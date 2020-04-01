@@ -78,8 +78,8 @@ job_short_model = api.model('Job short', {
     'cracking_time': fields.Float(),
     'hash_type': fields.String(required=True),
     'hash': fields.String(required=True),
-    'time_start': fields.String(required=True),
-    'time_end': fields.String(required=True),
+    'time_start': fields.DateTime(required=True),
+    'time_end': fields.DateTime(required=True),
     'password': fields.String(),
     'deleted': fields.Boolean()
 })

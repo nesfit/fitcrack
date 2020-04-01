@@ -134,8 +134,8 @@ class JobByID(Resource):
         job.name = args['name']
         job.comment = args['comment']
         job.seconds_per_workunit = args['seconds_per_job']
-        job.time_start = datetime.datetime.now() if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%d/%m/%Y %H:%M'),
-        job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%d/%m/%Y %H:%M')
+        job.time_start = datetime.datetime.now() if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%Y-%m-%dT%H:%M'),
+        job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%Y-%m-%dT%H:%M')
 
         db.session.commit()
         return {
