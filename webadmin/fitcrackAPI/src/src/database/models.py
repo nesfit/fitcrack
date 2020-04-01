@@ -9,7 +9,7 @@ import datetime
 import math
 
 from flask_login import UserMixin, AnonymousUserMixin
-from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, String, Text, text, JSON, ForeignKey, \
+from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, Boolean, String, Table, Text, text, JSON, ForeignKey, \
     Numeric, func, LargeBinary, select, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
@@ -178,6 +178,10 @@ class FcJobDictionary(Base):
     is_left = Column(Integer, nullable=False, server_default=text("'1'"))
     dictionary = relationship("FcDictionary")
 
+bin_job_junction = Table('fc_bin_job', Base.metadata,
+    Column('job_id', Integer, ForeignKey('fc_job.id')),
+    Column('bin_id', Integer, ForeignKey('fc_bin.id'))
+)
 
 class FcJob(Base):
     __tablename__ = 'fc_job'
@@ -304,6 +308,18 @@ class FcJob(Base):
             return 'error'
 
     hashes = relationship("FcHash", back_populates="job")
+
+class FcBin(Base):
+    __tablename__ = 'fc_bin'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(64), nullable=False)
+    position = Column(Integer)
+
+    jobs = relationship('FcJob',
+                    secondary=bin_job_junction,
+                    backref="bins",
+                    passive_deletes=True)
 
 class FcTemplate(Base):
     __tablename__ = 'fc_template'
