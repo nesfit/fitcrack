@@ -28,7 +28,7 @@ class AttackCrackingBase: public AttackBase {
          * @brief   Adds requred file form directory to arguments
          * @param   file_name [in] Name of the file to add
          */
-        void addRequiredFile(const std::string& file_name);
+        virtual void addRequiredFile(const std::string& file_name);
 
         /**
          * @brief   Adds requred file form directory to arguments

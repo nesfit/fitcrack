@@ -124,8 +124,29 @@ bool PipeWindows::isWriteOpen() const {
   return isEndOpen(write_);
 }
 
+void PipeWindows::waitForAvailableOutput() const
+{
+  DWORD availableChars = 0;
+  while(true)
+  {
+    if (PeekNamedPipe(read_, NULL, 0, NULL, &availableChars, NULL) == 0) {
+      if (GetLastError() == ERROR_BROKEN_PIPE) {
+        Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + " Got ERROR_BROKEN_PIPE: ");
+        return;
+      } else {
+        RunnerUtils::runtimeException("PeekPipe() failed", GetLastError());
+      }
+    }
+    if(availableChars > 0)
+    {
+      return;
+    }
+    //sleep for half a second, then try again
+    Sleep(500);
+  }
+}
 
-int  PipeWindows::writeMessage(std::string& message) {
+int PipeWindows::writeMessage(std::string& message) {
   DWORD written_chars = 0;
 
   Logging::debugPrint(Logging::Detail::DevelDebug, POSITION_IN_CODE + "Pipe writing message : " + message);

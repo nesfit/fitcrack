@@ -89,6 +89,8 @@ class PipeBase {
          */
         std::string readLine();
 
+        virtual void waitForAvailableOutput() const = 0;
+
         /**
          * @brief   Pure virtual function writing message to the pipe
          * @param   message [in] Message to write to pipe

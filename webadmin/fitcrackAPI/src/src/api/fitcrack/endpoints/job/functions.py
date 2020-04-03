@@ -54,7 +54,6 @@ def create_job(data):
     if not process_func:
         abort(400, "Unsupported attack type")
 
-    data['config'] = ''
     job = process_func(data)
 
     if job['attack_settings']['attack_mode'] == 3:
@@ -67,24 +66,6 @@ def create_job(data):
     else:
         attack_settings_control = job['attack_settings']['attack_mode']
 
-    job['config'] += (
-                         '|||attack_mode|UInt|' + lenStr(str(attack_settings_control)) + '|' +
-                         str(attack_settings_control) + '|||\n' +
-                         '|||attack_submode|UInt|' + lenStr(str(job['attack_settings']['attack_submode'])) + '|' +
-                         str(job['attack_settings']['attack_submode']) + '|||\n' +
-                         '|||name|String|' + lenStr(job['name']) + '|' + job['name'] + '|||\n' +
-                         '|||hash_type|UInt|' + lenStr(job['hash_settings']['hash_type']) + '|' +
-                         job['hash_settings']['hash_type'] + '|||\n'
-                         )
-
-    if job['attack_settings'].get('rule_left') and job['attack_settings']['rule_left'] != '':
-        job['config'] += '|||rule_left|String|' + lenStr(str(job['attack_settings']['rule_left'])) + '|' + \
-                             job['attack_settings']['rule_left'] + '|||\n'
-
-    if job['attack_settings'].get('rule_right') and job['attack_settings']['rule_right'] != '':
-        job['config'] += '|||rule_right|String|' + lenStr(str(job['attack_settings']['rule_right'])) + '|' + \
-                             job['attack_settings']['rule_right'] + '|||\n'
-
     token = uuid1()
 
     if job['time_start'] == '':
@@ -93,7 +74,6 @@ def create_job(data):
     if job['time_end'] == '':
         job['time_end'] = None
 
-# db_package => db_job
     db_job = FcJob(
         token=token.hex,
         attack=job['attack_name'],
@@ -110,11 +90,10 @@ def create_job(data):
         current_index_2='0',
         name=job['name'],
         comment=job['comment'],
-        time_start=None if not job['time_start'] else  datetime.datetime.strptime(job['time_start'], '%d/%m/%Y %H:%M'),
-        time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%d/%m/%Y %H:%M'),
+        time_start=None if not job['time_start'] else  datetime.datetime.strptime(job['time_start'], '%Y-%m-%dT%H:%M'),
+        time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%Y-%m-%dT%H:%M'),
         cracking_time='0',
         seconds_per_workunit=job['seconds_per_job'] if job['seconds_per_job'] > 60 else 60,
-        config=job['config'],
         dict1=job['dict1'] if job.get('dict1') else '',
         dict2=job['dict2'] if job.get('dict2') else '',
         charset1=job['charset1'] if job.get('charset1') else '',

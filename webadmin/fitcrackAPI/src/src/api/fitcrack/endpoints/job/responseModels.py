@@ -132,8 +132,8 @@ job_big_model = api.model('Job', {
     'indexes_verified': fields.String(required=True, default='0'),
     'current_index': fields.String(required=True, default='0'),
     'current_index_2': fields.String(required=True, default='0'),
-    'time_start': fields.String(required=True),
-    'time_end': fields.String(required=True),
+    'time_start': fields.DateTime(required=True),
+    'time_end': fields.DateTime(required=True),
     'seconds_per_job': fields.String(attribute='seconds_per_workunit',required=True, default='0'),
     'dict1': fields.String(required=True),
     'dictionary1': fields.Nested(dictionary_model),
@@ -159,13 +159,11 @@ job_big_model = api.model('Job', {
     'grammar_id': fields.Integer(),
     'grammar_name': fields.String(),
     'grammar_keyspace': fields.Integer()
-
-    #'grammar_id': fields.List(fields.Nested(pcfg_model))
 })
 
-job_nano_model = api.model('Package nano', {
-    'id': fields.Integer(readOnly=True, required=False, description='id package'),
-    'name': fields.String(required=True, description='meno package'),
+job_nano_model = api.model('Job nano', {
+    'id': fields.Integer(readOnly=True, required=False, description='job id'),
+    'name': fields.String(required=True, description='job name'),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),
@@ -173,6 +171,6 @@ job_nano_model = api.model('Package nano', {
     'progress': fields.Float(required=False),
 })
 
-job_nano_list_model = api.inherit('Package nano list', {
+job_nano_list_model = api.inherit('Job nano list', {
     'items': fields.List(fields.Nested(job_nano_model))
 })

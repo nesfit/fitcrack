@@ -28,7 +28,7 @@ class CMask {
 
     public:
         /** Default destructor */
-        ~CMask() = default;
+        virtual ~CMask() = default;
 
 
         /**
@@ -49,7 +49,7 @@ class CMask {
          * @brief Updates index of this mask object and database entry
          * @param newIndex [in] New mask current index
          */
-        void updateIndex(uint64_t newIndex);
+        virtual void updateIndex(uint64_t newIndex);
 
 
     private:

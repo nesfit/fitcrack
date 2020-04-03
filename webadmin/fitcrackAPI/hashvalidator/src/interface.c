@@ -2451,8 +2451,8 @@ static u32 parse_and_store_salt (u8 *out, u8 *in, u32 salt_len, MAYBE_UNUSED has
   }
   else
   {
-    if (salt_len < hashconfig->salt_min) return UINT_MAX;
-    if (salt_len > hashconfig->salt_max) return UINT_MAX;
+    // if (salt_len < hashconfig->salt_min) return UINT_MAX;
+    // if (salt_len > hashconfig->salt_max) return UINT_MAX;
   }
 
   u32 tmp_u32[(64 * 2) + 1] = { 0 };

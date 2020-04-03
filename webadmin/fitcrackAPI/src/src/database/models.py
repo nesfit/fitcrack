@@ -207,7 +207,6 @@ class FcJob(Base):
     time_end = Column(DateTime)
     cracking_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
-    config = Column(String(400, collation='utf8_bin'), nullable=False)
     dict1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
     dict2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
     charset1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
@@ -705,7 +704,7 @@ class FcHash(Base):
         try:
             return self.hash.decode("utf-8")
         except UnicodeDecodeError:
-            return 'BASE64:' + base64.encodebytes(self.hash).decode("utf-8")
+            return "BASE64<{}>".format(base64.encodebytes(self.hash).decode("utf-8"))
 
     @hybrid_property
     def password(self):
@@ -715,7 +714,7 @@ class FcHash(Base):
             else:
                 return None
         except (UnicodeDecodeError, ValueError) as e:
-            return self.result
+            return "HEX<{}>".format(self.result)
 
     @hybrid_property
     def hash_type_name(self):

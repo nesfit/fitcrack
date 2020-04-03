@@ -9,7 +9,7 @@ from src.api.apiConfig import api
 from src.api.fitcrack.responseModels import pagination
 
 notification_model = api.model('Notification', {
-    'job_id': fields.Integer(readOnly=True, required=False, description='id package'),
+    'job_id': fields.Integer(readOnly=True, required=False, description='job id'),
     'text': fields.String(),
     'type': fields.String(),
     'seen': fields.Boolean(),

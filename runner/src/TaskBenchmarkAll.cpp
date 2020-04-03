@@ -4,119 +4,134 @@
 */
 
 #include "TaskBenchmarkAll.hpp"
+#include <algorithm>
 /* Public */
 TaskBenchmarkAll::TaskBenchmarkAll (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) :
-TaskBase(directory, task_config, host_config, output_file, workunit_name) {
+  TaskBase(directory, task_config, host_config, output_file, workunit_name),
+  m_hcProcess(nullptr),
+  m_hcMutex(RunnerConstants::HashcatMutexName)
+{
   mode_ = "a";
 }
 
 TaskBenchmarkAll::~TaskBenchmarkAll()
 {
-  for(size_t i = 0; i < benchmark_tasks_.size(); ++i)
-  {
-    delete benchmark_tasks_[i];
-  }
+  delete m_hcProcess;
 }
 
 std::string TaskBenchmarkAll::generateOutputMessage() {
 
-  std::string output_message = "";
-  std::string hashtypes_speeds = "";
+  std::ostringstream msg;
 
   Logging::debugPrint(Logging::Detail::ObjectContentRevision, "last benchmark exit code is " + RunnerUtils::toString(exit_code_));
 
-  output_message += mode_ + "\n";
-
-  double time_sum = 0;
+  msg<<mode_<<'\n';
 
   if (exit_code_ == HashcatConstant::Succeded) {
 
-    output_message += ProjectConstants::TaskFinalStatus::Succeded + "\n";
+    msg<<ProjectConstants::TaskFinalStatus::Succeded<<'\n';
+    msg<<m_hcProcess->getExecutionTime()<<'\n';
 
-    for (size_t i = 0; i < hashtypes_.size(); i++) {
-      hashtypes_speeds += hashtypes_[i] + ":" + RunnerUtils::toString(benchmark_tasks_[i]->getTotalSpeed()) + "\n";
-      time_sum += benchmark_tasks_[i]->getRunTime();
+    for(std::map<std::string, uint64_t>::iterator cur = m_results.begin(); cur != m_results.end(); ++cur)
+    {
+      msg<<cur->first<<':'<<cur->second<<'\n';
     }
-
-    output_message += RunnerUtils::toString(time_sum) + "\n";
-    output_message += hashtypes_speeds;
 
   } else {
 
-    output_message += ProjectConstants::TaskFinalStatus::Error + "\n";
-    output_message += RunnerUtils::toString(exit_code_) + "\n";
-    output_message += benchmark_tasks_.back()->getErrorMessage() + "\n";
-    output_message += ProjectConstants::TaskFinalStatus::Error + "\n";
-
-    Logging::debugPrint(Logging::Detail::ObjectContentRevision, "last benchmark exit code is " + RunnerUtils::toString(exit_code_));
+    msg<<ProjectConstants::TaskFinalStatus::Error<<'\n';
+    msg<<exit_code_<<'\n';
+    msg<<m_hcProcess->readErrPipeAvailableLines()<<'\n';
+    msg<<ProjectConstants::TaskFinalStatus::Error<<'\n';
 
   }
 
-  return output_message;
+  return msg.str();
 }
 
 void TaskBenchmarkAll::initializeTotalHashes() {
-  total_hashes_ = benchmark_tasks_.size();
+  std::string hashtype;
+  
+  //get all the hashmodes
+  {
+    std::vector<std::string> args;
+    args.push_back("--example-hashes");
+    ProcessBase *hc_proc = Process::create(args, directory_);
+    //doesn't use GPU, no need to lock
+    hc_proc->run();
+    PipeBase *output = hc_proc->GetPipeOut();
+    static const std::string hashLineStart = "MODE: ";
+    while(output->canRead())
+    {
+      std::string line = hc_proc->GetPipeOut()->readLine();
+      if(line.substr(0, hashLineStart.length()) == hashLineStart)
+      {
+        total_hashes_ += 1;
+      }
+    }
+    hc_proc->finish();
+    delete hc_proc;
+  }
 }
 
 void TaskBenchmarkAll::initialize() {
-
-  std::fstream hashtypes_list_stream;
-  File hashtypes_list_file;
-  std::string hashtype;
-
-  directory_.findVersionedFile("formats", "list", hashtypes_list_file);
-  File::openReadStream(hashtypes_list_stream, hashtypes_list_file.getRelativePath());
-
-  while (!hashtypes_list_stream.eof()) {
-    File::readLine(hashtypes_list_stream, hashtype);
-
-    if (!hashtype.empty()) {
-
-      hashtypes_.push_back(std::string(hashtype));
-
-      ConfigTask benchmark_config = task_config_;
-      benchmark_config.add("hash_type", hashtype);
-
-      benchmark_tasks_.push_back(new TaskBenchmark(directory_, benchmark_config, host_config_, output_file_, workunit_name_));
-    }
-  }
-
+  //nothing else to do
   initializeTotalHashes();
 }
 
 void TaskBenchmarkAll::startComputation() {
-  for (std::vector<TaskBenchmark*>::iterator it = benchmark_tasks_.begin(); it != benchmark_tasks_.end(); it++) {
-    (*it)->initialize();
-    (*it)->startComputation();
-    (*it)->progress();
-    (*it)->finish();
-    (*it)->unlockHashcatMutex();
-    Logging::debugPrint(Logging::Detail::GeneralInfo,
-      "TaskBenchmarkAll : sub-result : " + RunnerUtils::toString(hashtypes_[computed_hashes_])
-      + " : " + RunnerUtils::toString((*it)->getTotalSpeed()));
-      actualizeComputedHashes(1);
+  std::vector<std::string> args;
+  args.push_back("-b");
+  args.push_back("--benchmark-all");
+  args.push_back("--machine-readable");
+  m_hcProcess = Process::create(args, directory_);
+  m_hcMutex.lock();
+  m_hcProcess->run();
+}
+
+int TaskBenchmarkAll::finish() {
+  exit_code_ = m_hcProcess->finish();
+  m_hcMutex.unlock();
+  return exit_code_;
+}
+
+void TaskBenchmarkAll::progress() {
+  PipeBase *output = m_hcProcess->GetPipeOut();
+  while(output->canRead())
+  {
+    std::string line = output->readLine();
+    //format of line is "%d:%u:%d:%d:%.2f:%" PRIu64, device_id + 1, hash_mode, device_info->corespeed_dev, device_info->memoryspeed_dev, device_info->exec_msec_dev, (u64) (device_info->hashes_msec_dev_benchmark * 1000
+    if(std::count(line.begin(), line.end(), ':') != 5)
+    {
+      continue;
+    }
+    std::istringstream parser(line);
+    Logging::debugPrint(Logging::Detail::ObjectContentRevision, "line to parse is " + line);
+    std::string component;
+    size_t componentIndex = -1;
+    uint64_t *hashSpeed = nullptr;
+    while(std::getline(parser, component, ':'))
+    {
+      componentIndex += 1;
+      switch(componentIndex)
+      {
+      case 1:
+        hashSpeed = &m_results[component];
+        break;
+      case 5:
+        *hashSpeed += RunnerUtils::stoull(component);
+        break;
+      default:
+        break;
+      }
+    }
+    if(componentIndex == 5)
+    {
+      //if this was parsed successfully, report progress to the server
+      //this way of reporting will report progress upon sucessful parsing of the first device rather than the last
+      //but hc should print them all pretty much at the same time, so it shouldn't matter much
+      actualizeComputedHashes(m_results.size()-computed_hashes_);
       reportProgress();
     }
   }
-
-  int TaskBenchmarkAll::finish() {
-    exit_code_ = benchmark_tasks_.back()->finish();
-    return exit_code_;
-  }
-
-  void TaskBenchmarkAll::progress() {
-    // TODO: implement and use or think how to report progress on benchmark all now
-    // it is in the starComputation
-
-  }
-
-  void TaskBenchmarkAll::printHashTypes() {
-    Logging::debugPrint(Logging::Detail::ObjectContentRevision, "hashes for benchmarking :");
-
-    for (std::vector<std::string>::iterator it = hashtypes_.begin(); it != hashtypes_.end(); it++) {
-      Logging::debugPrint(Logging::Detail::ObjectContentRevision, "\t'" + *it + "'");
-    }
-
-    Logging::debugPrint(Logging::Detail::ObjectContentRevision, "------------------------------------");
-  }
+}

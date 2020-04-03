@@ -71,6 +71,14 @@
       <template v-slot:item.added="{ item }">
         {{ $moment(item.added).format('D.M.YYYY H:mm:ss') }}
       </template>
+      <template v-slot:item.job="{ item }">
+      <router-link
+        :to="{ name: 'jobDetail', params: { id: item.job.id } }"
+        class="middle"
+      >
+        {{ item.job.name }}
+      </router-link>
+      </template>
     </v-data-table>
   </div>
 </template>
@@ -88,9 +96,10 @@
         loading: true,
         headers: [
           {text: 'Password', value: 'password', align: 'start', sortable: true},
-          {text: 'Hash type', value: 'hash_type_name', align: 'end', sortable: true},
+          {text: 'Hash type', value: 'hash_type_name', align: 'start', sortable: true},
           {text: 'Hash', value: 'hash', align: 'start', sortable: true},
-          {text: 'Added', value: 'added', align: 'end', sortable: true}
+          {text: 'Added', value: 'added', align: 'start', sortable: true},
+          {text: 'Job', value: 'job', align: 'end', sortable: true}
         ],
         hashes:
           []

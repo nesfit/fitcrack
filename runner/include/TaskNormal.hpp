@@ -13,12 +13,10 @@ class TaskNormal: public TaskComputeBase {
 
     private:
 
-	bool parse_curku_;	    /**< Flag signaling whether to parse CURKU or PROGRESS */
-
 	std::string passwords_;	    /**< Found password/s */
 
 	unsigned long long start_index_;	    /**< Index from which start computation */
-	unsigned long long start_computed_index_;   /**< Index from which start computation */
+	uint64_t invalidRuleCount;
 
     protected: 
 
@@ -32,39 +30,34 @@ class TaskNormal: public TaskComputeBase {
 	 * @brief   Parses Hashcat's progress output line
 	 * @param   progress_line [in] Line of the hashcat's output
 	 */
-	void parseHashcatProgress(std::string& progress_line);
+	bool parseHashcatProgress(std::string& progress_line);
 
 	/**
 	 * @brief   Reads password/s from the file
 	 */
 	void readPasswordsFromFile();
 
-	/**
-	 * @brief   Parses CURKU value from hashcat progress line
-	 * @param   progress_line [] Hashcat's progress line
-	 * @return  Parsed CURKU value
-	 */
-	std::string parseCurku(const std::string& progress_line);
-
+	typedef std::pair<uint64_t, uint64_t> ProgressPair;
+	
 	/**
 	 * @brief   Parses PROGRESS value from hashcat progress line
 	 * @param   progress_line [] Hashcat's progress line
 	 * @return  Parsed PROGRESS value
 	 */
-	std::string parseProgress(const std::string& progress_line);
+	ProgressPair parseProgress(const std::string& progress_line);
 
 	/**
 	 * @brief   Saves value from parameter into computed_hashes_
 	 * @param   computed_hashes_index [in] Values parsed from Hashcat's
 	 *	    progress line
 	 */
-	void saveParsedProgress(const std::string& computed_hashes_index);
+	void saveParsedProgress(uint64_t currentProgress);
 
 	/**
 	 * @brief   Sets total_hashes_ to the second value after PROGRESS
 	 * @param   progress_line [] Hashcat's progress line
 	 */
-	void setTotalHahsesFromProgressLine(const std::string& progress_line);
+	void setTotalHashesFromProgress(uint64_t current, uint64_t max);
 
     public:
 
@@ -95,10 +88,9 @@ class TaskNormal: public TaskComputeBase {
         std::string generateOutputMessage(); 
 
         /**
-         * @brief   Sets total_keyspace_ value to 1 since each benchmark task
-         *          is only for single hash_type
+         * @brief Do nothing. It's already 0 and will be initialized when progress line is parsed
          */
-        void initializeTotalHashes();
+        void initializeTotalHashes() {}
 
 	/**
 	 * @brief Parse hashcat benchmark line  

@@ -185,70 +185,51 @@
       </v-col>
     </v-row>
 
-    <v-row class="d-flex align-center justify-end">
-      <v-col
-        @click="fullDate = false"
-      >
-        <v-radio-group
-          v-model="hoursBefore"
-          row
-          hide-details
-          class="dateSelect"
-          :disabled="fullDate"
-          @change="loadData"
+    <v-row>
+      <v-col class="d-flex">
+        <v-switch
+          v-model="fullDate"
+          label="Custom range"
+          class="mr-4"
+        />
+        <div 
+          v-if="fullDate"
+          class="d-flex"
         >
-          <v-radio
-            value="1"
-            label="last hour"
+          <dt-picker
+            v-model="fromDate"
+            class="mr-4"
+            label="From"
+            @input="loadData"
           />
-          <v-radio
-            value="3"
-            label="last 3 hours"
+          <dt-picker
+            v-model="toDate"
+            label="To"
+            @input="loadData"
           />
-          <v-radio
-            value="6"
-            label="last 6 hours"
-          />
-        </v-radio-group>
-      </v-col>
-      <v-col
-        class="pl-2"
-        @click="fullDate = true"
-      >
-        <v-row>
-          <v-col>
-            <v-subheader class="textBottom">
-              From:
-            </v-subheader>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="fromDate"
-              :disabled="!fullDate"
-              text
-              single-line
-              mask="date-with-time"
-              :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-              @input="loadData"
+        </div>
+        <div v-else>
+          <v-radio-group
+            v-model="hoursBefore"
+            row
+            hide-details
+            class="dateSelect"
+            @change="loadData"
+          >
+            <v-radio
+              value="1"
+              label="last hour"
             />
-          </v-col>
-          <v-col>
-            <v-subheader class="textBottom">
-              To:
-            </v-subheader>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="toDate"
-              :disabled="!fullDate"
-              text
-              single-line
-              mask="date-with-time"
-              :placeholder="this.$moment().format('DD/MM/YYYY HH:MM')"
-              @input="loadData"
+            <v-radio
+              value="3"
+              label="last 3 hours"
             />
-          </v-col>
-        </v-row>
+            <v-radio
+              value="6"
+              label="last 6 hours"
+            />
+          </v-radio-group>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -259,13 +240,15 @@
   import jobTile from '@/components/home/jobTile'
   import fcGraph from '@/components/graph/fc_graph'
   import { attackIcon } from '@/assets/scripts/iconMaps'
+  import dtPicker from '@/components/picker/datetime'
 
   export default {
     name: 'HomeView',
     components: {
       gridTile,
       jobTile,
-      fcGraph
+      fcGraph,
+      dtPicker
     },
     data: function () {
       return {
@@ -273,8 +256,8 @@
         hostGraph: null,
         interval: null,
         hoursBefore: '6',
-        fromDate: this.$moment().format('DDMMYYYYHHmm'),
-        toDate: this.$moment().format('DDMMYYYYHHmm'),
+        fromDate: this.$moment().toISOString().slice(0, 16),
+        toDate: this.$moment().toISOString().slice(0, 16),
         fullDate: false,
         notifications: null,
         hostsInfo: null,
@@ -337,13 +320,13 @@
         var toDate = '';
 
         if (this.fullDate) {
-          if (this.fromDate.length === 12) {
-            fromDate = this.$moment(this.fromDate, 'DDMMYYYYHHmm').format('YYYY-M-D H:mm:ss');
+          if (this.fromDate.length === 16) {
+            fromDate = this.$moment(this.fromDate, 'YYYY-MM-DDTHH:mm').format('YYYY-M-D H:mm:ss');
           } else {
             return
           }
-          if (this.toDate.length === 12) {
-            toDate = this.$moment(this.toDate, 'DDMMYYYYHHmm').format('YYYY-M-D H:mm:ss');
+          if (this.toDate.length === 16) {
+            toDate = this.$moment(this.toDate, 'YYYY-MM-DDTHH:mm').format('YYYY-M-D H:mm:ss');
           } else {
             return
           }

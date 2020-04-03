@@ -308,7 +308,7 @@
       <v-btn
         :icon="$vuetify.breakpoint.xsOnly"
         text
-        @click.stop="logout"
+        @click.stop="$store.dispatch('signOut')"
       >
         <v-icon :left="$vuetify.breakpoint.smAndUp">
           mdi-logout-variant
@@ -343,7 +343,7 @@
   import notifications from '@/components/notification/fc_notifications_wrapper'
   import bins from '@/components/job/bins'
   import { routeIcon } from '@/router'
-  import axios from 'axios'
+  import store from '@/store'
 
   export default {
     components: {
@@ -363,23 +363,17 @@
         localStorage.setItem('navtab', val)
       }
     },
-    beforeRouteEnter (to, from, next) {
-      axios.get(window.serverAddress + '/user/isLoggedIn')
-        .then(response => response.data)
-        .then(userInfo => {
-          if (!userInfo.loggedIn) {
-            if (from.path === '/login') {
-              next()
-            }
-            sessionStorage.setItem('loginRedirect', to.path)
-            next('/login')
-          } else {
-            next(vm => {
-              vm.$store.state.user.userData = userInfo.user
-              vm.$store.state.user.loggedIn = true
-            })
-          }
-        })
+    async beforeRouteEnter (to, from, next) {
+      const loggedIn = await store.dispatch('resume')
+      if (!loggedIn) {
+        if (from.path === '/login') {
+          next()
+        }
+        sessionStorage.setItem('loginRedirect', to.path)
+        next('/login')
+      } else {
+        next()
+      }
     },
     mounted: function () {
       this.getNotificationsCount();
@@ -392,11 +386,6 @@
     },
     methods: {
       routeIcon,
-      logout: function () {
-        this.axios.get(this.$serverAddr + '/user/logout').then((response) => {
-          this.$logoutUser()
-        })
-      },
       toggleNotifications: function () {
         this.rightDrawer = !this.rightDrawer;
         if (this.rightDrawer) {

@@ -30,7 +30,7 @@ class CJob {
 
     public:
         /** Default destructor */
-        ~CJob() = default;
+        virtual ~CJob() = default;
 
         /**
          * @brief Creating instance as a shared pointer from database select
@@ -50,13 +50,13 @@ class CJob {
          * @brief Updates index of this job object and database entry
          * @param newIndex [in] New mask current index
          */
-        void updateIndex(uint64_t newIndex);
+        virtual void updateIndex(uint64_t newIndex);
 
         /**
          * @brief Updates index 2 of this job object and database entry
          * @param newIndex [in] New mask current index 2
          */
-        void updateIndex2(uint64_t newIndex2);
+        virtual void updateIndex2(uint64_t newIndex2);
 
         /**
          * @brief Updates status of this job object and database entry
@@ -112,10 +112,15 @@ class CJob {
         uint64_t    m_currentIndex2;
         std::string m_name;
         uint64_t    m_secondsPerWorkunit;
-        std::string m_config;
         std::string m_dict1;
         std::string m_dict2;
         std::string m_rules;
+        std::string m_ruleLeft;
+        std::string m_ruleRight;
+        std::string m_charset1;
+        std::string m_charset2;
+        std::string m_charset3;
+        std::string m_charset4;
         std::string m_grammar;
         uint64_t    m_grammar_id;
         std::string m_markov;
@@ -134,8 +139,10 @@ class CJob {
          */
 
         uint64_t m_combSecDictSize;     /**< Size of second dictionary in Combinator attack */
+    protected:
         std::vector<Config::Ptr<CMask>> m_masks;    /**< Vector of non-exhausted masks for mask attack */
         std::vector<Config::Ptr<CDictionary>> m_dictionaries;  /**< Vector of non-exhausted dictionaries */
+    private:
         std::string m_hashes;           /**< job hash(es) denoted by newlines */
 
         uint64_t m_totalPower;          /**< Sum of host power for this job */
@@ -162,10 +169,15 @@ class CJob {
         uint64_t getCurrentIndex2() const;
         const std::string & getName() const;
         uint64_t getSecondsPerWorkunit() const;
-        const std::string & getConfig() const;
         const std::string & getDict1() const;
         const std::string & getDict2() const;
         const std::string & getRules() const;
+        const std::string & getRuleLeft() const;
+        const std::string & getRuleRight() const;
+        const std::string & getCharset1() const;
+        const std::string & getCharset2() const;
+        const std::string & getCharset3() const;
+        const std::string & getCharset4() const;
         uint64_t getGrammarId() const;
         const std::string & getMarkov() const;
         uint32_t getMarkovThreshold() const;
@@ -184,11 +196,11 @@ class CJob {
      * @section Getters/Setters for other member variables
      */
 
-        std::vector<Config::Ptr<CMask>> getMasks() const;
+        virtual std::vector<Config::Ptr<CMask>> getMasks() const;
         void addMask(Config::Ptr<CMask> mask);
 
-        std::vector<Config::Ptr<CDictionary>> getDictionaries() const;
-        std::vector<Config::Ptr<CDictionary>> getRightDictionaries() const;
+        virtual std::vector<Config::Ptr<CDictionary>> getDictionaries() const;
+        virtual std::vector<Config::Ptr<CDictionary>> getRightDictionaries() const;
         void addDictionary(Config::Ptr<CDictionary> dictionary);
 
         std::string getHashes() const;

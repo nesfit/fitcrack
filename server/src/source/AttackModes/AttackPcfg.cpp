@@ -10,10 +10,10 @@
 #include <AttackPcfgClient.h>
 
 
-CAttackPcfg::CAttackPcfg(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-        :   AttackMode(job, host, seconds, sqlLoader)
+CAttackPcfg::CAttackPcfg(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+        :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
-    m_client = PretermClient(job->getId());
+    m_client = PretermClient(m_job->getId());
 }
 
 
@@ -47,7 +47,7 @@ bool CAttackPcfg::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open data BOINC input file! Setting job to malformed.\n");
@@ -88,9 +88,7 @@ bool CAttackPcfg::makeWorkunit()
     if (newKeyspace > Config::MAX_PCFG_KEYSPACE)
         newKeyspace = Config::MAX_PCFG_KEYSPACE;
 
-    loadNextPreterminals(preterminals, newKeyspace);
-
-    if (preterminals.empty() || newKeyspace == 0)
+    if(!loadNextPreterminals(preterminals, newKeyspace))
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to fetch response from PCFG Manager!\n");
@@ -113,7 +111,7 @@ bool CAttackPcfg::makeWorkunit()
 
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open config BOINC input file! Setting job to malformed.\n");
@@ -121,22 +119,13 @@ bool CAttackPcfg::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new workunit:\n");
-
-    /** Output original config from DB */
-    f << m_job->getConfig();
-    Tools::printDebug(m_job->getConfig().c_str());
-
-    /** Output mode */
-    f << "|||mode|String|1|n|||\n";
-    Tools::printDebug("|||mode|String|1|n|||\n");
+    f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
+                             m_job->getName(), m_job->getHashType());
 
     /** Output hc_keyspace */
-    int digits = 0;
-    uint64_t num = newKeyspace;
-    do { num /= 10; ++digits; } while (num != 0);    // Count digits
-    f << "|||hc_keyspace|BigUInt|" << digits << "|" << newKeyspace << "|||\n";
-    Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, newKeyspace);
+    auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(newKeyspace));
+    f << limitLine;
+    Tools::printDebug(limitLine.c_str());
 
     f.close();
 
@@ -151,7 +140,7 @@ bool CAttackPcfg::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                               "Failed to open grammar BOINC input file! Skipping workunit.\n");
@@ -240,7 +229,7 @@ bool CAttackPcfg::generateWorkunit()
                           "Generating PCFG workunit ...\n");
 
     /** Compute password count */
-    uint64_t passCount = m_host->getPower() * m_seconds;
+    uint64_t passCount = getPasswordCountToProcess();
 
     if (passCount < Config::minPassCount)
     {
@@ -264,12 +253,13 @@ bool CAttackPcfg::generateWorkunit()
 }
 
 
-void CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
+bool CAttackPcfg::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
 {
     /** Run gRPC query to get preterminals */
     if (!m_client.Connect())
-        return;
+        return false;
 
     preterminals = m_client.GetNextItems(realKeyspace);
     m_client.Acknowledge();
+    return !preterminals.empty() && realKeyspace > 0;
 }

@@ -5,7 +5,7 @@
 
 <template>
   <fc-tile
-    :title="data.path || 'Server browser'"
+    :title="data ? data.path || 'Server browser' : 'Connecting...'"
     icon="mdi-server-network"
     class="mx-auto dictContentContainer"
   >
@@ -25,6 +25,17 @@
         <v-list-item-content>
           <v-list-item-title>..</v-list-item-title>
           <v-list-item-subtitle>{{ data.parent }}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
+        v-show="data.folders.length == 0 && data.files.length == 0"
+      >
+        <v-list-item-action>
+          <v-icon>mdi-folder-alert</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>Empty folder</v-list-item-title>
+          <v-list-item-subtitle>Go up or add files on server</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-list-item

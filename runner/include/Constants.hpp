@@ -54,4 +54,9 @@ namespace ProjectConstants {
 	const std::string Error		= "3";	/**< Hashcat or something else failed */
     };
 };
+
+namespace RunnerConstants {
+    extern const std::string HashcatMutexName;
+}
+
 #endif // CONSTANTS_HPP

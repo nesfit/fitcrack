@@ -107,6 +107,8 @@ class PipeLinux : public PipeBase {
          */
         bool isWriteOpen() const;
 
+        virtual void waitForAvailableOutput() const;
+
         /**
          * @brief   Redirects read end of the pipe to another file descriptor
          * @param   target [in] New read end of the pipe (stdout, stderr etc.)

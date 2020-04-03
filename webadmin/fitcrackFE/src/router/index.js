@@ -6,6 +6,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+import store from '@/store'
+
 const home = r => require.ensure([], () => r(require('@/components/home/homeView')))
 const jobs = r => require.ensure([], () => r(require('@/components/job/jobsView')))
 const jobDetail = r => require.ensure([], () => r(require('@/components/jobDetail/jobDetailView')))
@@ -33,6 +35,7 @@ const PageNotFound = r => require.ensure([], () => r(require('@/components/pageN
 const EncryptedFiles = r => require.ensure([], () => r(require('@/components/encryptedFile/encryptedFilesView')))
 const Server = r => require.ensure([], () => r(require('@/components/server/serverPage')))
 const Settings = r => require.ensure([], () => r(require('@/components/settings/settingsView')))
+const UnauthorizedError = r => require.ensure([], () => r(require('@/components/errorPages/unauthorized')))
 
 Vue.use(Router);
 
@@ -83,6 +86,7 @@ const appRoutes = [
     name: 'addJob',
     component: addJob,
     meta: {
+      guard: 'ADD_NEW_JOB',
       title: 'Create a job',
       icon: 'mdi-briefcase-plus'
     }
@@ -224,6 +228,7 @@ const appRoutes = [
     name: 'manageUsers',
     component: manageUsers,
     meta: {
+      guard: 'MANAGE_USERS',
       title: 'Manage users',
       icon: 'mdi-folder-account'
     }
@@ -256,6 +261,15 @@ const appRoutes = [
     }
   },
   {
+    path: '/error/unauthorized',
+    name: 'unauthorized',
+    component: UnauthorizedError,
+    meta: {
+      title: 'Access Denied',
+      icon: 'mdi-alert'
+    }
+  },
+  {
     path: "*",
     component: PageNotFound
   }
@@ -275,6 +289,27 @@ const rt = new Router({
       children: appRoutes
     }
   ]
+})
+
+rt.beforeResolve(async (to, from, next) => {
+  const perm = to.meta.guard
+  if (!perm) {
+    next()
+    return
+  }
+  //
+  const hasAccess = await store.dispatch('hasPermission', perm)
+  if (hasAccess) {
+    next()
+  } else {
+    next({
+      name: 'unauthorized',
+      query: {
+        accessing: to.path,
+        missing: perm
+      }
+    })
+  }
 })
 
 rt.afterEach((to, from) => {

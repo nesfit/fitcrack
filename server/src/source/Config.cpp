@@ -39,6 +39,7 @@ namespace Config {
     std::string markovDir = "/usr/share/collections/markov/";
     std::string rulesDir = "/usr/share/collections/rules/";
     std::string pcfgDir = "/usr/share/collections/pcfg/";
+    std::string charsetDir = "/usr/share/collections/charsets/";
 
     /** Template names*/
     std::string inTemplateFileBench =      "bench_in";
@@ -256,4 +257,15 @@ void Tools::releaseFdMemory()
             delete fd.second;
         }
     }
+}
+
+
+std::string Tools::toHex(char *binaryData, int len)
+{
+    std::string s(len * 2, ' ');
+    for (int i = 0; i < len; ++i) {
+        s[2 * i]     = Config::hexmap[(binaryData[i] & 0xF0) >> 4];
+        s[2 * i + 1] = Config::hexmap[binaryData[i] & 0x0F];
+    }
+    return s;
 }

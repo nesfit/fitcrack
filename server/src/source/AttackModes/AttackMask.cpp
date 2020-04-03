@@ -9,8 +9,8 @@
 #include <AttackMask.h>
 
 
-CAttackMask::CAttackMask(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-    :   AttackMode(job, host, seconds, sqlLoader)
+CAttackMask::CAttackMask(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
 
 }
@@ -46,7 +46,7 @@ bool CAttackMask::makeWorkunit()
 
     std::ofstream f;
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open config BOINC input file! Setting job to malformed.\n");
@@ -54,26 +54,19 @@ bool CAttackMask::makeWorkunit()
         return false;
     }
 
-    Tools::printDebug("CONFIG for new workunit:\n");
-
-    /** Output original config from DB */
-    f << m_job->getConfig();
-    Tools::printDebug(m_job->getConfig().c_str());
-
-    /** Output mode */
-    f << "|||mode|String|1|n|||\n";
-    Tools::printDebug("|||mode|String|1|n|||\n");
+    f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
+                             m_job->getName(), m_job->getHashType(), "", "",
+                             m_job->getCharset1(), m_job->getCharset2(), m_job->getCharset3(),
+                             m_job->getCharset4());
 
     /** Output mask */
     f << "|||mask|String|" << workunitMask->getMask().length() << "|" << workunitMask->getMask() << "|||\n";
     Tools::printDebug("|||mask|String|%d|%s|||\n", workunitMask->getMask().length(), workunitMask->getMask().c_str());
 
     /** Output start_index */
-    int digits = 0;
-    uint64_t num = m_workunit->getStartIndex();
-    do { num /= 10; ++digits; } while (num != 0);    // Count digits
-    f << "|||start_index|BigUInt|" << digits << "|" << m_workunit->getStartIndex() << "|||\n";
-    Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, m_workunit->getStartIndex());
+    auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(m_workunit->getStartIndex()));
+    f << skipLine;
+    Tools::printDebug(skipLine.c_str());
 
     uint64_t maskHcKeyspace = workunitMask->getHcKeyspace();
     uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
@@ -81,17 +74,15 @@ bool CAttackMask::makeWorkunit()
     /** Output stop_index - only if it is not the last workunit in the current mask */
     if (m_workunit->getStartIndex() + workunitHcKeyspace < maskHcKeyspace)
     {
-        digits = 0;
-        num = workunitHcKeyspace;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||hc_keyspace|BigUInt|" << digits << "|" << workunitHcKeyspace << "|||\n";
-        Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitHcKeyspace);
+        auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
+        f << limitLine;
+        Tools::printDebug(limitLine.c_str());
     }
     else
     {
         /** Otherwise, send whole mask_hc_keyspace for correct progress calculation, --limit is omitted */
-        digits = 0;
-        num = maskHcKeyspace;
+        int digits = 0;
+        uint64_t num = maskHcKeyspace;
         do { num /= 10; ++digits; } while (num != 0);    // Count digits
         f << "|||mask_hc_keyspace|BigUInt|" << digits << "|" << maskHcKeyspace << "|||\n";
         Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, maskHcKeyspace);
@@ -110,7 +101,7 @@ bool CAttackMask::makeWorkunit()
     }
 
     f.open(path);
-    if (!f)
+    if (!f.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open data BOINC input file! Setting job to malformed.\n");
@@ -169,7 +160,7 @@ bool CAttackMask::generateWorkunit()
             "Generating mask workunit ...\n");
 
     /** Compute password count */
-    uint64_t passCount = m_host->getPower() * m_seconds;
+    uint64_t passCount = getPasswordCountToProcess();
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Number of real passwords host could compute: %" PRIu64 "\n", passCount);
 
@@ -185,19 +176,7 @@ bool CAttackMask::generateWorkunit()
             "Masks left for this job: %" PRIu64 "\n", maskVec.size());
 
     /** Find the following mask */
-    PtrMask currentMask;
-    for (PtrMask & mask : maskVec)
-    {
-        if (mask->getCurrentIndex() < mask->getHcKeyspace())
-        {
-            /** Mask for a new workunit found */
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Mask found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
-                    mask->getMask().c_str(), mask->getCurrentIndex(), mask->getHcKeyspace());
-            currentMask = mask;
-            break;
-        }
-    }
+    PtrMask currentMask = FindCurrentMask(maskVec);
 
     if (!currentMask)
     {

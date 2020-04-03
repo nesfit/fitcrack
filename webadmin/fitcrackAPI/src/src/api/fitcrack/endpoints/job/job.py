@@ -2,14 +2,7 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-'''
-packagesCollection => jobsCollection
-packageList_parser => jobList_parser
-page_of_packages_model => page_of_jobs_model
-packages_page => jobs_page
-packagess_query => jobs_query
-packagesJob => workunitsJob
-'''
+
 import os
 import base64
 import logging
@@ -45,13 +38,10 @@ log = logging.getLogger(__name__)
 
 ns = api.namespace('job', description='Operations with jobs.')
 
-# packagesCollection => jobsCollection
 @ns.route('')
 class jobsCollection(Resource):
-# packageList_parser => jobList_parser
     @api.expect(jobList_parser)
     @api.marshal_with(page_of_jobs_model)
-    #page_of_packages_model => page_of_jobs_model
     def get(self):
         """
         Returns list of jobs.
@@ -59,7 +49,6 @@ class jobsCollection(Resource):
         args = jobList_parser.parse_args(request)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        # packagess_query => jobs_query
         jobs_query = FcJob.query
 
         if args.showDeleted:
@@ -88,7 +77,6 @@ class jobsCollection(Resource):
             jobs_query = jobs_query.order_by(FcJob.id.desc())
 
 
-        # packages_page => jobs_page
         jobs_page = jobs_query.paginate(page, per_page, error_out=True)
 
         return jobs_page
@@ -99,8 +87,6 @@ class jobsCollection(Resource):
         """
         Creates new job.
         """
-        #create_package => create_job
-        #package => job
         data = request.json
         job = create_job(data)
 
@@ -110,7 +96,6 @@ class jobsCollection(Resource):
             'job_id': job.id
         }
 
-# PackageByID => JobByID
 @ns.route('/<int:id>')
 @api.response(404, 'Job not found.')
 class JobByID(Resource):
@@ -149,8 +134,8 @@ class JobByID(Resource):
         job.name = args['name']
         job.comment = args['comment']
         job.seconds_per_workunit = args['seconds_per_job']
-        job.time_start = datetime.datetime.now() if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%d/%m/%Y %H:%M'),
-        job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%d/%m/%Y %H:%M')
+        job.time_start = datetime.datetime.now() if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%Y-%m-%dT%H:%M'),
+        job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%Y-%m-%dT%H:%M')
 
         db.session.commit()
         return {
@@ -223,7 +208,7 @@ class OperationWithJob(Resource):
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0
-            job.time_start = job.time_end
+            job.time_start = job.time_end = None
             if job.attack_mode == 3:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
@@ -305,7 +290,6 @@ class jobsHost(Resource):
         }
 
 
-# packagesJob => workunitsJob
 @ns.route('/<int:id>/job')
 @api.response(404, 'Job not found.')
 class workunitsJob(Resource):
@@ -316,7 +300,6 @@ class workunitsJob(Resource):
         """
         Returns workunits to which job was devides.
         """
-        # packageJob_parser => job_parser
         args = jobWorkunit_parser.parse_args(request)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)

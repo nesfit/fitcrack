@@ -7,13 +7,11 @@
 #ifndef TASKCOMPUTEBASE_HPP
 #define TASKCOMPUTEBASE_HPP
 
-#include "Attack.hpp"
+#include "AttackBase.hpp"
 
 #include "TaskBase.hpp"
 
 #include "Process.hpp"
-#include "ProcessPCFG.hpp"
-#include "ProcessPrince.hpp"
 #include "NamedMutex.hpp"
 
 

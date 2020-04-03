@@ -29,10 +29,15 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_currentIndex2 = std::stoull(jobMap["current_index_2"]);
         this->m_name = jobMap["name"];
         this->m_secondsPerWorkunit = std::stoull(jobMap["seconds_per_workunit"]);
-        this->m_config = jobMap["config"];
         this->m_dict1 = jobMap["dict1"];
         this->m_dict2 = jobMap["dict2"];
         this->m_rules = jobMap["rules"];
+        this->m_ruleLeft = jobMap["rule_left"];
+        this->m_ruleRight = jobMap["rule_right"];
+        this->m_charset1 = jobMap["charset1"];
+        this->m_charset2 = jobMap["charset2"];
+        this->m_charset3 = jobMap["charset3"];
+        this->m_charset4 = jobMap["charset4"];
         if (!jobMap["grammar_id"].empty())
             this->m_grammar_id = std::stoull(jobMap["grammar_id"]);
         this->m_markov = jobMap["markov_hcstat"];
@@ -63,9 +68,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         }
 
         /** Compute second dictionary size */
-        if ((this->m_attackMode == Config::AttackMode::AttackCombinator ||             /**< For combinator attacks*/
-            (this->m_attackMode == Config::AttackMode::AttackDict && this->m_attackSubmode > 0) ||    /**< and rules*/
-            (this->m_attackMode == Config::AttackMode::AttackPcfg && this->m_attackSubmode > 0)) &&   /**< and PCFG rules*/
+        if (this->m_attackMode == Config::AttackMode::AttackCombinator &&
             this->m_hcKeyspace != 0)
                 m_combSecDictSize = this->m_keyspace / this->m_hcKeyspace;
 
@@ -285,12 +288,6 @@ uint64_t CJob::getSecondsPerWorkunit() const
 }
 
 
-const std::string & CJob::getConfig() const
-{
-    return m_config;
-}
-
-
 const std::string & CJob::getDict1() const
 {
     return m_dict1;
@@ -306,6 +303,18 @@ const std::string & CJob::getDict2() const
 const std::string & CJob::getRules() const
 {
     return m_rules;
+}
+
+
+const std::string & CJob::getRuleLeft() const
+{
+    return m_ruleLeft;
+}
+
+
+const std::string & CJob::getRuleRight() const
+{
+    return m_ruleRight;
 }
 
 
@@ -436,20 +445,48 @@ void CJob::setGrammar(const std::string & grammar)
     m_grammar = grammar;
 }
 
+
+const std::string &CJob::getCharset1() const
+{
+    return m_charset1;
+}
+
+
+const std::string &CJob::getCharset2() const
+{
+    return m_charset2;
+}
+
+
+const std::string &CJob::getCharset3() const
+{
+    return m_charset3;
+}
+
+
+const std::string &CJob::getCharset4() const
+{
+    return m_charset4;
+}
+
+
 uint32_t CJob::getMinPasswordLen() const
 {
     return m_minPasswordLen;
 }
+
 
 uint32_t CJob::getMaxPasswordLen() const
 {
     return m_maxPasswordLen;
 }
 
+
 uint32_t CJob::getMinElemInChain() const
 {
     return m_minElemInChain;
 }
+
 
 uint32_t CJob::getMaxElemInChain() const
 {

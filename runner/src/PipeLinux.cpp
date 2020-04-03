@@ -78,6 +78,22 @@ bool PipeLinux::isWriteOpen() const {
   return isEndOpen(write_);
 }
 
+void PipeLinux::waitForAvailableOutput() const
+{
+  pollfd pollstruct;
+  pollstruct.fd = read_;
+  pollstruct.events = POLLIN;
+  pollstruct.revents = 0;
+  do
+  {
+    int res = poll(&pollstruct, 1, -1);
+    if(res == -1 && errno != EINTR)
+    {
+      RunnerUtils::runtimeException("poll failed unexpectedly", errno);
+    }
+  } while((pollstruct.revents&(POLLHUP|POLLIN)) == 0);
+}
+
 int PipeLinux::readChar(char& c) {
   // Based on article
   // https://www.geeksforgeeks.org/non-blocking-io-with-pipes-in-c/
@@ -110,18 +126,7 @@ int PipeLinux::readChar(char& c) {
 
 int PipeLinux::readChar()
 {
-  pollfd pollstruct;
-  pollstruct.fd = read_;
-  pollstruct.events = POLLIN;
-  pollstruct.revents = 0;
-  do
-  {
-    int res = poll(&pollstruct, 1, -1);
-    if(res == -1 && errno != EINTR)
-    {
-      RunnerUtils::runtimeException("poll failed unexpectedly", errno);
-    }
-  } while((pollstruct.revents&(POLLHUP|POLLIN)) == 0);
+  waitForAvailableOutput();
   char c;
   int res;
   if((res = readChar(c)) != 1)

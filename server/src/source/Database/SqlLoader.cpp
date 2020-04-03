@@ -94,6 +94,13 @@ uint64_t CSqlLoader::getWorkunitCount(uint64_t jobId, uint64_t hostId)
             hostId, jobId));
 }
 
+uint64_t CSqlLoader::getTotalWorkunitCount(uint64_t jobId, uint64_t hostId)
+{
+    return getRowCount<CWorkunit>(formatQuery(
+            "WHERE `host_id` = %" PRIu64 " AND `job_id` = %" PRIu64,
+            hostId, jobId));
+}
+
 
 uint64_t CSqlLoader::getWorkunitCount(uint64_t jobId)
 {
@@ -259,8 +266,6 @@ std::vector<std::string> CSqlLoader::loadJobHashes(uint64_t jobId)
             std::string input(row[0]);
             CodeTools::Base64::Decode(input, output);
             result.emplace_back(output);
-            Tools::printDebugJob(Config::DebugType::Log, jobId,
-                                 "Decoded hash: %s\n", output.c_str());
         }
     }
 

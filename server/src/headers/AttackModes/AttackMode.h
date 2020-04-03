@@ -27,6 +27,8 @@
 /** System headers*/
 #include <fstream>
 
+#include <InputDict.h>
+
 
 class AttackMode {
     public:
@@ -62,7 +64,7 @@ protected:
         * @param host [in] Instance of CHost which this attack belongs to
         * @param seconds [in] Number of seconds this instance of attack should take
         */
-        AttackMode(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+        AttackMode(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
         :   m_job(job),
             m_host(host),
             m_seconds(seconds),
@@ -71,6 +73,46 @@ protected:
 
         }
 
+        /**
+         * @brief Generates a basic config file for all attack_types
+         * @param wuMode Mode of the WU (b/n/a)
+         * @param attackMode Attack number
+         * @param attackSubmode Attack submode
+         * @param name Name of the Job
+         * @param hashType Hashcat hash type
+         * @param ruleLeft Left rule if present
+         * @param ruleRight Right rule if present
+         * @param charset1 Charset 1 if being used
+         * @param charset2 Charset 2 if being used
+         * @param charset3 Charset 3 if being used
+         * @param charset4 Charset 4 if being used
+         * @return Config string with newline at the end
+         */
+        virtual std::string generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name,
+                unsigned hashType, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
+                std::string charset2="", std::string charset3="", std::string charset4="");
+
+        /**
+         * @brief Get the Mode Letter. This is 'n' for normal attack modes.
+         * 
+         * @return char The mode letter
+         */
+        virtual char getModeLetter() {return 'n';}
+
+        std::string makeConfigLine(const std::string &option, const std::string &type, const std::string &value);
+
+        virtual std::string makeLimitingConfigLine(const std::string &option, const std::string &type, const std::string &value)
+        {return makeConfigLine(option, type, value);}
+
+        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex);
+
+        virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const;
+
+        virtual PtrDictionary GetWorkunitDict() const;
+
+        virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks) const;
+
+        uint64_t getPasswordCountToProcess() const;
 
         PtrWorkunit m_workunit; /**< Instance of CWorkunit which is used to create this attack instance */
         PtrJob m_job;           /**< Instance of CJob which is parent of this attack instance */

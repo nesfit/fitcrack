@@ -9,8 +9,8 @@
 #include <AttackPrince.h>
 
 
-CAttackPrince::CAttackPrince(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-    :   AttackMode(job, host, seconds, sqlLoader)
+CAttackPrince::CAttackPrince(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
 }
 
@@ -66,8 +66,9 @@ bool CAttackPrince::makeWorkunit()
     Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
-    configFile << m_job->getConfig();
-    Tools::printDebug(m_job->getConfig().c_str());
+    configFile << generateBasicConfig(m_job->getAttackMode(),
+                                      m_job->getAttackSubmode(),
+                                      m_job->getName(), m_job->getHashType());
 
     /** Output mode */
     uint64_t startIndex = m_workunit->getStartIndex();

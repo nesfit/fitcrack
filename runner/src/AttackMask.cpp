@@ -50,6 +50,7 @@ void AttackMask::setHasCharsets() {
 /* Protected */
 
 void AttackMask::addSpecificArguments() {
+  AttackCrackingBase::addSpecificArguments();
   if (attack_submode_ == "0") {
 
     addArgument("--markov-disable");
@@ -84,5 +85,5 @@ void AttackMask::addSpecificArguments() {
 
 /* Public */
 AttackMask::AttackMask(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory), has_charsets_(false) {
-  addSpecificArguments();
+  
 }

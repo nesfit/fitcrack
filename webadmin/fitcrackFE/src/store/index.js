@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import user from './user'
 import jobForm from './job-form'
 import binInterface from './bin-interface'
 
@@ -9,27 +10,10 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     darkAppearance: false,
-    project: window.projectName || 'Fitcrack',
-    user: {
-      'userData': {
-        'id': null,
-        'username': null,
-        'mail': null,
-        'role': {
-          'MANAGE_USERS': true,
-          'ADD_NEW_JOB': true,
-          'UPLOAD_DICTIONARIES': true,
-          'VIEW_ALL_JOBS': true,
-          'EDIT_ALL_JOBS': true,
-          'OPERATE_ALL_JOBS': true,
-          'ADD_USER_PERMISSIONS_TO_JOB': true
-        }
-      },
-      'loggedIn': false,
-      'loggedInLink': null
-    }
+    project: window.projectName || 'Fitcrack'
   },
   modules: {
+    user,
     jobForm,
     binInterface
   }
