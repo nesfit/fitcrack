@@ -751,7 +751,7 @@ class Result(Base):
         try:
             return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' )
         except:
-            return self.stderr_out.decode("utf-8")
+            return self.stderr_out.decode("utf-8", errors='ignore')
 class FcServerUsage(Base):
     __tablename__ = 'fc_server_usage'
 
