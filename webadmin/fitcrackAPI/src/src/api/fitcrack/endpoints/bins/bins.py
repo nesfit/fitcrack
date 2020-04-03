@@ -58,6 +58,7 @@ class concrete_bin(Resource):
         Returns a bin with its jobs collection.
         """
         bin = FcBin.query.get(id)
+        bin.jobs = bin.jobs.filter(FcJob.deleted == 0).all()
         if bin is None:
             abort(404, 'No such bin')
         else:
@@ -136,10 +137,11 @@ class assign_bin(Resource):
         Assigns jobs to a bin. Add jobs via include array, remove via exclude.
         """
         data = request.json
-        include = data.get('include')
-        exclude = data.get('exclude')
+        include = data.get('include', [])
+        exclude = data.get('exclude', [])
 
         bin = FcBin.query.get(id)
+        bin.jobs = bin.jobs.all()
 
         # exclude if any
         bin.jobs = [job for job in bin.jobs if job.id not in exclude]

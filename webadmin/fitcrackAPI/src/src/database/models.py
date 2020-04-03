@@ -318,6 +318,7 @@ class FcBin(Base):
     jobs = relationship('FcJob',
                     secondary=bin_job_junction,
                     backref="bins",
+                    lazy='dynamic',
                     passive_deletes=True)
 
 class FcTemplate(Base):
