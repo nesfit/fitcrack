@@ -6596,6 +6596,13 @@ INSERT INTO `fc_pcfg_grammar` (`id`, `name`, `path`, `keyspace`, `time_added`, `
 (3, 'twitter-banned', 'twitter-banned.zip', 1096, '2019-08-30 12:17:48', '2019-08-30 12:17:48', 0);
 
 --
+-- Create default job bins
+--
+
+INSERT INTO `fc_bin` (`name`) VALUES
+('Samples')
+
+--
 -- Insert default BENCH_ALL job and sample jobs
 --
 
@@ -6619,6 +6626,18 @@ INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index
 (4,	3,	1,	0,	1),
 (5,	5,	2,	0,	1),
 (6,	5,	6,	0,	0);
+
+
+--
+-- Assign sample jobs to Samples bin
+--
+
+INSERT INTO `fc_bin_job` (`job_id`, `bin_id`) VALUES
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1);
 
 
 --

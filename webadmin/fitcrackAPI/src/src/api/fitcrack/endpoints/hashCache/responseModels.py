@@ -21,7 +21,7 @@ hashes_model = api.model('Hashes model', {
     'hash_type_name': fields.String(),
     'hash': fields.String(attribute='hashText'),
     'added': fields.DateTime(),
-    'package': fields.Nested(job_short_model)
+    'job': fields.Nested(job_short_model)
 })
 
 

@@ -1,0 +1,23 @@
+'''
+   * Author : see AUTHORS
+   * Licence: MIT, see LICENSE
+'''
+
+from flask_restplus import fields
+
+from src.api.apiConfig import api
+from src.api.fitcrack.endpoints.job.responseModels import job_nano_model
+
+bin_model = api.model('Job bin', {
+    'id': fields.Integer(readOnly=True),
+    'position': fields.Integer(readOnly=True),
+    'name': fields.String()
+})
+
+bin_with_jobs_model = api.inherit('Job bin with jobs list', bin_model, {
+    'jobs': fields.List(fields.Nested(job_nano_model))
+})
+
+bins_model = api.inherit('Job bin collection', {
+    'items': fields.List(fields.Nested(bin_model))
+})

@@ -166,20 +166,23 @@ DELIMITER ;
 
 
 --
--- Triggers & procedures for keeping job bins ordered
+-- Triggers and procedures for bin organization
 --
-drop trigger if exists assign_position;
+
+-- triggers
+
+drop trigger if exists assign_bin_position;
 
 delimiter //
-create trigger assign_position
+create trigger assign_bin_position
 before insert on fc_bin for each row
 begin
 declare pos int;
 set pos = (select max(position) from fc_bin);
 if pos is null then
-	set NEW.position = 0;
+  set NEW.position = 0;
 else
-	set NEW.position = pos + 1;
+  set NEW.position = pos + 1;
 end if;
 end
 delimiter ;
@@ -192,8 +195,8 @@ drop procedure if exists delete_bin;
 delimiter //
 
 create procedure move_bin(
-	IN bin_id INT(11),
-	IN target int
+  IN bin_id INT(11),
+  IN target int
 )
 
 begin
@@ -215,7 +218,7 @@ end //
 
 
 create procedure delete_bin(
-	IN bin_id INT(11)
+  IN bin_id INT(11)
 )
 
 begin

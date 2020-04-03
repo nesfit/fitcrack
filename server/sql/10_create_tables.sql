@@ -238,6 +238,22 @@ CREATE TABLE IF NOT EXISTS `fc_protected_file` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_bin`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `position` int(11),
+  `deleted` boolean NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 -- --------------------------------------------------------
 
 --
@@ -316,6 +332,21 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `kill` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_bin_job` (M2M junction)
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin_job` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `job_id` bigint(20) unsigned NOT NULL,
+  `bin_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `job_id` (`job_id`),
+  KEY `bin_id` (`bin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 
 -- --------------------------------------------------------
 
@@ -555,6 +586,15 @@ ALTER TABLE `fc_job_status`
 ALTER TABLE `fc_notification`
   ADD CONSTRAINT `fc_notification_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `fc_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fc_notification_ibfk_2` FOREIGN KEY (`source_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+--
+-- Obmedzenie pre junction tabuľku `fc_bin_job`
+--
+ALTER TABLE `fc_bin_job`
+  ADD CONSTRAINT `fc_bin_job_jobfk` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fc_bin_job_binfk` FOREIGN KEY (`bin_id`) REFERENCES `fc_bin` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 --
 -- Obmedzenie pre tabuľku `fc_job_graph`
