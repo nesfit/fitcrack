@@ -8,7 +8,7 @@ import Router from 'vue-router'
 
 const home = r => require.ensure([], () => r(require('@/components/home/homeView')))
 const jobs = r => require.ensure([], () => r(require('@/components/job/jobsView')))
-const jobDetail = r => require.ensure([], () => r(require('@/components/job/jobDetailView')))
+const jobDetail = r => require.ensure([], () => r(require('@/components/jobDetail/jobDetailView')))
 const login = r => require.ensure([], () => r(require('@/components/user/loginView')))
 const mainPage = r => require.ensure([], () => r(require('@/components/mainPage')))
 const addJob = r => require.ensure([], () => r(require('@/components/job/addJobView')))
@@ -61,9 +61,22 @@ const appRoutes = [
     }
   },
   {
-    path: '/jobs/hidden',
-    name: 'hiddenJobs',
-    component: jobs
+    path: '/bins/:id',
+    name: 'bins',
+    component: jobs,
+    meta: {
+      title: 'Bins',
+      icon: 'mdi-folder'
+    }
+  },
+  {
+    path: '/bins/trash',
+    name: 'trash',
+    component: jobs,
+    meta: {
+      title: 'Trash',
+      icon: 'mdi-delete'
+    }
   },
   {
     path: '/jobs/add',

@@ -241,6 +241,32 @@ CREATE TABLE IF NOT EXISTS `fc_protected_file` (
 -- --------------------------------------------------------
 
 --
+-- Štruktúra tabuľky pre tabuľku `fc_bin`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `position` int(11),
+  primary key (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_bin_job`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin_job` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `bin_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  primary key (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
 -- Štruktúra tabuľky pre tabuľku `fc_job`
 --
 
@@ -509,6 +535,12 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 -- Obmedzenie pre exportované tabuľky
 --
 
+--
+-- Obmedzenie pre tabuľku `fc_bin_job`
+--
+ALTER TABLE `fc_bin_job`
+  ADD CONSTRAINT `fc_bin_job_ibfk_1` FOREIGN KEY (`bin_id`) REFERENCES `fc_bin` (`id`),
+  ADD CONSTRAINT `fc_bin_job_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`);
 
 --
 -- Omezeni pro tabulku `fc_job_status`

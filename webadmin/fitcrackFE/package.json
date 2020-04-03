@@ -36,7 +36,8 @@
     "vue-progressbar": "^0.7.5",
     "vue-router": "^3.1.2",
     "vue-visible": "^1.0.2",
-    "vuetify": "^2.1.5",
+    "vuedraggable": "^2.23.2",
+    "vuetify": "^2.2.15",
     "vuex": "^3.1.2"
   },
   "devDependencies": {

@@ -6,7 +6,7 @@
 <template>
   <div class="relative">
     <div v-if="data === null">
-      <v-progress-circular
+      <v-progress-linear
         indeterminate
         color="primary"
         size="65"
@@ -15,15 +15,7 @@
       />
     </div>
     <div v-else>
-      <v-breadcrumbs
-        divider="/"
-        :items="
-          [
-            { text: 'Jobs', to: { name: 'jobs' }, exact: true },
-            { text: data.name }
-          ]"
-      />
-      <div>
+      <div class="mt-4">
         <v-row 
           justify="center"
           class="mx-3"

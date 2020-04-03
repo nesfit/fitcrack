@@ -1,15 +1,7 @@
 import Vue from 'vue'
+import { supermutator9000 } from '@/store'
 
 // Vuex module for the Add Job view
-const mut = prop => (state, val) => { state[prop] = val }
-
-function supermutator9000 (obj) {
-  const muts = {}
-  Object.keys(obj).forEach(key => {
-    muts[`${key}Mut`] = mut(key)
-  })
-  return muts
-}
 
 // Props that don't save to templates
 const base = {

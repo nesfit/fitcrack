@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import jobForm from './job-form'
+import binInterface from './bin-interface'
 
 Vue.use(Vuex)
 
@@ -29,7 +30,8 @@ export default new Vuex.Store({
     }
   },
   modules: {
-    jobForm
+    jobForm,
+    binInterface
   }
 })
 
@@ -39,4 +41,15 @@ export function twoWayMap (props) {
     map[p] = `${p}Mut`
   })
   return map
+}
+
+// Creates a generic Vuex mutation for every prop in 'obj'
+
+export function supermutator9000 (obj) {
+  const mut = prop => (state, val) => { state[prop] = val }
+  const muts = {}
+  Object.keys(obj).forEach(key => {
+    muts[`${key}Mut`] = mut(key)
+  })
+  return muts
 }

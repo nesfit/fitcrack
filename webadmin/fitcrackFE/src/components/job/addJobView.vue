@@ -519,6 +519,7 @@
 <script>
   import sha1 from 'sha1'
   import numberFormat from '@/assets/scripts/numberFormat'
+  import { attackIcon } from '@/assets/scripts/iconMaps'
 
   import combinator from '@/components/job/attacks/combinator'
   import mask from '@/components/job/attacks/mask'
@@ -622,6 +623,7 @@
     methods: {
       ...mapMutations('jobForm', ['applyTemplate']),
       numberFormat,
+      attackIcon,
       async loadSettings () {
         if (!this.timeForJob) {
           const settings = await this.axios.get(this.$serverAddr + '/settings').then(r => r.data)
@@ -656,18 +658,6 @@
           }
         })
         .catch(console.error)
-      },
-      attackIcon (handler) {
-        const map = {
-          'dictionary': 'mdi-dictionary',
-          'combinator': 'mdi-vector-combine',
-          'maskattack': 'mdi-boxing-glove',
-          'hybridWordlistMask': 'mdi-vector-difference-ba',
-          'hybridMaskWordlist': 'mdi-vector-difference-ab',
-          'pcfgAttack': 'mdi-ray-start-end',
-          'princeAttack': 'mdi-crown'
-        }
-        return map[handler] || 'mdi-checkbox-blank-outline'
       },
       subHashtypeChanged: function (key, val) {
         this.hashType.code = this.hashType.code.replace(key, val.code)

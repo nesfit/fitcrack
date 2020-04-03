@@ -163,3 +163,72 @@ BEGIN
 END
 //
 DELIMITER ;
+
+
+--
+-- Triggers & procedures for keeping job bins ordered
+--
+drop trigger if exists assign_position;
+
+delimiter //
+create trigger assign_position
+before insert on fc_bin for each row
+begin
+declare pos int;
+set pos = (select max(position) from fc_bin);
+if pos is null then
+	set NEW.position = 0;
+else
+	set NEW.position = pos + 1;
+end if;
+end
+delimiter ;
+
+-- procedures
+
+drop procedure if exists move_bin;
+drop procedure if exists delete_bin;
+
+delimiter //
+
+create procedure move_bin(
+	IN bin_id INT(11),
+	IN target int
+)
+
+begin
+declare pos int;
+declare exit handler for sqlexception
+begin
+rollback;
+end;
+set pos = (select position from fc_bin where id=bin_id);
+start transaction;
+if target > pos then
+update fc_bin set position = position - 1 where position between pos and target;
+else
+update fc_bin set position = position + 1 where position between target and pos;
+end if;
+update fc_bin set position = target where id = bin_id;
+commit;
+end //
+
+
+create procedure delete_bin(
+	IN bin_id INT(11)
+)
+
+begin
+declare pos int;
+declare exit handler for sqlexception
+begin
+rollback;
+end;
+set pos = (select position from fc_bin where id=bin_id);
+start transaction;
+delete from fc_bin where id=bin_id;
+update fc_bin set position = position - 1 where position > pos;
+commit;
+end //
+ 
+delimiter ;

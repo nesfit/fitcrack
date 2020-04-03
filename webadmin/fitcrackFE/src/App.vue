@@ -122,6 +122,10 @@
 
 </style>
 <style>
+  .theme--light.v-application {
+    background-color: #f5f5f5;
+  }
+
   h1, h2 {
     font-weight: normal;
   }

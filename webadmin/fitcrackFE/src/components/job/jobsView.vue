@@ -6,104 +6,146 @@
 <template>
   <div>
     <v-toolbar flat>
-      <v-chip>{{ totalItems }}</v-chip>
+      <v-chip>
+        <v-fade-transition mode="out-in">
+          <v-progress-circular
+            v-if="loading"
+            class="back-margin"
+            size="16"
+            width="2"
+            indeterminate
+          />
+          <span v-else>
+            {{ totalItems }}
+          </span>
+        </v-fade-transition>
+      </v-chip>
       <h2 class="ml-4">
-        All jobs
-        <span v-show="viewHidden">(hidden)</span>
-        <span v-show="status || attackType">that</span>
-        <span v-show="status">are {{ status }}</span>
-        <span v-show="status && attackType">and</span>
-        <span v-show="attackType">use {{ attackType }} attack</span>
+        {{ binTitle }}
+        <span
+          v-show="$vuetify.breakpoint.lgAndUp"
+          class="text--secondary"
+        >
+          <span v-show="status || attackType">that</span>
+          <span v-show="status">are {{ status }}</span>
+          <span v-show="status && attackType">and</span>
+          <span v-show="attackType">use {{ attackType }} attack</span>
+        </span>
       </h2>
-      <!--
       <v-spacer />
-      <v-btn text>
-        <v-icon left>
-          mdi-pencil
-        </v-icon>
-        Rename
-      </v-btn>
-      <v-btn text>
-        <v-icon left>
-          mdi-delete
-        </v-icon>
-        Delete
-      </v-btn>
-      -->
+      <div v-if="isBin">
+        <v-btn text>
+          <v-icon left>
+            mdi-pencil
+          </v-icon>
+          Rename Bin
+        </v-btn>
+        <v-btn text>
+          <v-icon left>
+            mdi-delete
+          </v-icon>
+          Delete Bin
+        </v-btn>
+      </div>
     </v-toolbar>
-    <v-text-field
-      v-model="search"
-      class="px-2 pt-3"
-      clearable
-      outlined
-      prepend-inner-icon="mdi-table-search"
-      label="Search"
-      single-line
-      hide-details
-    />
-    <div class="d-flex justify-space-between align-center px-4 pt-2">
-      <v-switch
-        v-model="viewHidden"
-        class="mr-4"
-        label="View hidden jobs"
-        :prepend-icon="viewHidden ? 'mdi-eye-off' : 'mdi-eye'"
-      />
-      <v-select
-        v-model="status"
-        class="mr-4"
-        :items="jobs_statuses"
-        label="Status"
-        single-line
-        item-text="text"
-        item-value="text"
-        prepend-icon="mdi-timelapse"
-        clearable
-        @change="updateList"
-      />
-      <v-select
-        v-model="attackType"
-        :items="jobs_types"
-        label="Attack type"
-        single-line
-        item-text="text"
-        item-value="text"
-        prepend-icon="mdi-crosshairs-gps"
-        clearable
-        @change="updateList"
-      />
+    <div class="overflow-hidden toolbar-cont">
+      <transition name="swap">
+        <div
+          v-if="selectedJobs.length == 0"
+          key="filtersToolbar"
+          class="toolbar-module d-flex justify-space-between align-center px-2"
+        >
+          <v-text-field
+            v-model="search"
+            class="mx-2 search-field"
+            clearable
+            prepend-icon="mdi-table-search"
+            label="Search"
+            single-line
+            @input="updateList"
+          />
+          <v-select
+            v-model="status"
+            class="mx-2"
+            :items="jobs_statuses"
+            label="Status"
+            single-line
+            item-text="text"
+            item-value="text"
+            prepend-icon="mdi-timelapse"
+            clearable
+            @change="updateList"
+          />
+          <v-select
+            v-model="attackType"
+            class="mx-2"
+            :items="jobs_types"
+            label="Attack type"
+            single-line
+            item-text="text"
+            item-value="text"
+            prepend-icon="mdi-crosshairs-gps"
+            clearable
+            @change="updateList"
+          />
+        </div>
+        <div
+          v-else 
+          key="selectionToolbar"
+          class="toolbar-module d-flex align-center swap-pad"
+        >
+          <v-btn
+            text
+            class="mr-2"
+            color="success"
+          >
+            <v-icon left>
+              mdi-play
+            </v-icon>
+            Start
+          </v-btn>
+          <v-btn
+            text
+            class="mr-2"
+            color="info"
+          >
+            <v-icon left>
+              mdi-restart
+            </v-icon>
+            Restart
+          </v-btn>
+          <v-btn
+            text
+            class="mr-2"
+            color="error"
+          >
+            <v-icon left>
+              mdi-stop
+            </v-icon>
+            Stop
+          </v-btn>
+          <v-btn
+            text
+            class="mr-2"
+          >
+            <v-icon left>
+              {{ isTrash ? 'mdi-delete-restore' : 'mdi-delete' }}
+            </v-icon>
+            {{ isTrash ? 'Restore' : 'Discard' }}
+          </v-btn>
+        </div>
+      </transition>
     </div>
 
-    <!--
-    <v-toolbar
-      dense
-      flat
-    >
-      <v-toolbar-items>
-        <v-btn
-          text
-          small
-          :disabled="selectedJobs.length == 0"
-        >
-          <v-icon left>
-            mdi-folder-move
-          </v-icon>
-          Move to bin
-        </v-btn>
-        <v-btn
-          text
-          small
-          :disabled="selectedJobs.length == 0"
-        >
-          <v-icon left>
-            mdi-delete-empty
-          </v-icon>
-          Discard
-        </v-btn>
-      </v-toolbar-items>
-    </v-toolbar>
-    -->
+    <v-divider />
 
+    <v-skeleton-loader
+      v-show="loading"
+      class="mx-auto"
+      type="table-thead, table-tbody, table-tfoot"
+    />
     <v-data-table
+      v-show="!loading"
       ref="table"
       v-model="selectedJobs"
       :headers="headers"
@@ -111,7 +153,6 @@
       :search="search"
       :options.sync="pagination"
       :server-items-length="totalItems"
-      :loading="loading"
       :footer-props="{itemsPerPageOptions: [25,10,50,100], itemsPerPageText:'Jobs per page'}"
       show-select
       fixed-header
@@ -120,10 +161,20 @@
       <template v-slot:item.name="{ item }">
         <router-link
           :to="{ name: 'jobDetail', params: { id: item.id } }"
-          class="middle"
+          class="table-link"
         >
           {{ item.name }}
         </router-link>
+      </template>
+      <template v-slot:item.attack="{ item }">
+        <span class="text-capitalize">
+          {{ item.attack }}
+          <v-icon
+            right
+          >
+            {{ attackIcon(item.attack) }}
+          </v-icon>
+        </span>
       </template>
       <!-- Status text cell -->
       <template v-slot:item.status="{ item }">
@@ -133,10 +184,16 @@
         >
           <template v-slot:activator="{ on }">
             <span
-              :class="item.status_type + '--text'"
+              :class="[item.status_type + '--text', 'text-capitalize']"
               v-on="on"
             >
               {{ item.status_text }}
+              <v-icon
+                right
+                :color="item.status_type"
+              >
+                {{ jobIcon(item.status_text) }}
+              </v-icon>
             </span>
           </template>
           <span>{{ item.status_tooltip }}</span>
@@ -147,17 +204,15 @@
         >
           <template v-slot:activator="{ on }">
             <span
-              class="warning--text"
+              class="text-capitalize"
               v-on="on"
             >
+              no hosts
               <v-icon
-                v-if="item.host_count == 0"
-                left
-                color="warning"
+                right
               >
                 mdi-alert
               </v-icon>
-              no hosts
             </span>
           </template>
           <span>No hosts, open job detail and assign them!</span>
@@ -184,78 +239,56 @@
       <!-- Action buttons cell -->
       <template v-slot:item.actions="{ item }">
         <div class="actionsBtns">
+          <v-btn
+            v-if="item.status === '0'"
+            :disabled="item.host_count == 0"
+            text
+            color="success"
+            @click="operateJob(item.id, 'start')"
+          >
+            Start
+            <v-icon right>
+              mdi-play
+            </v-icon>
+          </v-btn>
+          <v-btn
+            v-else-if="item.status < 10"
+            text
+            color="info"
+            @click="operateJob(item.id, 'restart')"
+          >
+            Restart
+            <v-icon right>
+              mdi-restart
+            </v-icon>
+          </v-btn>
+          <v-btn
+            v-else
+            text
+            color="error"
+            @click="operateJob(item.id, 'stop')"
+          >
+            Stop
+            <v-icon right>
+              mdi-stop
+            </v-icon>
+          </v-btn>
+
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
                 icon
                 class="mx-0"
-                :disabled="item.status !== '0' || item.host_count == 0"
                 v-on="on"
-                @click="operateJob(item.id, 'start')"
+                @click="hideJob(item.id)"
               >
-                <v-icon color="success">
-                  mdi-play-circle
+                <v-icon>
+                  {{ isTrash ? 'mdi-delete-restore' : 'mdi-delete' }}
                 </v-icon>
               </v-btn>
             </template>
-            <span>Start job</span>
+            <span>{{ isTrash ? 'Restore' : 'Discard' }}</span>
           </v-tooltip>
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                class="mx-0"
-                :disabled="item.status !== '10'"
-                v-on="on"
-                @click="operateJob(item.id, 'stop')"
-              >
-                <v-icon color="error">
-                  mdi-pause-circle
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Stop job</span>
-          </v-tooltip>
-          <v-menu>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                class="mx-0"
-                v-on="on"
-              >
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item 
-                v-if="item.status < 10"
-                @click="operateJob(item.id, 'restart')"
-              >
-                <v-list-item-title>
-                  <v-icon left>
-                    mdi-restart
-                  </v-icon>Restart
-                </v-list-item-title>
-              </v-list-item>
-              <!--
-              <v-list-item @click="operateJob(item.id, 'duplicate')">
-                <v-list-item-title>
-                  <v-icon left>
-                    mdi-content-copy
-                  </v-icon>Duplicate
-                </v-list-item-title>
-              </v-list-item>
-              -->
-              <v-list-item @click="hideJob(item.id)">
-                <v-list-item-title>
-                  <v-icon left>
-                    {{ item.deleted ? 'mdi-eye' : 'mdi-eye-off' }}
-                  </v-icon> 
-                  {{ item.deleted ? 'Stop hiding' : 'Hide' }}
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
         </div>
       </template>
     </v-data-table>
@@ -263,6 +296,10 @@
 </template>
 
 <script>
+  import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
+  import {mapTwoWayState} from 'spyfu-vuex-helpers'
+  import {twoWayMap} from '@/store'
+
   export default {
     name: 'JobsView',
     data () {
@@ -274,7 +311,6 @@
         viewHidden: false,
         totalItems: 0,
         pagination: {},
-        selectedJobs: [],
         loading: true,
         headers: [
           {
@@ -345,13 +381,32 @@
           ]
       }
     },
+    computed: {
+      ...mapTwoWayState('binInterface', twoWayMap(['selectedJobs'])),
+      isTrash () {
+        return this.$route.params['id'] === 'trash'
+      },
+      isBin () {
+        return this.$route.name === 'bins' && !this.isTrash
+      },
+      binName () {
+        const currentBin = this.$store.state.binInterface.bins.find(bin => bin.id == parseInt(this.$route.params['id']))
+        return currentBin ? currentBin.name : undefined
+      },
+      binTitle () {
+        if (this.binName) {
+          return `Jobs in ${this.binName}`
+        } else {
+          return this.isTrash ? 'Discarded Jobs' : 'All Jobs'
+        }
+      }
+    },
     watch: {
       pagination: {
         handler: 'updateList',
         deep: true
       },
-      '$route.name': 'updateList',
-      viewHidden: 'updateList'
+      $route: 'updateList'
     },
     mounted () {
       // this.loadJobs()
@@ -361,6 +416,7 @@
     },
     beforeDestroy: function () {
       clearInterval(this.interval)
+      this.selectedJobs = []
     },
     methods: {
       loadJobs () {
@@ -373,7 +429,7 @@
             'name': this.search,
             'status': this.status,
             'attack_mode': this.attackType,
-            'showDeleted': this.viewHidden
+            'showDeleted': this.isTrash
           }
         }).then((response) => {
           this.jobs = response.data.items;
@@ -382,6 +438,7 @@
         })
       },
       updateList () {
+        this.selectedJobs = []
         this.loading = true
         this.loadJobs()
       },
@@ -411,23 +468,65 @@
         .then((response) => {
           this.loadJobs()
         })
-      }
+      },
+      jobIcon,
+      attackIcon
     }
   }
 </script>
 
 <style scoped>
-.cont {
-  height: 100%;
+  .back-margin {
+    margin: 0 -.3em;
+  }
 
-}
+  .toolbar-cont {
+    position: relative;
+    height:4.15em;
+  }
+  .toolbar-module {
+    position: absolute;
+    flex-wrap: wrap-reverse;
+    width:100%;
+  }
+  @media screen and (max-width: 60em) {
+    .toolbar-cont {
+      height: auto;
+    }
+    .toolbar-module {
+      position: static;
+    }
+  }
+
+  .search-field {
+    min-width: 15em;
+  }
+
+  .cont {
+    height: 100%;
+  }
 
   .actionsBtns{
     text-align: right;
   }
 
-  .middle {
-    vertical-align: middle;
+  .table-link {
+    font-weight: bold;
+  }
+
+  .swap-pad {
+    padding: 1.05em;
+  }
+
+  .swap-enter-active, .swap-leave-active {
+    transition: transform .2s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  }
+
+  .swap-leave-to {
+    transform: translateY(-100%)
+  }
+  .swap-enter {
+    transform: translateY(100%)
   }
 
 </style>

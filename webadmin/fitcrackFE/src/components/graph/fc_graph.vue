@@ -32,7 +32,7 @@
           grid="true"
           :ymax="type === 'job' ? '100' : 'auto'"
           hide-hover="false"
-          resize="true"
+          :resize="true"
           :post-units="units"
           :smooth="false"
           :hover-callback="type === 'job' ? hoverCallbackJob : hoverCallbackWorkunit"
@@ -44,7 +44,7 @@
           :id="id || 'pie'"
           class="d-flex graph"
           :data="data.data"
-          resize="true"
+          :resize="true"
           :colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
         />
       </div>

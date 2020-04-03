@@ -12,7 +12,7 @@
       enable-resize-watcher
       fixed
       app
-      width="285"
+      width="290"
     >
       <router-link :to="{ name: 'home'}">
         <img
@@ -78,7 +78,7 @@
                 <v-icon>{{ routeIcon('addJob') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Add job</v-list-item-title>
+                <v-list-item-title>Add Job</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -90,54 +90,19 @@
                 <v-icon>{{ routeIcon('jobs') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>All jobs</v-list-item-title>
+                <v-list-item-title>All Jobs</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
             <v-divider class="mb-1" />
 
-            <v-subheader>
-              <b>JOB BINS</b>
-              <v-spacer />
-              <v-btn small text disabled>
-                new
-                <v-icon right>mdi-plus</v-icon>
-              </v-btn>
-            </v-subheader>
+            <bins />
 
-            <!-- ADD BIN
-            <v-list-item>
-              <v-list-item-action>
-                <v-icon>mdi-folder</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-text-field hide-details dense label="Bin name" placeholder="New bin" />
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn icon><v-icon>mdi-check</v-icon></v-btn>
-              </v-list-item-action>
-            </v-list-item>
-            -->
-
-            <v-list-item 
-              to="/bins/test"
-              exact
-              disabled
-            >
-              <v-list-item-action>
-                <v-icon>mdi-folder</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Example jobs</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-divider class="mb-1" />
+            <v-divider class="my-1" />
 
             <v-list-item 
               to="/bins/trash"
               exact
-              disabled
             >
               <v-list-item-action>
                 <v-icon>mdi-delete</v-icon>
@@ -222,7 +187,7 @@
                 <v-icon>{{ routeIcon('markovChains') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Markov chains</v-list-item-title>
+                <v-list-item-title>Markov Chains</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -256,7 +221,7 @@
                 <v-icon>{{ routeIcon('templates') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Job templates</v-list-item-title>
+                <v-list-item-title>Job Templates</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -268,7 +233,7 @@
                 <v-icon>{{ routeIcon('manageUsers') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Manage users</v-list-item-title>
+                <v-list-item-title>Manage Users</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -277,7 +242,16 @@
                 <v-icon>{{ routeIcon('myAccount') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>My account</v-list-item-title>
+                <v-list-item-title>My Account</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item :to="{ name: 'settings'}">
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('settings') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Settings</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -289,16 +263,7 @@
                 <v-icon>{{ routeIcon('server') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Server status</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-list-item @click="logout">
-              <v-list-item-action>
-                <v-icon>mdi-logout-variant</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Log out</v-list-item-title>
+                <v-list-item-title>Server Monitor</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -322,15 +287,13 @@
       -->
       <v-spacer />      
       <v-badge
+        :value="notificationsCount > 0"
+        :content="notificationsCount"
         color="red"
         overlap
         top
         left
       >
-        <span
-          v-if="notificationsCount > 0"
-          slot="badge"
-        >{{ notificationsCount }}</span>
         <v-btn
           :icon="$vuetify.breakpoint.xsOnly"
           text
@@ -378,12 +341,14 @@
 
 <script>
   import notifications from '@/components/notification/fc_notifications_wrapper'
+  import bins from '@/components/job/bins'
   import { routeIcon } from '@/router'
   import axios from 'axios'
 
   export default {
     components: {
-      'notifications-wrapper': notifications
+      'notifications-wrapper': notifications,
+      bins
     },
     data() {
       return {
@@ -417,13 +382,6 @@
         })
     },
     mounted: function () {
-      /*
-      if (!this.$store.state.user.loggedIn) {
-        this.$router.push({
-          name: 'login'
-        })
-      }
-      */
       this.getNotificationsCount();
       this.interval = setInterval(function () {
         this.getNotificationsCount()
@@ -497,6 +455,10 @@
 
   .navigationDrawer {
     z-index: 6;
+  }
+
+  .theme--dark .navigationDrawer {
+    background-color: #1e1e1e;
   }
 
   .main {
