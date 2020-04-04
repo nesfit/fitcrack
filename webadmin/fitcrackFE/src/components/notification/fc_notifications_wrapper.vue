@@ -20,10 +20,11 @@
           v-for="(item, i) in notifications.items"
           :key="i"
           :type="item.type"
+          :title="item.title"
           :text="item.text"
           :seen="item.seen"
           :time="item.time"
-          :job-id="item.job_id"
+          :jobId="item.job_id"
         />
       </v-list>
     </div>

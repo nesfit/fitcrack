@@ -29,7 +29,7 @@ from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashForma
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, job_nano_list_model
 from src.api.fitcrack.functions import shellExec
-from src.api.fitcrack.lang import statuses, job_status_text_to_code_dict, attack_modes
+from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, attack_modes
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg, FcJobStatus
@@ -60,7 +60,7 @@ class jobsCollection(Resource):
             jobs_query = jobs_query.filter(FcJob.name.like('%' + args.name + '%'))
 
         if args.status:
-            statusCode = statuses[args.status]
+            statusCode = status_to_code[args.status]
             jobs_query = jobs_query.filter_by(status=statusCode)
 
         if args.attack_mode:
@@ -174,11 +174,11 @@ class OperationWithJob(Resource):
                 if os.path.exists(prince_temp_job_dict):
                     os.remove(prince_temp_job_dict)
 
-            job.status = 10
+            job.status = status_to_code['running']
         elif action == 'stop':
-            job.status = 12
+            job.status = status_to_code['finishing']
         elif action == 'restart':
-            job.status = 10
+            job.status = status_to_code['running']
             job.result = None
             job.indexes_verified = 0
             job.current_index = 0
@@ -199,8 +199,8 @@ class OperationWithJob(Resource):
             db.session.add(FcJobGraph(progress=0, job_id=job.id))
         elif action == 'kill':
             # Job is stopped in Generator after sending BOINC commands
-            if (int(job.status) != 10) and (int(job.status) != 12):
-                job.status = 0
+            if (int(job.status) != status_to_code['running']) and (int(job.status) != status_to_code['finishing']):
+                job.status = status_to_code['ready']
                 workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
                 for item in workunits:
                     db.session.delete(item)

@@ -32,7 +32,7 @@ host_status_text_to_code_dict = {
     4: 'error.'
 }
 
-statuses = {
+status_to_code = {
     'ready': 0,
     'finished': 1,
     'exhausted': 2,
