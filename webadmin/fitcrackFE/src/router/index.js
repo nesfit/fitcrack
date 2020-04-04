@@ -55,6 +55,15 @@ const appRoutes = [
     component: testView
   },
   {
+    path: '/batches',
+    name: 'batches',
+    component: jobs,
+    meta: {
+      title: 'Batches',
+      icon: 'mdi-tray-full'
+    }
+  },
+  {
     path: '/jobs',
     name: 'jobs',
     component: jobs,

@@ -34,18 +34,69 @@
       </h2>
       <v-spacer />
       <div v-if="isBin">
-        <v-btn text>
-          <v-icon left>
-            mdi-pencil
-          </v-icon>
-          Rename Bin
-        </v-btn>
-        <v-btn text>
-          <v-icon left>
-            mdi-delete
-          </v-icon>
-          Delete Bin
-        </v-btn>
+        <transition 
+          name="fade"
+          mode="out-in"
+          @enter="focusRenameInput"
+        >
+          <div 
+            v-if="renamingBin" 
+            key="renameBinPanel"
+            class="d-flex align-center"
+          >
+            <v-text-field
+              ref="binRenameField"
+              v-model="newBinName"
+              :placeholder="binName"
+              hide-details
+              class="mr-2"
+              @keydown="renameBinKeyHandler"
+            />
+            <v-btn
+              text
+              @click="renameBinExec"
+            >
+              <v-icon left>
+                mdi-content-save
+              </v-icon>
+              Save
+            </v-btn>
+            <v-btn
+              text
+              :ripple="false"
+              @click="renamingBin = false"
+            >
+              <v-icon left>
+                mdi-undo-variant
+              </v-icon>
+              Cancel
+            </v-btn>
+          </div>
+          <div 
+            v-else
+            key="binActionsPanel"
+          >
+            <v-btn
+              text
+              :ripple="false"
+              @click="renamingBin = true"
+            >
+              <v-icon left>
+                mdi-pencil
+              </v-icon>
+              Rename Bin
+            </v-btn>
+            <v-btn
+              text
+              @click="deleteBinConfirm"
+            >
+              <v-icon left>
+                mdi-delete
+              </v-icon>
+              Delete Bin
+            </v-btn>
+          </div>
+        </transition>
       </div>
     </v-toolbar>
     <div class="overflow-hidden toolbar-cont">
@@ -98,31 +149,22 @@
             text
             class="mr-2"
             color="success"
+            :disabled="selectedJobs.length < 2"
           >
             <v-icon left>
-              mdi-play
+              mdi-tray-plus
             </v-icon>
-            Start
+            Batch Run
           </v-btn>
           <v-btn
             text
             class="mr-2"
-            color="info"
+            color="warning"
           >
             <v-icon left>
-              mdi-restart
+              mdi-desktop-classic
             </v-icon>
-            Restart
-          </v-btn>
-          <v-btn
-            text
-            class="mr-2"
-            color="error"
-          >
-            <v-icon left>
-              mdi-stop
-            </v-icon>
-            Stop
+            Hosts
           </v-btn>
           <v-btn
             text
@@ -297,21 +339,26 @@
 
 <script>
   import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
-  import {mapTwoWayState} from 'spyfu-vuex-helpers'
-  import {twoWayMap} from '@/store'
+  import { mapTwoWayState } from 'spyfu-vuex-helpers'
+  import { twoWayMap } from '@/store'
+  import { mapActions } from 'vuex'
 
   export default {
     name: 'JobsView',
     data () {
       return {
         interval: null,
+        renamingBin: false,
+        newBinName: null,
+        //
         status: null,
         attackType: null,
         search: '',
-        viewHidden: false,
+        //
         totalItems: 0,
         pagination: {},
         loading: true,
+        //
         headers: [
           {
             text: 'Name',
@@ -385,13 +432,16 @@
       isBin () {
         return this.$route.name === 'bins' && !this.isTrash
       },
+      binId () {
+        return parseInt(this.$route.params['id'])
+      },
       binName () {
-        const currentBin = this.$store.state.binInterface.bins.find(bin => bin.id == parseInt(this.$route.params['id']))
+        const currentBin = this.$store.state.binInterface.bins.find(bin => bin.id == this.binId)
         return currentBin ? currentBin.name : undefined
       },
       binTitle () {
         if (this.binName) {
-          return `Jobs in ${this.binName}`
+          return this.binName
         } else {
           return this.isTrash ? 'Discarded Jobs' : 'All Jobs'
         }
@@ -415,8 +465,10 @@
       this.selectedJobs = []
     },
     methods: {
-      loadJobs () {
-        this.axios.get(this.$serverAddr + '/job', {
+      ...mapActions('binInterface', { renameBin: 'rename', deleteBin: 'delete' }),
+      async loadJobs () {
+        const endpoint = this.isBin ? `/bins/${this.binId}` : `/job`
+        const data = await this.axios.get(this.$serverAddr + endpoint, {
           params: {
             'page': this.pagination.page,
             'per_page': this.pagination.itemsPerPage,
@@ -427,11 +479,10 @@
             'attack_mode': this.attackType,
             'showDeleted': this.isTrash
           }
-        }).then((response) => {
-          this.jobs = response.data.items;
-          this.totalItems = response.data.total;
-          this.loading = false
-        })
+        }).then(r => r.data)
+        this.jobs = this.isBin ? data.jobs : data.items;
+        this.totalItems = this.isBin ? data.jobs.length : data.total;
+        this.loading = false
       },
       updateList () {
         this.selectedJobs = []
@@ -464,6 +515,35 @@
         .then((response) => {
           this.loadJobs()
         })
+      },
+      focusRenameInput () {
+        if (this.renamingBin) {
+          this.$refs.binRenameField.focus()
+        }
+      },
+      renameBinExec () {
+        this.renameBin({
+          id: this.binId,
+          newName: this.newBinName
+        }).then(() => {
+          this.renamingBin = false
+        })
+      },
+      renameBinKeyHandler ({ keyCode }) {
+        switch (keyCode) {
+          case 13:
+            this.renameBinExec()
+            break
+          case 27:
+            this.renamingBin = false
+            break
+        }
+      },
+      deleteBinConfirm () {
+        this.$root.$confirm('Delete', `This will remove ${this.binName}. Jobs will be unassigned from the deleted bin, but will not be discarded. Are you sure?`)
+          .then((confirm) => {
+            this.deleteBin(this.binId)
+          })
       },
       jobIcon,
       attackIcon
@@ -523,6 +603,17 @@
   }
   .swap-enter {
     transform: translateY(100%)
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .1s, transform .2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .fade-leave-to {
+    opacity: 0;
+  }
+  .fade-enter {
+    transform: translateX(10%)
   }
 
 </style>

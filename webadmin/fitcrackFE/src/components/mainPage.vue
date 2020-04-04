@@ -83,6 +83,18 @@
             </v-list-item>
 
             <v-list-item 
+              :to="{ name: 'batches'}"
+              exact
+            >
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('batches') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Batches</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item 
               :to="{ name: 'jobs'}"
               exact
             >

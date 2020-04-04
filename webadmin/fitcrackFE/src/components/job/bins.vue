@@ -98,7 +98,7 @@
                 small
                 color="error"
                 v-on="on"
-                @click="removeSelectedFrom(id)"
+                @click="addOrRemoveJobs(id, true)"
               >
                 <v-icon>
                   mdi-minus
@@ -118,7 +118,7 @@
                 small
                 color="success"
                 v-on="on"
-                @click="addSelectedTo(id)"
+                @click="addOrRemoveJobs(id)"
               >
                 <v-icon>
                   mdi-plus
@@ -145,7 +145,7 @@
 <script>
 import {mapTwoWayState} from 'spyfu-vuex-helpers'
 import {twoWayMap} from '@/store'
-import {mapState} from 'vuex'
+import {mapState, mapActions} from 'vuex'
 import draggable from 'vuedraggable'
 
 export default {
@@ -154,14 +154,13 @@ export default {
   },
   data () {
     return {
-      loading: true,
       adding: false,
       newBinName: ''
     }
   },
   computed: {
     ...mapTwoWayState('binInterface', twoWayMap(['bins'])),
-    ...mapState('binInterface', ['selectedJobs']),
+    ...mapState('binInterface', ['loading', 'selectedJobs']),
     canAssign () {
       return this.selectedJobs.length > 0 && this.$route.params['id'] !== 'trash'
     }
@@ -170,28 +169,20 @@ export default {
     this.load()
   },
   methods: {
-    async load () {
-      this.loading = true
-      await new Promise(resolve => setTimeout(resolve, 3000))
-      this.loading = false
-    },
+    ...mapActions('binInterface', ['load', 'create', 'move', 'assign']),
     addBin () {
       this.adding = true
       this.$nextTick(() => this.$refs.addBinInput.focus())
     },
     async createBin () {
       if (this.newBinName === '' || this.loading) return
-      this.loading = true
-      // await API call
-      await this.load()
+      await this.create(this.newBinName)
       this.newBinName = ''
       this.adding = false
       setTimeout(() => this.$refs.addBtn.$el.focus(), 25)
     },
-    async updateBins ({ moved: { newIndex, element: { id } } }) {
-      this.loading = true
-      // await API call
-      this.load()
+    updateBins ({ moved: { newIndex, oldIndex, element: { id } } }) {
+      this.move({id, position: newIndex, oldIndex})
     },
     addBinKeyHandler ({ keyCode }) {
       switch (keyCode) {
@@ -203,8 +194,13 @@ export default {
           break
       }
     },
-    addSelectedTo (binId) {
-      console.log(binId)
+    addOrRemoveJobs (binId, removing = false) {
+      this.assign({
+        id: binId,
+        payload: {
+          [removing ? 'exclude' : 'include']: this.selectedJobs.map(job => job.id)
+        } 
+      })
     }
   }
 }

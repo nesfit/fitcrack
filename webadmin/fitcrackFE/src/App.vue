@@ -83,6 +83,7 @@
             this.alertText = 'Can not connect to ' + this.$serverAddr
             //this.alertText = error.message
           }
+          return Promise.reject(error)
         }.bind(this)
       )
 
