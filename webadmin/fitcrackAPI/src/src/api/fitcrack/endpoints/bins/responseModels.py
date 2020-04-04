@@ -6,7 +6,7 @@
 from flask_restplus import fields
 
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.job.responseModels import job_nano_model
+from src.api.fitcrack.responseModels import pagination, job_short_model
 
 bin_model = api.model('Job bin', {
     'id': fields.Integer(readOnly=True),
@@ -15,7 +15,7 @@ bin_model = api.model('Job bin', {
 })
 
 bin_with_jobs_model = api.inherit('Job bin with jobs list', bin_model, {
-    'jobs': fields.List(fields.Nested(job_nano_model))
+    'jobs': fields.List(fields.Nested(job_short_model))
 })
 
 bins_model = api.inherit('Job bin collection', {
