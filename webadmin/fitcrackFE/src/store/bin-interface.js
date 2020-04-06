@@ -8,6 +8,7 @@ const api = window.serverAddress
 
 const state = {
   loading: false,
+  clean: true, // signal changes to components using bins
   bins: [],
   selectedJobs: []
 }
@@ -26,6 +27,12 @@ export default {
     },
     idle (state) {
       state.loading = false
+    },
+    dirty (state) {
+      state.clean = false
+    },
+    clean (state) {
+      state.clean = true
     },
     unselect (state) {
       state.selectedJobs = []
@@ -65,11 +72,12 @@ export default {
           commit('idle')
         })
     },
-    async assign ({ commit }, { id, payload }) {
+    async assign ({ commit, dispatch }, { id, payload, dirty }) {
       commit('loading')
       await axios.put(`${api}/bins/${id}/assign`, payload)
-      commit('idle')
       commit('unselect')
+      if (dirty) commit('dirty')
+      dispatch('load')
     },
     async rename ({ commit }, { id, newName }) {
       commit('loading')

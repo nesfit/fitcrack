@@ -64,7 +64,7 @@
       </v-tabs>
 
       <v-tabs-items v-model="navtab">
-        <v-tab-item>
+        <v-tab-item eager>
           <v-list
             expand
             nav

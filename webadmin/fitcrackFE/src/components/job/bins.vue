@@ -77,7 +77,7 @@
       @change="updateBins"
     >
       <v-list-item 
-        v-for="({ id, name }, index) in bins"
+        v-for="({ id, name, job_count }, index) in bins"
         :key="id"
         :to="canAssign ? null : {name: 'bins', params: { id }}"
         exact
@@ -132,7 +132,16 @@
           v-else
           class="drag-handle my-1 reveal"
         >
-          <v-icon>mdi-drag</v-icon>
+          <v-badge
+            :content="job_count.toString()"
+            :value="true"
+            overlap
+            bordered
+            offset-y="16"
+            :color="job_count > 0 ? 'secondary' : 'error'"
+          >
+            <v-icon>mdi-drag</v-icon>
+          </v-badge>
         </v-list-item-action>
         <v-list-item-content>
           <v-list-item-title>{{ name }}</v-list-item-title>
@@ -199,7 +208,8 @@ export default {
         id: binId,
         payload: {
           [removing ? 'exclude' : 'include']: this.selectedJobs.map(job => job.id)
-        } 
+        },
+        dirty: removing
       })
     }
   }

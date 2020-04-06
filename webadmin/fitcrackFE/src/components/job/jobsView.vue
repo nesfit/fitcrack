@@ -47,7 +47,7 @@
             <v-text-field
               ref="binRenameField"
               v-model="newBinName"
-              :placeholder="binName"
+              :placeholder="bin.name"
               hide-details
               class="mr-2"
               @keydown="renameBinKeyHandler"
@@ -181,13 +181,29 @@
 
     <v-divider />
 
-    <v-skeleton-loader
-      v-show="loading"
-      class="mx-auto"
-      type="table-thead, table-tbody, table-tfoot"
-    />
+    <div 
+      v-if="!loading && binEmpty"
+      class="text-center mt-8 pa-8 detail-container"
+    >
+      <h1>You had one job. And you binned it.</h1>
+      <bin-illust 
+        :label="bin.name" 
+        class="illust"
+      />
+      <v-card class="text-start" flat>
+        <v-card-title>Here's how:</v-card-title>
+        <v-card-text>
+          <ol>
+            <li>List <router-link to="/jobs"><i class="mdi mdi-briefcase" /> <em>All Jobs</em></router-link> or another bin</li>
+            <li>Check <i class="mdi mdi-checkbox-marked-outline" /> the jobs you want to add here</li>
+            <li>Select <span class="success--text"><i class="mdi mdi-plus" /> <em>Add to {{bin.name}}</em></span> in the sidebar</li>
+          </ol>
+        </v-card-text>
+      </v-card>
+    </div>
+
     <v-data-table
-      v-show="!loading"
+      v-show="!binEmpty"
       ref="table"
       v-model="selectedJobs"
       :headers="headers"
@@ -341,10 +357,15 @@
   import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
   import { mapTwoWayState } from 'spyfu-vuex-helpers'
   import { twoWayMap } from '@/store'
-  import { mapActions } from 'vuex'
+  import { mapState, mapActions } from 'vuex'
+
+  import BinIllust from '@/components/details/binIllustration'
 
   export default {
     name: 'JobsView',
+    components: {
+      BinIllust
+    },
     data () {
       return {
         interval: null,
@@ -425,6 +446,7 @@
       }
     },
     computed: {
+      ...mapState('binInterface', ['clean']),
       ...mapTwoWayState('binInterface', twoWayMap(['selectedJobs'])),
       isTrash () {
         return this.$route.params['id'] === 'trash'
@@ -435,16 +457,18 @@
       binId () {
         return parseInt(this.$route.params['id'])
       },
-      binName () {
-        const currentBin = this.$store.state.binInterface.bins.find(bin => bin.id == this.binId)
-        return currentBin ? currentBin.name : undefined
+      bin () {
+        return this.$store.state.binInterface.bins.find(bin => bin.id == this.binId)
       },
       binTitle () {
-        if (this.binName) {
-          return this.binName
+        if (this.bin) {
+          return this.bin.name
         } else {
           return this.isTrash ? 'Discarded Jobs' : 'All Jobs'
         }
+      },
+      binEmpty () {
+        return this.bin && this.bin.job_count == 0
       }
     },
     watch: {
@@ -452,7 +476,13 @@
         handler: 'updateList',
         deep: true
       },
-      $route: 'updateList'
+      $route: 'updateList',
+      clean (isClean) {
+        if (!isClean) {
+          this.updateList()
+          this.$store.commit('binInterface/clean')
+        }
+      }
     },
     mounted () {
       // this.loadJobs()
@@ -467,8 +497,7 @@
     methods: {
       ...mapActions('binInterface', { renameBin: 'rename', deleteBin: 'delete' }),
       async loadJobs () {
-        const endpoint = this.isBin ? `/bins/${this.binId}` : `/job`
-        const data = await this.axios.get(this.$serverAddr + endpoint, {
+        const data = await this.axios.get(this.$serverAddr + '/job', {
           params: {
             'page': this.pagination.page,
             'per_page': this.pagination.itemsPerPage,
@@ -477,11 +506,12 @@
             'name': this.search,
             'status': this.status,
             'attack_mode': this.attackType,
-            'showDeleted': this.isTrash
+            'showDeleted': this.isTrash,
+            'bin': this.binId || null
           }
         }).then(r => r.data)
-        this.jobs = this.isBin ? data.jobs : data.items;
-        this.totalItems = this.isBin ? data.jobs.length : data.total;
+        this.jobs = data.items
+        this.totalItems = data.total
         this.loading = false
       },
       updateList () {
@@ -540,7 +570,7 @@
         }
       },
       deleteBinConfirm () {
-        this.$root.$confirm('Delete', `This will remove ${this.binName}. Jobs will be unassigned from the deleted bin, but will not be discarded. Are you sure?`)
+        this.$root.$confirm('Delete', `This will remove ${this.bin.name}. Jobs will be unassigned from the deleted bin, but will not be discarded. Are you sure?`)
           .then((confirm) => {
             this.deleteBin(this.binId)
           })
@@ -552,6 +582,17 @@
 </script>
 
 <style scoped>
+  .detail-container {
+    margin: 0 auto;
+    max-width: 800px;
+  }
+
+  .illust {
+    width: 80%;
+    max-width: 300px;
+    margin: 2em auto;
+  }
+
   .back-margin {
     margin: 0 -.3em;
   }
@@ -587,6 +628,8 @@
   }
 
   .table-link {
+    display: inline-block;
+    line-height: 3em;
     font-weight: bold;
   }
 
