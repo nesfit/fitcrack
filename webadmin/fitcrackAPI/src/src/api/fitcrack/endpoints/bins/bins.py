@@ -52,17 +52,7 @@ class bins(Resource):
 @ns.route('/<int:id>')
 class concrete_bin(Resource):
 
-    @api.marshal_with(bin_with_jobs_model)
-    def get(self, id):
-        """
-        Returns a bin with its jobs collection.
-        """
-        bin = FcBin.query.get(id)
-        bin.jobs = bin.jobs.filter(FcJob.deleted == 0).all()
-        if bin is None:
-            abort(404, 'No such bin')
-        else:
-            return bin
+    # GET bin_with_jobs deprecated, use GET job_collection with bin arg
 
     @api.expect(name)
     @api.response(200, 'Modified')

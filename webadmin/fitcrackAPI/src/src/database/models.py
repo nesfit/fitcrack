@@ -321,6 +321,10 @@ class FcBin(Base):
                     lazy='dynamic',
                     passive_deletes=True)
 
+    @hybrid_property
+    def job_count(self):
+        return self.jobs.filter(FcJob.deleted == 0).count()
+
 class FcTemplate(Base):
     __tablename__ = 'fc_template'
 

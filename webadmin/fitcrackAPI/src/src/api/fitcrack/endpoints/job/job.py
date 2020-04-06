@@ -51,6 +51,9 @@ class jobsCollection(Resource):
         per_page = args.get('per_page', 10)
         jobs_query = FcJob.query
 
+        if args.bin is not None:
+            jobs_query = jobs_query.filter(FcJob.bins.any(id=args.bin))
+
         if args.showDeleted:
             jobs_query = jobs_query.filter_by(deleted=True)
         else:
@@ -75,7 +78,6 @@ class jobsCollection(Resource):
 
         else:
             jobs_query = jobs_query.order_by(FcJob.id.desc())
-
 
         jobs_page = jobs_query.paginate(page, per_page, error_out=True)
 

@@ -11,7 +11,8 @@ from src.api.fitcrack.responseModels import pagination, job_short_model
 bin_model = api.model('Job bin', {
     'id': fields.Integer(readOnly=True),
     'position': fields.Integer(readOnly=True),
-    'name': fields.String()
+    'name': fields.String(),
+    'job_count': fields.Integer()
 })
 
 bin_with_jobs_model = api.inherit('Job bin with jobs list', bin_model, {
