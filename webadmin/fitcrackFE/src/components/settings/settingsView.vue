@@ -52,7 +52,7 @@
               </v-btn>
             </v-btn-toggle>
             <div class="mt-2 ml-1">
-              {{ appearanceHint }}
+              {{ appearanceHint }}<span v-show="testmode">. Temporarily toggle with CTRL+SHIFT+L anywhere.</span>
             </div>
           </v-card-text>
         </v-card>

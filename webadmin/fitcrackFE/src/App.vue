@@ -100,6 +100,12 @@
       } else if (!init || init == 'auto') {
         this.$vuetify.theme.dark = mql.matches
       }
+
+      window.addEventListener('keypress', e => {
+        if (localStorage.getItem('testmode') == 'true' && e.ctrlKey && e.shiftKey && e.code == 'KeyL') {
+          this.$vuetify.theme.dark = !this.$vuetify.theme.dark
+        }
+      })
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open
