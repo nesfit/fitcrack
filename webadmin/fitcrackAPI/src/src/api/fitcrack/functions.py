@@ -147,7 +147,7 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
         filePath = os.path.join(folder, file)
         if os.path.isfile(filePath):
             modificationTime = datetime.datetime.fromtimestamp(os.path.getmtime(filePath)).strftime('%Y-%m-%d %H:%M:%S')
-            DBrecord = DBmodel.query.filter_by(modification_time=modificationTime, path=file).first()
+            DBrecord = DBmodel.query.filter_by(path=file).first()
             if not DBrecord:
                 DBrecord = DBmodel(modification_time=modificationTime, path=file, name=file)
                 DBrecord = processFunction(DBrecord)
