@@ -57,13 +57,13 @@ std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attack
         result += "|||charset1|String|" + std::to_string(charset1.length()) + "|" + charset1 + "|||\n";
 
     if (!charset2.empty())
-        result += "|||charset1|String|" + std::to_string(charset2.length()) + "|" + charset2 + "|||\n";
+        result += "|||charset2|String|" + std::to_string(charset2.length()) + "|" + charset2 + "|||\n";
 
     if (!charset3.empty())
-        result += "|||charset1|String|" + std::to_string(charset3.length()) + "|" + charset3 + "|||\n";
+        result += "|||charset3|String|" + std::to_string(charset3.length()) + "|" + charset3 + "|||\n";
 
     if (!charset4.empty())
-        result += "|||charset1|String|" + std::to_string(charset4.length()) + "|" + charset4 + "|||\n";
+        result += "|||charset4|String|" + std::to_string(charset4.length()) + "|" + charset4 + "|||\n";
 
     Tools::printDebug("%s", result.c_str());
     return result;
