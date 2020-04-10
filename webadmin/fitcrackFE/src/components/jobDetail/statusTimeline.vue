@@ -1,28 +1,90 @@
 <template>
-  <v-timeline dense>
-    <v-timeline-item
-      v-for="{ time, status_text, status_type } in entries"
-      :key="time"
-      class="invisible"
-      :color="''/* NOPE */"
-      fill-dot
-    >
-      <template #icon>
-        <v-icon :color="status_type">
-          {{ jobIcon(status_text) }}
-        </v-icon>
+  <div class="d-flex history-wrap">
+    <v-tooltip top>
+      <template #activator="{ on }">
+        <v-btn
+          v-show="entries.length > visible.length"
+          class="mr-4 mt-3"
+          icon
+          @click="showAll = true"
+          v-on="on"
+        >
+          <v-icon>mdi-history</v-icon>
+        </v-btn>
       </template>
-      <div class="overline">
-        {{ status_text }}
+      <span>All Entries</span>
+    </v-tooltip>
+    <div class="d-flex justify-space-between history-container">
+      <div
+        v-for="{ time, status_text, status_type } in visible"
+        :key="time"
+        class="history-entry"
+      >
+        <div class="overline">{{ status_text }}</div>
+        <v-sheet class="mx-3">
+          <v-icon :color="status_type">
+            {{ jobIcon(status_text) }}
+          </v-icon>
+        </v-sheet>
+        <div class="subtitle-2 mt-2">
+          {{ $moment(time).format('DD.MM.YYYY') }}
+        </div>
+        <div>
+          {{ $moment(time).format('HH:mm') }}
+        </div>
       </div>
-      <div class="subtitle-2">
-        {{ $moment(time).format('DD.MM.YYYY') }}
-      </div>
-      <div>
-        {{ $moment(time).format('HH:mm') }}
-      </div>
-    </v-timeline-item>
-  </v-timeline>
+    </div>
+    <v-bottom-sheet 
+      v-model="showAll"
+      inset
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title>
+          <span>Full History</span>
+          <v-spacer />
+          <v-btn
+            icon
+            @click="showAll = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-data-table
+            :headers="[
+              {text: 'Time', value: 'time', align: 'start'},
+              {text: 'Status', value: 'status', align: 'end'},
+            ]"
+            :items="entries"
+            :footer-props="{itemsPerPageOptions: [10,25,50,{text: 'All', value: -1}]}"
+          >
+            <template v-slot:item.time="{ item }">
+              <strong>
+                {{ $moment(item.time).format('DD.MM.YYYY') }}
+              </strong>
+              <span>
+                {{ $moment(item.time).format('HH:mm') }}
+              </span>
+            </template>
+            <template v-slot:item.status="{ item }">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <span 
+                    :class="['font-weight-medium', item.status_type + '--text']"
+                    v-on="on"
+                  >
+                    {{ item.status_text }}
+                  </span>
+                </template>
+                <span>{{ item.status_tooltip }}</span>
+              </v-tooltip>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+    </v-bottom-sheet>
+  </div>
 </template>
 
 <script>
@@ -35,6 +97,23 @@ export default {
       default: () => []
     }
   },
+  data () {
+    return {
+      showAll: false
+    }
+  },
+  computed: {
+    visible () {
+      let lastReady = 0
+      for (let i = this.entries.length - 1; i >= 0; i--) {
+        if (this.entries[i].status === '0') {
+          lastReady = i
+          break
+        }
+      }
+      return this.entries.slice(lastReady)
+    }
+  },
   methods: {
     jobIcon
   }
@@ -42,7 +121,22 @@ export default {
 </script>
 
 <style>
-  .invisible .v-timeline-item__dot {
-    box-shadow: none;
+  .history-container {
+    position: relative;
+    flex-grow: 1;
+  }
+  .history-container::before {
+    content: '';
+    position: absolute;
+    width: calc(100% - 6em);
+    height: 2px;
+    background-color: #888;
+    margin: 0 2em;
+    top: 1.75em;
+  }
+
+  .history-entry {
+    text-align: center;
+    z-index: 2;
   }
 </style>

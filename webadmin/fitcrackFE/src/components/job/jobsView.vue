@@ -489,10 +489,12 @@
       this.interval = setInterval(function () {
         this.loadJobs()
       }.bind(this), 15000)
+      window.addEventListener('keydown', this.shortcutHandler)
     },
     beforeDestroy: function () {
       clearInterval(this.interval)
       this.selectedJobs = []
+      window.removeEventListener('keydown', this.shortcutHandler)
     },
     methods: {
       ...mapActions('binInterface', { renameBin: 'rename', deleteBin: 'delete' }),
@@ -570,13 +572,19 @@
         }
       },
       deleteBinConfirm () {
-        this.$root.$confirm('Delete', `This will remove ${this.bin.name}. Jobs will be unassigned from the deleted bin, but will not be discarded. Are you sure?`)
+        this.$root.$confirm('Delete Bin', `This will remove ${this.bin.name}. Jobs will be unassigned from the deleted bin, but will not be discarded. Are you sure?`)
           .then((confirm) => {
             this.deleteBin(this.binId)
           })
       },
       jobIcon,
-      attackIcon
+      attackIcon,
+      //
+      shortcutHandler (e) {
+        if (e.key === 'Delete' && this.isBin) {
+          this.deleteBinConfirm()
+        }
+      }
     }
   }
 </script>

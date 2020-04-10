@@ -90,10 +90,15 @@ export default {
         commit('idle')
       }
     },
-    async delete ({ commit, dispatch }, id) {
+    async delete ({ commit, dispatch, state: { bins } }, id) {
       commit('loading')
       await axios.delete(`${api}/bins/${id}`)
-      router.replace({ name: 'jobs' })
+      const index = bins.map(bin => bin.id).indexOf(id)
+      if (index > 0) {
+        router.replace({ name: 'bins', params: { id: bins[index - 1].id } })
+      } else {
+        router.replace({ name: 'jobs' })
+      }
       dispatch('load')
     }
   }

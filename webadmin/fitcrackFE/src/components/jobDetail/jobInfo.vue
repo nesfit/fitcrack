@@ -5,7 +5,7 @@
       class="top-sheet pa-4"
       dark
       tile
-      :color="data.status_type"
+      :color="statusColor"
     >
       <v-icon
         class="attack-icon"
@@ -24,22 +24,12 @@
             <b>{{ data.hash_type_name }}</b>
           </div>
         </div>
-        <v-tooltip left>
-          <template #activator="{ on }">
-            <v-btn
-              icon
-              v-on="on"
-            >
-              <v-icon>mdi-settings</v-icon>
-            </v-btn>
-          </template>
-          <span>Options</span>
-        </v-tooltip>
       </div>
       <div class="status">
         <v-progress-circular
           class="fu"
           :value="data.progress"
+          :indeterminate="indtProgress"
           size="26"
           rotate="-90"
         />
@@ -48,54 +38,98 @@
           {{ data.status_text }}
         </span>
       </div>
-      <!-- CTA FAB -->
-      <v-tooltip left>
-        <template #activator="{ on }">
-          <v-btn
-            :disabled="data.host_count == 0"
-            fab
-            small
-            absolute
-            bottom
-            right
-            light
-            class="z"
-            @click="operateJob(data.id, operation.text)"
-            v-on="on"
-          >
-            <v-icon>
-              {{ operation.icon }}
-            </v-icon>
-          </v-btn>
-        </template>
-        <span class="text-capitalize">{{ operation.text }}</span>
-      </v-tooltip>
+    </v-sheet>
+    <!-- ACTION SHEET -->
+    <v-sheet
+      class="cta-sheet pa-2 d-flex justify-space-between"
+      dark
+      tile
+      :color="statusColor"
+    >
+      <!-- action button -->
+      <v-btn
+        v-if="data.hosts.length > 0"
+        text
+        @click="$emit('operate', operation.text)"
+      >
+        <v-icon left>
+          {{ operation.icon }}
+        </v-icon>
+        <span>{{ operation.text }}</span>
+      </v-btn>
+      <v-btn
+        v-else
+        text
+        @click="$emit('edit-hosts')"
+      >
+        <v-icon left>
+          mdi-desktop-classic
+        </v-icon>
+        <span>Add Hosts</span>
+      </v-btn>
+      <!-- edit button -->
+      <v-btn
+        text
+        @click="editing = !editing"
+      >
+        <span>Edit</span>
+        <v-icon right>
+          mdi-pencil
+        </v-icon>
+      </v-btn>
     </v-sheet>
     <!-- INFO LIST -->
-    <v-list 
+    <v-list
       class="info-list"
       inactive
       two-line
     >
-      <v-list-item
-        v-for="({title, icon, value}, i) in details"
-        :key="i"
-      >
-        <v-list-item-content>
-          <v-list-item-subtitle class="overline mb-1">
-            <v-icon
-              class="mr-1"
-              small
-            >
-              {{ icon }}
-            </v-icon>
-            {{ title }}
-          </v-list-item-subtitle>
-          <v-list-item-title class="wrap">
-            {{ value }}
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      <transition name="fade" mode="out-in">
+        <transition-group
+          v-if="!editing"
+          tag="div"
+          name="list"
+        >
+          <v-list-item
+            v-for="({title, icon, value}) in details"
+            :key="title"
+          >
+            <v-list-item-content>
+              <v-list-item-subtitle class="overline mb-1">
+                <v-icon
+                  class="mr-1"
+                  small
+                >
+                  {{ icon }}
+                </v-icon>
+                {{ title }}
+              </v-list-item-subtitle>
+              <v-list-item-title class="wrap">
+                {{ value }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </transition-group>
+        <!-- EDITOR -->
+        <template v-else>
+          <v-list-item>
+            <v-list-item-content>
+              <v-text-field
+                outlined
+                hide-details
+                :value="data.comment"
+              >
+                <template #label>
+                  <v-icon class="label-icon">
+                    mdi-format-quote-close
+                  </v-icon>
+                  Comment
+                </template>
+              </v-text-field>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+      </transition>
     </v-list>
   </div>
 </template>
@@ -111,7 +145,18 @@ export default {
       default: () => {}
     }
   },
+  data () {
+    return {
+      editing: false
+    }
+  },
   computed: {
+    statusColor () {
+      return this.data.hosts.length > 0 ? this.data.status_type : 'secondary'
+    },
+    indtProgress () {
+      return ((this.data.progress == 0 || this.data.progress >= 100) && this.data.status === '10') || parseInt(this.data.status) > 10
+    },
     operation () {
       if (this.data.status === '0') {
         return {text: 'start', icon: 'mdi-play'}
@@ -136,12 +181,14 @@ export default {
         {title: 'Time per WU', icon: 'mdi-timeline-clock', value: d.seconds_per_job, format: v => `${v} seconds`},
       ]
       // Leave out missing stuff and format fields
-      return items.filter(i => i.value != null && i.value != undefined & i.value !== '').map(i => {
-        if (i.format) {
-          i.value = i.format(i.value)
-        }
-        return i
-      })
+      return items
+        .filter(i => i.value != null && i.value != undefined & i.value !== '')
+        .map(i => {
+          if (i.format) {
+            i.value = i.format(i.value)
+          }
+          return i
+        })
     },
     crackingTime () {
       const d = this.data
@@ -182,7 +229,8 @@ export default {
   methods: {
     jobIcon,
     attackIcon,
-    fmt
+    fmt,
+    editJob () {}
   }
 }
 </script>
@@ -193,8 +241,21 @@ export default {
   flex-direction: column;
 }
 
-.top-sheet {
+.top-sheet, .cta-sheet {
   position: relative;
+  z-index: 1;
+}
+
+.theme--dark .top-sheet::before,
+.theme--light .cta-sheet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,.25);
+  z-index: -1;
 }
 
 .info-list {
@@ -225,6 +286,29 @@ export default {
 }
 
 .z { z-index: 1 }
+
+.label-icon {
+  color:inherit;
+  transition:none;
+}
+
+/**/
+
+  .fade-enter-active {
+    transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .fade-leave-active {
+    transition: opacity .2s;
+  }
+
+  .fade-leave-to {
+    opacity: 0;
+  }
+  .fade-enter {
+    opacity: 0;
+    transform: translateY(-15px)
+  }
 
 </style>
 

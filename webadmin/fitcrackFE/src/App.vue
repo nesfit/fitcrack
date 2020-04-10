@@ -149,6 +149,29 @@
     width: 100%;
   }
 
+  /**/
+
+  .list-enter-active,
+  .list-leave-active,
+  .list-move {
+    transition: 200ms cubic-bezier(0.59, 0.12, 0.34, 0.95);
+    transition-property: opacity, transform;
+  }
+
+  .list-enter,
+  .list-leave-to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  .list-enter-to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .list-leave-active {
+    position: absolute;
+  }
 
 </style>
 

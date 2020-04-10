@@ -1,83 +1,176 @@
 <template>
   <div class="jd-container">
+    <v-progress-linear
+      v-if="!data"
+      indeterminate
+      color="secondary"
+    />
     <div class="jd-split">
-      <job-info
-        :data="data"
-        class="jd-info"
-      />
+      <transition name="info">
+        <job-info
+          v-if="data"
+          :data="data"
+          class="jd-info"
+          @operate="operateJob"
+          @edit-hosts="hostEditorOpen = true"
+        />
+      </transition>
       <v-divider vertical />
-      <div class="jd-main">
-        <v-expansion-panels 
-          accordion
-          multiple
-          flat
-          hover
-          :value="[0,1]"
+      <transition name="main">
+        <div
+          v-if="data"
+          class="jd-main"
         >
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              <span class="expansion-header">
-                <v-icon left>
-                  mdi-file-document-box-search-outline
-                </v-icon>
-                <b class="title">Details</b>
-              </span>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <div class="details-split">
-                <!-- <component
-                  :is="attackDetailComponent"
-                  :data="data"
-                  class="attack-info"
-                /> -->
-                <hash-table
-                  class="grow"
-                  :hashes="data.hashes"
-                />
-                <status-timeline 
-                  class="history mr-8"
-                  :entries="statusHistory"
-                />
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-divider />
-            <v-expansion-panel-header>
-              <span class="expansion-header">
-                <v-icon left>
-                  mdi-desktop-classic
-                </v-icon>
-                <b class="title">Hosts</b>
-              </span>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <host-table
-                :hosts="data.hosts"
-              />
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-divider />
-            <v-expansion-panel-header>
-              <span class="expansion-header">
-                <v-icon left>
-                  mdi-poll
-                </v-icon>
-                <b class="title">Statistics</b>
-              </span>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              Bad graphs breaking layout (don't) go here
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </div>
+          <v-expansion-panels 
+            accordion
+            multiple
+            flat
+            hover
+            :value="openPanels"
+          >
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                <span class="expansion-header">
+                  <v-icon left>
+                    mdi-file-document-box-search-outline
+                  </v-icon>
+                  <b class="title">Details</b>
+                </span>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-row v-if="statusHistory && statusHistory.length > 1">
+                  <v-col>
+                    <v-card-title>
+                      <span>Status History</span>
+                      <v-spacer />
+                      <v-btn
+                        text
+                        color="error"
+                        @click="operateJob('kill')"
+                      >
+                        <span>Purge</span>
+                        <v-icon right>
+                          mdi-undo-variant
+                        </v-icon>
+                      </v-btn>
+                    </v-card-title>
+                    <status-timeline 
+                      class="history px-4"
+                      :entries="statusHistory"
+                    />
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col md="4">
+                    <component
+                      :is="attackDetailComponent"
+                      :data="data"
+                      class="attack-info"
+                    />
+                  </v-col>
+                  <v-col md="8">
+                    <v-card flat>
+                      <v-card-title>Hashes</v-card-title>
+                      <v-card-text>
+                        <hash-table
+                          class="grow"
+                          :hashes="data.hashes"
+                        />
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-divider />
+              <v-expansion-panel-header>
+                <span class="expansion-header">
+                  <v-icon left>
+                    mdi-desktop-classic
+                  </v-icon>
+                  <b class="title">Hosts</b>
+                </span>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-row class="align-center">
+                  <v-col cols="8">
+                    <host-table
+                      :hosts="data.hosts"
+                    />
+                    <div class="d-flex mt-2">
+                      <v-spacer />
+                      <v-btn
+                        text
+                        color="info"
+                        @click="hostEditorOpen = true"
+                      >
+                        <span>Assign Hosts</span>
+                        <v-icon right>
+                          mdi-playlist-edit
+                        </v-icon>
+                      </v-btn>
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <graph
+                      id="hostPercentageGraph"
+                      :data="hostPercentageGraph"
+                    />
+                  </v-col>
+                </v-row>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-divider />
+              <v-expansion-panel-header>
+                <span class="expansion-header">
+                  <v-icon left>
+                    mdi-poll
+                  </v-icon>
+                  <b class="title">Statistics</b>
+                </span>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-row>
+                  <!-- sorry mobile, i have had enough of this -->
+                  <v-col cols="6">
+                    <v-card-title>Progress over time</v-card-title>
+                    <graph
+                      id="progressGraph"
+                      :data="progressGraph"
+                      units="%"
+                      type="job"
+                    />
+                  </v-col>
+                  <v-col cols="6">
+                    <v-card-title>Hashes in WUs</v-card-title>
+                    <graph
+                      id="hostGraph"
+                      :data="hostGraph"
+                      units=" hashes"
+                      type="host"
+                    />
+                  </v-col>
+                </v-row>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
+      </transition>
     </div>
     <v-divider />
     <workunits
+      v-if="data"
       class="wu-container"
       :data="data"
+    />
+    <!-- Dialogs -->
+    <host-editor
+      v-if="data"
+      v-model="hostEditorOpen"
+      :job-id="data.id"
+      @reload="loadData"
     />
   </div>
 </template>
@@ -89,6 +182,7 @@ import workunits from './workunits'
 import statusTimeline from './statusTimeline'
 import hashTable from './hashTable'
 import hostTable from './hostTable'
+import hostEditor from './hostEditor'
 //
 import graph from '@/components/graph/fc_graph'
 import combinatorDetail from '@/components/job/attacksDetail/combinator'
@@ -98,6 +192,8 @@ import pcfgDetail from '@/components/job/attacksDetail/pcfg'
 // Scripts
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 //
+let interval
+//
 export default {
   components: {
     jobInfo,
@@ -105,6 +201,7 @@ export default {
     statusTimeline,
     hashTable,
     hostTable,
+    hostEditor,
     graph,
     combinatorDetail,
     maskDetail,
@@ -117,7 +214,10 @@ export default {
       statusHistory: null,
       progressGraph: null,
       hostGraph: null,
-      hostPercentageGraph: null
+      hostPercentageGraph: null,
+      //
+      hostEditorOpen: false,
+      openPanels: [0,1,2]
     }
   },
   computed: {
@@ -138,9 +238,11 @@ export default {
     }
   },
   mounted () {
-    this.loadData()
-    this.loadHistory()
-    this.loadGraphs()
+    this.loadAll()
+    interval = setInterval(this.loadAll, 5000)
+  },
+  beforeDestroy () {
+    clearInterval(interval)
   },
   methods: {
     jobIcon,
@@ -164,6 +266,19 @@ export default {
       } catch (e) {
         console.error('Error getting job graphs', e)
       }
+    },
+    loadAll () {
+      this.loadData()
+      this.loadHistory()
+      this.loadGraphs()
+    },
+    //
+    operateJob (operation) {
+      this.axios.get(this.$serverAddr + '/job/' + this.data.id + '/action', {
+        params: {
+          'operation': operation
+        }
+      }).then(this.loadAll)
     }
   }
 }
@@ -205,5 +320,20 @@ export default {
 }
 
 /**/
+
+  .info-enter-active {
+    transition: all .7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .info-enter {
+    transform: translateY(-15px);
+    opacity: 0;
+  }
+
+  .main-enter-active {
+    transition: all .7s;
+  }
+  .main-enter {
+    opacity: 0;
+  }
 
 </style>

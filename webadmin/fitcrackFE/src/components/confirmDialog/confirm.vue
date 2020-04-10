@@ -7,24 +7,19 @@
   <v-dialog
     v-model="dialog"
     :max-width="options.width"
-    @keydown.esc="cancel()"
   >
-    <v-toolbar flat>
-      <v-toolbar-title>
-        {{ title }}
-      </v-toolbar-title>
-    </v-toolbar>
-    <v-card 
-      tile
+    <v-card
       flat
     >
+      <v-card-title>
+        {{ title }}
+      </v-card-title>
       <v-card-text v-show="!!message">
         {{ message }}
       </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn
-          color="grey"
           text
           @click.native="cancel()"
         >
@@ -36,6 +31,9 @@
           text
           @click.native="agree()"
         >
+          <v-icon left>
+            mdi-keyboard-return
+          </v-icon>
           Yes
         </v-btn>
       </v-card-actions>
@@ -79,6 +77,12 @@
         }
       };
     },
+    mounted () {
+      window.addEventListener('keydown', this.shortcutHandler)
+    },
+    beforeDestroy () {
+      window.removeEventListener('keydown', this.shortcutHandler)
+    },
     methods: {
       open(title, message, options) {
         this.dialog = true;
@@ -97,6 +101,18 @@
       },
       cancel() {
         this.dialog = false;
+      },
+      shortcutHandler (e) {
+        switch (e.key) {
+          case 'Escape':
+            this.cancel()
+            break
+          case 'Enter':
+            this.agree()
+            break
+          default:
+            return
+        }
       }
     }
   }

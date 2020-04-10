@@ -31,7 +31,7 @@ export default {
         {text: 'Password', value: 'password', align: 'end'}
       ],
       footer: {
-        itemsPerPageOptions: [25,50,100,{text: 'All', value: -1}], 
+        itemsPerPageOptions: [10,25,50,100,{text: 'All', value: -1}], 
         itemsPerPageText: 'Hashes per page'
       }
     }

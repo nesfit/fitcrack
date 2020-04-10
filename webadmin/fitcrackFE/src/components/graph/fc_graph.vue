@@ -24,7 +24,7 @@
       <div v-if="data.type === 'line'">
         <line-chart
           :id="id"
-          class="d-flex graph"
+          class="d-flex graph line"
           :data="data.data"
           :xkey="data.axies.x"
           :ykeys="data.axies.y"
@@ -36,16 +36,16 @@
           :post-units="units"
           :smooth="false"
           :hover-callback="type === 'job' ? hoverCallbackJob : hoverCallbackWorkunit"
-          :line-colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
+          :line-colors="palette"
         />
       </div>
       <div v-else-if="data.type === 'pie'">
         <donut-chart
           :id="id || 'pie'"
-          class="d-flex graph"
+          class="d-flex graph donut"
           :data="data.data"
           :resize="true"
-          :colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
+          :colors="palette"
         />
       </div>
     </div>
@@ -67,7 +67,8 @@
     props: ['data', 'id', 'units', 'type'],
     data: function () {
       return {
-        i: 1
+        i: 1,
+        palette: ['#f24b78', '#605f5e', '#1d3461', '#48beff', , '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']
       }
     },
     methods: {
@@ -122,5 +123,18 @@
     padding: 20px;
     vertical-align: middle;
     font-weight: 200;
+  }
+
+  .donut.graph {
+    height: 250px
+  }
+</style>
+
+<style>
+  .donut.graph text {
+    font-family: Roboto !important;
+  }
+  .theme--dark .donut.graph text {
+    fill: #efefef;
   }
 </style>

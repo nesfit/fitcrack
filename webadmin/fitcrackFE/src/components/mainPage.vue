@@ -328,9 +328,16 @@
         <span v-show="$vuetify.breakpoint.smAndUp">Sign out</span>
       </v-btn>
     </v-app-bar>
+    <!-- CONTENT -->
     <v-content class="height100 main">
-      <router-view />
+      <transition
+        name="route"
+        mode="out-in"
+      >
+        <router-view />
+      </transition>
     </v-content>
+    <!-- -->
     <v-navigation-drawer
       v-model="rightDrawer"
       class="pa-0"
@@ -477,6 +484,23 @@
     text-transform: uppercase;
     font-weight: 300;
     vertical-align: middle;
+  }
+
+  /**/
+
+  .route-enter-active {
+    transition: all .4s cubic-bezier(0.16, 1, 0.3, 1)
+  }
+  .route-leave-active {
+    transition: all .1s ease-in;
+  }
+  .route-enter {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  .route-leave-to {
+    transform: scale(1.02) translateY(-10px);
+    opacity: 0;
   }
 </style>
 

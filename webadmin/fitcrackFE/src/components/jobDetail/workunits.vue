@@ -36,8 +36,8 @@
       <div
         v-for="workunit in graphical"
         :key="workunit.id"
-        :style="{ 'flex-grow': workunit.keyspace, 'background-color': workunit.color }"
-        class="workunit-child"
+        :style="{ 'flex-grow': workunit.keyspace }"
+        :class="['workunit-child', workunit.state]"
       >
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -160,8 +160,7 @@ export default {
       immediate: true,
       deep: true,
       handler (job) {
-        console.log(job)
-      
+              
         // Computing of counts and avg keyspace
         if (job.workunits.length > 0) {
           const validWorkunits = job.workunits.filter(workunit => workunit.hc_keyspace !== 0)
@@ -176,23 +175,24 @@ export default {
           this.graphical = validWorkunits.map(workunit => {
 
             // retry && finished
-            let color = ""
+            let state = ""
 
             if (!workunit.retry && workunit.finished) {
-              color = 'lightgreen'
+              state = 'success'
             } else if (!workunit.retry && !workunit.finished){
-              color = 'yellow'
+              state = 'info'
             } else if (workunit.retry && !workunit.finished) {
-              color = 'orange'
+              state = 'error'
             } else {
-              color = 'green'
+              state = 'warning'
             }
 
             return {
               id: workunit.id,
               keyspace: workunit.hc_keyspace,
-              color: color,
-              text: "Id: " + workunit.id + " | Keyspace: " + workunit.hc_keyspace + " | Retry: " + workunit.retry + " | Finished: " + workunit.finished
+              state,
+              text: `ID ${workunit.id} (keyspace ${workunit.hc_keyspace}) ${workunit.retry ? 'retried and' : ''} ${workunit.finished ? 'finished' : 'not finished'}`,
+              //text: "Id: " + workunit.id + " | Keyspace: " + workunit.hc_keyspace + " | Retry: " + workunit.retry + " | Finished: " + workunit.finished
             }
           })
         }
