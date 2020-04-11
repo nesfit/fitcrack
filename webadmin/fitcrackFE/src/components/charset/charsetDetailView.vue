@@ -58,29 +58,18 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
-          <v-row class="mx-2">
+          <v-row class="mx-2 align-center">
             <v-col>
-              <v-btn
-                v-if="!edit"
+              <v-combobox
+                v-model="as"
+                :items="encodings"
+                label="View as"
                 outlined
-                color="primary"
-                @click="edit=true"
-              >
-                Edit <v-icon right>
-                  mdi-pencil
-                </v-icon>
-              </v-btn>
-              <v-btn
-                v-else
-                outlined
-                color="primary"
-                @click="saveCharset"
-              >
-                Save 
-                <v-icon right>
-                  mdi-content-save
-                </v-icon>
-              </v-btn>
+                dense
+                hide-details
+              />
+            </v-col>
+            <v-col>
               <v-btn
                 class="ma-0"
                 outlined
@@ -88,7 +77,10 @@
                 :href="$serverAddr + '/charset/' + data.id + '/download'"
                 target="_blank"
               >
-                Download <v-icon right>mdi-download</v-icon>
+                Download
+                <v-icon right>
+                  mdi-download
+                </v-icon>
               </v-btn>
             </v-col>
           </v-row>
@@ -96,13 +88,10 @@
           <div
             v-if="data != null"
             class="dictContent pa-2"
-            :class="{editing: edit}"
           >
             <code
               class="code elevation-0"
-              :contenteditable="edit"
-              @input="update"
-            >{{ data.data }}</code>
+            >{{ repr }}</code>
           </div>
         </fc-tile>
       </v-row>
@@ -111,6 +100,7 @@
 </template>
 
 <script>
+  import iconv from 'iconv-lite'
   import tile from '@/components/tile/fc_tile'
   export default {
     name: "CharsetDetailView",
@@ -120,8 +110,30 @@
     data: function () {
       return {
         data: null,
-        edit: false,
-        newData: ''
+        as: 'hex',
+        encodings: [
+          'hex',
+          'utf-8',
+          'cp1250',
+          'cp1251',
+          'cp1252',
+          'iso-8859-1',
+          'iso-8859-2',
+          'iso-8859-5',
+          'iso-8859-15',
+          'koi8-r',
+          'koi8-u'
+        ]
+      }
+    },
+    computed: {
+      repr () {
+        if (iconv.encodingExists(this.as)) {
+          return iconv.decode(Buffer.from(this.data.data, 'base64'), this.as)
+        } else {
+          this.$error('Unrecognized encoding!')
+          return '<unrecognized encoding selected>'
+        }
       }
     },
     mounted: function () {
@@ -131,23 +143,7 @@
       loadData: function ($state) {
         this.axios.get(this.$serverAddr + '/charset/' + this.$route.params.id).then((response) => {
           this.data = response.data
-          if (!this.data['canDecode'])
-            this.$error('Can not decode encoding.')
-        })
-      },
-      update:function(event){
-        console.log('text updated')
-        this.newData = event.target.innerText
-      },
-      saveCharset: function () {
-        if (this.newData === '')
-          return
-
-        this.axios.post(this.$serverAddr + '/charset/' + this.data.id + '/update', {
-          "newCharset": this.newData
-        }).then((response) => {
-          console.log(response.data)
-          this.edit=false
+          this.as = this.encodings.find(enc => this.data.name.search(new RegExp(enc, 'i')) >= 0) || 'hex'
         })
       }
     }
