@@ -46,37 +46,56 @@
       tile
       :color="statusColor"
     >
-      <!-- action button -->
-      <v-btn
-        v-if="data.hosts.length > 0"
-        text
-        @click="$emit('operate', operation.text)"
-      >
-        <v-icon left>
-          {{ operation.icon }}
-        </v-icon>
-        <span>{{ operation.text }}</span>
-      </v-btn>
-      <v-btn
-        v-else
-        text
-        @click="$emit('edit-hosts')"
-      >
-        <v-icon left>
-          mdi-desktop-classic
-        </v-icon>
-        <span>Add Hosts</span>
-      </v-btn>
-      <!-- edit button -->
-      <v-btn
-        text
-        @click="editing = !editing"
-      >
-        <span>Edit</span>
-        <v-icon right>
-          mdi-pencil
-        </v-icon>
-      </v-btn>
+      <template v-if="!editing">
+        <!-- action button -->
+        <v-btn
+          v-if="data.hosts.length > 0"
+          key="operate"
+          text
+          @click="$emit('operate', operation.text)"
+        >
+          <v-icon left>
+            {{ operation.icon }}
+          </v-icon>
+          <span>{{ operation.text }}</span>
+        </v-btn>
+        <v-btn
+          v-else
+          key="assign"
+          text
+          @click="$emit('edit-hosts')"
+        >
+          <v-icon left>
+            mdi-desktop-classic
+          </v-icon>
+          <span>Add Hosts</span>
+        </v-btn>
+        <!-- edit button -->
+        <v-btn
+          key="edit-enter"
+          text
+          @click="editing = true"
+        >
+          <span>Edit</span>
+          <v-icon right>
+            mdi-pencil
+          </v-icon>
+        </v-btn>
+      </template>
+      <template v-else>
+        <v-spacer />
+        <!-- cancel edit button -->
+        <v-btn
+          key="edit-cancel"
+          text
+          @click="editing = false"
+        >
+          <span>Cancel Edit</span>
+          <v-icon right>
+            mdi-undo-variant
+          </v-icon>
+        </v-btn>
+      </template>
     </v-sheet>
     <!-- INFO LIST -->
     <v-list
@@ -112,22 +131,10 @@
         </transition-group>
         <!-- EDITOR -->
         <template v-else>
-          <v-list-item>
-            <v-list-item-content>
-              <v-text-field
-                outlined
-                hide-details
-                :value="data.comment"
-              >
-                <template #label>
-                  <v-icon class="label-icon">
-                    mdi-format-quote-close
-                  </v-icon>
-                  Comment
-                </template>
-              </v-text-field>
-            </v-list-item-content>
-          </v-list-item>
+          <job-editor
+            :data="data"
+            @save="editing = false; $emit('reload')"
+          />
         </template>
       </transition>
     </v-list>
@@ -135,10 +142,15 @@
 </template>
 
 <script>
+import JobEditor from './jobEditor'
+
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 import fmt from '@/assets/scripts/numberFormat'
 
 export default {
+  components: {
+    JobEditor
+  },
   props: {
     data: {
       type: Object,
@@ -152,7 +164,11 @@ export default {
   },
   computed: {
     statusColor () {
-      return this.data.hosts.length > 0 ? this.data.status_type : 'secondary'
+      if (this.editing || this.data.hosts.length == 0) {
+        return 'secondary'
+      } else {
+        return this.data.status_type
+      }
     },
     indtProgress () {
       return ((this.data.progress == 0 || this.data.progress >= 100) && this.data.status === '10') || parseInt(this.data.status) > 10
@@ -286,11 +302,6 @@ export default {
 }
 
 .z { z-index: 1 }
-
-.label-icon {
-  color:inherit;
-  transition:none;
-}
 
 /**/
 
