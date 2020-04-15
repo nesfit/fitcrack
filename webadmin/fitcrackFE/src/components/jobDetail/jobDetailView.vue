@@ -13,6 +13,7 @@
           class="jd-info"
           @operate="operateJob"
           @edit-hosts="hostEditorOpen = true"
+          @reload="loadData"
         />
       </transition>
       <v-divider vertical />

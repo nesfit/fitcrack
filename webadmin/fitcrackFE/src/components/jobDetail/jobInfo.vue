@@ -123,9 +123,7 @@
                 </v-icon>
                 {{ title }}
               </v-list-item-subtitle>
-              <v-list-item-title class="wrap">
-                {{ value }}
-              </v-list-item-title>
+              <v-list-item-title class="pre">{{ value }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </transition-group>
@@ -133,7 +131,7 @@
         <template v-else>
           <job-editor
             :data="data"
-            @save="editing = false; $emit('reload')"
+            @save="saveEdit"
           />
         </template>
       </transition>
@@ -246,7 +244,10 @@ export default {
     jobIcon,
     attackIcon,
     fmt,
-    editJob () {}
+    saveEdit () {
+      this.editing = false
+      this.$emit('reload')
+    }
   }
 }
 </script>
@@ -279,6 +280,7 @@ export default {
 }
 
 .wrap { white-space: normal; }
+.pre { white-space: pre; }
 
 .top-sheet-bar {
   display: flex;
