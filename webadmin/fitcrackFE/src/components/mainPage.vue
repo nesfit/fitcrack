@@ -48,6 +48,7 @@
         v-model="navtab"
         icons-and-text
         grow
+        class="notrans"
       >
         <v-tab>
           Jobs
@@ -63,7 +64,10 @@
         </v-tab>
       </v-tabs>
 
-      <v-tabs-items v-model="navtab">
+      <v-tabs-items 
+        v-model="navtab"
+        class="notrans"
+      >
         <v-tab-item eager>
           <v-list
             expand
@@ -364,14 +368,8 @@
       right
       fixed
       app
-      width="400"
+      width="450"
     >
-      <v-toolbar
-        flat 
-        class="notifHeader"
-      >
-        <v-toolbar-title>Notifications</v-toolbar-title>
-      </v-toolbar>
       <notifications-wrapper ref="notifWrapper" />
     </v-navigation-drawer>
   </div>
@@ -529,4 +527,8 @@
     padding-left: 35px;
   }
 
+  .notrans,
+  .notrans .v-tabs-bar {
+    transition: none;
+  }
 </style>

@@ -10,6 +10,15 @@ export function jobIcon (status) {
   return icons[status] || 'mdi-help-circle-outline'
 }
 
+export function typeIcon (type) {
+  const icons = {
+    info: 'mdi-information-outline',
+    success: 'mdi-checkbox-marked-circle-outline',
+    error: 'mdi-close-circle-outline'
+  }
+  return icons[type] || 'mdi-help-circle-outline'
+}
+
 export function attackIcon (handler) {
   switch (handler) {
     case 'dictionary':
