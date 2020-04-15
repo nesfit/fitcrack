@@ -23,7 +23,7 @@ from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWorkunit_parser, \
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
-    editJob_argument
+    editJob_argument, multiEditHosts_argument
 from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
     computeCrackingTime, start_pcfg_manager
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
@@ -96,6 +96,40 @@ class jobsCollection(Resource):
             'message': 'Job \"' + job.name + '\" successfully created.',
             'status': True,
             'job_id': job.id
+        }
+
+@ns.route('/host')
+@api.response(404, 'job not found.')
+class multiJobsHost(Resource):
+
+    @api.expect(multiEditHosts_argument)
+    @api.marshal_with(simpleResponse)
+    def post(self):
+        """
+        Mapping of hosts to multiple jobs.
+        """
+
+        args = multiEditHosts_argument.parse_args(request)
+        beforeHosts = FcHostActivity.query.filter(FcHostActivity.job_id.in_(args['job_ids'])).all()
+        for host in beforeHosts:
+            db.session.delete(host)
+
+        for jobId in args['job_ids']:
+            for hostId in args['newHost_ids']:
+                host = FcHostActivity(boinc_host_id=hostId, job_id=jobId)
+                db.session.add(host)
+
+        try:
+            db.session.commit()
+        except:
+            return {
+                'status': False,
+                'message': 'Something went wrong.'
+            }
+
+        return {
+            'status': True,
+            'message': 'Hosts assigned.'
         }
 
 @ns.route('/<int:id>')
@@ -266,7 +300,7 @@ class jobsHost(Resource):
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        Mapping of hosts to job.
+        !DEPRECATED in favor of /job/host - Mapping of hosts to job.
         """
 
         args = editHostMapping_argument.parse_args(request)
