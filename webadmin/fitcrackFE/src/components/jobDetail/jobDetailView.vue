@@ -169,7 +169,7 @@
     <host-editor
       v-if="data"
       v-model="hostEditorOpen"
-      :job-id="data.id"
+      :job-ids="[data.id]"
       @reload="loadData"
     />
   </div>

@@ -59,7 +59,10 @@ export default {
   },
   props: {
     value: Boolean,
-    jobId: Number
+    jobIds: {
+      type: Array,
+      required: true
+    }
   },
   data () {
     return {
@@ -71,7 +74,8 @@ export default {
     async save () {
       this.saving = true
       try {
-        await this.axios.post(this.$serverAddr + '/job/' + this.jobId + '/host', {
+        await this.axios.post(this.$serverAddr + '/job/host', {
+          'job_ids': this.jobIds,
           'newHost_ids': this.hosts.map(host => host.id)
         })
         this.$emit('input') // close

@@ -160,6 +160,7 @@
             text
             class="mr-2"
             color="warning"
+            @click="hostEditorOpen = true"
           >
             <v-icon left>
               mdi-desktop-classic
@@ -311,6 +312,7 @@
           </v-btn>
           <v-btn
             v-else-if="item.status < 10"
+            :disabled="item.host_count == 0"
             text
             color="info"
             @click="operateJob(item.id, 'restart')"
@@ -350,6 +352,12 @@
         </div>
       </template>
     </v-data-table>
+    <!-- Dialogs -->
+    <host-editor
+      v-model="hostEditorOpen"
+      :job-ids="selectedJobs.map(j => j.id)"
+      @reload="updateList"
+    />
   </div>
 </template>
 
@@ -360,17 +368,20 @@
   import { mapState, mapActions } from 'vuex'
 
   import BinIllust from '@/components/details/binIllustration'
+  import HostEditor from '@/components/jobDetail/hostEditor'
 
   export default {
     name: 'JobsView',
     components: {
-      BinIllust
+      BinIllust,
+      HostEditor
     },
     data () {
       return {
         interval: null,
         renamingBin: false,
         newBinName: null,
+        hostEditorOpen: false,
         //
         status: null,
         attackType: null,
