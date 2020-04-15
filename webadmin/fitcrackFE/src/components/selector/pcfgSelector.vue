@@ -15,7 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'pcfgDetail', params: { id: item.id}}" target='_blank'>
+      <router-link :to="{name: 'pcfgDetail', params: { id: item.id}}">
         {{ item.name }}
         <v-icon 
           small
