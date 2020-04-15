@@ -170,6 +170,7 @@
           <v-btn
             text
             class="mr-2"
+            @click="multiTrash"
           >
             <v-icon left>
               {{ isTrash ? 'mdi-delete-restore' : 'mdi-delete' }}
@@ -559,6 +560,17 @@
       hideJob: function (id) {
         this.loading = true
         this.axios.delete(this.$serverAddr + '/job/' + id)
+        .then((response) => {
+          this.loadJobs()
+        })
+      },
+      multiTrash () {
+        if (this.selectedJobs.length == 0) return
+        //
+        this.loading = true
+        this.axios.patch(this.$serverAddr + '/job', {
+          job_ids: this.selectedJobs.map(j => j.id)
+        })
         .then((response) => {
           this.loadJobs()
         })
