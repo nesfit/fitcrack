@@ -81,7 +81,7 @@ class logs(Resource):
 #     @api.expect(newLogs_argument)
 #     def get(self):
 #         """
-#         vráti nove logy
+#         returns new logs
 #         """
 #         args = newLogs_argument.parse_args(request)
 #         lastLog = args.get('log', 1)

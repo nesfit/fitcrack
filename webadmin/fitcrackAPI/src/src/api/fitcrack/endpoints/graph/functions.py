@@ -124,7 +124,7 @@ def computeHostPercentageGraph(fromDate=None, jobId=None):
             abort(500, 'Wrong date fromat')
         jobsGraphData = jobsGraphData.filter(FcWorkunit.time >= date)
 
-    # TODO: Zakomponovat datum
+    # TODO: implement dates
 
     jobsGraphData = db.session.query(Host.domain_name.label('label'),
                                      func.cast(func.sum(FcWorkunit.hc_keyspace), Integer()).label('value')).filter(

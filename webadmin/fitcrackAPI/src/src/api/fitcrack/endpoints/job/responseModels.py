@@ -67,8 +67,8 @@ page_of_workunits_model = api.inherit('Page of workunits', pagination, {
 })
 
 verifyHash_model = api.model('Verified hash', {
-    'hash': fields.String(required=True, description='Hash ktory sa overoval'),
-    'result': fields.String(required=True, description='Ak ma hash spravny format tak OK'),
+    'hash': fields.String(required=True, description='Hash being validated'),
+    'result': fields.String(required=True, description='Whether the hash is valid'),
     'isInCache': fields.Boolean()
 })
 
@@ -85,7 +85,7 @@ host_cracking_time = api.model('host cracking time', {
 })
 
 crackingTime_model = api.model('Cracking time', {
-    'hash_code': fields.String(required=True, description='Typ hashu', default=None),
+    'hash_code': fields.String(required=True, description='Hash type', default=None),
     'keyspace': fields.Integer(required=True, default=None),
     'total_power': fields.Integer(required=True, default=None),
     'display_time': fields.String(required=True, default=None),

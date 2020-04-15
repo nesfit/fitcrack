@@ -59,7 +59,7 @@ def create_job(data):
     if job['attack_settings']['attack_mode'] == 3:
         job['attack_settings']['attack_submode'] = data['attack_settings']['attack_submode']
 
-    # nastavenie attack modu pre hybrid
+    # hybrid attack mode setting
     if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
         attack_settings_control = 1
 
