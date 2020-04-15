@@ -171,7 +171,7 @@ class change_my_password(Resource):
     @api.marshal_with(userSuccessResponse_model)
     def post(self):
         """
-        Zmena hesla uzivatela
+        Changes user's password.
         """
         args = user_change_password_arguments.parse_args(request)
         if not (current_user.check_password(args['old_password'])):

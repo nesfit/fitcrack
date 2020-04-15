@@ -86,7 +86,7 @@ if [[ $? != 0 ]]; then
 fi
 echo "Fitcrack tables created."
 
-echo "Crating Fitcrack database triggers..."
+echo "Creating Fitcrack database triggers..."
 mysql -h $DB_HOST -u $DB_USER -p"$DB_PW" -D"$DB_NAME" < server/sql/20_create_triggers.sql  2>/dev/null
 if [[ $? != 0 ]]; then
   echo "Error: Unable to create Fitcrack DB tables"
