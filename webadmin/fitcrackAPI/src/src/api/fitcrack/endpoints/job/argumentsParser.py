@@ -225,6 +225,8 @@ addJob_model = api.schema_model('addJob', {
     'type': 'object'
 })
 
+jobList_argument = reqparse.RequestParser()
+jobList_argument.add_argument('job_ids', type=list, required=True, location='json')
 
 jobOperation = reqparse.RequestParser()
 jobOperation.add_argument('operation', type=str, required=True,  help='job action',
