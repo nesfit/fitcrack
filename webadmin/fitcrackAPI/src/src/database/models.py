@@ -18,7 +18,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from src.api.fitcrack.attacks.hashtypes import getHashById
 from src.api.fitcrack.functions import getStringBetween
 from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
-    job_status_text_info_to_code_dict
+    job_status_text_info_to_code_dict, status_to_code
 from src.database import db
 
 Base = db.Model
@@ -297,13 +297,14 @@ class FcJob(Base):
 
     @hybrid_property
     def status_type(self):
-        if int(self.status) == 0 or int(self.status) == 10 or int(self.status) == 12:
+        code = int(self.status)
+        if code == status_to_code['ready'] or code == status_to_code['running'] or code == status_to_code['finishing']:
             return 'info'
-        if int(self.status) == 1:
+        if code == status_to_code['finished']:
             return 'success'
-        if int(self.status) == 0 or int(self.status) == 4:
+        if code == status_to_code['timeout']:
             return 'warning'
-        if int(self.status) == 1 or int(self.status) == 2 or int(self.status) == 3:
+        if code == status_to_code['exhausted'] or code == status_to_code['malformed']:
             return 'error'
 
     hashes = relationship("FcHash", back_populates="job")
@@ -382,13 +383,14 @@ class FcJobStatus(Base):
 
     @hybrid_property
     def status_type(self):
-        if int(self.status) == 0 or int(self.status) == 10 or int(self.status) == 12:
+        code = int(self.status)
+        if code == status_to_code['ready'] or code == status_to_code['running'] or code == status_to_code['finishing']:
             return 'info'
-        if int(self.status) == 1:
+        if code == status_to_code['finished']:
             return 'success'
-        if int(self.status) == 0 or int(self.status) == 4:
+        if code == status_to_code['timeout']:
             return 'warning'
-        if int(self.status) == 1 or int(self.status) == 2 or int(self.status) == 3:
+        if code == status_to_code['exhausted'] or code == status_to_code['malformed']:
             return 'error'
 
     job = relationship('FcJob')
@@ -772,7 +774,7 @@ class Result(Base):
         try:
             return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' )
         except:
-            return self.stderr_out.decode("utf-8")
+            return self.stderr_out.decode("utf-8", errors='ignore')
 class FcServerUsage(Base):
     __tablename__ = 'fc_server_usage'
 

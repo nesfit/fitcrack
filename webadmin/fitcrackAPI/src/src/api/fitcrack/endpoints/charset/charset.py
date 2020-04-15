@@ -20,6 +20,8 @@ from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcCharset
 
+from base64 import b64encode
+
 log = logging.getLogger(__name__)
 ns = api.namespace('charset', description='Endpoints for work with charset files.')
 
@@ -88,26 +90,12 @@ class charset(Resource):
         with open(os.path.join(CHARSET_DIR, charset.path), 'rb') as file:
             content = file.read()
 
-        try:
-            content = content.decode(encoding='Windows-1252')
-        except UnicodeDecodeError:
-            return {
-                'id': charset.id,
-                'name': charset.name,
-                'keyspace': charset.keyspace,
-                'time': charset.time,
-                'data': str(content),
-                'canDecode': False
-            }
-
-
         return {
             'id': charset.id,
             'name': charset.name,
             'keyspace': charset.keyspace,
             'time': charset.time,
-            'data': content,
-            'canDecode': True
+            'data': b64encode(content).decode('utf-8')
         }
 
     @api.marshal_with(simpleResponse)
@@ -140,30 +128,3 @@ class downloadCharset(Resource):
 
         charset = FcCharset.query.filter(FcCharset.id == id).first()
         return send_file(os.path.join(CHARSET_DIR, charset.path), as_attachment=True, attachment_filename=charset.path)
-
-
-@ns.route('/<id>/update')
-class updateCharset(Resource):
-
-    @api.expect(updateCharset_parser)
-    @api.marshal_with(simpleResponse)
-    def post(self, id):
-        """
-        Exchanges charset with new string.
-        """
-
-        args = updateCharset_parser.parse_args(request)
-        newData = args.get('newCharset', None)
-
-        charset = FcCharset.query.filter(FcCharset.id == id).first()
-        file = open(os.path.join(CHARSET_DIR, charset.path), 'r+')
-
-        file.seek(0)
-        file.write(newData)
-        file.truncate()
-        file.close()
-
-        return {
-            'message': 'File ' + charset.name + ' successfully changed.',
-            'status': True
-        }

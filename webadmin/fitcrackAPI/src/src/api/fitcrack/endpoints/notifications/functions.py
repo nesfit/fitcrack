@@ -5,7 +5,7 @@
 
 from sqlalchemy import desc
 
-from src.api.fitcrack.lang import job_status_text_info_to_code_dict
+from src.api.fitcrack.lang import job_status_text_info_to_code_dict, status_to_code
 from src.database import db
 from src.database.models import FcNotification
 
@@ -18,7 +18,8 @@ def getNotifications(userID, page, per_page, markAsSeen):
         notifications.append(
             {
                 'job_id': notif.source_id,
-                'text': 'Job ' + notif.source.name + ' ' + job_status_text_info_to_code_dict[notif.new_value],
+                'title': notif.source.name,
+                'text': job_status_text_info_to_code_dict[notif.new_value],
                 'type': getNotifType(notif.new_value),
                 'seen': notif.seen,
                 'time': notif.time
@@ -33,11 +34,11 @@ def getNotifications(userID, page, per_page, markAsSeen):
 
 
 def getNotifType(code):
-    if code == 0 or code == 10 or code == 12:
+    if code == status_to_code['ready'] or code == status_to_code['running'] or code == status_to_code['finishing']:
         return 'info'
-    if code == 1:
+    if code == status_to_code['finished']:
         return 'success'
-    if code == 0 or code == 4:
+    if code == status_to_code['timeout']:
         return 'warning'
-    if code == 1 or code == 2 or code == 3:
+    if code == status_to_code['exhausted'] or code == status_to_code['malformed']:
         return 'error'

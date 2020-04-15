@@ -10,7 +10,6 @@ from flask_restplus import Resource
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.status.responseModels import JobStatusCollection_model
 from src.database.models import FcJobStatus
-from src.api.fitcrack.lang import statuses, job_status_text_to_code_dict
 
 log = logging.getLogger(__name__)
 ns = api.namespace('status', description='Endpoints for reading changes in job status.')

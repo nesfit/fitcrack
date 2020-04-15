@@ -257,7 +257,7 @@ if [ $INSTALL_BACKEND = "y" ]; then
   cd webadmin/fitcrackAPI/hashcat-utils/src
   make -j$COMPILER_THREADS
   cd ..
-  mkdir bin
+  mkdir -p bin
   cp src/*.bin bin/
   cd $INSTALLER_ROOT
 

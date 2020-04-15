@@ -12,10 +12,14 @@
       outlined
     >
       <div class="text-left">
+        {{ 'Job \"' + title + '\"' }}
+      </div>
+      <v-divider />
+      <div class="text-left">
         {{ text }}
       </div>
       <small>
-        {{ $moment(time).format('DD.MM.YYYY HH:mm') }}
+        {{ $moment(time).format('DD. MM. YYYY HH:mm') }}
       </small>
     </v-alert>
   </v-list-item>
@@ -24,7 +28,7 @@
 <script>
     export default {
       name: 'Notification',
-      props: ['type', 'text', 'seen', 'time', 'jobId']
+      props: ['type', 'title', 'text', 'seen', 'time', 'jobId']
     }
 </script>
 

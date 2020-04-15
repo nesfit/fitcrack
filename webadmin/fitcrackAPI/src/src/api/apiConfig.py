@@ -15,7 +15,7 @@ import settings
 log = logging.getLogger(__name__)
 
 
-# Hlavicka dokumentacie API
+# API Docs Header
 api = Api(version='1.0', title='Fitcrack API',
           description='')
 

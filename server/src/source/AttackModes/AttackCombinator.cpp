@@ -291,7 +291,6 @@ bool CAttackCombinator::makeWorkunit()
         }
 
         auto dictVec = m_job->getDictionaries();
-        std::ifstream dictFile;
         for (auto & dict : dictVec)
         {
             if (!dict->isLeft())

@@ -71,13 +71,12 @@ bool CAttackMarkov::makeWorkunit()
 
     /** Output markov_threshold */
     uint32_t markov_threshold = m_job->getMarkovThreshold();
-    if (markov_threshold != 0)
-    {
-        unsigned digits = 0;
-        unsigned num = markov_threshold;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||markov_threshold|UInt|" << digits << "|" << markov_threshold << "|||\n";
-        Tools::printDebug("|||markov_threshold|UInt|%d|%" PRIu32 "|||\n", digits, markov_threshold);
+    if (markov_threshold != 0) {
+      std::string markovThreshold = std::to_string(markov_threshold);
+      f << "|||markov_threshold|UInt|" << markovThreshold.size() << "|"
+        << markovThreshold << "|||\n";
+      Tools::printDebug("|||markov_threshold|UInt|%d|%" PRIu64 "|||\n",
+                        markovThreshold.size(), markovThreshold);
     }
 
     uint64_t maskHcKeyspace = workunitMask->getHcKeyspace();
@@ -92,12 +91,13 @@ bool CAttackMarkov::makeWorkunit()
     }
     else
     {
-        /** Otherwise, send whole mask_hc_keyspace for correct progress calculation, --limit is omitted */
-        uint64_t digits = 0;
-        uint64_t num = maskHcKeyspace;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||mask_hc_keyspace|BigUInt|" << digits << "|" << maskHcKeyspace << "|||\n";
-        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, maskHcKeyspace);
+      /** Otherwise, send whole mask_hc_keyspace for correct progress
+       * calculation, --limit is omitted */
+      std::string maskHcKeyspaceStr = std::to_string(maskHcKeyspace);
+      f << "|||mask_hc_keyspace|BigUInt|" << maskHcKeyspaceStr.size() << "|"
+        << maskHcKeyspaceStr << "|||\n";
+      Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n",
+                        maskHcKeyspaceStr.size(), maskHcKeyspaceStr);
     }
 
     f.close();

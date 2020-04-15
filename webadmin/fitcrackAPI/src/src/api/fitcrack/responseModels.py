@@ -44,7 +44,7 @@ boincHostActivity_model = api.model('Host activity', {
 
 job_nano_model = api.model('Job nano', {
     'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
-    'name': fields.String(required=True, description='nazev ukolu'),
+    'name': fields.String(required=True, description='job name'),
     'status': fields.Integer(readOnly=True, required=False, description='state of the job'),
 })
 

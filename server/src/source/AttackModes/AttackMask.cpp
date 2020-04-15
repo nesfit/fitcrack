@@ -81,11 +81,11 @@ bool CAttackMask::makeWorkunit()
     else
     {
         /** Otherwise, send whole mask_hc_keyspace for correct progress calculation, --limit is omitted */
-        int digits = 0;
-        uint64_t num = maskHcKeyspace;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||mask_hc_keyspace|BigUInt|" << digits << "|" << maskHcKeyspace << "|||\n";
-        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, maskHcKeyspace);
+        std::string maskHcKeyspaceStr = std::to_string(maskHcKeyspace);
+        f << "|||mask_hc_keyspace|BigUInt|" << maskHcKeyspaceStr.size() << "|"
+          << maskHcKeyspaceStr << "|||\n";
+        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n",
+                          maskHcKeyspaceStr.size(), maskHcKeyspaceStr);
     }
 
     f.close();
