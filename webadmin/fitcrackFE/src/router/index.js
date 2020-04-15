@@ -35,6 +35,7 @@ const PageNotFound = r => require.ensure([], () => r(require('@/components/pageN
 const EncryptedFiles = r => require.ensure([], () => r(require('@/components/encryptedFile/encryptedFilesView')))
 const Server = r => require.ensure([], () => r(require('@/components/server/serverPage')))
 const Settings = r => require.ensure([], () => r(require('@/components/settings/settingsView')))
+const Transfer = r => require.ensure([], () => r(require('@/components/settings/dataTransfer')))
 const UnauthorizedError = r => require.ensure([], () => r(require('@/components/errorPages/unauthorized')))
 
 Vue.use(Router);
@@ -267,6 +268,15 @@ const appRoutes = [
     meta: {
       title: 'Settings',
       icon: 'mdi-cogs'
+    }
+  },
+  {
+    path: '/transfer',
+    name: 'transfer',
+    component: Transfer,
+    meta: {
+      title: 'Data Transfer',
+      icon: 'mdi-transfer'
     }
   },
   {

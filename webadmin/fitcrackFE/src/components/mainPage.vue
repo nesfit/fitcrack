@@ -258,15 +258,6 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :to="{ name: 'settings'}">
-              <v-list-item-action>
-                <v-icon>{{ routeIcon('settings') }}</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Settings</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
             <v-list-item
               v-if="$userCanManageUsers()"
               :to="{ name: 'server'}"
@@ -278,9 +269,37 @@
                 <v-list-item-title>Server Monitor</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+
+            <v-list-item :to="{ name: 'settings'}">
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('settings') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Settings</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+              :to="{ name: 'transfer'}"
+            >
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('transfer') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Data Transfer</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-tab-item>
       </v-tabs-items>
+      <!-- <v-btn
+        icon
+        absolute
+        bottom
+        left
+      >
+        <v-icon>mdi-lifebuoy</v-icon>
+      </v-btn> -->
     </v-navigation-drawer>
 
     <!-- TOP BAR -->
