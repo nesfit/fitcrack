@@ -23,7 +23,7 @@ from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWorkunit_parser, \
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
-    editJob_argument, multiEditHosts_argument
+    editJob_argument, multiEditHosts_argument, jobList_argument
 from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
     computeCrackingTime, start_pcfg_manager
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
@@ -97,6 +97,27 @@ class jobsCollection(Resource):
             'status': True,
             'job_id': job.id
         }
+
+    @api.expect(jobList_argument)
+    @api.response(200, 'Jobs moved to/from trash')
+    @api.response(500, 'Failed moving to/from trash')
+    def patch(self):
+        """
+        Moves jobs between trash and visible listing.
+        """
+        args = jobList_argument.parse_args(request)
+        ids = args['job_ids']
+        jobs = FcJob.query.filter(FcJob.id.in_(ids)).all()
+        for job in jobs:
+            job.deleted = not job.deleted
+            
+        try:
+            db.session.commit()
+        except:
+            return 'Oops', 500
+
+        return 'Moved', 200
+
 
 @ns.route('/host')
 @api.response(404, 'job not found.')
