@@ -249,21 +249,6 @@ CREATE TABLE IF NOT EXISTS `fc_bin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `position` int(11),
-  `deleted` boolean NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
--- --------------------------------------------------------
-
---
--- Štruktúra tabuľky pre tabuľku `fc_bin`
---
-
-CREATE TABLE IF NOT EXISTS `fc_bin` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  `position` int(11),
   primary key (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

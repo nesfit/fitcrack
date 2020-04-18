@@ -185,7 +185,7 @@ end if;
 elseif NEW.batch_id is null then
 	set NEW.queue_position = null;
 end if;
-end
+end //
 delimiter ;
 
 --
