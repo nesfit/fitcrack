@@ -2,7 +2,7 @@
   <div class="job-info">
     <!-- TOP SHEET -->
     <v-sheet
-      class="top-sheet pa-4"
+      class="info-sheet top-sheet pa-4"
       dark
       tile
       :color="statusColor"
@@ -41,7 +41,7 @@
     </v-sheet>
     <!-- ACTION SHEET -->
     <v-sheet
-      class="cta-sheet pa-2 d-flex justify-space-between"
+      class="info-sheet cta-sheet pa-2 d-flex justify-space-between"
       dark
       tile
       :color="statusColor"
@@ -258,9 +258,10 @@ export default {
   flex-direction: column;
 }
 
-.top-sheet, .cta-sheet {
+.info-sheet {
   position: relative;
   z-index: 1;
+  transition: background-color .5s;
 }
 
 .theme--dark .top-sheet::before,
