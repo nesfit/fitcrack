@@ -164,6 +164,73 @@ END
 //
 DELIMITER ;
 
+--
+-- Trigger assigning implicit queue position when job joins a batch
+--
+drop trigger if exists queue_in_batch;
+delimiter //
+create trigger queue_in_batch
+before update on fc_job for each row
+begin
+declare pos int;
+if (OLD.batch_id is null or OLD.batch_id <> NEW.batch_id) and NEW.batch_id is not null then
+-- actually assign a position
+set pos = (select max(queue_position) from fc_job where batch_id = NEW.batch_id);
+if pos is null then
+	set NEW.queue_position = 0;
+else
+	set NEW.queue_position = pos + 1;
+end if;
+-- or delet
+elseif NEW.batch_id is null then
+	set NEW.queue_position = null;
+end if;
+end
+delimiter ;
+
+--
+-- Procedure for finishing job and continuing batch if applicable
+--
+drop procedure if exists finish_job;
+delimiter //
+--
+create procedure finish_job(
+	IN job_id bigint(20),
+	IN end_status smallint(1)
+)
+sql security invoker
+begin
+declare b_id int(11);
+declare q_p int(11);
+declare succ_id bigint(20);
+--
+declare exit handler for sqlexception
+begin
+rollback;
+end;
+--
+set end_status = ifnull(end_status, 1); -- 1 = finished, default value 
+start transaction;
+-- set job to finished state
+update fc_job set status = end_status, result = 'check the hashlist', time_end = now() where id = job_id;
+-- get job batch details
+select batch_id, queue_position into b_id, q_p
+from fc_job where id = job_id;
+-- find successor id
+select id into succ_id 
+from fc_job where batch_id = b_id
+and queue_position > q_p
+and status = 0 -- ready
+order by queue_position asc
+limit 1;
+-- start succeessor if one exists
+if succ_id is not null then
+  update fc_job set status = 10 where id = succ_id;
+end if;
+--
+commit;
+end //
+delimiter ;
 
 --
 -- Triggers and procedures for bin organization
@@ -184,7 +251,7 @@ if pos is null then
 else
   set NEW.position = pos + 1;
 end if;
-end
+end //
 delimiter ;
 
 -- procedures
@@ -198,7 +265,7 @@ create procedure move_bin(
   IN bin_id INT(11),
   IN target int
 )
-
+sql security invoker
 begin
 declare pos int;
 declare exit handler for sqlexception
@@ -220,7 +287,7 @@ end //
 create procedure delete_bin(
   IN bin_id INT(11)
 )
-
+sql security invoker
 begin
 declare pos int;
 declare exit handler for sqlexception

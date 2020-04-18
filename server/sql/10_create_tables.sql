@@ -283,6 +283,18 @@ CREATE TABLE IF NOT EXISTS `fc_bin_job` (
 -- --------------------------------------------------------
 
 --
+-- Štruktúra tabuľky pre tabuľku `fc_batch`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_batch` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  primary key (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
 -- Štruktúra tabuľky pre tabuľku `fc_job`
 --
 
@@ -329,7 +341,10 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  `batch_id` int(11),
+  `queue_position` int(11)
+  PRIMARY KEY (`id`),
+  KEY `batch_id` (`batch_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 --
@@ -564,6 +579,12 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 --
 -- Obmedzenie pre exportované tabuľky
 --
+
+--
+-- Obmedzenie pre tabuľku `fc_job`
+--
+ALTER TABLE `fc_job`
+  ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL;
 
 --
 -- Obmedzenie pre tabuľku `fc_bin_job`
