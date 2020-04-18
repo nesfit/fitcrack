@@ -6600,7 +6600,7 @@ INSERT INTO `fc_pcfg_grammar` (`id`, `name`, `path`, `keyspace`, `time_added`, `
 --
 
 INSERT INTO `fc_bin` (`name`) VALUES
-('Samples')
+('Samples');
 
 --
 -- Insert default BENCH_ALL job and sample jobs

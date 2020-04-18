@@ -252,18 +252,6 @@ CREATE TABLE IF NOT EXISTS `fc_bin` (
   primary key (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- --------------------------------------------------------
-
---
--- Štruktúra tabuľky pre tabuľku `fc_bin_job`
---
-
-CREATE TABLE IF NOT EXISTS `fc_bin_job` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `bin_id` int(11) NOT NULL,
-  `job_id` int(11) NOT NULL,
-  primary key (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -327,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
   `batch_id` int(11),
-  `queue_position` int(11)
+  `queue_position` int(11),
   PRIMARY KEY (`id`),
   KEY `batch_id` (`batch_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
@@ -570,13 +558,6 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 --
 ALTER TABLE `fc_job`
   ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL;
-
---
--- Obmedzenie pre tabuľku `fc_bin_job`
---
-ALTER TABLE `fc_bin_job`
-  ADD CONSTRAINT `fc_bin_job_ibfk_1` FOREIGN KEY (`bin_id`) REFERENCES `fc_bin` (`id`),
-  ADD CONSTRAINT `fc_bin_job_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`);
 
 --
 -- Omezeni pro tabulku `fc_job_status`
