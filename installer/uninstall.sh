@@ -35,7 +35,7 @@ if [ -d "$BOINC_PROJECT_DIR" ]; then
         fi
       fi
       echo "Project removed. Restarting Apache..."
-      systemctl restart $APACHE_SERVICE
+      service $APACHE_SERVICE restart
     fi
   fi
 
@@ -74,9 +74,9 @@ if [ $DELETE_DB = "y" ]; then
 
   if [ $CONFIRMED = "y" ]; then
     # Drop project database
-
+    export MYSQL_PWD="$DB_PW"
     echo "Dropping original database..."
-    mysql -h $DB_HOST -u $DB_USER -p"$DB_PW" -e "DROP DATABASE $DB_NAME;" 2>/dev/null
+    mysql -h $DB_HOST -u $DB_USER -e "DROP DATABASE $DB_NAME;"
     if [[ $? != 0 ]]; then
       echo "Error: Unable to drop database $DB_NAME as user $DB_USER."
       read -e -p "Try again as database root? [y/N] (default: N): " DB_ROOT_CLEANUP
@@ -88,7 +88,7 @@ if [ $DELETE_DB = "y" ]; then
 
     if [ $DROPPED = "y" ]; then
       echo "Creating an empty database..."
-      mysql -h $DB_HOST -u $DB_USER -p"$DB_PW" -e "CREATE DATABASE $DB_NAME;" 2>/dev/null
+      mysql -h $DB_HOST -u $DB_USER -e "CREATE DATABASE $DB_NAME;"
       if [[ $? != 0 ]]; then
         echo "Error: Unable to create empty database $DB_HOST as user $DB_USER."
         echo "Try manually as root."
@@ -102,9 +102,9 @@ fi
 
 if [ $DB_ROOT_CLEANUP = "y" ]; then
     read -e -p "Enter database root password: " DB_ROOT_PW;
-
+    export MYSQL_PWD="$DB_ROOT_PW"
     echo "Dropping original database..."
-    mysql -h $DB_HOST -u root -p"$DB_ROOT_PW" -e "DROP DATABASE $DB_NAME;" 2>/dev/null
+    mysql -h $DB_HOST -u root -e "DROP DATABASE $DB_NAME;"
     if [[ $? != 0 ]]; then
       echo "Error: Unable to drop database $DB_NAME as root. Is the password correct?"
       exit
@@ -113,7 +113,7 @@ if [ $DB_ROOT_CLEANUP = "y" ]; then
     fi
 
     echo "Creating an empty database..."
-    mysql -h $DB_HOST -u root -p"$DB_ROOT_PW" -e "CREATE DATABASE $DB_NAME;" 2>/dev/null
+    mysql -h $DB_HOST -u root -e "CREATE DATABASE $DB_NAME;"
     if [[ $? != 0 ]]; then
       echo "Error: Unable to drop database $DB_NAME as root. Is the password correct?"
       exit
@@ -150,7 +150,7 @@ if [ $UNINSTALL_WEBADMIN = "y" ]; then
   fi
 
   echo "WebAdmin Uninstalled. Restarting Apache..."
-  systemctl restart $APACHE_SERVICE
+  service $APACHE_SERVICE restart
 fi
 
 

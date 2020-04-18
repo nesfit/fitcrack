@@ -108,5 +108,5 @@ fi
 ##################
 
 echo "WebAdmin update done. Restarting Apache..."
-systemctl restart $APACHE_SERVICE
+service $APACHE_SERVICE restart
 echo "Done."

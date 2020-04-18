@@ -136,7 +136,7 @@ APACHE_SERVICE=${APACHE_SERVICE:-$DEFAULT_APACHE_SERVICE}
 service --status-all 2>&1 | grep $APACHE_SERVICE >/dev/null 2>/dev/null
 
 if [[ $? != 0 ]]; then
-  echo "Error: $APACHE_SERVICE not found via systemctl."
+  echo "Error: $APACHE_SERVICE not found via service."
   exit
 fi
 
