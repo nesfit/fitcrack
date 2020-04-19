@@ -64,3 +64,6 @@ cleanbin:
 
 cleandoc:
 	rm -rf $(DOCDIR)*
+
+test_prince:
+	cd testground; python3 prince_tester.py; cd --
