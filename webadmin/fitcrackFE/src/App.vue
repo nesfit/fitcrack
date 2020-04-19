@@ -149,6 +149,19 @@
     width: 100%;
   }
 
+  .table-link {
+    display: inline-block;
+    line-height: 3em;
+    font-weight: bold;
+  }
+
+  .drag-handle {
+    cursor: grab;
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+
   /**/
 
   .list-enter-active,

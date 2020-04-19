@@ -149,7 +149,8 @@
             text
             class="mr-2"
             color="success"
-            :disabled="selectedJobs.length < 2"
+            :disabled="selectedJobs.filter(job => job.status == 0 && !job.batch_id).length < 2"
+            @click="batchCreatorOpen = true"
           >
             <v-icon left>
               mdi-tray-plus
@@ -239,7 +240,29 @@
       <!-- Status text cell -->
       <template v-slot:item.status="{ item }">
         <v-tooltip
-          v-if="item.host_count > 0"
+          v-if="item.batch_id && item.status == 0"
+          top
+        >
+          <template v-slot:activator="{ on }">
+            <router-link :to="`/batches/${item.batch_id}`">
+              <span
+                class="text-capitalize"
+                v-on="on"
+              >
+                enqueued
+                <v-icon
+                  right
+                  color="primary"
+                >
+                  mdi-timetable
+                </v-icon>
+              </span>
+            </router-link>
+          </template>
+          <span>This job is waiting in queue. Click to see the batch.</span>
+        </v-tooltip>
+        <v-tooltip
+          v-else-if="item.host_count > 0"
           top
         >
           <template v-slot:activator="{ on }">
@@ -300,40 +323,53 @@
       <template v-slot:item.actions="{ item }">
         <div class="actionsBtns">
           <v-btn
-            v-if="item.status === '0'"
-            :disabled="item.host_count == 0"
+            v-if="item.batch_id != null && (item.status == 0 || item.status >= 10)"
             text
-            color="success"
-            @click="operateJob(item.id, 'start')"
+            color="primary"
+            :to="`/batches/${item.batch_id}`"
           >
-            Start
+            Go to Batch
             <v-icon right>
-              mdi-play
+              mdi-tray-full
             </v-icon>
           </v-btn>
-          <v-btn
-            v-else-if="item.status < 10"
-            :disabled="item.host_count == 0"
-            text
-            color="info"
-            @click="operateJob(item.id, 'restart')"
-          >
-            Restart
-            <v-icon right>
-              mdi-restart
-            </v-icon>
-          </v-btn>
-          <v-btn
-            v-else
-            text
-            color="error"
-            @click="operateJob(item.id, 'stop')"
-          >
-            Stop
-            <v-icon right>
-              mdi-stop
-            </v-icon>
-          </v-btn>
+          <template v-else>
+            <v-btn
+              v-if="item.status === '0'"
+              :disabled="item.host_count == 0"
+              text
+              color="success"
+              @click="operateJob(item.id, 'start')"
+            >
+              Start
+              <v-icon right>
+                mdi-play
+              </v-icon>
+            </v-btn>
+            <v-btn
+              v-else-if="item.status < 10"
+              :disabled="item.host_count == 0"
+              text
+              color="info"
+              @click="operateJob(item.id, 'restart')"
+            >
+              Restart
+              <v-icon right>
+                mdi-restart
+              </v-icon>
+            </v-btn>
+            <v-btn
+              v-else
+              text
+              color="error"
+              @click="operateJob(item.id, 'stop')"
+            >
+              Stop
+              <v-icon right>
+                mdi-stop
+              </v-icon>
+            </v-btn>
+          </template>
 
           <v-tooltip top>
             <template v-slot:activator="{ on }">
@@ -359,6 +395,15 @@
       :job-ids="selectedJobs.map(j => j.id)"
       @reload="updateList"
     />
+    <v-dialog 
+      v-model="batchCreatorOpen"
+      max-width="900"
+    >
+      <batch-creator 
+        :jobs="selectedJobs"
+        @close="batchCreatorOpen = false"
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -370,12 +415,14 @@
 
   import BinIllust from '@/components/details/binIllustration'
   import HostEditor from '@/components/jobDetail/hostEditor'
+  import BatchCreator from '@/components/batch/batchCreator'
 
   export default {
     name: 'JobsView',
     components: {
       BinIllust,
-      HostEditor
+      HostEditor,
+      BatchCreator
     },
     data () {
       return {
@@ -383,6 +430,7 @@
         renamingBin: false,
         newBinName: null,
         hostEditorOpen: false,
+        batchCreatorOpen: false,
         //
         status: null,
         attackType: null,
@@ -509,7 +557,6 @@
     },
     beforeDestroy: function () {
       clearInterval(this.interval)
-      this.selectedJobs = []
       window.removeEventListener('keydown', this.shortcutHandler)
     },
     methods: {
@@ -660,12 +707,6 @@
 
   .actionsBtns{
     text-align: right;
-  }
-
-  .table-link {
-    display: inline-block;
-    line-height: 3em;
-    font-weight: bold;
   }
 
   .swap-pad {

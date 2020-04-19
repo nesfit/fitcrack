@@ -217,13 +217,6 @@ export default {
 </script>
 
 <style scoped>
-  .drag-handle {
-    cursor: grab;
-  }
-  .drag-handle:active {
-    cursor: grabbing;
-  }
-
   .attention {
     opacity: 0;
     animation: pop .5s forwards;

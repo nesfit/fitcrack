@@ -11,6 +11,8 @@ import store from '@/store'
 const home = r => require.ensure([], () => r(require('@/components/home/homeView')))
 const jobs = r => require.ensure([], () => r(require('@/components/job/jobsView')))
 const jobDetail = r => require.ensure([], () => r(require('@/components/jobDetail/jobDetailView')))
+const batchList = r => require.ensure([], () => r(require('@/components/batch/batchList')))
+const batchDetail = r => require.ensure([], () => r(require('@/components/batch/batchDetail')))
 const login = r => require.ensure([], () => r(require('@/components/user/loginView')))
 const mainPage = r => require.ensure([], () => r(require('@/components/mainPage')))
 const addJob = r => require.ensure([], () => r(require('@/components/job/addJobView')))
@@ -58,10 +60,18 @@ const appRoutes = [
   {
     path: '/batches',
     name: 'batches',
-    component: jobs,
+    component: batchList,
     meta: {
       title: 'Batches',
       icon: 'mdi-tray-full'
+    }
+  },
+  {
+    path: '/batches/:id',
+    name: 'batch',
+    component: batchDetail,
+    meta: {
+      title: 'Batch Detail'
     }
   },
   {
