@@ -19,6 +19,7 @@ jobList_parser.add_argument('order_by', type=str, required=False, help='result o
 jobList_parser.add_argument('descending', type=inputs.boolean, required=False)
 jobList_parser.add_argument('showDeleted', type=inputs.boolean, required=False, default=False)
 jobList_parser.add_argument('bin', type=int, required=False, default=None)
+jobList_parser.add_argument('batch', type=int, required=False, default=None)
 
 jobWorkunit_parser = pagination.copy()
 

@@ -6,6 +6,7 @@
 from flask_restplus import fields
 
 from src.api.apiConfig import api
+from src.api.fitcrack.endpoints.batches.responseModels import batch_model
 from src.api.fitcrack.endpoints.dictionary.responseModels import dictionary_model
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
@@ -111,6 +112,7 @@ pcfgGrammar_model = api.model('PCFG job', {
 job_big_model = api.model('Job', {
     'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
     'name': fields.String(required=True, description='name of the job'),
+    'batch': fields.Nested(batch_model),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
     'attack_mode': fields.String(required=True),

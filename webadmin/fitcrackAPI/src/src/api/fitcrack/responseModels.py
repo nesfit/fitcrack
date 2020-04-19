@@ -65,9 +65,13 @@ job_short_model = api.model('Job short', {
     'name': fields.String(required=True, description='name of the job'),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
+    'batch_id': fields.Integer(), # to know if job is enqueued and where
+    'queue_position': fields.Integer(),
     'attack_mode': fields.String(required=True),
     'attack': fields.String(required=True),
     'host_count': fields.Integer(),
+    'keyspace': fields.String(required=True),
+    'hc_keyspace': fields.String(required=True),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),

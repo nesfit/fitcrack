@@ -178,3 +178,37 @@ def sorted_cp (src, dst):
             if not line.endswith('\n'):
                 line += '\n'
             o.write(line)
+
+def get_batch_status (total, remaining, any_running):
+    if total == remaining:
+        return {
+            'code': 0,
+            'text': 'Prepared',
+            'icon': 'mdi-filter-variant',
+            'color': 'info',
+            'description': 'The batch is ready to run.'
+        }
+    elif remaining == 0:
+        return {
+            'code': 1,
+            'text': 'Done',
+            'icon': 'mdi-check-all',
+            'color': 'success',
+            'description': 'All jobs are done running.'
+        }
+    elif any_running:
+        return {
+            'code': 10,
+            'text': 'Working',
+            'icon': 'mdi-altimeter',
+            'color': 'warning',
+            'description': 'The batch is running its jobs in sequence.'
+        }
+    else:
+        return {
+            'code': 11,
+            'text': 'Interrupted',
+            'icon': 'mdi-hand-right',
+            'color': 'error',
+            'description': 'The batch is stopped and ready to resume.'
+        }

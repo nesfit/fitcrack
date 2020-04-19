@@ -165,30 +165,6 @@ END
 DELIMITER ;
 
 --
--- Trigger assigning implicit queue position when job joins a batch
---
-drop trigger if exists queue_in_batch;
-delimiter //
-create trigger queue_in_batch
-before update on fc_job for each row
-begin
-declare pos int;
-if (OLD.batch_id is null or OLD.batch_id <> NEW.batch_id) and NEW.batch_id is not null then
--- actually assign a position
-set pos = (select max(queue_position) from fc_job where batch_id = NEW.batch_id);
-if pos is null then
-	set NEW.queue_position = 0;
-else
-	set NEW.queue_position = pos + 1;
-end if;
--- or delet
-elseif NEW.batch_id is null then
-	set NEW.queue_position = null;
-end if;
-end //
-delimiter ;
-
---
 -- Procedure for finishing job and continuing batch if applicable
 --
 drop procedure if exists finish_job;

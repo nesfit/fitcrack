@@ -16,7 +16,7 @@ from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.api.fitcrack.attacks.hashtypes import getHashById
-from src.api.fitcrack.functions import getStringBetween
+from src.api.fitcrack.functions import getStringBetween, get_batch_status
 from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
     job_status_text_info_to_code_dict, status_to_code
 from src.database import db
@@ -228,6 +228,10 @@ class FcJob(Base):
     replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
+    batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
+    queue_position = Column(Integer)
+
+    batch = relationship("FcBatch", back_populates="jobs")
 
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')
@@ -313,7 +317,7 @@ class FcBin(Base):
     __tablename__ = 'fc_bin'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(64), nullable=False)
+    name = Column(String(50), nullable=False)
     position = Column(Integer)
 
     jobs = relationship('FcJob',
@@ -325,6 +329,26 @@ class FcBin(Base):
     @hybrid_property
     def job_count(self):
         return self.jobs.filter(FcJob.deleted == 0).count()
+
+class FcBatch(Base):
+    __tablename__ = 'fc_batch'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+
+    jobs = relationship("FcJob")
+
+    @hybrid_property
+    def total_jobs(self):
+        return len(self.jobs)
+
+    @hybrid_property
+    def waiting_jobs(self):
+        return len([job for job in self.jobs if job.status == 0])
+
+    @hybrid_property
+    def status(self):
+        return get_batch_status(self.total_jobs, self.waiting_jobs, len([job for job in self.jobs if job.status >= 10]) > 0)
 
 class FcTemplate(Base):
     __tablename__ = 'fc_template'

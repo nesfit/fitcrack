@@ -54,9 +54,12 @@ class jobsCollection(Resource):
         if args.bin is not None:
             jobs_query = jobs_query.filter(FcJob.bins.any(id=args.bin))
 
+        if args.batch is not None:
+            jobs_query = jobs_query.filter_by(batch_id=args.batch)
+
         if args.showDeleted:
             jobs_query = jobs_query.filter_by(deleted=True)
-        else:
+        elif not args.batch: # always show both in batches
             jobs_query = jobs_query.filter_by(deleted=False)
 
         if args.name:
