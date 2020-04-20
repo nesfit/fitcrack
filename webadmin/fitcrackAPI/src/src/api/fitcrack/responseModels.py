@@ -87,3 +87,15 @@ job_short_model = api.model('Job short', {
     'password': fields.String(),
     'deleted': fields.Boolean()
 })
+
+job_micro_model = api.model('Job micro', {
+    'id': fields.Integer(readOnly=True, required=False, description='job id'),
+    'name': fields.String(required=True, description='job name'),
+    'queue_position': fields.Integer(),
+    'attack': fields.String(),
+    'status': fields.String(required=False),
+    'status_text': fields.String(required=False),
+    'status_tooltip': fields.String(required=False),
+    'status_type': fields.String(),
+    'progress': fields.Float(required=False),
+})

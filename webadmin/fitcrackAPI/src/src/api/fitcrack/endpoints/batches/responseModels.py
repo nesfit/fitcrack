@@ -6,9 +6,10 @@
 from flask_restplus import fields
 
 from src.api.apiConfig import api
-from src.api.fitcrack.responseModels import pagination
+from src.api.fitcrack.responseModels import pagination, job_micro_model
 
 batch_status = api.model('Batch status object', {
+    'code': fields.Integer(),
     'text': fields.String(),
     'description': fields.String(),
     'icon': fields.String(),
@@ -23,6 +24,11 @@ batch_model = api.model('Job batch', {
     'status': fields.Nested(batch_status)
 })
 
+batch_with_jobs_model = api.inherit('Job batch with list of jobs', batch_model, {
+    'jobs': fields.List(fields.Nested(job_micro_model))
+})
+
 page_of_batches_model = api.inherit('Page of batches', pagination, {
     'items': fields.List(fields.Nested(batch_model))
 })
+

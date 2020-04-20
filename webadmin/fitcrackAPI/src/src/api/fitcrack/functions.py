@@ -188,14 +188,6 @@ def get_batch_status (total, remaining, any_running):
             'color': 'info',
             'description': 'The batch is ready to run.'
         }
-    elif remaining == 0:
-        return {
-            'code': 1,
-            'text': 'Done',
-            'icon': 'mdi-check-all',
-            'color': 'success',
-            'description': 'All jobs are done running.'
-        }
     elif any_running:
         return {
             'code': 10,
@@ -204,9 +196,17 @@ def get_batch_status (total, remaining, any_running):
             'color': 'warning',
             'description': 'The batch is running its jobs in sequence.'
         }
+    elif remaining == 0:
+        return {
+            'code': 1,
+            'text': 'Done',
+            'icon': 'mdi-check-all',
+            'color': 'success',
+            'description': 'All jobs are done running.'
+        }
     else:
         return {
-            'code': 11,
+            'code': 20,
             'text': 'Interrupted',
             'icon': 'mdi-hand-right',
             'color': 'error',

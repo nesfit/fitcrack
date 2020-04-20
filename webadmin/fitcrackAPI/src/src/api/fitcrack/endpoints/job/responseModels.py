@@ -166,6 +166,7 @@ job_big_model = api.model('Job', {
 job_nano_model = api.model('Job nano', {
     'id': fields.Integer(readOnly=True, required=False, description='job id'),
     'name': fields.String(required=True, description='job name'),
+    'attack': fields.String(),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),

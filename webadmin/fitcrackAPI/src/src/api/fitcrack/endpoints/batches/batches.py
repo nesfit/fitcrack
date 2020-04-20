@@ -11,8 +11,9 @@ from flask import request
 from flask_restplus import Resource, abort
 
 from src.api.apiConfig import api
+from src.api.fitcrack.lang import status_to_code
 from src.api.fitcrack.endpoints.batches.argumentsParser import batch_definition, batch_list
-from src.api.fitcrack.endpoints.batches.responseModels import batch_model, page_of_batches_model
+from src.api.fitcrack.endpoints.batches.responseModels import batch_with_jobs_model, page_of_batches_model
 from src.api.fitcrack.responseModels import simpleResponse
 
 from src.database import db
@@ -81,6 +82,16 @@ class batches(Resource):
 @ns.route('/<int:id>')
 class concrete_batch(Resource):
 
+    @api.marshal_with(batch_with_jobs_model)
+    @api.response(404, 'Batch doesn\'t exist')
+    def get(self, id):
+        """
+        Returns job batch.
+        """
+        batch = FcBatch.query.filter_by(id=id).one()
+        batch.jobs.sort(key=lambda x: x.queue_position)
+        return batch
+
     @api.response(200, 'Deleted')
     @api.response(500, 'Failed')
     def delete(self, id):
@@ -94,3 +105,51 @@ class concrete_batch(Resource):
             db.session().rollback()
             abort(500, 'Couldn\'t delete batch.')
         return ('Deleted', 200)
+
+
+@ns.route('/<int:id>/run')
+class concrete_batch(Resource):
+
+    @api.response(200, 'Sarted running')
+    @api.response(200, 'Nothing to do')
+    @api.response(500, 'Failed')
+    def post(self, id):
+        """
+        Runs a batch by starting the first job that is ready.
+        """
+        starter = FcJob.query.filter_by(batch_id=id).filter_by(status=0).order_by(FcJob.queue_position).first()
+        if not starter:
+            return ('Nothing to do', 200)
+        
+        starter.status = status_to_code['running']
+
+        try:
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'Couldn\'t run batch, try manually starting the first job.')
+        return ('Sarted running', 200)
+
+
+@ns.route('/<int:id>/interrupt')
+class concrete_batch(Resource):
+
+    @api.response(200, 'Interrupted')
+    @api.response(200, 'Nothing to do')
+    @api.response(500, 'Failed')
+    def post(self, id):
+        """
+        Interrupts a batch by stopping the job that is running.
+        """
+        stopper = FcJob.query.filter_by(batch_id=id).filter(FcJob.status >= 10).one_or_none()
+        if not stopper:
+            return ('Nothing to do', 200)
+
+        stopper.status = status_to_code['finishing']
+
+        try:
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'Couldn\'t interrupt batch, try manually purging the running job.')
+        return ('Interrupted', 200)
