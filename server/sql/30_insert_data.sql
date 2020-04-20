@@ -6629,7 +6629,9 @@ INSERT INTO `fc_rule` (`id`, `name`, `path`, `count`, `time`, `deleted`) VALUES
 (1,	'best64.rule',	'best64.rule',  77,  '2018-08-18 12:00:00',	0),
 (2,	'd3ad0ne.rule',	'd3ad0ne.rule', 34099,  '2018-08-18 12:00:00',	0),
 (3,	'leetspeak.rule',	'leetspeak.rule', 17, '2018-08-18 12:00:00',	0),
-(4,	'toggles1.rule',	'toggles1.rule',  15,	'2018-08-18 12:00:00',	0);
+(4,	'toggles1.rule',	'toggles1.rule',  15,	'2018-08-18 12:00:00',	0),
+(5,	'prince_generated.rule',	'prince_generated.rule', 8452, '2018-08-18 12:00:00',	0),
+(6,	'prince_optimized.rule',	'prince_optimized.rule',  1156,	'2018-08-18 12:00:00',	0);
 
 
 --

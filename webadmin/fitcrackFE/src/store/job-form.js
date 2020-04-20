@@ -138,19 +138,22 @@ export default {
           if (state.maxPasswordLen <= 0)
             return false;
 
-          if (state.maxPasswordLen > 16)
+          if (state.maxPasswordLen > 32)
+            return false;
+
+          if (state.maxElemInChain > 16)
             return false;
 
           if (state.minElemInChain <= 0)
             return false;
 
+          if (state.maxElemInChain <= 0)
+            return false;
+
           if (state.minPasswordLen > state.maxPasswordLen)
             return false;
 
-          if (state.maxElemInChain > 0 && (state.minElemInChain > state.maxElemInChain))
-            return false;
-
-          if (state.maxElemInChain > state.maxPasswordLen)
+          if (state.minElemInChain > state.maxElemInChain)
             return false;
 
           // All ok!
