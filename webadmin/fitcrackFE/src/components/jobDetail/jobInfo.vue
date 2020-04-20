@@ -34,8 +34,13 @@
           rotate="-90"
         />
         <span class="text-capitalize pt-1 ml-2">
-          <b v-show="data.progress > 0 && data.progress < 100">{{ data.progress }} %</b>
-          {{ data.status_text }}
+          <span v-if="data.batch && data.status == 0">
+            Enqueued
+          </span>
+          <span v-else>
+            <b v-show="data.progress > 0 && data.progress < 100">{{ data.progress }} %</b>
+            {{ data.status_text }}
+          </span>
         </span>
       </div>
     </v-sheet>
@@ -49,7 +54,18 @@
       <template v-if="!editing">
         <!-- action button -->
         <v-btn
-          v-if="data.hosts.length > 0"
+          v-if="data.batch && data.status == 0"
+          key="batch-link"
+          text
+          :to="`/batches/${data.batch.id}`"
+        >
+          <v-icon left>
+            mdi-tray-full
+          </v-icon>
+          <span>Go to Batch</span>
+        </v-btn>
+        <v-btn
+          v-else-if="data.hosts.length > 0"
           key="operate"
           text
           @click="$emit('operate', operation.text)"
@@ -164,7 +180,10 @@ export default {
     statusColor () {
       if (this.editing || this.data.hosts.length == 0) {
         return 'secondary'
-      } else {
+      } else if (this.data.batch && this.data.status == 0) {
+        return 'primary'
+      } 
+      else {
         return this.data.status_type
       }
     },
@@ -184,10 +203,11 @@ export default {
     details () {
       const d = this.data
       const items = [
+        {title: 'Part of batch', icon: 'mdi-tray-full', value: d.batch.name},
         {title: 'Comment', icon: 'mdi-format-quote-close', value: d.comment},
         {title: 'Keyspace', icon: 'mdi-key', value: d.keyspace, format: fmt},
         {title: 'Date Added', icon: 'mdi-calendar-import', value: d.time, format: v => this.$moment(v).calendar()},
-        {title: 'WU Sum Time', icon: 'mdi-sigma', value: d.cracking_time_str},
+        {title: 'Workunit Sum Time', icon: 'mdi-sigma', value: d.cracking_time_str},
         {title: 'Cracking Time', icon: 'mdi-timer', value: this.crackingTime},
         {title: 'Start', icon: 'mdi-ray-start', value: this.startTime},
         {title: 'End', icon: 'mdi-ray-end', value: this.endTime},

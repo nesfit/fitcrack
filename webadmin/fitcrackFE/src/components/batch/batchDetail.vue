@@ -144,6 +144,12 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <v-alert 
+        v-show="editing"
+        type="info"
+      >
+        Drag jobs to change run order
+      </v-alert>
       <draggable
         v-model="data.jobs"
         :animation="150"
@@ -189,6 +195,36 @@
           </v-list-item-action>
         </v-list-item>
       </draggable>
+      <v-card class="mt-6">
+        <v-card-text>
+          <v-row>
+            <v-col cols="3">
+              <v-card-title>
+                Host contribution
+              </v-card-title>
+              <graph
+                id="hostPercentageGraph"
+                :data="hostPercentageGraph"
+              />
+              <div class="mt-4 caption text-justify">
+                For each host that contributed, this is a sum of all hashes from all job's workunits in this batch.
+                For more info on distribution and propgress, see detailed view for each job.
+              </div>
+            </v-col>
+            <v-col cols="9">
+              <v-card-title>
+                Hashes in workunits over time
+              </v-card-title>
+              <graph
+                id="hostGraph"
+                :data="hostGraph"
+                units=" hashes"
+                type="host"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
     </div>
   </div>
 </template>
@@ -196,11 +232,13 @@
 <script>
 import { attackIcon, jobIcon } from '@/assets/scripts/iconMaps'
 
+import graph from '@/components/graph/fc_graph'
 import draggable from 'vuedraggable'
 
 export default {
   components: {
-    draggable
+    draggable,
+    graph
   },
   data () {
     return {
@@ -208,7 +246,10 @@ export default {
       data: null,
       original: null,
       editing: false,
-      loading: true
+      loading: true,
+      //
+      hostPercentageGraph: null,
+      hostGraph: null
     }
   },
   computed: {
@@ -225,7 +266,9 @@ export default {
   mounted () {
     this.load()
     this.interval = setInterval(() => {
-      this.load()
+      if (!this.editing) {
+        this.load()
+      }
     }, 5000)
   },
   beforeDestroy: function () {
@@ -236,9 +279,22 @@ export default {
     jobIcon,
     async load () {
       this.loading = true
+      this.loadGraphs()
       this.data = await this.axios.get(`${this.$serverAddr}/batches/${this.$route.params.id}`).then(r => r.data)
       this.original = {...this.data}
       this.loading = false
+    },
+    async loadGraphs () {
+      const id = this.$route.params.id
+      const graphPromises = [
+        this.axios.get(`${this.$serverAddr}/graph/hostPercentage/batch/${id}`).then(r => r.data),
+        this.axios.get(`${this.$serverAddr}/graph/hostsComputing/batch/${id}`).then(r => r.data)
+      ]
+      try {
+        [this.hostPercentageGraph, this.hostGraph] = await Promise.all(graphPromises)
+      } catch (e) {
+        console.error('Error getting batch graphs', e)
+      }
     },
     deleteBatchConfirm () {
       this.$root.$confirm('Unlink Batch', `This will unlink jobs from this batch and remove the batch. Jobs will not be discarded. If a job is currently running, it will finish normally. Are you sure?`)

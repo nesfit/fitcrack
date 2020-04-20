@@ -145,7 +145,7 @@
                     />
                   </v-col>
                   <v-col cols="6">
-                    <v-card-title>Hashes in WUs</v-card-title>
+                    <v-card-title>Hashes in workunits</v-card-title>
                     <graph
                       id="hostGraph"
                       :data="hostGraph"

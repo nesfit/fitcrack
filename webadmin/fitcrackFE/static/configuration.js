@@ -3,8 +3,7 @@
    * Licence: MIT, see LICENSE
 */
 
-//window.serverAddress = "http://pcfitcrack.fit.vutbr.cz:5000"
-window.serverAddress = "http://fitcrack.ovi.moe:5001"
+window.serverAddress = "http://localhost:5000"
 
 window.theme = {
   light: {

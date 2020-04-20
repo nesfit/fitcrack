@@ -50,6 +50,7 @@
           <v-list-item-action>
             <v-btn
               text
+              :disabled="queue.length <= 2"
               @click="deselect(id)"
             >
               <span>Unqueue</span>
