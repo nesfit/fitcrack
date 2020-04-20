@@ -550,9 +550,9 @@
     },
     mounted () {
       // this.loadJobs()
-      this.interval = setInterval(function () {
+      this.interval = setInterval(() => {
         this.loadJobs()
-      }.bind(this), 15000)
+      }, 5000)
       window.addEventListener('keydown', this.shortcutHandler)
     },
     beforeDestroy: function () {

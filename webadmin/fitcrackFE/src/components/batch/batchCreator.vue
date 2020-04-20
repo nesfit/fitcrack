@@ -186,6 +186,7 @@ export default {
           name: this.batchName,
           jobs: this.queue.map(job => job.id)
         }).then(r => r.data)
+        this.$store.commit('binInterface/selectedJobsMut', [])
         this.$router.push(`/batches/${res}`)
       } catch (e) {
         console.error(e)

@@ -48,7 +48,56 @@
           :rotate="270"
           :value="100 / item.total_jobs * (item.total_jobs - item.waiting_jobs)"
         />
-        <span class="ml-2"><strong>{{ item.waiting_jobs }}</strong> remaining</span>
+        <span class="ml-2"><strong>{{ item.waiting_jobs }}</strong> in queue</span>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <div class="actionsBtns">
+          <!-- opration buttons -->
+          <v-btn
+            v-if="item.status.code < 10"
+            :disabled="item.status.code == 1"
+            text
+            color="success"
+            @click="runBatch(item.id)"
+          >
+            Run
+            <v-icon right>
+              mdi-play
+            </v-icon>
+          </v-btn>
+          <v-btn
+            v-else-if="item.status.code < 20"
+            text
+            color="error"
+            @click="interruptBatch(item.id)"
+          >
+            Interrupt
+            <v-icon right>
+              mdi-pause
+            </v-icon>
+          </v-btn>
+          <v-btn
+            v-else
+            text
+            color="error"
+            @click="runBatch(item.id)"
+          >
+            Resume
+            <v-icon right>
+              mdi-skip-next
+            </v-icon>
+          </v-btn>
+          <!-- delete button -->
+          <v-btn
+            text
+            @click="deleteBatchConfirm(item.id)"
+          >
+            Unlink
+            <v-icon right>
+              mdi-link-variant-off
+            </v-icon>
+          </v-btn>
+        </div>
       </template>
     </v-data-table>
   </div>
@@ -58,6 +107,7 @@
 export default {
   data () {
     return {
+      interval: null,
       search: '',
       totalItems: 0,
       pagination: {},
@@ -79,11 +129,16 @@ export default {
   },
   mounted () {
     this.load()
+    this.interval = setInterval(() => {
+      this.load()
+    }, 5000)
+  },
+  beforeDestroy: function () {
+    clearInterval(this.interval)
   },
   methods: {
     async load () {
-      this.loading = true
-      const data = await this.axios.get(this.$serverAddr + '/batches', {
+      const data = await this.axios.get(`${this.$serverAddr}/batches`, {
         params: {
           'page': this.pagination.page,
           'per_page': this.pagination.itemsPerPage
@@ -92,6 +147,36 @@ export default {
       this.batches = data.items
       this.totalItems = data.total
       this.loading = false
+    },
+    async runBatch (id) {
+      this.loading = true
+      try {
+        await this.axios.post(`${this.$serverAddr}/batches/${id}/run`)
+        this.load()
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async interruptBatch (id) {
+      this.loading = true
+      try {
+        await this.axios.post(`${this.$serverAddr}/batches/${id}/interrupt`)
+        this.load()
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    deleteBatchConfirm (id) {
+      this.$root.$confirm('Unlink Batch', `This will unlink jobs from this batch and remove the batch. Jobs will not be discarded. If a job is currently running, it will finish normally. Are you sure?`)
+      .then(async confirm => {
+        this.loading = true
+        try {
+          await this.axios.delete(`${this.$serverAddr}/batches/${id}`)
+          this.load()
+        } catch (e) {
+          console.error(e)
+        }
+      })
     }
   }
 }
