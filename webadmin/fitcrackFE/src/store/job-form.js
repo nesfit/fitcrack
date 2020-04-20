@@ -57,6 +57,7 @@ export const empty = {
   maxPasswordLen: 8,
   minElemInChain: 1,
   maxElemInChain: 8,
+  shuffleDict: false,
   // other
   startNow: true,
   endNever: true,
@@ -96,6 +97,7 @@ export default {
         'max_password_len': parseInt(state.maxPasswordLen),
         'min_elem_in_chain': parseInt(state.minElemInChain),
         'max_elem_in_chain': parseInt(state.maxElemInChain),
+        'shuffle_dict': state.shuffleDict,
       }
     },
     jobSettings (state, { attackSettings }) {

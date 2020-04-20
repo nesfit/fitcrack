@@ -169,10 +169,6 @@ class OperationWithJob(Resource):
             if job.attack_mode == 9:
                 pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
                 start_pcfg_manager(job.id, pcfg.name, job.hc_keyspace)
-            elif job.attack_mode == 8:
-                prince_temp_job_dict = os.path.join(DICTIONARY_DIR, ".prince_" + str(id) + ".txt")
-                if os.path.exists(prince_temp_job_dict):
-                    os.remove(prince_temp_job_dict)
 
             job.status = status_to_code['running']
         elif action == 'stop':

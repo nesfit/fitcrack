@@ -284,6 +284,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `max_password_len` int(10) unsigned NOT NULL DEFAULT '0',
   `min_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
   `max_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
+  `shuffle_dict` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',

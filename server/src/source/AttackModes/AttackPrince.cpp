@@ -7,6 +7,8 @@
  */
  
 #include <AttackPrince.h>
+#include <random>
+#include <algorithm>
 
 
 CAttackPrince::CAttackPrince(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
@@ -180,8 +182,28 @@ bool CAttackPrince::makeWorkunit()
                             "Failed to open PRINCE attack dictionary! "
                             "Setting job to malformed.\n");
     }
-    dictFile << princeDictFile.rdbuf();
-    Tools::printDebug("Copied PRINCE dictionary to data file.\n");
+
+    if (m_job->getShuffleDictFlag()) {
+      std::random_device rd;
+      std::mt19937 gen(rd());
+
+      std::vector<std::string> words;
+      std::string word;
+      while (princeDictFile >> word) {
+        words.push_back(word);
+      }
+
+      std::shuffle(words.begin(), words.end(), gen);
+
+      for (const std::string &w : words) {
+        dictFile << w << '\n';
+      }
+      Tools::printDebug("Shuffled PRINCE dictionary to data file.\n");
+    } else {
+      dictFile << princeDictFile.rdbuf();
+      Tools::printDebug("Copied PRINCE dictionary to data file.\n");
+    }
+
     dictFile.close();
     princeDictFile.close();
 

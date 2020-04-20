@@ -132,6 +132,7 @@ class CJob {
         uint32_t m_maxPasswordLen;
         uint32_t m_minElemInChain;
         uint32_t m_maxElemInChain;
+        bool m_shuffleDict;
         bool m_killFlag;
 
         /**
@@ -188,6 +189,7 @@ class CJob {
         uint32_t getMaxPasswordLen() const;
         uint32_t getMinElemInChain() const;
         uint32_t getMaxElemInChain() const;
+        bool getShuffleDictFlag() const;
         bool getKillFlag() const;
 
         void setGrammar(const std::string & grammar);

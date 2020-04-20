@@ -112,6 +112,7 @@ def create_job(data):
         max_password_len=job['attack_settings'].get('max_password_len', 0),
         min_elem_in_chain=job['attack_settings'].get('min_elem_in_chain', 0),
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
+        shuffle_dict=job['attack_settings'].get('shuffle_dict', 0),
         replicate_factor=1,
         deleted=False
         )

@@ -33,6 +33,11 @@
        v-model="casePermute"
        label="Case permutation"
     />
+    <v-divider />
+    <v-checkbox
+       v-model="shuffleDict"
+       label="Purple Rain Attack"
+    />
 
     <v-divider />
     <v-card-title>
@@ -123,7 +128,7 @@
       'rules-selector': ruleSelector
     },
     computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'checkDuplicates',
-    'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain'])),
+    'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain', 'shuffleDict'])),
     methods: {
       checkValid: function () {
         if (this.minPasswordLen <= 0) {

@@ -345,7 +345,7 @@ def process_job_8(job):
         job['attack_settings']['attack_submode'] = 1
         job['rules'] = rules.name
 
-    prince_settings = ["case_permute", "check_duplicates", "min_password_len", "max_password_len", "min_elem_in_chain", "max_elem_in_chain"]
+    prince_settings = ["case_permute", "check_duplicates", "min_password_len", "max_password_len", "min_elem_in_chain", "max_elem_in_chain", "shuffle_dict"]
     for setting in prince_settings:
         job[setting] = job['attack_settings'][setting]
 

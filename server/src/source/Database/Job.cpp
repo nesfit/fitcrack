@@ -49,6 +49,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_maxPasswordLen = std::stoul(jobMap["max_password_len"]);
         this->m_minElemInChain = std::stoul(jobMap["min_elem_in_chain"]);
         this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
+        this->m_shuffleDict = std::stoul(jobMap["shuffle_dict"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         /** Check for valid values */
@@ -353,6 +354,11 @@ bool CJob::getCasePermuteFlag() const
 bool CJob::getCheckDuplicatesFlag() const
 {
     return m_checkDuplicates;
+}
+
+bool CJob::getShuffleDictFlag() const
+{
+    return m_shuffleDict;
 }
 
 
