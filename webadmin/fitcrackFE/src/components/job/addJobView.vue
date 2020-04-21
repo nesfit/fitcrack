@@ -453,7 +453,7 @@
                     required
                     type="number"
                     suffix="seconds"
-                    :min="60"
+                    :min="10"
                   />
                 </v-col>
                 <v-col>

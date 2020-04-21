@@ -77,7 +77,7 @@
                           <template v-slot:activator="{ on }">
                             <v-btn
                               icon
-                              :disabled="data.status !== '0'"
+                              :disabled="data.status != '0'"
                               v-on="on"
                               @click="operateJob('start')"
                             >
@@ -639,7 +639,7 @@
             <v-col cols="8">
               <v-text-field
                 v-model="editJobValues.seconds_per_job"
-                min="60"
+                min="10"
               />
             </v-col>
           </v-row>

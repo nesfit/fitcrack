@@ -169,7 +169,7 @@ export default {
         !state.attackSettingsTab ||
         !attackSettings ||
         state.hashType == null ||
-        state.timeForJob < 60 ||
+        state.timeForJob < 10 ||
         state.name === ''
       ) {
         return false

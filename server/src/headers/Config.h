@@ -136,7 +136,7 @@ namespace Config {
     const uint64_t MAX_PCFG_KEYSPACE = 60000000;
 
     /** Minimum workunit time in seconds */
-    const uint64_t minSeconds = 60;
+    const uint64_t minSeconds = 10;
 
     /** Minimum timeout factor of seconds_per_workunit */
     const uint64_t minTimeoutFactor = 5;
