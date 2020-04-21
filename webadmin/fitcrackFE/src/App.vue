@@ -59,6 +59,9 @@
       */
       this.axios.interceptors.response.use(
         function (response) {
+          if (response.data.hasOwnProperty('hideAlert') && response.data.hideAlert) {
+            this.alert = false;
+          }
           if (response.data.hasOwnProperty('status') && response.data.hasOwnProperty('message') && response.data.status) {
             this.alertType = 'success';
             this.alert = true;

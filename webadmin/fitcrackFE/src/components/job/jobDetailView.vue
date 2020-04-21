@@ -707,6 +707,7 @@
   import maskDetail from '@/components/job/attacksDetail/mask'
   import dictionaryDetail from '@/components/job/attacksDetail/dictionary'
   import pcfgDetail from '@/components/job/attacksDetail/pcfg'
+  import princeDetail from '@/components/job/attacksDetail/prince'
   import {DonutChart, LineChart} from 'vue-morris'
   import graph from '@/components/graph/fc_graph'
   import FcTextarea from '@/components/textarea/fc_textarea'
@@ -721,6 +722,7 @@
       'maskDetail': maskDetail,
       'dictionaryDetail': dictionaryDetail,
       'pcfgDetail': pcfgDetail,
+      'princeDetail': princeDetail,
       'fc-textarea': FcTextarea,
       hostSelector,
       dtPicker
@@ -800,9 +802,8 @@
             return 'dictionaryDetail'
           case 'pcfg':
             return 'pcfgDetail'
-          // dictionaryDetail is good enough for PRINCE
           case 'prince':
-            return 'dictionaryDetail'
+            return 'princeDetail'
           default:
             return 'combinatorDetail'
         }

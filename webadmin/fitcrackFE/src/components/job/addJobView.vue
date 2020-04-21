@@ -369,7 +369,7 @@
                 </v-item>
               </v-item-group>
 
-              <v-component :is="attackSettingsTab" />
+              <v-component :is="attackSettingsTab" :keyspace="keyspace" />
 
               <v-row>
                 <v-spacer />

@@ -325,8 +325,6 @@ def process_job_8(job):
         if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
             abort(500, 'Dictionary does not exist.')
 
-    job['hc_keyspace'] = compute_prince_keyspace(job['attack_settings'])
-
     ruleFileMultiplier = 1
 
     if job['attack_settings']['rules']:
@@ -350,7 +348,11 @@ def process_job_8(job):
         job[setting] = job['attack_settings'][setting]
 
     job['attack_name'] = 'prince'
-    job['keyspace'] = job['hc_keyspace'] * ruleFileMultiplier
+
+    # Keyspace limit control
+    # If no keyspace limit is set, keyspace limit represents full keyspace
+    job['hc_keyspace'] = job['attack_settings']['keyspace_limit']
+    job['keyspace'] = job['attack_settings']['keyspace_limit'] * ruleFileMultiplier
 
     return job
 

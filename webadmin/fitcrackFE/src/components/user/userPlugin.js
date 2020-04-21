@@ -80,6 +80,13 @@ const UserPlugin = {
             }
         })
     }
+
+    Vue.prototype.$hideAlert = function () {
+      this.axios.interceptors.response.handlers["0"].fulfilled(
+        {data:
+            { hideAlert: true }
+        })
+    }
   }
 };
 

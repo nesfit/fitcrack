@@ -15,15 +15,6 @@
     />
     <v-divider />
 
-     <v-card-title>
-      <span>Select rule file</span>
-    </v-card-title>
-    <rules-selector 
-      v-model="rules"
-      @input="checkValid"
-    />
-    <v-divider />
-
     <v-checkbox
        v-model="checkDuplicates"
        label="Check password duplicates"
@@ -75,7 +66,7 @@
       />
     </v-card-text>
 
-        <v-divider />
+    <v-divider />
     <v-card-title>
       <span>Minimal number of elements per chain (1 - 16)</span>
     </v-card-title>
@@ -111,6 +102,28 @@
       />
     </v-card-text>
 
+    <v-card-title>
+      <span>Edit keyspace limit</span>
+    </v-card-title>
+    <v-text-field
+      v-model.number="keyspaceLimit"
+      outlined
+      single-line
+      required
+      type="number"
+      suffix="passwords"
+      :max="keyspace"
+      @blur="checkValid"
+    />
+
+    <v-card-title>
+      <span>Select rule file</span>
+    </v-card-title>
+    <rules-selector
+      v-model="rules"
+      @input="checkValid"
+    />
+
   </div>
 </template>
 
@@ -127,8 +140,14 @@
       'dict-selector': dictSelector,
       'rules-selector': ruleSelector
     },
+    props: ['keyspace'],
+    watch: {
+      keyspace (val) {
+        this.keyspaceLimit = val
+      }
+    },
     computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'checkDuplicates',
-    'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain', 'shuffleDict'])),
+    'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain', 'shuffleDict', 'keyspaceLimit'])),
     methods: {
       checkValid: function () {
         if (this.minPasswordLen <= 0) {
@@ -164,6 +183,12 @@
             return false;
         }
 
+        if (this.keyspaceLimit > this.keyspace) {
+          this.keyspaceLimit = this.keyspace
+        }
+
+        // Hide any previous error alert, new settings are valid
+        this.$hideAlert()
         return true
       }
     }
