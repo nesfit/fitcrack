@@ -17,6 +17,7 @@ const char *ConfigTask::MIN_PASSWORD_LEN = "min_password_len";
 const char *ConfigTask::MAX_PASSWORD_LEN = "max_password_len";
 const char *ConfigTask::MIN_ELEM_IN_CHAIN = "min_elem_in_chain";
 const char *ConfigTask::MAX_ELEM_IN_CHAIN = "max_elem_in_chain";
+const char *ConfigTask::GENERATE_RANDOM_RULES = "generate_random_rules";
 
 /* Private */
 
@@ -68,6 +69,7 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::MIN_ELEM_IN_CHAIN);
   supported_.push_back(ConfigTask::MAX_ELEM_IN_CHAIN);
   supported_.push_back(ConfigTask::SKIP_FROM_START);
+  supported_.push_back(ConfigTask::GENERATE_RANDOM_RULES);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

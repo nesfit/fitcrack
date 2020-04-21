@@ -50,6 +50,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_minElemInChain = std::stoul(jobMap["min_elem_in_chain"]);
         this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
         this->m_shuffleDict = std::stoul(jobMap["shuffle_dict"]);
+        this->m_generateRandomRules = std::stoul(jobMap["generate_random_rules"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         /** Check for valid values */
@@ -340,6 +341,10 @@ uint32_t CJob::getReplicateFactor() const
     return m_replicateFactor;
 }
 
+uint32_t CJob::getRandomRulesCount() const
+{
+    return m_generateRandomRules;
+}
 
 bool CJob::getKillFlag() const
 {

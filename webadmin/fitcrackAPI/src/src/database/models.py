@@ -222,6 +222,7 @@ class FcJob(Base):
     min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
     max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     shuffle_dict = Column(Integer, nullable=False, server_default=text("'0'"))
+    generate_random_rules = Column(Integer, nullable=False, server_default=text("'0'"))
     replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))

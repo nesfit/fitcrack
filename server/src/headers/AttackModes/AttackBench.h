@@ -34,7 +34,7 @@ class CAttackBench : public BaseAttack {
         virtual char getModeLetter() override;
         
         virtual std::string generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name,
-                unsigned hashType, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
+                unsigned hashType, unsigned generateRandomRules = 0, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
                 std::string charset2="", std::string charset3="", std::string charset4="") override;
 
         virtual std::string makeLimitingConfigLine(const std::string &, const std::string &, const std::string &) override {return "";}
@@ -63,12 +63,12 @@ char CAttackBench<BaseAttack>::getModeLetter()
 
 template <typename BaseAttack>
 std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name,
-    unsigned hashType, std::string ruleLeft, std::string ruleRight, std::string charset1,
+    unsigned hashType, unsigned generateRandomRules, std::string ruleLeft, std::string ruleRight, std::string charset1,
     std::string charset2, std::string charset3, std::string charset4)
 {
     std::ostringstream configBuilder;
-    configBuilder<<AttackMode::generateBasicConfig(attackMode, attackSubmode, name,
-        hashType, ruleLeft, ruleRight, charset1, charset2, charset3, charset4);
+    configBuilder << AttackMode::generateBasicConfig(attackMode, attackSubmode, name,
+        hashType, generateRandomRules, ruleLeft, ruleRight, charset1, charset2, charset3, charset4);
     size_t curLen = 0;
     size_t curCount = 0;
     auto dicts = this->m_job->getDictionaries();

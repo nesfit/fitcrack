@@ -325,14 +325,15 @@ def process_job_8(job):
         if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
             abort(500, 'Dictionary does not exist.')
 
-    ruleFileMultiplier = 1
+    job['hc_keyspace'] = compute_prince_keyspace(job['attack_settings'])
+    random_rules_count = 0
+    if job['attack_settings']['generate_random_rules']:
+        random_rules_count = int(job['attack_settings']['generate_random_rules'])
+    ruleFileMultiplier = random_rules_count
 
     if job['attack_settings']['rules']:
         rules = FcRule.query.filter(FcRule.id == job['attack_settings']['rules']['id']).first()
-        ruleFileMultiplier = rules.count
-
-        if ruleFileMultiplier == 0:
-            ruleFileMultiplier = 1
+        ruleFileMultiplier += rules.count
 
         if not rules:
             abort(500, 'Wrong rules file selected.')
@@ -343,16 +344,20 @@ def process_job_8(job):
         job['attack_settings']['attack_submode'] = 1
         job['rules'] = rules.name
 
-    prince_settings = ["case_permute", "check_duplicates", "min_password_len", "max_password_len", "min_elem_in_chain", "max_elem_in_chain", "shuffle_dict"]
+    prince_settings = ["case_permute", "check_duplicates", "min_password_len", "max_password_len", "min_elem_in_chain", "max_elem_in_chain", "shuffle_dict", 'generate_random_rules']
     for setting in prince_settings:
         job[setting] = job['attack_settings'][setting]
 
     job['attack_name'] = 'prince'
 
     # Keyspace limit control
-    # If no keyspace limit is set, keyspace limit represents full keyspace
-    job['hc_keyspace'] = job['attack_settings']['keyspace_limit']
-    job['keyspace'] = job['attack_settings']['keyspace_limit'] * ruleFileMultiplier
+    if job['attack_settings']['keyspace_limit'] < job['hc_keyspace']:
+        job['hc_keyspace'] = job['attack_settings']['keyspace_limit']
+
+    if ruleFileMultiplier == 0:
+        job['keyspace'] = job['hc_keyspace']
+    else:
+        job['keyspace'] = job['hc_keyspace'] * ruleFileMultiplier
 
     return job
 

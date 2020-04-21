@@ -58,6 +58,7 @@ export const empty = {
   minElemInChain: 1,
   maxElemInChain: 8,
   shuffleDict: false,
+  generateRandomRules: 0,
   // other
   startNow: true,
   endNever: true,
@@ -98,6 +99,7 @@ export default {
         'min_elem_in_chain': parseInt(state.minElemInChain),
         'max_elem_in_chain': parseInt(state.maxElemInChain),
         'shuffle_dict': state.shuffleDict,
+        'generate_random_rules': parseInt(state.generateRandomRules),
       }
     },
     jobSettings (state, { attackSettings }) {
@@ -139,23 +141,21 @@ export default {
             return false;
           if (state.maxPasswordLen <= 0)
             return false;
-
           if (state.maxPasswordLen > 32)
             return false;
-
           if (state.maxElemInChain > 16)
             return false;
-
           if (state.minElemInChain <= 0)
             return false;
-
           if (state.maxElemInChain <= 0)
             return false;
-
           if (state.minPasswordLen > state.maxPasswordLen)
             return false;
-
           if (state.minElemInChain > state.maxElemInChain)
+            return false;
+          if (state.keyspaceLimit < 0)
+            return false;
+          if (state.generateRandomRules < 0)
             return false;
 
           // All ok!

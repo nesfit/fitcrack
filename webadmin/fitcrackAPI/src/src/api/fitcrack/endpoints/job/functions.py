@@ -113,6 +113,7 @@ def create_job(data):
         min_elem_in_chain=job['attack_settings'].get('min_elem_in_chain', 0),
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         shuffle_dict=job['attack_settings'].get('shuffle_dict', 0),
+        generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         replicate_factor=1,
         deleted=False
         )
@@ -268,12 +269,18 @@ def computeCrackingTime(data):
 
     elif attackSettings['attack_mode'] == 8:
         dictsKeyspace = compute_prince_keyspace(attackSettings)
-        rulesKeyspace = 1
+        random_rules = 0
+        if attackSettings['generate_random_rules']:
+            random_rules = int(attackSettings['generate_random_rules'])
+        rulesKeyspace = random_rules
         if attackSettings['rules']:
             rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-            rulesKeyspace = rules.count
+            rulesKeyspace += rules.count
 
-        keyspace = dictsKeyspace * rulesKeyspace
+        if rulesKeyspace == 0:
+            keyspace = dictsKeyspace
+        else:
+            keyspace = dictsKeyspace * rulesKeyspace
 
     elif attackSettings['attack_mode'] == 9:
         if(attackSettings['keyspace_limit']):

@@ -89,7 +89,7 @@ protected:
          * @return Config string with newline at the end
          */
         virtual std::string generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name,
-                unsigned hashType, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
+                unsigned hashType, unsigned generateRandomRules = 0, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
                 std::string charset2="", std::string charset3="", std::string charset4="");
 
         /**
