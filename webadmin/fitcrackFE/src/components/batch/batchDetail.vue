@@ -208,7 +208,7 @@
               />
               <div class="mt-4 caption text-justify">
                 For each host that contributed, this is a sum of all hashes from all job's workunits in this batch.
-                For more info on distribution and propgress, see detailed view for each job.
+                For more info on distribution and progress, see detailed view for each job.
               </div>
             </v-col>
             <v-col cols="9">
@@ -278,7 +278,6 @@ export default {
     attackIcon,
     jobIcon,
     async load () {
-      this.loading = true
       this.loadGraphs()
       this.data = await this.axios.get(`${this.$serverAddr}/batches/${this.$route.params.id}`).then(r => r.data)
       this.original = {...this.data}

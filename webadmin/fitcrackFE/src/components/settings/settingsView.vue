@@ -118,7 +118,7 @@
           <v-card-actions>
             <v-spacer />
             <v-btn
-              text
+              color="primary"
               :loading="saving"
               @click="saveSettings"
             >
