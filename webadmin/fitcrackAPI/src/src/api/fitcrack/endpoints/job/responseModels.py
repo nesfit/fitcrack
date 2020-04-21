@@ -11,7 +11,7 @@ from src.api.fitcrack.endpoints.dictionary.responseModels import dictionary_mode
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
 from src.api.fitcrack.responseModels import pagination, simpleResponse, job_short_model, \
-    boincHost_model
+    boincHost_model, job_permissions
 
 
 boincResult_model = api.model('boinc result', {
@@ -115,6 +115,7 @@ job_big_model = api.model('Job', {
     'batch': fields.Nested(batch_model),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
+    'permissions': fields.Nested(job_permissions),
     'attack_mode': fields.String(required=True),
     'attack_submode': fields.Integer(),
     'attack': fields.String(required=True),

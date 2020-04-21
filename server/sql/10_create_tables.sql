@@ -262,7 +262,9 @@ CREATE TABLE IF NOT EXISTS `fc_bin` (
 CREATE TABLE IF NOT EXISTS `fc_batch` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  primary key (`id`)
+  `creator_id` int(11),
+  primary key (`id`),
+  key `creator_id` (`creator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -558,6 +560,12 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 --
 ALTER TABLE `fc_job`
   ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL;
+
+--
+-- Obmedzenie pre tabuľku `fc_batch`
+--
+ALTER TABLE `fc_batch`
+  ADD CONSTRAINT `user_link` FOREIGN KEY (`creator_id`) REFERENCES `fc_user` (`id`) ON DELETE SET NULL;
 
 --
 -- Omezeni pro tabulku `fc_job_status`

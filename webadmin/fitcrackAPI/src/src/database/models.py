@@ -8,7 +8,7 @@ import base64
 import datetime
 import math
 
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, Boolean, String, Table, Text, text, JSON, ForeignKey, \
     Numeric, func, LargeBinary, select, and_
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -311,6 +311,16 @@ class FcJob(Base):
         if code == status_to_code['exhausted'] or code == status_to_code['malformed']:
             return 'error'
 
+    @hybrid_property
+    def permissions(self):
+        base = {'view': False, 'edit': False, 'operate': False}
+        record = db.session.query(FcUserPermission).filter_by(user_id=current_user.id).filter_by(job_id=self.id).one_or_none()
+        if record:
+            base['view'] = record.view
+            base['edit'] = record.modify
+            base['operate'] = record.operate
+        return base
+
     hashes = relationship("FcHash", back_populates="job")
 
 class FcBin(Base):
@@ -328,14 +338,22 @@ class FcBin(Base):
 
     @hybrid_property
     def job_count(self):
-        return self.jobs.filter(FcJob.deleted == 0).count()
+        query = self.jobs
+        if not current_user.role.VIEW_ALL_JOBS:
+            ids = db.session.query(FcUserPermission.job_id).filter_by(user_id=current_user.id).filter_by(view=1).all()
+            ids = [x[0] for x in ids]
+            query = query.filter(FcJob.id.in_(ids))
+        
+        return query.filter(FcJob.deleted == 0).count()
 
 class FcBatch(Base):
     __tablename__ = 'fc_batch'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
+    creator_id = Column(ForeignKey('fc_user.id', ondelete='SET NULL'), index=True)
 
+    creator = relationship("FcUser", backref="batches")
     jobs = relationship("FcJob")
 
     @hybrid_property
@@ -349,6 +367,14 @@ class FcBatch(Base):
     @hybrid_property
     def status(self):
         return get_batch_status(self.total_jobs, self.waiting_jobs, len([job for job in self.jobs if job.status >= 10]) > 0)
+
+    @hybrid_property
+    def current_user_can_edit(self):
+        return self.creator_id == current_user.id or current_user.role.EDIT_ALL_JOBS
+
+    @hybrid_property
+    def current_user_can_operate(self):
+        return self.creator_id == current_user.id or current_user.role.OPERATE_ALL_JOBS
 
 class FcTemplate(Base):
     __tablename__ = 'fc_template'

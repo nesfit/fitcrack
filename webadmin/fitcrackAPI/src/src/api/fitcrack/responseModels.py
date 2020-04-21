@@ -42,6 +42,12 @@ boincHostActivity_model = api.model('Host activity', {
     'online': fields.Boolean()
 })
 
+job_permissions = api.model('Job permissions object', {
+    'view': fields.Boolean(),
+    'edit': fields.Boolean(),
+    'operate': fields.Boolean()
+})
+
 job_nano_model = api.model('Job nano', {
     'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
     'name': fields.String(required=True, description='job name'),
@@ -65,6 +71,7 @@ job_short_model = api.model('Job short', {
     'name': fields.String(required=True, description='name of the job'),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
+    'permissions': fields.Nested(job_permissions),
     'batch_id': fields.Integer(), # to know if job is enqueued and where
     'queue_position': fields.Integer(),
     'attack_mode': fields.String(required=True),
@@ -91,6 +98,7 @@ job_short_model = api.model('Job short', {
 job_micro_model = api.model('Job micro', {
     'id': fields.Integer(readOnly=True, required=False, description='job id'),
     'name': fields.String(required=True, description='job name'),
+    'permissions': fields.Nested(job_permissions),
     'queue_position': fields.Integer(),
     'attack': fields.String(),
     'status': fields.String(required=False),

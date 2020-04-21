@@ -7,6 +7,7 @@ import logging
 import json
 
 from flask import request
+from flask_login import current_user
 
 from flask_restplus import Resource, abort
 
@@ -40,12 +41,18 @@ class batches(Resource):
         jobs = data['jobs']
 
         if id:
-            batch = FcBatch.query.filter_by(id=id).one_or_none()
+            query = FcBatch.query
+            if not current_user.role.OPERATE_ALL_JOBS or not current_user.role.VIEW_ALL_JOBS:
+                query = query.filter_by(creator_id=current_user.id)
+            batch = query.filter_by(id=id).one_or_none()
         if not id or not batch: # new batch
             batch = FcBatch()
+            is_new = True
 
         batch.name = name
         batch.jobs = FcJob.query.filter(FcJob.id.in_(jobs)).all()
+        if is_new:
+            batch.creator_id = current_user.id
 
         # queue order
         for index, job_id in enumerate(jobs):
@@ -55,7 +62,7 @@ class batches(Resource):
 
         # save batch
         try:
-            if not id:
+            if is_new:
                 db.session.add(batch)
             db.session.commit()
         except exc.IntegrityError as e:
@@ -73,8 +80,11 @@ class batches(Resource):
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
 
-        batches_query = FcBatch.query.order_by(FcBatch.id.desc())
-        batches_page = batches_query.paginate(page, per_page, error_out=True)
+        query = FcBatch.query
+        if not current_user.role.VIEW_ALL_JOBS:
+            query = query.filter_by(creator_id=current_user.id)
+        query = query.order_by(FcBatch.id.desc())
+        batches_page = query.paginate(page, per_page, error_out=True)
 
         return batches_page
 
@@ -88,7 +98,9 @@ class concrete_batch(Resource):
         """
         Returns job batch.
         """
-        batch = FcBatch.query.filter_by(id=id).one()
+        batch = FcBatch.query.filter_by(id=id).one_or_none()
+        if batch and not current_user.role.VIEW_ALL_JOBS and batch.creator_id != current_user.id:
+            abort(401, 'Unauthorized to access this batch.')
         batch.jobs.sort(key=lambda x: x.queue_position)
         return batch
 
@@ -96,8 +108,12 @@ class concrete_batch(Resource):
     @api.response(500, 'Failed')
     def delete(self, id):
         """
-        Deletes a batch.
+        Deletes (unlinks) a batch.
         """
+        batch = FcBatch.query.filter_by(id=id).one_or_none()
+        if batch and not current_user.role.EDIT_ALL_JOBS and batch.creator_id != current_user.id:
+            abort(401, 'Unauthorized to unlink this batch.')
+
         try:
             FcBatch.query.filter_by(id=id).delete()
             db.session.commit()
@@ -117,6 +133,10 @@ class concrete_batch(Resource):
         """
         Runs a batch by starting the first job that is ready.
         """
+        batch = FcBatch.query.filter_by(id=id).one_or_none()
+        if batch and not current_user.role.OPERATE_ALL_JOBS and batch.creator_id != current_user.id:
+            abort(401, 'Unauthorized to operate this batch.')
+
         starter = FcJob.query.filter_by(batch_id=id).filter_by(status=0).order_by(FcJob.queue_position).first()
         if not starter:
             return ('Nothing to do', 200)
@@ -141,6 +161,10 @@ class concrete_batch(Resource):
         """
         Interrupts a batch by stopping the job that is running.
         """
+        batch = FcBatch.query.filter_by(id=id).one_or_none()
+        if batch and not current_user.role.OPERATE_ALL_JOBS and batch.creator_id != current_user.id:
+            abort(401, 'Unauthorized to operate this batch.')
+
         stopper = FcJob.query.filter_by(batch_id=id).filter(FcJob.status >= 10).one_or_none()
         if not stopper:
             return ('Nothing to do', 200)

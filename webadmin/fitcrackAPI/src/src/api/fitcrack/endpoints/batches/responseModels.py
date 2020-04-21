@@ -21,7 +21,9 @@ batch_model = api.model('Job batch', {
     'name': fields.String(),
     'total_jobs': fields.Integer(readOnly=True),
     'waiting_jobs': fields.Integer(readOnly=True),
-    'status': fields.Nested(batch_status)
+    'status': fields.Nested(batch_status),
+    'current_user_can_edit': fields.Boolean(),
+    'current_user_can_operate': fields.Boolean()
 })
 
 batch_with_jobs_model = api.inherit('Job batch with list of jobs', batch_model, {
