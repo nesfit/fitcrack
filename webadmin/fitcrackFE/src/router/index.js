@@ -17,6 +17,7 @@ const login = r => require.ensure([], () => r(require('@/components/user/loginVi
 const mainPage = r => require.ensure([], () => r(require('@/components/mainPage')))
 const addJob = r => require.ensure([], () => r(require('@/components/job/addJobView')))
 const user = r => require.ensure([], () => r(require('@/components/user/userView')))
+const templates = r => require.ensure([], () => r(require('@/components/jobTemplate/templateList')))
 const hosts = r => require.ensure([], () => r(require('@/components/host/hostsView')))
 const hashes = r => require.ensure([], () => r(require('@/components/hashcache/hashCacheView')))
 const dictionaries = r => require.ensure([], () => r(require('@/components/dictionary/dictionariesView')))
@@ -122,7 +123,7 @@ const appRoutes = [
   {
     path: '/templates',
     name: 'templates',
-    component: jobs,
+    component: templates,
     meta: {
       title: 'Job templates',
       icon: 'mdi-file'
@@ -286,7 +287,7 @@ const appRoutes = [
     component: Transfer,
     meta: {
       title: 'Data Transfer',
-      icon: 'mdi-transfer'
+      icon: 'mdi-dolly'
     }
   },
   {
