@@ -33,7 +33,7 @@
         </span>
       </h2>
       <v-spacer />
-      <div v-if="isBin">
+      <div v-if="isBin && $userCan('EDIT_ALL_JOBS')">
         <transition 
           name="fade"
           mode="out-in"
@@ -224,7 +224,15 @@
           :to="{ name: 'jobDetail', params: { id: item.id } }"
           class="table-link"
         >
-          {{ item.name }}
+          <span>{{ item.name }}</span>
+          <v-icon
+            v-if="item.batch_id"
+            right
+            small
+            color="primary"
+          >
+            mdi-tray-full
+          </v-icon>
         </router-link>
       </template>
       <template v-slot:item.attack="{ item }">
@@ -333,7 +341,7 @@
               mdi-tray-full
             </v-icon>
           </v-btn>
-          <template v-else>
+          <template v-else-if="item.permissions.operate || $userCan('OPERATE_ALL_JOBS')">
             <v-btn
               v-if="item.status === '0'"
               :disabled="item.host_count == 0"
@@ -374,6 +382,7 @@
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
+                v-if="item.permissions.edit || $userCan('EDIT_ALL_JOBS')"  
                 icon
                 class="mx-0"
                 v-on="on"
@@ -527,8 +536,10 @@
       binTitle () {
         if (this.bin) {
           return this.bin.name
+        } else if (this.isTrash) {
+          return 'Discarded Jobs'
         } else {
-          return this.isTrash ? 'Discarded Jobs' : 'All Jobs'
+          return this.$userCan('VIEW_ALL_JOBS') ? 'All Jobs' : 'My Jobs'
         }
       },
       binEmpty () {

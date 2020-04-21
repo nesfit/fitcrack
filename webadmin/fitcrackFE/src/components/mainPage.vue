@@ -75,7 +75,7 @@
             dense
           >
             <v-list-item
-              v-if="$userCanAddJob()"
+              v-if="$userCan('ADD_NEW_JOB')"
               :to="{ name: 'addJob'}"
             >
               <v-list-item-action>
@@ -106,7 +106,7 @@
                 <v-icon>{{ routeIcon('jobs') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>All Jobs</v-list-item-title>
+                <v-list-item-title>{{ $userCan('VIEW_ALL_JOBS') ? 'All' : 'My' }} Jobs</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -242,7 +242,7 @@
             </v-list-item>
 
             <v-list-item
-              v-if="$userCanManageUsers()"
+              v-if="$userCan('MANAGE_USERS')"
               :to="{ name: 'manageUsers'}"
             >
               <v-list-item-action>
@@ -263,7 +263,7 @@
             </v-list-item>
 
             <v-list-item
-              v-if="$userCanManageUsers()"
+              v-if="$userCan('MANAGE_USERS')"
               :to="{ name: 'server'}"
             >
               <v-list-item-action>

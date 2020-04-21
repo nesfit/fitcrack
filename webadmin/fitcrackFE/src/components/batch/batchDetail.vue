@@ -19,7 +19,7 @@
         {{ data ? data.name : '...' }}
       </h2>
       <v-spacer />
-      <div>
+      <div v-if="data.current_user_can_edit">
         <transition 
           name="fade"
           mode="out-in"
@@ -110,7 +110,7 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions v-if="data.waiting_jobs > 0">
+        <v-card-actions v-if="data.waiting_jobs > 0 && data.current_user_can_operate">
           <!-- opration buttons -->
           <v-btn
             v-if="data.status.code < 10"

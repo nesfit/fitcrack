@@ -9,32 +9,34 @@
         indeterminate
       />
       <v-spacer />
-      <v-btn
-        v-if="!adding"
-        ref="addBtn"
-        key="addBtn"
-        small
-        text
-        @click="addBin"
-      >
-        New
-        <v-icon right>
-          mdi-plus
-        </v-icon>
-      </v-btn>
-      <v-btn
-        v-else
-        key="cancelBtn"
-        small
-        text
-        :disabled="loading"
-        @click="adding = false"
-      >
-        Cancel
-        <v-icon right>
-          mdi-close
-        </v-icon>
-      </v-btn>
+      <template v-if="$userCan('EDIT_ALL_JOBS')">
+        <v-btn
+          v-if="!adding"
+          ref="addBtn"
+          key="addBtn"
+          small
+          text
+          @click="addBin"
+        >
+          New
+          <v-icon right>
+            mdi-plus
+          </v-icon>
+        </v-btn>
+        <v-btn
+          v-else
+          key="cancelBtn"
+          small
+          text
+          :disabled="loading"
+          @click="adding = false"
+        >
+          Cancel
+          <v-icon right>
+            mdi-close
+          </v-icon>
+        </v-btn>
+      </template>
     </v-subheader>
 
     <v-list-item
@@ -73,13 +75,14 @@
       v-model="bins"
       handle=".drag-handle"
       :animation="150"
-      :disabled="loading || canAssign"
+      :disabled="loading || canAssign || !$userCan('EDIT_ALL_JOBS')"
       @change="updateBins"
     >
       <v-list-item 
         v-for="({ id, name, job_count }, index) in bins"
         :key="id"
         :to="canAssign ? null : {name: 'bins', params: { id }}"
+        :disabled="!$userCan('VIEW_ALL_JOBS') && job_count == 0"
         exact
       >
         <v-list-item-action 
@@ -130,17 +133,17 @@
         </v-list-item-action>
         <v-list-item-action
           v-else
-          class="drag-handle my-1 reveal"
+          :class="[{'drag-handle': $userCan('EDIT_ALL_JOBS')}, 'my-1', 'reveal']"
         >
           <v-badge
             :content="job_count.toString()"
-            :value="true"
+            :value="$userCan('VIEW_ALL_JOBS') || job_count > 0"
             overlap
             bordered
             offset-y="16"
             :color="job_count > 0 ? 'secondary' : 'error'"
           >
-            <v-icon>mdi-drag</v-icon>
+            <v-icon>{{ $userCan('EDIT_ALL_JOBS') ? 'mdi-drag' : 'mdi-folder-outline' }}</v-icon>
           </v-badge>
         </v-list-item-action>
         <v-list-item-content>
@@ -171,7 +174,7 @@ export default {
     ...mapTwoWayState('binInterface', twoWayMap(['bins'])),
     ...mapState('binInterface', ['loading', 'selectedJobs']),
     canAssign () {
-      return this.selectedJobs.length > 0 && this.$route.params['id'] !== 'trash'
+      return this.selectedJobs.length > 0 && this.$route.params['id'] !== 'trash' && this.$userCan('EDIT_ALL_JOBS')
     }
   },
   mounted () {

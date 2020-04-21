@@ -45,6 +45,7 @@
                       <span>Status History</span>
                       <v-spacer />
                       <v-btn
+                        v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')"
                         text
                         color="error"
                         @click="operateJob('kill')"
@@ -102,6 +103,7 @@
                     <div class="d-flex mt-2">
                       <v-spacer />
                       <v-btn
+                        v-if="data.permissions.edit || $userCan('EDIT_ALL_JOBS')"
                         text
                         color="info"
                         @click="hostEditorOpen = true"
