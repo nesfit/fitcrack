@@ -55,7 +55,7 @@
         <!-- action button -->
         <template v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')">
           <v-btn
-            v-if="data.batch && data.status == 0"
+            v-if="data.batch && data.batch.id && data.status == 0"
             key="batch-link"
             text
             :to="`/batches/${data.batch.id}`"
@@ -184,7 +184,7 @@ export default {
     statusColor () {
       if (this.editing || this.data.hosts.length == 0) {
         return 'secondary'
-      } else if (this.data.batch && this.data.status == 0) {
+      } else if (this.data.batch && this.data.batch.id && this.data.status == 0) {
         return 'primary'
       } 
       else {
