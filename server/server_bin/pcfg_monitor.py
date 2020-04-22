@@ -5,12 +5,14 @@
 import re
 import mysql.connector
 import datetime
+import subprocess
 from psutil import process_iter
 from time import sleep
 
 
-CONFIG_PATH = '/home/boincadm/projects/fitcrack/config.xml'
-# CONFIG_PATH = '../config.xml'
+PCFG_DIR = '/usr/share/collections/pcfg/'
+CONFIG_PATH = '../config.xml'
+EMPTY_HASHLIST = 'empty_hashlist.txt'
 
 
 def parse_config():
@@ -76,25 +78,47 @@ def get_running_managers():
     result = []
 
     for proc in process_iter():
-        # TODO: Wait for new branch and check the pcfg cmdline to look for and extract ID from
-        if proc.cmdline() and 'pcfg-manager' in proc.cmdline()[0]:
-            print(proc.cmdline())
+        try:
+            if proc.cmdline() and \
+               'pcfg-manager' in proc.cmdline()[0] and \
+               'server' in proc.cmdline()[1]:
+                result.append(int(proc.cmdline()[proc.cmdline().index('-p') + 1]) - 50050)
+        except ValueError:
+            continue
 
     return result
 
 
 def purge_job(job_id, cursor):
     """Purges the job in case of some nasty crash before."""
-    ...
-    # TODO: set job indexes to 0
+    cursor.execute('UPDATE fc_job SET indexes_verified = 0, current_index = 0 WHERE id = %s', (job_id, ))
 
 
-def run_new_manager(job_id):
+def job_id_to_port(job_id):
+    """Transforms job_id to finite port interval."""
+    return (job_id % 1000) + 50050
+
+
+def get_keyspace(job_id, cursor):
+    """Returns job keyspace from database."""
+    cursor.execute('SELECT hc_keyspace FROM fc_job WHERE id = %s', (str(job_id),))
+    return cursor.fetchone()[0]
+
+
+def get_grammar_name(job_id, cursor):
+    """Returns job keyspace from database."""
+    cursor.execute('SELECT fc_pcfg_grammar.name FROM fc_pcfg_grammar '
+                   'LEFT JOIN fc_job ON fc_pcfg_grammar.id = fc_job.grammar_id '
+                   'WHERE fc_job.id = %s', (job_id,))
+    return cursor.fetchone()[0]
+
+
+def run_new_manager(job_id, cursor):
     """Run new PCFG manager for a new running PCFG job."""
     print(datetime.datetime.utcnow(), '[LOG]: Running new PCFG manager for job ID', job_id)
-    ...
-    # Wait for new branch and copy the cmdline to run Manager
-    # Don't forget to run in detached mode
+    process = subprocess.Popen(
+        ['./pcfg-manager', 'server', '-p', str(job_id_to_port(job_id)), '-m', str(get_keyspace(job_id, cursor)),
+         '--hashlist', EMPTY_HASHLIST, '-r', PCFG_DIR + get_grammar_name(job_id, cursor)])
 
 
 def main():
@@ -102,19 +126,25 @@ def main():
     fitcrack_db = connect_db()
     f_cursor = fitcrack_db.cursor()
 
+    # Prepare empty hashlist
+    open(EMPTY_HASHLIST, 'a').close()
+
     while True:
         pcfg_jobs = get_running_pcfg_jobs(f_cursor)
         running_managers = get_running_managers()
 
         # Check if there is a missing manager
-        missing_managers = list(set(pcfg_jobs) - set(running_managers))
+        missing_managers = []
+        for job_id in pcfg_jobs:
+            if job_id % 1000 not in running_managers:
+                missing_managers.append(job_id)
 
         for job_id in missing_managers:
             # Run new manager
             purge_job(job_id, f_cursor)
-            run_new_manager(job_id)
-
             fitcrack_db.commit()
+
+            run_new_manager(job_id, f_cursor)
 
         # Sleep before next check
         sleep(2)
