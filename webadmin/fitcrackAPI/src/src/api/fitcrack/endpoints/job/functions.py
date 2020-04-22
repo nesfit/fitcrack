@@ -18,7 +18,7 @@ from os.path import basename
 from uuid import uuid1
 from flask_restplus import abort
 from sqlalchemy import exc
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
+from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, ROOT_DIR
 from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
@@ -326,10 +326,3 @@ def calculate_port_number(job_id):
 
     portNumber = 50050 + job_id
     return str(portNumber)
-
-
-def start_pcfg_manager(job_id, grammar_name, keyspace):
-
-    manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
-    test = PCFG_MANAGER_DIR + " server " + "-p " + str(calculate_port_number(job_id)) + " -m " + str(keyspace) + " --hashlist " + PCFG_MANAGER + "/README.md" + " -r " + PCFG_DIR + "/" + grammar_name
-    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", str(calculate_port_number(job_id)), "-m", str(keyspace), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])

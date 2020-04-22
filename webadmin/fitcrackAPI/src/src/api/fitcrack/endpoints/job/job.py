@@ -25,7 +25,7 @@ from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWo
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
     editJob_argument
 from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
-    computeCrackingTime, start_pcfg_manager
+    computeCrackingTime
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, job_nano_list_model
 from src.api.fitcrack.functions import shellExec
@@ -166,10 +166,6 @@ class OperationWithJob(Resource):
         job = FcJob.query.filter(FcJob.id == id).one()
 
         if action == 'start':
-            if job.attack_mode == 9:
-                pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
-                start_pcfg_manager(job.id, pcfg.name, job.hc_keyspace)
-
             job.status = status_to_code['running']
         elif action == 'stop':
             job.status = status_to_code['finishing']
