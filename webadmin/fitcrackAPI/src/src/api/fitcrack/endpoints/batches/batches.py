@@ -39,6 +39,7 @@ class batches(Resource):
         id = data.get('id', None)
         name = data['name']
         jobs = data['jobs']
+        is_new = False
 
         if id:
             query = FcBatch.query
