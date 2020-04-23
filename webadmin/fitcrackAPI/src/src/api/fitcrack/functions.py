@@ -186,9 +186,12 @@ def directory_tree (path):
         for d in sorted(dirs):
             root['children'].append({
                 'name': d,
-                'children': []
+                'empty': True,
+                'children': [],
+                'path': os.path.join(*nest_in, d)
             })
         for f in sorted(files):
+            root['empty'] = False
             root['children'].append({
                 'name': f,
                 'path': os.path.join(*nest_in, f)

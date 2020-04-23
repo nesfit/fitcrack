@@ -128,9 +128,13 @@ class pcfgFileRead(Resource):
             abort(404, 'Can\'t find PCFG grammar')
         dirname = Path(pcfg.path).stem
 
-        with open(os.path.join(PCFG_DIR, dirname, target)) as file:
+        with open(os.path.join(PCFG_DIR, dirname, target), mode='rb') as file:
             filename = os.path.basename(file.name)
             content = file.read()
+            try:
+                content = content.decode()
+            except UnicodeDecodeError:
+                content = 'Binary file HEX dump:\n' + content.hex()
 
         return {
             'name': filename,
