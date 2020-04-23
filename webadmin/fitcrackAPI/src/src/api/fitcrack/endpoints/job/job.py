@@ -354,11 +354,12 @@ class jobsHost(Resource):
 
         return hosts_page
 
+    @api.deprecated
     @api.expect(editHostMapping_argument)
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        !DEPRECATED in favor of /job/host - Mapping of hosts to job.
+        Deprecated in favor of /job/host - Mapping of hosts to job.
         """
         if not current_user.role.EDIT_ALL_JOBS and not can_edit_job(id):
             abort(401, 'Unauthorized access to job.')
