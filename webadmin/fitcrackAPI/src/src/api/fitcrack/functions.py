@@ -161,6 +161,39 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
                 result.append(DBrecord)
     return result
 
+def get_nesting (path, root = '/'):
+    localpath = path.replace(root, '').split('/')
+    return localpath[1:], localpath[-1]
+
+def directory_tree (path):
+    parent = os.path.dirname(path) + '/'
+    _, name = get_nesting(path, parent)
+    listing = {
+        'name': name,
+        'children': []
+    }
+    # walk recursively
+    for base, dirs, files in os.walk(path):
+        nest_in, name = get_nesting(base, parent)
+        # go to current root in dict
+        root = listing
+        for d in nest_in:
+            print('root is now', root['name'])
+            for child in root['children']:
+                if child['name'] == d:
+                    root = child
+        # insert contents
+        for d in sorted(dirs):
+            root['children'].append({
+                'name': d,
+                'children': []
+            })
+        for f in sorted(files):
+            root['children'].append({
+                'name': f
+            })
+    
+    return listing
 
 def sorted_cp (src, dst):
     "Sort source text file by line length and output to destination"
