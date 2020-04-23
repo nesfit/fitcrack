@@ -26,7 +26,8 @@ createPcfgGrammarBin, calculateKeyspace, makePcfgFolder, moveGrammarToPcfgDir
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfgs_model, pcfgData_model, \
     pcfg_model, pcfgTree_model
 from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder, directory_tree
-from src.api.fitcrack.responseModels import simpleResponse
+from src.api.fitcrack.responseModels import simpleResponse, file_content
+from src.api.fitcrack.argumentsParser import path
 from src.database import db
 from src.database.models import FcPcfg, FcDictionary
 
@@ -111,7 +112,31 @@ class pcfgTree(Resource):
             abort(500, 'PCFG is not unzipped or doesn\'t exist on the server')
         return directory_tree(path)
         
-        
+
+@ns.route('/<id>/file')
+class pcfgFileRead(Resource):
+
+    @api.expect(path)
+    @api.marshal_with(file_content)
+    def get(self, id):
+        """
+        Returns requested PCFG file contents
+        """
+        target = path.parse_args(request).get('path')
+        pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
+        if not pcfg:
+            abort(404, 'Can\'t find PCFG grammar')
+        dirname = Path(pcfg.path).stem
+
+        with open(os.path.join(PCFG_DIR, dirname, target)) as file:
+            filename = os.path.basename(file.name)
+            content = file.read()
+
+        return {
+            'name': filename,
+            'path': os.path.join(dirname, target),
+            'data': content
+        }        
 
 
 @ns.route('/add')

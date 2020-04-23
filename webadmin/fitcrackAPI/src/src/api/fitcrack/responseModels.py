@@ -21,6 +21,12 @@ simpleResponse = api.model('simpleResponse', {
     'message': fields.String(description="Some details...")
 })
 
+file_content = api.model('File info and content data', {
+    'name': fields.String(),
+    'path': fields.String(),
+    'data': fields.String()
+})
+
 host_short_model = api.model('Host short', {
     'id': fields.Integer(readOnly=True, required=False),
     'boinc_host_id': fields.Integer(readOnly=True, required=False),

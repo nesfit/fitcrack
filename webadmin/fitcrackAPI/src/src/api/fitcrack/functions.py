@@ -190,7 +190,8 @@ def directory_tree (path):
             })
         for f in sorted(files):
             root['children'].append({
-                'name': f
+                'name': f,
+                'path': os.path.join(*nest_in, f)
             })
     
     return listing
