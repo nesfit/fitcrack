@@ -23,6 +23,7 @@ const hashes = r => require.ensure([], () => r(require('@/components/hashcache/h
 const dictionaries = r => require.ensure([], () => r(require('@/components/dictionary/dictionariesView')))
 const dictionaryDetail = r => require.ensure([], () => r(require('@/components/dictionary/dictionaryDetailView')))
 const pcfg = r => require.ensure([], () => r(require('@/components/pcfg/pcfgView.vue')))
+const pcfgBrowser = r => require.ensure([], () => r(require('@/components/pcfg/pcfgBrowser.vue')))
 const manageUsers = r => require.ensure([], () => r(require('@/components/user/manageUsersView')))
 const myAccount = r => require.ensure([], () => r(require('@/components/myAccount/myAccountView')))
 const hostDetail = r => require.ensure([], () => r(require('@/components/host/hostDetailView')))
@@ -181,6 +182,14 @@ const appRoutes = [
     meta: {
       title: 'PCFG',
       icon: 'mdi-ray-start-end'
+    }
+  },
+  {
+    path: '/pcfg/:id',
+    name: 'pcfgBrowser',
+    component: pcfgBrowser,
+    meta: {
+      title: 'Inspect PCFG'
     }
   },
   {
