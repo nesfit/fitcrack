@@ -505,7 +505,7 @@ class Host(Base):
     workunits = relationship("FcWorkunit", secondary="fc_host_activity",
                         primaryjoin="Host.id == FcHostActivity.boinc_host_id",
                         secondaryjoin="FcHostActivity.job_id == FcWorkunit.id",
-                        viewonly=True, order_by="desc(FcWorkunit.id)")
+                        order_by="desc(FcWorkunit.id)")
 
     last_active = relationship("FcHostStatus", uselist=False)
 
