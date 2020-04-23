@@ -13,8 +13,8 @@
 
 uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job)
 {
-    uint64_t minimum = Config::minSeconds;
     uint64_t maximum = job->getMaxSeconds();
+    uint64_t minimum = std::max(Config::minSeconds, maximum/4);
 
     uint64_t seconds = ((job->getHcKeyspace() - job->getCurrentIndex()) / (job->getTotalPower() + 1)) / 10;
 
