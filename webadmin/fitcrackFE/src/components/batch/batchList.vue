@@ -53,42 +53,45 @@
       <template v-slot:item.actions="{ item }">
         <div class="actionsBtns">
           <!-- opration buttons -->
-          <v-btn
-            v-if="item.status.code < 10"
-            :disabled="item.status.code == 1"
-            text
-            color="success"
-            @click="runBatch(item.id)"
-          >
-            Run
-            <v-icon right>
-              mdi-play
-            </v-icon>
-          </v-btn>
-          <v-btn
-            v-else-if="item.status.code < 20"
-            text
-            color="error"
-            @click="interruptBatch(item.id)"
-          >
-            Interrupt
-            <v-icon right>
-              mdi-pause
-            </v-icon>
-          </v-btn>
-          <v-btn
-            v-else
-            text
-            color="error"
-            @click="runBatch(item.id)"
-          >
-            Resume
-            <v-icon right>
-              mdi-skip-next
-            </v-icon>
-          </v-btn>
+          <template v-if="item.current_user_can_operate">
+            <v-btn
+              v-if="item.status.code < 10"
+              :disabled="item.status.code == 1"
+              text
+              color="success"
+              @click="runBatch(item.id)"
+            >
+              Run
+              <v-icon right>
+                mdi-play
+              </v-icon>
+            </v-btn>
+            <v-btn
+              v-else-if="item.status.code < 20"
+              text
+              color="error"
+              @click="interruptBatch(item.id)"
+            >
+              Interrupt
+              <v-icon right>
+                mdi-pause
+              </v-icon>
+            </v-btn>
+            <v-btn
+              v-else
+              text
+              color="error"
+              @click="runBatch(item.id)"
+            >
+              Resume
+              <v-icon right>
+                mdi-skip-next
+              </v-icon>
+            </v-btn>
+          </template>
           <!-- delete button -->
           <v-btn
+            v-if="item.current_user_can_edit"
             text
             @click="deleteBatchConfirm(item.id)"
           >

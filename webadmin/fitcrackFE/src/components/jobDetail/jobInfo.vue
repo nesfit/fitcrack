@@ -46,48 +46,52 @@
     </v-sheet>
     <!-- ACTION SHEET -->
     <v-sheet
-      class="info-sheet cta-sheet pa-2 d-flex justify-space-between"
+      class="info-sheet cta-sheet pa-2 d-flex"
       dark
       tile
       :color="statusColor"
     >
       <template v-if="!editing">
         <!-- action button -->
-        <v-btn
-          v-if="data.batch && data.status == 0"
-          key="batch-link"
-          text
-          :to="`/batches/${data.batch.id}`"
-        >
-          <v-icon left>
-            mdi-tray-full
-          </v-icon>
-          <span>Go to Batch</span>
-        </v-btn>
-        <v-btn
-          v-else-if="data.hosts.length > 0"
-          key="operate"
-          text
-          @click="$emit('operate', operation.text)"
-        >
-          <v-icon left>
-            {{ operation.icon }}
-          </v-icon>
-          <span>{{ operation.text }}</span>
-        </v-btn>
-        <v-btn
-          v-else
-          key="assign"
-          text
-          @click="$emit('edit-hosts')"
-        >
-          <v-icon left>
-            mdi-desktop-classic
-          </v-icon>
-          <span>Add Hosts</span>
-        </v-btn>
+        <template v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')">
+          <v-btn
+            v-if="data.batch && data.status == 0"
+            key="batch-link"
+            text
+            :to="`/batches/${data.batch.id}`"
+          >
+            <v-icon left>
+              mdi-tray-full
+            </v-icon>
+            <span>Go to Batch</span>
+          </v-btn>
+          <v-btn
+            v-else-if="data.hosts.length > 0"
+            key="operate"
+            text
+            @click="$emit('operate', operation.text)"
+          >
+            <v-icon left>
+              {{ operation.icon }}
+            </v-icon>
+            <span>{{ operation.text }}</span>
+          </v-btn>
+          <v-btn
+            v-else
+            key="assign"
+            text
+            @click="$emit('edit-hosts')"
+          >
+            <v-icon left>
+              mdi-desktop-classic
+            </v-icon>
+            <span>Add Hosts</span>
+          </v-btn>
+        </template>
+        <v-spacer />
         <!-- edit button -->
         <v-btn
+          v-if="data.permissions.edit || $userCan('EDIT_ALL_JOBS')"
           key="edit-enter"
           text
           @click="editing = true"
