@@ -253,15 +253,6 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :to="{ name: 'myAccount'}">
-              <v-list-item-action>
-                <v-icon>{{ routeIcon('myAccount') }}</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>My Account</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
             <v-list-item
               v-if="$userCan('MANAGE_USERS')"
               :to="{ name: 'server'}"
@@ -315,12 +306,100 @@
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>{{ $store.state.project }}</v-toolbar-title>
-      <!--
-      <router-link :to="{ name: 'home'}" class="textLogo">
-        <span class="logoSmallText" v-text="$vuetify.theme.project"></span>
-      </router-link>
-      -->
-      <v-spacer />      
+      <v-spacer />
+      <v-menu
+        v-model="userFlyout"
+        :close-on-content-click="false"
+        transition="slide-y-transition"
+      >
+        <template #activator="{ on }">
+          <v-btn
+            large
+            rounded
+            text
+            class="pr-2"
+            v-on="on"
+          >
+            <div class="text-none text-end subtitle-2 mr-2">
+              {{ user.username }}
+            </div>
+            <v-avatar
+              :color="avatarColor"
+              size="32"
+            >
+              <span class="white--text">
+                {{ user.username.split(' ').map(p => p[0]).join('') }}
+              </span>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-card min-width="250">
+          <v-card-text class="text--primary d-flex align-center">
+            <div>
+              <div class="subtitle-2">
+                {{ user.username }}
+              </div>
+              <div class="caption">
+                {{ user.mail }}
+              </div>
+            </div>
+            <v-spacer />
+            <v-btn
+              text
+              class="ml-4"
+              @click="roles = !roles"
+            >
+              {{ user.role.name }}
+              <v-icon right>
+                {{ roles ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
+            </v-btn>
+          </v-card-text>
+          <v-expand-transition>
+            <div v-show="roles">
+              <v-card-text class="py-0">
+                <div class="subtitle-1">
+                  Roles
+                </div>
+                <v-list dense>
+                  <v-list-item
+                    v-for="role in roleList"
+                    :key="role"
+                  >
+                    <v-list-item-title class="text-capitalize">
+                      {{ role }}
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-card-text>
+            </div>
+          </v-expand-transition>
+          <v-card-actions>
+            <v-btn
+              text
+              :to="{ name: 'myAccount' }"
+              class="mr-2"
+              @click="userFlyout = false"
+            >
+              <v-icon left>
+                {{ routeIcon('myAccount') }}
+              </v-icon>
+              <span>My Account</span>
+            </v-btn>
+            <v-spacer />
+            <v-btn
+              text
+              class="ml-2"
+              @click.stop="$store.dispatch('signOut')"
+            >
+              <span>Sign out</span>
+              <v-icon right>
+                mdi-logout-variant
+              </v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-menu>
       <v-badge
         :value="notificationsCount > 0"
         :content="notificationsCount"
@@ -330,26 +409,16 @@
         left
       >
         <v-btn
-          :icon="$vuetify.breakpoint.xsOnly"
-          text
+          large
+          rounded
+          icon
           @click.stop="toggleNotifications"
         >
-          <v-icon :left="$vuetify.breakpoint.smAndUp">
+          <v-icon>
             {{ notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell-outline' }}
           </v-icon>
-          <span v-show="$vuetify.breakpoint.smAndUp">Alerts</span>
         </v-btn>
       </v-badge>
-      <v-btn
-        :icon="$vuetify.breakpoint.xsOnly"
-        text
-        @click.stop="$store.dispatch('signOut')"
-      >
-        <v-icon :left="$vuetify.breakpoint.smAndUp">
-          mdi-logout-variant
-        </v-icon>
-        <span v-show="$vuetify.breakpoint.smAndUp">Sign out</span>
-      </v-btn>
     </v-app-bar>
     <!-- CONTENT -->
     <v-content class="height100 main">
@@ -390,8 +459,28 @@
       return {
         drawer: true,
         rightDrawer: false,
+        userFlyout: false,
+        roles: false,
         notificationsCount: 0,
         navtab: parseInt(localStorage.getItem('navtab')) || 0
+      }
+    },
+    computed: {
+      user () {
+        return this.$store.state.user.userData
+      },
+      avatarColor () {
+        const hue = this.user.username
+          .split('')
+          .map(c => c.charCodeAt(0) * 10)
+          .reduce((p,c) => p + c << 2, 0)
+        return `hsl(${hue}, 80%, 40%)`
+      },
+      roleList () {
+        return Object.entries(this.user.role)
+          .filter(e => e[1] === true)
+          .map(e => e[0])
+          .map(r => r.split('_').join(' ').toLowerCase())
       }
     },
     watch: {
