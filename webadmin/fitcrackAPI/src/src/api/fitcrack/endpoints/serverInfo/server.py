@@ -13,7 +13,6 @@ from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usa
 from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
 from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument
 from src.api.fitcrack.endpoints.graph.argumentsParser import job_graph_arguments
-from src.api.fitcrack.functions import shellExec
 from src.database import db
 from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
@@ -56,37 +55,6 @@ class serverInfo(Resource):
             })
 
         return {'subsystems': result}
-
-
-@ns.route('/control')
-class serverOperation(Resource):
-    @api.expect(operation)
-    @api.marshal_with(simpleResponse)
-    def get(self):
-        """
-        Operations with server(restart, start, stop).
-        """
-        args = operation.parse_args(request)
-        action = args.get('operation')
-
-
-        if action == "start":
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/start')
-        elif action == "stop":
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/stop')
-        elif action == "restart":
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/stop')
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/start')
-        else:
-            abort(400, "Bad operation " + action)
-
-
-
-        return {
-            "status": True,
-            "message": "Operation " + action + " finished sucesfull."
-        }
-
 
 
 @ns.route('/getUsageData')
