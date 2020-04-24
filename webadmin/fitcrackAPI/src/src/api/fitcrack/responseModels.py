@@ -51,7 +51,8 @@ boincHostActivity_model = api.model('Host activity', {
 job_permissions = api.model('Job permissions object', {
     'view': fields.Boolean(),
     'edit': fields.Boolean(),
-    'operate': fields.Boolean()
+    'operate': fields.Boolean(),
+    'owner': fields.Boolean()
 })
 
 job_nano_model = api.model('Job nano', {

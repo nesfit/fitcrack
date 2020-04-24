@@ -24,17 +24,19 @@ from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWorkunit_parser, \
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
-    editJob_argument, multiEditHosts_argument, jobList_argument
+    editJob_argument, multiEditHosts_argument, jobList_argument, job_permissions_arguments
 from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
     computeCrackingTime, start_pcfg_manager, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
     can_view_job, can_edit_job, can_operate_job
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
-    verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, job_nano_list_model
+    verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, \
+    job_nano_list_model, job_user_permissions_model
 from src.api.fitcrack.functions import shellExec
 from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, attack_modes
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg, FcJobStatus
+from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, \
+    FcJobDictionary, FcPcfg, FcJobStatus, FcUserPermission, FcUser
 
 log = logging.getLogger(__name__)
 
@@ -327,6 +329,57 @@ class OperationWithJob(Resource):
             'status': True,
             'message': 'Job \"' + job.name + '\" ' + action + "ed."
         }
+
+
+@ns.route('/<int:id>/permissions')
+class userPermissions(Resource):
+    
+    @api.marshal_with(job_user_permissions_model)
+    @api.response(500, 'permission aggregation failed')
+    def get(self, id):
+        """
+        Returns list of users with their permissions on this job
+        """
+        data = FcUserPermission.query.filter_by(job_id=id).all()
+        return {
+            'items': [{
+                'id': d.user.id,
+                'username': d.user.username,
+                'mail': d.user.mail,
+                'view': d.view,
+                'modify': d.modify,
+                'operate': d.operate,
+                'owner': d.owner
+            } for d in data]
+        }
+
+    @api.expect(job_permissions_arguments)
+    @api.response(200, 'permissions updated')
+    @api.response(500, 'permission management failed')
+    def put(self, id):
+        """
+        Assigns specified permissions on specified job to the user
+        """
+        args = job_permissions_arguments.parse_args(request)
+        user_id = args.get('user_id')
+
+        record = FcUserPermission.query.filter_by(job_id=id).filter_by(user_id=user_id).one_or_none()
+        if not record:
+            record = FcUserPermission(job_id=id, user_id=user_id, view=0, modify=0, operate=0, owner=0)
+            db.session.add(record)
+        
+        for perm in 'view', 'modify', 'operate':
+            old = getattr(record, perm)
+            new = args.get(perm)
+            setattr(record, perm, old if not new else new)
+
+        try:
+            db.session.commit()
+        except:
+            db.session().rollback()
+            abort(500, 'Permission management failed.')
+
+        return 'Permissions updated.', 200
 
 
 

@@ -145,7 +145,7 @@ def create_job(data):
         hash = FcHash(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
         db.session.add(hash)
 
-    perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1)
+    perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)
     db.session.add(perms)
 
     db.session.commit()

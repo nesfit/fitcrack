@@ -496,6 +496,7 @@ CREATE TABLE IF NOT EXISTS `fc_user_permissions` (
   `view` tinyint(1) NOT NULL DEFAULT '0',
   `modify` tinyint(1) NOT NULL DEFAULT '0',
   `operate` tinyint(1) NOT NULL DEFAULT '0',
+  `owner` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `job_id` (`job_id`),
   KEY `user_id` (`user_id`)

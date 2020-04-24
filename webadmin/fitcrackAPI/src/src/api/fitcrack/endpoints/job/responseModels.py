@@ -178,3 +178,17 @@ job_nano_model = api.model('Job nano', {
 job_nano_list_model = api.inherit('Job nano list', {
     'items': fields.List(fields.Nested(job_nano_model))
 })
+
+user_permissions = api.model('User with permissions', {
+    'id': fields.Integer(),
+    'username': fields.String(),
+    'mail': fields.String(),
+    'view': fields.Boolean(),
+    'modify': fields.Boolean(),
+    'operate': fields.Boolean(),
+    'owner': fields.Boolean()
+})
+
+job_user_permissions_model = api.model('List of users and their permissions on a job', {
+    'items': fields.List(fields.Nested(user_permissions))
+})

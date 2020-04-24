@@ -313,12 +313,15 @@ class FcJob(Base):
 
     @hybrid_property
     def permissions(self):
-        base = {'view': False, 'edit': False, 'operate': False}
+        base = {'view': False, 'edit': False, 'operate': False, 'owner': False}
         record = db.session.query(FcUserPermission).filter_by(user_id=current_user.id).filter_by(job_id=self.id).one_or_none()
         if record:
-            base['view'] = record.view
-            base['edit'] = record.modify
-            base['operate'] = record.operate
+            if record.owner:
+                base = {'view': True, 'edit': True, 'operate': True, 'owner': True}
+            else:
+                base['view'] = record.view
+                base['edit'] = record.modify
+                base['operate'] = record.operate
         return base
 
     hashes = relationship("FcHash", back_populates="job")
@@ -660,6 +663,7 @@ class FcUserPermission(Base):
     view = Column(Integer, nullable=False, server_default=text("'0'"))
     modify = Column(Integer, nullable=False, server_default=text("'0'"))
     operate = Column(Integer, nullable=False, server_default=text("'0'"))
+    owner = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship('FcJob')
     user = relationship('FcUser')

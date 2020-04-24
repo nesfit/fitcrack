@@ -6660,3 +6660,15 @@ INSERT INTO `fc_role` (`name`, `MANAGE_USERS`, `ADD_NEW_JOB`, `UPLOAD_DICTIONARI
 
 INSERT INTO `fc_user` (`username`, `password`, `mail`, `role_id`, `deleted`) VALUES
 ('fitcrack', 'pbkdf2:sha256:50000$YqLJFcXh$430310718869b9783680c546a5fb1a50e9b34d7e49cc1bd1dd2a508b46c7409c', 'ihranicky@fit.vutbr.cz', 1, 0);
+
+--
+-- Give admin ownership of jobs shipping with fitcrack
+--
+
+INSERT INTO `fc_user_permissions` (`job_id`, `user_id`, `owner`) VALUES
+(1, 1, 1),
+(2, 1, 1),
+(3, 1, 1),
+(4, 1, 1),
+(5, 1, 1),
+(6, 1, 1);
