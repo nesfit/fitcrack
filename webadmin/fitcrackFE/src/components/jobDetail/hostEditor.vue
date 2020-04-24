@@ -1,6 +1,6 @@
 <template>
-  <v-bottom-sheet 
-    inset
+  <v-dialog 
+    max-width="1200"
     :value="value"
     @input="$emit('input')"
   >
@@ -8,17 +8,6 @@
       <v-card-title>
         <span>Host Mapping</span>
         <v-spacer />
-        <v-btn 
-          text
-          :loading="saving"
-          color="success"
-          @click="save"
-        >
-          <v-icon left>
-            mdi-check
-          </v-icon>
-          Done
-        </v-btn>
         <v-btn
           icon
           @click="$emit('input')"
@@ -32,22 +21,31 @@
           select-all
           auto-refresh
         />
-        <v-row>
-          <v-col>
-            <v-btn
-              text
-              to="/hosts"
-            >
-              <v-icon left>
-                mdi-desktop-classic
-              </v-icon>
-              Host List
-            </v-btn>
-          </v-col>
-        </v-row>
       </v-card-text>
+      <v-card-actions class="pa-6">
+        <v-btn
+          text
+          to="/hosts"
+        >
+          <v-icon left>
+            mdi-desktop-classic
+          </v-icon>
+          Host List
+        </v-btn>
+        <v-spacer />
+        <v-btn 
+          :loading="saving"
+          color="success"
+          @click="save"
+        >
+          <v-icon left>
+            mdi-check
+          </v-icon>
+          Assign
+        </v-btn>
+      </v-card-actions>
     </v-card>
-  </v-bottom-sheet>
+  </v-dialog>
 </template>
 
 <script>

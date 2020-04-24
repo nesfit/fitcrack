@@ -103,6 +103,17 @@
         </v-btn>
       </template>
       <template v-else>
+        <v-btn
+          v-if="data.permissions.owner"
+          key="edit-perms"
+          text
+          @click="$emit('edit-permissions')"
+        >
+          <v-icon left>
+            mdi-account
+          </v-icon>
+          Permissions
+        </v-btn>
         <v-spacer />
         <!-- cancel edit button -->
         <v-btn
@@ -110,7 +121,7 @@
           text
           @click="editing = false"
         >
-          <span>Cancel Edit</span>
+          <span>Cancel</span>
           <v-icon right>
             mdi-undo-variant
           </v-icon>

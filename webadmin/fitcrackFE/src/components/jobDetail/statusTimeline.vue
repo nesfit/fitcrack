@@ -34,9 +34,8 @@
         </div>
       </div>
     </div>
-    <v-bottom-sheet 
+    <v-dialog 
       v-model="showAll"
-      inset
       max-width="500"
     >
       <v-card>
@@ -83,7 +82,7 @@
           </v-data-table>
         </v-card-text>
       </v-card>
-    </v-bottom-sheet>
+    </v-dialog>
   </div>
 </template>
 

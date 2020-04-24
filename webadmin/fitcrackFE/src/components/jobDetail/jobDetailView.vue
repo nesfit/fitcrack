@@ -13,6 +13,7 @@
           class="jd-info"
           @operate="operateJob"
           @edit-hosts="hostEditorOpen = true"
+          @edit-permissions="permsEditorOpen = true"
           @reload="loadData"
         />
       </transition>
@@ -46,7 +47,6 @@
                       <v-spacer />
                       <v-btn
                         v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')"
-                        text
                         color="error"
                         @click="operateJob('kill')"
                       >
@@ -104,7 +104,6 @@
                       <v-spacer />
                       <v-btn
                         v-if="data.permissions.edit || $userCan('EDIT_ALL_JOBS')"
-                        text
                         color="info"
                         @click="hostEditorOpen = true"
                       >
@@ -175,6 +174,11 @@
       :job-ids="[data.id]"
       @reload="loadData"
     />
+    <perms-editor
+      v-if="data"
+      v-model="permsEditorOpen"
+      :job-id="data.id"
+    />
   </div>
 </template>
 
@@ -186,6 +190,7 @@ import statusTimeline from './statusTimeline'
 import hashTable from './hashTable'
 import hostTable from './hostTable'
 import hostEditor from './hostEditor'
+import permsEditor from './jobPermissions'
 //
 import graph from '@/components/graph/fc_graph'
 import combinatorDetail from '@/components/job/attacksDetail/combinator'
@@ -205,6 +210,7 @@ export default {
     hashTable,
     hostTable,
     hostEditor,
+    permsEditor,
     graph,
     combinatorDetail,
     maskDetail,
@@ -220,6 +226,7 @@ export default {
       hostPercentageGraph: null,
       //
       hostEditorOpen: false,
+      permsEditorOpen: false,
       openPanels: [0,1,2]
     }
   },
