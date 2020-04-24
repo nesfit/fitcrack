@@ -6607,7 +6607,7 @@ INSERT INTO `fc_job` (`id`, `token`, `attack`, `attack_mode`, `attack_submode`, 
 (3, '55214a34a2ce11e889a50242ac140005',	'dictionary',	0,	0,	3200,	'check hashlist',	0,	NULL,	226082,	226082,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1,	0),
 (4, 'ed5245baa2ce11e885330242ac140005',	'mask',	3,	0,	18000,	'check hashlist',	0,	NULL,	217180147158,	13270583,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-mask-sha3',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1,	0),
 (5, '6b873008a2cf11e8af3c0242ac140005',	'combinator',	1,	0,	3200,	'check hashlist',	0,	NULL,	397000,	1000,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-combinator-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1,	0),
-(6, 'ad97b17dc57f11e8af3c0242ac140005',	'pcfg',	9,	0,	1700,	'check hashlist',	0,	NULL,	999,	999,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-pcfg-sha512',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, 3, 0, 0, 0, 0, 1,	0),
+(6, 'ad97b17dc57f11e8af3c0242ac140005',	'pcfg',	9,	0,	1700,	'check hashlist',	0,	NULL,	1096,	1096,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-pcfg-sha512',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, 3, 0, 0, 0, 0, 1,	0),
 (7, '54d7b17dc57f11e8af3c0242ac140005',	'prince',	8,	0,	0,	'check hashlist',	0,	NULL,	2306859,	2306859,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-prince-md5',	'',	NULL,	NULL,	0,	120,	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 1, 8, 1, 8, 1,	0);
 
 --
