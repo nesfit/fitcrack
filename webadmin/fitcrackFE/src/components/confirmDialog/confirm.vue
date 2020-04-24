@@ -105,10 +105,14 @@
       shortcutHandler (e) {
         switch (e.key) {
           case 'Escape':
-            this.cancel()
+            if (this.reject) {
+              this.cancel()
+            }
             break
           case 'Enter':
-            this.agree()
+            if (this.resolve) {
+              this.agree()
+            }
             break
           default:
             return
