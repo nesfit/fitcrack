@@ -302,10 +302,44 @@
     <v-app-bar
       app
       height="64px"
-      class="mainToolbar"
+      :class="['mainToolbar', {'very-important-must-not-miss': daemonWarning}]"
+      :color="daemonWarning ? 'error' : ''"
+      :dark="daemonWarning"
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>{{ $store.state.project }}</v-toolbar-title>
+      <v-spacer />
+      <v-row
+        v-if="daemonWarning"
+        class="align-center"
+      >
+        <v-col class="text-center">
+          <v-icon
+            large
+            left
+            class="important-must-not-miss"
+          >
+            mdi-alert-octagon
+          </v-icon>
+          <span class="mr-4">
+            Some Daemons are not running!
+          </span>
+          <v-btn
+            light
+            @click="daemonDetails = true"
+          >
+            Details
+          </v-btn>
+          <v-btn
+            icon
+            @click="daemonWarning = false"
+          >
+            <v-icon>
+              mdi-close-circle
+            </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
       <v-spacer />
       <v-menu
         v-model="userFlyout"
@@ -324,7 +358,7 @@
               {{ user.username }}
             </div>
             <v-avatar
-              :color="avatarColor"
+              :color="daemonWarning ? 'secondary' : avatarColor"
               size="32"
             >
               <span class="white--text">
@@ -441,6 +475,54 @@
     >
       <notifications-wrapper ref="notifWrapper" />
     </v-navigation-drawer>
+    <!-- D A E M O N (。>︿<) A L E R T -->
+    <v-dialog
+      v-model="daemonDetails"
+      overlay-color="red darken-4"
+      :overlay-opacity=".8"
+      max-width="550"
+    >
+      <v-card>
+        <v-card-title>
+          Daemons not running
+        </v-card-title>
+        <v-card-text class="pb-0">
+          The server daemons are services that carry out regular routines and <strong>are vital</strong>
+          for the inner workings of Fitcrack. It seems that, unfortunately, some have crashed. Here's a list of inactive daemons:
+        </v-card-text>
+        <v-card-text class="py-0">
+          <v-list dense>
+            <v-list-item
+              v-for="daemon in fallenDaemons"
+              :key="daemon"
+            >              
+              <v-list-item-title>
+                {{ daemon }}
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-card-text>
+        <v-card-text>
+          <v-sheet
+            dark
+            color="error"
+            class="pa-4 mb-2"
+          >
+            Follow these steps to summon them again:
+            <ol>
+              <li>Access your server's shell (ex. via ssh)</li>
+              <li>
+                Run <code>/home/<em>&lt;BOINC user&gt;</em>/projects/{{ $store.state.project }}/bin/start</code>
+                as BOINC or another privileged user. BOINC user is <code>boincadm</code> by default.
+              </li>
+            </ol>
+          </v-sheet>
+          <span>
+            After starting successfully, you can dismiss the warning.
+          </span>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -461,6 +543,9 @@
         rightDrawer: false,
         userFlyout: false,
         roles: false,
+        daemonWarning: false,
+        daemonDetails: false,
+        fallenDaemons: [],
         notificationsCount: 0,
         navtab: parseInt(localStorage.getItem('navtab')) || 0
       }
@@ -501,13 +586,14 @@
       }
     },
     mounted: function () {
-      this.getNotificationsCount();
-      this.interval = setInterval(function () {
-        this.getNotificationsCount()
-      }.bind(this), 10000)
+      this.getNotificationsCount()
+      this.checkDaemons()
+      this.ninterval = setInterval(this.getNotificationsCount, 10000)
+      this.dinterval = setInterval(this.checkDaemons, 60000)
     },
     beforeDestroy: function () {
-      clearInterval(this.interval)
+      clearInterval(this.ninterval)
+      clearInterval(this.dinterval)
     },
     methods: {
       routeIcon,
@@ -523,6 +609,12 @@
         }).then((response) => {
           this.notificationsCount = response.data.count
         })
+      },
+      async checkDaemons () {
+        const statuses = await this.axios.get(`${this.$serverAddr}/serverInfo/info`).then(r => r.data.subsystems)
+        this.fallenDaemons = statuses.filter(s => s.status !== 'running').map(s => s.name)
+        this.daemonWarning = this.fallenDaemons.length > 0
+        if (!this.daemonWarning) this.daemonDetails = false
       }
     }
   }
@@ -590,6 +682,24 @@
     text-transform: uppercase;
     font-weight: 300;
     vertical-align: middle;
+  }
+
+  .important-must-not-miss {
+    animation: notice-me-disappear 1s infinite;
+  }
+  .very-important-must-not-miss {
+    animation: notice-me-bleed 2s infinite;
+  }
+  
+  @keyframes notice-me-disappear {
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes notice-me-bleed {
+    65% {
+      box-shadow: 0 0 2em red
+    }
   }
 
   /**/
