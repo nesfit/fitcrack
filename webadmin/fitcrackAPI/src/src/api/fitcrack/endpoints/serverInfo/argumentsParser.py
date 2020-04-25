@@ -25,3 +25,6 @@ serverUsage_argument.add_argument('net_recv', type=float, required=True)
 serverUsage_argument.add_argument('net_sent', type=float, required=True)
 serverUsage_argument.add_argument('hdd_read', type=float, required=True)
 serverUsage_argument.add_argument('hdd_write', type=float, required=True)
+
+export_options = reqparse.RequestParser()
+export_options.add_argument('jobs', type=int, action='split', help='List of job ids to export')

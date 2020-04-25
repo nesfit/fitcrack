@@ -11,13 +11,14 @@ from src.api.apiConfig import api
 from src.api.fitcrack.responseModels import simpleResponse
 from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo
 from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
-from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument
+from src.api.fitcrack.endpoints.serverInfo.transfer import pack, unpack
+from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options
 from src.api.fitcrack.endpoints.graph.argumentsParser import job_graph_arguments
 from src.database import db
 from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
 import platform
-from flask import request
+from flask import request, Response, stream_with_context
 from flask_restplus import abort
 import xml.etree.ElementTree as ET
 import urllib.request
@@ -109,5 +110,41 @@ class saveData(Resource):
 
         return {
             'message': 'Usage data saved',
+            'status': True
+        }
+
+
+@ns.route('/transfer')
+class systemTransfer(Resource):
+
+    @api.expect(export_options)
+    def get(self):
+        """
+        Configurable system data export to a package file
+        """
+        args = export_options.parse_args(request)
+        jobs = args.get('jobs')
+
+        return Response(stream_with_context(pack(jobs=jobs)), headers={"Content-disposition": "attachment; filename=fitcrack-export.fcp"})
+
+    @api.marshal_with(simpleResponse)
+    def post(self):
+        """
+        System data import from a package file
+        """
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            abort(500, 'No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            abort(500, 'No selected file')
+
+        unpack(file)
+
+        return {
+            'message': 'Package data imported',
             'status': True
         }
