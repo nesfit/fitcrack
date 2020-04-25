@@ -209,10 +209,10 @@ class FcJob(Base):
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
     dict1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
     dict2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
-    charset1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset3 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset4 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
+    charset1 = Column(String(4096, 'utf8_bin'))
+    charset2 = Column(String(4096, 'utf8_bin'))
+    charset3 = Column(String(4096, 'utf8_bin'))
+    charset4 = Column(String(4096, 'utf8_bin'))
     rules = Column(String(100, 'utf8_bin'), ForeignKey('fc_rule.name'))
     rule_left = Column(String(255, 'utf8_bin'))
     rule_right = Column(String(255, 'utf8_bin'))
@@ -235,15 +235,6 @@ class FcJob(Base):
 
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')
-
-    charSet1 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset1==FcCharset.name")
-    charSet2 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset2==FcCharset.name")
-    charSet3 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset3==FcCharset.name")
-    charSet4 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset4==FcCharset.name")
 
     rulesFile = relationship("FcRule",
                              primaryjoin="FcJob.rules==FcRule.name")
