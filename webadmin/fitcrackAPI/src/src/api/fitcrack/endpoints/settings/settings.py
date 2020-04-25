@@ -39,11 +39,13 @@ class settings(Resource):
         args = settings_arguments.parse_args(request)
         spw, = args['default_seconds_per_workunit'], 
         wtf, = args['default_workunit_timeout_factor'], 
+        hta, = args['default_hwmon_temp_abort'],
         dba = args['default_bench_all']
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
         if (wtf is not None): settings.default_workunit_timeout_factor = wtf
+        if (hta is not None): settings.default_hwmon_temp_abort = hta
         if (dba is not None): settings.default_bench_all = dba
         db.session.commit()
 

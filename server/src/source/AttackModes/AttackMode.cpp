@@ -35,7 +35,7 @@ void AttackMode::setDefaultWorkunitParams(DB_WORKUNIT * wu)
 
 
 std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType, unsigned generateRandomRules,
-                                            std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
+                                            unsigned hwTempAbort, std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
                                             std::string charset3, std::string charset4)
 {
     std::string result = "|||mode|String|1|" + std::string(1, getModeLetter()) + "|||\n";
@@ -69,6 +69,11 @@ std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attack
       result += "|||generate_random_rules|UInt|" +
                 std::to_string(std::to_string(generateRandomRules).length()) +
                 "|" + std::to_string(generateRandomRules) + "|||\n";
+
+    if (hwTempAbort)
+      result += "|||hwmon_temp_abort|UInt|" +
+                std::to_string(std::to_string(hwTempAbort).length()) + "|" +
+                std::to_string(hwTempAbort) + "|||\n";
 
     Tools::printDebug("%s", result.c_str());
     return result;

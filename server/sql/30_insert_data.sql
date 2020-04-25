@@ -2,8 +2,8 @@
 -- Insert default settings row
 --
 
-INSERT INTO `fc_settings` (`delete_finished_workunits`, `default_seconds_per_workunit`, `default_replicate_factor`, `default_verify_hash_format`, `default_check_hashcache`, `default_workunit_timeout_factor`, `default_bench_all`) VALUES
-(0, 3600, 1, 1, 1, 48, 0);
+INSERT INTO `fc_settings` (`delete_finished_workunits`, `default_seconds_per_workunit`, `default_replicate_factor`, `default_verify_hash_format`, `default_check_hashcache`, `default_workunit_timeout_factor`, `default_hwmon_temp_abort`, `default_bench_all`) VALUES
+(0, 3600, 1, 1, 1, 48, 90, 0);
 
 
 --

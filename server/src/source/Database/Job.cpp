@@ -92,6 +92,9 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
                                  this->m_timeoutFactor, Config::minTimeoutFactor);
             this->m_timeoutFactor = Config::minTimeoutFactor;
         }
+
+        /** Temperature threshold */
+        m_hwTempAbort = m_sqlLoader->getHWTempAbort();
     }
     catch(std::logic_error & error)
     {
@@ -442,6 +445,11 @@ uint64_t CJob::getCombSecDictSize() const
 unsigned int CJob::getTimeoutFactor() const
 {
     return m_timeoutFactor;
+}
+
+unsigned int CJob::getHWTempAbort() const
+{
+    return m_hwTempAbort;
 }
 
 

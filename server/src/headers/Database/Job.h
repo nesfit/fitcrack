@@ -151,6 +151,7 @@ class CJob {
         uint64_t m_secondsPassed;       /**< Seconds from time_start to now() */
         uint64_t m_maxSeconds;          /**< Maximum time of workunit */
         unsigned int m_timeoutFactor;   /**< Timeout for workunits, factor of time for a single workunit */
+        unsigned int m_hwTempAbort;     /**< Temperature threshold to stop cracking */
 
     public:
 
@@ -214,6 +215,7 @@ class CJob {
         uint64_t getMaxSeconds() const;
         uint64_t getCombSecDictSize() const;
         unsigned int getTimeoutFactor() const;
+        unsigned int getHWTempAbort() const;
 
         const std::string & getGrammar() const;
 };

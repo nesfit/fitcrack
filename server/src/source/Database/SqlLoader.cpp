@@ -204,6 +204,12 @@ unsigned int CSqlLoader::getTimeoutFactor()
                                                   Config::tableNameSettings.c_str())));
 }
 
+unsigned int CSqlLoader::getHWTempAbort()
+{
+    return (unsigned int)(getSqlNumber(formatQuery("SELECT `default_hwmon_temp_abort` FROM `%s` LIMIT 1",
+                                                  Config::tableNameSettings.c_str())));
+}
+
 
 uint32_t CSqlLoader::getHostStatus(uint64_t host_id)
 {

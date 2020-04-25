@@ -326,6 +326,7 @@ class FcSetting(Base):
     default_verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
     default_check_hashcache = Column(Integer, nullable=False, server_default=text("'1'"))
     default_workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
+    default_hwmon_temp_abort = Column(Integer, nullable=False, server_default=text("'90'"))
     default_bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
 
 

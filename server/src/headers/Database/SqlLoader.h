@@ -175,6 +175,12 @@ class CSqlLoader {
         unsigned int getTimeoutFactor();
 
         /**
+         * @brief Reads hwmon_temp_abort from fc_settings
+         * @return Number from DB
+         */
+        unsigned int getHWTempAbort();
+
+        /**
          * Returns fresh host status from DB
          * @param host_id ID of the host
          * @return status column form fc_host

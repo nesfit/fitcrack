@@ -22,6 +22,7 @@ void AttackCrackingBase::addSpecificArguments() {
   findAndAddOptional(ConfigTask::START_INDEX, "-s");
   findAndAddOptional(ConfigTask::HC_KEYSPACE, "-l");
   findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "-g");
+  findAndAddOptional(ConfigTask::HWMON_TEMP_ABORT, "--hwmon-temp-abort");
 
   addArgument("--status-timer="+RunnerUtils::toString(HashcatConstant::ProgressPeriod));
 

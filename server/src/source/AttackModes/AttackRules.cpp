@@ -58,7 +58,7 @@ bool CAttackRules::makeWorkunit() {
     }
 
     f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
-                             m_job->getName(), m_job->getHashType());
+                             m_job->getName(), m_job->getHashType(), 0, m_job->getHWTempAbort());
 
     f.close();
 

@@ -107,6 +107,17 @@
               hint="Multiplying factor for workunit timeout — the time after which a workunit is considered failed."
               persistent-hint
             />
+            <v-text-field
+              v-model="settings.default_hwmon_temp_abort"
+              :loading="loading"
+              outlined
+              type="number"
+              label="Temperature threshold"
+              hint="Abort cracking if temperature of the client's PC reaches this threshold"
+              persistent-hint
+              suffix="°C"
+              class="mb-4"
+            />
             <v-switch
               v-model="settings.default_bench_all"
               :loading="loading"

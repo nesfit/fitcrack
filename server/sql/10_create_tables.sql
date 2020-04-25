@@ -417,6 +417,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `default_verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `default_check_hashcache` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `default_workunit_timeout_factor` int(10) unsigned NOT NULL DEFAULT '6',
+  `default_hwmon_temp_abort` int(10) unsigned NOT NULL DEFAULT '90',
   `default_bench_all` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
