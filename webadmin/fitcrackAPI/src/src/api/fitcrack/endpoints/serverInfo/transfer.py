@@ -1,12 +1,13 @@
 import platform, time
 import msgpack
 
+from flask_login import current_user
 from src.database import db
 from sqlalchemy import exc
 
-from src.database.models import FcJob
+from src.database.models import FcJob, FcUserPermission
 from src.database.models import FcHash, FcMask # for (un)packing directly
-from src.database.models import FcRule, FcHcstat, FcDictionary, FcJobDictionary # for dependencies
+from src.database.models import FcRule, FcHcstat, FcDictionary, FcJobDictionary, FcPcfg # for dependencies
 
 
 # scalar or relationship fields that get copied over
@@ -14,7 +15,7 @@ JOB_EXPORTABLE_COLUMNS = (
   'attack', 'attack_mode', 'attack_submode', 'hash_type', 'hashes',
   'keyspace', 'hc_keyspace', 'name', 'comment', 'seconds_per_workunit', 
   'charset1', 'charset2', 'charset3', 'charset4', 'rule_left', 'rule_right', 
-  'markov_threshold', 'grammar_id', 'case_permute', 'check_duplicates', 
+  'markov_threshold', 'case_permute', 'check_duplicates', 
   'min_password_len', 'max_password_len', 'min_elem_in_chain', 
   'max_elem_in_chain', 'replicate_factor', 'deleted', 'masks'
 )
@@ -23,6 +24,7 @@ JOB_EXPORTABLE_DEPENDENCIES = {
   # as {type}: {value to store for identification}
   'rulesFile': 'name',
   'markov': 'name',
+  'pcfg': 'name',
   'left_dictionaries': 'dictionary.name',
   'right_dictionaries': 'dictionary.name'
 }
@@ -30,15 +32,38 @@ JOB_EXPORTABLE_DEPENDENCIES = {
 DEP_MAP = {
   'rulesFile': 'rule',
   'markov': 'markov',
+  'pcfg': 'pcfg',
   'left_dictionaries': 'dictionary',
   'right_dictionaries': 'dictionary'
 }
-# maps dep type annotations to actual sqlalchemy model classes
+# maps dep type annotations to actual sqlalchemy model classes and columns
 ORM_MAP = {
-  'rule': FcRule,
-  'markov': FcHcstat,
-  'dictionary': FcDictionary
+  'rule': (FcRule, 'name'),
+  'markov': (FcHcstat, 'name'),
+  'pcfg': (FcPcfg, 'name'),
+  'dictionary': (FcDictionary, 'name')
 }
+
+# Example for this craziness:
+# ---------------------------
+#
+# EXPORTING:
+# JOB_EXPORTABLE_DEPENDENCIES says for FcJob column left_dictionaries
+# to access (if it is a list then for each element) dictionary.name
+# and store its value in the dependency list. This is stored in the form
+# 'type/value', type defined by DEP_MAP, ex. here 'dictionary/english.txt'.
+# Jobs stored in the export reference these dependencies by their index
+# in the dependency list.
+#
+# Ex: If job requires dicts english.txt and bible.txt, and the dep list is
+# ['rule/best64.rule', 'dictionary/bible.txt', 'dictionary/english.txt']
+# then the stored job will have 'left_dictionaries': [2, 1]
+#
+# IMPORTING:
+# The function dependency_check uses ORM_MAP to find out which model class
+# corresponds to the stored dependecny by its type (dictionary -> FcDictionary)
+# and what column to search for the stored value (dictionary -> name). It then
+# tries to find and return all the actual dependencies from DB or raises error.
 
 
 class JobSerializer:
@@ -113,7 +138,7 @@ def pack (**options):
   }
 
   # reading
-  query = FcJob.query
+  query = FcJob.query.filter_by(deleted=False)
   if job_ids:
     query = query.filter(FcJob.id.in_(job_ids))
   joblist = query.all()
@@ -138,11 +163,17 @@ class ImportDependencyMissing (Exception):
   def __init__(self, missing_deps):
     self.missing = missing_deps
 
-def recreate_hash (hashstring, hashtype):
-  return FcHash(hash=hashstring, hash_type=hashtype)
+def find_or_recreate_hash (hashstring, hashtype):
+  hash = FcHash.query.filter_by(hash=hashstring).first()
+  if not hash:
+    hash = FcHash(hash=hashstring, hash_type=hashtype)
+  return hash
 
-def recreate_mask (data):
-  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'])
+def find_or_recreate_mask (data):
+  mask = FcMask.query.filter_by(mask=data['mask']).first()
+  if not mask:
+    mask = FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'])
+  return mask
 
 def unpack (package):
   """
@@ -156,9 +187,9 @@ def unpack (package):
   # start creating jobs
   for job in contents['jobs']:
     # transform directly stored object back
-    job['hashes'] = list(map(lambda h: recreate_hash(h, job['hash_type']), job['hashes']))
+    job['hashes'] = list(map(lambda h: find_or_recreate_hash(h, job['hash_type']), job['hashes']))
     if job.get('masks'):
-      job['masks'] = list(map(recreate_mask, job['masks']))
+      job['masks'] = list(map(find_or_recreate_mask, job['masks']))
     newjob = FcJob()
     for field in JOB_EXPORTABLE_COLUMNS:
       setattr(newjob, field, job.get(field))
@@ -185,6 +216,8 @@ def unpack (package):
     newjob.current_index_2 = 0
     newjob.dict1 = ''
     newjob.dict2 = ''
+    # add owner
+    newjob.permission_records.append(FcUserPermission(user_id=current_user.id, view=1, modify=1, operate=1, owner=1))
     # save
     db.session.add(newjob)
   # end for loop over jobs
@@ -199,10 +232,11 @@ def dependency_check (deps):
   missing = []
   records = []
   for dep in deps:
-    dtype, idv = dep.split('/')
-    dcls = ORM_MAP[dtype]
-    # try to find by name
-    found = dcls.query.filter_by(name=idv).one_or_none()
+    dtype, dvalue = dep.split('/')
+    dcls, col = ORM_MAP[dtype]
+    # try to find by value
+    dv = {col: dvalue}
+    found = dcls.query.filter_by(**dv).filter_by(deleted=False).first()
     if not found:
       missing.append(dep)
     records.append(found)

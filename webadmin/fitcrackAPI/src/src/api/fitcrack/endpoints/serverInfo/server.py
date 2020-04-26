@@ -9,10 +9,10 @@ from time import sleep
 from flask_restplus import Resource
 from src.api.apiConfig import api
 from src.api.fitcrack.responseModels import simpleResponse
-from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo
+from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo, dependency_report
 from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
-from src.api.fitcrack.endpoints.serverInfo.transfer import pack, unpack
-from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options
+from src.api.fitcrack.endpoints.serverInfo.transfer import pack, unpack, dependency_check, ImportDependencyMissing
+from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options, dependency_list
 from src.api.fitcrack.endpoints.graph.argumentsParser import job_graph_arguments
 from src.database import db
 from src.database.models import FcServerUsage
@@ -141,10 +141,32 @@ class systemTransfer(Resource):
         # submit a empty part without filename
         if file.filename == '':
             abort(500, 'No selected file')
-
-        unpack(file)
+        try:
+            unpack(file)
+        except ImportDependencyMissing as dep_err:
+            return {
+                'message': f'Missing dependencies: {", ".join(dep_err.missing)}',
+                'status': False
+            }
 
         return {
             'message': 'Package data imported',
             'status': True
+        }
+
+
+@ns.route('/transfer/validate')
+class systemTransfer(Resource):
+
+    @api.expect(dependency_list)
+    @api.marshal_with(dependency_report)
+    def post(self):
+        """
+        Pre-import dependency check
+        """
+        args = dependency_list.parse_args(request)
+        deps = args.get('deps')
+        _, missing = dependency_check(deps)
+        return {
+            'missing': missing
         }
