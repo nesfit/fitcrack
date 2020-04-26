@@ -102,6 +102,94 @@
         </v-textarea>
       </v-list-item-content>
     </v-list-item>
+    <!-- prince copypasta -->
+    <template v-if="data.attack_mode == 8">
+      <v-list-item>
+        <v-list-item-content>
+          <v-checkbox
+            v-model="edit.check_duplicates"
+            label="Check password duplicates"
+          />
+          <v-checkbox
+            v-model="edit.case_permute"
+            label="Case permutation"
+          />
+          <v-checkbox
+            v-model="edit.shuffle_dict"
+            label="Purple Rain Attack"
+          />
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-text-field
+            v-model="edit.min_password_len"
+            outlined
+            label="Minimal length of passwords (1 - 32)"
+            required
+            type="number"
+            min="1"
+            max="32"
+          />
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-text-field
+            v-model="edit.max_password_len"
+            outlined
+            label="Maximal length of passwords (1 - 32)"
+            required
+            type="number"
+            min="1"
+            max="32"
+          />
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-text-field
+            v-model="edit.min_elem_in_chain"
+            outlined
+            label="Minimal number of elements per chain (1 - 16)"
+            required
+            type="number"
+            min="1"
+            max="16"
+          />
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-text-field
+            v-model="edit.max_elem_in_chain"
+            outlined
+            label="Maximal number of elements per chain (1 - 16)"
+            required
+            type="number"
+            min="1"
+            max="16"
+          />
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-text-field
+            v-model="edit.generate_random_rules"
+            outlined
+            label="Generate random rules"
+            required
+            type="number"
+            min="0"
+          />
+        </v-list-item-content>
+      </v-list-item>
+    </template>
     <!-- save button -->
     <v-list-item>
       <v-list-item-content>
@@ -145,7 +233,15 @@ export default {
           this.$moment().toISOString(true).slice(0, 16) :
           this.$moment(this.data.time_end).toISOString(true).slice(0, 16),
         startNow: (this.data.time_start === null),
-        endNever: (this.data.time_end === null)
+        endNever: (this.data.time_end === null),
+        check_duplicates: this.data.check_duplicates,
+        case_permute: this.data.case_permute,
+        shuffle_dict: this.data.shuffle_dict,
+        min_password_len: this.data.min_password_len,
+        max_password_len: this.data.max_password_len,
+        min_elem_in_chain: this.data.min_elem_in_chain,
+        max_elem_in_chain: this.data.max_elem_in_chain,
+        generate_random_rules: this.data.generate_random_rules
       }
     }
   },
