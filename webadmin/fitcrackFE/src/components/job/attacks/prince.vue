@@ -17,7 +17,7 @@
 
     <v-checkbox
        v-model="checkDuplicates"
-       label="Check password duplicates"
+       label="Check for password duplicates"
     />
     <v-divider />
     <v-checkbox
