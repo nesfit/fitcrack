@@ -294,7 +294,7 @@ bool CAttackCombinator::makeWorkunit()
         for (auto & dict : dictVec)
         {
             if (!dict->isLeft())
-            continue;
+                continue;
 
             auto dictFile = makeInputDict(dict, 0);
             dictFile->CopyTo(path);
@@ -359,11 +359,11 @@ bool CAttackCombinator::generateWorkunit()
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess();
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     /** Load job RIGHT-side dictionaries */

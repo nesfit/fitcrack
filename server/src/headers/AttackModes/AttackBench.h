@@ -46,6 +46,8 @@ class CAttackBench : public BaseAttack {
         virtual PtrDictionary GetWorkunitDict() const override;
 
         virtual bool loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace);
+
+        virtual uint64_t getMinPassCount() const {return 0;}
 };
 
 template <typename BaseAttack>
@@ -159,7 +161,7 @@ template <typename BaseAttack>
 bool CAttackBench<BaseAttack>::loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace)
 {
     preterminals = "";
-    realKeyspace = 1;
+    realKeyspace = 0;
     return true;
 }
 

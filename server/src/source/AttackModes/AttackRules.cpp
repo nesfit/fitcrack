@@ -8,6 +8,7 @@
 
 #include <AttackRules.h>
 
+#include <algorithm>
 #include <cmath>    /**< std::round */
 
 
@@ -64,6 +65,16 @@ bool CAttackRules::makeWorkunit() {
 
     /** Load current workunit dictionary */
     PtrDictionary workunitDict = GetWorkunitDict();
+
+    uint64_t ruleCount = 0;
+    {
+        const std::string &rules = m_job->getRules();
+        ruleCount = std::count(rules.begin(), rules.end(), '\n');
+        if(rules.back() != '\n')
+        {
+            ruleCount += 1;
+        }
+    }
 
     /** Debug */
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
@@ -128,24 +139,27 @@ bool CAttackRules::makeWorkunit() {
                 "Adding %" PRIu64 " passwords to host dict file\n", dictKeyspace);
 
         auto writtenPasswords = inputDict->WritePasswordsTo(dictKeyspace, path);
-        if(writtenPasswords == 0)
+        if(writtenPasswords < dictKeyspace)
         {
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "'start_index' parameter is too far away\n");
-            workunitDict->updateIndex(workunitDict->getHcKeyspace());
-            m_job->updateIndex(m_job->getCurrentIndex() - dictKeyspace);
-            return true;
-        }
-        else if(writtenPasswords < dictKeyspace)
-        {
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Ate all passwords from current dictionary\n");
-            m_workunit->setHcKeyspace(writtenPasswords);
-
-            if (!m_workunit->isDuplicated())
+            if(writtenPasswords == 0)
             {
+                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                        "'start_index' parameter is too far away\n");
                 workunitDict->updateIndex(workunitDict->getHcKeyspace());
-                m_job->updateIndex(m_job->getCurrentIndex() - dictKeyspace + writtenPasswords);
+                m_job->updateIndex(m_job->getCurrentIndex() - dictKeyspace);
+                return true;
+            }
+            else
+            {
+                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                        "Ate all passwords from current dictionary\n");
+                m_workunit->setHcKeyspace(writtenPasswords);
+
+                if (!m_workunit->isDuplicated())
+                {
+                    workunitDict->updateIndex(workunitDict->getHcKeyspace());
+                    m_job->updateIndex(m_job->getCurrentIndex() - dictKeyspace + writtenPasswords);
+                }
             }
         }
     }
@@ -276,11 +290,11 @@ bool CAttackRules::generateWorkunit()
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess();
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     /** Load job dictionaries */

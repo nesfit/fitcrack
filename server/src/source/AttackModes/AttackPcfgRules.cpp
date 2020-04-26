@@ -284,11 +284,11 @@ bool CAttackPcfgRules::generateWorkunit()
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess();
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                               "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     /** Create the workunit */

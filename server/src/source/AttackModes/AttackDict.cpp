@@ -106,7 +106,7 @@ bool CAttackDict::makeWorkunit()
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                 "Adding %" PRIu64 " passwords to host dictionary file\n", workunitKeyspace);
         auto writtenPasswords = inputDict->WritePasswordsTo(workunitKeyspace, path);
-        if(writtenPasswords == 0)
+        if(writtenPasswords == 0 && workunitKeyspace > 0)
         {
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                                 "'start_index' parameter is too far away\n");
@@ -192,11 +192,11 @@ bool CAttackDict::generateWorkunit()
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess();
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     /** Load job dictionaries */

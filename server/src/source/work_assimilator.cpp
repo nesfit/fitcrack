@@ -461,6 +461,10 @@ void update_power(uint64_t host_id, uint64_t count, double elapsed_time)
 {
     char buf[SQL_BUF_SIZE];
     uint64_t power = std::round(count / elapsed_time);
+    if(power == 0)
+    {
+        power = 1;
+    }
     //uint64_t actualPower;
     /*
     std::snprintf(buf, SQL_BUF_SIZE, "SELECT `power` FROM `fc_host` WHERE id = %" PRIu64 " LIMIT 1;", host_id);
@@ -767,7 +771,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                 /** Update fc_host power */
                 std::cerr << __LINE__ << " - New host power: " << power << std::endl;
-                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET power = %llu, status = %d, time = now() WHERE id = %" PRIu64 " ;", mysql_table_host.c_str(), power, Host_normal, host_id);
+                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET power = %llu, status = %d, time = now() WHERE id = %" PRIu64 " ;", mysql_table_host.c_str(), power ? power : 1, Host_normal, host_id);
                 update_mysql(buf);
 
                 /** Read cracking_time */

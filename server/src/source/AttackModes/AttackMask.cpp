@@ -84,8 +84,8 @@ bool CAttackMask::makeWorkunit()
         std::string maskHcKeyspaceStr = std::to_string(maskHcKeyspace);
         f << "|||mask_hc_keyspace|BigUInt|" << maskHcKeyspaceStr.size() << "|"
           << maskHcKeyspaceStr << "|||\n";
-        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n",
-                          maskHcKeyspaceStr.size(), maskHcKeyspaceStr);
+        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%s|||\n",
+                          maskHcKeyspaceStr.size(), maskHcKeyspaceStr.c_str());
     }
 
     f.close();
@@ -164,11 +164,11 @@ bool CAttackMask::generateWorkunit()
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Number of real passwords host could compute: %" PRIu64 "\n", passCount);
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     std::vector<PtrMask> maskVec = m_job->getMasks();

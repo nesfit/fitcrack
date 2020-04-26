@@ -173,7 +173,10 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
     }
     else
     {
-        if (m_sqlLoader->getWorkunitCount(jobId, host->getId()) >= (isBenchmark ? 1 : 2))
+        if (
+            (!isBenchmark && m_sqlLoader->getWorkunitCount(jobId, host->getId()) >= 2) ||
+            (isBenchmark && m_sqlLoader->getBenchCount(jobId, host->getId()) >= 1)
+        )
         {
             Tools::printDebugHost(Config::DebugType::Log, jobId, hostBoincId,
                     "Host has enough workunits\n");
@@ -212,7 +215,11 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
         }
     }
     /** Try to set a workunit from retry */
-    bool retryFlag = setEasiestRetry(job, host, attack);
+    bool retryFlag = false;
+    if(!isBenchmark)
+    {
+        retryFlag = setEasiestRetry(job, host, attack);
+    }
 
     if (job->getStatus() == Config::JobState::JobFinishing && !retryFlag)
     {

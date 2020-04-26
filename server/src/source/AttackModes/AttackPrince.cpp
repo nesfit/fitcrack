@@ -306,14 +306,14 @@ bool CAttackPrince::generateWorkunit() {
                         "Generating prince workunit ...\n");
 
   /** Compute password count */
-  uint64_t passwordsRange = m_host->getPower() * m_seconds;
+  uint64_t passwordsRange = getPasswordCountToProcess();
   uint64_t currentIndex = m_job->getCurrentIndex();
   uint64_t jobHcKeyspace = m_job->getHcKeyspace();
-  if (passwordsRange < Config::minPassCount) {
+  if (passwordsRange < getMinPassCount()) {
     Tools::printDebugHost(
         Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
         "Passwords range is too small! Falling back to minimum passwords\n");
-    passwordsRange = Config::minPassCount;
+    passwordsRange = getMinPassCount();
   }
 
   Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
@@ -325,12 +325,12 @@ bool CAttackPrince::generateWorkunit() {
   Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
                         m_host->getBoincHostId(),
                         "Passwords range: %" PRIu64 "\n", passwordsRange);
+  //check if the job isn't finished
+  if (currentIndex >= jobHcKeyspace)
+    return false;
   /** Adjust password range */
   if (currentIndex + passwordsRange > jobHcKeyspace)
     passwordsRange = jobHcKeyspace - currentIndex;
-
-  if (!passwordsRange)
-    return false;
 
   /** Create the workunit */
   m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),

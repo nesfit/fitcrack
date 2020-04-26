@@ -114,6 +114,8 @@ protected:
 
         uint64_t getPasswordCountToProcess() const;
 
+        virtual uint64_t getMinPassCount() const {return Config::minPassCount;}
+
         PtrWorkunit m_workunit; /**< Instance of CWorkunit which is used to create this attack instance */
         PtrJob m_job;           /**< Instance of CJob which is parent of this attack instance */
         PtrHost m_host;         /**< Instance of CHost which this attack belongs to */
