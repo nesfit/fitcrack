@@ -13,10 +13,17 @@
 
 uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job)
 {
-    uint64_t maximum = job->getMaxSeconds();
-    uint64_t minimum = std::max(Config::minSeconds, maximum/4);
+    uint64_t desiredSeconds = job->getSecondsPerWorkunit();
+    uint64_t maximum = desiredSeconds;
+    uint64_t minimum = std::max(Config::minSeconds, desiredSeconds/4);
 
-    uint64_t seconds = ((job->getHcKeyspace() - job->getCurrentIndex()) / (job->getTotalPower() + 1)) / 10;
+    uint64_t curIndex = job->getCurrentIndex();
+    uint64_t passCount = job->getKeyspace();
+    uint64_t hcKeyspace = job->getHcKeyspace();
+    //power is in passwords/second, make sure index is counted in passwords
+    curIndex *= passCount/hcKeyspace;
+
+    uint64_t seconds = ((passCount - curIndex) / (job->getTotalPower() + 1)) / 10;
 
     if (seconds < minimum)
         seconds = minimum;
@@ -25,7 +32,7 @@ uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job)
 
     Tools::printDebugJob(Config::DebugType::Log, job->getId(),
                          "Calculating seconds: seconds_per_workunit = %" PRIu64 ", real seconds = %" PRIu64"\n",
-                         job->getSecondsPerWorkunit(), seconds);
+                         desiredSeconds, seconds);
 
     return seconds;
 }
