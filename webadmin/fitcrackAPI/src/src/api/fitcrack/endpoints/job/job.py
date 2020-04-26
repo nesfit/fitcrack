@@ -29,10 +29,11 @@ from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashForma
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, job_nano_list_model
 from src.api.fitcrack.functions import shellExec
+from src.api.fitcrack.attacks.functions import compute_prince_keyspace
 from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, attack_modes
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg, FcJobStatus
+from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg, FcJobStatus, FcRule
 
 log = logging.getLogger(__name__)
 
@@ -137,14 +138,40 @@ class JobByID(Resource):
         job.time_start = datetime.datetime.now() if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%Y-%m-%dT%H:%M'),
         job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%Y-%m-%dT%H:%M')
 
-        job.case_permute = args['case_permute']
-        job.check_duplicates = args['check_duplicates']
-        job.shuffle_dict = args['shuffle_dict']
-        job.min_password_len = args['min_password_len']
-        job.max_password_len = args['max_password_len']
-        job.min_elem_in_chain = args['min_elem_in_chain']
-        job.max_elem_in_chain = args['max_elem_in_chain']
-        job.generate_random_rules = args['generate_random_rules']
+        if job.attack_mode == attack_modes['prince']:      
+            # Recompute new keyspace/hc_keyspace
+            args['left_dictionaries'] = []
+            for record in job.left_dictionaries:
+                d = {}
+                d['name'] = record.dictionary.name
+                args['left_dictionaries'].append(d)
+
+            new_keyspace = compute_prince_keyspace(args)
+            if new_keyspace == -1:
+                abort(401, 'Unable to compute new job keyspace.\nJob \"' + job.name + '\" was not edited.')
+
+            job.hc_keyspace = new_keyspace
+            # Prince settings
+            job.case_permute = args['case_permute']
+            job.check_duplicates = args['check_duplicates']
+            job.shuffle_dict = args['shuffle_dict']
+            job.min_password_len = args['min_password_len']
+            job.max_password_len = args['max_password_len']
+            job.min_elem_in_chain = args['min_elem_in_chain']
+            job.max_elem_in_chain = args['max_elem_in_chain']
+            job.generate_random_rules = args['generate_random_rules']
+
+            random_rules_count = 0
+            if job.generate_random_rules:
+                random_rules_count = int(job.generate_random_rules)
+            ruleFileMultiplier = random_rules_count
+            if job.rulesFile:
+                ruleFileMultiplier += job.rulesFile.count
+
+            if ruleFileMultiplier == 0:
+                job.keyspace = job.hc_keyspace
+            else:
+                job.keyspace = job.hc_keyspace * ruleFileMultiplier
 
         db.session.commit()
         return {
@@ -190,11 +217,11 @@ class OperationWithJob(Resource):
             job.cracking_time = 0
             job.time_start = None
             job.time_end = None
-            if job.attack_mode == 3:
+            if job.attack_mode == attack_modes['mask']:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
                     mask.current_index = 0
-            elif job.attack_mode == 0 or job.attack_mode == 1:
+            elif job.attack_mode == attack_modes['dictionary'] or job.attack_mode == attack_modes['combinator']:
                 dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
                 for dictionary in dictionaries:
                     dictionary.current_index = 0
@@ -214,11 +241,11 @@ class OperationWithJob(Resource):
             job.current_index = 0
             job.cracking_time = 0
             job.time_start = job.time_end = None
-            if job.attack_mode == 3:
+            if job.attack_mode == attack_modes['mask']:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
                     mask.current_index = 0
-            elif job.attack_mode == 0 or job.attack_mode == 1:
+            elif job.attack_mode == attack_modes['dictionary'] or job.attack_mode == attack_modes['combinator']:
                 dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
                 for dictionary in dictionaries:
                     dictionary.current_index = 0

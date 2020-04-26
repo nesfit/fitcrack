@@ -92,7 +92,7 @@ def compute_prince_keyspace(attackSettings):
     try:
         return int(shellExec(compute_keyspace_command))
     except Exception:
-        return 0
+        return -1
 
 keyspace_dict = {
     'l': 26,
