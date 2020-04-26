@@ -106,6 +106,7 @@
               label="Workunit timeout factor"
               hint="Multiplying factor for workunit timeout — the time after which a workunit is considered failed."
               persistent-hint
+              class="mb-4"
             />
             <v-text-field
               v-model="settings.default_hwmon_temp_abort"
