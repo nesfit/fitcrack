@@ -14,7 +14,7 @@ from flask import request
 from flask_restplus import Resource
 from flask_restplus import abort
 from flask_login import current_user
-from sqlalchemy import func
+from sqlalchemy import func, exc
 
 from settings import DICTIONARY_DIR
 
@@ -222,7 +222,16 @@ class JobByID(Resource):
 
         if args['time_end'] == '':
             args['time_end'] = None
+        
+        dicts = job.left_dictionaries
+        if dicts:
+            args['left_dictionaries'] = []
+            for dct in dicts:
+                d = {}
+                d['name'] = dct.dictionary.name
+                args['left_dictionaries'].append(d)
 
+        rule_file = job.rulesFile
         job.name = args['name']
         job.comment = args['comment']
         job.seconds_per_workunit = args['seconds_per_job']
@@ -231,17 +240,24 @@ class JobByID(Resource):
 
         if job.attack_mode == attack_modes['prince']:      
             # Recompute new keyspace/hc_keyspace
-            args['left_dictionaries'] = []
-            for record in job.left_dictionaries:
-                d = {}
-                d['name'] = record.dictionary.name
-                args['left_dictionaries'].append(d)
-
             new_keyspace = compute_prince_keyspace(args)
             if new_keyspace == -1:
                 abort(401, 'Unable to compute new job keyspace.\nJob \"' + job.name + '\" was not edited.')
 
-            job.hc_keyspace = new_keyspace
+            random_rules_count = 0
+            if args['generate_random_rules']:
+                random_rules_count = int(args['generate_random_rules'])
+            ruleFileMultiplier = random_rules_count
+            if rule_file:
+                ruleFileMultiplier += rule_file.count
+
+            if ruleFileMultiplier != 0:
+                new_keyspace = new_keyspace * ruleFileMultiplier
+
+            if new_keyspace > (2 ** 63) - 1: # due db's bigint range
+                abort(401, 'Job keyspace is out of allowed range.')
+
+            job.keyspace = new_keyspace
             # Prince settings
             job.case_permute = args['case_permute']
             job.check_duplicates = args['check_duplicates']
@@ -252,23 +268,15 @@ class JobByID(Resource):
             job.max_elem_in_chain = args['max_elem_in_chain']
             job.generate_random_rules = args['generate_random_rules']
 
-            random_rules_count = 0
-            if job.generate_random_rules:
-                random_rules_count = int(job.generate_random_rules)
-            ruleFileMultiplier = random_rules_count
-            if job.rulesFile:
-                ruleFileMultiplier += job.rulesFile.count
-
-            if ruleFileMultiplier == 0:
-                job.keyspace = job.hc_keyspace
-            else:
-                job.keyspace = job.hc_keyspace * ruleFileMultiplier
-
-        db.session.commit()
-        return {
-            'status': True,
-            'message': 'Job \"' + job.name + '\" edited.'
-        }
+        try:
+            db.session.commit()
+            return {
+                'status': True,
+                'message': 'Job \"' + job.name + '\" edited.'
+            }
+        except:
+            db.session().rollback()
+            abort(401, 'Unable to edit this job. Please check if new settings are correct.')
 
     @api.response(204, 'Job successfully deleted.')
     def delete(self, id):

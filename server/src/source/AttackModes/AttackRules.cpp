@@ -66,16 +66,6 @@ bool CAttackRules::makeWorkunit() {
     /** Load current workunit dictionary */
     PtrDictionary workunitDict = GetWorkunitDict();
 
-    uint64_t ruleCount = 0;
-    {
-        const std::string &rules = m_job->getRules();
-        ruleCount = std::count(rules.begin(), rules.end(), '\n');
-        if(rules.back() != '\n')
-        {
-            ruleCount += 1;
-        }
-    }
-
     /** Debug */
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "In first dict, there are %" PRIu64 " passwords\n", workunitDict->getHcKeyspace());
