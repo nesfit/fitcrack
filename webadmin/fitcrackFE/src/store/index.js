@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import user from './user'
 import jobForm from './job-form'
 import binInterface from './bin-interface'
+import transfer from './transfer'
 
 Vue.use(Vuex)
 
@@ -15,7 +16,8 @@ export default new Vuex.Store({
   modules: {
     user,
     jobForm,
-    binInterface
+    binInterface,
+    transfer
   }
 })
 

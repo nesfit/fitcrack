@@ -463,7 +463,7 @@
         <router-view />
       </transition>
     </v-content>
-    <!-- -->
+    <!-- NOTIFICATION DRAWER -->
     <v-navigation-drawer
       v-model="rightDrawer"
       class="pa-0"
@@ -523,6 +523,28 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!-- TRANSFER SHORTCUT -->
+    <v-fab-transition>
+      <v-btn
+        v-if="transferCount > 0 && $route.name !== 'transfer'"
+        fab
+        fixed
+        bottom
+        left
+        class="z-top"
+        color="primary"
+        :to="{ name: 'transfer' }"
+      >
+        <v-badge
+          :content="transferCount"
+          color="secondary"
+        >
+          <v-icon>
+            mdi-dolly
+          </v-icon>
+        </v-badge>
+      </v-btn>
+    </v-fab-transition>
   </div>
 </template>
 
@@ -566,9 +588,17 @@
           .filter(e => e[1] === true)
           .map(e => e[0])
           .map(r => r.split('_').join(' ').toLowerCase())
+      },
+      transferCount () {
+        return this.$store.state.transfer.jobs.length
       }
     },
     watch: {
+      $route (to) {
+        if (to.meta.navtab !== undefined) {
+          this.navtab = to.meta.navtab
+        }
+      },
       navtab (val) {
         localStorage.setItem('navtab', val)
       }
@@ -661,6 +691,10 @@
 
   .navigationDrawer {
     z-index: 6;
+  }
+
+  .z-top {
+    z-index: 9001;
   }
 
   .theme--dark .navigationDrawer {

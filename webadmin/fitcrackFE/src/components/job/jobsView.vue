@@ -171,6 +171,16 @@
           <v-btn
             text
             class="mr-2"
+            @click="exportAdd"
+          >
+            <v-icon left>
+              mdi-package-variant
+            </v-icon>
+            Add to Export
+          </v-btn>
+          <v-btn
+            text
+            class="mr-2"
             @click="multiTrash"
           >
             <v-icon left>
@@ -420,7 +430,7 @@
   import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
   import { mapTwoWayState } from 'spyfu-vuex-helpers'
   import { twoWayMap } from '@/store'
-  import { mapState, mapActions } from 'vuex'
+  import { mapState, mapMutations, mapActions } from 'vuex'
 
   import BinIllust from '@/components/details/binIllustration'
   import HostEditor from '@/components/jobDetail/hostEditor'
@@ -571,6 +581,7 @@
       window.removeEventListener('keydown', this.shortcutHandler)
     },
     methods: {
+      ...mapMutations('transfer', { addJobsForTransfer: 'add' }),
       ...mapActions('binInterface', { renameBin: 'rename', deleteBin: 'delete' }),
       async loadJobs () {
         const data = await this.axios.get(this.$serverAddr + '/job', {
@@ -661,6 +672,9 @@
           .then((confirm) => {
             this.deleteBin(this.binId)
           })
+      },
+      exportAdd () {
+        this.addJobsForTransfer(this.selectedJobs)
       },
       jobIcon,
       attackIcon,
