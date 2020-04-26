@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <fc-tile title="Dictionaries and rules">
+  <fc-tile title="PRINCE attack details">
     <v-data-table
       :headers="headers"
       :items="data.left_dictionaries"
@@ -40,6 +40,95 @@
         </v-list-item-content>
       </v-list-item>
     </template>
+
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Number of generated random rules:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.generate_random_rules }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Check for password duplicates:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.check_duplicates ? 'Yes' : ' No' }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Case permutation:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.case_permute ? 'Enabled' : ' Disabled' }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+        Purple Rain Attack:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.shuffle_dict ? 'Enabled' : ' Disabled' }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Minimal length of passwords:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.min_password_len }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Maximal length of passwords:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.max_password_len }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Minimal number of elements per chain:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.min_elem_in_chain }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list-item class="px-2 py-1">
+        <v-list-item-action class="pr-3 key">
+          Maximal number of elements per chain:
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title class="text-right">
+          {{ data.max_elem_in_chain }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
   </fc-tile>
 </template>
 
@@ -60,7 +149,7 @@
       return {
         headers: [
           {
-            text: 'Name',
+            text: 'Dictionary name',
             align: 'start',
             value: 'dictionary.name'
           },
