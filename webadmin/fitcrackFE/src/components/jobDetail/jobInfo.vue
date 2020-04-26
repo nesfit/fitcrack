@@ -34,7 +34,7 @@
           rotate="-90"
         />
         <span class="text-capitalize pt-1 ml-2">
-          <span v-if="data.batch && data.status == 0">
+          <span v-if="data.batch && data.batch.id && data.status == 0">
             Enqueued
           </span>
           <span v-else>

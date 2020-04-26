@@ -98,6 +98,7 @@
                 autofocus
                 item-text="username"
                 item-value="id"
+                label="Type username"
                 @input="addUser"
               />
             </v-card-text>

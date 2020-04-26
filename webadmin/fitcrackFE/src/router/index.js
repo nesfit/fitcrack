@@ -65,7 +65,8 @@ const appRoutes = [
     component: batchList,
     meta: {
       title: 'Batches',
-      icon: 'mdi-tray-full'
+      icon: 'mdi-tray-full',
+      navtab: 0
     }
   },
   {
@@ -82,7 +83,8 @@ const appRoutes = [
     component: jobs,
     meta: {
       title: 'Jobs',
-      icon: 'mdi-briefcase'
+      icon: 'mdi-briefcase',
+      navtab: 0
     }
   },
   {
@@ -91,7 +93,8 @@ const appRoutes = [
     component: jobs,
     meta: {
       title: 'Bins',
-      icon: 'mdi-folder'
+      icon: 'mdi-folder',
+      navtab: 0
     }
   },
   {
@@ -100,7 +103,8 @@ const appRoutes = [
     component: jobs,
     meta: {
       title: 'Trash',
-      icon: 'mdi-delete'
+      icon: 'mdi-delete',
+      navtab: 0
     }
   },
   {
@@ -110,7 +114,8 @@ const appRoutes = [
     meta: {
       guard: 'ADD_NEW_JOB',
       title: 'Create a job',
-      icon: 'mdi-briefcase-plus'
+      icon: 'mdi-briefcase-plus',
+      navtab: 0
     }
   },
   {
@@ -127,7 +132,8 @@ const appRoutes = [
     component: templates,
     meta: {
       title: 'Job templates',
-      icon: 'mdi-file'
+      icon: 'mdi-file',
+      navtab: 2
     }
   },
   {
@@ -136,7 +142,8 @@ const appRoutes = [
     component: hosts,
     meta: {
       title: 'Hosts',
-      icon: 'mdi-desktop-classic'
+      icon: 'mdi-desktop-classic',
+      navtab: 2
     }
   },
   {
@@ -158,7 +165,8 @@ const appRoutes = [
     component: hashes,
     meta: {
       title: 'Hashes',
-      icon: 'mdi-book-lock'
+      icon: 'mdi-book-lock',
+      navtab: 1
     }
   },
   {
@@ -167,7 +175,8 @@ const appRoutes = [
     component: dictionaries,
     meta: {
       title: 'Dictionaries',
-      icon: 'mdi-dictionary'
+      icon: 'mdi-dictionary',
+      navtab: 1
     }
   },
   {
@@ -181,7 +190,8 @@ const appRoutes = [
     component: pcfg,
     meta: {
       title: 'PCFG',
-      icon: 'mdi-ray-start-end'
+      icon: 'mdi-ray-start-end',
+      navtab: 1
     }
   },
   {
@@ -198,7 +208,8 @@ const appRoutes = [
     component: rules,
     meta: {
       title: 'Rules',
-      icon: 'mdi-gavel'
+      icon: 'mdi-gavel',
+      navtab: 1
     }
   },
   {
@@ -212,7 +223,8 @@ const appRoutes = [
     component: charsets,
     meta: {
       title: 'Charsets',
-      icon: 'mdi-alphabetical'
+      icon: 'mdi-alphabetical',
+      navtab: 1
     }
   },
   {
@@ -226,7 +238,8 @@ const appRoutes = [
     component: masks,
     meta: {
       title: 'Masks',
-      icon: 'mdi-guy-fawkes-mask'
+      icon: 'mdi-guy-fawkes-mask',
+      navtab: 1
     }
   },
   {
@@ -240,7 +253,8 @@ const appRoutes = [
     component: markovChains,
     meta: {
       title: 'Markov chains',
-      icon: 'mdi-matrix'
+      icon: 'mdi-matrix',
+      navtab: 1
     }
   },
   {
@@ -260,7 +274,8 @@ const appRoutes = [
     meta: {
       guard: 'MANAGE_USERS',
       title: 'Manage users',
-      icon: 'mdi-folder-account'
+      icon: 'mdi-folder-account',
+      navtab: 2
     }
   },
   {
@@ -278,7 +293,8 @@ const appRoutes = [
     component: Server,
     meta: {
       title: 'Server monitor',
-      icon: 'mdi-gauge'
+      icon: 'mdi-gauge',
+      navtab: 2
     }
   },
   {
@@ -287,7 +303,8 @@ const appRoutes = [
     component: Settings,
     meta: {
       title: 'Settings',
-      icon: 'mdi-cogs'
+      icon: 'mdi-cogs',
+      navtab: 2
     }
   },
   {
@@ -296,7 +313,8 @@ const appRoutes = [
     component: Transfer,
     meta: {
       title: 'Data Transfer',
-      icon: 'mdi-dolly'
+      icon: 'mdi-dolly',
+      navtab: 2
     }
   },
   {
