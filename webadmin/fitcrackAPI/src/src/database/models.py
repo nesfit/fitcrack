@@ -218,7 +218,7 @@ class FcJob(Base):
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
     markov_threshold = Column(Integer, nullable=False, server_default=text("'0'"))
-    grammar_id = Column(BigInteger, nullable=False)
+    grammar_id = Column(BigInteger, ForeignKey('fc_pcfg_grammar.id'), nullable=False)
     case_permute = Column(Integer, nullable=False, server_default=text("'0'"))
     check_duplicates = Column(Integer, nullable=False, server_default=text("'0'"))
     min_password_len = Column(Integer, nullable=False, server_default=text("'1'"))
@@ -231,6 +231,9 @@ class FcJob(Base):
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
     queue_position = Column(Integer)
 
+    permission_records = relationship("FcUserPermission",
+                          primaryjoin="FcJob.id==FcUserPermission.job_id")
+
     batch = relationship("FcBatch", back_populates="jobs")
 
     workunits = relationship("FcWorkunit")
@@ -241,6 +244,9 @@ class FcJob(Base):
 
     markov = relationship("FcHcstat",
                           primaryjoin="FcJob.markov_hcstat==FcHcstat.name")
+
+    pcfg = relationship("FcPcfg",
+                          primaryjoin="FcJob.grammar_id==FcPcfg.id")
 
     hosts = relationship("Host", secondary="fc_host_activity",
                          primaryjoin="FcJob.id == FcHostActivity.job_id",
