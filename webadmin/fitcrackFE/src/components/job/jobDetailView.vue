@@ -560,7 +560,7 @@
 
     <v-dialog
       v-model="editJobDialog"
-      max-width="500"
+      max-width="700"
     >
       <v-card
         v-if="editJobValues !== null"
@@ -642,6 +642,102 @@
                 min="10"
               />
             </v-col>
+
+              <v-col v-if="editJobValues.attack_mode == 8" cols="12">
+                <v-checkbox
+                  v-model="editJobValues.check_duplicates"
+                  label="Check password duplicates"
+                />
+                <v-checkbox
+                  v-model="editJobValues.case_permute"
+                  label="Case permutation"
+                />
+                <v-checkbox
+                  v-model="editJobValues.shuffle_dict"
+                  label="Purple Rain Attack"
+                />
+              </v-col>
+
+              <v-col v-if="editJobValues.attack_mode == 8" cols="8">
+                <v-subheader class="height64">
+                  Minimal length of passwords (1 - 32):
+                </v-subheader>
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="4">
+                <v-text-field
+                  v-model="editJobValues.min_password_len"
+                  text
+                  single-line
+                  required
+                  type="number"
+                  min="1"
+                  max="32"
+                />
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="8">
+                <v-subheader class="height64">
+                  Maximal length of passwords (1 - 32):
+                </v-subheader>
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="4">
+                <v-text-field
+                  v-model="editJobValues.max_password_len"
+                  text
+                  single-line
+                  required
+                  type="number"
+                  min="1"
+                  max="32"
+                />
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="8">
+                <v-subheader class="height64">
+                  Minimal number of elements per chain (1 - 16):
+                </v-subheader>
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="4">
+                <v-text-field
+                  v-model="editJobValues.min_elem_in_chain"
+                  text
+                  single-line
+                  required
+                  type="number"
+                  min="1"
+                  max="16"
+                />
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="8">
+                <v-subheader class="height64">
+                  Maximal number of elements per chain (1 - 16):
+                </v-subheader>
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="4">
+                <v-text-field
+                  v-model="editJobValues.max_elem_in_chain"
+                  text
+                  single-line
+                  required
+                  type="number"
+                  min="1"
+                  max="16"
+                />
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="8">
+                <v-subheader class="height64">
+                  Generate random rules:
+                </v-subheader>
+              </v-col>
+              <v-col v-if="editJobValues.attack_mode == 8" cols="4">
+                <v-text-field
+                  v-model="editJobValues.generate_random_rules"
+                  text
+                  single-line
+                  required
+                  type="number"
+                  min="0"
+                />
+              </v-col>
+
           </v-row>
         </v-card-text>
         <v-card-actions>
@@ -789,7 +885,15 @@
           time_start: this.$moment().toISOString(true).slice(0, 16),
           time_end:   this.$moment().toISOString(true).slice(0, 16),
           startNow: false,
-          endNever: false
+          endNever: false,
+          check_duplicates: false,
+          case_permute: false,
+          shuffle_dict: false,
+          min_password_len: 1,
+          max_password_len: 8,
+          min_elem_in_chain: 1,
+          max_elem_in_chain: 8,
+          generate_random_rules: 0,
         }
       }
     },
@@ -923,6 +1027,7 @@
       },
       showEditJobDialog: function() {
         this.editJobValues = {
+          attack_mode: this.data.attack_mode,
           name: this.data.name,
           comment: this.data.comment,
           seconds_per_job: this.data.seconds_per_job,
@@ -931,7 +1036,15 @@
             this.$moment().toISOString(true).slice(0, 16) :
             this.$moment(this.data.time_end).toISOString(true).slice(0, 16),
           startNow: (this.data.time_start === null),
-          endNever: (this.data.time_end === null)
+          endNever: (this.data.time_end === null),
+          check_duplicates: this.data.check_duplicates,
+          case_permute: this.data.case_permute,
+          shuffle_dict: this.data.shuffle_dict,
+          min_password_len: this.data.min_password_len,
+          max_password_len: this.data.max_password_len,
+          min_elem_in_chain: this.data.min_elem_in_chain,
+          max_elem_in_chain: this.data.max_elem_in_chain,
+          generate_random_rules: this.data.generate_random_rules,
         }
         this.editJobDialog = true
       },

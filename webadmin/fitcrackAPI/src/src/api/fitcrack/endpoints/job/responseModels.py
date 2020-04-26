@@ -158,7 +158,15 @@ job_big_model = api.model('Job', {
     'right_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'grammar_id': fields.Integer(),
     'grammar_name': fields.String(),
-    'grammar_keyspace': fields.Integer()
+    'grammar_keyspace': fields.Integer(),
+    'case_permute': fields.Boolean(),
+    'check_duplicates': fields.Boolean(),
+    'min_password_len': fields.Integer(),
+    'max_password_len': fields.Integer(),
+    'min_elem_in_chain': fields.Integer(),
+    'max_elem_in_chain': fields.Integer(),
+    'shuffle_dict': fields.Boolean(),
+    'generate_random_rules': fields.Integer()
 })
 
 job_nano_model = api.model('Job nano', {
