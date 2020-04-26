@@ -72,3 +72,17 @@ class templateData(Resource):
             return {
                 'template': json.dumps(template.template) # uhm...
             }
+
+    @api.response(200, 'Deleted')
+    @api.response(500, 'Failed')
+    def delete(self, id):
+        """
+        Deletes a template
+        """
+        try:
+            FcTemplate.query.filter_by(id=id).delete()
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'Couldn\'t delete template.')
+        return ('Deleted', 200)

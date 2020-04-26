@@ -8,15 +8,15 @@ import base64
 import datetime
 import math
 
-from flask_login import UserMixin, AnonymousUserMixin
-from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, String, Text, text, JSON, ForeignKey, \
+from flask_login import UserMixin, AnonymousUserMixin, current_user
+from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, Boolean, String, Table, Text, text, JSON, ForeignKey, \
     Numeric, func, LargeBinary, select, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.api.fitcrack.attacks.hashtypes import getHashById
-from src.api.fitcrack.functions import getStringBetween
+from src.api.fitcrack.functions import getStringBetween, get_batch_status
 from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
     job_status_text_info_to_code_dict, status_to_code
 from src.database import db
@@ -178,6 +178,10 @@ class FcJobDictionary(Base):
     is_left = Column(Integer, nullable=False, server_default=text("'1'"))
     dictionary = relationship("FcDictionary")
 
+bin_job_junction = Table('fc_bin_job', Base.metadata,
+    Column('job_id', Integer, ForeignKey('fc_job.id')),
+    Column('bin_id', Integer, ForeignKey('fc_bin.id'))
+)
 
 class FcJob(Base):
     __tablename__ = 'fc_job'
@@ -205,16 +209,16 @@ class FcJob(Base):
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
     dict1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
     dict2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
-    charset1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset3 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset4 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
+    charset1 = Column(String(4096, 'utf8_bin'))
+    charset2 = Column(String(4096, 'utf8_bin'))
+    charset3 = Column(String(4096, 'utf8_bin'))
+    charset4 = Column(String(4096, 'utf8_bin'))
     rules = Column(String(100, 'utf8_bin'), ForeignKey('fc_rule.name'))
     rule_left = Column(String(255, 'utf8_bin'))
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
     markov_threshold = Column(Integer, nullable=False, server_default=text("'0'"))
-    grammar_id = Column(BigInteger, nullable=False)
+    grammar_id = Column(BigInteger, ForeignKey('fc_pcfg_grammar.id'), nullable=False)
     case_permute = Column(Integer, nullable=False, server_default=text("'0'"))
     check_duplicates = Column(Integer, nullable=False, server_default=text("'0'"))
     min_password_len = Column(Integer, nullable=False, server_default=text("'1'"))
@@ -226,24 +230,25 @@ class FcJob(Base):
     replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
+    batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
+    queue_position = Column(Integer)
+
+    permission_records = relationship("FcUserPermission",
+                          primaryjoin="FcJob.id==FcUserPermission.job_id")
+
+    batch = relationship("FcBatch", back_populates="jobs")
 
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')
-
-    charSet1 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset1==FcCharset.name")
-    charSet2 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset2==FcCharset.name")
-    charSet3 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset3==FcCharset.name")
-    charSet4 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset4==FcCharset.name")
 
     rulesFile = relationship("FcRule",
                              primaryjoin="FcJob.rules==FcRule.name")
 
     markov = relationship("FcHcstat",
                           primaryjoin="FcJob.markov_hcstat==FcHcstat.name")
+
+    pcfg = relationship("FcPcfg",
+                          primaryjoin="FcJob.grammar_id==FcPcfg.id")
 
     hosts = relationship("Host", secondary="fc_host_activity",
                          primaryjoin="FcJob.id == FcHostActivity.job_id",
@@ -305,7 +310,73 @@ class FcJob(Base):
         if code == status_to_code['exhausted'] or code == status_to_code['malformed']:
             return 'error'
 
+    @hybrid_property
+    def permissions(self):
+        base = {'view': False, 'edit': False, 'operate': False, 'owner': False}
+        record = db.session.query(FcUserPermission).filter_by(user_id=current_user.id).filter_by(job_id=self.id).one_or_none()
+        if record:
+            if record.owner:
+                base = {'view': True, 'edit': True, 'operate': True, 'owner': True}
+            else:
+                base['view'] = record.view
+                base['edit'] = record.modify
+                base['operate'] = record.operate
+        return base
+
     hashes = relationship("FcHash", back_populates="job")
+
+class FcBin(Base):
+    __tablename__ = 'fc_bin'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    position = Column(Integer)
+
+    jobs = relationship('FcJob',
+                    secondary=bin_job_junction,
+                    backref="bins",
+                    lazy='dynamic',
+                    passive_deletes=True)
+
+    @hybrid_property
+    def job_count(self):
+        query = self.jobs
+        if not current_user.role.VIEW_ALL_JOBS:
+            ids = db.session.query(FcUserPermission.job_id).filter_by(user_id=current_user.id).filter_by(view=1).all()
+            ids = [x[0] for x in ids]
+            query = query.filter(FcJob.id.in_(ids))
+        
+        return query.filter(FcJob.deleted == 0).count()
+
+class FcBatch(Base):
+    __tablename__ = 'fc_batch'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    creator_id = Column(ForeignKey('fc_user.id', ondelete='SET NULL'), index=True)
+
+    creator = relationship("FcUser", backref="batches")
+    jobs = relationship("FcJob")
+
+    @hybrid_property
+    def total_jobs(self):
+        return len(self.jobs)
+
+    @hybrid_property
+    def waiting_jobs(self):
+        return len([job for job in self.jobs if job.status == 0])
+
+    @hybrid_property
+    def status(self):
+        return get_batch_status(self.total_jobs, self.waiting_jobs, len([job for job in self.jobs if job.status >= 10]) > 0)
+
+    @hybrid_property
+    def current_user_can_edit(self):
+        return self.creator_id == current_user.id or current_user.role.EDIT_ALL_JOBS
+
+    @hybrid_property
+    def current_user_can_operate(self):
+        return self.creator_id == current_user.id or current_user.role.OPERATE_ALL_JOBS
 
 class FcTemplate(Base):
     __tablename__ = 'fc_template'
@@ -437,7 +508,7 @@ class Host(Base):
     workunits = relationship("FcWorkunit", secondary="fc_host_activity",
                         primaryjoin="Host.id == FcHostActivity.boinc_host_id",
                         secondaryjoin="FcHostActivity.job_id == FcWorkunit.id",
-                        viewonly=True, order_by="desc(FcWorkunit.id)")
+                        order_by="desc(FcWorkunit.id)")
 
     last_active = relationship("FcHostStatus", uselist=False)
 
@@ -592,6 +663,7 @@ class FcUserPermission(Base):
     view = Column(Integer, nullable=False, server_default=text("'0'"))
     modify = Column(Integer, nullable=False, server_default=text("'0'"))
     operate = Column(Integer, nullable=False, server_default=text("'0'"))
+    owner = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship('FcJob')
     user = relationship('FcUser')

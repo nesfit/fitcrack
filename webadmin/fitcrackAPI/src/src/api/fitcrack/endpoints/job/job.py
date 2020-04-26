@@ -13,6 +13,7 @@ import tempfile
 from flask import request
 from flask_restplus import Resource
 from flask_restplus import abort
+from flask_login import current_user
 from sqlalchemy import func
 
 from settings import DICTIONARY_DIR
@@ -23,17 +24,20 @@ from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWorkunit_parser, \
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
-    editJob_argument
+    editJob_argument, multiEditHosts_argument, jobList_argument, job_permissions_arguments
 from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
-    computeCrackingTime, start_pcfg_manager
+    computeCrackingTime, start_pcfg_manager, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
+    can_view_job, can_edit_job, can_operate_job
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
-    verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, job_nano_list_model
+    verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, \
+    job_nano_list_model, job_user_permissions_model
 from src.api.fitcrack.functions import shellExec
 from src.api.fitcrack.attacks.functions import compute_prince_keyspace
 from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, attack_modes
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, FcJobDictionary, FcPcfg, FcJobStatus, FcRule
+from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, \
+    FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser
 
 log = logging.getLogger(__name__)
 
@@ -52,9 +56,19 @@ class jobsCollection(Resource):
         per_page = args.get('per_page', 10)
         jobs_query = FcJob.query
 
+        if not current_user.role.VIEW_ALL_JOBS:
+            ids = visible_jobs_ids()
+            jobs_query = jobs_query.filter(FcJob.id.in_(ids))
+
+        if args.bin is not None:
+            jobs_query = jobs_query.filter(FcJob.bins.any(id=args.bin))
+
+        if args.batch is not None:
+            jobs_query = jobs_query.filter_by(batch_id=args.batch)
+
         if args.showDeleted:
             jobs_query = jobs_query.filter_by(deleted=True)
-        else:
+        elif not args.batch: # always show both in batches
             jobs_query = jobs_query.filter_by(deleted=False)
 
         if args.name:
@@ -77,7 +91,6 @@ class jobsCollection(Resource):
         else:
             jobs_query = jobs_query.order_by(FcJob.id.desc())
 
-
         jobs_page = jobs_query.paginate(page, per_page, error_out=True)
 
         return jobs_page
@@ -88,6 +101,9 @@ class jobsCollection(Resource):
         """
         Creates new job.
         """
+        if not current_user.role.ADD_NEW_JOB:
+            abort(401, 'Unauthorized to add a job.')
+
         data = request.json
         job = create_job(data)
 
@@ -95,6 +111,77 @@ class jobsCollection(Resource):
             'message': 'Job \"' + job.name + '\" successfully created.',
             'status': True,
             'job_id': job.id
+        }
+
+    @api.expect(jobList_argument)
+    @api.response(200, 'Jobs moved to/from trash')
+    @api.response(500, 'Failed moving to/from trash')
+    def patch(self):
+        """
+        Moves jobs between trash and visible listing.
+        """
+
+        args = jobList_argument.parse_args(request)
+        ids = args['job_ids']
+        query = FcJob.query.filter(FcJob.id.in_(ids))
+        if not current_user.role.EDIT_ALL_JOBS:
+            editable = editable_jobs_ids()
+            query = query.filter(FcJob.id.in_(editable))
+        jobs = query.all()
+        if (len(jobs) == 0):
+            abort(400, 'No jobs selected or you don\'t have permissions on them.')
+
+        for job in jobs:
+            job.deleted = not job.deleted
+            
+        try:
+            db.session.commit()
+        except:
+            return 'Oops', 500
+
+        return 'Moved', 200
+
+
+@ns.route('/host')
+@api.response(404, 'job not found.')
+class multiJobsHost(Resource):
+
+    @api.expect(multiEditHosts_argument)
+    @api.marshal_with(simpleResponse)
+    def post(self):
+        """
+        Mapping of hosts to multiple jobs.
+        """
+
+        args = multiEditHosts_argument.parse_args(request)
+        ids = args['job_ids']
+        requested_count = len(ids)
+        skipped = 0
+        if not current_user.role.EDIT_ALL_JOBS:
+            editable = editable_jobs_ids()
+            ids = [id for id in ids if id in editable]
+            skipped = requested_count - len(ids)
+            
+        beforeHosts = FcHostActivity.query.filter(FcHostActivity.job_id.in_(ids)).all()
+        for host in beforeHosts:
+            db.session.delete(host)
+
+        for jobId in ids:
+            for hostId in args['newHost_ids']:
+                host = FcHostActivity(boinc_host_id=hostId, job_id=jobId)
+                db.session.add(host)
+
+        try:
+            db.session.commit()
+        except:
+            return {
+                'status': False,
+                'message': 'Something went wrong.'
+            }
+
+        return {
+            'status': True,
+            'message': f'Hosts assigned to {str(len(ids))} job(s).{" " + str(skipped) + " skipped due to permissions." if skipped else ""}'
         }
 
 @ns.route('/<int:id>')
@@ -106,6 +193,8 @@ class JobByID(Resource):
         """
         Returns job.
         """
+        if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
 
         job = FcJob.query.filter(FcJob.id == id).one()
 
@@ -122,6 +211,8 @@ class JobByID(Resource):
         """
         Changes created job.
         """
+        if not current_user.role.EDIT_ALL_JOBS and not can_edit_job(id):
+            abort(401, 'Unauthorized access to job.')
 
         args = editJob_argument.parse_args(request)
         job = FcJob.query.filter(FcJob.id == id).one()
@@ -135,7 +226,7 @@ class JobByID(Resource):
         job.name = args['name']
         job.comment = args['comment']
         job.seconds_per_workunit = args['seconds_per_job']
-        job.time_start = datetime.datetime.now() if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%Y-%m-%dT%H:%M'),
+        job.time_start = None if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%Y-%m-%dT%H:%M'),
         job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%Y-%m-%dT%H:%M')
 
         if job.attack_mode == attack_modes['prince']:      
@@ -197,6 +288,9 @@ class OperationWithJob(Resource):
         """
         Operations with job(restart, start, stop).
         """
+        if not current_user.role.OPERATE_ALL_JOBS and not can_operate_job(id):
+            abort(401, 'Unauthorized access to job.')
+
         args = jobOperation.parse_args(request)
         action = args.get('operation')
         job = FcJob.query.filter(FcJob.id == id).one()
@@ -269,6 +363,57 @@ class OperationWithJob(Resource):
         }
 
 
+@ns.route('/<int:id>/permissions')
+class userPermissions(Resource):
+    
+    @api.marshal_with(job_user_permissions_model)
+    @api.response(500, 'permission aggregation failed')
+    def get(self, id):
+        """
+        Returns list of users with their permissions on this job
+        """
+        data = FcUserPermission.query.filter_by(job_id=id).all()
+        return {
+            'items': [{
+                'id': d.user.id,
+                'username': d.user.username,
+                'mail': d.user.mail,
+                'view': d.view,
+                'modify': d.modify,
+                'operate': d.operate,
+                'owner': d.owner
+            } for d in data]
+        }
+
+    @api.expect(job_permissions_arguments)
+    @api.response(200, 'permissions updated')
+    @api.response(500, 'permission management failed')
+    def put(self, id):
+        """
+        Assigns specified permissions on specified job to the user
+        """
+        args = job_permissions_arguments.parse_args(request)
+        user_id = args.get('user_id')
+
+        record = FcUserPermission.query.filter_by(job_id=id).filter_by(user_id=user_id).one_or_none()
+        if not record:
+            record = FcUserPermission(job_id=id, user_id=user_id, view=0, modify=0, operate=0, owner=0)
+            db.session.add(record)
+        
+        for perm in 'view', 'modify', 'operate':
+            old = getattr(record, perm)
+            new = args.get(perm)
+            setattr(record, perm, old if not new else new)
+
+        try:
+            db.session.commit()
+        except:
+            db.session().rollback()
+            abort(500, 'Permission management failed.')
+
+        return 'Permissions updated.', 200
+
+
 
 @ns.route('/<int:id>/host')
 @api.response(404, 'job not found.')
@@ -280,6 +425,8 @@ class jobsHost(Resource):
         """
         Returns list of hosts that are working on job.
         """
+        if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
 
         args = jobHost_parser.parse_args(request)
         page = args.get('page', 1)
@@ -292,12 +439,15 @@ class jobsHost(Resource):
 
         return hosts_page
 
+    @api.deprecated
     @api.expect(editHostMapping_argument)
     @api.marshal_with(simpleResponse)
     def post(self, id):
         """
-        Mapping of hosts to job.
+        Deprecated in favor of /job/host - Mapping of hosts to job.
         """
+        if not current_user.role.EDIT_ALL_JOBS and not can_edit_job(id):
+            abort(401, 'Unauthorized access to job.')
 
         args = editHostMapping_argument.parse_args(request)
         beforeHosts = FcHostActivity.query.filter_by(job_id=id).all()
@@ -330,8 +480,11 @@ class workunitsJob(Resource):
     @api.marshal_with(page_of_jobs_model)
     def get(self, id):
         """
-        Returns workunits to which job was devides.
+        Returns workunits making up this job.
         """
+        if not current_user.role.EDIT_VIEW_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
+
         args = jobWorkunit_parser.parse_args(request)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)

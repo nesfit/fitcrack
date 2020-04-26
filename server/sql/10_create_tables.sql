@@ -238,6 +238,35 @@ CREATE TABLE IF NOT EXISTS `fc_protected_file` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_bin`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `position` int(11),
+  primary key (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_batch`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_batch` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `creator_id` int(11),
+  primary key (`id`),
+  key `creator_id` (`creator_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 -- --------------------------------------------------------
 
 --
@@ -289,8 +318,26 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  `batch_id` int(11),
+  `queue_position` int(11),
+  PRIMARY KEY (`id`),
+  KEY `batch_id` (`batch_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_bin_job` (M2M junction)
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin_job` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `job_id` bigint(20) unsigned NOT NULL,
+  `bin_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `job_id` (`job_id`),
+  KEY `bin_id` (`bin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 
 -- --------------------------------------------------------
 
@@ -452,6 +499,7 @@ CREATE TABLE IF NOT EXISTS `fc_user_permissions` (
   `view` tinyint(1) NOT NULL DEFAULT '0',
   `modify` tinyint(1) NOT NULL DEFAULT '0',
   `operate` tinyint(1) NOT NULL DEFAULT '0',
+  `owner` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `job_id` (`job_id`),
   KEY `user_id` (`user_id`)
@@ -511,6 +559,17 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 -- Obmedzenie pre exportované tabuľky
 --
 
+--
+-- Obmedzenie pre tabuľku `fc_job`
+--
+ALTER TABLE `fc_job`
+  ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL;
+
+--
+-- Obmedzenie pre tabuľku `fc_batch`
+--
+ALTER TABLE `fc_batch`
+  ADD CONSTRAINT `user_link` FOREIGN KEY (`creator_id`) REFERENCES `fc_user` (`id`) ON DELETE SET NULL;
 
 --
 -- Omezeni pro tabulku `fc_job_status`
@@ -525,6 +584,15 @@ ALTER TABLE `fc_job_status`
 ALTER TABLE `fc_notification`
   ADD CONSTRAINT `fc_notification_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `fc_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fc_notification_ibfk_2` FOREIGN KEY (`source_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+--
+-- Obmedzenie pre junction tabuľku `fc_bin_job`
+--
+ALTER TABLE `fc_bin_job`
+  ADD CONSTRAINT `fc_bin_job_jobfk` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fc_bin_job_binfk` FOREIGN KEY (`bin_id`) REFERENCES `fc_bin` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 --
 -- Obmedzenie pre tabuľku `fc_job_graph`

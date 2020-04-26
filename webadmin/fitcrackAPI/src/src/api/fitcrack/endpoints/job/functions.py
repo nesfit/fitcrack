@@ -17,13 +17,14 @@ import os
 from os.path import basename
 from uuid import uuid1
 from flask_restplus import abort
+from flask_login import current_user
 from sqlalchemy import exc
 from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
 from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
-from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash
+from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash, FcUserPermission
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
@@ -145,6 +146,9 @@ def create_job(data):
     for hashObj in data['hash_settings']['hash_list']:
         hash = FcHash(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
         db.session.add(hash)
+
+    perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)
+    db.session.add(perms)
 
     db.session.commit()
     return db_job
@@ -335,3 +339,28 @@ def start_pcfg_manager(job_id, grammar_name, keyspace):
     manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
     test = PCFG_MANAGER_DIR + " server " + "-p " + str(calculate_port_number(job_id)) + " -m " + str(keyspace) + " --hashlist " + PCFG_MANAGER + "/README.md" + " -r " + PCFG_DIR + "/" + grammar_name
     process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", str(calculate_port_number(job_id)), "-m", str(keyspace), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])
+
+# permission utils
+def perm_base ():
+    return db.session.query(FcUserPermission.job_id).filter_by(user_id=current_user.id)
+
+def visible_jobs_ids ():
+    ids = perm_base().filter_by(view=1).all()
+    return [x[0] for x in ids]
+
+def editable_jobs_ids ():
+    ids = perm_base().filter_by(modify=1).all()
+    return [x[0] for x in ids]
+
+def actionable_jobs_ids ():
+    ids = perm_base().filter_by(operate=1).all()
+    return [x[0] for x in ids]
+
+def can_view_job (id):
+    return True if perm_base().filter_by(view=1).filter_by(job_id=id).one_or_none() else False
+
+def can_edit_job (id):
+    return True if perm_base().filter_by(modify=1).filter_by(job_id=id).one_or_none() else False
+
+def can_operate_job (id):
+    return True if perm_base().filter_by(operate=1).filter_by(job_id=id).one_or_none() else False

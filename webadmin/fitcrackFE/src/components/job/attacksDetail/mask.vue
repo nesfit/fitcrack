@@ -5,81 +5,26 @@
 
 <template>
   <fc-tile title="Attack details">
+    <v-data-table
+      :headers="maskHeaders"
+      :items="data.masks"
+      hide-default-footer
+    >
+      <template v-slot:item.progress="{ item }">
+        <v-progress-circular
+          size="16"
+          :width="3"
+          :rotate="270"
+          color="primary"
+          :value="item.progress"
+        />
+        <span class="progressPercentageMask">{{ progressToPercentage(item.progress) }}</span>
+      </template>
+    </v-data-table>
     <v-list
       single-line
       class="width100"
     >
-      <v-list-item class="px-2 py-1">
-        <v-list-item-action class="pr-3 key">
-          Type:
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title class="text-right">
-            {{ data.attack }}
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <template v-if="data.charSet1.id !== null">
-        <v-divider />
-        <v-list-item class="px-2 py-1">
-          <v-list-item-action class="pr-3 key">
-            Charset 1:
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
-              <router-link :to="{name: 'charsetDetail', params: { id: data.charSet1.id}}">
-                {{ data.charSet1.name }}
-              </router-link>
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-      <template v-if="data.charSet2.id !== null">
-        <v-divider />
-        <v-list-item class="px-2 py-1">
-          <v-list-item-action class="pr-3 key">
-            charset 2:
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
-              <router-link :to="{name: 'charsetDetail', params: { id: data.charSet2.id}}">
-                {{ data.charSet2.name }}
-              </router-link>
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-      <template v-if="data.charSet3.id !== null">
-        <v-divider />
-        <v-list-item class="px-2 py-1">
-          <v-list-item-action class="pr-3 key">
-            Charset 3:
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
-              <router-link :to="{name: 'charsetDetail', params: { id: data.charSet3.id}}">
-                {{ data.charSet3.name }}
-              </router-link>
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-      <template v-if="data.charSet4.id !== null">
-        <v-divider />
-        <v-list-item class="px-2 py-1">
-          <v-list-item-action class="pr-3 key">
-            Charset 4:
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
-              <router-link :to="{name: 'charsetDetail', params: { id: data.charSet4.id}}">
-                {{ data.charSet4.name }}
-              </router-link>
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-
       <template v-if="data.markov.id !== null">
         <v-divider />
         <v-list-item class="px-2 py-1">
@@ -97,24 +42,6 @@
           </v-list-item-content>
         </v-list-item>
       </template>
-
-      <v-divider />
-      <v-data-table
-        :headers="maskHeaders"
-        :items="data.masks"
-        hide-default-footer
-      >
-        <template v-slot:item.progress="{ item }">
-          <v-progress-circular
-            size="16"
-            :width="3"
-            :rotate="270"
-            color="primary"
-            :value="item.progress"
-          />
-          <span class="progressPercentageMask">{{ progressToPercentage(item.progress) }}</span>
-        </template>
-      </v-data-table>
     </v-list>
   </fc-tile>
 </template>

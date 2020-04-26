@@ -239,6 +239,7 @@
   import gridTile from '@/components/home/gridTile'
   import jobTile from '@/components/home/jobTile'
   import fcGraph from '@/components/graph/fc_graph'
+  import { attackIcon } from '@/assets/scripts/iconMaps'
   import dtPicker from '@/components/picker/datetime'
 
   export default {

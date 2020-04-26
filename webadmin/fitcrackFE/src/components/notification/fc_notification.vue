@@ -4,34 +4,46 @@
 -->
 
 <template>
-  <v-list-item :to="'/jobs/' + jobId">
-    <v-alert
-      class="d-inline-block width100 my-2"
-      :type="type"
-      :text="!seen"
-      outlined
-    >
-      <div class="text-left">
-        {{ 'Job \"' + title + '\"' }}
+  <v-list-item 
+    :to="'/jobs/' + jobId"
+    :class="['py-2', 'pr-6', { seen }]"
+  >
+    <v-list-item-avatar>
+      <v-icon :color="seen ? null : type">
+        {{ typeIcon(type) }}
+      </v-icon>
+    </v-list-item-avatar>
+    <v-list-item-content>
+      <div class="d-flex justify-space-between align-center mb-2">
+        <v-list-item-title :class="['font-weight-bold', `${seen ? '' : type}--text`]">
+          {{ title }}
+        </v-list-item-title>
+        <v-list-item-subtitle class="text-end nogrow">
+          {{ $moment(time).format('DD. MM. YYYY HH:mm') }}
+        </v-list-item-subtitle>
       </div>
-      <v-divider />
-      <div class="text-left">
+      <div class="body-2">
         {{ text }}
       </div>
-      <small>
-        {{ $moment(time).format('DD. MM. YYYY HH:mm') }}
-      </small>
-    </v-alert>
+    </v-list-item-content>
   </v-list-item>
 </template>
 
 <script>
-    export default {
-      name: 'Notification',
-      props: ['type', 'title', 'text', 'seen', 'time', 'jobId']
-    }
+  import { typeIcon } from '@/assets/scripts/iconMaps'
+  export default {
+    name: 'Notification',
+    props: ['type', 'title', 'text', 'seen', 'time', 'jobId'],
+    methods: { typeIcon }
+  }
 </script>
 
 <style scoped>
+.nogrow {
+  flex: none;
+}
 
+.seen {
+  opacity: .7;
+}
 </style>

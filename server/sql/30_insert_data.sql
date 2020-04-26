@@ -6598,6 +6598,13 @@ INSERT INTO `fc_pcfg_grammar` (`id`, `name`, `path`, `keyspace`, `time_added`, `
 (3, 'twitter-banned', 'twitter-banned.zip', 1096, '2019-08-30 12:17:48', '2019-08-30 12:17:48', 0);
 
 --
+-- Create default job bins
+--
+
+INSERT INTO `fc_bin` (`name`) VALUES
+('Samples');
+
+--
 -- Insert default BENCH_ALL job and sample jobs
 --
 
@@ -6625,6 +6632,18 @@ INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index
 
 
 --
+-- Assign sample jobs to Samples bin
+--
+
+INSERT INTO `fc_bin_job` (`job_id`, `bin_id`) VALUES
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1);
+
+
+--
 -- Insert default rules
 --
 
@@ -6646,3 +6665,15 @@ INSERT INTO `fc_role` (`name`, `MANAGE_USERS`, `ADD_NEW_JOB`, `UPLOAD_DICTIONARI
 
 INSERT INTO `fc_user` (`username`, `password`, `mail`, `role_id`, `deleted`) VALUES
 ('fitcrack', 'pbkdf2:sha256:50000$YqLJFcXh$430310718869b9783680c546a5fb1a50e9b34d7e49cc1bd1dd2a508b46c7409c', 'ihranicky@fit.vutbr.cz', 1, 0);
+
+--
+-- Give admin ownership of jobs shipping with fitcrack
+--
+
+INSERT INTO `fc_user_permissions` (`job_id`, `user_id`, `owner`) VALUES
+(1, 1, 1),
+(2, 1, 1),
+(3, 1, 1),
+(4, 1, 1),
+(5, 1, 1),
+(6, 1, 1);

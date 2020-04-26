@@ -15,7 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'charsetDetail', params: { id: item.id}}" target='_blank'>
+      <router-link :to="{name: 'charsetDetail', params: { id: item.id}}">
         {{ item.name }}
         <v-icon 
           small
@@ -72,7 +72,6 @@
     text-overflow: ellipsis;
     display: block;
     width: 200px;
-    vertical-align: middle;
     line-height: 50px;
     height: 50px;
   }

@@ -65,7 +65,7 @@
           </v-tooltip>
         </template>
       </v-data-table>
-      <v-card-actions>
+      <v-card-actions v-if="$userCan('UPLOAD_DICTIONARIES')">
         <v-checkbox
           v-model="sortUploaded"
           label="Sort on upload"

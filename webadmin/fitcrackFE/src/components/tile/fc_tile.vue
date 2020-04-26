@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <v-card class="mx-auto">
+  <v-card flat class="mx-auto">
     <v-card-title>
       <v-icon 
         v-if="icon"

@@ -21,6 +21,12 @@ simpleResponse = api.model('simpleResponse', {
     'message': fields.String(description="Some details...")
 })
 
+file_content = api.model('File info and content data', {
+    'name': fields.String(),
+    'path': fields.String(),
+    'data': fields.String()
+})
+
 host_short_model = api.model('Host short', {
     'id': fields.Integer(readOnly=True, required=False),
     'boinc_host_id': fields.Integer(readOnly=True, required=False),
@@ -40,6 +46,13 @@ boincHostActivity_model = api.model('Host activity', {
     'last_seen': fields.String(),
     'seconds_delta': fields.String(),
     'online': fields.Boolean()
+})
+
+job_permissions = api.model('Job permissions object', {
+    'view': fields.Boolean(),
+    'edit': fields.Boolean(),
+    'operate': fields.Boolean(),
+    'owner': fields.Boolean()
 })
 
 job_nano_model = api.model('Job nano', {
@@ -65,9 +78,14 @@ job_short_model = api.model('Job short', {
     'name': fields.String(required=True, description='name of the job'),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
+    'permissions': fields.Nested(job_permissions),
+    'batch_id': fields.Integer(), # to know if job is enqueued and where
+    'queue_position': fields.Integer(),
     'attack_mode': fields.String(required=True),
     'attack': fields.String(required=True),
     'host_count': fields.Integer(),
+    'keyspace': fields.String(required=True),
+    'hc_keyspace': fields.String(required=True),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),
@@ -82,4 +100,17 @@ job_short_model = api.model('Job short', {
     'time_end': fields.DateTime(required=True),
     'password': fields.String(),
     'deleted': fields.Boolean()
+})
+
+job_micro_model = api.model('Job micro', {
+    'id': fields.Integer(readOnly=True, required=False, description='job id'),
+    'name': fields.String(required=True, description='job name'),
+    'permissions': fields.Nested(job_permissions),
+    'queue_position': fields.Integer(),
+    'attack': fields.String(),
+    'status': fields.String(required=False),
+    'status_text': fields.String(required=False),
+    'status_tooltip': fields.String(required=False),
+    'status_type': fields.String(),
+    'progress': fields.Float(required=False),
 })

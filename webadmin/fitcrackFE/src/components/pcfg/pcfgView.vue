@@ -24,6 +24,14 @@
         :loading="loading"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'PCFGs per page'}"
       >
+        <template v-slot:item.name="{ item: {id, name} }">
+          <router-link
+            :to="{name: 'pcfgBrowser', params: {id}}"
+            class="font-weight-bold"
+          >
+            {{ name }}
+          </router-link>
+        </template>
         <template v-slot:item.time_added="{ item }">
           {{ $moment(item.time_added).format('DD.MM.YYYY HH:mm') }}
         </template>

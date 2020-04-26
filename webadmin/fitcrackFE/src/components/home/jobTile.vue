@@ -11,6 +11,7 @@
 
 <script>
 import gridTile from './gridTile'
+import { jobIcon } from '@/assets/scripts/iconMaps'
 export default {
   components: {
     gridTile
@@ -32,16 +33,7 @@ export default {
       }
       return colors[status]
     },
-    jobIcon (status) {
-      const icons = {
-        ready: 'mdi-play-circle-outline',
-        finished: 'mdi-checkbox-marked-circle-outline',
-        exhausted: 'mdi-close-circle-outline',
-        malformed: 'mdi-alert-circle-outline',
-        finishing: 'mdi-progress-clock'
-      }
-      return icons[status]
-    }
+    jobIcon
   }
 }
 </script>

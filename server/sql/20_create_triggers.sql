@@ -163,3 +163,118 @@ BEGIN
 END
 //
 DELIMITER ;
+
+--
+-- Procedure for finishing job and continuing batch if applicable
+--
+drop procedure if exists finish_job;
+delimiter //
+--
+create procedure finish_job(
+	IN job_id bigint(20),
+	IN end_status smallint(1)
+)
+sql security invoker
+begin
+declare b_id int(11);
+declare q_p int(11);
+declare succ_id bigint(20);
+--
+declare exit handler for sqlexception
+begin
+rollback;
+end;
+--
+set end_status = ifnull(end_status, 1); -- 1 = finished, default value 
+start transaction;
+-- set job to finished state
+update fc_job set status = end_status, result = 'check the hashlist', time_end = now() where id = job_id;
+-- get job batch details
+select batch_id, queue_position into b_id, q_p
+from fc_job where id = job_id;
+-- find successor id
+select id into succ_id 
+from fc_job where batch_id = b_id
+and queue_position > q_p
+and status = 0 -- ready
+order by queue_position asc
+limit 1;
+-- start succeessor if one exists
+if succ_id is not null then
+  update fc_job set status = 10 where id = succ_id;
+end if;
+--
+commit;
+end //
+delimiter ;
+
+--
+-- Triggers and procedures for bin organization
+--
+
+-- triggers
+
+drop trigger if exists assign_bin_position;
+
+delimiter //
+create trigger assign_bin_position
+before insert on fc_bin for each row
+begin
+declare pos int;
+set pos = (select max(position) from fc_bin);
+if pos is null then
+  set NEW.position = 0;
+else
+  set NEW.position = pos + 1;
+end if;
+end //
+delimiter ;
+
+-- procedures
+
+drop procedure if exists move_bin;
+drop procedure if exists delete_bin;
+
+delimiter //
+
+create procedure move_bin(
+  IN bin_id INT(11),
+  IN target int
+)
+sql security invoker
+begin
+declare pos int;
+declare exit handler for sqlexception
+begin
+rollback;
+end;
+set pos = (select position from fc_bin where id=bin_id);
+start transaction;
+if target > pos then
+update fc_bin set position = position - 1 where position between pos and target;
+else
+update fc_bin set position = position + 1 where position between target and pos;
+end if;
+update fc_bin set position = target where id = bin_id;
+commit;
+end //
+
+
+create procedure delete_bin(
+  IN bin_id INT(11)
+)
+sql security invoker
+begin
+declare pos int;
+declare exit handler for sqlexception
+begin
+rollback;
+end;
+set pos = (select position from fc_bin where id=bin_id);
+start transaction;
+delete from fc_bin where id=bin_id;
+update fc_bin set position = position - 1 where position > pos;
+commit;
+end //
+ 
+delimiter ;

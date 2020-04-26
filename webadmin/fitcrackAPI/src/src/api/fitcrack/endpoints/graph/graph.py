@@ -12,6 +12,7 @@ from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.graph.argumentsParser import job_graph_arguments
 from src.api.fitcrack.endpoints.graph.functions import computeJobsGraph, computeHostGraph, \
     computeHostPercentageGraph
+from src.api.fitcrack.endpoints.batches.functions import getIdsFromBatch
 from src.api.fitcrack.endpoints.graph.responseModels import job_graph_model, pie_graph_model
 
 log = logging.getLogger(__name__)
@@ -85,7 +86,21 @@ class hostsComputingSingle(Resource):
         args = job_graph_arguments.parse_args(request)
         fromDate = args['from_date']
 
-        graphData = computeHostGraph(fromDate, jobId=id)
+        graphData = computeHostGraph(fromDate, jobIds=id)
+
+        return graphData
+
+
+@ns.route('/hostsComputing/batch/<int:id>')
+class hostsComputingBatch(Resource):
+
+    @api.marshal_with(job_graph_model)
+    def get(self, id):
+        """
+        Returns 2D graph representing computing power of active host.
+        """
+        job_ids = getIdsFromBatch(id)
+        graphData = computeHostGraph(jobIds=job_ids)
 
         return graphData
 
@@ -104,5 +119,19 @@ class hostPercentage(Resource):
         fromDate = args['from_date']
 
         graphData = computeHostPercentageGraph(fromDate, id)
+
+        return graphData
+
+
+@ns.route('/hostPercentage/batch/<int:id>')
+class hostPercentageBatch(Resource):
+
+    @api.marshal_with(pie_graph_model)
+    def get(self, id):
+        """
+        Returns 2D graph representing ratio of host's computing power.
+        """
+        job_ids = getIdsFromBatch(id)
+        graphData = computeHostPercentageGraph(jobIds=job_ids)
 
         return graphData

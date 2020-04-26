@@ -18,6 +18,8 @@ jobList_parser.add_argument('order_by', type=str, required=False, help='result o
                                 choices=['name', 'time', 'progress', 'attack_mode', 'status'])
 jobList_parser.add_argument('descending', type=inputs.boolean, required=False)
 jobList_parser.add_argument('showDeleted', type=inputs.boolean, required=False, default=False)
+jobList_parser.add_argument('bin', type=int, required=False, default=None)
+jobList_parser.add_argument('batch', type=int, required=False, default=None)
 
 jobWorkunit_parser = pagination.copy()
 
@@ -224,13 +226,19 @@ addJob_model = api.schema_model('addJob', {
     'type': 'object'
 })
 
+jobList_argument = reqparse.RequestParser()
+jobList_argument.add_argument('job_ids', type=list, required=True, location='json')
 
 jobOperation = reqparse.RequestParser()
 jobOperation.add_argument('operation', type=str, required=True,  help='job action',
                        choices=["start", "stop", "restart", "kill"])
 
 editHostMapping_argument = reqparse.RequestParser()
-editHostMapping_argument.add_argument('newHost_ids', type=list, required=True, location='json')
+editHostMapping_argument.add_argument('newHost_ids', type=list, required=True, location='json', help='An array of host IDs')
+
+multiEditHosts_argument = editHostMapping_argument.copy()
+multiEditHosts_argument.add_argument('job_ids', type=list, required=True, location='json', help='An array of job IDs')
+
 editJob_argument = reqparse.RequestParser()
 editJob_argument.add_argument('name', type=str, required=True)
 editJob_argument.add_argument('comment', type=str, required=True)
@@ -248,3 +256,9 @@ editJob_argument.add_argument('max_password_len', type=int, required=True)
 editJob_argument.add_argument('min_elem_in_chain', type=int, required=True)
 editJob_argument.add_argument('max_elem_in_chain', type=int, required=True)
 editJob_argument.add_argument('generate_random_rules', type=int, required=True)
+
+job_permissions_arguments = reqparse.RequestParser()
+job_permissions_arguments.add_argument('user_id', type=int, help='user to grant/revoke permissions on', required=True, location='json')
+job_permissions_arguments.add_argument('view', type=bool, required=False, location='json', help='grant view permission? when not provided: for new record defaults to false, otherwise leaves unchanged')
+job_permissions_arguments.add_argument('modify', type=bool, required=False, location='json', help='grant modify permission? when not provided: for new record defaults to false, otherwise leaves uncFalse')
+job_permissions_arguments.add_argument('operate', type=bool, required=False, location='json', help='grant operate permission? when not provided: for new record defaults to false, otherwise leaves unchanged')

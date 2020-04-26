@@ -6,11 +6,12 @@
 from flask_restplus import fields
 
 from src.api.apiConfig import api
+from src.api.fitcrack.endpoints.batches.responseModels import batch_model
 from src.api.fitcrack.endpoints.dictionary.responseModels import dictionary_model
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
 from src.api.fitcrack.responseModels import pagination, simpleResponse, job_short_model, \
-    boincHost_model
+    boincHost_model, job_permissions
 
 
 boincResult_model = api.model('boinc result', {
@@ -111,8 +112,10 @@ pcfgGrammar_model = api.model('PCFG job', {
 job_big_model = api.model('Job', {
     'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
     'name': fields.String(required=True, description='name of the job'),
+    'batch': fields.Nested(batch_model),
     'comment': fields.String(required=False),
     'priority': fields.Integer(),
+    'permissions': fields.Nested(job_permissions),
     'attack_mode': fields.String(required=True),
     'attack_submode': fields.Integer(),
     'attack': fields.String(required=True),
@@ -139,10 +142,10 @@ job_big_model = api.model('Job', {
     'dictionary1': fields.Nested(dictionary_model),
     'dict2': fields.String(required=True),
     'dictionary2': fields.Nested(dictionary_model),
-    'charSet1': fields.Nested(hcStat_model),
-    'charSet2': fields.Nested(hcStat_model),
-    'charSet3': fields.Nested(hcStat_model),
-    'charSet4': fields.Nested(hcStat_model),
+    'charset1': fields.String(),
+    'charset2': fields.String(),
+    'charset3': fields.String(),
+    'charset4': fields.String(),
     'rulesFile': fields.Nested(hcStat_model),
     'rule_left': fields.String(),
     'rule_right': fields.String(),
@@ -172,6 +175,7 @@ job_big_model = api.model('Job', {
 job_nano_model = api.model('Job nano', {
     'id': fields.Integer(readOnly=True, required=False, description='job id'),
     'name': fields.String(required=True, description='job name'),
+    'attack': fields.String(),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),
@@ -181,4 +185,18 @@ job_nano_model = api.model('Job nano', {
 
 job_nano_list_model = api.inherit('Job nano list', {
     'items': fields.List(fields.Nested(job_nano_model))
+})
+
+user_permissions = api.model('User with permissions', {
+    'id': fields.Integer(),
+    'username': fields.String(),
+    'mail': fields.String(),
+    'view': fields.Boolean(),
+    'modify': fields.Boolean(),
+    'operate': fields.Boolean(),
+    'owner': fields.Boolean()
+})
+
+job_user_permissions_model = api.model('List of users and their permissions on a job', {
+    'items': fields.List(fields.Nested(user_permissions))
 })

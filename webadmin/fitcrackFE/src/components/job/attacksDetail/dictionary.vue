@@ -11,7 +11,7 @@
       hide-default-footer
     >
       <template v-slot:item.dictionary.name="{ item: { dictionary } }">
-        <router-link :to="{name: 'dictionaryDetail', params: { id: dictionary.id}}" target='_blank'>
+        <router-link :to="{name: 'dictionaryDetail', params: { id: dictionary.id}}">
           {{ dictionary.name }}
           <v-icon 
             small
@@ -33,7 +33,7 @@
         </v-list-item-action>
         <v-list-item-content>
           <v-list-item-title class="text-right">
-            <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}" target='_blank'>
+            <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}">
               {{ data.rulesFile.name }}
             </router-link>
           </v-list-item-title>

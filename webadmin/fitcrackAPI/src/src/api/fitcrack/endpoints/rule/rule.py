@@ -163,30 +163,3 @@ class downloadRule(Resource):
 
         rule = FcRule.query.filter(FcRule.id == id).first()
         return send_from_directory(RULE_DIR, rule.path)
-
-
-@ns.route('/<id>/update')
-class updateRule(Resource):
-
-    @api.expect(updateRule_parser)
-    @api.marshal_with(simpleResponse)
-    def post(self, id):
-        """
-        Replaces rule with new string.
-        """
-
-        args = updateRule_parser.parse_args(request)
-        newData = args.get('newRule', None)
-
-        rule = FcRule.query.filter(FcRule.id == id).first()
-        file = open(os.path.join(RULE_DIR, rule.path), 'r+')
-
-        file.seek(0)
-        file.write(newData)
-        file.truncate()
-        file.close()
-
-        return {
-            'message': 'File ' + rule.name + ' successfully changed.',
-            'status': True
-        }

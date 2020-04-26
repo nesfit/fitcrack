@@ -131,33 +131,3 @@ class downloadMask(Resource):
 
         maskSet = FcMasksSet.query.filter(FcMasksSet.id == id).first()
         return send_from_directory(MASKS_DIR, maskSet.path)
-
-
-@ns.route('/<id>/update')
-class updateMaskSet(Resource):
-
-    @api.expect(updateMask_parser)
-    @api.marshal_with(simpleResponse)
-    def post(self, id):
-        """
-        Exchanges maskset with new string.
-        """
-
-        args = updateMask_parser.parse_args(request)
-        newData = args.get('newMaskSet', None)
-
-        for line in newData.splitlines():
-            check_mask_syntax(line)
-
-        maskSet = FcMasksSet.query.filter(FcMasksSet.id == id).first()
-        file = open(os.path.join(MASKS_DIR, maskSet.path), 'r+')
-
-        file.seek(0)
-        file.write(newData)
-        file.truncate()
-        file.close()
-
-        return {
-            'message': 'File ' + maskSet.name + ' successfully changed.',
-            'status': True
-        }

@@ -62,13 +62,15 @@ def computeJobsGraph(fromDate=None, toDate=None, jobId=None):
     }
 
 
-def computeHostGraph(fromDate=None, toDate=None, jobId=None):
+def computeHostGraph(fromDate=None, toDate=None, jobIds=None):
     x = "time"
     y = []
     data = []
     labels = []
     jobsGraphData = FcWorkunit.query
 
+    if jobIds and not isinstance(jobIds, list):
+        jobIds = [jobIds]
 
     if toDate:
         date = get_date_or_exception(toDate)
@@ -84,8 +86,8 @@ def computeHostGraph(fromDate=None, toDate=None, jobId=None):
     if toDate and fromDate and get_date_or_exception(toDate) < get_date_or_exception(fromDate) :
         abort(500, 'From date is greater than to date.')
 
-    if jobId:
-        jobsGraphData = jobsGraphData.filter_by(job_id=jobId)
+    if jobIds:
+        jobsGraphData = jobsGraphData.filter(FcWorkunit.job_id.in_(jobIds))
 
     for jobData in jobsGraphData:
         data.append(jobData.as_graph())
@@ -94,7 +96,7 @@ def computeHostGraph(fromDate=None, toDate=None, jobId=None):
             y.append(yAx)
             labels.append(jobData.host.domain_name)
 
-    if not jobId and not toDate:
+    if not jobIds and not toDate:
         data.append({'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
 
     if len(y) == 0:
@@ -113,9 +115,12 @@ def computeHostGraph(fromDate=None, toDate=None, jobId=None):
     }
 
 
-def computeHostPercentageGraph(fromDate=None, jobId=None):
+def computeHostPercentageGraph(fromDate=None, jobIds=None):
     date = None
     jobsGraphData = FcWorkunit.query
+
+    if jobIds and not isinstance(jobIds, list):
+        jobIds = [jobIds]
 
     if fromDate:
         try:
@@ -128,7 +133,7 @@ def computeHostPercentageGraph(fromDate=None, jobId=None):
 
     jobsGraphData = db.session.query(Host.domain_name.label('label'),
                                      func.cast(func.sum(FcWorkunit.hc_keyspace), Integer()).label('value')).filter(
-        FcWorkunit.job_id == jobId).group_by(FcWorkunit.boinc_host_id).join(FcWorkunit.host).all()
+        FcWorkunit.job_id.in_(jobIds)).group_by(FcWorkunit.boinc_host_id).join(FcWorkunit.host).all()
 
     data = []
     for tup in jobsGraphData:

@@ -21,3 +21,21 @@ pcfgData_model = api.inherit('PCFG with data', {
     'data': fields.String(),
     'status': fields.Boolean()
 })
+
+pcfgTree_model = api.model('PCFG Directory Tree', {
+    'name': fields.String(example='grammar name'),
+    'children': fields.Raw(example=[
+                {
+                    'name': 'folder1',
+                    'children': [
+                        {'name': 'file1-in-folder.txt'},
+                        {'name': 'file2-in-folder.txt'}
+                    ]
+                },
+                {
+                    'name': 'empty-folder',
+                    'children': []
+                },
+                {'name': 'file.txt'}
+            ])
+})

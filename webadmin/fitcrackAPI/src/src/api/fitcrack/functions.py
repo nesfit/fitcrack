@@ -161,6 +161,43 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
                 result.append(DBrecord)
     return result
 
+def get_nesting (path, root = '/'):
+    localpath = path.replace(root, '').split('/')
+    return localpath[1:], localpath[-1]
+
+def directory_tree (path):
+    parent = os.path.dirname(path) + '/'
+    _, name = get_nesting(path, parent)
+    listing = {
+        'name': name,
+        'children': []
+    }
+    # walk recursively
+    for base, dirs, files in os.walk(path):
+        nest_in, name = get_nesting(base, parent)
+        # go to current root in dict
+        root = listing
+        for d in nest_in:
+            print('root is now', root['name'])
+            for child in root['children']:
+                if child['name'] == d:
+                    root = child
+        # insert contents
+        for d in sorted(dirs):
+            root['children'].append({
+                'name': d,
+                'empty': True,
+                'children': [],
+                'path': os.path.join(*nest_in, d)
+            })
+        for f in sorted(files):
+            root['empty'] = False
+            root['children'].append({
+                'name': f,
+                'path': os.path.join(*nest_in, f)
+            })
+    
+    return listing
 
 def sorted_cp (src, dst):
     "Sort source text file by line length and output to destination"
@@ -178,3 +215,37 @@ def sorted_cp (src, dst):
             if not line.endswith('\n'):
                 line += '\n'
             o.write(line)
+
+def get_batch_status (total, remaining, any_running):
+    if total == remaining:
+        return {
+            'code': 0,
+            'text': 'Prepared',
+            'icon': 'mdi-filter-variant',
+            'color': 'info',
+            'description': 'The batch is ready to run.'
+        }
+    elif any_running:
+        return {
+            'code': 10,
+            'text': 'Working',
+            'icon': 'mdi-altimeter',
+            'color': 'warning',
+            'description': 'The batch is running its jobs in sequence.'
+        }
+    elif remaining == 0:
+        return {
+            'code': 1,
+            'text': 'Done',
+            'icon': 'mdi-check-all',
+            'color': 'success',
+            'description': 'All jobs are done running.'
+        }
+    else:
+        return {
+            'code': 20,
+            'text': 'Interrupted',
+            'icon': 'mdi-hand-right',
+            'color': 'error',
+            'description': 'The batch is stopped and ready to resume.'
+        }

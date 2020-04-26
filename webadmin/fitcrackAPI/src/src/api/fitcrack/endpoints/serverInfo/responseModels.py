@@ -31,3 +31,7 @@ usageinfo = api.model("UsageInfo", {
 usageinfoList = api.model('UsageInfoList', {
     'items': fields.List(fields.Nested(usageinfo)),
 })
+
+dependency_report = api.model('Report of missing dependencies', {
+    'missing': fields.List(fields.String),
+})
