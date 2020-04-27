@@ -196,6 +196,7 @@ import graph from '@/components/graph/fc_graph'
 import combinatorDetail from '@/components/job/attacksDetail/combinator'
 import maskDetail from '@/components/job/attacksDetail/mask'
 import dictionaryDetail from '@/components/job/attacksDetail/dictionary'
+import princeDetail from '@/components/job/attacksDetail/prince'
 import pcfgDetail from '@/components/job/attacksDetail/pcfg'
 // Scripts
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
@@ -215,6 +216,7 @@ export default {
     combinatorDetail,
     maskDetail,
     dictionaryDetail,
+    princeDetail,
     pcfgDetail
   },
   data () {
@@ -239,9 +241,8 @@ export default {
           return 'dictionaryDetail'
         case 'pcfg':
           return 'pcfgDetail'
-        // dictionaryDetail is good enough for PRINCE
         case 'prince':
-          return 'dictionaryDetail'
+          return 'princeDetail'
         default:
           return 'combinatorDetail'
       }
