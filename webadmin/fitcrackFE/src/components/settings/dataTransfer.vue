@@ -95,10 +95,16 @@
               Server <strong>{{ packageContents.packager }}</strong> packaged this export
               on {{ this.$moment.unix(packageContents.timestamp).format('DD.MM.YYYY HH:mm') }}
             </div>
+            <v-alert
+              v-if="!validFile"
+              type="error"
+            >
+              This does not appear to be a valid package.
+            </v-alert>
           </v-card-text>
           <v-card-actions>
             <v-btn
-              v-if="depsValidated"
+              v-if="dependencyList"
               text
               @click="showDeps = !showDeps"
             >
@@ -239,6 +245,7 @@ export default {
   data () {
     return {
       packageFile: null,
+      validFile: true,
       packageContents: null,
       missingDeps: [],
       depsValidated: false,
@@ -265,7 +272,13 @@ export default {
       return this.packageContents ? this.packageContents.jobs : this.jobs
     },
     dependencyList () {
-      if (!this.packageContents && !this.depsValidated) return null
+      if (
+        !this.packageContents || 
+        (this.packageContents && !this.packageContents.timestamp) ||
+        !this.depsValidated
+      ) {
+        return null
+      }
       const md = this.missingDeps
       return this.packageContents.deps.map(dep => {
         const [type, name] = dep.split('/')
@@ -301,8 +314,15 @@ export default {
         const buffer = await file.arrayBuffer()
         const uarr = new Uint8Array(buffer)
         this.packageContents = msgpackDecode(uarr)
-        this.checkDeps(this.packageContents.deps)
+        if (this.packageContents.timestamp) {
+          this.validFile = true
+          this.checkDeps(this.packageContents.deps)
+        } else {
+          this.validFile = false
+          this.packageContents = null
+        }
       } else {
+        this.validFile = true
         this.packageContents = null
         this.depsValidated = false
         this.missingDeps = []
