@@ -6677,4 +6677,5 @@ INSERT INTO `fc_user_permissions` (`job_id`, `user_id`, `owner`) VALUES
 (3, 1, 1),
 (4, 1, 1),
 (5, 1, 1),
-(6, 1, 1);
+(6, 1, 1),
+(7, 1, 1);
