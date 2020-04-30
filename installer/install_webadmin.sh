@@ -275,6 +275,12 @@ if [ $INSTALL_BACKEND = "y" ]; then
 fi
 
 #######################
+# Configure deamons #
+#######################
+
+sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $BOINC_PROJECT_DIR/bin/measureUsage.py
+
+#######################
 # Configure front-end #
 #######################
 
