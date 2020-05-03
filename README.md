@@ -38,6 +38,7 @@ Don't forget to activate [usage measure](#usage) of your server.
 * PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
 * Curl
+* Gtest (only if you intend to build the tests in server/src/tests)
 
 ### Installation
 Create a user for running BOINC server
