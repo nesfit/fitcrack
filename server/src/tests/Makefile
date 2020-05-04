@@ -55,7 +55,7 @@ default: debug #tests
 debug: CXXFLAGS+=-g
 debug: tests
 
-test: tests
+test: tests $(TESTDATADIR)/generatedPasswords.txt
 	./tests
 
 #this is suitable for one executable build
@@ -74,6 +74,9 @@ tests: LIBDIRFLAGS+=
 tests: LDFLAGS+=-lgtest
 tests: $(TEST_OFILES) $(OBJLIB)
 	$(COMPILER) $^ -o $@ $(LIBDIRFLAGS) $(LDFLAGS)
+
+$(TESTDATADIR)/generatedPasswords.txt: createTestData.sh
+	./createTestData.sh > $(TESTDATADIR)/generatedPasswords.txt
 
 $(OBJLIB): $(OFILES)
 	ar rsT $@ $^
@@ -97,7 +100,7 @@ $(DEPDIR)/%.d: ;
 .PHONY: clean install
 
 clean:
-	@rm -rf $(OBJDIR) $(DEPDIR) $(LIBNAME) tests
+	@rm -rf $(OBJDIR) $(DEPDIR) $(LIBNAME) tests $(TESTDATADIR)/generatedPasswords.txt
 
 #this includes the .d files generated in compilation
 #they contain rules in format name.o: srcfile headers
