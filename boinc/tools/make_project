@@ -247,6 +247,7 @@ project.config.daemons.make_node_and_append("daemon").cmd = 'bitwise_validator -
 project.config.daemons.make_node_and_append("daemon").cmd = 'assimilator -d 3 --app fitcrack'
 project.config.daemons.make_node_and_append("daemon").cmd = 'trickler --variety fitcrack'
 project.config.daemons.make_node_and_append("daemon").cmd = 'measureUsage.py'
+project.config.daemons.make_node_and_append("daemon").cmd = 'pcfg_monitor.py'
 
 # set up default tasks
 
