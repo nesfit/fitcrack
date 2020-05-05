@@ -64,22 +64,6 @@ CREATE TABLE IF NOT EXISTS `fc_dictionary` (
   `keyspace` bigint(20) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Štruktúra tabuľky pre tabuľku `fc_hashcache`
---
-
-CREATE TABLE IF NOT EXISTS `fc_hashcache` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `hash_type` int(11) unsigned DEFAULT NULL,
-  `hash` longtext COLLATE utf8_bin,
-  `result` text COLLATE utf8_bin,
-  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
@@ -280,9 +264,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `attack_mode` tinyint(3) unsigned NOT NULL,
   `attack_submode` tinyint(3) NOT NULL DEFAULT '0',
   `hash_type` int(10) unsigned NOT NULL,
-  `hash` longtext COLLATE utf8_bin NOT NULL,
   `status` smallint(1) unsigned NOT NULL DEFAULT '0',
-  `result` text COLLATE utf8_bin,
   `keyspace` bigint(20) unsigned NOT NULL,
   `hc_keyspace` bigint(20) unsigned NOT NULL,
   `indexes_verified` bigint(20) unsigned NOT NULL,
@@ -295,8 +277,6 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `time_end` timestamp NULL DEFAULT NULL,
   `cracking_time` double NOT NULL DEFAULT '0',
   `seconds_per_workunit` bigint(20) unsigned NOT NULL DEFAULT '3600',
-  `dict1` varchar(255) COLLATE utf8_bin NOT NULL,
-  `dict2` varchar(255) COLLATE utf8_bin NOT NULL,
   `charset1` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
   `charset2` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
   `charset3` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
@@ -315,7 +295,6 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `max_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
   `shuffle_dict` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `generate_random_rules` int(10) unsigned NOT NULL DEFAULT '0',
-  `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
   `batch_id` int(11),
@@ -458,9 +437,7 @@ CREATE TABLE `fc_pcfg_grammar` (
 
 CREATE TABLE IF NOT EXISTS `fc_settings` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `delete_finished_workunits` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `default_seconds_per_workunit` int(10) unsigned NOT NULL DEFAULT '3600',
-  `default_replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
   `default_verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `default_check_hashcache` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `default_workunit_timeout_factor` int(10) unsigned NOT NULL DEFAULT '6',
