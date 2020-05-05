@@ -304,10 +304,6 @@ class OperationWithJob(Resource):
         job = FcJob.query.filter(FcJob.id == id).one()
 
         if action == 'start':
-            if job.attack_mode == 9:
-                pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()
-                start_pcfg_manager(job.id, pcfg.name, job.hc_keyspace)
-
             job.status = status_to_code['running']
         elif action == 'stop':
             job.status = status_to_code['finishing']

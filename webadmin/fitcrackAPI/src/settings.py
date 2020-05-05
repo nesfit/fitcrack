@@ -17,12 +17,9 @@ EXE_OR_BIN = 'bin'
 DICTIONARY_DIR = '/usr/share/collections/dictionaries'
 PCFG_DIR = '/usr/share/collections/pcfg'
 # PCFG Mower
-#PCFG_MOWER_DIR = ROOT_DIR + '/src/api/fitcrack/endpoints/pcfg/pcfg_mower/pcfg_mower.py'
 PCFG_MOWER_DIR = ROOT_DIR + '/../pcfg_mower/pcfg_mower.py'
 # PCFG Manager
-#PCFG_MANAGER_DIR = ROOT_DIR + '/src/api/fitcrack/endpoints/pcfg/pcfg_manager/pcfg-manager'
 PCFG_MANAGER_DIR = ROOT_DIR + '/../pcfg_manager/pcfg-manager'
-#PCFG_MANAGER = ROOT_DIR + '/src/api/fitcrack/endpoints/pcfg/pcfg_manager'
 PCFG_MANAGER = ROOT_DIR + '/../pcfg_manager'
 # PCFG Trainer
 PCFG_TRAINER_DIR = ROOT_DIR + '/../pcfg_trainer/pcfg_trainer.py'
