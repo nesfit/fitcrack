@@ -74,12 +74,14 @@ CREATE TRIGGER `client_error_trigger` BEFORE UPDATE ON `result`
 	IF (NEW.outcome = 3 AND OLD.outcome != 3)
 	THEN
 		UPDATE `fc_workunit` SET retry = 1 WHERE `workunit_id` = NEW.workunitid LIMIT 1;
-		UPDATE `fc_host` SET `status` = 0, `power` = 0 WHERE id IN (SELECT `host_id` FROM `fc_workunit` WHERE `workunit_id` = NEW.workunitid) LIMIT 1;
+		-- UPDATE `fc_host` SET `status` = 0, `power` = 0 WHERE id IN (SELECT `host_id` FROM `fc_workunit` WHERE `workunit_id` = NEW.workunitid) LIMIT 1;
+		UPDATE `fc_job` SET `status` = 10 WHERE `status` = 12 AND id IN (SELECT `job_id` FROM `fc_workunit` WHERE `workunit_id` = NEW.workunitid) LIMIT 1;
 	END IF;
 	IF (NEW.outcome = 7 AND OLD.outcome != 7)
 	THEN
 		UPDATE `fc_workunit` SET retry = 1 WHERE `workunit_id` = NEW.workunitid LIMIT 1;
-		UPDATE `fc_host` SET `status` = 0, `power` = 0 WHERE id IN (SELECT `host_id` FROM `fc_workunit` WHERE `workunit_id` = NEW.workunitid) LIMIT 1;
+		-- UPDATE `fc_host` SET `status` = 0, `power` = 0 WHERE id IN (SELECT `host_id` FROM `fc_workunit` WHERE `workunit_id` = NEW.workunitid) LIMIT 1;
+		UPDATE `fc_job` SET `status` = 10 WHERE `status` = 12 AND id IN (SELECT `job_id` FROM `fc_workunit` WHERE `workunit_id` = NEW.workunitid) LIMIT 1;
 	END IF;
 END
 //
