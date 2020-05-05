@@ -144,9 +144,10 @@ def main():
         for job_id in missing_managers:
             # Run new manager
             purge_job(job_id, f_cursor)
-            fitcrack_db.commit()
-
             run_new_manager(job_id, f_cursor)
+
+        # To work around cache, we need to commit always
+        fitcrack_db.commit()
 
         # Sleep before next check
         sleep(2)
