@@ -110,7 +110,6 @@ class CJob {
         uint32_t    m_attackMode;
         uint32_t    m_attackSubmode;
         uint32_t    m_hashType;
-        std::string m_hash;
         uint32_t    m_status;
         uint64_t    m_keyspace;
         uint64_t    m_hcKeyspace;
@@ -118,8 +117,6 @@ class CJob {
         uint64_t    m_currentIndex2;
         std::string m_name;
         uint64_t    m_secondsPerWorkunit;
-        std::string m_dict1;
-        std::string m_dict2;
         std::string m_rules;
         std::string m_ruleLeft;
         std::string m_ruleRight;
@@ -131,7 +128,6 @@ class CJob {
         uint64_t    m_grammar_id;
         std::string m_markov;
         uint32_t m_markovThreshold;
-        uint32_t m_replicateFactor;
         bool m_casePermute;
         bool m_checkDuplicates;
         uint32_t m_minPasswordLen;
@@ -170,7 +166,6 @@ class CJob {
         uint32_t getAttackMode() const;
         uint32_t getAttackSubmode() const;
         uint32_t getHashType() const;
-        const std::string & getHash() const;
         uint32_t getStatus() const;
         uint64_t getKeyspace() const;
         uint64_t getHcKeyspace() const;
@@ -178,8 +173,6 @@ class CJob {
         uint64_t getCurrentIndex2() const;
         const std::string & getName() const;
         uint64_t getSecondsPerWorkunit() const;
-        const std::string & getDict1() const;
-        const std::string & getDict2() const;
         const std::string & getRules() const;
         const std::string & getRuleLeft() const;
         const std::string & getRuleRight() const;
@@ -190,7 +183,6 @@ class CJob {
         uint64_t getGrammarId() const;
         const std::string & getMarkov() const;
         uint32_t getMarkovThreshold() const;
-        uint32_t getReplicateFactor() const;
         bool getCasePermuteFlag() const;
         bool getCheckDuplicatesFlag() const;
         uint32_t getMinPasswordLen() const;

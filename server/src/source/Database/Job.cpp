@@ -21,7 +21,6 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_attackMode = std::stoul(jobMap["attack_mode"]);
         this->m_attackSubmode = std::stoul(jobMap["attack_submode"]);
         this->m_hashType = std::stoul(jobMap["hash_type"]);
-        this->m_hash = jobMap["hash"];
         this->m_status = std::stoul(jobMap["status"]);
         this->m_keyspace = std::stoull(jobMap["keyspace"]);
         this->m_hcKeyspace = std::stoull(jobMap["hc_keyspace"]);
@@ -29,8 +28,6 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_currentIndex2 = std::stoull(jobMap["current_index_2"]);
         this->m_name = jobMap["name"];
         this->m_secondsPerWorkunit = std::stoull(jobMap["seconds_per_workunit"]);
-        this->m_dict1 = jobMap["dict1"];
-        this->m_dict2 = jobMap["dict2"];
         this->m_rules = jobMap["rules"];
         this->m_ruleLeft = jobMap["rule_left"];
         this->m_ruleRight = jobMap["rule_right"];
@@ -42,7 +39,6 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
             this->m_grammar_id = std::stoull(jobMap["grammar_id"]);
         this->m_markov = jobMap["markov_hcstat"];
         this->m_markovThreshold = std::stoul(jobMap["markov_threshold"]);
-        this->m_replicateFactor = std::stoul(jobMap["replicate_factor"]);
         this->m_casePermute = std::stoul(jobMap["case_permute"]);
         this->m_checkDuplicates = std::stoul(jobMap["check_duplicates"]);
         this->m_minPasswordLen = std::stoul(jobMap["min_password_len"]);
@@ -257,12 +253,6 @@ uint32_t CJob::getHashType() const
 }
 
 
-const std::string &CJob::getHash() const
-{
-    return m_hash;
-}
-
-
 uint32_t CJob::getStatus() const
 {
     return m_status;
@@ -305,18 +295,6 @@ uint64_t CJob::getSecondsPerWorkunit() const
 }
 
 
-const std::string & CJob::getDict1() const
-{
-    return m_dict1;
-}
-
-
-const std::string & CJob::getDict2() const
-{
-    return m_dict2;
-}
-
-
 const std::string & CJob::getRules() const
 {
     return m_rules;
@@ -350,11 +328,6 @@ const std::string & CJob::getMarkov() const
     return m_markov;
 }
 
-
-uint32_t CJob::getReplicateFactor() const
-{
-    return m_replicateFactor;
-}
 
 uint32_t CJob::getRandomRulesCount() const
 {
