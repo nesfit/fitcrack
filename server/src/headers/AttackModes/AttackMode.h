@@ -17,6 +17,8 @@
 #include <Dictionary.h>
 #include <SqlLoader.h>
 #include <Config.h>
+#include <InputDict.h>
+#include <MaskSplitter.h>
 
 /** BOINC headers */
 #include <backend_lib.h>
@@ -26,8 +28,6 @@
 
 /** System headers*/
 #include <fstream>
-
-#include <InputDict.h>
 
 
 class AttackMode {
@@ -106,9 +106,13 @@ protected:
 
         virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex);
 
+        virtual std::unique_ptr<MaskSplitter> makeMaskSplitter(std::vector<std::string> customCharsets = {});
+
         virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const;
 
         virtual PtrDictionary GetWorkunitDict() const;
+
+        virtual PtrMask GetWorkunitMask() const;
 
         virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks) const;
 

@@ -12,6 +12,7 @@
 
 #include <AttackBench.h>
 #include <AttackCombinator.h>
+#include <AttackHybridDictMask.h>
 #include <AttackDict.h>
 #include <AttackMask.h>
 #include <AttackMarkov.h>
@@ -127,6 +128,9 @@ AttackMode *CreateAttack(PtrJob &job, PtrHost &host, uint64_t duration, CSqlLoad
 
         case Config::AttackMode::AttackPrince:
             return AttackTypeMaker<CAttackPrince>::CreateAttack(job, host, duration, sqlLoader);
+
+        case Config::AttackMode::AttackHybridDictMask:
+            return AttackTypeMaker<CAttackHybridDictMask>::CreateAttack(job, host, duration, sqlLoader);
 
         default:
             Tools::printDebugHost(Config::DebugType::Error, job->getId(), host->getId(),

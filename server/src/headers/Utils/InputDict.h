@@ -7,6 +7,7 @@ class InputDict
 {
 public:
 	InputDict(PtrDictionary dbDict, uint64_t startIndex);
+	virtual ~InputDict() = default;
 	/**
 	 * @brief Writes @p passCount passwords to file at @p dst
 	 * 

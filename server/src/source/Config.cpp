@@ -42,17 +42,18 @@ namespace Config {
     std::string charsetDir = "/usr/share/collections/charsets/";
 
     /** Template names*/
-    std::string inTemplateFileBench =      "bench_in";
-    std::string inTemplateFileMask =       "mask_in";
-    std::string inTemplateFileMarkov =     "markov_in";
-    std::string inTemplateFileDict =       "dict_in";
-    std::string inTemplateFileCombinator = "combinator_in";
-    std::string inTemplateFileRule =       "rule_in";
-    std::string inTemplateFilePrince =     "prince_in";
-    std::string inTemplateFilePrinceRules ="prince_rules_in";
-    std::string inTemplateFilePcfg =       "pcfg_in";
-    std::string inTemplateFilePcfgRules =  "pcfg_rules_in";
-    std::string outTemplateFile =          "app_out";
+    std::string inTemplateFileBench =          "bench_in";
+    std::string inTemplateFileMask =           "mask_in";
+    std::string inTemplateFileMarkov =         "markov_in";
+    std::string inTemplateFileDict =           "dict_in";
+    std::string inTemplateFileCombinator =     "combinator_in";
+    std::string inTemplateFileHybridDictMask = "hybrid_dict_mask_in";
+    std::string inTemplateFileRule =           "rule_in";
+    std::string inTemplateFilePrince =         "prince_in";
+    std::string inTemplateFilePrinceRules =    "prince_rules_in";
+    std::string inTemplateFilePcfg =           "pcfg_in";
+    std::string inTemplateFilePcfgRules =      "pcfg_rules_in";
+    std::string outTemplateFile =              "app_out";
 
     /** Some default values */
     char * inTemplatePathBench = nullptr;
@@ -64,6 +65,7 @@ namespace Config {
     char * inTemplatePathPcfg = nullptr;
     char * inTemplatePathPcfgRules = nullptr;
     char * inTemplatePathCombinator = nullptr;
+    char * inTemplatePathHybridDictMask = nullptr;
     char * inTemplatePathRule = nullptr;
     DB_APP * app = nullptr;
     int startTime = 0;

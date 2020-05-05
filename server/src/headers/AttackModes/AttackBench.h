@@ -41,9 +41,13 @@ class CAttackBench : public BaseAttack {
 
         virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex) override;
 
+        virtual std::unique_ptr<MaskSplitter> makeMaskSplitter(std::vector<std::string> customCharsets) override;
+
         virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const override;
 
         virtual PtrDictionary GetWorkunitDict() const override;
+
+        virtual PtrMask GetWorkunitMask() const override;
 
         virtual bool loadNextPreterminals(std::string & preterminals, uint64_t & realKeyspace);
 
@@ -137,14 +141,20 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
 template <typename BaseAttack>
 std::unique_ptr<InputDict> CAttackBench<BaseAttack>::makeInputDict(PtrDictionary dict, uint64_t startIndex)
 {
-    return std::make_unique<InputDictBenchmark>(dict, startIndex);
+    return std::unique_ptr<InputDict>(new InputDictBenchmark(dict, startIndex));
+}
+
+template <typename BaseAttack>
+std::unique_ptr<MaskSplitter> CAttackBench<BaseAttack>::makeMaskSplitter(std::vector<std::string> customCharsets)
+{
+    return std::unique_ptr<MaskSplitter>(new MaskSplitterBenchmark(std::move(customCharsets)));
 }
 
 template <typename BaseAttack>
 PtrDictionary CAttackBench<BaseAttack>::FindCurrentDict(std::vector<PtrDictionary> &dicts) const
 {
     Tools::printDebug("Bench attack: dict count is %zu\n", dicts.size());
-    auto maxElem = std::max_element(dicts.begin(), dicts.end(), [](const auto &lhs, const auto &rhs){
+    auto maxElem = std::max_element(dicts.begin(), dicts.end(), [](const PtrDictionary &lhs, const PtrDictionary &rhs){
         return lhs->getHcKeyspace() < rhs->getHcKeyspace();
     });
     if(maxElem == dicts.end()) return nullptr;
@@ -155,6 +165,12 @@ template <typename BaseAttack>
 PtrDictionary CAttackBench<BaseAttack>::GetWorkunitDict() const
 {
     return std::make_shared<CBenchmarkDictionary>(*BaseAttack::GetWorkunitDict());
+}
+
+template <typename BaseAttack>
+PtrMask CAttackBench<BaseAttack>::GetWorkunitMask() const
+{
+    return std::make_shared<CBenchmarkMask>(*BaseAttack::GetWorkunitDict());
 }
 
 template <typename BaseAttack>

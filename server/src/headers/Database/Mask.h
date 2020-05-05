@@ -65,6 +65,7 @@ class CMask {
         std::string m_mask;
         uint64_t    m_currentIndex;
         uint64_t    m_hcKeyspace;
+        uint64_t    m_keyspace;
 
     public:
 
@@ -77,6 +78,7 @@ class CMask {
         const std::string & getMask() const;
         uint64_t getCurrentIndex() const;
         uint64_t getHcKeyspace() const;
+        uint64_t getKeyspace() const;
 };
 
 #endif //WORKGENERATOR_MASK_H

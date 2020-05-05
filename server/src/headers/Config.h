@@ -67,6 +67,7 @@ namespace Config {
     extern std::string inTemplateFileMarkov;
     extern std::string inTemplateFileDict;
     extern std::string inTemplateFileCombinator;
+    extern std::string inTemplateFileHybridDictMask;
     extern std::string inTemplateFileRule;
     extern std::string inTemplateFilePrince;
     extern std::string inTemplateFilePrinceRules;
@@ -80,6 +81,7 @@ namespace Config {
     extern char * inTemplatePathMarkov;
     extern char * inTemplatePathDict;
     extern char * inTemplatePathCombinator;
+    extern char * inTemplatePathHybridDictMask;
     extern char * inTemplatePathRule;
     extern char * inTemplatePathPrince;
     extern char * inTemplatePathPrinceRules;
@@ -114,6 +116,7 @@ namespace Config {
         AttackDict = 0,
         AttackCombinator = 1,
         AttackMask = 3,
+        AttackHybridDictMask = 6,
         AttackPrince = 8,
         AttackPcfg = 9
     };

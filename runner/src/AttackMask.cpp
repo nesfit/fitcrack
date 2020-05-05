@@ -5,48 +5,6 @@
 
 #include "AttackMask.hpp"
 
-/* Private */
-
-void AttackMask::addCharset(std::fstream& mask_file, const std::string& charset_name) {
-  std::string content;
-
-  if (config_.find(charset_name, content)) {
-    content += ",";
-    mask_file.write(content.data(), content.length());
-    setHasCharsets();
-  }
-}
-
-void AttackMask::addMask(std::fstream& mask_file) {
-  std::string mask;
-
-  if (config_.find("mask", mask)) {
-    mask_file.write(mask.data(), mask.length());
-  }
-}
-
-void AttackMask::createMaskFile() {
-  std::fstream mask_file;
-
-  File::openWriteStream(mask_file, HashcatConstant::MaskFileName, std::ios_base::trunc);
-
-  addCharset(mask_file, "charset1");
-  addCharset(mask_file, "charset2");
-  addCharset(mask_file, "charset3");
-  addCharset(mask_file, "charset4");
-
-  addMask(mask_file);
-
-  mask_file.close();
-
-  directory_.scanForEntities();
-}
-
-void AttackMask::setHasCharsets() {
-  if (!has_charsets_)
-  has_charsets_ = true;
-}
-
 /* Protected */
 
 void AttackMask::addSpecificArguments() {
@@ -84,6 +42,6 @@ void AttackMask::addSpecificArguments() {
 
 
 /* Public */
-AttackMask::AttackMask(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory), has_charsets_(false) {
+AttackMask::AttackMask(const ConfigTask& config, Directory& directory) : AttackWithMask(config, directory) {
   
 }

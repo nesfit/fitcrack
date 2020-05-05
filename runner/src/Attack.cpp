@@ -9,6 +9,7 @@
 #include "AttackBenchmark.hpp"
 #include "AttackCombinator.hpp"
 #include "AttackDictionary.hpp"
+#include "AttackHybridDictMask.hpp"
 #include "AttackMask.hpp"
 #include "AttackPCFG.hpp"
 #include "AttackPrince.hpp"
@@ -49,6 +50,9 @@ AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory) 
   case AT_Mask:
     attack = new AttackMask(task_config, directory);
     break;
+  case AT_HybridDictMask:
+    attack = new AttackHybridDictMask(task_config, directory);
+    break;
   case AT_Prince:
     attack = new AttackPrince(task_config, directory);
     break;
@@ -69,6 +73,9 @@ AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory) 
       break;
     case AT_Mask:
       attack = new AttackBenchmark<AttackMask>(task_config, directory);
+      break;
+    case AT_HybridDictMask:
+      attack = new AttackBenchmark<AttackHybridDictMask>(task_config, directory);
       break;
     case AT_Prince:
       attack = new AttackBenchmark<AttackPrince>(task_config, directory);

@@ -88,7 +88,12 @@ std::string AttackMode::makeConfigLine(const std::string &option, const std::str
 
 std::unique_ptr<InputDict> AttackMode::makeInputDict(PtrDictionary dict, uint64_t startIndex)
 {
-    return std::make_unique<InputDict>(dict, startIndex);
+    return std::unique_ptr<InputDict>(new InputDict(dict, startIndex));
+}
+
+std::unique_ptr<MaskSplitter> AttackMode::makeMaskSplitter(std::vector<std::string> customCharsets)
+{
+    return std::unique_ptr<MaskSplitter>(new MaskSplitter(std::move(customCharsets)));
 }
 
 PtrDictionary AttackMode::FindCurrentDict(std::vector<PtrDictionary> &dicts) const
@@ -110,6 +115,11 @@ PtrDictionary AttackMode::FindCurrentDict(std::vector<PtrDictionary> &dicts) con
 PtrDictionary AttackMode::GetWorkunitDict() const
 {
     return m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+}
+
+PtrMask AttackMode::GetWorkunitMask() const
+{
+    return m_sqlLoader->loadMask(m_workunit->getMaskId());
 }
 
 PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks) const

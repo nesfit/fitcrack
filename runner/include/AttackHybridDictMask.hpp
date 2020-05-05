@@ -3,15 +3,13 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifndef ATTACKMASK_HPP
-#define ATTACKMASK_HPP
+#ifndef ATTACKHYBRIDDICTMASK_HPP
+#define ATTACKHYBRIDDICTMASK_HPP
 
 #include "AttackWithMask.hpp"
 
-#include "File.hpp"
-
-/** Class representing hashcat's mask attack */
-class AttackMask: public AttackWithMask {
+/** Class representing hashcat's combinator attack */
+class AttackHybridDictMask: public AttackWithMask {
 
     protected:
 
@@ -27,6 +25,8 @@ class AttackMask: public AttackWithMask {
          * @param   config [in] Representation of config file
          * @param   directory [in] Working directory
          */
-        AttackMask(const ConfigTask& config, Directory& directory);
+        AttackHybridDictMask(const ConfigTask& config, Directory& directory);
+
 };
-#endif // ATTACKMASK_HPP
+
+#endif // ATTACKHYBRIDDICTMASK_HPP

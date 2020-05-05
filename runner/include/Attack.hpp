@@ -19,6 +19,7 @@ enum AttackType {
   AT_Prince,
   AT_PCFG,
   AT_Benchmark,
+  AT_HybridDictMask,
   AT_Unknown
 };
 

@@ -9,18 +9,28 @@ class MaskSplitter
 {
 public:
 	explicit MaskSplitter(std::vector<std::string> customCharsets = {});
+	virtual ~MaskSplitter() = default;
 	struct MaskSettings
 	{
 		std::string mask;
 		std::vector<std::string> customCharsets;
 		uint64_t keyspace = 1;
+		MaskSettings(std::string mask, std::vector<std::string> customCharsets, uint64_t keyspace):
+			mask(std::move(mask)), customCharsets(std::move(customCharsets)), keyspace(keyspace)
+		{}
 	};
-	MaskSettings GetMaskSlice(const std::string &mask, uint64_t startIndex, uint64_t desiredKeyspace);
-private:
+	virtual MaskSettings GetMaskSlice(const std::string &mask, uint64_t startIndex, uint64_t desiredKeyspace);
+protected:
 	void NormalizeCustomCharsets();
 	const std::string &GetCharset(char placeholder);
 	static const std::unordered_map<char, std::string> s_builtinCharsets;
 	std::vector<std::string> m_customCharsets;
+};
+
+class MaskSplitterBenchmark: public MaskSplitter
+{
+	using MaskSplitter::MaskSplitter;
+	virtual MaskSettings GetMaskSlice(const std::string &mask, uint64_t, uint64_t) override {return {mask, m_customCharsets, 0};}
 };
 
 #endif //FITCRACK_MASK_SPLITTER_H_
