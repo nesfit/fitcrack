@@ -112,14 +112,14 @@ def get_grammar_name(job_id, cursor):
     cursor.execute('SELECT fc_pcfg_grammar.name FROM fc_pcfg_grammar '
                    'LEFT JOIN fc_job ON fc_pcfg_grammar.id = fc_job.grammar_id '
                    'WHERE fc_job.id = %s', (job_id,))
-    return cursor.fetchone()[0]
+    return cursor.fetchone()[0].decode('utf-8')
 
 
 def run_new_manager(job_id, cursor):
     """Run new PCFG manager for a new running PCFG job."""
     print(datetime.datetime.utcnow(), '[LOG]: Running new PCFG manager for job ID', job_id)
     process = subprocess.Popen(
-        ['./pcfg-manager', 'server', '-p', str(job_id_to_port(job_id)), '-m', str(get_keyspace(job_id, cursor)),
+        ['../bin/pcfg-manager', 'server', '-p', str(job_id_to_port(job_id)), '-m', str(get_keyspace(job_id, cursor)),
          '--hashlist', EMPTY_HASHLIST, '-r', PCFG_DIR + get_grammar_name(job_id, cursor)])
 
 
