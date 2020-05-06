@@ -57,6 +57,9 @@ class AttackMode {
          */
         void setDefaultWorkunitParams(DB_WORKUNIT * wu);
 
+        virtual bool requiresMasks() const {return false;}
+        virtual bool requiresDicts() const {return false;}
+
 protected:
         /**
         * @brief Base constructor for all attacks, saves supplied arguments to member variables

@@ -24,7 +24,7 @@ class CAttackBench : public BaseAttack {
          * @param job [in] Instance of CJob which is parent of this workunit instance
          * @param host [in] Instance of CHost which this workunit belongs to
          */
-        CAttackBench(PtrJob job, PtrHost &host, CSqlLoader *sqlLoader);
+        CAttackBench(PtrJob &job, PtrHost &host, CSqlLoader *sqlLoader);
 
         /**
          * @brief Destructor
@@ -55,10 +55,10 @@ class CAttackBench : public BaseAttack {
 };
 
 template <typename BaseAttack>
-CAttackBench<BaseAttack>::CAttackBench(PtrJob job, PtrHost &host, CSqlLoader *sqlLoader):
+CAttackBench<BaseAttack>::CAttackBench(PtrJob &job, PtrHost &host, CSqlLoader *sqlLoader):
     BaseAttack(std::make_shared<CBenchmarkJob>(*job), host, 60, sqlLoader)
 {
-    
+    job = this->m_job;
 }
 
 template <typename BaseAttack>
@@ -170,7 +170,7 @@ PtrDictionary CAttackBench<BaseAttack>::GetWorkunitDict() const
 template <typename BaseAttack>
 PtrMask CAttackBench<BaseAttack>::GetWorkunitMask() const
 {
-    return std::make_shared<CBenchmarkMask>(*BaseAttack::GetWorkunitDict());
+    return std::make_shared<CBenchmarkMask>(*BaseAttack::GetWorkunitMask());
 }
 
 template <typename BaseAttack>

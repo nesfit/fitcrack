@@ -13,6 +13,7 @@ void AttackHybridDictMask::addSpecificArguments() {
 
   AttackCrackingBase::addSpecificArguments();
 
+  addRequiredFile("dict");
 
   createMaskFile();
   addRequiredFile(HashcatConstant::MaskFileName);
@@ -20,5 +21,4 @@ void AttackHybridDictMask::addSpecificArguments() {
   if (has_charsets_) {
     addArgument("--hex-charset");
   }
-  addRequiredFile("dict");
 }

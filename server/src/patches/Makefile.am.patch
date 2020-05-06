@@ -24,6 +24,7 @@
 +    AttackBench.h \
 +    AttackCombinator.h \
 +    AttackDict.h \
++    AttackHybridDictMask.h \
 +    AttackMarkov.h \
 +    AttackMask.h \
 +    AttackMode.h \
@@ -43,6 +44,7 @@
 +    AttackBenchAll.cpp \
 +    AttackCombinator.cpp \
 +    AttackDict.cpp \
++    AttackHybridDictMask.cpp \
 +    AttackMarkov.cpp \
 +    AttackMask.cpp \
 +    AttackMode.cpp \

@@ -199,12 +199,6 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
             return;
         }
 
-        /** Load non-exhausted masks/dictionaries */
-        if (job->getAttackMode() == Config::AttackMode::AttackMask)
-            job->loadMasks();
-        else
-            job->loadDictionaries();
-
         /** Calculate workunit duration */
         uint64_t duration = calculateSecondsIcdf2c(job);
 
@@ -217,6 +211,12 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
         {
             attack = CreateAttack<NormalAttackMaker>(job, host, duration, m_sqlLoader);
         }
+
+        /** Load non-exhausted masks/dictionaries */
+        if(attack->requiresMasks())
+            job->loadMasks();
+        if(attack->requiresDicts())
+            job->loadDictionaries();
     }
     /** Try to set a workunit from retry */
     bool retryFlag = false;

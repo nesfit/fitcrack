@@ -26,6 +26,9 @@ AttackType AttackModeToType(char attack_mode)
   case '3':
     return AT_Mask;
     break;
+  case '6':
+    return AT_HybridDictMask;
+    break;
   case '8':
     return AT_Prince;
   case '9':

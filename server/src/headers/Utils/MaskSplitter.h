@@ -14,9 +14,9 @@ public:
 	{
 		std::string mask;
 		std::vector<std::string> customCharsets;
-		uint64_t keyspace = 1;
-		MaskSettings(std::string mask, std::vector<std::string> customCharsets, uint64_t keyspace):
-			mask(std::move(mask)), customCharsets(std::move(customCharsets)), keyspace(keyspace)
+		uint64_t keyspace;
+		MaskSettings(std::string maskP = "", std::vector<std::string> customCharsetsP = {}, uint64_t keyspaceP = 1):
+			mask(std::move(maskP)), customCharsets(std::move(customCharsetsP)), keyspace(keyspaceP)
 		{}
 	};
 	virtual MaskSettings GetMaskSlice(const std::string &mask, uint64_t startIndex, uint64_t desiredKeyspace);

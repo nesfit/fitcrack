@@ -33,6 +33,8 @@ class CAttackMask : public AttackMode {
          */
         bool makeWorkunit() override ;
 
+        virtual bool requiresMasks() const override {return true;}
+
     private:
         /**
          * @brief Function to generate new CWorkunit for certain host for given time

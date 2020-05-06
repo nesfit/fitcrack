@@ -116,6 +116,7 @@ bool CAttackHybridDictMask::makeWorkunit()
 				auto maskSplitter = makeMaskSplitter();
 				auto mask = maskSplitter->GetMaskSlice(workunitMask->getMask(), m_workunit->getStartIndex(), 1);
 				auto maskConfig = MakeConfigLinesFromSplitMask(mask);
+				f<<maskConfig;
 				Tools::printDebug(maskConfig.c_str());
 			}
 
@@ -165,6 +166,7 @@ bool CAttackHybridDictMask::makeWorkunit()
 				auto maskSplitter = makeMaskSplitter();
 				auto mask = maskSplitter->GetMaskSlice(workunitMask->getMask(), m_workunit->getStartIndex(), maskKeyspace);
 				auto maskConfig = MakeConfigLinesFromSplitMask(mask);
+				f<<maskConfig;
 				Tools::printDebug(maskConfig.c_str());
 				maskKeyspace = mask.keyspace;
 			}
@@ -200,6 +202,7 @@ bool CAttackHybridDictMask::makeWorkunit()
 				auto maskSplitter = makeMaskSplitter();
 				auto mask = maskSplitter->GetMaskSlice(workunitMask->getMask(), m_workunit->getStartIndex(), 1);
 				auto maskConfig = MakeConfigLinesFromSplitMask(mask);
+				f<<maskConfig;
 				Tools::printDebug(maskConfig.c_str());
 			}
 

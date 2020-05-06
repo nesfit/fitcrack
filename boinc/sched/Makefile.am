@@ -318,6 +318,7 @@ fitcrack_sources = \
     AttackBench.h \
     AttackCombinator.h \
     AttackDict.h \
+    AttackHybridDictMask.h \
     AttackMarkov.h \
     AttackMask.h \
     AttackMode.h \
@@ -332,6 +333,7 @@ fitcrack_sources = \
     Dictionary.h \
     Host.h \
     InputDict.h \
+    MaskSplitter.h \
     Workunit.h \
     Mask.h \
     Job.h \
@@ -341,6 +343,7 @@ fitcrack_sources = \
     AttackBenchAll.cpp \
     AttackCombinator.cpp \
     AttackDict.cpp \
+    AttackHybridDictMask.cpp \
     AttackMarkov.cpp \
     AttackMask.cpp \
     AttackMode.cpp \
@@ -354,6 +357,7 @@ fitcrack_sources = \
     Dictionary.cpp \
     Host.cpp \
     InputDict.cpp \
+    MaskSplitter.cpp \
     Workunit.cpp \
     Mask.cpp \
     Job.cpp \
