@@ -184,4 +184,16 @@ else
   echo " cd $BOINC_PROJECT_DIR"
   echo " ./bin/start"
 fi
+
+read -e -p "Attach this host to Fitcrack BOINC project? [y/N] (default: y)" FITCRACK_BOINC_ATTACH
+FITCRACK_BOINC_ATTACH=${FITCRACK_BOINC_ATTACH:-y}
+if [ $FITCRACK_BOINC_ATTACH = "y" ]; then
+  python3 installer/boinc_connect.py --url ${BOINC_URL}/${BOINC_PROJECT}
+  if [[ $? == 0 ]]; then
+    echo "Successfully attached."
+  else
+    echo "Unable to attach."
+  fi
+fi
+
 echo " *** All done *** "
