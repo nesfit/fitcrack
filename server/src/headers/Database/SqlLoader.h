@@ -208,6 +208,13 @@ class CSqlLoader {
         std::vector<Config::Ptr<CMask>> loadJobMasks(uint64_t jobId);
 
         /**
+         * @brief Returns vector of masks which are not exhausted (taking normal keyspace) and belongs to supplied job
+         * @param jobId Job ID which masks we search for
+         * @return Vector of smart pointers to found masks
+         */
+        std::vector<Config::Ptr<CMask>> loadJobMasksWithNormalKeyspace(uint64_t jobId);
+
+        /**
          * @brief Returns vector of dictionaries which are not exhausted and belongs to supplied job
          * @param jobId Job ID which dictionaries we search for
          * @return Vector of smart pointers to found dictionaries

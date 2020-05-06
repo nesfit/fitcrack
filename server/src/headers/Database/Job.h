@@ -77,8 +77,9 @@ class CJob {
 
         /**
          * @brief Loads all non-exhausted mask database entries for this job to job vector m_masks
+         * @param useNormalKeyspace [in] If true, will use keyspace instead of hc keyspace to determine exhaustion
          */
-        void loadMasks();
+        void loadMasks(bool useNormalKeyspace);
 
         /**
          * @brief Loads all non-exhausted dictionary database entries for this job to job vector m_dictionaries

@@ -165,10 +165,10 @@ void CJob::updateStartTime()
 }
 
 
-void CJob::loadMasks()
+void CJob::loadMasks(bool useNormalKeyspace)
 {
     m_masks.clear();
-    auto maskVec = m_sqlLoader->loadJobMasks(this->m_id);
+    auto maskVec = useNormalKeyspace ? m_sqlLoader->loadJobMasksWithNormalKeyspace(this->m_id) : m_sqlLoader->loadJobMasks(this->m_id);
     for (auto & mask : maskVec)
         this->addMask(mask);
 }

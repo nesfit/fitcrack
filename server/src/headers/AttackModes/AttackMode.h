@@ -59,6 +59,7 @@ class AttackMode {
 
         virtual bool requiresMasks() const {return false;}
         virtual bool requiresDicts() const {return false;}
+        virtual bool masksUseRealKeyspace() const {return false;}
 
 protected:
         /**
@@ -119,7 +120,7 @@ protected:
 
         virtual PtrMask GetWorkunitMask() const;
 
-        virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks) const;
+        virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace) const;
 
         uint64_t getPasswordCountToProcess() const;
 

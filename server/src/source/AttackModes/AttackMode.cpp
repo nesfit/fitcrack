@@ -122,16 +122,17 @@ PtrMask AttackMode::GetWorkunitMask() const
     return m_sqlLoader->loadMask(m_workunit->getMaskId());
 }
 
-PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks) const
+PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace) const
 {
     for (PtrMask & mask : masks)
     {
-        if (mask->getCurrentIndex() < mask->getHcKeyspace())
+        auto maskKeyspace = useRealKeyspace ? mask->getKeyspace() : mask->getHcKeyspace();
+        if (mask->getCurrentIndex() < maskKeyspace)
         {
             /** Mask for a new workunit found */
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                     "Mask found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
-                    mask->getMask().c_str(), mask->getCurrentIndex(), mask->getHcKeyspace());
+                    mask->getMask().c_str(), mask->getCurrentIndex(), maskKeyspace);
             return mask;
         }
     }

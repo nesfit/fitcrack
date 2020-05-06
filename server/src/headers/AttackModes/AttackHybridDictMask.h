@@ -21,6 +21,7 @@ class CAttackHybridDictMask : public AttackMode {
 
 		virtual bool requiresDicts() const override {return true;}
 		virtual bool requiresMasks() const override {return true;}
+		virtual bool masksUseRealKeyspace() const override {return true;}
 
 	private:
 		/**

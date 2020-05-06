@@ -1,6 +1,7 @@
 #include "MaskSplitter.h"
 
 #include <algorithm>
+#include <cmath>
 #include <sstream>
 
 //taken from https://hashcat.net/wiki/doku.php?id=mask_attack
@@ -68,7 +69,7 @@ void AddCharsetSlice(
 	result.keyspace *= curCharsetBestSize;
 	if(curCharsetBestSize == possibleCharset.size() && charsetIdentifier)
 	{
-		result.mask += charsetIdentifier;
+		result.mask += *charsetIdentifier;
 	}
 	else
 	{
@@ -158,15 +159,15 @@ MaskSplitter::MaskSettings MaskSplitter::GetMaskSlice(const std::string &mask, u
 		if(i == forcedSplitIndex)
 		{
 			//we have to split here
-			size_t bestSize = desiredKeyspace/result.keyspace;
-			//0.75 to avoid fircing createion of itty bitty workunits later
+			size_t bestSize = std::round(double(desiredKeyspace)/result.keyspace);
+			//0.75 to avoid fircing creation of itty bitty workunits later
 			//for example by taking 90 of 91 remaining chars, forcing the next WU to use just one
 			AddCharsetSlice(bestSize, possibleNewCharset, result);
 			noLongerAddingPlaceholders = true;
 			continue;
 		}
 		const std::string &charset = GetCharset(mask[i]);
-		size_t remainingKeyspace = desiredKeyspace/result.keyspace;
+		size_t remainingKeyspace = std::round(double(desiredKeyspace)/result.keyspace);
 		if(remainingKeyspace >= charset.size())
 		{
 			//simplest case, just add the identifier and continue analyzing

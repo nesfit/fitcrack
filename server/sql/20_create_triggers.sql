@@ -15,7 +15,7 @@ CREATE TRIGGER `job_notification` AFTER UPDATE ON `fc_job`
 		INSERT INTO fc_job_graph (progress, job_id) VALUES (
 	        IF(NEW.hc_keyspace = 0 OR NEW.status = 1 OR NEW.status = 2,
 	           100,
-	           ROUND((NEW.indexes_verified / IF( NEW.attack_mode = 1, NEW.keyspace, NEW.hc_keyspace )) * 100, 2)
+	           ROUND((NEW.indexes_verified / IF( NEW.attack_mode = 1 OR NEW.attack_mode = 6 OR NEW.attack_mode = 7, NEW.keyspace, NEW.hc_keyspace )) * 100, 2)
 	          ),
 
 	        NEW.id  );

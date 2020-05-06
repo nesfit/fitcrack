@@ -214,7 +214,7 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
 
         /** Load non-exhausted masks/dictionaries */
         if(attack->requiresMasks())
-            job->loadMasks();
+            job->loadMasks(attack->masksUseRealKeyspace());
         if(attack->requiresDicts())
             job->loadDictionaries();
     }

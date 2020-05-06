@@ -264,7 +264,7 @@ bool CAttackHybridDictMask::makeWorkunit()
 			if (!dict->isLeft())
 				continue;
 
-			auto dictFile = makeInputDict(dict, 0);
+			auto dictFile = makeInputDict(dict, 0, true);
 			dictFile->CopyTo(path);
 		}
 	}
@@ -338,7 +338,7 @@ bool CAttackHybridDictMask::generateWorkunit()
 		"Masks left for this job: %" PRIu64 "\n", maskVec.size());
 
 	/** Find the following mask */
-	PtrMask currentMask = FindCurrentMask(maskVec);
+	PtrMask currentMask = FindCurrentMask(maskVec, true);
 
 	if (!currentMask)
 	{

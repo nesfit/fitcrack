@@ -176,7 +176,7 @@ bool CAttackMask::generateWorkunit()
             "Masks left for this job: %" PRIu64 "\n", maskVec.size());
 
     /** Find the following mask */
-    PtrMask currentMask = FindCurrentMask(maskVec);
+    PtrMask currentMask = FindCurrentMask(maskVec, false);
 
     if (!currentMask)
     {
