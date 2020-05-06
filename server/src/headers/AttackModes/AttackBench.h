@@ -39,7 +39,7 @@ class CAttackBench : public BaseAttack {
 
         virtual std::string makeLimitingConfigLine(const std::string &, const std::string &, const std::string &) override {return "";}
 
-        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex) override;
+        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex, bool isSticky) override;
 
         virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const override;
 
@@ -102,20 +102,23 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
             }
         }
     };
-    for(auto &dict: dicts)
+    if(!this->hasStickyLeftDict())
     {
-        if(!dict->isLeft())
+        for(auto &dict: dicts)
         {
-            hasRightDicts = true;
-            continue;
+            if(!dict->isLeft())
+            {
+                hasRightDicts = true;
+                continue;
+            }
+            CountPasswords(dict);
         }
-        CountPasswords(dict);
+        {
+            auto tmp = pwdCountBuilder.str();
+            configBuilder<<"|||benchmark_dict1|String|"<<tmp.size()<<'|'<<tmp<<"|||\n";
+        }
     }
-    {
-        auto tmp = pwdCountBuilder.str();
-        configBuilder<<"|||benchmark_dict1|String|"<<tmp.size()<<'|'<<tmp<<"|||\n";
-    }
-    if(hasRightDicts)
+    if(this->hasStickyLeftDict() || hasRightDicts)
     {
         pwdCountBuilder.str("");
         for(auto &dict: dicts)
@@ -124,8 +127,10 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
             {
                 continue;
             }
+            hasRightDicts = true;
             CountPasswords(dict);
         }
+        if(hasRightDicts)
         {
             auto tmp = pwdCountBuilder.str();
             configBuilder<<"|||benchmark_dict2|String|"<<tmp.size()<<'|'<<tmp<<"|||\n";
@@ -135,8 +140,13 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
 }
 
 template <typename BaseAttack>
-std::unique_ptr<InputDict> CAttackBench<BaseAttack>::makeInputDict(PtrDictionary dict, uint64_t startIndex)
+std::unique_ptr<InputDict> CAttackBench<BaseAttack>::makeInputDict(PtrDictionary dict, uint64_t startIndex, bool isSticky)
 {
+    //do NOT screw up sticky files
+    if(isSticky)
+    {
+        return BaseAttack::makeInputDict(dict, startIndex, isSticky);
+    }
     return std::make_unique<InputDictBenchmark>(dict, startIndex);
 }
 

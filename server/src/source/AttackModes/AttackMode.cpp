@@ -86,7 +86,7 @@ std::string AttackMode::makeConfigLine(const std::string &option, const std::str
     return stream.str();
 }
 
-std::unique_ptr<InputDict> AttackMode::makeInputDict(PtrDictionary dict, uint64_t startIndex)
+std::unique_ptr<InputDict> AttackMode::makeInputDict(PtrDictionary dict, uint64_t startIndex, bool)
 {
     return std::make_unique<InputDict>(dict, startIndex);
 }

@@ -88,7 +88,7 @@ bool CAttackRules::makeWorkunit() {
     try
     {
 
-        auto inputDict = makeInputDict(workunitDict, m_workunit->getStartIndex());
+        auto inputDict = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
 
         uint64_t dictKeyspace = m_workunit->getHcKeyspace();
 

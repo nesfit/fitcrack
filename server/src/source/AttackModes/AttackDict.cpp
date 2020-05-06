@@ -97,7 +97,7 @@ bool CAttackDict::makeWorkunit()
 
     try
     {
-        auto inputDict = makeInputDict(workunitDict, m_workunit->getStartIndex());
+        auto inputDict = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
 
         /** Add 'keyspace' passwords to dict file */
 

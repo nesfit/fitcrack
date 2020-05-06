@@ -104,7 +104,9 @@ protected:
         virtual std::string makeLimitingConfigLine(const std::string &option, const std::string &type, const std::string &value)
         {return makeConfigLine(option, type, value);}
 
-        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex);
+        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex, bool isSticky);
+
+        virtual bool hasStickyLeftDict() const {return false;}
 
         virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const;
 
