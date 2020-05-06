@@ -1013,6 +1013,11 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 for(workunitIt = workunits.begin(); workunitIt != workunits.end(); ++workunitIt)
                     set_retry_workunit((*workunitIt)->m_workunit_id);
 
+                /** Set job back from Finishing state to Running */
+                std::cerr << __LINE__ << " - If job if Finishing, switching to running" << std::endl;
+                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET status = %d WHERE id = %" PRIu64 " AND status = %d LIMIT 1 ;", mysql_table_job.c_str(), Job_running, job_id, Job_finishing);
+                update_mysql(buf);
+
                 // Do not set pacakge to finished/delete
                 std::fclose(f);
                 return 0;

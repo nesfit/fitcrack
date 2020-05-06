@@ -8,3 +8,5 @@ flask_script
 psutil
 werkzeug==0.15.4
 msgpack
+mysql-connector
+

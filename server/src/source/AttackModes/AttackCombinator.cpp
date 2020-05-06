@@ -90,7 +90,7 @@ bool CAttackCombinator::makeWorkunit()
     try
     {
 
-        auto dict2_file = makeInputDict(workunitDict, m_workunit->getStartIndex());
+        auto dict2_file = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
 
         /** Check combinator workunit type */
         /** Dictionary is already fragmented, continue fragmenting */
@@ -290,13 +290,16 @@ bool CAttackCombinator::makeWorkunit()
             return false;
         }
 
+        //delete the file
+        (std::ofstream(path));
+
         auto dictVec = m_job->getDictionaries();
         for (auto & dict : dictVec)
         {
             if (!dict->isLeft())
                 continue;
 
-            auto dictFile = makeInputDict(dict, 0);
+            auto dictFile = makeInputDict(dict, 0, true);
             dictFile->CopyTo(path);
         }
     }

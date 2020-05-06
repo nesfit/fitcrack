@@ -9,6 +9,7 @@ cp -Rf boinc/sched/work_generator $BOINC_PROJECT_DIR/bin/
 cp -Rf boinc/sched/assimilator $BOINC_PROJECT_DIR/bin/
 cp -Rf boinc/sched/bitwise_validator $BOINC_PROJECT_DIR/bin/
 cp -Rf boinc/sched/trickler $BOINC_PROJECT_DIR/bin/
+cp -Rf webadmin/fitcrackAPI/pcfg_manager/pcfg-manager $BOINC_PROJECT_DIR/bin/
 
 # Copy Fitcrack communication templates
 cp -Rf server/templates/* $BOINC_PROJECT_DIR/templates/

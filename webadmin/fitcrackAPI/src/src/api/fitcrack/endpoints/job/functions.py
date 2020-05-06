@@ -19,7 +19,7 @@ from uuid import uuid1
 from flask_restplus import abort
 from flask_login import current_user
 from sqlalchemy import exc
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
+from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, ROOT_DIR
 from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
@@ -364,3 +364,4 @@ def can_edit_job (id):
 
 def can_operate_job (id):
     return True if perm_base().filter_by(operate=1).filter_by(job_id=id).one_or_none() else False
+

@@ -37,6 +37,8 @@ class CAttackCombinator : public AttackMode {
         bool makeWorkunit() override ;
 
         virtual bool requiresDicts() const override {return true;}
+        
+        virtual bool hasStickyLeftDict() const override {return true;}
 
     private:
         /**

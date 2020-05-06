@@ -107,7 +107,9 @@ protected:
         virtual std::string makeLimitingConfigLine(const std::string &option, const std::string &type, const std::string &value)
         {return makeConfigLine(option, type, value);}
 
-        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex);
+        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex, bool isSticky);
+
+        virtual bool hasStickyLeftDict() const {return false;}
 
         virtual std::unique_ptr<MaskSplitter> makeMaskSplitter(std::vector<std::string> customCharsets = {});
 
