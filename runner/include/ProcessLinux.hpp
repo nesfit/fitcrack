@@ -31,6 +31,8 @@ class ProcessLinux : public ProcessBase {
          */
         void launchSubprocess();
 
+        virtual char getQuoteChar() {return '\'';}
+
     public:
 
         /**

@@ -47,6 +47,10 @@ class ProcessBase {
          */
         void setStopTime();
 
+        std::string quoteArgIfNecessary(const std::string &arg);
+
+        virtual char getQuoteChar() = 0;
+
         /**
          * @brief   Reads all lines from the pipe
          * @param   pipe [in] Pipe to read from

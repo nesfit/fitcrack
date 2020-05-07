@@ -32,12 +32,8 @@ void AttackMask::addSpecificArguments() {
     RunnerUtils::runtimeException("AttackMask: unsupported attack_submode = " + attack_submode_ + " attack_mode = " + attack_mode_ + " has no such attack_submode");
   }
 
-  createMaskFile();
-  addRequiredFile(HashcatConstant::MaskFileName);
+  createMaskAndCharsets();
 
-  if (has_charsets_) {
-    addArgument("--hex-charset");
-  }
 }
 
 

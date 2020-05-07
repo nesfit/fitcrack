@@ -27,11 +27,11 @@ ProcessBase::ProcessBase(const std::string& exec_name, const std::vector<std::st
   Logging::debugPrint(Logging::Detail::ObjectManipulation, "-------------------------------");
 }
 
-std::string quoteArgIfNecessary(const std::string &arg)
+std::string ProcessBase::quoteArgIfNecessary(const std::string &arg)
 {
   if (arg.find(" ") != std::string::npos)
   {
-    return '\''+arg+'\'';
+    return getQuoteChar()+arg+getQuoteChar();
   }
   else
   {

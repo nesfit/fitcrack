@@ -26,6 +26,8 @@ class ProcessWindows : public ProcessBase {
          * @brief   Contains steps leading to execution of executable with appropiate arguments.
          */
         void launchSubprocess();
+
+        virtual char getQuoteChar() {return '"';}
     
     public:
 

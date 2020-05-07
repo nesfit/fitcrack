@@ -1,0 +1,10 @@
+|||mode|String|1|n|||
+|||attack_mode|UInt|1|6|||
+|||attack_submode|UInt|1|0|||
+|||name|String|13|hybrid test 4|||
+|||hash_type|UInt|1|0|||
+|||rule_left|String|4|c $-|||
+|||hwmon_temp_abort|UInt|2|95|||
+|||mask|String|3|aaa|||
+|||start_index|BigUInt|3|450|||
+|||hc_keyspace|BigUInt|3|150|||

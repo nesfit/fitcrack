@@ -15,10 +15,7 @@ void AttackHybridDictMask::addSpecificArguments() {
 
   addRequiredFile("dict");
 
-  createMaskFile();
-  addRequiredFile(HashcatConstant::MaskFileName);
+  createMaskAndCharsets();
 
-  if (has_charsets_) {
-    addArgument("--hex-charset");
-  }
+  findAndAddOptional("rule_left", "--rule-left");
 }
