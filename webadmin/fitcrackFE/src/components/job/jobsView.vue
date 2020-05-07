@@ -521,6 +521,14 @@
           {
             'text': 'prince',
             'code': 4
+          },
+          {
+            'text': 'hybrid (wordlist + mask)',
+            'code': 5
+          },
+          {
+            'text': 'hybrid (mask + wordlist)',
+            'code': 6
           }
         ],
         jobs:
