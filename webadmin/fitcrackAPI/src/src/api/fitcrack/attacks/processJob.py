@@ -226,7 +226,7 @@ def post_process_job_3(data, db_job):
 
 
 # hybrid attack
-def process_job_6(job):
+def process_job_6(job, actually7=False):
     job['attack_settings']['attack_submode'] = 0
     if job['attack_settings']['rule_left'] and job['attack_settings']['rule_right']:
         job['attack_settings']['attack_submode'] = 3
@@ -235,14 +235,28 @@ def process_job_6(job):
     elif job['attack_settings']['rule_right']:
         job['attack_settings']['attack_submode'] = 2
 
+    mask = job['attack_settings']['mask']
 
-    check_mask_syntax(job['attack_settings']['mask'])
-    rightDict = make_dict_from_mask(job['attack_settings']['mask'])
-    job['attack_settings']['right_dictionaries'] = [ rightDict ]
+    check_mask_syntax(mask)
+    maskKeyspace = compute_keyspace_from_mask(mask)
+    maskHcKeyspace = shellExec(
+                    HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' --keyspace -a 3 ' + mask,
+                    cwd=HASHCAT_DIR, abortOnError=True)
+    if maskHcKeyspace == '':
+        abort(500, 'Server can not compute keyspace for mask ' + mask)
+    try:
+        maskHcKeyspace = int(maskHcKeyspace)
+    except ValueError:
+        abort(500, 'Hashcat says: "' + maskHcKeyspace + '".')
 
-    dictsLeftKeyspace = 0
-    dictsRightKeyspace = rightDict.keyspace
-    for dictObj in job['attack_settings']['left_dictionaries']:
+    job['mask_data'] = {
+        'mask': mask,
+        'keyspace': maskKeyspace,
+        'hc_keyspace': maskHcKeyspace
+    }
+
+    dictsKeyspace = 0
+    for dictObj in job['attack_settings']['left_dictionaries' if not actually7 else 'right_dictionaries']:
         dict = FcDictionary.query.filter(FcDictionary.id == dictObj['id']).first()
         if not dict:
             abort(500, 'Wrong dictionary selected.')
@@ -250,12 +264,12 @@ def process_job_6(job):
         if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
             abort(500, 'Dictionary does not exist.')
 
-        dictsLeftKeyspace += dict.keyspace
+        dictsKeyspace += dict.keyspace
 
-    keyspace = dictsLeftKeyspace * dictsRightKeyspace
+    keyspace = dictsKeyspace * maskKeyspace
 
-    job['attack_name'] = 'hybrid (Wordlist + Mask)'
-    job['hc_keyspace'] = dictsLeftKeyspace
+    job['attack_name'] = 'hybrid' + '(Wordlist + Mask)' if not actually7 else '(Mask + Wordlist)'
+    job['hc_keyspace'] = dictsKeyspace if not actually7 else maskHcKeyspace
     job['keyspace'] = keyspace
     return job
 
@@ -265,49 +279,27 @@ def post_process_job_6(data, db_job):
         jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'])
         db.session.add(jobDict)
 
-    for dict in data['attack_settings']['right_dictionaries']:
-        jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict.id, is_left=False)
-        db.session.add(jobDict)
+    mask = data['mask_data']
+    db_mask = FcMask(job_id=db_job.id,
+                     mask=mask['mask'],
+                     current_index='0',
+                     keyspace=mask['keyspace'],
+                     hc_keyspace=mask['hc_keyspace'])
+    db.session.add(db_mask)
 
 # hybrid attack
 def process_job_7(job):
-    job['attack_settings']['attack_submode'] = 0
-    if job['attack_settings']['rule_left'] and job['attack_settings']['rule_right']:
-        job['attack_settings']['attack_submode'] = 3
-    elif job['attack_settings']['rule_left']:
-        job['attack_settings']['attack_submode'] = 1
-    elif job['attack_settings']['rule_right']:
-        job['attack_settings']['attack_submode'] = 2
-
-    check_mask_syntax(job['attack_settings']['mask'])
-    leftDict = make_dict_from_mask(job['attack_settings']['mask'])
-    job['attack_settings']['left_dictionaries'] = [ leftDict ]
-
-    dictsLeftKeyspace = leftDict.keyspace
-    dictsRightKeyspace = 0
-    for dictObj in job['attack_settings']['right_dictionaries']:
-        dict = FcDictionary.query.filter(FcDictionary.id == dictObj['id']).first()
-        if not dict:
-            abort(500, 'Wrong dictionary selected.')
-
-        if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
-            abort(500, 'Dictionary does not exist.')
-
-        dictsRightKeyspace += dict.keyspace
-
-    keyspace = dictsLeftKeyspace * dictsRightKeyspace
-
-    job['attack_name'] = 'hybrid (Mask + Wordlist)'
-    job['hc_keyspace'] = dictsLeftKeyspace
-    job['keyspace'] = keyspace
-    job['attack_settings']['attack_mode'] = 1
-    return job
+    return process_job_6(job, True)
 
 
 def post_process_job_7(data, db_job):
-    for dict in data['attack_settings']['left_dictionaries']:
-        jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict.id)
-        db.session.add(jobDict)
+    mask = data['mask_data']
+    db_mask = FcMask(job_id=db_job.id,
+                     mask=mask['mask'],
+                     current_index='0',
+                     keyspace=mask['keyspace'],
+                     hc_keyspace=mask['hc_keyspace'])
+    db.session.add(db_mask)
 
     for dict in data['attack_settings']['right_dictionaries']:
         jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'], is_left=False)

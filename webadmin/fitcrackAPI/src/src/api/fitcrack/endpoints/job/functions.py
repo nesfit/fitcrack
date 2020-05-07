@@ -60,13 +60,6 @@ def create_job(data):
     if job['attack_settings']['attack_mode'] == 3:
         job['attack_settings']['attack_submode'] = data['attack_settings']['attack_submode']
 
-    # hybrid attack mode setting
-    if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
-        attack_settings_control = 1
-
-    else:
-        attack_settings_control = job['attack_settings']['attack_mode']
-
     token = uuid1()
 
     if job['time_start'] == '':
@@ -78,7 +71,7 @@ def create_job(data):
     db_job = FcJob(
         token=token.hex,
         attack=job['attack_name'],
-        attack_mode='1' if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7 else job['attack_settings']['attack_mode'],
+        attack_mode=job['attack_settings']['attack_mode'],
         attack_submode=job['attack_settings']['attack_submode'],
         hash_type=job['hash_settings']['hash_type'],
         hash='check hashlist',
