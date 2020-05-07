@@ -245,7 +245,6 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
 void CSimpleGenerator::finishJob(PtrJob &job)
 {
     uint64_t jobId = job->getId();
-    uint32_t attackMode = job->getAttackMode();
 
     if (m_sqlLoader->isJobTimeout(jobId))
     {
