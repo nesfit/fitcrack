@@ -85,7 +85,7 @@ def get_running_managers():
                'pcfg-manager' in proc.cmdline()[0] and \
                'server' in proc.cmdline()[1]:
                 result.append(int(proc.cmdline()[proc.cmdline().index('-p') + 1]) - 50050)
-        except ValueError:
+        except (ValueError, IndexError):
             continue
 
     return result
