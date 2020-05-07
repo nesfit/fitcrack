@@ -194,6 +194,7 @@ import permsEditor from './jobPermissions'
 //
 import graph from '@/components/graph/fc_graph'
 import combinatorDetail from '@/components/job/attacksDetail/combinator'
+import hybridDetail from '@/components/job/attacksDetail/hybrid'
 import maskDetail from '@/components/job/attacksDetail/mask'
 import dictionaryDetail from '@/components/job/attacksDetail/dictionary'
 import princeDetail from '@/components/job/attacksDetail/prince'
@@ -214,6 +215,7 @@ export default {
     permsEditor,
     graph,
     combinatorDetail,
+    hybridDetail,
     maskDetail,
     dictionaryDetail,
     princeDetail,
@@ -243,8 +245,10 @@ export default {
           return 'pcfgDetail'
         case 'prince':
           return 'princeDetail'
-        default:
+        case 'combinator':
           return 'combinatorDetail'
+        default:
+          return 'hybridDetail'
       }
     }
   },
