@@ -28,8 +28,13 @@ void Logging::log(const int debug_level, const std::string& class_name, const st
     /* Allow class name to be specified or to be passed as __PRETTY_FUNCTION__ */
     if ((class_name_buffer = parseClassName(class_name)) == "::")
     class_name_buffer = "";
-
-    std::clog << "[" << Logging::Detail::tag[debug_level] << "]: at " << ::time(nullptr) << ":" << class_name_buffer << ": " << message << std::endl;
+  
+    time_t tm = ::time(nullptr);
+    // Returns string with 26 characters
+    char * current_time = ::asctime(::localtime(&tm));
+    // Remove trailing '\n'
+    current_time[24] = '\0';
+    std::clog << "[" << Logging::Detail::tag[debug_level] << "][" <<  current_time << "] " << class_name_buffer << ": " << message << std::endl;
   }
 }
 
