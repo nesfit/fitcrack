@@ -268,7 +268,7 @@ def process_job_6(job, actually7=False):
 
     keyspace = dictsKeyspace * maskKeyspace
 
-    job['attack_name'] = 'hybrid' + '(Wordlist + Mask)' if not actually7 else '(Mask + Wordlist)'
+    job['attack_name'] = 'hybrid (Wordlist + Mask)' if not actually7 else 'hybrid (Mask + Wordlist)'
     job['hc_keyspace'] = dictsKeyspace if not actually7 else maskHcKeyspace
     job['keyspace'] = keyspace
     return job
