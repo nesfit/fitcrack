@@ -120,8 +120,8 @@ def run_new_manager(job_id, cursor):
     print(datetime.datetime.utcnow(), '[LOG]: Running new PCFG manager for job ID', job_id)
     process = subprocess.Popen(
         ['../bin/pcfg-manager', 'server', '-p', str(job_id_to_port(job_id)), '-m', str(get_keyspace(job_id, cursor)),
-         '--hashlist', EMPTY_HASHLIST, '-r', PCFG_DIR + get_grammar_name(job_id, cursor)])
-
+         '-r', PCFG_DIR + get_grammar_name(job_id, cursor)])
+           
 
 def main():
     # Connect to fitcrack DB
