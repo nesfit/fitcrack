@@ -18,7 +18,7 @@ from src.api.fitcrack.endpoints.batches.responseModels import batch_with_jobs_mo
 from src.api.fitcrack.responseModels import simpleResponse
 
 from src.database import db
-from src.database.models import FcBatch, FcJob
+from src.database.models import FcBatch, FcJob, Host, FcHostActivity
 
 log = logging.getLogger(__name__)
 ns = api.namespace('batches', description='Endpoints for job batches.')
@@ -137,6 +137,14 @@ class concrete_batch(Resource):
         batch = FcBatch.query.filter_by(id=id).one_or_none()
         if batch and not current_user.role.OPERATE_ALL_JOBS and batch.creator_id != current_user.id:
             abort(401, 'Unauthorized to operate this batch.')
+
+        # check hosts
+        hosts = [ a[0] for a in db.session.query(Host.id).all() ]
+        for job in FcJob.query.filter_by(batch_id=id).all():
+            if job.host_count == 0:
+                for hostId in hosts:
+                    host = FcHostActivity(boinc_host_id=hostId, job_id=job.id)
+                    db.session.add(host)
 
         starter = FcJob.query.filter_by(batch_id=id).filter_by(status=0).order_by(FcJob.queue_position).first()
         if not starter:

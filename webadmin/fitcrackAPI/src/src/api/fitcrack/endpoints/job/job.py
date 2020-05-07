@@ -36,7 +36,7 @@ from src.api.fitcrack.attacks.functions import compute_prince_keyspace
 from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, attack_modes
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcJob, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, \
+from src.database.models import FcJob, Host, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, \
     FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser
 
 log = logging.getLogger(__name__)
@@ -304,6 +304,12 @@ class OperationWithJob(Resource):
         job = FcJob.query.filter(FcJob.id == id).one()
 
         if action == 'start':
+            # check hosts
+            hosts = [ a[0] for a in db.session.query(Host.id).all() ]
+            if job.host_count == 0:
+                for hostId in hosts:
+                    host = FcHostActivity(boinc_host_id=hostId, job_id=job.id)
+                    db.session.add(host)
             job.status = status_to_code['running']
         elif action == 'stop':
             job.status = status_to_code['finishing']
