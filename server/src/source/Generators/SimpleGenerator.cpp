@@ -253,8 +253,7 @@ void CSimpleGenerator::finishJob(PtrJob &job)
                              "Timeouted job has finished all workunits. Setting state to timeout.\n", jobId);
         job->updateStatusOfRunningJob(Config::JobState::JobTimeout);
     }
-    else if ((attackMode == Config::AttackMode::AttackCombinator && (job->getCurrentIndex() * job->getHcKeyspace() >= job->getKeyspace())) ||
-             (attackMode != Config::AttackMode::AttackCombinator && (job->getCurrentIndex() >= job->getHcKeyspace())))
+    else if (job->isKeyspaceExhausted())
     {
         if (m_sqlLoader->isAnythingCracked(jobId))
         {

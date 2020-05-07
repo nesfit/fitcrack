@@ -210,6 +210,17 @@ bool CJob::loadHashes()
     return true;
 }
 
+bool CJob::isKeyspaceExhausted() const
+{
+    switch(getAttackMode())
+    {
+    case Config::AttackMode::AttackCombinator:
+    case Config::AttackMode::AttackHybridDictMask:
+        return getCurrentIndex()*getHcKeyspace() >= getKeyspace();
+    default:
+        return getCurrentIndex() >= getHcKeyspace();
+    }
+}
 
 /**
  * @section Table attributes getters

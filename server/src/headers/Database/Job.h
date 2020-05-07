@@ -92,6 +92,11 @@ class CJob {
          */
         bool loadHashes();
 
+        /**
+         * @brief Get the index at which the job is finished
+         */
+        bool isKeyspaceExhausted() const;
+
     private:
 
         CSqlLoader * m_sqlLoader;         /**< SqlLoader for database updating */
