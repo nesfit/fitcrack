@@ -11,48 +11,24 @@ import subprocess
 from psutil import process_iter
 from time import sleep
 
+DB_HOST = 'localhost'
+DB_NAME = 'fitcrack'
+DB_USER = 'fitcrack'
+DB_PW = 'mypassword'
 
 PCFG_DIR = '/usr/share/collections/pcfg/'
-CONFIG_PATH = '../config.xml'
-EMPTY_HASHLIST = 'empty_hashlist.txt'
-
-
-def parse_config():
-    with open(CONFIG_PATH, 'r') as config:
-        lines = config.read().splitlines()
-        for line in lines:
-            if '<db_user>' in line:
-                db_user = re.search('^\s*<db_user>(.+)</db_user>$', line).group(1)
-            elif '<db_name>' in line:
-                db_name = re.search('^\s*<db_name>(.+)</db_name>$', line).group(1)
-            elif '<db_passwd>' in line:
-                db_passwd = re.search('^\s*<db_passwd>(.+)</db_passwd>$', line).group(1)
-            elif '<db_host>' in line:
-                db_host = re.search('^\s*<db_host>(.+)</db_host>$', line).group(1)
-
-    return db_host, db_name, db_user, db_passwd
-
 
 def connect_db():
-    """Parses BOINC config and accesses the Fitcrack DB.
+    """Accesses the Fitcrack DB.
 
     :return: MySQL object
     """
     try:
-        db_host, db_name, db_user, db_passwd = parse_config()
-    except FileNotFoundError:
-        print(datetime.datetime.utcnow(), '[ERROR]: Config file not found')
-        exit(1)
-    except UnboundLocalError:
-        print(datetime.datetime.utcnow(), '[ERROR]: Failed to parse config.xml')
-        exit(1)
-
-    try:
         fitcrack_db = mysql.connector.connect(
-            host=db_host,
-            user=db_user,
-            passwd=db_passwd,
-            database=db_name
+            host=DB_HOST,
+            user=DB_USER,
+            passwd=DB_PW,
+            database=DB_NAME
         )
     except mysql.connector.Error as err:
         print(datetime.datetime.utcnow(), '[ERROR]: Could not connect to Fitcrack DB:', err)
@@ -127,9 +103,6 @@ def main():
     # Connect to fitcrack DB
     fitcrack_db = connect_db()
     f_cursor = fitcrack_db.cursor()
-
-    # Prepare empty hashlist
-    open(EMPTY_HASHLIST, 'a').close()
 
     while True:
         pcfg_jobs = get_running_pcfg_jobs(f_cursor)

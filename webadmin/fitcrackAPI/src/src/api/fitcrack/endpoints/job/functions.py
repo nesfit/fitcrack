@@ -321,18 +321,6 @@ def computeCrackingTime(data):
 
     return result
 
-def calculate_port_number(job_id):
-
-    portNumber = 50050 + job_id
-    return str(portNumber)
-
-
-def start_pcfg_manager(job_id, grammar_name, keyspace):
-
-    manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
-    test = PCFG_MANAGER_DIR + " server " + "-p " + str(calculate_port_number(job_id)) + " -m " + str(keyspace) + " --hashlist " + PCFG_MANAGER + "/README.md" + " -r " + PCFG_DIR + "/" + grammar_name
-    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", str(calculate_port_number(job_id)), "-m", str(keyspace), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])
-
 # permission utils
 def perm_base ():
     return db.session.query(FcUserPermission.job_id).filter_by(user_id=current_user.id)

@@ -26,7 +26,7 @@ from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWo
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
     editJob_argument, multiEditHosts_argument, jobList_argument, job_permissions_arguments
 from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
-    computeCrackingTime, start_pcfg_manager, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
+    computeCrackingTime, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
     can_view_job, can_edit_job, can_operate_job
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, \
