@@ -172,7 +172,7 @@ def find_or_recreate_hash (hashstring, hashtype):
 def find_or_recreate_mask (data):
   mask = FcMask.query.filter_by(mask=data['mask']).first()
   if not mask:
-    mask = FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'])
+    mask = FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0)
   return mask
 
 def unpack (package):
