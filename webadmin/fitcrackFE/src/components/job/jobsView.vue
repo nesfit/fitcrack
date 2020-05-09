@@ -380,6 +380,7 @@
               v-else
               text
               color="error"
+              :disabled="item.status === '12'"
               @click="operateJob(item.id, 'stop')"
             >
               Stop
