@@ -133,7 +133,7 @@
 </style>
 <style>
   .theme--light.v-application {
-    background-color: #f5f5f5;
+    background-color: #f5f5f5 !important;
   }
 
   h1, h2 {
