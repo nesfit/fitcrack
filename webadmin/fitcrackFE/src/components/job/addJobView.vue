@@ -232,7 +232,7 @@
                     v-if="inputMethod !== null"
                     ref="textarea"
                     v-model="hashList"
-                    :class="{error: hashListError}"
+                    :class="{'hasherror': hashListError}"
                     class="textarea"
                     max-height="500"
                     :readonly="!(inputMethod === 'multipleHashes' && !gotBinaryHash) "
@@ -864,14 +864,14 @@
     overflow: hidden;
   }
 
-  .textarea.error {
-    border-width: 2px;
-    border-style: solid;
-    border-radius: 5px
-  }
-
   .mode-btn {
     height: initial !important;
     margin: 1em;
+  }
+</style>
+
+<style>
+  .hasherror .scrollCont {
+    border-color: #e01 !important;
   }
 </style>
