@@ -119,7 +119,10 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
         }
         {
             auto tmp = pwdCountBuilder.str();
-            configBuilder<<"|||benchmark_dict1|String|"<<tmp.size()<<'|'<<tmp<<"|||\n";
+            if(!tmp.empty())
+            {
+                configBuilder<<"|||benchmark_dict1|String|"<<tmp.size()<<'|'<<tmp<<"|||\n";
+            }
         }
     }
     if(this->hasStickyLeftDict() || hasRightDicts)

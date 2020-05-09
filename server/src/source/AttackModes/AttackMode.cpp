@@ -141,6 +141,5 @@ PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKey
 
 uint64_t AttackMode::getPasswordCountToProcess() const
 {
-    auto hashes = m_job->getHashes();
     return m_host->getPower()*m_seconds;
 }

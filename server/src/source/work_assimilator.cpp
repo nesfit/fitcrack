@@ -687,10 +687,6 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                     break;
                 }
 
-                /** In case of mask attack, convert power to mask indices/s */
-                std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_mode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-                uint64_t attack_mode = get_num_from_mysql(buf);
-
                 /** Save original power for fc_benchmark */
                 long long unsigned int original_power = power;
 
@@ -699,32 +695,6 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 std::cerr<<__LINE__<<" - There are "<<hashcount<<" hashes, dividing power\n";
                 //benchmark sends hashes/second, so if there are more we need to divide by that to get keys/second
                 power /= hashcount;
-
-                if (attack_mode == 3)
-                {
-                    std::snprintf(buf, SQL_BUF_SIZE, "SELECT keyspace FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-                    uint64_t keyspace = get_num_from_mysql(buf);
-
-                    std::snprintf(buf, SQL_BUF_SIZE, "SELECT hc_keyspace FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-                    uint64_t hc_keyspace = get_num_from_mysql(buf);
-
-                    /** Job with keyspace == 0 is malformed */
-                    if (hc_keyspace == 0 || keyspace == 0)
-                    {
-                        std::cerr << __LINE__ << " - Keyspace cannot be 0, setting job to Malformed status" << std::endl;
-                        std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET status = %d WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), Job_malformed, job_id);
-                        update_mysql(buf);
-                        break;
-                    }
-
-                    uint64_t factor = keyspace / hc_keyspace;
-
-                    if (factor > 1)
-                    {
-                        power /= factor * FIRST_WU_SHRINK_FACTOR;
-                        std::cerr << __LINE__ << " - Updating power for mask-attack with ratio: 1/" << factor << ", new power: " << power << std::endl;
-                    }
-                }
 
                 //power is in hashes per second, and rules multiply the keyspace
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT rules FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
@@ -822,9 +792,25 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
             uint64_t hc_keyspace = get_num_from_mysql(buf);
             uint64_t power_keyspace = hc_keyspace;
 
-            /** In case of rules attack, multiply the keyspace by number of rules */
+            // If attack has mask and is not hybrid with mask on right side, convert power from mask indices/s to passwords/s
             std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_mode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
             uint64_t attack_mode = get_num_from_mysql(buf);
+
+            //these two actually don't have WU keyspace divided by the mask factor
+            if(attack_mode != 6 && attack_mode != 7)
+            {
+                std::snprintf(buf, SQL_BUF_SIZE, "SELECT mask_id FROM `%s` WHERE workunit_id = %lu LIMIT 1;", mysql_table_workunit.c_str(), wu.id);
+                uint64_t maskId = get_num_from_mysql(buf);
+                if(maskId != 0)
+                {
+                    //job has mask and uses it for indexing, multiply keyspace
+                    std::snprintf(buf, SQL_BUF_SIZE, "SELECT hc_keyspace FROM `%s` WHERE id = %lu LIMIT 1;", mysql_table_mask.c_str(), maskId);
+                    uint64_t maskHcKeyspace = get_num_from_mysql(buf);
+                    std::snprintf(buf, SQL_BUF_SIZE, "SELECT keyspace FROM `%s` WHERE id = %lu LIMIT 1;", mysql_table_mask.c_str(), maskId);
+                    uint64_t maskKeyspace = get_num_from_mysql(buf);
+                    power_keyspace *= maskKeyspace/maskHcKeyspace;
+                }
+            }
 
             /** Read workunit properties */
             std::snprintf(buf, SQL_BUF_SIZE, "SELECT seconds_per_workunit FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);

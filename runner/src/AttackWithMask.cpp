@@ -46,6 +46,10 @@ void AttackWithMask::addMask() {
     }
     addArgument(mask);
   }
+  else
+  {
+    RunnerUtils::runtimeException("Missing hashcat required argument \"mask\"");
+  }
 }
 
 void AttackWithMask::createMaskAndCharsets() {

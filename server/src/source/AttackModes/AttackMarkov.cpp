@@ -240,24 +240,29 @@ bool CAttackMarkov::generateWorkunit()
                 "No masks found for this job\n");
         return false;
     }
+    uint64_t maskHcKeyspace = currentMask->getHcKeyspace();
+    uint64_t maskKeyspace = currentMask->getKeyspace();
+
+    uint64_t hcDivisionFactor = maskKeyspace/maskHcKeyspace;
+    //round up
+    uint64_t hcKeyspace = (passCount+hcDivisionFactor-1)/hcDivisionFactor;
 
     uint64_t maskIndex = currentMask->getCurrentIndex();
-    uint64_t maskHcKeyspace = currentMask->getHcKeyspace();
-    if (maskIndex + passCount > maskHcKeyspace)
+    if (maskIndex + hcKeyspace > maskHcKeyspace)
     {
         /** Host is too powerful for this mask, it will finish it */
-        passCount = maskHcKeyspace - maskIndex;
+        hcKeyspace = maskHcKeyspace - maskIndex;
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adjusting #passwords, mask too small, new keyspace: %" PRIu64 "\n", passCount);
+                "Adjusting #passwords, mask too small, new #: %" PRIu64 "\n", hcKeyspace);
     }
 
     /** Create new mask workunit */
-    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
+    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, hcKeyspace,
                          currentMask->getId(), 0, false, 0, false);
 
     /** Update indexes for job and mask*/
-    m_job->updateIndex(m_job->getCurrentIndex() + passCount);
-    currentMask->updateIndex(maskIndex + passCount);
+    m_job->updateIndex(m_job->getCurrentIndex() + hcKeyspace);
+    currentMask->updateIndex(maskIndex + hcKeyspace);
 
     return true;
 }

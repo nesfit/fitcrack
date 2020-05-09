@@ -20,6 +20,7 @@ enum AttackType {
   AT_PCFG,
   AT_Benchmark,
   AT_HybridDictMask,
+  AT_HybridMaskDict,
   AT_Unknown
 };
 
