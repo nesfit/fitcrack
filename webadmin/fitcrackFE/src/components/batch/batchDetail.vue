@@ -19,7 +19,7 @@
         {{ data ? data.name : '...' }}
       </h2>
       <v-spacer />
-      <div v-if="data.current_user_can_edit">
+      <div v-if="data && data.current_user_can_edit">
         <transition 
           name="fade"
           mode="out-in"
