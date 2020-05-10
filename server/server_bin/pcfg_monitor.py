@@ -63,6 +63,9 @@ def get_running_managers():
                 result.append(int(proc.cmdline()[proc.cmdline().index('-p') + 1]) - 50050)
         except (ValueError, IndexError):
             continue
+        except Exception as e:
+            print(datetime.datetime.utcnow(), '[WARN]: Unknown exception occured in process parsing:', e)
+            continue
 
     return result
 
