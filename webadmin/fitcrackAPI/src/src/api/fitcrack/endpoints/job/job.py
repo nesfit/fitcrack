@@ -345,11 +345,11 @@ class OperationWithJob(Resource):
             job.current_index = 0
             job.cracking_time = 0
             job.time_start = job.time_end = None
-            if job.attack_mode == attack_modes['mask']:
+            if job.attack_mode == attack_modes['mask'] or job.attack_mode == attack_modes['hybrid (wordlist + mask)']:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
                     mask.current_index = 0
-            elif job.attack_mode == attack_modes['dictionary'] or job.attack_mode == attack_modes['combinator']:
+            elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
                 dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
                 for dictionary in dictionaries:
                     dictionary.current_index = 0
