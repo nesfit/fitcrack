@@ -95,7 +95,7 @@ class CJob {
         /**
          * @brief Get the index at which the job is finished
          */
-        bool isKeyspaceExhausted() const;
+        uint64_t getEndIndex() const;
 
     private:
 
