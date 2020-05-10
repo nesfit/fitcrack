@@ -17,7 +17,7 @@ JOB_EXPORTABLE_COLUMNS = (
   'charset1', 'charset2', 'charset3', 'charset4', 'rule_left', 'rule_right', 
   'markov_threshold', 'case_permute', 'check_duplicates', 
   'min_password_len', 'max_password_len', 'min_elem_in_chain', 
-  'max_elem_in_chain', 'replicate_factor', 'deleted', 'masks'
+  'max_elem_in_chain', 'deleted', 'masks'
 )
 # relationship fields that get stored as dependencies
 JOB_EXPORTABLE_DEPENDENCIES = {
@@ -211,11 +211,8 @@ def unpack (package):
         jd = FcJobDictionary(is_left=0, dictionary=deps[index])
         newjob.right_dictionaries.append(jd)
     # adding values for useless non-null fields
-    newjob.hash = ''
     newjob.indexes_verified = 0
     newjob.current_index_2 = 0
-    newjob.dict1 = ''
-    newjob.dict2 = ''
     # add owner
     newjob.permission_records.append(FcUserPermission(user_id=current_user.id, view=1, modify=1, operate=1, owner=1))
     # save

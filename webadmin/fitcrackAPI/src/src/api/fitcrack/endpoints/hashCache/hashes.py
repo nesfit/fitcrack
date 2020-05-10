@@ -15,7 +15,7 @@ from src.api.fitcrack.endpoints.hashCache.argumentsParser import hashes_parser
 from src.api.fitcrack.endpoints.hashCache.responseModels import page_of_hashes_model
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 
-from src.database.models import FcHashcache, FcHash
+from src.database.models import FcHash
 
 log = logging.getLogger(__name__)
 ns = api.namespace('hashes', description='Operations with hashes.')

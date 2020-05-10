@@ -416,12 +416,4 @@ def process_job_9(job):
 
 def post_process_job_9(data, db_job):
     print("\n PCFG attack post_process\n")
-'''
-    for dict in data['attack_settings']['left_dictionaries']:
-        jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict.id)
-        db.session.add(jobDict)
 
-    for dict in data['attack_settings']['right_dictionaries']:
-        jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'], is_left=False)
-        db.session.add(jobDict)
-'''

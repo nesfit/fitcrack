@@ -77,7 +77,6 @@ job_short_model = api.model('Job short', {
     'id': fields.Integer(readOnly=True, required=False, description='id job'),
     'name': fields.String(required=True, description='name of the job'),
     'comment': fields.String(required=False),
-    'priority': fields.Integer(),
     'permissions': fields.Nested(job_permissions),
     'batch_id': fields.Integer(), # to know if job is enqueued and where
     'queue_position': fields.Integer(),
@@ -90,15 +89,12 @@ job_short_model = api.model('Job short', {
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),
     'status_type': fields.String(),
-    'result': fields.String(required=False),
     'progress': fields.Float(required=False),
     'time': fields.DateTime(required=False),
     'cracking_time': fields.Float(),
     'hash_type': fields.String(required=True),
-    'hash': fields.String(required=True),
     'time_start': fields.DateTime(required=True),
     'time_end': fields.DateTime(required=True),
-    'password': fields.String(),
     'deleted': fields.Boolean()
 })
 

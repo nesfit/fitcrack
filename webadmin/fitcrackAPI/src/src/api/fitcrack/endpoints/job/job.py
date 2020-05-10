@@ -317,7 +317,6 @@ class OperationWithJob(Resource):
             job.status = status_to_code['finishing']
         elif action == 'restart':
             job.status = status_to_code['running']
-            job.result = None
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0

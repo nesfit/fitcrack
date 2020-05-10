@@ -98,7 +98,6 @@ export default {
       return {
         "name": state.name,
         "comment": state.comment,
-        "priority": 0,
         "hosts_ids": state.hosts.map(h => h.id),
         "seconds_per_job": parseInt(state.timeForJob),
         "time_start": (state.startNow ? '' : state.startDate),

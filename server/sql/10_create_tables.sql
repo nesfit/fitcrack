@@ -259,7 +259,6 @@ CREATE TABLE IF NOT EXISTS `fc_batch` (
 
 CREATE TABLE IF NOT EXISTS `fc_job` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `token` varchar(64) COLLATE utf8_bin DEFAULT NULL,
   `attack` varchar(40) COLLATE utf8_bin NOT NULL,
   `attack_mode` tinyint(3) unsigned NOT NULL,
   `attack_submode` tinyint(3) NOT NULL DEFAULT '0',
@@ -423,7 +422,6 @@ CREATE TABLE `fc_pcfg_grammar` (
   `path` varchar(400) NOT NULL,
   `keyspace` bigint(20) unsigned NOT NULL,
   `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
