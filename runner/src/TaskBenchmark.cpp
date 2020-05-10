@@ -23,39 +23,79 @@ void TaskBenchmark::parseHashcatBenchmark(std::string& output_line) {
 
   Logging::debugPrint(Logging::Detail::CustomOutput, "Hashcat output line for parsing: " + output_line);
 
-  static const char marker[] = "SPEED\t";
-  size_t found_at = output_line.find(marker);
-  if (found_at != std::string::npos) {
-    //make sure we don't double count
-    device_speeds_.clear();
-    //-1 for terminating NULL
-    found_at += sizeof(marker)-1;
-    std::istringstream parser(output_line.substr(found_at));
-    Logging::debugPrint(Logging::Detail::CustomOutput, "to parse: " + output_line.substr(found_at));
-    size_t speed;
-    size_t dummy;
-    while(parser>>speed && parser>>dummy && dummy == 1000)
-    {
-      Logging::debugPrint(Logging::Detail::CustomOutput, "parsed speed: " + RunnerUtils::toString(speed));
-      device_speeds_.push_back(speed);
-    }
-    m_benchmarked_speeds.insert(getTotalSpeed());
-  }
-  else
+  //find the speeds
   {
-    Logging::debugPrint(Logging::Detail::CustomOutput, "Not found");
+    static const char marker[] = "SPEED\t";
+    size_t found_at = output_line.find(marker);
+    if (found_at != std::string::npos) {
+      //make sure we don't double count
+      device_speeds_.clear();
+      //-1 for terminating NULL
+      found_at += sizeof(marker)-1;
+      std::istringstream parser(output_line.substr(found_at));
+      Logging::debugPrint(Logging::Detail::CustomOutput, "to parse: " + output_line.substr(found_at));
+      size_t speed;
+      size_t dummy;
+      while(parser>>speed && parser>>dummy && dummy == 1000)
+      {
+        Logging::debugPrint(Logging::Detail::CustomOutput, "parsed speed: " + RunnerUtils::toString(speed));
+        device_speeds_.push_back(speed);
+      }
+      m_benchmarked_speeds.insert(getTotalSpeed());
+    }
+    else
+    {
+      Logging::debugPrint(Logging::Detail::CustomOutput, "Not found");
+    }
+  }
+
+  //find the number of salts
+  //HC prinst like so: printf ("RECSALT\t%d\t%d\t", hashcat_status->salts_done, hashcat_status->salts_cnt);
+  if(m_saltCount <= 1)
+  {
+    static const char marker[] = "RECSALT\t";
+    size_t found_at = output_line.find(marker);
+    if (found_at != std::string::npos) {
+      //-1 for terminating NULL
+      found_at += sizeof(marker)-1;
+      uint64_t dummy;
+      uint64_t saltCount;
+      std::istringstream parser(output_line.substr(found_at));
+      if(parser>>dummy && parser>>saltCount)
+      {
+        m_saltCount = saltCount;
+      }
+    }
   }
 
 }
 
 /* Public */
 
-TaskBenchmark::TaskBenchmark (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name)  {
+TaskBenchmark::TaskBenchmark (
+  Directory& directory,
+  ConfigTask& task_config,
+  const std::string& host_config,
+  const std::string& output_file,
+  const std::string& workunit_name
+):
+  TaskComputeBase (directory, task_config, host_config, output_file, workunit_name),
+  m_saltCount(1)
+{
   mode_ = "b";
   initializeTotalHashes();
 }
 
-TaskBenchmark::TaskBenchmark (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name)  {
+TaskBenchmark::TaskBenchmark (
+  Directory& directory,
+  ConfigTask& task_config,
+  ConfigHost& host_config,
+  const std::string& output_file,
+  const std::string& workunit_name
+):
+  TaskComputeBase (directory, task_config, host_config, output_file, workunit_name),
+  m_saltCount(1)
+{
   mode_ = "b";
   initializeTotalHashes();
 }
@@ -71,7 +111,9 @@ std::string TaskBenchmark::generateOutputMessage() {
   if (exit_code_ == HashcatConstant::Succeded || exit_code_ == HashcatConstant::Exhausted || exit_code_ == HashcatConstant::RuntimeAbort) {
 
     output_message += ProjectConstants::TaskFinalStatus::Succeded + "\n";
-    output_message += RunnerUtils::toString(getBenchmarkedSpeed()) + "\n";
+    //divide by salt count. This is done since hashcat prints it and finding it out on the server would be a PITA
+    uint64_t speed = getBenchmarkedSpeed()/m_saltCount;
+    output_message += RunnerUtils::toString(speed) + "\n";
     output_message += RunnerUtils::toString(process_hashcat_->getExecutionTime()) + "\n";
     //communicate success to the outside world
     exit_code_ = HashcatConstant::Succeded;
