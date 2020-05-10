@@ -143,21 +143,19 @@
                   clearable
                   label="Select hash type"
                   :items="hashTypes"
-                  item-text="name"
+                  :filter="hashTypeFilter"
                   return-object
                   required
                   hide-details
                   single-line
                   flat
                   solo-inverted
+                  no-data-text="No matching hash type"
                   @change="validateHashes(null)"
                 >
-                  <template
-                    slot="item"
-                    slot-scope="data"
-                  >
+                  <template #item="{ item }">
                     <v-list-item-content>
-                      <v-list-item-title><b>{{ data.item.code }}</b> - {{ data.item.name }}</v-list-item-title>
+                      <v-list-item-title><b>{{ item.code }}</b> - {{ item.name }}</v-list-item-title>
                     </v-list-item-content>
                   </template>
                 </v-autocomplete>
@@ -657,6 +655,10 @@
           }
         })
         .catch(console.error)
+      },
+      hashTypeFilter ({name, code}, query) {
+        const q = query.toLowerCase()
+        return name.toLowerCase().includes(q) || code.toLowerCase().includes(q)
       },
       subHashtypeChanged: function (key, val) {
         this.hashType.code = this.hashType.code.replace(key, val.code)
