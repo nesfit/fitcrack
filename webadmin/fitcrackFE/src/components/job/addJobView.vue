@@ -143,6 +143,7 @@
                   clearable
                   label="Select hash type"
                   :items="hashTypes"
+                  item-text="name"
                   :filter="hashTypeFilter"
                   return-object
                   required
