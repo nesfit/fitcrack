@@ -342,6 +342,9 @@ class OperationWithJob(Resource):
                 for item in workunits:
                     db.session.delete(item)
                 print("done")
+            else:
+                job.kill = True
+
             job.indexes_verified = 0
             job.current_index = 0
             job.cracking_time = 0
@@ -360,9 +363,6 @@ class OperationWithJob(Resource):
             graphData = FcJobGraph.query.filter(FcJobGraph.job_id == id).all()
             for item in graphData:
                 db.session.delete(item)
-
-            job.kill = True
-
         else:
             abort(401, 'Bad operation with job!')
 
