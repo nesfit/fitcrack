@@ -145,18 +145,24 @@
           key="selectionToolbar"
           class="toolbar-module d-flex align-center swap-pad"
         >
-          <v-btn
-            text
-            class="mr-2"
-            color="success"
-            :disabled="selectedJobs.filter(job => job.status == 0 && !job.batch_id).length < 2"
-            @click="batchCreatorOpen = true"
-          >
-            <v-icon left>
-              mdi-tray-plus
-            </v-icon>
-            Batch Run
-          </v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                text
+                class="mr-2"
+                color="success"
+                :disabled="selectedJobs.filter(job => job.status == 0 && !job.batch_id).length < 2"
+                @click="batchCreatorOpen = true"
+                v-on="on"
+              >
+                <v-icon left>
+                  mdi-tray-plus
+                </v-icon>
+                Batch Run
+              </v-btn>
+            </template>
+            <span>Only <strong class="info--text">ready</strong> jobs can be added</span>
+          </v-tooltip>
           <v-btn
             text
             class="mr-2"
