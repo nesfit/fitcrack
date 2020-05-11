@@ -390,21 +390,6 @@ void cancel_workunits2(vector<MysqlWorkunit *> workunits)
 }
 
 
-void delete_workunits2(vector<MysqlWorkunit *> workunits)
-{
-    log_messages.printf(MSG_DEBUG, "delete_workunits2: workunits:%lu\n", workunits.size());
-
-    std::vector<MysqlWorkunit *>::iterator workunit;
-    char buf[SQL_BUF_SIZE];
-
-    for(workunit = workunits.begin(); workunit != workunits.end(); ++workunit)
-    {
-        std::snprintf(buf, SQL_BUF_SIZE, "DELETE FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_workunit.c_str(), (*workunit)->m_id);
-        update_mysql(buf);
-    }
-}
-
-
 /**
  * @brief Sets 'finish' column to number of 'fc_workunit' entries
  * @param workunits Vector of 'fc_workunit' entries
@@ -624,10 +609,6 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
         return 0;
     }
-
-    // Read the fc_settings
-    std::snprintf(buf, SQL_BUF_SIZE, "SELECT delete_finished_workunits FROM `%s` LIMIT 1;", mysql_table_settings.c_str());
-    uint64_t deleteFlag = get_num_from_mysql(buf);
 
     for (unsigned int i = 0; i < n; ++i)
     {
@@ -909,10 +890,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                     workunits = find_workunits2(job_id, "");
                     cancel_workunits2(workunits);
 
-                    if (deleteFlag)
-                        delete_workunits2(workunits);
-                    else
-                        finish_workunits(workunits);
+                    finish_workunits(workunits);
 
                     /** Kill PCFG Manager */
                     if (attack_mode == 9)
@@ -1110,20 +1088,10 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
             }
         }
 
-        if (deleteFlag)
-        {
-            /** Delete finished workunit */
-            std::cerr << __LINE__ << " - Deleting assimilated workunit with workId " << wu.id << std::endl;
-            std::snprintf(buf, SQL_BUF_SIZE, "DELETE FROM `%s` WHERE workunit_id = %lu ;", mysql_table_workunit.c_str(), wu.id);
-            update_mysql(buf);
-        }
-        else
-        {
-            /** Set workunit finished flag */
-            std::cerr << __LINE__ << " - Setting finished flag to assimilated workunit with workunit_id " << wu.id << std::endl;
-            std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET finished = 1, progress = 100 WHERE workunit_id = %lu ;", mysql_table_workunit.c_str(), wu.id);
-            update_mysql(buf);
-        }
+        /** Set workunit finished flag */
+        std::cerr << __LINE__ << " - Setting finished flag to assimilated workunit with workunit_id " << wu.id << std::endl;
+        std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET finished = 1, progress = 100 WHERE workunit_id = %lu ;", mysql_table_workunit.c_str(), wu.id);
+        update_mysql(buf);
 
         std::fclose(f);
     }

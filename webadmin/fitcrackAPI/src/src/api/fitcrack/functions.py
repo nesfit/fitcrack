@@ -149,7 +149,7 @@ def getFilesFromFolder(folder, DBmodel, processFunction):
             modificationTime = datetime.datetime.fromtimestamp(os.path.getmtime(filePath)).strftime('%Y-%m-%d %H:%M:%S')
             DBrecord = DBmodel.query.filter_by(path=file).first()
             if not DBrecord:
-                DBrecord = DBmodel(modification_time=modificationTime, path=file, name=file)
+                DBrecord = DBmodel(time=modificationTime, path=file, name=file)
                 DBrecord = processFunction(DBrecord)
                 try:
                     db.session.add(DBrecord)

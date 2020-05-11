@@ -190,7 +190,7 @@ end;
 set end_status = ifnull(end_status, 1); -- 1 = finished, default value 
 start transaction;
 -- set job to finished state
-update fc_job set status = end_status, result = 'check the hashlist', time_end = now() where id = job_id;
+update fc_job set status = end_status, time_end = now() where id = job_id;
 -- get job batch details
 select batch_id, queue_position into b_id, q_p
 from fc_job where id = job_id;

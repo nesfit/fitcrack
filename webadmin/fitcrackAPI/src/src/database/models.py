@@ -42,26 +42,6 @@ class FcBenchmark(Base):
         }
 
 
-class FcHashcache(Base):
-    __tablename__ = 'fc_hashcache'
-
-    id = Column(BigInteger, primary_key=True)
-    hash_type = Column(Integer)
-    hash = Column(String(200, collation='utf8_bin'))
-    result = Column(Text(collation='utf8_bin'))
-    added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-
-    @hybrid_property
-    def hash_type_name(self):
-        return getHashById(str(self.hash_type))['name']
-
-    @hybrid_property
-    def password(self):
-       if self.result:
-           return base64.b64decode(self.result).decode("utf-8")
-       return None
-
-
 class FcHost(Base):
     __tablename__ = 'fc_host'
 
@@ -76,8 +56,6 @@ class FcHost(Base):
     def status_text(self):
         return host_status_text_to_code_dict.get(self.status)
 
-    #job = relationship("FcWorkunit", back_populates="hosts")
-    # workunits = relationship("FcWorkunit", back_populates="host")
     boinc_host = relationship("Host", uselist=False)
 
 
@@ -111,7 +89,6 @@ class FcDictionary(Base):
     keyspace = Column(BigInteger, nullable=False)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
-    modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
 
 class FcPcfg(Base):
@@ -123,7 +100,6 @@ class FcPcfg(Base):
     keyspace = Column(BigInteger, nullable=False)
     time_added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
-    modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
 
 class FcHcstat(Base):
@@ -187,14 +163,11 @@ class FcJob(Base):
     __tablename__ = 'fc_job'
 
     id = Column(BigInteger, primary_key=True)
-    token = Column(String(64, 'utf8_bin'))
     attack = Column(String(20, 'utf8_bin'), nullable=False)
     attack_mode = Column(Integer, nullable=False)
     attack_submode = Column(Integer, nullable=False, server_default=text("'0'"))
     hash_type = Column(Integer, nullable=False)
-    hash = Column(String(200, collation='utf8_bin'), nullable=False)
     status = Column(SmallInteger, nullable=False, server_default=text("'0'"))
-    result = Column(Text(collation='utf8_bin'))
     keyspace = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
     indexes_verified = Column(BigInteger, nullable=False)
@@ -207,8 +180,6 @@ class FcJob(Base):
     time_end = Column(DateTime)
     cracking_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
-    dict1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
-    dict2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
     charset1 = Column(String(4096, 'utf8_bin'))
     charset2 = Column(String(4096, 'utf8_bin'))
     charset3 = Column(String(4096, 'utf8_bin'))
@@ -227,7 +198,6 @@ class FcJob(Base):
     max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     shuffle_dict = Column(Integer, nullable=False, server_default=text("'0'"))
     generate_random_rules = Column(Integer, nullable=False, server_default=text("'0'"))
-    replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
@@ -391,9 +361,7 @@ class FcSetting(Base):
     __tablename__ = 'fc_settings'
 
     id = Column(Integer, primary_key=True)
-    delete_finished_workunits = Column(Integer, nullable=False, server_default=text("'0'"))
     default_seconds_per_workunit = Column(Integer, nullable=False, server_default=text("'3600'"))
-    default_replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
     default_verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
     default_check_hashcache = Column(Integer, nullable=False, server_default=text("'1'"))
     default_workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
@@ -501,8 +469,6 @@ class Host(Base):
     p_ngpus = Column(Integer, nullable=False)
     p_gpu_fpops = Column(Float(asdecimal=True), nullable=False)
 
-    #workunits = relationship("FcWorkunit", back_populates="host", order_by="desc(FcWorkunit.id)")
-    #fc_host = relationship("FcHost", uselist=False, back_populates="boinc_host")
     user = relationship("User", back_populates="hosts")
 
     workunits = relationship("FcWorkunit", secondary="fc_host_activity",
@@ -516,8 +482,6 @@ class Host(Base):
                         primaryjoin="Host.id == FcHostActivity.boinc_host_id",
                         secondaryjoin="FcHostActivity.job_id == FcJob.id",
                         viewonly=True)
-
-    #job = relationship("FcWorkunit", back_populates="hosts")
 
     @hybrid_property
     def deleted(self):
@@ -552,7 +516,6 @@ class FcWorkunit(Base):
     finished = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship("FcJob", back_populates="workunits")
-    # host = relationship("FcHost", back_populates="workunits")
     host = relationship("Host", back_populates="workunits")
 
     result = relationship('Result',  uselist=False, primaryjoin="FcWorkunit.workunit_id==Result.workunitid", viewonly=True)

@@ -24,7 +24,7 @@ from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
-from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash, FcUserPermission
+from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash, FcUserPermission
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
@@ -60,7 +60,12 @@ def create_job(data):
     if job['attack_settings']['attack_mode'] == 3:
         job['attack_settings']['attack_submode'] = data['attack_settings']['attack_submode']
 
-    token = uuid1()
+    # hybrid attack mode setting
+    if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
+        attack_settings_control = 1
+
+    else:
+        attack_settings_control = job['attack_settings']['attack_mode']
 
     if job['time_start'] == '':
         job['time_start'] = None
@@ -69,14 +74,11 @@ def create_job(data):
         job['time_end'] = None
 
     db_job = FcJob(
-        token=token.hex,
         attack=job['attack_name'],
         attack_mode=job['attack_settings']['attack_mode'],
         attack_submode=job['attack_settings']['attack_submode'],
         hash_type=job['hash_settings']['hash_type'],
-        hash='check hashlist',
         status='0',
-        result=None,
         keyspace=job['keyspace'],
         hc_keyspace=job['hc_keyspace'],
         indexes_verified='0',
@@ -88,8 +90,6 @@ def create_job(data):
         time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%Y-%m-%dT%H:%M'),
         cracking_time='0',
         seconds_per_workunit=job['seconds_per_job'] if job['seconds_per_job'] > 10 else 10,
-        dict1=job['dict1'] if job.get('dict1') else '',
-        dict2=job['dict2'] if job.get('dict2') else '',
         charset1=job['charset1'] if job.get('charset1') else '',
         charset2=job['charset2'] if job.get('charset2') else '',
         charset3=job['charset3'] if job.get('charset3') else '',
@@ -108,7 +108,6 @@ def create_job(data):
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         shuffle_dict=job['attack_settings'].get('shuffle_dict', 0),
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
-        replicate_factor=1,
         deleted=False
         )
 
