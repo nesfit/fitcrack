@@ -10,7 +10,6 @@ job_status_text_to_code_dict = {
     3: 'malformed',
     4: 'timeout',
     10: 'running',
-    11: 'validating',
     12: 'finishing'
 }
 
@@ -39,7 +38,6 @@ status_to_code = {
     'malformed': 3,
     'timeout': 4,
     'running': 10,
-    'validating': 11,
     'finishing': 12
 }
 

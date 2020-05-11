@@ -12,7 +12,7 @@ from src.api.fitcrack.argumentsParser import pagination
 jobList_parser = pagination.copy()
 jobList_parser.add_argument('name', type=str, required=False, help='filter by name')
 jobList_parser.add_argument('status', type=str, required=False, help='filter by state',
-                                choices=['ready', 'finished', 'exhausted', 'malformed', 'timeout', 'running', 'validating', 'finishing'])
+                                choices=['ready', 'finished', 'exhausted', 'malformed', 'timeout', 'running', 'finishing'])
 jobList_parser.add_argument('attack_mode', type=str, required=False, help='filter by attack type')
 jobList_parser.add_argument('order_by', type=str, required=False, help='result ordering',
                                 choices=['name', 'time', 'progress', 'attack_mode', 'status'])
