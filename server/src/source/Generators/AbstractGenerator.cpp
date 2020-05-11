@@ -19,9 +19,10 @@ uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job)
 
     uint64_t curIndex = job->getCurrentIndex();
     uint64_t passCount = job->getKeyspace();
-    uint64_t hcKeyspace = job->getHcKeyspace();
     //power is in passwords/second, make sure index is counted in passwords
-    curIndex *= passCount/hcKeyspace;
+    curIndex *= passCount/job->getEndIndex();
+    //in most jobs it is 0, so it won't hurt. When it is not 0, it is always in passwords
+    curIndex += job->getCurrentIndex2();
 
     uint64_t seconds = ((passCount - curIndex) / (job->getTotalPower() + 1)) / 10;
 

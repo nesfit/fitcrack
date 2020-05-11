@@ -210,15 +210,16 @@ bool CJob::loadHashes()
     return true;
 }
 
-bool CJob::isKeyspaceExhausted() const
+uint64_t CJob::getEndIndex() const
 {
     switch(getAttackMode())
     {
     case Config::AttackMode::AttackCombinator:
     case Config::AttackMode::AttackHybridDictMask:
-        return getCurrentIndex()*getHcKeyspace() >= getKeyspace();
+    case Config::AttackMode::AttackHybridMaskDict:
+        return getKeyspace()/getHcKeyspace();
     default:
-        return getCurrentIndex() >= getHcKeyspace();
+        return getHcKeyspace();
     }
 }
 

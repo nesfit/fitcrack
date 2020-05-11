@@ -690,12 +690,6 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 /** Save original power for fc_benchmark */
                 long long unsigned int original_power = power;
 
-                std::snprintf(buf, SQL_BUF_SIZE, "SELECT COUNT(*) FROM `%s` WHERE job_id = %" PRIu64 " LIMIT 1;", mysql_table_hash.c_str(), job_id);
-                uint64_t hashcount = get_num_from_mysql(buf);
-                std::cerr<<__LINE__<<" - There are "<<hashcount<<" hashes, dividing power\n";
-                //benchmark sends hashes/second, so if there are more we need to divide by that to get keys/second
-                power /= hashcount;
-
                 //power is in hashes per second, and rules multiply the keyspace
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT rules FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
                 std::string rulesFilename = get_str_from_mysql(buf);
