@@ -194,7 +194,7 @@
     <v-list-item>
       <v-list-item-content>
         <v-btn
-          text
+          color="primary"
           @click="save"
         >
           <v-icon left>
