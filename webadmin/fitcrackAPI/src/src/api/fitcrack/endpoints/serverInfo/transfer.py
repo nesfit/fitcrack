@@ -163,17 +163,11 @@ class ImportDependencyMissing (Exception):
   def __init__(self, missing_deps):
     self.missing = missing_deps
 
-def find_or_recreate_hash (hashstring, hashtype):
-  hash = FcHash.query.filter_by(hash=hashstring).first()
-  if not hash:
-    hash = FcHash(hash=hashstring, hash_type=hashtype)
-  return hash
+def recreate_hash (hashstring, hashtype):
+  return FcHash(hash=hashstring, hash_type=hashtype)
 
-def find_or_recreate_mask (data):
-  mask = FcMask.query.filter_by(mask=data['mask']).first()
-  if not mask:
-    mask = FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0)
-  return mask
+def recreate_mask (data):
+  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0)
 
 def unpack (package):
   """
@@ -187,13 +181,16 @@ def unpack (package):
   # start creating jobs
   for job in contents['jobs']:
     # transform directly stored object back
-    job['hashes'] = list(map(lambda h: find_or_recreate_hash(h, job['hash_type']), job['hashes']))
+    job['hashes'] = list(map(lambda h: recreate_hash(h, job['hash_type']), job['hashes']))
     if job.get('masks'):
-      job['masks'] = list(map(find_or_recreate_mask, job['masks']))
+      job['masks'] = list(map(recreate_mask, job['masks']))
     newjob = FcJob()
     for field in JOB_EXPORTABLE_COLUMNS:
       setattr(newjob, field, job.get(field))
     # manual labor now
+    #
+    # !!! If you added new DEPS to export, make sure to unpack them like these !!!
+    #
     dep_rule = job.get('rulesFile')
     if dep_rule:
       newjob.rulesFile = deps[dep_rule[0]]
@@ -210,6 +207,9 @@ def unpack (package):
       for index in dep_right_dictionaries:
         jd = FcJobDictionary(is_left=0, dictionary=deps[index])
         newjob.right_dictionaries.append(jd)
+    dep_pcfg = job.get('pcfg')
+    if dep_pcfg:
+      newjob.pcfg = deps[dep_pcfg[0]]
     # adding values for useless non-null fields
     newjob.hash = ''
     newjob.indexes_verified = 0
