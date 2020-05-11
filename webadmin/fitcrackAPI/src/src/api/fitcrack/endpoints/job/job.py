@@ -240,8 +240,8 @@ class JobByID(Resource):
 
         if job.attack_mode == attack_modes['prince']:      
             # Recompute new keyspace/hc_keyspace
-            new_keyspace = compute_prince_keyspace(args)
-            if new_keyspace == -1:
+            new_hc_keyspace = compute_prince_keyspace(args)
+            if new_hc_keyspace == -1:
                 abort(401, 'Unable to compute new job keyspace.\nJob \"' + job.name + '\" was not edited.')
 
             random_rules_count = 0
@@ -251,12 +251,14 @@ class JobByID(Resource):
             if rule_file:
                 ruleFileMultiplier += rule_file.count
 
+            new_keyspace = new_hc_keyspace
             if ruleFileMultiplier != 0:
-                new_keyspace = new_keyspace * ruleFileMultiplier
+                new_keyspace = new_hc_keyspace * ruleFileMultiplier
 
             if new_keyspace > (2 ** 63) - 1: # due db's bigint range
                 abort(401, 'Job keyspace is out of allowed range.')
 
+            job.hc_keyspace = new_hc_keyspace
             job.keyspace = new_keyspace
             # Prince settings
             job.case_permute = args['case_permute']
