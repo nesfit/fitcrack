@@ -124,7 +124,7 @@ def process_job_3(job, hashcatKeyspace=True):
 
     # charsets
     hashcatArgs = ''
-    charsetsSize = []
+    charsetsSize = {}
     if job['attack_settings'].get('charset'):
         if len(job['attack_settings']['charset']) > 4:
             abort(500, 'Maximum of charsets files is 4.')
