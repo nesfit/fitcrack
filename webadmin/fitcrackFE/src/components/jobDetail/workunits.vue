@@ -142,7 +142,7 @@ export default {
         {text: 'Progress', align: 'end', value: 'progress'},
         {text: 'Cracking time', align: 'end', value: 'cracking_time_str'},
         {text: 'Generated', align: 'end', value: 'time'},
-        {text: 'Start index', align: 'end', value: 'start_index'},
+        {text: 'Start index', align: 'end', value: 'start_index_real'},
         {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
         {text: 'Retry', align: 'center', value: 'retry'},
         {text: 'Finished', align: 'center', value: 'finished'},

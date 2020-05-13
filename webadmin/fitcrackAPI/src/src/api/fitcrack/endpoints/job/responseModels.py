@@ -28,6 +28,7 @@ workunit_model = api.model('Workunit', {
     'boinc_host_id': fields.Integer(),
     'start_index': fields.Integer(),
     'start_index_2': fields.Integer(),
+    'start_index_real': fields.Integer(),
     'hc_keyspace': fields.Integer(),
     'mask_id': fields.Integer(),
     'duplicated': fields.Boolean(),
