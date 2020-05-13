@@ -14,7 +14,9 @@ class TaskBenchmarkAll: public TaskBase {
 private:
 
 	std::map<std::string, uint64_t> m_results; ///< Results for each hash
-	ProcessBase *m_hcProcess;
+	std::vector<std::string> m_modes;
+	std::string m_lastErrString;
+	double m_totalExecutionTime;
 	NamedMutex m_hcMutex;
 
 public:
