@@ -9,6 +9,8 @@ TAB=$(shell echo -e '\t')
 
 GIT_REV=$(shell git rev-parse HEAD)
 
+$(shell echo 'void ehframe_dummy (void) { }' > $(BINDIR)/ehframe_dummy.C)
+
 CXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -pedantic -lboinc_api -lboinc -lzip -lz -static-libgcc -static-libstdc++ 
 CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'  
 ## Release
@@ -22,6 +24,8 @@ OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))
 linux: TARGET=runner.bin
 linux: CXX=g++
 linux: CXXPATHS+=-L'./lib/x86_64_linux'
+#this is necessary because of https://bugzilla.redhat.com/show_bug.cgi?id=199788#c2 (15 yrs old and still not fixed -.-')
+linux: CXXFLAGS+= -lc $(BINDIR)/ehframe_dummy.C
 linux: ARCH=-m64
 linux: $(OBJDIR) $(BINDIR) runner
 
