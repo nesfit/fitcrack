@@ -111,6 +111,8 @@ class role(Resource):
         """
         Changes one property in user's role.
         """
+        if not current_user.role.MANAGE_USERS:
+            abort(401, 'Unauthorized to change roles')
         args = change_role_arguments.parse_args(request)
         role = FcRole.query.filter_by(id=id).one()
         if not hasattr(role, args['key']):
@@ -127,6 +129,8 @@ class role(Resource):
         """
         Deletes role.
         """
+        if not current_user.role.MANAGE_USERS:
+            abort(401, 'Unauthorized to change roles')
         role = FcRole.query.filter_by(id=id).one()
         try:
             db.session.delete(role)
@@ -150,6 +154,8 @@ class roleNew(Resource):
         """
         Adds new role into DB.
         """
+        if not current_user.role.MANAGE_USERS:
+            abort(401, 'Unauthorized to change roles')
         args = new_role_arguments.parse_args(request)
         role = FcRole(name=args['name'])
         db.session.add(role)
