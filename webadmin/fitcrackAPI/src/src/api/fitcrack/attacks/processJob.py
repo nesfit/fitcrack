@@ -319,7 +319,7 @@ def process_job_8(job):
 
     job['hc_keyspace'] = compute_prince_keyspace(job['attack_settings'])
     if job['hc_keyspace'] == -1:
-        abort(401, 'Unable to compute job keyspace.')
+        abort(400, 'Unable to compute job keyspace.')
     random_rules_count = 0
     if job['attack_settings']['generate_random_rules']:
         random_rules_count = int(job['attack_settings']['generate_random_rules'])

@@ -259,7 +259,7 @@ def computeCrackingTime(data):
     elif attackSettings['attack_mode'] == 8:
         dictsKeyspace = compute_prince_keyspace(attackSettings)
         if dictsKeyspace == -1:
-             abort(401, 'Unable to compute job keyspace.')
+             abort(400, 'Unable to compute job keyspace.')
         random_rules = 0
         if attackSettings['generate_random_rules']:
             random_rules = int(attackSettings['generate_random_rules'])

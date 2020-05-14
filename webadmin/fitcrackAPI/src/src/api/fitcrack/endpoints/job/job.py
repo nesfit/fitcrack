@@ -242,7 +242,7 @@ class JobByID(Resource):
             # Recompute new keyspace/hc_keyspace
             new_hc_keyspace = compute_prince_keyspace(args)
             if new_hc_keyspace == -1:
-                abort(401, 'Unable to compute new job keyspace.\nJob \"' + job.name + '\" was not edited.')
+                abort(400, 'Unable to compute new job keyspace.\nJob \"' + job.name + '\" was not edited.')
 
             random_rules_count = 0
             if args['generate_random_rules']:
@@ -256,7 +256,7 @@ class JobByID(Resource):
                 new_keyspace = new_hc_keyspace * ruleFileMultiplier
 
             if new_keyspace > (2 ** 63) - 1: # due db's bigint range
-                abort(401, 'Job keyspace is out of allowed range.')
+                abort(400, 'Job keyspace is out of allowed range.')
 
             job.hc_keyspace = new_hc_keyspace
             job.keyspace = new_keyspace
@@ -278,7 +278,7 @@ class JobByID(Resource):
             }
         except:
             db.session().rollback()
-            abort(401, 'Unable to edit this job. Please check if new settings are correct.')
+            abort(400, 'Unable to edit this job. Please check if new settings are correct.')
 
     @api.response(204, 'Job successfully deleted.')
     def delete(self, id):
@@ -364,7 +364,7 @@ class OperationWithJob(Resource):
             for item in graphData:
                 db.session.delete(item)
         else:
-            abort(401, 'Bad operation with job!')
+            abort(400, 'Bad operation with job!')
 
         db.session.commit()
 
