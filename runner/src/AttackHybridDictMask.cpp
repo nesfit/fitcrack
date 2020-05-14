@@ -13,7 +13,7 @@ void AttackHybridDictMask::addSpecificArguments() {
 
   AttackCrackingBase::addSpecificArguments();
 
-  addRequiredFile("dict");
+  addRequiredFile("dict1");
 
   createMaskAndCharsets();
 
