@@ -20,6 +20,14 @@ boincResult_model = api.model('boinc result', {
 
 })
 
+rule_model = api.model('Rule', {
+    'id': fields.Integer(readOnly=True, required=False),
+    'name': fields.String(readOnly=True, required=False),
+    'path': fields.String(readOnly=True, required=False),
+    'count': fields.Integer(readOnly=True),
+    'time': fields.DateTime(readOnly=True, required=False),
+})
+
 workunit_model = api.model('Workunit', {
     'id': fields.String(),
     'job_id': fields.Integer(),
@@ -141,7 +149,7 @@ job_big_model = api.model('Job', {
     'charset2': fields.String(),
     'charset3': fields.String(),
     'charset4': fields.String(),
-    'rulesFile': fields.Nested(hcStat_model),
+    'rulesFile': fields.Nested(rule_model),
     'rule_left': fields.String(),
     'rule_right': fields.String(),
     'markov': fields.Nested(hcStat_model),

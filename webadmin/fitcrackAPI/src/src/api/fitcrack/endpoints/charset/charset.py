@@ -13,8 +13,7 @@ from sqlalchemy import exc
 from settings import CHARSET_DIR
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.charset.argumentsParser import updateCharset_parser
-from src.api.fitcrack.endpoints.charset.responseModels import charset_model
-from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
+from src.api.fitcrack.endpoints.charset.responseModels import charset_model, charsetCollection_model
 from src.api.fitcrack.functions import fileUpload
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
@@ -31,7 +30,7 @@ ALLOWED_EXTENSIONS = set(['txt', 'hcchr', 'charset'])
 @ns.route('')
 class charsetCollection(Resource):
 
-    @api.marshal_with(hcStatsCollection_model)
+    @api.marshal_with(charsetCollection_model)
     def get(self):
         """
         Ruturns collection of HcStats files.

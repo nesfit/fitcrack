@@ -12,6 +12,9 @@ charset_model = api.model('charset', {
     'name': fields.String(readOnly=True, required=False),
     'keyspace': fields.Integer(),
     'time': fields.DateTime(readOnly=True, required=False),
-    'data': fields.String(),
-    'canDecode': fields.Boolean()
+    'data': fields.String()
+})
+
+charsetCollection_model = api.inherit('Charset collection', {
+    'items': fields.List(fields.Nested(charset_model))
 })
