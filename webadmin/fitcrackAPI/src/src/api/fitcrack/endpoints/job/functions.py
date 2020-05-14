@@ -93,7 +93,7 @@ def create_job(data):
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',
         markov_threshold=job['markov_threshold'] if job.get('markov_threshold') else 0,
         grammar_id=job['attack_settings']['pcfg_grammar']['id'] if job['attack_settings'].get('pcfg_grammar') else 0,
-        case_permute=job['case_permute'] if job['attack_settings'].get('case_permute') else 0,
+        case_permute=job['attack_settings'].get('case_permute', 0),
         check_duplicates=job['attack_settings'].get('check_duplicates', 0),
         min_password_len=job['attack_settings'].get('min_password_len', 0),
         max_password_len=job['attack_settings'].get('max_password_len', 0),
