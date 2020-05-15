@@ -103,10 +103,7 @@ class charset(Resource):
         Deletes charset.
         """
         charset = FcCharset.query.filter(FcCharset.id == id).one()
-        if (charset.deleted):
-            charset.deleted = False
-        else:
-            charset.deleted = True
+        charset.deleted = True
         db.session.commit()
         path = os.path.join(CHARSET_DIR, charset.path)
         if os.path.exists(path):

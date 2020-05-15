@@ -75,11 +75,7 @@ class pcfg(Resource):
         Deletes pcfg
         """
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).one()
-        if (pcfg.deleted):
-            pcfg.deleted = False
-        else:
-            pcfg.deleted = True
-
+        pcfg.deleted = True
         db.session.commit()
 
         pcfgFullPath = os.path.join(PCFG_DIR, pcfg.path)

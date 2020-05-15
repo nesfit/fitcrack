@@ -140,10 +140,7 @@ def create_job(data):
 
 def delete_job(id):
     job = FcJob.query.filter(FcJob.id == id).one()
-    if (job.deleted):
-        job.deleted = False
-    else:
-        job.deleted = True
+    job.deleted = True
     db.session.commit()
 
 

@@ -95,10 +95,7 @@ class rule(Resource):
         Deletes rule file.
         """
         rule = FcRule.query.filter(FcRule.id == id).one()
-        if (rule.deleted):
-            rule.deleted = False
-        else:
-            rule.deleted = True
+        rule.deleted = True
         db.session.commit()
 
         ruleFullPath = os.path.join(RULE_DIR, rule.path)

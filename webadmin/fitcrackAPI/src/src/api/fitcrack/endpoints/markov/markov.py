@@ -92,10 +92,7 @@ class markov(Resource):
         Deletes HcStat file.
         """
         markov = FcHcstat.query.filter(FcHcstat.id == id).one()
-        if (markov.deleted):
-            markov.deleted = False
-        else:
-            markov.deleted = True
+        markov.deleted = True
         db.session.commit()
         return {
             'status': True,

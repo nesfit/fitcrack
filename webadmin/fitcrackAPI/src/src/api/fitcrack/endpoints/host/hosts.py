@@ -81,10 +81,7 @@ class HostByID(Resource):
         Removes host from table
         """
         hostStatus = FcHostStatus.query.filter(FcHostStatus.boinc_host_id == id).one()
-        if (hostStatus.deleted):
-            hostStatus.deleted = False
-        else:
-            hostStatus.deleted = True
+        hostStatus.deleted = True
         db.session.commit()
         return 'Host successfully deleted.', 204
 

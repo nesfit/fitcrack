@@ -109,10 +109,7 @@ class mask(Resource):
         Deletes mask.
         """
         mask = FcMasksSet.query.filter(FcMasksSet.id == id).one()
-        if (mask.deleted):
-            mask.deleted = False
-        else:
-            mask.deleted = True
+        mask.deleted = True
         db.session.commit()
         return {
             'status': True,
