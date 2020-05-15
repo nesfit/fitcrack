@@ -100,4 +100,4 @@ Select a grammar from the list __(1)__ and optionally limit the keyspace below _
 PRINCE Attack
 -------------
 
-The PRINCE (PRobability INfinite Chained Elements) attack is a glorified dictionary attack that uses magic to generate password candidates. There are various options that control the generation, such as a password length limit (both ends) or letter case permutation. Apart from the source dictionary, all the other configuration is optional.
+The PRINCE (PRobability INfinite Chained Elements) attack is an advanced combinator attack that uses the PRINCE algorithm to generate password candidates. There are various options that control the generation, such as a password length limit (both ends), element chaining limit or letter case permutation. Apart from the source dictionary, all the other configuration is optional.
