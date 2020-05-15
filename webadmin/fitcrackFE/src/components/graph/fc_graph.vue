@@ -95,7 +95,7 @@
           return
         var hostIdentifier = Object.keys(row)[1]
         var hostId = hostIdentifier.split('_')[0]
-        console.log(hostId)
+        var hashes = row[hostIdentifier];
         var time = this.$moment(row['time']).format('DD.MM.YYYY HH:mm');
         var hostName = '';
 
@@ -107,7 +107,7 @@
         }
 
         return '<b>' + time + '</b></br> Host <a href="/hosts/' + hostId + '"> ' +
-          hostName + '</a>'
+          hostName + '</a> ' + hashes + ' hashes'
       }
     }
   }
