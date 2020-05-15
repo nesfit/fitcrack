@@ -261,7 +261,7 @@ const appRoutes = [
     name: 'files',
     component: EncryptedFiles,
     meta: {
-      title: 'Encrypted files',
+      title: 'Encrypted Files',
       icon: 'mdi-file-lock',
       navtab: 1
     }

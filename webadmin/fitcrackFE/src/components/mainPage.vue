@@ -203,7 +203,7 @@
                 <v-icon>{{ routeIcon('files') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Encrypted files</v-list-item-title>
+                <v-list-item-title>Encrypted Files</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
