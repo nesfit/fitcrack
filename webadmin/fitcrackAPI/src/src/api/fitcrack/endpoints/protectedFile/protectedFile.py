@@ -5,7 +5,8 @@
 
 import logging
 
-from flask import request, redirect, send_from_directory
+import os
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -85,6 +86,9 @@ class protectedFile(Resource):
         """
         Downloads hashed file.
         """
+        print("ahoj")
+        encryptedFile = FcEncryptedFile.query.filter(FcEncryptedFile.id == id).first()
+        print(encryptedFile.path)
+        path = os.path.join(PROTECTEDFILES_DIR, encryptedFile.path)
+        return send_file(path, attachment_filename=encryptedFile.path, as_attachment=True)
 
-        file = FcEncryptedFile.query.filter(FcEncryptedFile.id == id).first()
-        return send_from_directory(PROTECTEDFILES_DIR, file.name)
