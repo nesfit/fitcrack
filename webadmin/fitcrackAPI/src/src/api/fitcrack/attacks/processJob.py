@@ -228,9 +228,7 @@ def post_process_job_3(data, db_job):
 # hybrid attack
 def process_job_6(job, actually7=False):
     job['attack_settings']['attack_submode'] = 0
-    if job['attack_settings']['rule_left'] and job['attack_settings']['rule_right']:
-        job['attack_settings']['attack_submode'] = 3
-    elif job['attack_settings']['rule_left']:
+    if job['attack_settings']['rule_left']:
         job['attack_settings']['attack_submode'] = 1
     elif job['attack_settings']['rule_right']:
         job['attack_settings']['attack_submode'] = 2
