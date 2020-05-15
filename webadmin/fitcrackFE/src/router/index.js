@@ -16,7 +16,6 @@ const batchDetail = r => require.ensure([], () => r(require('@/components/batch/
 const login = r => require.ensure([], () => r(require('@/components/user/loginView')))
 const mainPage = r => require.ensure([], () => r(require('@/components/mainPage')))
 const addJob = r => require.ensure([], () => r(require('@/components/job/addJobView')))
-const user = r => require.ensure([], () => r(require('@/components/user/userView')))
 const templates = r => require.ensure([], () => r(require('@/components/jobTemplate/templateList')))
 const hosts = r => require.ensure([], () => r(require('@/components/host/hostsView')))
 const hashes = r => require.ensure([], () => r(require('@/components/hashcache/hashCacheView')))
@@ -260,12 +259,12 @@ const appRoutes = [
   {
     path: '/files',
     name: 'files',
-    component: EncryptedFiles
-  },
-  {
-    path: '/user',
-    name: 'user',
-    component: user
+    component: EncryptedFiles,
+    meta: {
+      title: 'Encrypted files',
+      icon: 'mdi-file-lock',
+      navtab: 1
+    }
   },
   {
     path: '/user/manageUsers',

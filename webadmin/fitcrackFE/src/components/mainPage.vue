@@ -189,15 +189,6 @@
               </v-list-item-content>
             </v-list-item>
 
-            <!--<v-list-item :to="{ name: 'files'}">-->
-            <!--<v-list-item-action>-->
-            <!--<v-icon>{{ routeIcon('') }}</v-icon>-->
-            <!--</v-list-item-action>-->
-            <!--<v-list-item-content>-->
-            <!--<v-list-item-title>Encrypted files</v-list-item-title>-->
-            <!--</v-list-item-content>-->
-            <!--</v-list-item>-->
-
             <v-list-item :to="{ name: 'markovChains'}">
               <v-list-item-action>
                 <v-icon>{{ routeIcon('markovChains') }}</v-icon>
@@ -207,14 +198,14 @@
               </v-list-item-content>
             </v-list-item>
 
-            <!--<v-list-item :to="{ name: 'server'}">-->
-            <!--<v-list-item-action>-->
-            <!--<v-icon>{{ routeIcon('') }}</v-icon>-->
-            <!--</v-list-item-action>-->
-            <!--<v-list-item-content>-->
-            <!--<v-list-item-title>Control</v-list-item-title>-->
-            <!--</v-list-item-content>-->
-            <!--</v-list-item>-->
+            <v-list-item :to="{ name: 'files'}">
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('files') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Encrypted files</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-tab-item>
         <v-tab-item>
