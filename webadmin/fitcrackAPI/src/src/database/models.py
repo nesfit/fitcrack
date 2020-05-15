@@ -382,7 +382,7 @@ class FcJobGraph(Base):
     def as_graph(self):
         return {
             'time': str(getattr(self, 'time')),
-            getattr(self.job, 'id'): round(getattr(self, 'progress'))
+            getattr(self.job, 'id'): min(round(getattr(self, 'progress')), 100)
         }
 
 
