@@ -86,9 +86,7 @@ class protectedFile(Resource):
         """
         Downloads hashed file.
         """
-        print("ahoj")
         encryptedFile = FcEncryptedFile.query.filter(FcEncryptedFile.id == id).first()
-        print(encryptedFile.path)
         path = os.path.join(PROTECTEDFILES_DIR, encryptedFile.path)
         return send_file(path, attachment_filename=encryptedFile.path, as_attachment=True)
 
