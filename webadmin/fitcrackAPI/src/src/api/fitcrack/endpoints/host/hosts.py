@@ -78,12 +78,12 @@ class HostByID(Resource):
 
     def delete(self, id):
         """
-        Removes host from table
+        Hides or shows a host from the list
         """
         hostStatus = FcHostStatus.query.filter(FcHostStatus.boinc_host_id == id).one()
-        hostStatus.deleted = True
+        hostStatus.deleted = not hostStatus.deleted
         db.session.commit()
-        return 'Host successfully deleted.', 204
+        return 'Host visibility toggled', 200
 
 
 

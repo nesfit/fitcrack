@@ -138,11 +138,6 @@ def create_job(data):
     db.session.commit()
     return db_job
 
-def delete_job(id):
-    job = FcJob.query.filter(FcJob.id == id).one()
-    job.deleted = True
-    db.session.commit()
-
 
 def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
     result = shellExec(

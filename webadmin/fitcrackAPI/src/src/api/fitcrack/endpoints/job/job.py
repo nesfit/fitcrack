@@ -25,7 +25,7 @@ from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWorkunit_parser, \
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
     editJob_argument, multiEditHosts_argument, jobList_argument, job_permissions_arguments
-from src.api.fitcrack.endpoints.job.functions import delete_job, verifyHashFormat, create_job, \
+from src.api.fitcrack.endpoints.job.functions import verifyHashFormat, create_job, \
     computeCrackingTime, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
     can_view_job, can_edit_job, can_operate_job
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
@@ -280,12 +280,14 @@ class JobByID(Resource):
             db.session().rollback()
             abort(400, 'Unable to edit this job. Please check if new settings are correct.')
 
-    @api.response(204, 'Job successfully deleted.')
+    @api.response(204, 'Job moved.')
     def delete(self, id):
         """
-        Deletes job.
+        Moves the job to the trash bin or restores it.
         """
-        delete_job(id)
+        job = FcJob.query.filter(FcJob.id == id).one()
+        job.deleted = not job.deleted
+        db.session.commit()
         return None, 204
 
 
