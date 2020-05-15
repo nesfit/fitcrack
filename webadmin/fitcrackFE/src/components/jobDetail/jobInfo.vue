@@ -225,6 +225,7 @@ export default {
         {title: 'Date Added', icon: 'mdi-calendar-import', value: d.time, format: v => this.$moment(v).calendar()},
         {title: 'Workunit Sum Time', icon: 'mdi-sigma', value: d.cracking_time_str},
         {title: 'Cracking Time', icon: 'mdi-timer', value: this.crackingTime},
+        {title: 'Estimated Cracking Time', icon: 'mdi-bell-ring-outline', value: d.estimated_cracking_time_str},
         {title: 'Start', icon: 'mdi-ray-start', value: this.startTime},
         {title: 'End', icon: 'mdi-ray-end', value: this.endTime},
         {title: 'Efficiency', icon: 'mdi-chart-timeline-variant', value: this.efficiency},

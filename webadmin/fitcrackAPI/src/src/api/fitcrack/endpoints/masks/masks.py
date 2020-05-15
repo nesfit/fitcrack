@@ -6,7 +6,7 @@
 import logging
 
 import os
-from flask import request, redirect, send_from_directory
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -127,4 +127,5 @@ class downloadMask(Resource):
         """
 
         maskSet = FcMasksSet.query.filter(FcMasksSet.id == id).first()
-        return send_from_directory(MASKS_DIR, maskSet.path)
+        path = os.path.join(MASKS_DIR, maskSet.path)
+        return send_file(path, attachment_filename=maskSet.path, as_attachment=True)

@@ -244,6 +244,25 @@ class FcJob(Base):
             return 'really long'
 
     @hybrid_property
+    def estimated_cracking_time_str(self):
+        total_power = 0
+        boinc_host_ids = [host.id for host in self.hosts]
+        hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == self.hash_type). \
+            filter(FcBenchmark.boinc_host_id.in_(boinc_host_ids)).all()
+
+        for host in hosts:
+            total_power += host.power
+
+        est_time = None
+        if (total_power > 0):
+            est_time = float(self.keyspace / total_power)
+            try:
+                est_time = str(datetime.timedelta(seconds=math.floor(est_time)))
+            except OverflowError:
+                est_time = 'really long'
+        return est_time
+
+    @hybrid_property
     def progress(self):
         if self.hc_keyspace == 0:
             return 100

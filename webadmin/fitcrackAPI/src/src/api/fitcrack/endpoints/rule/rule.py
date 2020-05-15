@@ -9,7 +9,7 @@ import os
 import re
 from itertools import islice
 
-from flask import request, redirect, send_from_directory
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -159,4 +159,5 @@ class downloadRule(Resource):
         """
 
         rule = FcRule.query.filter(FcRule.id == id).first()
-        return send_from_directory(RULE_DIR, rule.path)
+        path = os.path.join(RULE_DIR, rule.path)
+        return send_file(path, attachment_filename=rule.path, as_attachment=True)

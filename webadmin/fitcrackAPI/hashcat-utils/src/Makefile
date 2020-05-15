@@ -28,33 +28,33 @@ CFLAGS_NATIVE  = $(CFLAGS)
 LDFLAGS_NATIVE = $(LDFLAGS)
 
 native:
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o cap2hccapx.bin cap2hccapx.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o cleanup-rules.bin cleanup-rules.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o combinator.bin combinator.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o combinator3.bin combinator3.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o combipow.bin combipow.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o ct3_to_ntlm.bin ct3_to_ntlm.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o cutb.bin cutb.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o expander.bin expander.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o gate.bin gate.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o generate-rules.bin generate-rules.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o hcstatgen.bin hcstatgen.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o cap2hccapx.bin cap2hccapx.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o cleanup-rules.bin cleanup-rules.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o combinator.bin combinator.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o combinator3.bin combinator3.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o combipow.bin combipow.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o ct3_to_ntlm.bin ct3_to_ntlm.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o cutb.bin cutb.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o expander.bin expander.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o gate.bin gate.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o generate-rules.bin generate-rules.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o hcstatgen.bin hcstatgen.c
 	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o hcstat2gen.bin hcstat2gen.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o keyspace.bin keyspace.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o len.bin len.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o mli2.bin mli2.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o morph.bin morph.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o permute.bin permute.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o permute_exist.bin permute_exist.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o prepare.bin prepare.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o req-include.bin req-include.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o req-exclude.bin req-exclude.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o rli.bin rli.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o rli2.bin rli2.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o rules_optimize.bin rules_optimize.c cpu_rules.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o splitlen.bin splitlen.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o strip-bsr.bin strip-bsr.c
-	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o strip-bsn.bin strip-bsn.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o keyspace.bin keyspace.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o len.bin len.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o mli2.bin mli2.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o morph.bin morph.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o permute.bin permute.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o permute_exist.bin permute_exist.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o prepare.bin prepare.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o req-include.bin req-include.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o req-exclude.bin req-exclude.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o rli.bin rli.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o rli2.bin rli2.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o rules_optimize.bin rules_optimize.c cpu_rules.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o splitlen.bin splitlen.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o strip-bsr.bin strip-bsr.c
+#	${CC_NATIVE} ${CFLAGS_NATIVE} ${LDFLAGS_NATIVE} -o strip-bsn.bin strip-bsn.c
 
 ##
 ## WINDOWS
