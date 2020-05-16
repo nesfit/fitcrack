@@ -223,7 +223,7 @@ export default {
         {title: 'Comment', icon: 'mdi-format-quote-close', value: d.comment},
         {title: 'Keyspace', icon: 'mdi-key', value: d.keyspace, format: fmt},
         {title: 'Date Added', icon: 'mdi-calendar-import', value: d.time, format: v => this.$moment(v).calendar()},
-        {title: 'Workunit Sum Time', icon: 'mdi-sigma', value: d.cracking_time_str},
+        {title: 'Workunit Sum Time', icon: 'mdi-sigma', value: d.workunit_sum_time_str},
         {title: 'Cracking Time', icon: 'mdi-timer', value: this.crackingTime},
         {title: 'Estimated Cracking Time', icon: 'mdi-bell-ring-outline', value: d.estimated_cracking_time_str},
         {title: 'Start', icon: 'mdi-ray-start', value: this.startTime},

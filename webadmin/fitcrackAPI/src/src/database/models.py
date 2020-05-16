@@ -237,7 +237,7 @@ class FcJob(Base):
         return getHashById(str(self.hash_type))['name']
 
     @hybrid_property
-    def cracking_time_str(self):
+    def workunit_sum_time_str(self):
         try:
             return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
         except OverflowError:
