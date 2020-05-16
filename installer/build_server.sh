@@ -26,7 +26,6 @@ rm -f tmp/built 2>/dev/null
 
 cd boinc
 chmod +x _autosetup
-chmod +x configure
 
 
 if [ -f /opt/rh/devtoolset-7/enable ]; then
@@ -39,6 +38,7 @@ if [[ $? != 0 ]]; then
   exit
 fi
 
+chmod +x configure
 ./configure --disable-client --disable-manager
 if [[ $? != 0 ]]; then
   echo "Error during configuration."

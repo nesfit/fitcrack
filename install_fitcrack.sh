@@ -161,6 +161,12 @@ fi
 
 ########################################
 
+read -e -p "Enter the number of workunits per hosts (default: 2): " MAX_WUS_IN_PROGRESS
+MAX_WUS_IN_PROGRESS=${MAX_WUS_IN_PROGRESS:-2}
+sed -i "s|<max_wus_in_progress>1</max_wus_in_progress>|<max_wus_in_progress>$MAX_WUS_IN_PROGRESS</max_wus_in_progress>|g" $BOINC_PROJECT_DIR/config.xml
+
+########################################
+
 echo "+----------------------------------------------------------+"
 echo "|                  INSTALLATION COMPLETED                  |"
 echo "|          Have fun and a lot of cracked hashes...         |"
