@@ -31,6 +31,8 @@ from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 def create_job(data):
     if data['name'] == '':
         abort(500, 'Name can not be empty.')
+    if len(data['hash_settings']['hash_list']) == 0:
+        abort(500, 'Hash list can not be empty.')
 
     for idx, hashObj in enumerate(data['hash_settings']['hash_list']):
 
