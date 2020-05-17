@@ -599,6 +599,7 @@
       window.addEventListener('keydown', this.shortcutHandler)
     },
     beforeDestroy: function () {
+      this.selectedJobs = []
       clearInterval(this.interval)
       window.removeEventListener('keydown', this.shortcutHandler)
     },
