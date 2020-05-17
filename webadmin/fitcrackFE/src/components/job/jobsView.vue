@@ -573,10 +573,16 @@
     },
     watch: {
       pagination: {
-        handler: 'updateList',
-        deep: true
+        deep: true,
+        handler ({ page }) {
+          this.$paginator(this.$route.path, page)
+          this.updateList()
+        }
       },
-      $route: 'updateList',
+      $route ({ path }) {
+        this.pagination.page = this.$paginator(path)
+        this.updateList()
+      },
       clean (isClean) {
         if (!isClean) {
           this.updateList()
@@ -586,6 +592,7 @@
     },
     mounted () {
       // this.loadJobs()
+      this.pagination.page = this.$paginator(this.$route.path)
       this.interval = setInterval(() => {
         this.loadJobs()
       }, 5000)

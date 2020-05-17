@@ -23,6 +23,7 @@ import moment from 'moment'
 import mdfSetup from 'moment-duration-format'
 import VueVisible from 'vue-visible'
 import UserPlugin from '@/components/user/userPlugin'
+import paginator from '@/plugins/paginator'
 import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
@@ -48,6 +49,7 @@ Vue.axios.defaults.withCredentials = true
 Vue.use(Vuetify);
 
 Vue.use(UserPlugin);
+Vue.use(paginator)
 
 Vue.use(VueProgressBar, {
   color: window.theme.light.primary,
