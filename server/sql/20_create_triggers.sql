@@ -175,7 +175,7 @@ delimiter //
 create trigger set_end_time
 before update on fc_job for each row
 begin
-if NEW.status between 1 and 9 then
+if NEW.status <> OLD.status and NEW.status between 1 and 9 then
   set NEW.time_end = now();
 end if;
 end //
