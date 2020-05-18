@@ -150,7 +150,11 @@ void CJob::updateStatusOfRunningJob(Config::JobState newStatus)
         this->m_status = newStatus;
 
     /** Database update */
-    this->m_sqlLoader->updateRunningJobStatus(this->m_id, newStatus);
+    if (newStatus == Config::JobState::JobFinishing) {
+        this->m_sqlLoader->setJobToFinishing(this->m_id);
+    } else {
+        this->m_sqlLoader->updateRunningJobStatus(this->m_id, newStatus);
+    }
 }
 
 

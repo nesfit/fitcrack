@@ -178,6 +178,12 @@ void CSqlLoader::updateRunningJobStatus(uint64_t jobId, uint32_t newStatus)
                                  CJob::getTableName().c_str(), newStatus, jobId));
 }
 
+void CSqlLoader::setJobToFinishing(uint64_t jobId)
+{
+    return updateSql(formatQuery("CALL set_finishing(%" PRIu64 ");",
+                                 jobId));
+}
+
 
 bool CSqlLoader::isJobTimeout(uint64_t jobId)
 {

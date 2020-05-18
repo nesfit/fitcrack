@@ -2,7 +2,7 @@
 -- Spúšťače 
 --
 DROP TRIGGER IF EXISTS `job_notification`;
-DELIMITER //
+DELIMITER // 
 CREATE TRIGGER `job_notification` AFTER UPDATE ON `fc_job`
  FOR EACH ROW BEGIN
 	DECLARE userID int;
@@ -167,14 +167,28 @@ END
 DELIMITER ;
 
 --
+-- Trigger for saving job end time on finish
+--
+drop trigger if exists set_end_time;
+
+delimiter //
+create trigger set_end_time
+before update on fc_job for each row
+begin
+if NEW.status between 1 and 9 then
+  set NEW.time_end = now();
+end if;
+end //
+delimiter ;
+
+--
 -- Procedure for finishing job and continuing batch if applicable
 --
 drop procedure if exists finish_job;
 delimiter //
 --
-create procedure finish_job(
-	IN job_id bigint(20),
-	IN end_status smallint(1)
+create procedure set_finishing(
+	IN job_id bigint(20)
 )
 sql security invoker
 begin
@@ -187,10 +201,10 @@ begin
 rollback;
 end;
 --
-set end_status = ifnull(end_status, 1); -- 1 = finished, default value 
 start transaction;
--- set job to finished state
-update fc_job set status = end_status, time_end = now() where id = job_id;
+-- set job to finishing state
+update fc_job set status = 12 
+where id = job_id and status >= 10 limit 1;
 -- get job batch details
 select batch_id, queue_position into b_id, q_p
 from fc_job where id = job_id;

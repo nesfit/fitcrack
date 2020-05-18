@@ -156,6 +156,13 @@ class CSqlLoader {
         void updateRunningJobStatus(uint64_t jobId, uint32_t newStatus);
 
         /**
+         * @brief Set status of RUNNING fc_job entry to FINISHING via stored procedure
+         * @param jobId [in] ID of job entry
+         * @note This uses a procedure that runs additional logic to support batch running jobs
+         */
+        void setJobToFinishing(uint64_t jobId);
+
+        /**
          * @brief Returns if job with supplied ID has passed time_end
          * @param jobId ID of job to check
          * @return True if now() is greater than time_end of supplied job, False otherwise
