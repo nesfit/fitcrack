@@ -225,7 +225,7 @@ if new_status between 1 and 9 then
 	and status >= 10;
 end if;
 -- start succeessor if one exists
-if succ_id is not null and r_cnt = 0 then
+if succ_id is not null and r_cnt = 0 and new_status <> 0 then
   update fc_job set status = 10 where id = succ_id;
 end if;
 --
