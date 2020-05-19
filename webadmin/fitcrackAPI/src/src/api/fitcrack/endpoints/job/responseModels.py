@@ -136,6 +136,7 @@ job_big_model = api.model('Job', {
     'workunit_sum_time': fields.Float(),
     'workunit_sum_time_str': fields.String(),
     'estimated_cracking_time_str': fields.String(),
+    'efficiency': fields.Float(),
     'hash_type_name': fields.String(),
     'hash_type': fields.String(required=True),
     'keyspace': fields.String(required=True),
