@@ -38,6 +38,7 @@ workunit_model = api.model('Workunit', {
     'start_index_2': fields.Integer(),
     'start_index_real': fields.Integer(),
     'hc_keyspace': fields.Integer(),
+    'keyspace': fields.Integer(),
     'mask_id': fields.Integer(),
     'duplicated': fields.Boolean(),
     'duplicate': fields.Integer(),

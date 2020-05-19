@@ -143,7 +143,7 @@ export default {
         {text: 'Cracking time', align: 'end', value: 'cracking_time_str'},
         {text: 'Generated', align: 'end', value: 'time'},
         {text: 'Start index', align: 'end', value: 'start_index_real'},
-        {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
+        {text: 'Keyspace', align: 'end', value: 'keyspace', format: fmt},
         {text: 'Retry', align: 'center', value: 'retry'},
         {text: 'Finished', align: 'center', value: 'finished'},
         {text: 'Log', align: 'center', value: 'data-table-expand'}
@@ -167,7 +167,7 @@ export default {
           this.title.valid = validWorkunits.length
           this.title.benchmarks = job.workunits.length - validWorkunits.length
           if (validWorkunits.length > 0) {
-            this.title.avgKeyspace = (validWorkunits.map(workunit => workunit.hc_keyspace).reduce((a, b) => a + b) / validWorkunits.length)
+            this.title.avgKeyspace = (validWorkunits.map(workunit => workunit.keyspace).reduce((a, b) => a + b) / validWorkunits.length)
           }
           
 
@@ -189,12 +189,13 @@ export default {
 
             return {
               id: workunit.id,
-              keyspace: workunit.hc_keyspace,
+              keyspace: workunit.keyspace,
               state,
-              text: `ID ${workunit.id} (keyspace ${workunit.hc_keyspace}) ${workunit.retry ? 'retried and' : ''} ${workunit.finished ? 'finished' : 'not finished'}`,
-              //text: "Id: " + workunit.id + " | Keyspace: " + workunit.hc_keyspace + " | Retry: " + workunit.retry + " | Finished: " + workunit.finished
+              text: `ID ${workunit.id} (keyspace ${workunit.keyspace}, hc_keyspace ${workunit.hc_keyspace}) ${workunit.retry ? 'retried and' : ''} ${workunit.finished ? 'finished' : 'not finished'}`,
             }
           })
+        } else {
+          this.graphical = []
         }
       }
     }

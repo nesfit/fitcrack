@@ -559,6 +559,12 @@ class FcWorkunit(Base):
     result = relationship('Result',  uselist=False, primaryjoin="FcWorkunit.workunit_id==Result.workunitid", viewonly=True)
 
     @hybrid_property
+    def keyspace(self):
+        if self.job.rulesFile:
+            return self.hc_keyspace * self.job.rulesFile
+        return self.hc_keyspace
+
+    @hybrid_property
     def start_index_real(self):
         if self.job.attack_mode in [1,6,7]:
             return self.start_index * self.job.hc_keyspace + self.start_index_2
