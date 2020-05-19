@@ -504,7 +504,7 @@
               <li>Access your server's shell (ex. via ssh)</li>
               <li>
                 Run <code>/home/<em>&lt;BOINC user&gt;</em>/projects/{{ $store.state.project }}/bin/start</code>
-                as BOINC or another privileged user. BOINC user is <code>boincadm</code> by default.
+                as BOINC. BOINC user is <code>boincadm</code> by default.
               </li>
             </ol>
           </v-sheet>

@@ -26,7 +26,7 @@
             </router-link>
           </v-list-item-title>
           <span>
-            Keyspace {{ data.grammar_keyspace || 'not specified' }}
+            Keyspace: {{ data.grammar_keyspace || 'not specified' }}
           </span>
         </v-list-item-content>
       </v-list-item>
@@ -36,8 +36,8 @@
           <v-list-item-action class="pr-3 key">
             Rules:
           </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title class="text-right">
+          <v-list-item-content class="text-right">
+            <v-list-item-title>
               <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}">
                 {{ data.rulesFile.name }}
                 <v-icon 
@@ -48,6 +48,9 @@
                 </v-icon>
               </router-link>
             </v-list-item-title>
+          <span>
+            Count: {{ data.rulesFile.count || 'not specified' }}
+          </span>
           </v-list-item-content>
         </v-list-item>
       </template>

@@ -31,12 +31,15 @@
         <v-list-item-action class="pr-3 key">
           Rules:
         </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title class="text-right">
+        <v-list-item-content class="text-right">
+          <v-list-item-title>
             <router-link :to="{name: 'ruleDetail', params: { id: data.rulesFile.id}}" target='_blank'>
               {{ data.rulesFile.name }}
             </router-link>
           </v-list-item-title>
+          <span>
+            Keyspace: {{ data.rulesFile.count || 'not specified' }}
+          </span>
         </v-list-item-content>
       </v-list-item>
     </template>
