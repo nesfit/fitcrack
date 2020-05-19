@@ -244,9 +244,9 @@ export default {
     crackingTime () {
       const d = this.data
       if (d.time_end) {
-        return this.$moment.utc(this.$moment(d.time_end).diff(this.$moment(d.time_start))).format("HH:mm:ss")
+        return this.$moment.duration(this.$moment(d.time_end).diff(this.$moment(d.time_start))).format()
       } else if (d.time_start) {
-        return this.$moment.utc(this.$moment().diff(this.$moment(d.time_start))).format("HH:mm:ss")
+        return this.$moment.duration(this.$moment().diff(this.$moment(d.time_start))).format()
       } else {
         return 'Not started yet'
       }
