@@ -269,8 +269,8 @@ export default {
     },
     efficiency () {
       const validWorkunits = this.data.workunits.filter(workunit => workunit.hc_keyspace !== 0)
-      if (this.data.hosts.length > 0 && validWorkunits.length > 0 && this.data.cracking_time > 0) {
-        const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.cracking_time)
+      if (this.data.hosts.length > 0 && validWorkunits.length > 0 && this.data.workunit_sum_time > 0) {
+        const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.workunit_sum_time)
         if (efficiency > 1)
           return null
         return (efficiency * 100).toFixed(2) + ' %'

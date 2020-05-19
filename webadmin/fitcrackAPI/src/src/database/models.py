@@ -178,7 +178,7 @@ class FcJob(Base):
     comment = Column(Text(collation='utf8_bin'), nullable=False)
     time_start = Column(DateTime)
     time_end = Column(DateTime)
-    cracking_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
+    workunit_sum_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
     charset1 = Column(String(4096, 'utf8_bin'))
     charset2 = Column(String(4096, 'utf8_bin'))
@@ -239,7 +239,7 @@ class FcJob(Base):
     @hybrid_property
     def workunit_sum_time_str(self):
         try:
-            return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
+            return str(datetime.timedelta(seconds=math.floor(self.workunit_sum_time)))
         except OverflowError:
             return 'really long'
 

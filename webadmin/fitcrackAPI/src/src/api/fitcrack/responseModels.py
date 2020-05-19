@@ -91,7 +91,7 @@ job_short_model = api.model('Job short', {
     'status_type': fields.String(),
     'progress': fields.Float(required=False),
     'time': fields.DateTime(required=False),
-    'cracking_time': fields.Float(),
+    'workunit_sum_time': fields.Float(),
     'hash_type': fields.String(required=True),
     'time_start': fields.DateTime(required=True),
     'time_end': fields.DateTime(required=True),

@@ -274,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `comment` text COLLATE utf8_bin NOT NULL,
   `time_start` timestamp NULL DEFAULT NULL,
   `time_end` timestamp NULL DEFAULT NULL,
-  `cracking_time` double NOT NULL DEFAULT '0',
+  `workunit_sum_time` double NOT NULL DEFAULT '0',
   `seconds_per_workunit` bigint(20) unsigned NOT NULL DEFAULT '3600',
   `charset1` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
   `charset2` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
