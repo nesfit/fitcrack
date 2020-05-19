@@ -174,14 +174,8 @@ void CSqlLoader::updateJobStatus(uint64_t jobId, uint32_t newStatus)
 
 void CSqlLoader::updateRunningJobStatus(uint64_t jobId, uint32_t newStatus)
 {
-    return updateSql(formatQuery("UPDATE `%s` SET status = %" PRIu32 " WHERE id = %" PRIu64 " AND status >= 10 LIMIT 1;",
-                                 CJob::getTableName().c_str(), newStatus, jobId));
-}
-
-void CSqlLoader::setJobToFinishing(uint64_t jobId)
-{
-    return updateSql(formatQuery("CALL set_finishing(%" PRIu64 ");",
-                                 jobId));
+    return updateSql(formatQuery("CALL set_running_job_status(%" PRIu64 ", %" PRIu32 ");",
+                                 jobId, newStatus));
 }
 
 
