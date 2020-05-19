@@ -3,6 +3,7 @@
 import psutil
 import time
 import urllib3.request
+import datetime
 
 server = "http://localhost:5000"
 http = urllib3.PoolManager()
@@ -48,4 +49,7 @@ while True:
 	print("HDD_W: " + str(hdd_write))
 
 	url = server + "/serverInfo/saveData" + "?cpu=" + str(cpu) + "&ram=" + str(mem) + "&net_recv=" + str(recv) + "&net_sent=" + str(sent) + "&hdd_read=" + str(hdd_read) + "&hdd_write=" + str(hdd_write)
-	response = http.request('GET', url)
+	try:
+        http.request('POST', url)
+    except Exception as e:
+        print(datetime.datetime.utcnow(), '[WARN]: Unknown exception occured in sending usage data:', e)

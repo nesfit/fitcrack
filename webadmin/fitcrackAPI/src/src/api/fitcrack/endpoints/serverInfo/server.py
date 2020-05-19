@@ -93,7 +93,7 @@ class saveData(Resource):
 
     @api.expect(serverUsage_argument)
     @api.marshal_with(simpleResponse)
-    def get(self):
+    def post(self):
         """
         Function for saving of new data into the table fc_server_usage
         """
