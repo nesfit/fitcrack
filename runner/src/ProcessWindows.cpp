@@ -25,11 +25,11 @@ void ProcessWindows::launchSubprocess() {
   }
 
   if (!SetHandleInformation(startup_info_.hStdOutput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
-    RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
+    RunnerUtils::runtimeException("SetHandleInformation() for stdout failed", GetLastError());
   }
 
-  if (!SetHandleInformation(startup_info_.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
-    RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
+  if (startup_info_.hStdInput != GetStdHandle(STD_INPUT_HANDLE) && !SetHandleInformation(startup_info_.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
+    RunnerUtils::runtimeException("SetHandleInformation() for stdin failed", GetLastError());
   }
 
   /** Start the child process */
