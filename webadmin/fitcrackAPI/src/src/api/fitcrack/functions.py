@@ -227,7 +227,7 @@ def get_batch_status (total, remaining, any_running):
         }
     elif any_running:
         return {
-            'code': 10,
+            'code': 1,
             'text': 'Working',
             'icon': 'mdi-altimeter',
             'color': 'warning',
@@ -235,7 +235,7 @@ def get_batch_status (total, remaining, any_running):
         }
     elif remaining == 0:
         return {
-            'code': 1,
+            'code': 3,
             'text': 'Done',
             'icon': 'mdi-check-all',
             'color': 'success',
@@ -243,7 +243,7 @@ def get_batch_status (total, remaining, any_running):
         }
     else:
         return {
-            'code': 20,
+            'code': 2,
             'text': 'Interrupted',
             'icon': 'mdi-hand-right',
             'color': 'error',
