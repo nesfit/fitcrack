@@ -68,7 +68,10 @@
     data: function () {
       return {
         i: 1,
-        palette: ['#f24b78', '#605f5e', '#1d3461', '#48beff', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']
+        palette: ['#f24b78', '#605f5e', '#1d3461', '#48beff', 
+                  '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', 
+                  '#d2f53c', '#ffd700', '#ff0051', '#65157f', 
+                  '#ff4300', '#193bdf', '#afe31b', '#c28f62']
       }
     },
     methods: {
