@@ -94,7 +94,7 @@
           <span>{{ data.status.text }}</span>
           <v-spacer />
           <span v-if="data.waiting_jobs > 0">
-            {{ data.waiting_jobs }} queued to run
+            {{ data.waiting_jobs }} waiting to run
           </span>
         </v-card-title>
         <v-card-text>
@@ -110,10 +110,10 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions v-if="data.waiting_jobs > 0 && data.current_user_can_operate">
+        <v-card-actions v-if="data.current_user_can_operate">
           <!-- opration buttons -->
           <v-btn
-            v-if="data.status.code < 10"
+            v-if="data.status.code < 1"
             color="success"
             @click="runBatch"
           >
@@ -123,7 +123,7 @@
             </v-icon>
           </v-btn>
           <v-btn
-            v-else-if="data.status.code < 20"
+            v-else-if="data.status.code < 2"
             color="error"
             @click="interruptBatch"
           >
@@ -133,7 +133,7 @@
             </v-icon>
           </v-btn>
           <v-btn
-            v-else
+            v-else-if="data.status.code < 3"
             color="error"
             @click="runBatch"
           >
