@@ -2,7 +2,7 @@
 -- Spúšťače 
 --
 DROP TRIGGER IF EXISTS `job_notification`;
-DELIMITER //
+DELIMITER // 
 CREATE TRIGGER `job_notification` AFTER UPDATE ON `fc_job`
  FOR EACH ROW BEGIN
 	DECLARE userID int;
@@ -167,30 +167,46 @@ END
 DELIMITER ;
 
 --
--- Procedure for finishing job and continuing batch if applicable
+-- Trigger for saving job end time on finish
 --
-drop procedure if exists finish_job;
+drop trigger if exists set_end_time;
+
+delimiter //
+create trigger set_end_time
+before update on fc_job for each row
+begin
+if NEW.status <> OLD.status and NEW.status between 1 and 9 then
+  set NEW.time_end = now();
+end if;
+end //
+delimiter ;
+
+--
+-- Procedure for changing status of running job and continuing batch if applicable
+--
+drop procedure if exists set_running_job_status;
 delimiter //
 --
-create procedure finish_job(
+create procedure set_running_job_status(
 	IN job_id bigint(20),
-	IN end_status smallint(1)
+	IN new_status smallint(1)
 )
 sql security invoker
 begin
 declare b_id int(11);
 declare q_p int(11);
 declare succ_id bigint(20);
+declare r_cnt int;
 --
 declare exit handler for sqlexception
 begin
 rollback;
 end;
 --
-set end_status = ifnull(end_status, 1); -- 1 = finished, default value 
 start transaction;
--- set job to finished state
-update fc_job set status = end_status, time_end = now() where id = job_id;
+-- set job to new state
+update fc_job set status = new_status 
+where id = job_id and status >= 10 limit 1;
 -- get job batch details
 select batch_id, queue_position into b_id, q_p
 from fc_job where id = job_id;
@@ -201,8 +217,15 @@ and queue_position > q_p
 and status = 0 -- ready
 order by queue_position asc
 limit 1;
+-- if new status is < 10 and another job in batch is running, skip batch ops
+set r_cnt = 0;
+if new_status between 1 and 9 then
+  select count(id) into r_cnt
+	from fc_job where batch_id = b_id
+	and status >= 10;
+end if;
 -- start succeessor if one exists
-if succ_id is not null then
+if succ_id is not null and r_cnt = 0 and new_status <> 0 then
   update fc_job set status = 10 where id = succ_id;
 end if;
 --

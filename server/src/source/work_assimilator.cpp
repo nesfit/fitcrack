@@ -883,7 +883,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 if (no_hashes_left(job_id))
                 {
                     /** Finish the job */
-                    std::snprintf(buf, SQL_BUF_SIZE, "CALL finish_job(%" PRIu64 ", %d);", job_id, Job_finished);
+                    std::snprintf(buf, SQL_BUF_SIZE, "CALL set_running_job_status(%" PRIu64 ", %d);", job_id, Job_finished);
                     update_mysql(buf);
 
                     std::cerr << __LINE__ << " - Canceling all workunits for job_id " << job_id << std::endl;
