@@ -657,6 +657,15 @@ class FcUserPermission(Base):
     job = relationship('FcJob')
     user = relationship('FcUser')
 
+    @hybrid_property
+    def can_view(self): return self.view == 1 or self.owner == 1
+
+    @hybrid_property
+    def can_modify(self): return self.modify == 1 or self.owner == 1
+
+    @hybrid_property
+    def can_operate(self): return self.operate == 1 or self.owner == 1
+
 
 class User(Base):
     __tablename__ = 'user'
