@@ -83,7 +83,7 @@ def create_job(data):
         comment=job['comment'],
         time_start=None if not job['time_start'] else  datetime.datetime.strptime(job['time_start'], '%Y-%m-%dT%H:%M'),
         time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%Y-%m-%dT%H:%M'),
-        cracking_time='0',
+        workunit_sum_time='0',
         seconds_per_workunit=job['seconds_per_job'] if job['seconds_per_job'] > 10 else 10,
         charset1=job['charset1'] if job.get('charset1') else '',
         charset2=job['charset2'] if job.get('charset2') else '',
@@ -312,23 +312,23 @@ def perm_base ():
     return db.session.query(FcUserPermission.job_id).filter_by(user_id=current_user.id)
 
 def visible_jobs_ids ():
-    ids = perm_base().filter_by(view=1).all()
+    ids = perm_base().filter_by(can_view=True).all()
     return [x[0] for x in ids]
 
 def editable_jobs_ids ():
-    ids = perm_base().filter_by(modify=1).all()
+    ids = perm_base().filter_by(can_modify=True).all()
     return [x[0] for x in ids]
 
 def actionable_jobs_ids ():
-    ids = perm_base().filter_by(operate=1).all()
+    ids = perm_base().filter_by(can_operate=True).all()
     return [x[0] for x in ids]
 
 def can_view_job (id):
-    return True if perm_base().filter_by(view=1).filter_by(job_id=id).one_or_none() else False
+    return True if perm_base().filter_by(can_view=True).filter_by(job_id=id).one_or_none() else False
 
 def can_edit_job (id):
-    return True if perm_base().filter_by(modify=1).filter_by(job_id=id).one_or_none() else False
+    return True if perm_base().filter_by(can_modify=True).filter_by(job_id=id).one_or_none() else False
 
 def can_operate_job (id):
-    return True if perm_base().filter_by(operate=1).filter_by(job_id=id).one_or_none() else False
+    return True if perm_base().filter_by(can_operate=True).filter_by(job_id=id).one_or_none() else False
 

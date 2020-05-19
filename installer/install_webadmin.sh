@@ -274,15 +274,7 @@ if [ $INSTALL_BACKEND = "y" ]; then
   echo "Installed to $APACHE_DOCUMENT_ROOT/fitcrackAPI."
 fi
 
-#######################
-# Configure deamons #
-#######################
-
 sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $BOINC_PROJECT_DIR/bin/measureUsage.py
-sed -i "s|DB_HOST = '.*|DB_HOST = '$DB_HOST'|g" $BOINC_PROJECT_DIR/bin/pcfg_monitor.py
-sed -i "s|DB_NAME = '.*|DB_NAME = '$DB_NAME'|g" $BOINC_PROJECT_DIR/bin/pcfg_monitor.py
-sed -i "s|DB_USER = '.*|DB_USER = '$DB_USER'|g" $BOINC_PROJECT_DIR/bin/pcfg_monitor.py
-sed -i "s|DB_PW = '.*|DB_PW = '$DB_PW'|g" $BOINC_PROJECT_DIR/bin/pcfg_monitor.py
 
 #######################
 # Configure front-end #

@@ -138,6 +138,8 @@ class assign_bin(Resource):
 
         # include if any
         jobs = FcJob.query.filter(FcJob.id.in_(include)).all()
+        # remove first to prevent duplicates
+        bin.jobs = [job for job in bin.jobs if job.id not in include]
         bin.jobs.extend(jobs)
 
         if bin is None:

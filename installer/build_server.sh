@@ -53,4 +53,4 @@ fi
 
 cd ..
 touch tmp/built
-echo "Build successfull."
+echo "Build successful."
