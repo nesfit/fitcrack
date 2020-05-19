@@ -50,6 +50,6 @@ while True:
 
 	url = server + "/serverInfo/saveData" + "?cpu=" + str(cpu) + "&ram=" + str(mem) + "&net_recv=" + str(recv) + "&net_sent=" + str(sent) + "&hdd_read=" + str(hdd_read) + "&hdd_write=" + str(hdd_write)
 	try:
-        http.request('POST', url)
-    except Exception as e:
-        print(datetime.datetime.utcnow(), '[WARN]: Unknown exception occured in sending usage data:', e)
+		http.request('POST', url)
+	except Exception as e:
+		print(datetime.datetime.utcnow(), '[WARN]: Unknown exception occured in sending usage data:', e)
