@@ -7,6 +7,7 @@
 import re
 import mysql.connector
 import datetime
+import time
 import subprocess
 from psutil import process_iter
 from time import sleep
@@ -70,8 +71,26 @@ def get_running_managers():
     return result
 
 
+def cancel_wus(job_id, cursor):
+    """Cancel running BOINC WUs.
+
+    :note: This is a duplicated 'cancel_jobs' BOINC function from backend_lib.h
+    """
+    cursor.execute('SELECT id, workunit_id FROM fc_workunit WHERE job_id = %s AND finished = 0', (job_id, ))
+    wus = cursor.fetchall()
+
+    for wu_id, fitcrack_wu_id in wus:
+        # Cancel results
+        cursor.execute('UPDATE result SET server_state = 5, outcome = 5 WHERE server_state <= 2 AND workunitid = %s', (wu_id, ))
+   
+        # Cancel jobs
+        cursor.execute('UPDATE workunit SET error_mask = error_mask|16, transition_time = %s WHERE id = %s', (int(time.time()), wu_id, ))
+        cursor.execute('UPDATE fc_workunit SET finished = 1 WHERE id = %s', (fitcrack_wu_id, ))
+
+
 def purge_job(job_id, cursor):
     """Purges the job in case of some nasty crash before."""
+    cancel_wus(job_id, cursor)
     cursor.execute('UPDATE fc_job SET indexes_verified = 0, current_index = 0 WHERE id = %s', (job_id, ))
 
 
