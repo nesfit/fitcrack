@@ -178,7 +178,7 @@ class FcJob(Base):
     comment = Column(Text(collation='utf8_bin'), nullable=False)
     time_start = Column(DateTime)
     time_end = Column(DateTime)
-    cracking_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
+    workunit_sum_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
     charset1 = Column(String(4096, 'utf8_bin'))
     charset2 = Column(String(4096, 'utf8_bin'))
@@ -233,20 +233,39 @@ class FcJob(Base):
         return len(self.hosts)
 
     @hybrid_property
+    def total_time(self):
+        if not self.time_start:
+            return 0
+        if self.time_end:
+            return (self.time_end - self.time_start).total_seconds()
+        else:
+            return (datetime.datetime.now() - self.time_start).total_seconds()
+
+    @hybrid_property
+    def efficiency(self):
+        wu_active_hosts = [wu.boinc_host_id for wu in self.workunits]
+        job_active_hosts_count = len(set(wu_active_hosts))
+        if self.total_time == 0.0:
+            return 0
+        job_eff = float(self.workunit_sum_time) / (job_active_hosts_count * self.total_time)
+        return int(job_eff * 100)
+
+
+    @hybrid_property
     def hash_type_name(self):
         return getHashById(str(self.hash_type))['name']
 
     @hybrid_property
     def workunit_sum_time_str(self):
         try:
-            return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
+            return str(datetime.timedelta(seconds=math.floor(self.workunit_sum_time)))
         except OverflowError:
             return 'really long'
 
     @hybrid_property
     def estimated_cracking_time_str(self):
         total_power = 0
-        boinc_host_ids = [host.id for host in self.hosts]
+        boinc_host_ids = [host.id for host in self.hosts if host.last_active.online]
         hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == self.hash_type). \
             filter(FcBenchmark.boinc_host_id.in_(boinc_host_ids)).all()
 

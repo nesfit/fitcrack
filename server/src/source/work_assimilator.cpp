@@ -425,7 +425,7 @@ void set_retry_workunit(uint64_t workunit_id)
  *
  *
  */
-void plan_new_benchamrk(uint64_t host_id)
+void plan_new_benchmark(uint64_t host_id)
 {
     char buf[SQL_BUF_SIZE];
 
@@ -649,7 +649,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
             if (retval != 1)
             {
                 std::cerr << __LINE__ << " - ERROR: Failed to read status code." << std::endl;
-                plan_new_benchamrk(host_id);
+                plan_new_benchmark(host_id);
                 break;
             }
 
@@ -664,7 +664,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 if (retval != 1)
                 {
                     std::cerr << __LINE__ << " - ERROR: Failed to read host power." << std::endl;
-                    plan_new_benchamrk(host_id);
+                    plan_new_benchmark(host_id);
                     break;
                 }
 
@@ -724,12 +724,12 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 if (retval != 1)
                 {
                     std::cerr << __LINE__ << " - ERROR: Failed to read cracking_time." << std::endl;
-                    plan_new_benchamrk(host_id);
+                    plan_new_benchmark(host_id);
                     break;
                 }
                 std::cerr << __LINE__ << " - Benchmark time: " << cracking_time << "s" << std::endl;
 
-                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET cracking_time = cracking_time + %lf WHERE id = %" PRIu64 " ;", mysql_table_job.c_str(), cracking_time, job_id);
+                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET workunit_sum_time = workunit_sum_time + %lf WHERE id = %" PRIu64 " ;", mysql_table_job.c_str(), cracking_time, job_id);
                 update_mysql(buf);
 
                 std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET cracking_time = %lf WHERE `workunit_id` = %lu LIMIT 1;", mysql_table_workunit.c_str(), cracking_time, wu.id);
@@ -742,7 +742,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 std::cerr << __LINE__ << " - B_CODE: " << code <<" (bench ERROR)" << std::endl;
                 log_messages.printf(MSG_DEBUG, "code %d\n", code);
 
-                plan_new_benchamrk(host_id);
+                plan_new_benchmark(host_id);
             }
         }
 
@@ -806,7 +806,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 {
                     std::cerr << __LINE__ << " - Cracking time: " << cracking_time << "s" << std::endl;
 
-                    std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET cracking_time = cracking_time + %lf WHERE id = %" PRIu64 " ;", mysql_table_job.c_str(), cracking_time, job_id);
+                    std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET workunit_sum_time = workunit_sum_time + %lf WHERE id = %" PRIu64 " ;", mysql_table_job.c_str(), cracking_time, job_id);
                     update_mysql(buf);
 
                     std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET cracking_time = %lf WHERE `workunit_id` = %lu LIMIT 1;", mysql_table_workunit.c_str(), cracking_time, wu.id);
@@ -928,7 +928,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 {
                     std::cerr << __LINE__ << " - Cracking time: " << cracking_time << "s" << std::endl;
 
-                    std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET cracking_time = cracking_time + %lf WHERE id = %" PRIu64 " ;", mysql_table_job.c_str(), cracking_time, job_id);
+                    std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET workunit_sum_time = workunit_sum_time + %lf WHERE id = %" PRIu64 " ;", mysql_table_job.c_str(), cracking_time, job_id);
                     update_mysql(buf);
 
                     std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET cracking_time = %lf WHERE `workunit_id` = %lu LIMIT 1;", mysql_table_workunit.c_str(), cracking_time, wu.id);
@@ -993,7 +993,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
             if (retval != 1)
             {
                 std::cerr << __LINE__ << " - ERROR: Failed to read status code." << std::endl;
-                plan_new_benchamrk(host_id);
+                plan_new_benchmark(host_id);
                 break;
             }
 
@@ -1008,7 +1008,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 if (retval != 1)
                 {
                     std::cerr << __LINE__ << " - ERROR: Failed to read cracking_time." << std::endl;
-                    plan_new_benchamrk(host_id);
+                    plan_new_benchmark(host_id);
                     break;
                 }
 
@@ -1024,7 +1024,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                 if (find_benchmark_results(speed_map, boinc_host_id))
                 {
-                    /** Benchamrk was already run in the past */
+                    /** benchmark was already run in the past */
                     while (std::fscanf(f,"%u:%llu\n", &hash_type, &power) == 2)
                     {
                         auto it = speed_map.find(hash_type);

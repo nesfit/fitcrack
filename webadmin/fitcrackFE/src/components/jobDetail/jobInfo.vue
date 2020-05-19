@@ -228,7 +228,7 @@ export default {
         {title: 'Estimated Cracking Time', icon: 'mdi-bell-ring-outline', value: d.estimated_cracking_time_str},
         {title: 'Start', icon: 'mdi-ray-start', value: this.startTime},
         {title: 'End', icon: 'mdi-ray-end', value: this.endTime},
-        {title: 'Efficiency', icon: 'mdi-chart-timeline-variant', value: this.efficiency},
+        {title: 'Efficiency', icon: 'mdi-chart-timeline-variant', value: d.efficiency, format: v => `${v} %`},
         {title: 'Time per WU', icon: 'mdi-timeline-clock', value: d.seconds_per_job, format: v => `${v} seconds`},
       ]
       // Leave out missing stuff and format fields
@@ -265,17 +265,6 @@ export default {
         return this.$moment(d.time_end).format('DD.MM.YYYY HH:mm')
       } else {
         return 'Not planned'
-      }
-    },
-    efficiency () {
-      const validWorkunits = this.data.workunits.filter(workunit => workunit.hc_keyspace !== 0)
-      if (this.data.hosts.length > 0 && validWorkunits.length > 0 && this.data.cracking_time > 0) {
-        const efficiency = (validWorkunits.map(workunit => workunit.cracking_time).reduce((a, b) => a + b)) / (this.data.hosts.length * this.data.cracking_time)
-        if (efficiency > 1)
-          return null
-        return (efficiency * 100).toFixed(2) + ' %'
-      } else {
-        return null
       }
     }
   },

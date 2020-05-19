@@ -83,7 +83,7 @@ def create_job(data):
         comment=job['comment'],
         time_start=None if not job['time_start'] else  datetime.datetime.strptime(job['time_start'], '%Y-%m-%dT%H:%M'),
         time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%Y-%m-%dT%H:%M'),
-        cracking_time='0',
+        workunit_sum_time='0',
         seconds_per_workunit=job['seconds_per_job'] if job['seconds_per_job'] > 10 else 10,
         charset1=job['charset1'] if job.get('charset1') else '',
         charset2=job['charset2'] if job.get('charset2') else '',

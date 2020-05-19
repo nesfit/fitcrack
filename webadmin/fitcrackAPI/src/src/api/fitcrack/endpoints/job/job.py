@@ -321,7 +321,7 @@ class OperationWithJob(Resource):
             job.status = status_to_code['running']
             job.indexes_verified = 0
             job.current_index = 0
-            job.cracking_time = 0
+            job.workunit_sum_time = 0
             job.time_start = None
             job.time_end = None
             if job.attack_mode == attack_modes['mask'] or job.attack_mode == attack_modes['hybrid (wordlist + mask)']:
@@ -349,7 +349,7 @@ class OperationWithJob(Resource):
 
             job.indexes_verified = 0
             job.current_index = 0
-            job.cracking_time = 0
+            job.workunit_sum_time = 0
             job.time_start = job.time_end = None
             if job.attack_mode == attack_modes['mask'] or job.attack_mode == attack_modes['hybrid (wordlist + mask)']:
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
