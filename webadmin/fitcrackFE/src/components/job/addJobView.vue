@@ -491,7 +491,7 @@
           class="mb-5"
         >
           <template-modal
-            :inherited-name="name"
+            :inherited-name="selectedTemplateName"
             @templatesUpdated="fetchTemplates"
           />
           <v-btn
@@ -561,6 +561,7 @@
         keyspace: null,
         gotBinaryHash: false,
         hashListError: false,
+        selectedTemplateName: '',
         attacks,
         templates: [
           {
@@ -643,15 +644,17 @@
       fetchAndApplyTemplate (id) {
         if (id == 0) {
           this.applyTemplate()
+          this.selectedTemplateName = ''
           this.$store.commit('jobForm/selectedTemplateMut', 0)
           this.loadSettings()
           return
         }
         this.axios.get(this.$serverAddr + `/template/${id}`)
         .then((response) => {
-          console.log(response)
           if (response.data && response.data.template) {
-            this.applyTemplate(JSON.parse(response.data.template))
+            const data = JSON.parse(response.data.template)
+            this.applyTemplate(data)
+            this.selectedTemplateName = data.template
             this.$store.commit('jobForm/selectedTemplateMut', id)
           }
         })

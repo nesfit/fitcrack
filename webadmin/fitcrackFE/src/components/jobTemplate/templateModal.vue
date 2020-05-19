@@ -18,7 +18,7 @@
       >
         <v-icon left>
           mdi-file-plus
-        </v-icon>Make template
+        </v-icon>Manage Template
       </v-btn>
     </template>
 
@@ -38,6 +38,9 @@
           <div>
             The choices you made in the job configuration will be saved as a template.<br>
             You can pre-fill any new job configuration with templates you saved.
+            <div v-show="name !== '' && name === inheritedName">
+              Keep the name to update an existing template.
+            </div>
           </div>
         </div>
         <v-text-field
@@ -63,8 +66,9 @@
           color="primary"
           text
           @click="submit"
+          :disabled="name === ''"
         >
-          Save template
+          {{ name !== '' && name === inheritedName ? 'Update' : 'Save' }} template
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -94,7 +98,7 @@
         const template = this.$store.getters['jobForm/makeTemplate'](this.name)
         console.log(template)
         this.loading = true
-        this.axios.post(this.$serverAddr + '/template', template).then((response) => {
+        this.axios.put(this.$serverAddr + '/template', template).then((response) => {
           this.$emit('templatesUpdated')
         }).catch((error) => {
           this.loading = false
@@ -102,9 +106,7 @@
         this.dialog = false
       },
       nameMe () {
-        if (this.name === '') {
-          this.name = this.inheritedName
-        }
+        this.name = this.inheritedName
       }
     }
   }
