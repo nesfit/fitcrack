@@ -168,17 +168,18 @@ class concrete_batch(Resource):
     @api.response(500, 'Failed')
     def post(self, id):
         """
-        Interrupts a batch by stopping the job that is running.
+        Interrupts a batch by stopping the jobs that are running.
         """
         batch = FcBatch.query.filter_by(id=id).one_or_none()
         if batch and not current_user.role.OPERATE_ALL_JOBS and batch.creator_id != current_user.id:
             abort(401, 'Unauthorized to operate this batch.')
 
-        stopper = FcJob.query.filter_by(batch_id=id).filter(FcJob.status >= 10).one_or_none()
-        if not stopper:
+        stoppers = FcJob.query.filter_by(batch_id=id).filter(FcJob.status >= 10).all()
+        if len(stoppers) == 0:
             return ('Nothing to do', 200)
 
-        stopper.status = status_to_code['finishing']
+        for stopper in stoppers:
+            stopper.status = status_to_code['finishing']
 
         try:
             db.session.commit()
