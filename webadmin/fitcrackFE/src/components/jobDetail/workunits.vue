@@ -143,7 +143,7 @@ export default {
         {text: 'Cracking time', align: 'end', value: 'cracking_time_str'},
         {text: 'Generated', align: 'end', value: 'time'},
         {text: 'Start index', align: 'end', value: 'start_index_real'},
-        {text: 'Keyspace', align: 'end', value: 'keyspace', format: fmt},
+        {text: 'Keyspace', align: 'end', value: 'keyspace'},
         {text: 'Retry', align: 'center', value: 'retry'},
         {text: 'Finished', align: 'center', value: 'finished'},
         {text: 'Log', align: 'center', value: 'data-table-expand'}
@@ -194,8 +194,6 @@ export default {
               text: `ID ${workunit.id} (keyspace ${workunit.keyspace}, hc_keyspace ${workunit.hc_keyspace}) ${workunit.retry ? 'retried and' : ''} ${workunit.finished ? 'finished' : 'not finished'}`,
             }
           })
-        } else {
-          this.graphical = []
         }
       }
     }

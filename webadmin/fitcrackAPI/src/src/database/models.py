@@ -560,16 +560,32 @@ class FcWorkunit(Base):
 
     @hybrid_property
     def keyspace(self):
-        if self.job.rulesFile:
-            return self.hc_keyspace * self.job.rulesFile
-        return self.hc_keyspace
+        if self.job.attack_mode == 8:
+            rules = self.job.generate_random_rules
+            if self.job.rulesFile:
+                rules += self.job.rulesFile.count
+            return self.hc_keyspace * rules if rules else self.hc_keyspace
+        else:
+            if self.job.rulesFile:
+                return self.hc_keyspace * self.job.rulesFile.count
+            return self.hc_keyspace
 
     @hybrid_property
     def start_index_real(self):
         if self.job.attack_mode in [1,6,7]:
             return self.start_index * self.job.hc_keyspace + self.start_index_2
         else:
-            return self.start_index
+            if self.job.attack_mode == 8:
+                rules = self.job.generate_random_rules
+                if self.job.rulesFile:
+                    rules += self.job.rulesFile.count
+                if rules != 0:
+                    return self.start_index * rules
+                return self.start_index * rules if rules else self.start_index
+            else:
+                if self.job.rulesFile:
+                    return self.start_index * self.job.rulesFile.count
+                return self.start_index
 
     def as_graph(self):
         return {
