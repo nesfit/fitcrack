@@ -237,20 +237,11 @@ def process_job_6(job, actually7=False):
 
     check_mask_syntax(mask)
     maskKeyspace = compute_keyspace_from_mask(mask)
-    maskHcKeyspace = shellExec(
-                    HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' --keyspace -a 3 ' + mask,
-                    cwd=HASHCAT_DIR, abortOnError=True)
-    if maskHcKeyspace == '':
-        abort(500, 'Server can not compute keyspace for mask ' + mask)
-    try:
-        maskHcKeyspace = int(maskHcKeyspace)
-    except ValueError:
-        abort(500, 'Hashcat says: "' + maskHcKeyspace + '".')
 
     job['mask_data'] = {
         'mask': mask,
         'keyspace': maskKeyspace,
-        'hc_keyspace': maskHcKeyspace
+        'hc_keyspace': maskKeyspace
     }
 
     dictsKeyspace = 0
