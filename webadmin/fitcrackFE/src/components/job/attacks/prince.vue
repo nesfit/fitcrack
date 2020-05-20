@@ -214,6 +214,11 @@
             return false;
         }
 
+        if (this.rules.length > 0 && this.generateRandomRules > 0) {
+            this.$error('Cannot combine a rule file together with random rules generation.')
+            return false;
+        }
+
         // Hide any previous error alert, new settings are valid
         this.$hideAlert()
         return true

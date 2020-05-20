@@ -325,7 +325,7 @@ def process_job_8(job):
 
     if job['attack_settings']['rules']:
         rules = FcRule.query.filter(FcRule.id == job['attack_settings']['rules']['id']).first()
-        ruleFileMultiplier += rules.count
+        ruleFileMultiplier = rules.count
 
         if not rules:
             abort(500, 'Wrong rules file selected.')

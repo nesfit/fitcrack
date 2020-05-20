@@ -260,7 +260,7 @@ def computeCrackingTime(data):
         rulesKeyspace = random_rules
         if attackSettings['rules']:
             rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
-            rulesKeyspace += rules.count
+            rulesKeyspace = rules.count
 
         if rulesKeyspace == 0:
             keyspace = dictsKeyspace

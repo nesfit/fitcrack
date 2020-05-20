@@ -148,6 +148,8 @@ export default {
             return false;
           if (state.generateRandomRules < 0)
             return false;
+          if (state.rules.length > 0 && state.generateRandomRules > 0)
+            return false;
 
           // All ok!
           return true

@@ -249,7 +249,7 @@ class JobByID(Resource):
                 random_rules_count = int(args['generate_random_rules'])
             ruleFileMultiplier = random_rules_count
             if rule_file:
-                ruleFileMultiplier += rule_file.count
+                ruleFileMultiplier = rule_file.count
 
             new_keyspace = new_hc_keyspace
             if ruleFileMultiplier != 0:
