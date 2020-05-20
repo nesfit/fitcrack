@@ -92,7 +92,8 @@
               outlined
               type="number"
               label="Default time per workunit"
-              hint="The time per workunit preference used for new jobs. You can change it on a per-job basis in the additional settings step when creating a job or via the edit job dialog."
+              :hint="wuTimeHint"
+              :color="settings.default_seconds_per_workunit < wutthresh ? 'warning' : ''"
               persistent-hint
               suffix="seconds"
               class="mb-4"
@@ -155,7 +156,8 @@
           testmode: localStorage.getItem('testmode') == 'true' || false,
           settings: {},
           loading: true,
-          saving: false
+          saving: false,
+          wutthresh: 180 // minimum reccomended seconds per WU
         }
       },
       computed: {
@@ -169,6 +171,13 @@
               return 'Webadmin will retain dark appearance regardless of your system theme'
             default:
               return undefined
+          }
+        },
+        wuTimeHint () {
+          if (this.settings.default_seconds_per_workunit && this.settings.default_seconds_per_workunit < this.wutthresh) {
+            return 'Setting extremely low time per workunit leads to high overhead. Cracking may take much longer than estimated. Consider choosing a higher default value.'
+          } else {
+            return 'The time per workunit preference used for new jobs. You can change it on a per-job basis in the additional settings step when creating a job or via the edit job dialog.'
           }
         }
       },
