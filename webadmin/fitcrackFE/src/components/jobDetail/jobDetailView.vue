@@ -47,10 +47,11 @@
                       <v-spacer />
                       <v-btn
                         v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')"
-                        color="error"
-                        @click="operateJob('kill')"
+                        :color="purging ? '' : 'error'"
+                        :ripple="false"
+                        @click="purgeHandler"
                       >
-                        <span>Purge</span>
+                        <span>{{ purging ? 'Click to confirm' : 'Purge' }}</span>
                         <v-icon right>
                           mdi-undo-variant
                         </v-icon>
@@ -63,14 +64,14 @@
                   </v-col>
                 </v-row>
                 <v-row>
-                  <v-col md="4">
+                  <v-col>
                     <component
                       :is="attackDetailComponent"
                       :data="data"
                       class="attack-info"
                     />
                   </v-col>
-                  <v-col md="8">
+                  <v-col>
                     <v-card flat>
                       <v-card-title>Hashes</v-card-title>
                       <v-card-text>
@@ -193,12 +194,12 @@ import hostEditor from './hostEditor'
 import permsEditor from './jobPermissions'
 //
 import graph from '@/components/graph/fc_graph'
-import combinatorDetail from '@/components/job/attacksDetail/combinator'
-import hybridDetail from '@/components/job/attacksDetail/hybrid'
-import maskDetail from '@/components/job/attacksDetail/mask'
-import dictionaryDetail from '@/components/job/attacksDetail/dictionary'
-import princeDetail from '@/components/job/attacksDetail/prince'
-import pcfgDetail from '@/components/job/attacksDetail/pcfg'
+import combinatorDetail from '@/components/jobDetail/attacks/combinator'
+import hybridDetail from '@/components/jobDetail/attacks/hybrid'
+import maskDetail from '@/components/jobDetail/attacks/mask'
+import dictionaryDetail from '@/components/jobDetail/attacks/dictionary'
+import princeDetail from '@/components/jobDetail/attacks/prince'
+import pcfgDetail from '@/components/jobDetail/attacks/pcfg'
 // Scripts
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 //
@@ -231,7 +232,8 @@ export default {
       //
       hostEditorOpen: false,
       permsEditorOpen: false,
-      openPanels: [0,1,2]
+      openPanels: [0,1,2],
+      purging: false
     }
   },
   computed: {
@@ -295,6 +297,17 @@ export default {
           'operation': operation
         }
       }).then(this.loadAll)
+    },
+    purgeHandler () {
+      if (!this.purging) {
+        this.purging = true
+        setTimeout(() => {
+          this.purging = false
+        }, 3000)
+      } else {
+        this.purging = false
+        this.operateJob('kill')
+      }
     }
   }
 }

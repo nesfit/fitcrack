@@ -1,6 +1,6 @@
 <!--
-   * Author : see AUTHORS
-   * Licence: MIT, see LICENSE
+  * Author : see AUTHORS
+  * Licence: MIT, see LICENSE
 -->
 
 <template>
