@@ -264,21 +264,34 @@ class FcJob(Base):
 
     @hybrid_property
     def estimated_cracking_time_str(self):
-        total_power = 0
         boinc_host_ids = [host.id for host in self.hosts if host.last_active.online]
-        hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == self.hash_type). \
-            filter(FcBenchmark.boinc_host_id.in_(boinc_host_ids)).all()
+        jobHosts = FcHost.query.filter(FcHost.job_id == self.id). \
+            filter(FcHost.boinc_host_id.in_(boinc_host_ids)).all()
 
-        for host in hosts:
-            total_power += host.power
+        hostsPower = {}
+        for host in jobHosts:
+            hostsPower[host.boinc_host_id] = host.power
+
+        hostBenchmarks = FcBenchmark.query.filter(FcBenchmark.hash_type == self.hash_type). \
+            filter(FcBenchmark.boinc_host_id.in_(boinc_host_ids)).all()
+        total_power = 0
+        for benchmark in hostBenchmarks:
+            if hostsPower.get(benchmark.boinc_host_id, 0) == 0:
+                total_power += benchmark.power
+            else:
+                total_power += hostsPower[benchmark.boinc_host_id]
 
         est_time = None
         if (total_power > 0):
             est_time = float(self.keyspace / total_power)
             try:
-                est_time = str(datetime.timedelta(seconds=math.floor(est_time)))
+                time_delta = datetime.timedelta(seconds=math.floor(est_time))
+                if time_delta.total_seconds() < 60:
+                    est_time = 'About a minute'
+                else:
+                    est_time = str(time_delta)
             except OverflowError:
-                est_time = 'really long'
+                est_time = 'Really long'
         return est_time
 
     @hybrid_property
