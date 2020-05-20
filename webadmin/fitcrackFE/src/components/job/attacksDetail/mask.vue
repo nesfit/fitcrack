@@ -18,7 +18,7 @@
           color="primary"
           :value="item.progress"
         />
-        <span class="progressPercentageMask">{{ progressToPercentage(item.progress) }}</span>
+        <span>{{ progressToPercentage(item.progress) }}</span>
       </template>
     </v-data-table>
     <v-list
@@ -68,7 +68,7 @@
             align: 'left',
             value: 'mask'
           },
-          {text: 'Mask progress', value: 'progress', align: 'right'}
+          {text: 'Progress', value: 'progress', align: 'right'}
         ],
         represenArray: {
           'l': {

@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <fc-tile title="Hybrid attack assets">
+  <fc-tile title="Hybrid attack details">
     <v-card-title>
       Mask
     </v-card-title>
@@ -13,16 +13,6 @@
       :items="data.masks"
       hide-default-footer
     >
-      <template v-slot:item.progress="{ item }">
-        <v-progress-circular
-          size="16"
-          :width="3"
-          :rotate="270"
-          color="primary"
-          :value="item.progress"
-        />
-        <span class="progressPercentageMask">{{ progressToPercentage(item.progress) }}</span>
-      </template>
     </v-data-table>
 
     <v-divider />
@@ -85,8 +75,7 @@
             text: 'Mask',
             align: 'left',
             value: 'mask'
-          },
-          {text: 'Mask progress', value: 'progress', align: 'right'}
+          }
         ]
       }
     },
@@ -94,11 +83,6 @@
       dicts () { return this.data.attack_mode === '7' ? this.data.right_dictionaries : this.data.left_dictionaries },
       hasRule () { return this.data.rule_left !== '' || this.data.rule_right !== '' },
       rule () { return this.data.attack_mode === '7' ? this.data.rule_right : this.data.rule_left }
-    },
-    methods: {
-      progressToPercentage (progress) {
-        return progress.toFixed() + '%'
-      }
     }
   }
 </script>
