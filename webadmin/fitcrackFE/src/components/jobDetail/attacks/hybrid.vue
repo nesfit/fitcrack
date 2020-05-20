@@ -12,8 +12,7 @@
       :headers="maskHeaders"
       :items="data.masks"
       hide-default-footer
-    >
-    </v-data-table>
+    />
 
     <v-divider />
     <v-card-title>
@@ -34,6 +33,16 @@
             mdi-open-in-new
           </v-icon>
         </router-link>
+      </template>
+      <template v-slot:item.progress="{ item: { current_index, dictionary: { keyspace } } }">
+        <v-progress-circular
+          size="16"
+          :width="3"
+          :rotate="270"
+          color="primary"
+          :value="(100 / keyspace) * current_index"
+        />
+        <span>{{ ((100 / keyspace) * current_index).toFixed() }} %</span>
       </template>
     </v-data-table>
     <template v-if="hasRule">
@@ -62,14 +71,6 @@
     props: ['data'],
     data() {
       return {
-        headers: [
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'dictionary.name'
-          },
-          {text: 'Keyspace', value: 'dictionary.keyspace', align: 'right'}
-        ],
         maskHeaders: [
           {
             text: 'Mask',
@@ -82,7 +83,21 @@
     computed: {
       dicts () { return this.data.attack_mode === '7' ? this.data.right_dictionaries : this.data.left_dictionaries },
       hasRule () { return this.data.rule_left !== '' || this.data.rule_right !== '' },
-      rule () { return this.data.attack_mode === '7' ? this.data.rule_right : this.data.rule_left }
+      rule () { return this.data.attack_mode === '7' ? this.data.rule_right : this.data.rule_left },
+      headers () {
+        const base = [
+          {
+            text: 'Name',
+            align: 'left',
+            value: 'dictionary.name'
+          },
+          {text: 'Keyspace', value: 'dictionary.keyspace', align: 'right'}
+        ]
+        return this.data.attack_mode === '6' ? base : [
+          ...base,
+          {text: 'Progress', value: 'progress', align: 'right'}
+        ]
+      }
     }
   }
 </script>

@@ -1,6 +1,6 @@
 <!--
-  * Author : see AUTHORS
-  * Licence: MIT, see LICENSE
+   * Author : see AUTHORS
+   * Licence: MIT, see LICENSE
 -->
 
 <template>
@@ -21,8 +21,15 @@
           </v-icon>
         </router-link>
       </template>
-      <template v-slot:item.dictionary.time="{ item: { dictionary } }">
-        {{ $moment(dictionary.time).format('DD.MM.YYYY HH:mm') }}
+      <template v-slot:item.progress="{ item: { current_index, dictionary: { keyspace } } }">
+        <v-progress-circular
+          size="16"
+          :width="3"
+          :rotate="270"
+          color="primary"
+          :value="(100 / keyspace) * current_index"
+        />
+        <span>{{ ((100 / keyspace) * current_index).toFixed() }} %</span>
       </template>
     </v-data-table>
     <template v-if="data.rulesFile.id !== null">
@@ -68,7 +75,7 @@
             value: 'dictionary.name'
           },
           {text: 'Keyspace', value: 'dictionary.keyspace', align: 'end'},
-          {text: 'Time', value: 'dictionary.time', align: 'end'}
+          {text: 'Progress', value: 'progress', align: 'end'}
         ]
       }
     },

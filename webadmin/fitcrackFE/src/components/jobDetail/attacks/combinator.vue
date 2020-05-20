@@ -1,6 +1,6 @@
 <!--
-  * Author : see AUTHORS
-  * Licence: MIT, see LICENSE
+   * Author : see AUTHORS
+   * Licence: MIT, see LICENSE
 -->
 
 <template>
@@ -43,7 +43,7 @@
       Right
     </v-card-title>
     <v-data-table
-      :headers="headers"
+      :headers="rightHeaders"
       :items="data.right_dictionaries"
       hide-default-footer
     >
@@ -57,6 +57,16 @@
             mdi-open-in-new
           </v-icon>
         </router-link>
+      </template>
+      <template v-slot:item.progress="{ item: { current_index, dictionary: { keyspace } } }">
+        <v-progress-circular
+          size="16"
+          :width="3"
+          :rotate="270"
+          color="primary"
+          :value="(100 / keyspace) * current_index"
+        />
+        <span>{{ ((100 / keyspace) * current_index).toFixed() }} %</span>
       </template>
     </v-data-table>
     <template v-if="data.rule_right !== ''">
@@ -91,11 +101,18 @@
             align: 'left',
             value: 'dictionary.name'
           },
-          {text: 'Keyspace', value: 'dictionary.keyspace', align: 'right'},
-          /*{text: 'Time', value: 'dictionary.time', align: 'right'}*/
+          {text: 'Keyspace', value: 'dictionary.keyspace', align: 'right'}
         ]
       }
     },
+    computed: {
+      rightHeaders () {
+        return [
+          ...this.headers,
+          {text: 'Progress', value: 'progress', align: 'right'}
+        ]
+      }
+    }
   }
 </script>
 
