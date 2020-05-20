@@ -293,7 +293,11 @@ def computeCrackingTime(data):
     if (total_power > 0):
         display_time = float(keyspace / total_power)
         try:
-            display_time = str(datetime.timedelta(seconds=math.floor(display_time)))
+            time_delta = datetime.timedelta(seconds=math.floor(display_time))
+            if time_delta.total_seconds() < 60:
+                display_time = 'About a minute'
+            else:
+                display_time = str(time_delta)
         except OverflowError:
             display_time = 'really long'
 
