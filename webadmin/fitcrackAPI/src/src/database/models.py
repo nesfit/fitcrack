@@ -245,7 +245,7 @@ class FcJob(Base):
     def efficiency(self):
         wu_active_hosts = [wu.boinc_host_id for wu in self.workunits]
         job_active_hosts_count = len(set(wu_active_hosts))
-        if self.total_time == 0.0:
+        if job_active_hosts_count == 0 or self.total_time == 0.0:
             return 0
         job_eff = float(self.workunit_sum_time) / (job_active_hosts_count * self.total_time)
         return int(job_eff * 100)
