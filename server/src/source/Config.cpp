@@ -30,7 +30,7 @@ namespace Config {
     std::string tableNameMask =         "fc_mask";
     std::string tableNameSettings =     "fc_settings";
     std::string tableNameDictionary =   "fc_dictionary";
-    std::string tableNamePckgDictionary = "fc_job_dictionary";
+    std::string tableNameJobDictionary = "fc_job_dictionary";
     std::string tableNameHash =         "fc_hash";
     std::string tableNamePcfgGrammar =  "fc_pcfg_grammar";
 

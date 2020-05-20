@@ -257,10 +257,10 @@ std::vector<Config::Ptr<CMask>> CSqlLoader::loadJobMasksWithNormalKeyspace(uint6
 
 std::vector<Config::Ptr<CDictionary>> CSqlLoader::loadJobDictionaries(uint64_t jobId) {
     return customLoad<CDictionary>(formatQuery("SELECT `%s`.*, `%s`.`path`, `%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = `%s`.`id` WHERE `job_id` = %" PRIu64 " AND `current_index` < `keyspace` ORDER BY `%s`.`id` ASC ;",
-                                               Config::tableNamePckgDictionary.c_str(), Config::tableNameDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), jobId, Config::tableNamePckgDictionary.c_str()));
+                                               Config::tableNameJobDictionary.c_str(), Config::tableNameDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), jobId, Config::tableNameJobDictionary.c_str()));
 }
 
 
@@ -308,10 +308,10 @@ Config::Ptr<CMask> CSqlLoader::loadMask(uint64_t maskId)
 Config::Ptr<CDictionary> CSqlLoader::loadDictionary(uint64_t dictId)
 {
     return customLoad<CDictionary>(formatQuery("SELECT `%s`.*, `%s`.`path`, `%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = `%s`.`id` WHERE `%s`.`id` = %" PRIu64 " LIMIT 1 ;",
-                                               Config::tableNamePckgDictionary.c_str(), Config::tableNameDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
+                                               Config::tableNameJobDictionary.c_str(), Config::tableNameDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
                                                dictId)).front();
 }
 
