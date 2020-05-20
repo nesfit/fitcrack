@@ -487,6 +487,18 @@
         </v-row>
 
         <v-row
+          v-if="timeForJob < 180"
+          justify="center"
+        >
+          <v-alert
+            outlined
+            type="warning"
+          >
+            Setting extremely low time per workunit leads to high overhead. The cracking may take much longer than estimated. Consider choosing a higher value.
+          </v-alert>
+        </v-row>
+
+        <v-row
           justify="center"
           class="mb-5"
         >
