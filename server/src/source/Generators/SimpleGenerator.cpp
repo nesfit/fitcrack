@@ -78,6 +78,10 @@ void CSimpleGenerator::run()
             std::vector<PtrHost> activeHosts = m_sqlLoader->loadActiveHosts(jobId);
             for (PtrHost & host : activeHosts)
             {
+                if(host->getSecondsSinceLastSeen() > 60)
+                {
+                    continue;
+                }
                 uint32_t hostStatus = host->getStatus();
 
                 if (hostStatus == Config::HostState::HostBench)

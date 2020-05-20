@@ -63,6 +63,7 @@ class CHost {
         uint64_t m_power;
         uint64_t m_jobId;
         uint32_t m_status;
+        uint64_t m_secondsSinceLastSeen;
 
     public:
 
@@ -75,6 +76,8 @@ class CHost {
         uint64_t getPower() const;
         uint64_t getJobId() const;
         uint32_t getStatus() const;
+        ///Get the seconds since the host was seen last
+        uint64_t getSecondsSinceLastSeen() const;
 };
 
 #endif //WORKGENERATOR_HOST_H

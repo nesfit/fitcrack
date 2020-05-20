@@ -42,8 +42,18 @@ std::vector<PtrHost> CSqlLoader::loadActiveHosts(uint64_t jobId)
     addNewHosts(jobId);
 
     /** Return all active hosts for jobId */
-    return load<CHost>(formatQuery("WHERE (status = %d OR status = %d) AND `job_id` = %" PRIu64 "",
-                                   Config::HostState::HostBench, Config::HostState::HostNormal, jobId));
+    return customLoad<CHost>(formatQuery(
+        R"';..;'(
+            SELECT host_table.*, TIMESTAMPDIFF(SECOND, last_seen, UTC_TIMESTAMP()) as seconds_since_last_seen
+                FROM `%s` host_table INNER JOIN `%s_status` status_table ON host_table.`boinc_host_id` = status_table.`boinc_host_id`
+                WHERE (status = %d OR status = %d) AND `job_id` = %)';..;'" PRIu64 ";"
+        ,
+        CHost::getTableName().c_str(),
+        CHost::getTableName().c_str(),
+        Config::HostState::HostBench,
+        Config::HostState::HostNormal,
+        jobId
+    ));
 }
 
 
