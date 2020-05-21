@@ -145,7 +145,7 @@
               outlined
               type="number"
               label="T_pmin"
-              min="20"
+              min="10"
               max="3600"
               hint="Absolute minimum seconds per workunit (including the start of hashcat, etc.). Prevents creation of extremely small workunits."
               persistent-hint

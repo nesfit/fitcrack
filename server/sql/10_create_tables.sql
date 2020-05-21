@@ -436,8 +436,6 @@ CREATE TABLE `fc_pcfg_grammar` (
 CREATE TABLE IF NOT EXISTS `fc_settings` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `default_seconds_per_workunit` int(10) unsigned NOT NULL DEFAULT '3600',
-  `default_verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `default_check_hashcache` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `default_workunit_timeout_factor` int(10) unsigned NOT NULL DEFAULT '6',
   `default_hwmon_temp_abort` int(10) unsigned NOT NULL DEFAULT '90',
   `default_bench_all` tinyint(1) unsigned NOT NULL DEFAULT '1',
