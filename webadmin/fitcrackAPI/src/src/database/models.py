@@ -417,16 +417,16 @@ class FcSetting(Base):
     default_workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
     default_hwmon_temp_abort = Column(Integer, nullable=False, server_default=text("'90'"))
     default_bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
-    default_distribution_coefficient_alpha = Column(Numeric(4, 2), nullable=False, server_default=text("'0.1'"))
+    default_distribution_coefficient_alpha = Column(Numeric(5, 2), nullable=False, server_default=text("'0.1'"))
     default_tp_min = Column(Integer, nullable=False, server_default=text("'3600'"))
     default_ramp_up_workunits = Column(Integer, nullable=False, server_default=text("'1'"))
-    default_ramp_down_coefficient = Column(Numeric(4, 2), nullable=False, server_default=text("'0.25'"))
+    default_ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
 
     id = Column(BigInteger, primary_key=True)
-    progress = Column(Numeric(4, 2), nullable=False)
+    progress = Column(Numeric(5, 2), nullable=False)
     job_id = Column(ForeignKey('fc_job.id'), nullable=False, index=True)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
