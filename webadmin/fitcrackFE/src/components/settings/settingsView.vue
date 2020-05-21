@@ -123,9 +123,55 @@
             <v-switch
               v-model="settings.default_bench_all"
               :loading="loading"
+              outlined
               label="Run full benchmark on join"
               hint="When enabled, new hosts connected to the system will run a complete first-time benchmark."
               persistent-hint
+              class="mb-4"
+            />
+            <v-text-field
+              v-model="settings.default_distribution_coefficient_alpha"
+              :loading="loading"
+              outlined
+              type="number"
+              label="Distribution coefficient α"
+              hint="Maximum percentage of the remaining keyspace that can be assigned with a single workunit unless it would be below the minimum."
+              persistent-hint
+              class="mb-4"
+            />
+            <v-text-field
+              v-model="settings.default_tp_min"
+              :loading="loading"
+              outlined
+              type="number"
+              label="T_pmin"
+              min="20"
+              max="3600"
+              hint="Absolute minimum seconds per workunit (including the start of hashcat, etc.). Prevents creation of extremely small workunits."
+              persistent-hint
+              suffix="seconds"
+              class="mb-4"
+            />
+            <v-switch
+              v-model="settings.default_ramp_up_workunits"
+              :loading="loading"
+              outlined
+              label="Ramp-up workunits"
+              hint="If enabled, Fitcrack creates smaller workunits at start. The size increases until the solving time hits the “Time per workunit” value."
+              persistent-hint
+              class="mb-4"
+            />
+            <v-text-field
+              v-model="settings.default_ramp_down_coefficient"
+              :loading="loading"
+              outlined
+              type="number"
+              min="0.0"
+              max="1.0"
+              label="Ramp down coefficient"
+              hint="Minimum fraction of “Time per workunit” that can be created. Influences the size of workunits at the end of the job. The lower the value, the smaller the size workunits at the end. 1.0 means no ramp down, 0.0 ramp down is limited only by T_pmin."
+              persistent-hint
+              class="mb-4"
             />
           </v-card-text>
           <v-card-actions>
