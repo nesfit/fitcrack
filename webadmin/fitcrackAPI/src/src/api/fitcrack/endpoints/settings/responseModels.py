@@ -13,7 +13,7 @@ settings_model = api.model('Settings', {
     'default_hwmon_temp_abort': fields.Integer(),
     'default_bench_all': fields.Boolean(),
     'default_distribution_coefficient_alpha': fields.Float(),
-    'default_tp_min': fields.Integer(),
+    'default_t_pmin': fields.Integer(),
     'default_ramp_up_workunits': fields.Integer(),
     'default_ramp_down_coefficient': fields.Float()
 })

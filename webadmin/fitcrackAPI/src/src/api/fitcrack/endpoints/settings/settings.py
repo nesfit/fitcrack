@@ -42,7 +42,7 @@ class settings(Resource):
         hta = args['default_hwmon_temp_abort']
         dba = args['default_bench_all']
         dca = args['default_distribution_coefficient_alpha']
-        tpmin = args['default_tp_min']
+        tpmin = args['default_t_pmin']
         ruw = args['default_ramp_up_workunits']
         rdc = args['default_ramp_down_coefficient']
 
@@ -52,7 +52,7 @@ class settings(Resource):
         if (hta is not None): settings.default_hwmon_temp_abort = hta
         if (dba is not None): settings.default_bench_all = dba
         if (dca is not None): settings.default_distribution_coefficient_alpha = dca
-        if (tpmin is not None): settings.default_tp_min = tpmin
+        if (tpmin is not None): settings.default_t_pmin = tpmin
         if (ruw is not None): settings.default_ramp_up_workunits = ruw
         if (rdc is not None): settings.default_ramp_down_coefficient = rdc
         db.session.commit()

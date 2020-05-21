@@ -442,7 +442,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `default_hwmon_temp_abort` int(10) unsigned NOT NULL DEFAULT '90',
   `default_bench_all` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `default_distribution_coefficient_alpha` decimal(5,2) NOT NULL DEFAULT '0.1',
-  `default_tp_min` int(10) unsigned NOT NULL DEFAULT '20',
+  `default_t_pmin` int(10) unsigned NOT NULL DEFAULT '20',
   `default_ramp_up_workunits` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `default_ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
   PRIMARY KEY (`id`)

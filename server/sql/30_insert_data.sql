@@ -2,7 +2,7 @@
 -- Insert default settings row
 --
 
-INSERT INTO `fc_settings` (`default_seconds_per_workunit`, `default_verify_hash_format`, `default_check_hashcache`, `default_workunit_timeout_factor`, `default_hwmon_temp_abort`, `default_bench_all`, `default_distribution_coefficient_alpha`, `default_tp_min`, `default_ramp_up_workunits`, `default_ramp_down_coefficient`) VALUES
+INSERT INTO `fc_settings` (`default_seconds_per_workunit`, `default_verify_hash_format`, `default_check_hashcache`, `default_workunit_timeout_factor`, `default_hwmon_temp_abort`, `default_bench_all`, `default_distribution_coefficient_alpha`, `default_t_pmin`, `default_ramp_up_workunits`, `default_ramp_down_coefficient`) VALUES
 (3600, 1, 1, 48, 90, 0, 0.1, 20, 1, 0.25);
 
 

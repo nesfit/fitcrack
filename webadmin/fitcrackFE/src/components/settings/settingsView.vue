@@ -140,7 +140,7 @@
               class="mb-4"
             />
             <v-text-field
-              v-model="settings.default_tp_min"
+              v-model="settings.default_t_pmin"
               :loading="loading"
               outlined
               type="number"
