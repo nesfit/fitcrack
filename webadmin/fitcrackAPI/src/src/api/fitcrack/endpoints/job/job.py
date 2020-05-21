@@ -343,7 +343,6 @@ class OperationWithJob(Resource):
                 workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
                 for item in workunits:
                     db.session.delete(item)
-                print("done")
             else:
                 job.kill = True
 

@@ -11,7 +11,7 @@
       hide-default-footer
     >
       <template v-slot:item.dictionary.name="{ item: { dictionary } }">
-        <router-link :to="{name: 'princeDetail', params: { id: dictionary.id}}" target='_blank'>
+        <router-link :to="{name: 'dictionaryDetail', params: { id: dictionary.id}}" target='_blank'>
           {{ dictionary.name }}
           <v-icon 
             small
