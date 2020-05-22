@@ -107,7 +107,7 @@
               class="mb-4"
             />
             <v-text-field
-              v-model="settings.default_workunit_timeout_factor"
+              v-model="settings.workunit_timeout_factor"
               :loading="loading"
               outlined
               type="number"
@@ -118,7 +118,7 @@
               class="mb-4"
             />
             <v-text-field
-              v-model="settings.default_hwmon_temp_abort"
+              v-model="settings.hwmon_temp_abort"
               :loading="loading"
               outlined
               type="number"
@@ -129,7 +129,7 @@
               class="mb-4"
             />
             <v-switch
-              v-model="settings.default_bench_all"
+              v-model="settings.bench_all"
               :loading="loading"
               outlined
               label="Run full benchmark on join"
@@ -138,7 +138,7 @@
               class="mb-4"
             />
             <v-text-field
-              v-model="settings.default_distribution_coefficient_alpha"
+              v-model="settings.distribution_coefficient_alpha"
               :loading="loading"
               outlined
               type="number"
@@ -148,7 +148,7 @@
               class="mb-4"
             />
             <v-text-field
-              v-model="settings.default_t_pmin"
+              v-model="settings.t_pmin"
               :loading="loading"
               outlined
               type="number"
@@ -161,7 +161,7 @@
               class="mb-4"
             />
             <v-switch
-              v-model="settings.default_ramp_up_workunits"
+              v-model="settings.ramp_up_workunits"
               :loading="loading"
               outlined
               label="Ramp-up workunits"
@@ -170,7 +170,7 @@
               class="mb-4"
             />
             <v-text-field
-              v-model="settings.default_ramp_down_coefficient"
+              v-model="settings.ramp_down_coefficient"
               :loading="loading"
               outlined
               type="number"

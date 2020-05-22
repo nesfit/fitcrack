@@ -414,13 +414,13 @@ class FcSetting(Base):
 
     id = Column(Integer, primary_key=True)
     default_seconds_per_workunit = Column(Integer, nullable=False, server_default=text("'3600'"))
-    default_workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
-    default_hwmon_temp_abort = Column(Integer, nullable=False, server_default=text("'90'"))
-    default_bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
-    default_distribution_coefficient_alpha = Column(Numeric(5, 2), nullable=False, server_default=text("'0.1'"))
-    default_t_pmin = Column(Integer, nullable=False, server_default=text("'20'"))
-    default_ramp_up_workunits = Column(Integer, nullable=False, server_default=text("'1'"))
-    default_ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
+    workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
+    hwmon_temp_abort = Column(Integer, nullable=False, server_default=text("'90'"))
+    bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
+    distribution_coefficient_alpha = Column(Numeric(5, 2), nullable=False, server_default=text("'0.1'"))
+    t_pmin = Column(Integer, nullable=False, server_default=text("'20'"))
+    ramp_up_workunits = Column(Integer, nullable=False, server_default=text("'1'"))
+    ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'

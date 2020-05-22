@@ -436,13 +436,13 @@ CREATE TABLE `fc_pcfg_grammar` (
 CREATE TABLE IF NOT EXISTS `fc_settings` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `default_seconds_per_workunit` int(10) unsigned NOT NULL DEFAULT '3600',
-  `default_workunit_timeout_factor` int(10) unsigned NOT NULL DEFAULT '6',
-  `default_hwmon_temp_abort` int(10) unsigned NOT NULL DEFAULT '90',
-  `default_bench_all` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `default_distribution_coefficient_alpha` decimal(5,2) NOT NULL DEFAULT '0.1',
-  `default_t_pmin` int(10) unsigned NOT NULL DEFAULT '20',
-  `default_ramp_up_workunits` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `default_ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
+  `workunit_timeout_factor` int(10) unsigned NOT NULL DEFAULT '6',
+  `hwmon_temp_abort` int(10) unsigned NOT NULL DEFAULT '90',
+  `bench_all` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `distribution_coefficient_alpha` decimal(5,2) NOT NULL DEFAULT '0.1',
+  `t_pmin` int(10) unsigned NOT NULL DEFAULT '20',
+  `ramp_up_workunits` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
