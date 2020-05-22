@@ -252,6 +252,9 @@ export default {
         default:
           return 'hybridDetail'
       }
+    },
+    shouldConfirmPurge () {
+        return localStorage.getItem('confirmpurge') == 'true'
     }
   },
   mounted () {
@@ -299,7 +302,8 @@ export default {
       }).then(this.loadAll)
     },
     purgeHandler () {
-      if (!this.purging) {
+      console.log(this.shouldConfirmPurge)
+      if (this.shouldConfirmPurge && !this.purging) {
         this.purging = true
         setTimeout(() => {
           this.purging = false

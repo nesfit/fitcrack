@@ -229,7 +229,7 @@ export default {
         {title: 'Start', icon: 'mdi-ray-start', value: this.startTime},
         {title: 'End', icon: 'mdi-ray-end', value: this.endTime},
         {title: 'Efficiency', icon: 'mdi-chart-timeline-variant', value: d.efficiency, format: v => `${v} %`},
-        {title: 'Time per WU', icon: 'mdi-timeline-clock', value: d.seconds_per_job, format: v => `${v} seconds`},
+        {title: 'Time per workunit', icon: 'mdi-timeline-clock', value: d.seconds_per_job, format: v => `${v} seconds`},
       ]
       // Leave out missing stuff and format fields
       return items

@@ -54,7 +54,15 @@
             <div class="mt-2 ml-1">
               {{ appearanceHint }}<span v-show="testmode">. Temporarily toggle with CTRL+SHIFT+L anywhere.</span>
             </div>
-          </v-card-text>
+            <v-switch
+                v-model="confirmpurge"
+                mandatory
+                label="Ask to confirm job purge"
+                hint="If enabled, Fitcrack asks for confirmation after clicking on Purge button."
+                persistent-hint
+                class="mb-4"
+            />
+           </v-card-text>
         </v-card>
         <v-card flat class="mt-6">
           <v-card-title>
@@ -69,6 +77,7 @@
               label="Developer mode"
               hint="Enables useful utilities throughout the app when developing Fitcrack."
               persistent-hint
+              class="mb-4"
             />
           </v-card-text>
         </v-card>
@@ -203,7 +212,8 @@
           settings: {},
           loading: true,
           saving: false,
-          wutthresh: 180 // minimum reccomended seconds per WU
+          wutthresh: 180, // minimum reccomended seconds per WU
+          confirmpurge: localStorage.getItem('confirmpurge') == 'true' || false
         }
       },
       computed: {
@@ -236,6 +246,9 @@
         },
         testmode (value) {
           localStorage.setItem('testmode', value)
+        },
+        confirmpurge (value) {
+          localStorage.setItem('confirmpurge', value)
         }
       },
       mounted () {
