@@ -103,7 +103,7 @@ FOR EACH ROW BEGIN
 	INSERT INTO fc_host_status (`id`, `boinc_host_id`, `last_seen`) VALUES (DEFAULT, NEW.id, DEFAULT);
 
 	-- Run bench_all
-	SET benchAll = (SELECT `default_bench_all` FROM `fc_settings` LIMIT 1);
+	SET benchAll = (SELECT `bench_all` FROM `fc_settings` LIMIT 1);
 
 	IF (benchAll)
 	THEN		

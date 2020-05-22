@@ -210,13 +210,13 @@ void CSqlLoader::addNewWorkunit(PtrWorkunit workunit)
 
 unsigned int CSqlLoader::getTimeoutFactor()
 {
-    return (unsigned int)(getSqlNumber(formatQuery("SELECT `default_workunit_timeout_factor` FROM `%s` LIMIT 1",
+    return (unsigned int)(getSqlNumber(formatQuery("SELECT `workunit_timeout_factor` FROM `%s` LIMIT 1",
                                                   Config::tableNameSettings.c_str())));
 }
 
 unsigned int CSqlLoader::getHWTempAbort()
 {
-    return (unsigned int)(getSqlNumber(formatQuery("SELECT `default_hwmon_temp_abort` FROM `%s` LIMIT 1",
+    return (unsigned int)(getSqlNumber(formatQuery("SELECT `hwmon_temp_abort` FROM `%s` LIMIT 1",
                                                   Config::tableNameSettings.c_str())));
 }
 
