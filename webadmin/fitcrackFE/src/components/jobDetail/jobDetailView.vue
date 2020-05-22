@@ -254,6 +254,8 @@ export default {
       }
     },
     shouldConfirmPurge () {
+        if (!localStorage.hasOwnProperty('confirmpurge'))
+          return true
         return localStorage.getItem('confirmpurge') == 'true'
     }
   },

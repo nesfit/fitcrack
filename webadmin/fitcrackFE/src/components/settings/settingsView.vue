@@ -56,7 +56,6 @@
             </div>
             <v-switch
                 v-model="confirmpurge"
-                mandatory
                 label="Ask to confirm job purge"
                 hint="If enabled, Fitcrack asks for confirmation after clicking on Purge button."
                 persistent-hint
@@ -213,7 +212,7 @@
           loading: true,
           saving: false,
           wutthresh: 180, // minimum reccomended seconds per WU
-          confirmpurge: localStorage.getItem('confirmpurge') == 'true' || false
+          confirmpurge: !localStorage.hasOwnProperty('confirmpurge') || localStorage.getItem('confirmpurge') == 'true'
         }
       },
       computed: {
