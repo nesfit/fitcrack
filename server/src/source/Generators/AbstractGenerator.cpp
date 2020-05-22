@@ -9,13 +9,15 @@
 #include <sched_util_basic.h>
 #include <sched_util.h>
 #include "AbstractGenerator.h"
+#include "SqlLoader.h"
 
+#include <cmath>
 
-uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job)
+uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job, CSqlLoader &loader)
 {
     uint64_t desiredSeconds = job->getSecondsPerWorkunit();
-    uint64_t maximum = desiredSeconds;
-    uint64_t minimum = std::max(Config::minSeconds, desiredSeconds/4);
+    uint64_t maximum = loader.getEnableRampUp() ? job->getMaxSeconds() : desiredSeconds;
+    uint64_t minimum = std::max<uint64_t>(loader.getAbsoluteMinimumWorkunitSeconds(), desiredSeconds*loader.getRampDownCoefficient());
 
     uint64_t curIndex = job->getCurrentIndex();
     uint64_t passCount = job->getKeyspace();
@@ -24,7 +26,7 @@ uint64_t CAbstractGenerator::calculateSecondsIcdf2c(PtrJob &job)
     //in most jobs it is 0, so it won't hurt. When it is not 0, it is always in passwords
     curIndex += job->getCurrentIndex2();
 
-    uint64_t seconds = ((passCount - curIndex) / (job->getTotalPower() + 1)) / 10;
+    uint64_t seconds = std::round(((passCount - curIndex) / (job->getTotalPower() + 1))*loader.getDistributionCoefficient());
 
     if (seconds < minimum)
         seconds = minimum;

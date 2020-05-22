@@ -180,6 +180,18 @@ class CSqlLoader {
          */
         unsigned int getHWTempAbort();
 
+        /// Gets the distribution coefficient from the database
+        double getDistributionCoefficient();
+
+        /// Gets the setting for the absolute minimum time a workunit should take
+        unsigned getAbsoluteMinimumWorkunitSeconds();
+
+        /// returns whether there should be a ramp up of WU time
+        bool getEnableRampUp();
+
+        /// Gets the ramp-down coefficient from the database
+        double getRampDownCoefficient();
+
         /**
          * Returns fresh host status from DB
          * @param host_id ID of the host
@@ -312,11 +324,31 @@ private:
         void addNewHosts(uint64_t jobId);
 
         /**
-         * Returns number from database select
+         * Returns a string from database select
+         * @param query [in] An SQL query to execute
+         * @return A string from select
+         */
+        std::string getSqlString(const std::string & query);
+
+        /**
+         * @brief Get a result of the given type from the database.
+         * 
+         * @tparam Res 
+         * @param query 
+         * @return Res 
+         */
+        template <typename Res>
+        Res getSqlConverted(const std::string &query, Res(*conversionFn)(const std::string&));
+
+        /**
+         * Returns a number from database select
          * @param query [in] An SQL query to execute
          * @return Number from select
          */
         uint64_t getSqlNumber(const std::string & query);
+
+        ///Returns a floating point number from a database query
+        double getSqlDouble(const std::string & query);
 
         /**
          * @brief This is template function for loading different objects from database

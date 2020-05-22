@@ -208,7 +208,7 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
         }
 
         /** Calculate workunit duration */
-        uint64_t duration = calculateSecondsIcdf2c(job);
+        uint64_t duration = calculateSecondsIcdf2c(job, *m_sqlLoader);
 
         /** Create the workunit */
         if(isBenchmark)

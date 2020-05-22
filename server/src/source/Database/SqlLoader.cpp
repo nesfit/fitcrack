@@ -216,8 +216,36 @@ unsigned int CSqlLoader::getTimeoutFactor()
 
 unsigned int CSqlLoader::getHWTempAbort()
 {
-    return (unsigned int)(getSqlNumber(formatQuery("SELECT `hwmon_temp_abort` FROM `%s` LIMIT 1",
-                                                  Config::tableNameSettings.c_str())));
+    return getSqlNumber(formatQuery("SELECT `hwmon_temp_abort` FROM `%s` LIMIT 1",
+                                                  Config::tableNameSettings.c_str()));
+}
+
+/// Gets the distribution coefficient from the database
+double CSqlLoader::getDistributionCoefficient()
+{
+    return getSqlDouble(formatQuery("SELECT `distribution_coefficient_alpha` FROM `%s` LIMIT 1",
+                                                Config::tableNameSettings.c_str()));
+}
+
+/// Gets the setting for the absolute minimum time a workunit should take
+unsigned CSqlLoader::getAbsoluteMinimumWorkunitSeconds()
+{
+    return getSqlNumber(formatQuery("SELECT `t_pmin` FROM `%s` LIMIT 1",
+                                                  Config::tableNameSettings.c_str()));
+}
+
+/// returns whether there should be a ramp up of WU time
+bool CSqlLoader::getEnableRampUp()
+{
+    return getSqlNumber(formatQuery("SELECT `ramp_up_workunits` FROM `%s` LIMIT 1",
+                                                  Config::tableNameSettings.c_str()));
+}
+
+/// Gets the ramp-down coefficient from the database
+double CSqlLoader::getRampDownCoefficient()
+{
+    return getSqlDouble(formatQuery("SELECT `ramp_down_coefficient` FROM `%s` LIMIT 1",
+                                                Config::tableNameSettings.c_str()));
 }
 
 
@@ -499,13 +527,12 @@ void CSqlLoader::addNewHosts(uint64_t jobId)
 }
 
 
-uint64_t CSqlLoader::getSqlNumber(const std::string & query)
+std::string CSqlLoader::getSqlString(const std::string & query)
 {
-    uint64_t result = 0;
     updateSql(query.c_str());
 
-    MYSQL_RES* sqlResult;
-    sqlResult = mysql_store_result(boinc_db.mysql);
+    std::unique_ptr<MYSQL_RES, decltype(&mysql_free_result)> sqlResult(nullptr, &mysql_free_result);
+    sqlResult.reset(mysql_store_result(boinc_db.mysql));
     if (!sqlResult)
     {
         Tools::printDebugTimestamp("Problem with DB query.\nShutting down now.");
@@ -514,22 +541,55 @@ uint64_t CSqlLoader::getSqlNumber(const std::string & query)
     }
 
     MYSQL_ROW row;
-    while ((row = mysql_fetch_row(sqlResult)))
+    while ((row = mysql_fetch_row(sqlResult.get())))
     {
         if (row[0] == nullptr)
             continue;
 
-        try
-        {
-            result = std::stoull(row[0]);
-        }
-        catch (std::logic_error & error)
-        {
-            Tools::printDebugTimestamp("Error converting row count to uint64_t: %s\n", error.what());
-            continue;
-        }
+        return row[0];
     }
 
-    mysql_free_result(sqlResult);
-    return result;
+    return "";
+}
+
+template <typename Res>
+Res CSqlLoader::getSqlConverted(const std::string &query, Res(*conversionFn)(const std::string&))
+{
+    try
+    {
+        return conversionFn(getSqlString(query));
+    }
+    catch(const std::exception &e)
+    {
+        Tools::printDebugTimestamp("Error converting db result to target type: %s\n", e.what());
+    }
+    catch(...)
+    {
+        Tools::printDebugTimestamp("Unknown error converting db result to target type\n");
+    }
+    return {};
+}
+
+uint64_t CSqlLoader::getSqlNumber(const std::string & query)
+{
+    return getSqlConverted(
+        query,
+        static_cast<
+            unsigned long long(*)(const std::string &)
+        >(
+            [](const std::string &res){return std::stoull(res);}
+        )
+    );
+}
+
+double CSqlLoader::getSqlDouble(const std::string & query)
+{
+    return getSqlConverted(
+        query,
+        static_cast<
+            double(*)(const std::string &)
+        >(
+            [](const std::string &res){return std::stod(res);}
+        )
+    );
 }
