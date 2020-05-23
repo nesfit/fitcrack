@@ -39,7 +39,7 @@ void InputDict::CopyTo(const std::string &dst)
 	{
 		throw Exception("Rewinding to beginning of dictionary failed");
 	}
-	std::ofstream out(dst, std::ios::ate);
+	std::ofstream out(dst, std::ios::ate|std::ios::app);
 	if(!out)
 	{
 		throw Exception("Failed to open output file for copying dictionary");
