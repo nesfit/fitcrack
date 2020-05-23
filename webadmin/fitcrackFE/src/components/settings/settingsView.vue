@@ -111,7 +111,7 @@
               :loading="loading"
               outlined
               type="number"
-              step="0.1"
+              min="5"
               label="Workunit timeout factor"
               hint="Multiplying factor for workunit timeout — the time after which a workunit is considered failed."
               persistent-hint
@@ -267,6 +267,9 @@
           .then(() => {
             this.saving = false
             this.$store.state.jobForm.timeForJob = this.settings.default_seconds_per_workunit
+          })
+          .catch((error) => {
+            this.saving = false
           })
         }
       }

@@ -19,6 +19,9 @@ from src.database.models import FcSetting
 log = logging.getLogger(__name__)
 ns = api.namespace('settings', description='Endpoints for manipulating system settings.')
 
+# Matches minTimeoutFactor in generator's Config.h
+MIN_TIMEOUT_FACTOR = 5
+
 @ns.route('')
 class settings(Resource):
 
@@ -48,7 +51,10 @@ class settings(Resource):
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
-        if (wtf is not None): settings.workunit_timeout_factor = wtf
+        if (wtf is not None):
+            if wtf < MIN_TIMEOUT_FACTOR:
+                abort(400, 'Workunit timeout factor cannot be smaller than {}.'.format(MIN_TIMEOUT_FACTOR))
+            settings.workunit_timeout_factor = wtf
         if (hta is not None): settings.hwmon_temp_abort = hta
         if (dba is not None): settings.bench_all = dba
         if (dca is not None): settings.distribution_coefficient_alpha = dca
