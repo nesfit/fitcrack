@@ -843,8 +843,11 @@
           return
         }
 
+        // Check if all job settings are valid
         if (!this.valid) {
-          this.$error('Error in job settings.')
+          // If all checks above passed and this one did not, it means that attack specific settings are incorrect.
+          this.$error('Error in attack settings.')
+          this.step = 2
           return
         }
 
