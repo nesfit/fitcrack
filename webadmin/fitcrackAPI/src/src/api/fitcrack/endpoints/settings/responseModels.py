@@ -14,6 +14,7 @@ settings_model = api.model('Settings', {
     'bench_all': fields.Boolean(),
     'distribution_coefficient_alpha': fields.Float(),
     't_pmin': fields.Integer(),
-    'ramp_up_workunits': fields.Integer(),
-    'ramp_down_coefficient': fields.Float()
+    'ramp_up_workunits': fields.Boolean(),
+    'ramp_down_coefficient': fields.Float(),
+    'verify_hash_format': fields.Boolean(),
 })

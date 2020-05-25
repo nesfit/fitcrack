@@ -134,6 +134,7 @@ job_big_model = api.model('Job', {
     'status_type': fields.String(),
     'progress': fields.Float(required=False),
     'time': fields.DateTime(required=False),
+    'cracked_hashes_str': fields.String(),
     'total_time': fields.Float(),
     'workunit_sum_time': fields.Float(),
     'workunit_sum_time_str': fields.String(),

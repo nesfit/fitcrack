@@ -45,6 +45,7 @@ class settings(Resource):
         tpmin = args['t_pmin']
         ruw = args['ramp_up_workunits']
         rdc = args['ramp_down_coefficient']
+        vhf = args['verify_hash_format']
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
@@ -55,6 +56,7 @@ class settings(Resource):
         if (tpmin is not None): settings.t_pmin = tpmin
         if (ruw is not None): settings.ramp_up_workunits = ruw
         if (rdc is not None): settings.ramp_down_coefficient = rdc
+        if (vhf is not None): settings.verify_hash_format = vhf
         db.session.commit()
 
         return {

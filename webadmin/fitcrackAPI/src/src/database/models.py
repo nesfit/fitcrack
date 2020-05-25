@@ -229,6 +229,12 @@ class FcJob(Base):
     right_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == False))
 
     @hybrid_property
+    def cracked_hashes_str(self):
+        cracked = len([hash.result for hash in self.hashes if hash.result != None])
+        total = len(self.hashes)
+        return "{} % ({}/{})".format(int((cracked * 100)/total), cracked, total)
+
+    @hybrid_property
     def host_count(self):
         return len(self.hosts)
 
@@ -421,6 +427,7 @@ class FcSetting(Base):
     t_pmin = Column(Integer, nullable=False, server_default=text("'20'"))
     ramp_up_workunits = Column(Integer, nullable=False, server_default=text("'1'"))
     ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
+    verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'

@@ -24,7 +24,7 @@ from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
-from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash, FcUserPermission
+from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash, FcUserPermission, FcSetting
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
@@ -34,6 +34,7 @@ def create_job(data):
     if len(data['hash_settings']['hash_list']) == 0:
         abort(500, 'Hash list can not be empty.')
 
+    settings = FcSetting.query.first()
     for idx, hashObj in enumerate(data['hash_settings']['hash_list']):
 
         if hashObj['hash'].startswith('BASE64:'):
@@ -41,11 +42,13 @@ def create_job(data):
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(decoded)
                 fp.seek(0)
-                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+                if settings.verify_hash_format:
+                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= decoded
 
         else:
-            verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+            if settings.verify_hash_format:
+                verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= hashObj['hash'].encode()
 
     hybrid_mask_dict = False
@@ -142,14 +145,21 @@ def create_job(data):
 
 
 def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
-    result = shellExec(
-        HASHVALIDATOR_PATH + ' -m ' + hash_type + ' ' + "'" + hash + "'", getReturnCode=True
-    )
+    hashes = []
+    settings = FcSetting.query.first()
+    if not settings.verify_hash_format:
+        with open(hash, "r") as hashFile:
+            hashes = [(hash.strip() + " OK") for hash in hashFile.readlines()]
+    else:
+        result = shellExec(
+            HASHVALIDATOR_PATH + ' -m ' + hash_type + ' ' + "'" + hash + "'", getReturnCode=True
+        )
 
-    if result['returnCode'] != 0:
-        abort(500, 'Error in hashValidator.')
+        if result['returnCode'] != 0:
+            abort(500, 'Error in hashValidator.')
 
-    hashes = result['msg'].rstrip().split('\n')
+        hashes = result['msg'].rstrip().split('\n')
+
     hashesArr = []
     hasError = False
     for hash in hashes:

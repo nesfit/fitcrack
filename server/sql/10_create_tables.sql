@@ -443,6 +443,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `t_pmin` int(10) unsigned NOT NULL DEFAULT '20',
   `ramp_up_workunits` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
+  `verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

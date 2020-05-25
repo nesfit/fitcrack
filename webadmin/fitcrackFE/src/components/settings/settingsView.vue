@@ -133,7 +133,16 @@
               :loading="loading"
               outlined
               label="Run full benchmark on join"
-              hint="When enabled, new hosts connected to the system will run a complete first-time benchmark."
+              hint="If enabled, new hosts connected to the system will run a complete first-time benchmark."
+              persistent-hint
+              class="mb-4"
+            />
+            <v-switch
+              v-model="settings.verify_hash_format"
+              :loading="loading"
+              outlined
+              label="Verify hash format"
+              hint="If enabled, Fitcrack checks if the format of every user-entered hash is valid."
               persistent-hint
               class="mb-4"
             />
