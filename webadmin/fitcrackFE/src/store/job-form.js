@@ -163,7 +163,7 @@ export default {
         !attackSettings ||
         state.hashType == null ||
         state.validatedHashes.length == 0 ||
-        state.timeForJob < 60 ||
+        state.timeForJob < 10 ||
         state.name === ''
       ) {
         return false

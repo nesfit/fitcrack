@@ -79,7 +79,7 @@
             <v-icon class="label-icon">
               mdi-timeline-clock
             </v-icon>
-            Time per Workunit
+            Time per workunit
           </template>
         </v-text-field>
       </v-list-item-content>

@@ -37,7 +37,7 @@ from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, 
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcJob, Host, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, \
-    FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser
+    FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser, FcSetting
 
 log = logging.getLogger(__name__)
 
@@ -235,6 +235,9 @@ class JobByID(Resource):
         job.name = args['name']
         job.comment = args['comment']
         job.seconds_per_workunit = args['seconds_per_job']
+        settings = FcSetting.query.first()
+        if job.seconds_per_workunit < settings.t_pmin:
+            abort(400, 'Value for \"Time for workunit\" is smaller than absolute minimum seconds per workunit ({}).'.format(settings.t_pmin))
         job.time_start = None if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%Y-%m-%dT%H:%M'),
         job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%Y-%m-%dT%H:%M')
 
@@ -256,7 +259,7 @@ class JobByID(Resource):
                 new_keyspace = new_hc_keyspace * ruleFileMultiplier
 
             if new_keyspace > (2 ** 63) - 1: # due db's bigint range
-                abort(400, 'Job keyspace is out of allowed range.')
+                abort(400, 'Job keyspace is higher than maximal allowed value 2^64.')
 
             job.hc_keyspace = new_hc_keyspace
             job.keyspace = new_keyspace

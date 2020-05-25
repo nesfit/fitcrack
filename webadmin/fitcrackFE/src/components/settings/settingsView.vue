@@ -260,6 +260,26 @@
           this.loading = false
         },
         saveSettings () {
+          if (this.settings.ramp_down_coefficient < 0.0) {
+            this.$error('Ramp down coefficient must be higher or equal to 0.0.')
+            return
+          }
+          if (this.settings.ramp_down_coefficient > 1.0) {
+            this.$error('Ramp down coefficient must be smaller or equal to 1.0.')
+            return
+          }
+          if (this.settings.t_pmin < 10) {
+            this.$error('Absolute minimum seconds per workunit must be higher or equal to 10.')
+            return
+          }
+          if (this.settings.t_pmin > 3600) {
+            this.$error('Absolute minimum seconds per workunit must be smaller or equal to 3600.')
+            return
+          }
+          if (this.settings.workunit_timeout_factor < 5) { // see minTimeoutFactor in generator's Config.h
+            this.$error('Workunit timeout factor cannot be smaller than 5.')
+            return
+          }
           this.saving = true
           this.axios.post(this.$serverAddr + '/settings', {
             ...this.settings
@@ -267,9 +287,6 @@
           .then(() => {
             this.saving = false
             this.$store.state.jobForm.timeForJob = this.settings.default_seconds_per_workunit
-          })
-          .catch((error) => {
-            this.saving = false
           })
         }
       }
