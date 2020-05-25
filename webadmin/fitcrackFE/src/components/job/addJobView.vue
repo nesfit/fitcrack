@@ -784,8 +784,31 @@
       },
       submit () {
         // TODO: maybe delete this condition
+        if (this.name === '') {
+          this.$error('Job name can not be empty.')
+          return
+        }
+
         if (this.inputMethod === 'encryptedFile' && !this.$refs.encryptedFileUploader.fileUploaded ) {
           this.$error('No file uploaded.')
+          this.step = 1
+          return
+        }
+
+        if (this.hashType === null) {
+          this.$error('No hash type selected.')
+          this.step = 1
+          return
+        }
+
+        if (this.invalidHashes.length > 0 && !this.ignoreHashes) {
+          this.$error('Some hashes are invalid.')
+          this.step = 1
+          return
+        }
+
+        if (this.validatedHashes.length == 0) {
+          this.$error('List of validated hashes is empty.')
           this.step = 1
           return
         }
@@ -802,23 +825,6 @@
           return
         }
 
-        if (this.hashType === null) {
-          this.$error('No hash type selected.')
-          this.step = 1
-          return
-        }
-
-        if (this.name === '') {
-          this.$error('Job name can not be empty.')
-          return
-        }
-
-        if (this.invalidHashes.length > 0 && !this.ignoreHashes) {
-          this.$error('Some hashes are invalid.')
-          this.step = 1
-          return
-        }
-
         if (this.keyspace > 1.8446744e+19 /* 2^64 */) {
           this.$error('Job keyspace is higher than maximal allowed value 2^64.')
           this.step = 2
@@ -831,21 +837,9 @@
           return
         }
 
-        if (this.timeForJob  > 3600) {
+        if (this.timeForJob > 3600) {
           this.$error('Time per workunit must be smaller or equal to 3600 seconds.')
           this.step = 4
-          return
-        }
-
-        if (this.validatedHashes.length == 0) {
-          this.$error('List of validated hashes is empty.')
-          this.step = 1
-          return
-        }
-
-        if (this.keyspace > 1.8446744e+19 /* 2^64 */) {
-          this.$error('Job keyspace is out of allowed range.')
-          this.step = 2
           return
         }
 
