@@ -243,10 +243,8 @@ export default {
     },
     crackingTime () {
       const d = this.data
-      if (d.time_end) {
-        return this.$moment.duration(this.$moment(d.time_end).diff(this.$moment(d.time_start))).format()
-      } else if (d.time_start) {
-        return this.$moment.duration(this.$moment().diff(this.$moment(d.time_start))).format()
+      if (d.total_time) {
+        return this.$moment.duration(d.total_time, 'seconds').format()
       } else {
         return 'Not started yet'
       }

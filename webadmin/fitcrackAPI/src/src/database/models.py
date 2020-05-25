@@ -246,7 +246,7 @@ class FcJob(Base):
         # Hosts which did more work on the job than just benchmarks
         wu_active_hosts = [wu.boinc_host_id for wu in self.workunits if wu.hc_keyspace > 0]
         job_active_hosts_count = len(set(wu_active_hosts))
-        if job_active_hosts_count == 0 or self.total_time == 0.0:
+        if job_active_hosts_count == 0 or self.workunit_sum_time == 0.0 or self.total_time == 0.0:
             return 0
         benchmarks_sum_time = sum([wu.cracking_time for wu in self.workunits if wu.hc_keyspace == 0])
         job_eff = (float(self.workunit_sum_time) - float(benchmarks_sum_time)) / (job_active_hosts_count * self.total_time)
