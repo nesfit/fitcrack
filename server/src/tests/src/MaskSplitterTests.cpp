@@ -28,11 +28,11 @@ TEST(Basic, ZeroOffsetAndKeyspace)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 0);
 	ASSERT_EQ(1, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -43,11 +43,11 @@ TEST(Basic, Offset1)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 0);
 	ASSERT_EQ(1, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -58,11 +58,11 @@ TEST(Basic, Keyspace2)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 2);
 	ASSERT_EQ(2, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -73,11 +73,11 @@ TEST(Basic, FirstCharsetTwice)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 20);
 	ASSERT_EQ(20, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -88,11 +88,11 @@ TEST(Basic, FirstTwoCharsets)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 160);
 	ASSERT_EQ(160, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -103,11 +103,11 @@ TEST(Advanced, BreakOnFirstCharset)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 160);
 	ASSERT_EQ(6, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -118,11 +118,11 @@ TEST(Advanced, WholeFirstCharset)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 9);
 	ASSERT_EQ(10, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -133,11 +133,11 @@ TEST(Advanced, BreakOnSecondCharset)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 160);
 	ASSERT_EQ(140, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -148,11 +148,11 @@ TEST(Advanced, BreakOnFirstCharsetHugeKeyspace)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 1600000);
 	ASSERT_EQ(6, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -163,11 +163,11 @@ TEST(Advanced, BreakOnSecondCharsetHugeKeyspace)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 1600000);
 	ASSERT_EQ(140, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -178,11 +178,11 @@ TEST(Advanced, BreakOnFirstCharsetSecondPartlyDone)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 1600000);
 	ASSERT_EQ(6, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -193,11 +193,11 @@ TEST(Advanced, BreakOnThirdCharset)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 9999999);
 	ASSERT_EQ(160*(16-3), result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -209,11 +209,11 @@ TEST(Advanced, NoSmallLeftovers1)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 160*thirdCharsetLeftoverKeyspace-10);
 	ASSERT_EQ(160*thirdCharsetLeftoverKeyspace, result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
@@ -225,11 +225,11 @@ TEST(Advanced, NoSmallLeftovers2)
 	auto result = splitter.GetMaskSlice(g_testMaskBasic, startingIndex, 160*thirdCharsetLeftoverKeyspace*0.6);
 	ASSERT_EQ(160*(thirdCharsetLeftoverKeyspace/2), result.keyspace);
 	MaskSplitter testSplitter(result.customCharsets);
-	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace);
+	ASSERT_EQ(result.keyspace, testSplitter.GetMaskSlice(result.mask, 0, INTMAX_MAX).keyspace)<<"Resulting mask is "<<result.mask;
 	for(size_t i = 0; i < result.keyspace; ++i)
 	{
 		auto testRes = testSplitter.GetMaskSlice(g_testMaskBasic, i+startingIndex, 1);
-		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask);
+		ASSERT_EQ(g_correctMasks[i+startingIndex], testRes.mask)<<"i: "<<i<<", startingIndex: "<<startingIndex;
 	}
 }
 
