@@ -108,8 +108,6 @@ MaskSplitter::MaskSettings MaskSplitter::GetMaskSlice(const std::string &mask, u
 		{
 			//forced split here
 			charset = charset.substr(charIndex);
-			//desired keyspace is capped here
-			desiredKeyspace = std::min(desiredKeyspace, result.keyspace*charset.size());
 		}
 		if(desiredKeyspace <= result.keyspace)
 		{
