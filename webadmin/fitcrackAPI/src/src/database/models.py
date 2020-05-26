@@ -242,19 +242,12 @@ class FcJob(Base):
 
     @hybrid_property
     def total_time(self):
-        total_time = 0
         if not self.time_start:
-            total_time = 0
+            return 0
         elif self.time_end:
-            total_time = (self.time_end - self.time_start).total_seconds()
+            return (self.time_end - self.time_start).total_seconds()
         else:
-            total_time = (datetime.datetime.now() - self.time_start).total_seconds()
-
-        if total_time < int(self.workunit_sum_time):
-            # Should not happen in practise, but if yes, we should handle this rare weird situation glacefully
-            return self.workunit_sum_time
-        
-        return total_time
+            return (datetime.datetime.now() - self.time_start).total_seconds()
 
     @hybrid_property
     def efficiency(self):
@@ -265,7 +258,7 @@ class FcJob(Base):
             return 0
         benchmarks_sum_time = sum([wu.cracking_time for wu in self.workunits if wu.hc_keyspace == 0])
         job_eff = (float(self.workunit_sum_time) - float(benchmarks_sum_time)) / (job_active_hosts_count * self.total_time)
-        return int(job_eff * 100)
+        return int(min(job_eff, 1.0) * 100)
 
 
     @hybrid_property
