@@ -312,7 +312,7 @@ class FcJob(Base):
             return 100
         elif self.status == 2:
             return 100
-        elif self.attack_mode == 1:
+        elif self.attack_mode in [1, 6, 7]:
             return round((self.indexes_verified / self.keyspace) * 100)
         else:
             return round((self.indexes_verified / self.hc_keyspace) * 100)

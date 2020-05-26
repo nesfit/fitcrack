@@ -81,40 +81,9 @@ void AddCharsetSlice(
 MaskSplitter::MaskSettings MaskSplitter::GetMaskSlice(const std::string &mask, uint64_t startIndex, uint64_t desiredKeyspace)
 {
 	//index at which we replace a charset with a newly created one
-	size_t forcedSplitIndex = std::string::npos;
 	size_t adjustedStartIndex = startIndex;
-	//The characters we can choose from to create the new charset
-	std::string possibleNewCharset;
-	//find where we *have* to split
-	for(size_t i = 0; i < mask.size(); ++i)
-	{
-		if(mask[i] != '?')
-		{
-			continue;
-		}
-		//got a charset, analyze
-		++i;
-		if(mask[i] == '?')
-		{
-			//just a literal question mark
-			continue;
-		}
-		const std::string &charset = GetCharset(mask[i]);
-		if(adjustedStartIndex%(charset.size()) != 0)
-		{
-			//charset was split before, figure out where exactly
-			forcedSplitIndex = i;
-			size_t startingCharIndex = adjustedStartIndex%charset.size();
-			adjustedStartIndex /= charset.size();
-			possibleNewCharset = charset.substr(startingCharIndex);
-			break;
-		}
-		adjustedStartIndex /= charset.size();
-	}
-	//now find where we *want* to split
 	MaskSettings result;
 	result.customCharsets = m_customCharsets;
-	bool noLongerAddingPlaceholders = false;
 	for(size_t i = 0; i < mask.size(); ++i)
 	{
 		if(mask[i] != '?')
@@ -130,55 +99,40 @@ MaskSplitter::MaskSettings MaskSplitter::GetMaskSlice(const std::string &mask, u
 			continue;
 		}
 		//got a charset, analyze
-		if(noLongerAddingPlaceholders)
+		std::string charset = GetCharset(mask[i]);
+		//Figure out which char to start at
+		size_t charIndex = adjustedStartIndex%charset.size();
+		//adjust the start index for the next iteration
+		adjustedStartIndex /= charset.size();
+		if(charIndex > 0)
 		{
-			//We already have the desired keyspace, now just add simple characters
-			if(i == forcedSplitIndex)
-			{
-				//we already have the necessary charset, just use that
-				result.mask += possibleNewCharset[0];
-				continue;
-			}
-			const std::string &charset = GetCharset(mask[i]);
-			if(i < forcedSplitIndex)
-			{
-				//We're before the forced split point, we can just take the first char
-				result.mask += charset[0];
-				continue;
-			}
-			//charset after the forced split point. Figure out which char we have to take
-			size_t charIndex = adjustedStartIndex%charset.size();
-			//add that char
-			result.mask += charset[charIndex];
-			//and adjust the start index for the new iteration
-			adjustedStartIndex /= charset.size();
+			//forced split here
+			charset = charset.substr(charIndex);
+			//desired keyspace is capped here
+			desiredKeyspace = std::min(desiredKeyspace, result.keyspace*charset.size());
+		}
+		if(desiredKeyspace <= result.keyspace)
+		{
+			//we have reached the desired keyspace. Just add a single char
+			result.mask += charset[0];
 			continue;
 		}
 		//we are still possibly adding placeholder elements
 		result.mask += '?';
-		if(i == forcedSplitIndex)
-		{
-			//we have to split here
-			size_t bestSize = std::round(double(desiredKeyspace)/result.keyspace);
-			//0.75 to avoid fircing creation of itty bitty workunits later
-			//for example by taking 90 of 91 remaining chars, forcing the next WU to use just one
-			AddCharsetSlice(bestSize, possibleNewCharset, result);
-			noLongerAddingPlaceholders = true;
-			continue;
-		}
-		const std::string &charset = GetCharset(mask[i]);
 		size_t remainingKeyspace = std::round(double(desiredKeyspace)/result.keyspace);
-		if(remainingKeyspace >= charset.size())
+		if(charIndex == 0 && remainingKeyspace >= charset.size())
 		{
 			//simplest case, just add the identifier and continue analyzing
 			result.mask += mask[i];
 			result.keyspace *= charset.size();
-			continue;
 		}
-		//less than charset size, this is the end. Just figure out how much to send
-		AddCharsetSlice(remainingKeyspace, charset, result, &mask[i]);
-		noLongerAddingPlaceholders = true;
-		continue;
+		else
+		{
+			//less than charset size, this is the end. Just figure out how much to send
+			AddCharsetSlice(remainingKeyspace, charset, result, charIndex == 0 ? &mask[i] : nullptr);
+			//make sure we don't continue adding charsets after this
+			desiredKeyspace = result.keyspace;
+		}
 	}
 	return result;
 }
