@@ -11,29 +11,10 @@ import time
 from flask_restplus import abort
 from werkzeug.utils import secure_filename
 
-from settings import DICTIONARY_DIR, MASK_PROCESSOR_PATH, HASHCAT_EXECUTABLE, PRINCE_PROCESSOR_PATH
+from settings import DICTIONARY_DIR, HASHCAT_EXECUTABLE, PRINCE_PROCESSOR_PATH
 from src.api.fitcrack.functions import shellExec
 from src.database import db
 from src.database.models import FcDictionary
-
-
-def make_dict_from_mask(mask, filename=None):
-    if not filename:
-
-        filename = 'hybrid_attack' + str(int(time.time())) + '.txt'
-
-    filename = secure_filename(filename)
-    path = os.path.join(DICTIONARY_DIR, filename)
-
-
-    print(MASK_PROCESSOR_PATH + ' ' + mask + ' -o ' + path)
-    print(shellExec(MASK_PROCESSOR_PATH + ' ' + mask + ' -o ' + path))
-
-    dictionary = FcDictionary(name=filename, path=filename, keyspace=compute_keyspace_from_mask(mask), deleted=True)
-    db.session.add(dictionary)
-    db.session.commit()
-    return dictionary
-
 
 def check_mask_syntax(mask):
     if not re.fullmatch("^(\?[ludhHsab]|[ -~])+$", mask):
