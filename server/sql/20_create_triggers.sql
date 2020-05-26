@@ -24,7 +24,7 @@ CREATE TRIGGER `job_notification` AFTER UPDATE ON `fc_job`
 	-- job status changed. We need to send notifications!
 	IF NEW.status <> OLD.status THEN
 
-		IF NEW.status = 10 THEN
+		IF NEW.status = 10 AND OLD.indexes_verified = 0 THEN
 			INSERT INTO fc_job_graph (progress, job_id) VALUES ( 0, NEW.id);
 		END IF;
 
