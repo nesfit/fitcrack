@@ -232,6 +232,8 @@ class FcJob(Base):
     def cracked_hashes_str(self):
         cracked = len([hash.result for hash in self.hashes if hash.result != None])
         total = len(self.hashes)
+        if total == 0:
+            return ""
         return "{} % ({}/{})".format(int((cracked * 100)/total), cracked, total)
 
     @hybrid_property
