@@ -324,6 +324,7 @@ class OperationWithJob(Resource):
             job.status = status_to_code['running']
             job.indexes_verified = 0
             job.current_index = 0
+            job.current_index_2 = 0
             job.workunit_sum_time = 0
             job.time_start = None
             job.time_end = None
