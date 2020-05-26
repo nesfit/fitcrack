@@ -242,12 +242,17 @@ class FcJob(Base):
 
     @hybrid_property
     def total_time(self):
+        total_time = 0
         if not self.time_start:
-            return 0
+            total_time = 0
         if self.time_end:
-            return (self.time_end - self.time_start).total_seconds()
+            total_time = (self.time_end - self.time_start).total_seconds()
         else:
-            return (datetime.datetime.now() - self.time_start).total_seconds()
+            total_time = (datetime.datetime.now() - self.time_start).total_seconds()
+
+        if total_time < int(self.workunit_sum_time):
+            # Should not happen in practise, but if yes, we should handle this rare weird situation glacefully
+            return self.workunit_sum_time
 
     @hybrid_property
     def efficiency(self):
