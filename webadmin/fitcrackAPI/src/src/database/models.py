@@ -210,6 +210,7 @@ class FcJob(Base):
 
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')
+    status_history = relationship('FcJobStatus')
 
     rulesFile = relationship("FcRule",
                              primaryjoin="FcJob.rules==FcRule.name")
@@ -244,14 +245,37 @@ class FcJob(Base):
     def total_time(self):
         if not self.time_start:
             return 0
-        elif self.time_end:
-            return (self.time_end - self.time_start).total_seconds()
         else:
             now = datetime.datetime.now()
             if now < self.time_start:
                 # Planned job
                 return 0
-            return (now - self.time_start).total_seconds()
+
+            # Compute job total cracking time from job status history table
+            total_time = 0
+            last_run_time = self.time_start
+            for item in self.status_history:
+                # Skip all status change events before job start
+                if item.time <= self.time_start:
+                    continue
+
+                code = int(item.status)
+                if code == status_to_code['running']:
+                    # Job resumed
+                    last_run_time = item.time
+
+                if (code == status_to_code['ready'] or code == status_to_code['finished'] or \
+                    code == status_to_code['timeout'] or code == status_to_code['exhausted'] or \
+                    code == status_to_code['malformed']) and last_run_time:
+                    # Job paused/ended
+                    total_time += (item.time - last_run_time).total_seconds()
+                    last_run_time = None
+
+            if last_run_time:
+                # Job is running
+                total_time += (now - last_run_time).total_seconds()
+
+            return total_time
 
     @hybrid_property
     def efficiency(self):
