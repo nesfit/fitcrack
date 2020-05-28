@@ -247,7 +247,11 @@ class FcJob(Base):
         elif self.time_end:
             return (self.time_end - self.time_start).total_seconds()
         else:
-            return (datetime.datetime.now() - self.time_start).total_seconds()
+            now = datetime.datetime.now()
+            if now < self.time_start:
+                # Planned job
+                return 0
+            return (now - self.time_start).total_seconds()
 
     @hybrid_property
     def efficiency(self):
