@@ -28,6 +28,9 @@
         </v-icon>
       </router-link>
     </template>
+    <template v-slot:item.jobs="{ item }">
+      {{ item.jobs.map(j => j.status === 10 ? 1 : 0).reduce((a, b) => a + b, 0) }}
+    </template>
     <template v-slot:item.p_model="{ item }">
       <span class="oneline">{{ item.p_model.replace(/(?:\(R\)|\(TM\)|Intel|AMD)/g, '') }}</span>
     </template>
@@ -63,6 +66,7 @@
           {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
           {text: 'OS', value: 'os_name', align: 'end', sortable: false},
           {text: 'Processor', value: 'p_model', align: 'end', width: '200', sortable: false},
+          {text: 'Active jobs', value: 'jobs', align: 'center', sortable: false},
           {text: 'Online', value: 'last_active', align: 'end', sortable: false},
         ]
       }
