@@ -165,8 +165,8 @@
         loading: false,
         fullDate: false,
         hoursBefore: '1',
-        fromDate: this.$moment().toISOString().slice(0, 16),
-        toDate: this.$moment().toISOString().slice(0, 16),
+        fromDate: this.$moment().format('YYYY-MM-DDTHH:mm:ss'),
+        toDate: this.$moment().format('YYYY-MM-DDTHH:mm:ss'),
       }
     },
     mounted: function () {

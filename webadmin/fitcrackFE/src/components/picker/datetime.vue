@@ -90,7 +90,7 @@ export default {
     disabled: Boolean,
     value: {
       type: String,
-      default: () => new Date().toJSON().slice(0,16)
+      default: () => this.$moment().format('YYYY-MM-DDTHH:mm:ss')
     }
   },
   data () {
