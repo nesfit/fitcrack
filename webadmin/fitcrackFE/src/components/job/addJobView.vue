@@ -837,12 +837,6 @@
           return
         }
 
-        if (this.timeForJob > 3600) {
-          this.$error('Time per workunit must be smaller or equal to 3600 seconds.')
-          this.step = 4
-          return
-        }
-
         // Check if all job settings are valid
         if (!this.valid) {
           // If all checks above passed and this one did not, it means that attack specific settings are incorrect.
