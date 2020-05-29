@@ -414,6 +414,9 @@
           </v-tooltip>
         </div>
       </template>
+      <template #footer.page-text="{ pageStart, pageStop, itemsLength }">
+        <strong>Page {{ pagination.page }}</strong> – {{ pageStart }}-{{ pageStop }} of {{ itemsLength }}
+      </template>
     </v-data-table>
     <!-- Dialogs -->
     <host-editor
@@ -576,16 +579,19 @@
         deep: true,
         handler ({ page }) {
           this.$paginator(this.$route.path, page)
-          this.updateList()
+          this.updateList(false)
         }
       },
       $route ({ path }) {
         this.pagination.page = this.$paginator(path)
-        this.updateList()
+        this.status = null
+        this.attackType = null
+        this.search = ''
+        this.updateList(false)
       },
       clean (isClean) {
         if (!isClean) {
-          this.updateList()
+          this.updateList(false)
           this.$store.commit('binInterface/clean')
         }
       }
@@ -624,7 +630,8 @@
         this.totalItems = data.total
         this.loading = false
       },
-      updateList () {
+      updateList (resetPagination = true) {
+        if (resetPagination) this.pagination.page = 1
         this.selectedJobs = []
         this.loading = true
         this.loadJobs()
