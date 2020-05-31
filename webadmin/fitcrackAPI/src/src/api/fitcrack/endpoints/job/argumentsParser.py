@@ -250,7 +250,6 @@ editJob_argument.add_argument('endNever', type=str, required=True)
 
 editJob_argument.add_argument('case_permute', type=bool, required=True)
 editJob_argument.add_argument('check_duplicates', type=bool, required=True)
-editJob_argument.add_argument('shuffle_dict', type=bool, required=True)
 editJob_argument.add_argument('min_password_len', type=int, required=True)
 editJob_argument.add_argument('max_password_len', type=int, required=True)
 editJob_argument.add_argument('min_elem_in_chain', type=int, required=True)

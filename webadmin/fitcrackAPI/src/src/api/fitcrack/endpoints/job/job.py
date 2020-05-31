@@ -266,7 +266,6 @@ class JobByID(Resource):
             # Prince settings
             job.case_permute = args['case_permute']
             job.check_duplicates = args['check_duplicates']
-            job.shuffle_dict = args['shuffle_dict']
             job.min_password_len = args['min_password_len']
             job.max_password_len = args['max_password_len']
             job.min_elem_in_chain = args['min_elem_in_chain']

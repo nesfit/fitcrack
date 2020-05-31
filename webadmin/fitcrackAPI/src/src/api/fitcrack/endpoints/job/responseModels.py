@@ -174,7 +174,6 @@ job_big_model = api.model('Job', {
     'max_password_len': fields.Integer(),
     'min_elem_in_chain': fields.Integer(),
     'max_elem_in_chain': fields.Integer(),
-    'shuffle_dict': fields.Boolean(),
     'generate_random_rules': fields.Integer()
 })
 

@@ -80,17 +80,6 @@
       <v-divider />
       <v-list-item class="px-2 py-1">
         <v-list-item-action class="pr-3 key">
-        Purple Rain Attack:
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title class="text-right">
-          {{ data.shuffle_dict ? 'Enabled' : ' Disabled' }}
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-divider />
-      <v-list-item class="px-2 py-1">
-        <v-list-item-action class="pr-3 key">
           Minimal length of passwords:
         </v-list-item-action>
         <v-list-item-content>

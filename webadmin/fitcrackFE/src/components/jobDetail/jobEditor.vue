@@ -114,10 +114,6 @@
             v-model="edit.case_permute"
             label="Case permutation"
           />
-          <v-checkbox
-            v-model="edit.shuffle_dict"
-            label="Purple Rain Attack"
-          />
         </v-list-item-content>
       </v-list-item>
 
@@ -236,7 +232,6 @@ export default {
         endNever: (this.data.time_end === null),
         check_duplicates: this.data.check_duplicates,
         case_permute: this.data.case_permute,
-        shuffle_dict: this.data.shuffle_dict,
         min_password_len: this.data.min_password_len,
         max_password_len: this.data.max_password_len,
         min_elem_in_chain: this.data.min_elem_in_chain,

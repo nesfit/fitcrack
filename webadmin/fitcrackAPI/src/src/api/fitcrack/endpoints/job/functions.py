@@ -99,12 +99,11 @@ def create_job(data):
         markov_threshold=job['markov_threshold'] if job.get('markov_threshold') else 0,
         grammar_id=job['attack_settings']['pcfg_grammar']['id'] if job['attack_settings'].get('pcfg_grammar') else 0,
         case_permute=job['attack_settings'].get('case_permute', 0),
-        check_duplicates=job['attack_settings'].get('check_duplicates', 0),
+        check_duplicates=job['attack_settings'].get('check_duplicates', 1),
         min_password_len=job['attack_settings'].get('min_password_len', 0),
         max_password_len=job['attack_settings'].get('max_password_len', 0),
         min_elem_in_chain=job['attack_settings'].get('min_elem_in_chain', 0),
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
-        shuffle_dict=job['attack_settings'].get('shuffle_dict', 0),
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         deleted=False
         )

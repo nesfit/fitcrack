@@ -43,13 +43,12 @@ export const empty = {
   pcfg: [],
   keyspaceLimit: 0,
   // prince
-  checkDuplicates: false,
+  checkDuplicates: true,
   casePermute: false,
   minPasswordLen: 1,
   maxPasswordLen: 8,
   minElemInChain: 1,
   maxElemInChain: 8,
-  shuffleDict: false,
   generateRandomRules: 0,
   // other
   startNow: true,
@@ -90,7 +89,6 @@ export default {
         'max_password_len': parseInt(state.maxPasswordLen),
         'min_elem_in_chain': parseInt(state.minElemInChain),
         'max_elem_in_chain': parseInt(state.maxElemInChain),
-        'shuffle_dict': state.shuffleDict,
         'generate_random_rules': parseInt(state.generateRandomRules),
       }
     },
