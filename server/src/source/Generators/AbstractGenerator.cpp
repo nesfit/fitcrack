@@ -86,6 +86,8 @@ void CAbstractGenerator::deleteStickyFiles(PtrJob &job, std::vector<PtrHost> &jo
             break;
 
         case Config::AttackMode::AttackDict:
+        case Config::AttackMode::AttackPrince:
+        case Config::AttackMode::AttackPcfg:
             if (job->getAttackSubmode() == 0)
                 break;
 
