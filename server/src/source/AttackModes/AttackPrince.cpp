@@ -36,7 +36,8 @@ bool CAttackPrince::makeWorkunit()
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
-    std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
+    /** Same name of dict file - for sticky flag to work */
+    std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "", Config::appName, m_job->getId());
     if (with_rules) {
       /** Same name of rules file - for sticky flag to work */
       std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId());

@@ -257,7 +257,7 @@ void CSimpleGenerator::finishJob(PtrJob &job)
     if (m_sqlLoader->isJobTimeout(jobId))
     {
         Tools::printDebugJob(Config::DebugType::Log, jobId,
-                             "Timeouted job has finished all workunits. Setting state to timeout.\n", jobId);
+                             "Timeouted job has finished all workunits. Setting state to timeout.\n");
         job->updateStatusOfRunningJob(Config::JobState::JobTimeout);
     }
     else if (job->getCurrentIndex() >= job->getEndIndex())
@@ -265,15 +265,14 @@ void CSimpleGenerator::finishJob(PtrJob &job)
         if (m_sqlLoader->isAnythingCracked(jobId))
         {
             Tools::printDebugJob(Config::DebugType::Log, jobId,
-                                 "Job is exhausted but found some passwords. Setting state to finished.\n",
-                                 jobId);
+                                 "Job is exhausted but found some passwords. Setting state to finished.\n");
             job->updateStatusOfRunningJob(Config::JobState::JobFinished);
             m_sqlLoader->updateEndTimeNow(jobId);
         }
         else
         {
             Tools::printDebugJob(Config::DebugType::Log, jobId,
-                                 "Job is exhausted. Setting state to exhausted.\n", jobId);
+                                 "Job is exhausted. Setting state to exhausted.\n");
             job->updateStatusOfRunningJob(Config::JobState::JobExhausted);
             m_sqlLoader->updateEndTimeNow(jobId);
         }
@@ -281,7 +280,7 @@ void CSimpleGenerator::finishJob(PtrJob &job)
     else
     {
         Tools::printDebugJob(Config::DebugType::Log, jobId,
-                             "Job finished all workunits and was paused.\n", jobId);
+                             "Job finished all workunits and was paused.\n");
         job->updateStatusOfRunningJob(Config::JobState::JobReady);
     }
 }

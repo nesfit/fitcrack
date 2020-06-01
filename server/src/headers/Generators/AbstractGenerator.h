@@ -41,6 +41,12 @@ class CAbstractGenerator
         void activateJobs();
 
         /**
+         * @brief Get list of job sticky files
+         * @param job CJob which is done
+         */
+        std::vector<std::string> getStickyFiles(PtrJob &job);
+
+        /**
          * @brief Send all job host a message to delete job sticky files
          * @param job CJob which is done
          */

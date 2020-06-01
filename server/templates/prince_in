@@ -6,6 +6,8 @@
         <number>1</number>
     </file_info>
     <file_info>
+        <sticky/>
+        <no_delete/>
         <number>2</number>
     </file_info>
     <workunit>

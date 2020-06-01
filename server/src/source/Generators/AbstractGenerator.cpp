@@ -66,42 +66,57 @@ void CAbstractGenerator::activateJobs()
     }
 }
 
-
-void CAbstractGenerator::deleteStickyFiles(PtrJob &job, std::vector<PtrHost> &jobHosts)
-{
-    std::string stickyName;
-
-    /** Get sticky file name according to attack */
+std::vector<std::string> CAbstractGenerator::getStickyFiles(PtrJob &job) {
+    std::vector<std::string> stickyFiles;
+    /** Get sticky file names according to attack */
     switch (job->getAttackMode())
     {
         case Config::AttackMode::AttackCombinator:
-            stickyName = std::string(Config::appName) + "_combinator_" + std::to_string(job->getId());
+            stickyFiles.push_back(std::string(Config::appName) + "_combinator_" + std::to_string(job->getId()));
             break;
 
         case Config::AttackMode::AttackMask:
             if (job->getAttackSubmode() == 0)
                 break;
 
-            stickyName = std::string(Config::appName) + "_markov_" + std::to_string(job->getId());
+            stickyFiles.push_back(std::string(Config::appName) + "_markov_" + std::to_string(job->getId()));
             break;
 
         case Config::AttackMode::AttackDict:
+          if (job->getAttackSubmode() == 1)
+            stickyFiles.push_back(std::string(Config::appName) + "_rules_" +
+                                  std::to_string(job->getId()));
+          break;
         case Config::AttackMode::AttackPrince:
+          stickyFiles.push_back(std::string(Config::appName) + "_dict_" +
+                                std::to_string(job->getId()));
+          if (job->getAttackSubmode() == 1)
+            stickyFiles.push_back(std::string(Config::appName) + "_rules_" +
+                                  std::to_string(job->getId()));
+          break;
         case Config::AttackMode::AttackPcfg:
-            if (job->getAttackSubmode() == 0)
-                break;
-
-            stickyName = std::string(Config::appName) + "_rules_" + std::to_string(job->getId());
-            break;
+          stickyFiles.push_back(std::string(Config::appName) + "_grammar_" +
+                                std::to_string(job->getId()));
+          if (job->getAttackSubmode() == 1)
+            stickyFiles.push_back(std::string(Config::appName) + "_rules_" +
+                                  std::to_string(job->getId()));
+          break;
 
         default:
-            break;
+          break;
     }
 
-    if (stickyName.empty())
+    return stickyFiles;
+}
+
+void CAbstractGenerator::deleteStickyFiles(PtrJob &job, std::vector<PtrHost> &jobHosts)
+{
+    std::vector<std::string> stickyFiles = getStickyFiles(job);
+    if (stickyFiles.empty())
         return;
 
     /** Send message to all hosts in fc_host working on job */
-    for (PtrHost & host : jobHosts)
-        create_delete_file_msg((int)host->getBoincHostId(), stickyName.c_str());
+    for (PtrHost &host : jobHosts)
+      for (const std::string &stickyFile : stickyFiles)
+        create_delete_file_msg((int)host->getBoincHostId(), stickyFile.c_str());
 }

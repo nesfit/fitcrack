@@ -555,16 +555,19 @@ std::string CSqlLoader::getSqlString(const std::string & query)
 template <typename Res>
 Res CSqlLoader::getSqlConverted(const std::string &query, Res(*conversionFn)(const std::string&))
 {
+    std::string sqlQuery = getSqlString(query);
     try
     {
-        return conversionFn(getSqlString(query));
+        return conversionFn(sqlQuery);
     }
     catch(const std::exception &e)
     {
+        Tools::printDebugTimestamp("SQL query '%s' failed.\n", query.c_str());
         Tools::printDebugTimestamp("Error converting db result to target type: %s\n", e.what());
     }
     catch(...)
     {
+        Tools::printDebugTimestamp("SQL query '%s' failed.\n", query.c_str());
         Tools::printDebugTimestamp("Unknown error converting db result to target type\n");
     }
     return {};
