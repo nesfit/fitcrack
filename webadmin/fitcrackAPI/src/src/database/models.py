@@ -285,6 +285,8 @@ class FcJob(Base):
             return 0
         benchmarks_sum_time = sum([wu.cracking_time for wu in self.workunits if wu.hc_keyspace == 0])
         job_eff = (float(self.workunit_sum_time) - float(benchmarks_sum_time)) / (job_active_hosts_count * self.total_time)
+        if job_eff <= 0.0:
+            return 0
         return int(min(job_eff, 1.0) * 100)
 
 
