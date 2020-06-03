@@ -918,9 +918,9 @@ class Result(Base):
     @hybrid_property
     def stderr_out_text(self):
         try:
-            return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' )
+            return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' ).replace('\r', '')
         except:
-            return self.stderr_out.decode("utf-8", errors='ignore')
+            return self.stderr_out.decode("utf-8", errors='ignore').replace('\r', '')
 class FcServerUsage(Base):
     __tablename__ = 'fc_server_usage'
 
