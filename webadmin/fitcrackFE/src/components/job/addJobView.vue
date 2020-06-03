@@ -698,12 +698,6 @@
         if (data === '') {
           return
         }
-        ///
-        const hashType = parseInt(this.hashType.code)
-        if (hashType >= 17300 && hashType <= 18100) {
-          return // Until validator can deal with Hashcat 5 modes
-        }
-        ///
 
         this.axios.post(this.$serverAddr + '/job/verifyHash', {
           'hashtype': this.hashType.code,

@@ -7,16 +7,41 @@
 #include "types.h"
 #include "memory.h"
 #include "event.h"
+#include "hashes.h"
+
+#include "convert.h"
+#include "debugfile.h"
 #include "filehandling.h"
-#include "hlfmt.h"                       
+#include "hlfmt.h"
 #include "interface.h"
 #include "terminal.h"
+#include "logfile.h"
+#include "loopback.h"
+#include "mpsp.h"
+#include "opencl.h"
+#include "outfile.h"
+#include "potfile.h"
+#include "rp.h"
 #include "shared.h"
-#include "hashValidator.h" 
+#include "thread.h"
+#include "timer.h"
+#include "locking.h"
+
+#ifdef WITH_BRAIN
+#include "brain.h"
+#endif
+
+int sort_by_string (const void *p1, const void *p2)
+{
+  const char *s1 = (const char *) p1;
+  const char *s2 = (const char *) p2;
+
+  return strcmp (s1, s2);
+}
 
 int sort_by_digest_p0p1 (const void *v1, const void *v2, void *v3)
-{  
-  const u32 *d1 = (const u32 *) v1; 
+{
+  const u32 *d1 = (const u32 *) v1;
   const u32 *d2 = (const u32 *) v2;
 
   hashconfig_t *hashconfig = (hashconfig_t *) v3;
@@ -66,6 +91,11 @@ int sort_by_salt (const void *v1, const void *v2)
   return 0;
 }
 
+int sort_by_salt_buf (const void *v1, const void *v2, MAYBE_UNUSED void * v3)
+{
+  return sort_by_salt (v1, v2);
+}
+
 int sort_by_hash (const void *v1, const void *v2, void *v3)
 {
   const hash_t *h1 = (const hash_t *) v1;
@@ -100,6 +130,376 @@ int sort_by_hash_no_salt (const void *v1, const void *v2, void *v3)
   return sort_by_digest_p0p1 (d1, d2, v3);
 }
 
+int fitcrack_hash_validator(int parser_result, char *hash) {
+
+  if (parser_result == PARSER_OK) {
+    printf("%s OK\n", hash);
+  } else {
+    printf("%s %s\n", hash, strparser(parser_result));
+  }
+  // Pretend that it is OK to silence hashcat's own logic to report broken hashes
+  return PARSER_OK;
+}
+
+int save_hash (hashcat_ctx_t *hashcat_ctx)
+{
+  hashes_t        *hashes       = hashcat_ctx->hashes;
+  hashconfig_t    *hashconfig   = hashcat_ctx->hashconfig;
+  user_options_t  *user_options = hashcat_ctx->user_options;
+
+  const char *hashfile = hashes->hashfile;
+
+  char *new_hashfile;
+  char *old_hashfile;
+
+  hc_asprintf (&new_hashfile, "%s.new", hashfile);
+  hc_asprintf (&old_hashfile, "%s.old", hashfile);
+
+  unlink (new_hashfile);
+
+  char separator = hashconfig->separator;
+
+  FILE *fp = fopen (new_hashfile, "wb");
+
+  if (fp == NULL)
+  {
+    event_log_error (hashcat_ctx, "%s: %s", new_hashfile, strerror (errno));
+
+    free (new_hashfile);
+    free (old_hashfile);
+
+    return -1;
+  }
+
+  if (lock_file (fp) == -1)
+  {
+    fclose (fp);
+
+    event_log_error (hashcat_ctx, "%s: %s", new_hashfile, strerror (errno));
+
+    free (new_hashfile);
+    free (old_hashfile);
+
+    return -1;
+  }
+
+  u8 *out_buf = (u8 *) hcmalloc (HCBUFSIZ_LARGE);
+
+  for (u32 salt_pos = 0; salt_pos < hashes->salts_cnt; salt_pos++)
+  {
+    if (hashes->salts_shown[salt_pos] == 1) continue;
+
+    salt_t *salt_buf = &hashes->salts_buf[salt_pos];
+
+    for (u32 digest_pos = 0; digest_pos < salt_buf->digests_cnt; digest_pos++)
+    {
+      u32 idx = salt_buf->digests_offset + digest_pos;
+
+      if (hashes->digests_shown[idx] == 1) continue;
+
+      if (hashconfig->opts_type & OPTS_TYPE_BINARY_HASHFILE)
+      {
+        if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501))
+        {
+          hccapx_t hccapx;
+
+          to_hccapx_t (hashcat_ctx, &hccapx, salt_pos, digest_pos);
+
+          hc_fwrite (&hccapx, sizeof (hccapx_t), 1, fp);
+        }
+        else
+        {
+          // TODO
+        }
+      }
+      else
+      {
+        if (user_options->username == true)
+        {
+          user_t *user = hashes->hash_info[idx]->user;
+
+          u32 i;
+
+          for (i = 0; i < user->user_len; i++) fputc (user->user_name[i], fp);
+
+          fputc (separator, fp);
+        }
+
+        out_buf[0] = 0;
+
+        ascii_digest (hashcat_ctx, (char *) out_buf, HCBUFSIZ_LARGE, salt_pos, digest_pos);
+
+        fprintf (fp, "%s" EOL, out_buf);
+      }
+    }
+  }
+
+  hcfree (out_buf);
+
+  fflush (fp);
+
+  fclose (fp);
+
+  unlink (old_hashfile);
+
+  if (rename (hashfile, old_hashfile) != 0)
+  {
+    event_log_error (hashcat_ctx, "Rename file '%s' to '%s': %s", hashfile, old_hashfile, strerror (errno));
+
+    free (new_hashfile);
+    free (old_hashfile);
+
+    return -1;
+  }
+
+  unlink (hashfile);
+
+  if (rename (new_hashfile, hashfile) != 0)
+  {
+    event_log_error (hashcat_ctx, "Rename file '%s' to '%s': %s", new_hashfile, hashfile, strerror (errno));
+
+    free (new_hashfile);
+    free (old_hashfile);
+
+    return -1;
+  }
+
+  unlink (old_hashfile);
+
+  free (new_hashfile);
+  free (old_hashfile);
+
+  return 0;
+}
+
+void check_hash (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, plain_t *plain)
+{
+  debugfile_ctx_t *debugfile_ctx = hashcat_ctx->debugfile_ctx;
+  loopback_ctx_t  *loopback_ctx  = hashcat_ctx->loopback_ctx;
+  hashes_t        *hashes        = hashcat_ctx->hashes;
+  hashconfig_t    *hashconfig    = hashcat_ctx->hashconfig;
+
+  const u32 salt_pos    = plain->salt_pos;
+  const u32 digest_pos  = plain->digest_pos;  // relative
+
+  // hash
+
+  u8 *out_buf = hashes->out_buf;
+
+  out_buf[0] = 0;
+
+  ascii_digest (hashcat_ctx, (char *) out_buf, HCBUFSIZ_LARGE, salt_pos, digest_pos);
+
+  // plain
+
+  u32 plain_buf[64] = { 0 };
+
+  u8 *plain_ptr = (u8 *) plain_buf;
+  int plain_len = 0;
+
+  build_plain (hashcat_ctx, device_param, plain, plain_buf, &plain_len);
+
+  // TOTP should be base32 encoded
+  if (hashconfig->hash_mode == KERN_TYPE_TOTP_HMACSHA1)
+  {
+    // we need a temp buffer for the base32 encoding
+    u32 temp_buf[64] = { 0 };
+    u8 *temp_ptr = (u8 *) temp_buf;
+
+    // encode our plain
+    plain_len = base32_encode (int_to_base32, (const u8 *) plain_ptr, plain_len, (u8 *) temp_buf);
+
+    // copy the base32 content into our plain buffer
+    strncpy ((char *) plain_ptr, (char *) temp_ptr, sizeof (plain_buf));
+  }
+
+  // crackpos
+
+  u64 crackpos = 0;
+
+  build_crackpos (hashcat_ctx, device_param, plain, &crackpos);
+
+  // debug
+
+  u8  debug_rule_buf[RP_PASSWORD_SIZE] = { 0 };
+  int debug_rule_len  = 0; // -1 error
+
+  u8  debug_plain_ptr[RP_PASSWORD_SIZE] = { 0 };
+  int debug_plain_len = 0;
+
+  build_debugdata (hashcat_ctx, device_param, plain, debug_rule_buf, &debug_rule_len, debug_plain_ptr, &debug_plain_len);
+
+  // no need for locking, we're in a mutex protected function
+
+  potfile_write_append (hashcat_ctx, (char *) out_buf, plain_ptr, plain_len);
+
+  // outfile, can be either to file or stdout
+  // if an error occurs opening the file, send to stdout as fallback
+  // the fp gets opened for each cracked hash so that the user can modify (move) the outfile while hashcat runs
+
+  outfile_write_open (hashcat_ctx);
+
+  u8 *tmp_buf = hashes->tmp_buf;
+
+  tmp_buf[0] = 0;
+
+  const int tmp_len = outfile_write (hashcat_ctx, (char *) out_buf, plain_ptr, plain_len, crackpos, NULL, 0, (char *) tmp_buf);
+
+  outfile_write_close (hashcat_ctx);
+
+  EVENT_DATA (EVENT_CRACKER_HASH_CRACKED, tmp_buf, tmp_len);
+
+  // if enabled, update also the loopback file
+
+  if (loopback_ctx->fp != NULL)
+  {
+    loopback_write_append (hashcat_ctx, plain_ptr, plain_len);
+  }
+
+  // if enabled, update also the (rule) debug file
+
+  if (debugfile_ctx->fp != NULL)
+  {
+    // the next check implies that:
+    // - (user_options->attack_mode == ATTACK_MODE_STRAIGHT)
+    // - debug_mode > 0
+
+    if ((debug_plain_len > 0) || (debug_rule_len > 0))
+    {
+      debugfile_write_append (hashcat_ctx, debug_rule_buf, debug_rule_len, plain_ptr, plain_len, debug_plain_ptr, debug_plain_len);
+    }
+  }
+}
+
+int check_cracked (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, const u32 salt_pos)
+{
+  cpt_ctx_t      *cpt_ctx      = hashcat_ctx->cpt_ctx;
+  hashconfig_t   *hashconfig   = hashcat_ctx->hashconfig;
+  hashes_t       *hashes       = hashcat_ctx->hashes;
+  status_ctx_t   *status_ctx   = hashcat_ctx->status_ctx;
+  user_options_t *user_options = hashcat_ctx->user_options;
+
+  salt_t *salt_buf = &hashes->salts_buf[salt_pos];
+
+  u32 num_cracked;
+
+  cl_int CL_err;
+
+  CL_err = hc_clEnqueueReadBuffer (hashcat_ctx, device_param->command_queue, device_param->d_result, CL_TRUE, 0, sizeof (u32), &num_cracked, 0, NULL, NULL);
+
+  if (CL_err != CL_SUCCESS)
+  {
+    event_log_error (hashcat_ctx, "clEnqueueReadBuffer(): %s", val2cstr_cl (CL_err));
+
+    return -1;
+  }
+
+  if (user_options->speed_only == true)
+  {
+    // we want the hc_clEnqueueReadBuffer to run in benchmark mode because it has an influence in performance
+    // however if the benchmark cracks the artificial hash used for benchmarks we don't want to see that!
+
+    return 0;
+  }
+
+  if (num_cracked)
+  {
+    plain_t *cracked = (plain_t *) hccalloc (num_cracked, sizeof (plain_t));
+
+    CL_err = hc_clEnqueueReadBuffer (hashcat_ctx, device_param->command_queue, device_param->d_plain_bufs, CL_TRUE, 0, num_cracked * sizeof (plain_t), cracked, 0, NULL, NULL);
+
+    if (CL_err != CL_SUCCESS)
+    {
+      event_log_error (hashcat_ctx, "clEnqueueReadBuffer(): %s", val2cstr_cl (CL_err));
+
+      return -1;
+    }
+
+    u32 cpt_cracked = 0;
+
+    hc_thread_mutex_lock (status_ctx->mux_display);
+
+    for (u32 i = 0; i < num_cracked; i++)
+    {
+      const u32 hash_pos = cracked[i].hash_pos;
+
+      if (hashes->digests_shown[hash_pos] == 1) continue;
+
+      if ((hashconfig->opts_type & OPTS_TYPE_PT_NEVERCRACK) == 0)
+      {
+        hashes->digests_shown[hash_pos] = 1;
+
+        hashes->digests_done++;
+
+        cpt_cracked++;
+
+        salt_buf->digests_done++;
+
+        if (salt_buf->digests_done == salt_buf->digests_cnt)
+        {
+          hashes->salts_shown[salt_pos] = 1;
+
+          hashes->salts_done++;
+        }
+      }
+
+      if (hashes->salts_done == hashes->salts_cnt) mycracked (hashcat_ctx);
+
+      check_hash (hashcat_ctx, device_param, &cracked[i]);
+    }
+
+    hc_thread_mutex_unlock (status_ctx->mux_display);
+
+    hcfree (cracked);
+
+    if (cpt_cracked > 0)
+    {
+      hc_thread_mutex_lock (status_ctx->mux_display);
+
+      cpt_ctx->cpt_buf[cpt_ctx->cpt_pos].timestamp = time (NULL);
+      cpt_ctx->cpt_buf[cpt_ctx->cpt_pos].cracked   = cpt_cracked;
+
+      cpt_ctx->cpt_pos++;
+
+      cpt_ctx->cpt_total += cpt_cracked;
+
+      if (cpt_ctx->cpt_pos == CPT_CACHE) cpt_ctx->cpt_pos = 0;
+
+      hc_thread_mutex_unlock (status_ctx->mux_display);
+    }
+
+    if (hashconfig->opts_type & OPTS_TYPE_PT_NEVERCRACK)
+    {
+      // we need to reset cracked state on the device
+      // otherwise host thinks again and again the hash was cracked
+      // and returns invalid password each time
+
+      memset (hashes->digests_shown_tmp, 0, salt_buf->digests_cnt * sizeof (u32));
+
+      CL_err = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_digests_shown, CL_TRUE, salt_buf->digests_offset * sizeof (u32), salt_buf->digests_cnt * sizeof (u32), &hashes->digests_shown_tmp[salt_buf->digests_offset], 0, NULL, NULL);
+
+      if (CL_err != CL_SUCCESS)
+      {
+        event_log_error (hashcat_ctx, "clEnqueueWriteBuffer(): %s", val2cstr_cl (CL_err));
+
+        return -1;
+      }
+    }
+
+    num_cracked = 0;
+
+    CL_err = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_result, CL_TRUE, 0, sizeof (u32), &num_cracked, 0, NULL, NULL);
+
+    if (CL_err != CL_SUCCESS)
+    {
+      event_log_error (hashcat_ctx, "clEnqueueWriteBuffer(): %s", val2cstr_cl (CL_err));
+
+      return -1;
+    }
+  }
+
+  return 0;
+}
 
 void hashes_init_filename (hashcat_ctx_t *hashcat_ctx)
 {
@@ -220,11 +620,11 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
         return -1;
       }
 
-      //EVENT_DATA (EVENT_HASHLIST_COUNT_LINES_PRE, hashfile, strlen (hashfile));
+      EVENT_DATA (EVENT_HASHLIST_COUNT_LINES_PRE, hashfile, strlen (hashfile));
 
       hashes_avail = count_lines (fp);
 
-      //EVENT_DATA (EVENT_HASHLIST_COUNT_LINES_POST, hashfile, strlen (hashfile));
+      EVENT_DATA (EVENT_HASHLIST_COUNT_LINES_POST, hashfile, strlen (hashfile));
 
       rewind (fp);
 
@@ -466,15 +866,62 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
 
               if ((user_options->hash_mode == 2500) || (user_options->hash_mode == 2501))
               {
-                wpa_t *wpa = (wpa_t *) hashes_buf[hashes_cnt].esalt;
+                wpa_eapol_t *wpa_eapol = (wpa_eapol_t *) hashes_buf[hashes_cnt].esalt;
 
                 if (user_options->hccapx_message_pair_chgd == true)
                 {
-                  wpa->message_pair_chgd = (int) user_options->hccapx_message_pair_chgd;
-                  wpa->message_pair      = (u8)  user_options->hccapx_message_pair;
+                  wpa_eapol->message_pair_chgd = (int) user_options->hccapx_message_pair_chgd;
+                  wpa_eapol->message_pair      = (u8)  user_options->hccapx_message_pair;
                 }
 
-                wpa->nonce_error_corrections = user_options->nonce_error_corrections;
+                if (wpa_eapol->message_pair & (1 << 4))
+                {
+                  // ap-less attack detected, nc not needed
+
+                  wpa_eapol->nonce_error_corrections = 0;
+                }
+                else
+                {
+                  if (wpa_eapol->message_pair & (1 << 7))
+                  {
+                    // replaycount not checked, nc needed
+
+                    wpa_eapol->nonce_error_corrections = user_options->nonce_error_corrections;
+                  }
+                  else
+                  {
+                    // replaycount checked, nc not needed, but we allow user overwrites
+
+                    if (user_options->nonce_error_corrections_chgd == true)
+                    {
+                      wpa_eapol->nonce_error_corrections = user_options->nonce_error_corrections;
+                    }
+                    else
+                    {
+                      wpa_eapol->nonce_error_corrections = 0;
+                    }
+                  }
+                }
+
+                // now some optimization related to replay counter endianess
+                // hcxtools has techniques to detect them
+                // since we can not guarantee to get our handshakes from hcxtools we enable both by default
+                // this means that we check both even if both are not set!
+                // however if one of them is set, we can assume that the endianess has been checked and the other one is not needed
+
+                wpa_eapol->detected_le = 1;
+                wpa_eapol->detected_be = 1;
+
+                if (wpa_eapol->message_pair & (1 << 5))
+                {
+                  wpa_eapol->detected_le = 1;
+                  wpa_eapol->detected_be = 0;
+                }
+                else if (wpa_eapol->message_pair & (1 << 6))
+                {
+                  wpa_eapol->detected_le = 0;
+                  wpa_eapol->detected_be = 1;
+                }
               }
             }
 
@@ -483,7 +930,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
               memset (hashes_buf[hashes_cnt].hook_salt, 0, hashconfig->hook_salt_size);
             }
 
-            parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) in, sizeof (hccapx_t), &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+            parser_status = hashconfig->parse_func ((u8 *) in, sizeof (hccapx_t), &hashes_buf[hashes_cnt], hashconfig);
+            parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
             if (parser_status != PARSER_OK)
             {
@@ -503,7 +951,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
         {
           if (hash_len == 32)
           {
-            parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf, 16, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+            parser_status = hashconfig->parse_func ((u8 *) hash_buf, 16, &hashes_buf[hashes_cnt], hashconfig);
+            parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
             if (parser_status == PARSER_OK)
             {
@@ -517,7 +966,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
               event_log_warning (hashcat_ctx, "Hash '%s': %s", input_buf, strparser (parser_status));
             }
 
-            parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf + 16, 16, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+            parser_status = hashconfig->parse_func ((u8 *) hash_buf + 16, 16, &hashes_buf[hashes_cnt], hashconfig);
+            parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
             if (parser_status == PARSER_OK)
             {
@@ -533,7 +983,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
           }
           else
           {
-            parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+            parser_status = hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig);
+            parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
             if (parser_status == PARSER_OK)
             {
@@ -571,7 +1022,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
         }
         else
         {
-          parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+          parser_status = hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig);
+          parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
           if (parser_status == PARSER_OK)
           {
@@ -701,7 +1153,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
         {
           if (hash_len == 32)
           {
-            int parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf, 16, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+            int parser_status = hashconfig->parse_func ((u8 *) hash_buf, 16, &hashes_buf[hashes_cnt], hashconfig);
+            parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
             if (parser_status < PARSER_GLOBAL_ZERO)
             {
@@ -723,7 +1176,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
 
             hashes_cnt++;
 
-            parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf + 16, 16, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+            parser_status = hashconfig->parse_func ((u8 *) hash_buf + 16, 16, &hashes_buf[hashes_cnt], hashconfig);
+            parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
             if (parser_status < PARSER_GLOBAL_ZERO)
             {
@@ -747,7 +1201,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
           }
           else
           {
-            int parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+            int parser_status = hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig);
+            parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
             if (parser_status < PARSER_GLOBAL_ZERO)
             {
@@ -772,7 +1227,8 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
         }
         else
         {
-          int parser_status = fitcrackHashValidator(hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig), hash_buf);
+          int parser_status = hashconfig->parse_func ((u8 *) hash_buf, (u32) hash_len, &hashes_buf[hashes_cnt], hashconfig);
+          parser_status = fitcrack_hash_validator(parser_status, hash_buf);
 
           if (parser_status < PARSER_GLOBAL_ZERO)
           {
@@ -803,7 +1259,7 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
         hashlist_parse.hashes_cnt   = hashes_cnt;
         hashlist_parse.hashes_avail = hashes_avail;
 
-        //EVENT_DATA (EVENT_HASHLIST_PARSE_HASH, &hashlist_parse, sizeof (hashlist_parse_t));
+        EVENT_DATA (EVENT_HASHLIST_PARSE_HASH, &hashlist_parse, sizeof (hashlist_parse_t));
       }
 
       hashlist_parse_t hashlist_parse;
@@ -811,7 +1267,7 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
       hashlist_parse.hashes_cnt   = hashes_cnt;
       hashlist_parse.hashes_avail = hashes_avail;
 
-      //EVENT_DATA (EVENT_HASHLIST_PARSE_HASH, &hashlist_parse, sizeof (hashlist_parse_t));
+      EVENT_DATA (EVENT_HASHLIST_PARSE_HASH, &hashlist_parse, sizeof (hashlist_parse_t));
 
       hcfree (line_buf);
 
@@ -820,6 +1276,22 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
   }
 
   hashes->hashes_cnt = hashes_cnt;
+
+  if (hashes_cnt)
+  {
+    EVENT (EVENT_HASHLIST_SORT_HASH_PRE);
+
+    if (hashconfig->is_salted == true)
+    {
+      hc_qsort_r (hashes_buf, hashes_cnt, sizeof (hash_t), sort_by_hash, (void *) hashconfig);
+    }
+    else
+    {
+      hc_qsort_r (hashes_buf, hashes_cnt, sizeof (hash_t), sort_by_hash_no_salt, (void *) hashconfig);
+    }
+
+    EVENT (EVENT_HASHLIST_SORT_HASH_POST);
+  }
 
   if (hashconfig->hash_mode == 3000)
   {
@@ -849,4 +1321,589 @@ int hashes_init_stage1 (hashcat_ctx_t *hashcat_ctx)
   }
 
   return 0;
+}
+
+int hashes_init_stage2 (hashcat_ctx_t *hashcat_ctx)
+{
+  hashconfig_t   *hashconfig   = hashcat_ctx->hashconfig;
+  hashes_t       *hashes       = hashcat_ctx->hashes;
+  user_options_t *user_options = hashcat_ctx->user_options;
+  potfile_ctx_t  *potfile_ctx  = hashcat_ctx->potfile_ctx;
+
+  hash_t *hashes_buf = hashes->hashes_buf;
+  u32     hashes_cnt = hashes->hashes_cnt;
+
+  /**
+   * Remove duplicates
+   */
+
+  EVENT (EVENT_HASHLIST_UNIQUE_HASH_PRE);
+
+  u32 hashes_cnt_new = 1;
+
+  for (u32 hashes_pos = 1; hashes_pos < hashes_cnt; hashes_pos++)
+  {
+    if (potfile_ctx->keep_all_hashes == true)
+    {
+      // do not sort, because we need to keep all hashes in this particular case
+    }
+    else if (hashconfig->is_salted == true)
+    {
+      if (sort_by_salt (hashes_buf[hashes_pos].salt, hashes_buf[hashes_pos - 1].salt) == 0)
+      {
+        if (sort_by_digest_p0p1 (hashes_buf[hashes_pos].digest, hashes_buf[hashes_pos - 1].digest, (void *) hashconfig) == 0) continue;
+      }
+    }
+    else
+    {
+      if (sort_by_digest_p0p1 (hashes_buf[hashes_pos].digest, hashes_buf[hashes_pos - 1].digest, (void *) hashconfig) == 0) continue;
+    }
+
+    hash_t tmp;
+
+    memcpy (&tmp, &hashes_buf[hashes_pos], sizeof (hash_t));
+
+    memcpy (&hashes_buf[hashes_cnt_new], &tmp, sizeof (hash_t));
+
+    hashes_cnt_new++;
+  }
+
+  for (u32 i = hashes_cnt_new; i < hashes->hashes_cnt; i++)
+  {
+    memset (&hashes_buf[i], 0, sizeof (hash_t));
+  }
+
+  hashes_cnt = hashes_cnt_new;
+
+  hashes->hashes_cnt = hashes_cnt;
+
+  EVENT (EVENT_HASHLIST_UNIQUE_HASH_POST);
+
+  /**
+   * Now generate all the buffers required for later
+   */
+
+  void   *digests_buf_new    = hccalloc (hashes_cnt, hashconfig->dgst_size);
+  salt_t *salts_buf_new      = NULL;
+  void   *esalts_buf_new     = NULL;
+  void   *hook_salts_buf_new = NULL;
+
+  if (hashconfig->is_salted == true)
+  {
+    salts_buf_new = (salt_t *) hccalloc (hashes_cnt, sizeof (salt_t));
+  }
+  else
+  {
+    salts_buf_new = (salt_t *) hccalloc (1, sizeof (salt_t));
+  }
+
+  if (hashconfig->esalt_size > 0)
+  {
+    esalts_buf_new = hccalloc (hashes_cnt, hashconfig->esalt_size);
+  }
+
+  if (hashconfig->hook_salt_size > 0)
+  {
+    hook_salts_buf_new = hccalloc (hashes_cnt, hashconfig->hook_salt_size);
+  }
+
+  EVENT (EVENT_HASHLIST_SORT_SALT_PRE);
+
+  u32 digests_cnt  = hashes_cnt;
+  u32 digests_done = 0;
+
+  u32 *digests_shown     = (u32 *) hccalloc (digests_cnt, sizeof (u32));
+  u32 *digests_shown_tmp = (u32 *) hccalloc (digests_cnt, sizeof (u32));
+
+  u32 salts_cnt   = 0;
+  u32 salts_done  = 0;
+
+  hashinfo_t **hash_info = NULL;
+
+  if ((user_options->username == true) || (hashconfig->opts_type & OPTS_TYPE_HASH_COPY) || (hashconfig->opts_type & OPTS_TYPE_HASH_SPLIT))
+  {
+    hash_info = (hashinfo_t **) hccalloc (hashes_cnt, sizeof (hashinfo_t *));
+  }
+
+  u32 *salts_shown = (u32 *) hccalloc (digests_cnt, sizeof (u32));
+
+  salt_t *salt_buf;
+
+  {
+    // copied from inner loop
+
+    salt_buf = &salts_buf_new[salts_cnt];
+
+    memcpy (salt_buf, hashes_buf[0].salt, sizeof (salt_t));
+
+    hashes_buf[0].salt = salt_buf;
+
+    if (hashconfig->hook_salt_size > 0)
+    {
+      char *hook_salts_buf_new_ptr = ((char *) hook_salts_buf_new) + (salts_cnt * hashconfig->hook_salt_size);
+
+      memcpy (hook_salts_buf_new_ptr, hashes_buf[0].hook_salt, hashconfig->hook_salt_size);
+
+      hashes_buf[0].hook_salt = hook_salts_buf_new_ptr;
+    }
+
+    salt_buf->digests_cnt    = 0;
+    salt_buf->digests_done   = 0;
+    salt_buf->digests_offset = 0;
+
+    salts_cnt++;
+  }
+
+  salt_buf->digests_cnt++;
+
+  char *digests_buf_new_ptr = ((char *) digests_buf_new) + (0 * hashconfig->dgst_size);
+
+  memcpy (digests_buf_new_ptr, hashes_buf[0].digest, hashconfig->dgst_size);
+
+  hashes_buf[0].digest = digests_buf_new_ptr;
+
+  if (hashconfig->esalt_size > 0)
+  {
+    char *esalts_buf_new_ptr = ((char *) esalts_buf_new) + (0 * hashconfig->esalt_size);
+
+    memcpy (esalts_buf_new_ptr, hashes_buf[0].esalt, hashconfig->esalt_size);
+
+    hashes_buf[0].esalt = esalts_buf_new_ptr;
+  }
+
+  if ((user_options->username == true) || (hashconfig->opts_type & OPTS_TYPE_HASH_COPY) || (hashconfig->opts_type & OPTS_TYPE_HASH_SPLIT))
+  {
+    hash_info[0] = hashes_buf[0].hash_info;
+  }
+
+  // copy from inner loop
+
+  for (u32 hashes_pos = 1; hashes_pos < hashes_cnt; hashes_pos++)
+  {
+    if (hashconfig->is_salted == true)
+    {
+      if (sort_by_salt (hashes_buf[hashes_pos].salt, hashes_buf[hashes_pos - 1].salt) != 0)
+      {
+        salt_buf = &salts_buf_new[salts_cnt];
+
+        memcpy (salt_buf, hashes_buf[hashes_pos].salt, sizeof (salt_t));
+
+        hashes_buf[hashes_pos].salt = salt_buf;
+
+        if (hashconfig->hook_salt_size > 0)
+        {
+          char *hook_salts_buf_new_ptr = ((char *) hook_salts_buf_new) + (salts_cnt * hashconfig->hook_salt_size);
+
+          memcpy (hook_salts_buf_new_ptr, hashes_buf[hashes_pos].hook_salt, hashconfig->hook_salt_size);
+
+          hashes_buf[hashes_pos].hook_salt = hook_salts_buf_new_ptr;
+        }
+
+        salt_buf->digests_cnt    = 0;
+        salt_buf->digests_done   = 0;
+        salt_buf->digests_offset = hashes_pos;
+
+        salts_cnt++;
+      }
+
+      hashes_buf[hashes_pos].salt = salt_buf;
+
+      if (hashconfig->hook_salt_size > 0)
+      {
+        char *hook_salts_buf_new_ptr = ((char *) hook_salts_buf_new) + (salts_cnt * hashconfig->hook_salt_size);
+
+        hashes_buf[hashes_pos].hook_salt = hook_salts_buf_new_ptr;
+      }
+    }
+
+    salt_buf->digests_cnt++;
+
+    digests_buf_new_ptr = ((char *) digests_buf_new) + (hashes_pos * hashconfig->dgst_size);
+
+    memcpy (digests_buf_new_ptr, hashes_buf[hashes_pos].digest, hashconfig->dgst_size);
+
+    hashes_buf[hashes_pos].digest = digests_buf_new_ptr;
+
+    if (hashconfig->esalt_size > 0)
+    {
+      char *esalts_buf_new_ptr = ((char *) esalts_buf_new) + (hashes_pos * hashconfig->esalt_size);
+
+      memcpy (esalts_buf_new_ptr, hashes_buf[hashes_pos].esalt, hashconfig->esalt_size);
+
+      hashes_buf[hashes_pos].esalt = esalts_buf_new_ptr;
+    }
+
+    if ((user_options->username == true) || (hashconfig->opts_type & OPTS_TYPE_HASH_COPY) || (hashconfig->opts_type & OPTS_TYPE_HASH_SPLIT))
+    {
+      hash_info[hashes_pos] = hashes_buf[hashes_pos].hash_info;
+    }
+  }
+
+  EVENT (EVENT_HASHLIST_SORT_SALT_POST);
+
+  hcfree (hashes->digests_buf);
+  hcfree (hashes->salts_buf);
+  hcfree (hashes->esalts_buf);
+  hcfree (hashes->hook_salts_buf);
+
+  hashes->digests_cnt       = digests_cnt;
+  hashes->digests_done      = digests_done;
+  hashes->digests_buf       = digests_buf_new;
+  hashes->digests_shown     = digests_shown;
+  hashes->digests_shown_tmp = digests_shown_tmp;
+
+  hashes->salts_cnt         = salts_cnt;
+  hashes->salts_done        = salts_done;
+  hashes->salts_buf         = salts_buf_new;
+  hashes->salts_shown       = salts_shown;
+
+  hashes->esalts_buf        = esalts_buf_new;
+  hashes->hook_salts_buf    = hook_salts_buf_new;
+
+  hashes->hash_info         = hash_info;
+
+  return 0;
+}
+
+int hashes_init_stage3 (hashcat_ctx_t *hashcat_ctx)
+{
+  hashes_t *hashes = hashcat_ctx->hashes;
+
+  u32  digests_done  = hashes->digests_done;
+  u32 *digests_shown = hashes->digests_shown;
+
+  u32  salts_cnt     = hashes->salts_cnt;
+  u32  salts_done    = hashes->salts_done;
+  u32 *salts_shown   = hashes->salts_shown;
+
+  hash_t *hashes_buf = hashes->hashes_buf;
+
+  salt_t *salts_buf  = hashes->salts_buf;
+
+  for (u32 salt_idx = 0; salt_idx < salts_cnt; salt_idx++)
+  {
+    salt_t *salt_buf = salts_buf + salt_idx;
+
+    u32 digests_cnt = salt_buf->digests_cnt;
+
+    for (u32 digest_idx = 0; digest_idx < digests_cnt; digest_idx++)
+    {
+      const u32 hashes_idx = salt_buf->digests_offset + digest_idx;
+
+      if (hashes_buf[hashes_idx].cracked == 1)
+      {
+        digests_shown[hashes_idx] = 1;
+
+        digests_done++;
+
+        salt_buf->digests_done++;
+      }
+    }
+
+    if (salt_buf->digests_done == salt_buf->digests_cnt)
+    {
+      salts_shown[salt_idx] = 1;
+
+      salts_done++;
+    }
+
+    if (salts_done == salts_cnt) mycracked (hashcat_ctx);
+  }
+
+  hashes->digests_done = digests_done;
+
+  hashes->salts_cnt   = salts_cnt;
+  hashes->salts_done  = salts_done;
+
+  return 0;
+}
+
+int hashes_init_stage4 (hashcat_ctx_t *hashcat_ctx)
+{
+  hashconfig_t   *hashconfig   = hashcat_ctx->hashconfig;
+  hashes_t       *hashes       = hashcat_ctx->hashes;
+  user_options_t *user_options = hashcat_ctx->user_options;
+
+  const int rc_defaults = hashconfig_general_defaults (hashcat_ctx);
+
+  if (rc_defaults == -1) return -1;
+
+  if (hashes->salts_cnt == 1)
+    hashconfig->opti_type |= OPTI_TYPE_SINGLE_SALT;
+
+  if (hashes->digests_cnt == 1)
+    hashconfig->opti_type |= OPTI_TYPE_SINGLE_HASH;
+
+  if (hashconfig->attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+    hashconfig->opti_type |= OPTI_TYPE_NOT_ITERATED;
+
+  if (user_options->attack_mode == ATTACK_MODE_BF)
+    hashconfig->opti_type |= OPTI_TYPE_BRUTE_FORCE;
+
+  if (hashconfig->opti_type & OPTI_TYPE_BRUTE_FORCE)
+  {
+    if (hashconfig->opti_type & OPTI_TYPE_SINGLE_HASH)
+    {
+      if (hashconfig->opti_type & OPTI_TYPE_APPENDED_SALT)
+      {
+        if (hashconfig->opts_type & OPTS_TYPE_ST_ADD80)
+        {
+          hashconfig->opts_type &= ~OPTS_TYPE_ST_ADD80;
+          hashconfig->opts_type |=  OPTS_TYPE_PT_ADD80;
+        }
+
+        if (hashconfig->opts_type & OPTS_TYPE_ST_ADDBITS14)
+        {
+          hashconfig->opts_type &= ~OPTS_TYPE_ST_ADDBITS14;
+          hashconfig->opts_type |=  OPTS_TYPE_PT_ADDBITS14;
+        }
+
+        if (hashconfig->opts_type & OPTS_TYPE_ST_ADDBITS15)
+        {
+          hashconfig->opts_type &= ~OPTS_TYPE_ST_ADDBITS15;
+          hashconfig->opts_type |=  OPTS_TYPE_PT_ADDBITS15;
+        }
+      }
+    }
+  }
+
+  // at this point we no longer need hash_t* structure
+
+  hash_t *hashes_buf = hashes->hashes_buf;
+
+  hcfree (hashes_buf);
+
+  hashes->hashes_cnt = 0;
+  hashes->hashes_buf = NULL;
+
+  // starting from here, we should allocate some scratch buffer for later use
+
+  u8 *out_buf = (u8 *) hcmalloc (HCBUFSIZ_LARGE);
+
+  hashes->out_buf = out_buf;
+
+  // we need two buffers in parallel
+
+  u8 *tmp_buf = (u8 *) hcmalloc (HCBUFSIZ_LARGE);
+
+  hashes->tmp_buf = tmp_buf;
+
+  // brain session
+
+  #ifdef WITH_BRAIN
+  if (user_options->brain_client == true)
+  {
+    const u32 brain_session = brain_compute_session (hashcat_ctx);
+
+    user_options->brain_session = brain_session;
+  }
+  #endif
+
+  return 0;
+}
+
+int hashes_init_selftest (hashcat_ctx_t *hashcat_ctx)
+{
+  folder_config_t *folder_config = hashcat_ctx->folder_config;
+  hashconfig_t    *hashconfig    = hashcat_ctx->hashconfig;
+  hashes_t        *hashes        = hashcat_ctx->hashes;
+  user_options_t  *user_options  = hashcat_ctx->user_options;
+
+  if (hashconfig->st_hash == NULL) return 0;
+
+  void   *st_digests_buf    = NULL;
+  salt_t *st_salts_buf      = NULL;
+  void   *st_esalts_buf     = NULL;
+  void   *st_hook_salts_buf = NULL;
+
+  st_digests_buf =          hccalloc (1, hashconfig->dgst_size);
+
+  st_salts_buf = (salt_t *) hccalloc (1, sizeof (salt_t));
+
+  if (hashconfig->esalt_size > 0)
+  {
+    st_esalts_buf = hccalloc (1, hashconfig->esalt_size);
+  }
+
+  if (hashconfig->hook_salt_size > 0)
+  {
+    st_hook_salts_buf = hccalloc (1, hashconfig->hook_salt_size);
+  }
+
+  hash_t hash;
+
+  hash.digest    = st_digests_buf;
+  hash.salt      = st_salts_buf;
+  hash.esalt     = st_esalts_buf;
+  hash.hook_salt = st_hook_salts_buf;
+  hash.cracked   = 0;
+  hash.hash_info = NULL;
+  hash.pw_buf    = NULL;
+  hash.pw_len    = 0;
+
+  int parser_status;
+
+  if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501))
+  {
+    char *tmpdata = (char *) hcmalloc (sizeof (hccapx_t));
+
+    const size_t st_hash_len = strlen (hashconfig->st_hash);
+
+    for (size_t i = 0, j = 0; j < st_hash_len; i += 1, j += 2)
+    {
+      const u8 c = hex_to_u8 ((const u8 *) hashconfig->st_hash + j);
+
+      tmpdata[i] = c;
+    }
+
+    parser_status = hashconfig->parse_func ((u8 *) tmpdata, sizeof (hccapx_t), &hash, hashconfig);
+
+    hcfree (tmpdata);
+
+    wpa_eapol_t *wpa_eapol = (wpa_eapol_t *) st_esalts_buf;
+
+    wpa_eapol->detected_le = 1;
+    wpa_eapol->detected_be = 0;
+
+    wpa_eapol->nonce_error_corrections = 3;
+  }
+  else if (hashconfig->opts_type & OPTS_TYPE_BINARY_HASHFILE)
+  {
+    char *tmpfile_bin;
+
+    hc_asprintf (&tmpfile_bin, "%s/selftest.hash", folder_config->session_dir);
+
+    FILE *fp = fopen (tmpfile_bin, "wb");
+
+    const size_t st_hash_len = strlen (hashconfig->st_hash);
+
+    for (size_t i = 0; i < st_hash_len; i += 2)
+    {
+      const u8 c = hex_to_u8 ((const u8 *) hashconfig->st_hash + i);
+
+      fputc (c, fp);
+    }
+
+    fclose (fp);
+
+    parser_status = hashconfig->parse_func ((u8 *) tmpfile_bin, (u32) strlen (tmpfile_bin), &hash, hashconfig);
+
+    unlink (tmpfile_bin);
+
+    hcfree (tmpfile_bin);
+  }
+  else
+  {
+    hashconfig_t *hashconfig_st = (hashconfig_t *) hcmalloc (sizeof (hashconfig_t));
+
+    memcpy (hashconfig_st, hashconfig, sizeof (hashconfig_t));
+
+    hashconfig_st->separator = SEPARATOR;
+
+    if (user_options->hex_salt)
+    {
+      if (hashconfig->salt_type == SALT_TYPE_GENERIC)
+      {
+        // this is save as there's no hash mode that has both SALT_TYPE_GENERIC and OPTS_TYPE_ST_HEX by default
+
+        hashconfig_st->opts_type &= ~OPTS_TYPE_ST_HEX;
+      }
+    }
+
+    // Make sure that we do not modify constant data. Make a copy of the constant self-test hash
+    // Note: sometimes parse_func () modifies the data internally. We always need to use a copy of the original data
+
+    char *tmpdata = hcstrdup (hashconfig->st_hash);
+
+    parser_status = hashconfig->parse_func ((u8 *) tmpdata, (u32) strlen (hashconfig->st_hash), &hash, hashconfig_st);
+
+    hcfree (tmpdata);
+
+    hcfree (hashconfig_st);
+  }
+
+  if (parser_status == PARSER_OK)
+  {
+    // nothing to do
+  }
+  else
+  {
+    event_log_error (hashcat_ctx, "Self-test hash parsing error: %s", strparser (parser_status));
+
+    return -1;
+  }
+
+  hashes->st_digests_buf    = st_digests_buf;
+  hashes->st_salts_buf      = st_salts_buf;
+  hashes->st_esalts_buf     = st_esalts_buf;
+  hashes->st_hook_salts_buf = st_hook_salts_buf;
+
+  return 0;
+}
+
+void hashes_destroy (hashcat_ctx_t *hashcat_ctx)
+{
+  hashconfig_t   *hashconfig   = hashcat_ctx->hashconfig;
+  hashes_t       *hashes       = hashcat_ctx->hashes;
+  user_options_t *user_options = hashcat_ctx->user_options;
+
+  hcfree (hashes->digests_buf);
+  hcfree (hashes->digests_shown);
+  hcfree (hashes->digests_shown_tmp);
+
+  hcfree (hashes->salts_buf);
+  hcfree (hashes->salts_shown);
+
+  if ((user_options->username == true) || (hashconfig->opts_type & OPTS_TYPE_HASH_COPY))
+  {
+    for (u32 hash_pos = 0; hash_pos < hashes->hashes_cnt; hash_pos++)
+    {
+      if (user_options->username == true)
+      {
+        hcfree (hashes->hash_info[hash_pos]->user);
+      }
+
+      if (hashconfig->opts_type & OPTS_TYPE_HASH_COPY)
+      {
+        hcfree (hashes->hash_info[hash_pos]->orighash);
+      }
+
+      if (hashconfig->opts_type & OPTS_TYPE_HASH_SPLIT)
+      {
+        hcfree (hashes->hash_info[hash_pos]->split);
+      }
+    }
+  }
+
+  hcfree (hashes->hash_info);
+
+  hcfree (hashes->esalts_buf);
+  hcfree (hashes->hook_salts_buf);
+
+  hcfree (hashes->out_buf);
+  hcfree (hashes->tmp_buf);
+
+  hcfree (hashes->st_digests_buf);
+  hcfree (hashes->st_salts_buf);
+  hcfree (hashes->st_esalts_buf);
+  hcfree (hashes->st_hook_salts_buf);
+
+  hcfree (hashes->hashfile_hcdmp);
+
+  memset (hashes, 0, sizeof (hashes_t));
+}
+
+void hashes_logger (hashcat_ctx_t *hashcat_ctx)
+{
+  hashes_t      *hashes      = hashcat_ctx->hashes;
+  logfile_ctx_t *logfile_ctx = hashcat_ctx->logfile_ctx;
+
+  logfile_top_string (hashes->hashfile);
+  logfile_top_uint   (hashes->hashlist_mode);
+  logfile_top_uint   (hashes->hashlist_format);
+  logfile_top_uint   (hashes->hashes_cnt);
+  logfile_top_uint   (hashes->digests_cnt);
+  logfile_top_uint   (hashes->digests_done);
+  logfile_top_uint   (hashes->salts_cnt);
+  logfile_top_uint   (hashes->salts_done);
 }

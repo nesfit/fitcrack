@@ -13,6 +13,13 @@
 #include <time.h>
 #include <fcntl.h>
 #include <ctype.h>
+#include <math.h>
+
+#if defined (_WIN)
+#include <winsock2.h> // needed for select()
+#else
+#include <sys/select.h>
+#endif
 
 bool overflow_check_u32_add (const u32 a, const u32 b);
 bool overflow_check_u32_mul (const u32 a, const u32 b);
@@ -47,6 +54,7 @@ bool hc_path_exist (const char *path);
 bool hc_path_read (const char *path);
 bool hc_path_write (const char *path);
 bool hc_path_create (const char *path);
+bool hc_path_has_bom (const char *path);
 
 bool hc_string_is_digit (const char *s);
 
@@ -66,5 +74,15 @@ u32 power_of_two_floor_32 (const u32 v);
 
 u32 round_up_multiple_32 (const u32 v, const u32 m);
 u64 round_up_multiple_64 (const u64 v, const u64 m);
+
+void hc_strncat (u8 *dst, u8 *src, const size_t n);
+
+int count_char (const u8 *buf, const int len, const u8 c);
+float get_entropy (const u8 *buf, const int len);
+
+int select_read_timeout  (int sockfd, const int sec);
+int select_write_timeout (int sockfd, const int sec);
+
+int select_read_timeout_console (const int sec);
 
 #endif // _SHARED_H
