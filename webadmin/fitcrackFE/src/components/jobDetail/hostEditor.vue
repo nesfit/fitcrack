@@ -15,7 +15,7 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
-      <v-card-text>
+      <v-card-text class="scroller">
         <host-selector
           v-model="hosts"
           select-all
@@ -87,3 +87,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.scroller {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+</style>

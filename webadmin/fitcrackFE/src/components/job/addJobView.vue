@@ -390,11 +390,13 @@
           </v-stepper-step>
           <v-stepper-content step="3">
             <v-subheader>Select which hosts to distribute workunits to</v-subheader>
-            <host-selector
-              v-model="hosts"
-              select-all
-              auto-refresh
-            />
+            <div class="scroller">
+              <host-selector
+                v-model="hosts"
+                select-all
+                auto-refresh
+              />
+            </div>
             <v-row>
               <v-spacer />
               <v-btn
@@ -905,6 +907,11 @@
   .mode-btn {
     height: initial !important;
     margin: 1em;
+  }
+
+  .scroller {
+    max-height: 400px;
+    overflow-y: auto;
   }
 </style>
 
