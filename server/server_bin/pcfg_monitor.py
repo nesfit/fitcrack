@@ -43,7 +43,7 @@ def get_running_pcfg_jobs(cursor):
 
     :return [int]:  List of running PCFG Job IDs
     """
-    cursor.execute('SELECT id FROM fc_job WHERE status = 10 AND attack_mode = 9')
+    cursor.execute('SELECT id FROM fc_job WHERE status = 10 AND attack_mode = 9 AND current_index < hc_keyspace')
     jobs = cursor.fetchall()
 
     return [x[0] for x in jobs]
@@ -82,7 +82,7 @@ def cancel_wus(job_id, cursor):
     for wu_id, fitcrack_wu_id in wus:
         # Cancel results
         cursor.execute('UPDATE result SET server_state = 5, outcome = 5 WHERE server_state <= 2 AND workunitid = %s', (wu_id, ))
-   
+
         # Cancel jobs
         cursor.execute('UPDATE workunit SET error_mask = error_mask|16, transition_time = %s WHERE id = %s', (int(time.time()), wu_id, ))
         cursor.execute('UPDATE fc_workunit SET finished = 1 WHERE id = %s', (fitcrack_wu_id, ))
@@ -119,7 +119,7 @@ def run_new_manager(job_id, cursor):
     process = subprocess.Popen(
         ['../bin/pcfg-manager', 'server', '-p', str(job_id_to_port(job_id)), '-m', str(get_keyspace(job_id, cursor)),
          '-r', PCFG_DIR + get_grammar_name(job_id, cursor)])
-           
+
 
 def main():
     # Connect to fitcrack DB

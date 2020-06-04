@@ -228,7 +228,7 @@ void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchma
     }
     /** Try to set a workunit from retry */
     bool retryFlag = false;
-    if(!isBenchmark)
+    if(!isBenchmark && job->getAttackMode() != Config::AttackMode::AttackPcfg)
     {
         retryFlag = setEasiestRetry(job, host, attack);
     }
