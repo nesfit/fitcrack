@@ -8,10 +8,12 @@
     v-model="selected"
     :headers="headers"
     :items="items"
-    :search="search"
+    :loading="loading"
     item-key="id"
     show-select
     :single-select="!selectAll"
+    disable-pagination
+    hide-default-footer
     @input="updateSelected"
   >
     <template v-slot:item.domain_name="{ item }">
@@ -57,6 +59,7 @@
     },
     data() {
       return {
+        loading: false,
         headers: [
           {
             text: 'Name',
@@ -81,7 +84,7 @@
     },
     methods: {
       getData(autorefreshing = false) {
-        this.loading = true
+        if (!autorefreshing) this.loading = true
         this.axios.get(this.$serverAddr + '/hosts', {
           params: {
             'all': true
