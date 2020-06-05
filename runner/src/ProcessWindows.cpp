@@ -104,10 +104,21 @@ bool ProcessWindows::isRunning() {
 }
 
 int ProcessWindows::run() {
+  killIfRunning();
 
   setStartTime();
   launchSubprocess();
   return 0;
+}
+
+void ProcessWindows::killIfRunning() {
+  std::string proc = getExecutable();
+  if (proc.find(".") == 0)
+    proc = proc.erase(0, 2);
+  std::string kill_cmd = "taskkill /F /IM " + proc;
+  Logging::debugPrint(Logging::Detail::GeneralInfo, "Kill cmd: " + kill_cmd);
+  int ret = system(kill_cmd.c_str());
+  (void)ret;
 }
 
 #endif // __WIN32

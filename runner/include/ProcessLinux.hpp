@@ -80,6 +80,10 @@ class ProcessLinux : public ProcessBase {
          */
         int run();
 
+        /**
+         * @brief   Kill process if currently running
+         */
+        void killIfRunning();
 };
 #endif // PROCESSLINUX_HPP
 

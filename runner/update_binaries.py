@@ -46,7 +46,7 @@ change_runner_ver(FITCRACK_APPS_DIR + str(last_ver + 1) +
 
 subprocess.run(["make", "clean"], stdout=subprocess.DEVNULL)
 print("Building new linux binary")
-subprocess.run(["make", "linux"], stdout=subprocess.DEVNULL)
+subprocess.run(["make", "linux", "-j4"], stdout=subprocess.DEVNULL)
 shutil.copy("./bin/runner.bin", FITCRACK_APPS_DIR + str(last_ver + 1) +
             "/x86_64-pc-linux-gnu/runner" + str(last_ver + 1) + ".bin")
 os.remove(FITCRACK_APPS_DIR + str(last_ver + 1) +
@@ -54,7 +54,7 @@ os.remove(FITCRACK_APPS_DIR + str(last_ver + 1) +
 
 subprocess.run(["make", "clean"], stdout=subprocess.DEVNULL)
 print("Building new windows binary")
-subprocess.run(["make", "windows"], stdout=subprocess.DEVNULL)
+subprocess.run(["make", "windows", "-j4"], stdout=subprocess.DEVNULL)
 shutil.copy("./bin/runner.exe", FITCRACK_APPS_DIR + str(last_ver + 1) +
             "/windows_x86_64/runner" + str(last_ver + 1) + ".exe")
 os.remove(FITCRACK_APPS_DIR + str(last_ver + 1) +

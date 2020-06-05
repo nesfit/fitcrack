@@ -30,37 +30,44 @@ class ProcessWindows : public ProcessBase {
         virtual char getQuoteChar() {return '"';}
     
     public:
+      /**
+       * @brief   Conctutor which sets name of the executable
+       * @param   exec_name [in] Name of the executable
+       * @param   exec_args [in] Arguments which to pass to executable
+       * @param   is_external_generator [in] Whether executable is an external
+       * password generator or not
+       */
+      ProcessWindows(const std::string &exec_name,
+                     const std::vector<std::string> &exec_args,
+                     bool is_external_generator);
 
-	/**
-	 * @brief   Conctutor which sets name of the executable
-	 * @param   exec_name [in] Name of the executable
-	 * @param   exec_args [in] Arguments which to pass to executable
-     * @param   is_external_generator [in] Whether executable is an external password generator or not
-	 */
-	ProcessWindows(const std::string& exec_name, const std::vector<std::string>& exec_args, bool is_external_generator);
+      /**
+       * @brief Destructor closing the process and thread handles
+       */
+      ~ProcessWindows();
 
-	/**
-	 * @brief Destructor closing the process and thread handles
-	 */
-	~ProcessWindows();
+      /**
+       * @brief   Converts status to exit code
+       * @return  Exit code of child process
+       */
+      int getExitCode() const;
 
-        /**
-         * @brief   Converts status to exit code
-         * @return  Exit code of child process 
-         */
-        int getExitCode() const;
+      /**
+       * @brief   Checks if process is still running
+       *
+       */
+      bool isRunning();
 
-        /**
-         * @brief   Checks if process is still running
-         *	    
-         */
-        bool isRunning();
+      /**
+       * @brief   Launches the process
+       * @return  Return code of CreateProcess()
+       */
+      int run();
 
-	/**
-	 * @brief   Launches the process
-	 * @return  Return code of CreateProcess() 
-	 */
-	int run();
+      /**
+       * @brief   Kill process if currently running
+       */
+      void killIfRunning();
 
 };		// end of class ProcessWindows
 #endif // PROCESSWINDOWS_HPP

@@ -132,9 +132,21 @@ class ProcessBase {
         void setExecutable(const std::string& exec_name);
 
         /**
+         * @brief   Get executable path
+         * @return  executable path
+         */
+        std::string& getExecutable();
+
+        /**
          * @brief   Pure virtual function launching process and filling star time
          */
         virtual int run() = 0;
+
+        /**
+         * @brief   Kill process if currently running
+         */
+        virtual void killIfRunning() = 0;
+
         /**
          * @brief   Sets process input pipe
          * @param   in_pipe [in] Pipe
