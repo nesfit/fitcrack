@@ -290,17 +290,17 @@ bool CAttackCombinator::makeWorkunit()
             return false;
         }
 
-        //delete the file
-        (std::ofstream(path));
-
-        auto dictVec = m_job->getDictionaries();
-        for (auto & dict : dictVec)
+        if(!std::ifstream(path))
         {
-            if (!dict->isLeft())
-                continue;
+            auto dictVec = m_job->getDictionaries();
+            for (auto & dict : dictVec)
+            {
+                if (!dict->isLeft())
+                    continue;
 
-            auto dictFile = makeInputDict(dict, 0, true);
-            dictFile->CopyTo(path);
+                auto dictFile = makeInputDict(dict, 0, true);
+                dictFile->CopyTo(path);
+            }
         }
     }
     catch(const InputDict::Exception &e)

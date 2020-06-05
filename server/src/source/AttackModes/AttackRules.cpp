@@ -198,35 +198,38 @@ bool CAttackRules::makeWorkunit() {
         return false;
     }
 
-    f.open(path);
-    if (!f.is_open())
+    if(!std::ifstream(path))
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open rules BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        f.open(path);
+        if (!f.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to open rules BOINC input file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    if(m_job->getRules().empty())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Rules is not set in database! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        if(m_job->getRules().empty())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Rules is not set in database! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    std::ifstream rulesFile;
-    rulesFile.open((Config::rulesDir + m_job->getRules()).c_str());
-    if (!rulesFile)
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open rules file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        std::ifstream rulesFile;
+        rulesFile.open((Config::rulesDir + m_job->getRules()).c_str());
+        if (!rulesFile)
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to open rules file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    f << rulesFile.rdbuf();
-    f.close();
+        f << rulesFile.rdbuf();
+        f.close();
+    }
 
 
     /** Fill in the workunit parameters */

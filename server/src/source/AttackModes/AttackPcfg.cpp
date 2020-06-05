@@ -139,31 +139,34 @@ bool CAttackPcfg::makeWorkunit()
         return true;
     }
 
-    f.open(path);
-    if (!f.is_open())
+    if(!std::ifstream(path))
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Failed to open grammar BOINC input file! Skipping workunit.\n");
-        return true;
+        f.open(path);
+        if (!f.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                "Failed to open grammar BOINC input file! Skipping workunit.\n");
+            return true;
+        }
+
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                            "Creating grammar file %s\n", (Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
+
+
+        /** Load grammar path from DB and dump it to BOINC input file  */
+        std::ifstream grammarFile;
+        grammarFile.open((Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
+        if (!grammarFile) {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                "Failed to open grammar file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
+
+        f << grammarFile.rdbuf();
+        grammarFile.close();
+        f.close();
     }
-
-    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                          "Creating grammar file %s\n", (Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
-
-
-    /** Load grammar path from DB and dump it to BOINC input file  */
-    std::ifstream grammarFile;
-    grammarFile.open((Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
-    if (!grammarFile) {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Failed to open grammar file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
-
-    f << grammarFile.rdbuf();
-    grammarFile.close();
-    f.close();
 
 
     /** Fill in the workunit parameters */

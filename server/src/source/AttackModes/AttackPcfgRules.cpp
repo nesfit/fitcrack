@@ -150,72 +150,78 @@ bool CAttackPcfgRules::makeWorkunit()
         return true;
     }
 
-    f.open(path);
-    if (!f.is_open())
+    if(!std::ifstream(path))
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Failed to open grammar BOINC input file! Skipping workunit.\n");
-        return true;
+        f.open(path);
+        if (!f.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                "Failed to open grammar BOINC input file! Skipping workunit.\n");
+            return true;
+        }
+
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                            "Creating grammar file %s\n", (Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
+
+
+        /** Load grammar path from DB and dump it to BOINC input file  */
+        std::ifstream grammarFile;
+        grammarFile.open((Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
+        if (!grammarFile) {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                "Failed to open grammar file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
+
+        f << grammarFile.rdbuf();
+        grammarFile.close();
+        f.close();
     }
 
-    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                          "Creating grammar file %s\n", (Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
-
-
-    /** Load grammar path from DB and dump it to BOINC input file  */
-    std::ifstream grammarFile;
-    grammarFile.open((Config::pcfgDir + m_job->getGrammar() + "/grammar.bin").c_str());
-    if (!grammarFile) {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Failed to open grammar file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
-
-    f << grammarFile.rdbuf();
-    grammarFile.close();
-    f.close();
-
-    
-    /** Create rules file */
     retval = config.download_path(name5, path);
     if (retval)
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Failed to receive BOINC filename - rules. Setting job to malformed.\n");
+                            "Failed to receive BOINC filename - rules. Setting job to malformed.\n");
         m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
 
-    f.open(path);
-    if (!f.is_open())
+    /** Create rules file */
+    if(!std::ifstream(path))
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Failed to open rules BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
 
-    if(m_job->getRules().empty())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Rules is not set in database! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        f.open(path);
+        if (!f.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                "Failed to open rules BOINC input file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    std::ifstream rulesFile;
-    rulesFile.open((Config::rulesDir + m_job->getRules()).c_str());
-    if (!rulesFile)
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                              "Failed to open rules file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        if(m_job->getRules().empty())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                "Rules is not set in database! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    f << rulesFile.rdbuf();
-    f.close();
+        std::ifstream rulesFile;
+        rulesFile.open((Config::rulesDir + m_job->getRules()).c_str());
+        if (!rulesFile)
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                                "Failed to open rules file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
+
+        f << rulesFile.rdbuf();
+        f.close();
+    }
 
 
     /** Fill in the workunit parameters */

@@ -136,35 +136,38 @@ bool CAttackMarkov::makeWorkunit()
         return false;
     }
 
-    f.open(path);
-    if (!f.is_open())
+    if(!std::ifstream(path))
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open markov BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        f.open(path);
+        if (!f.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to open markov BOINC input file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    if(m_job->getMarkov().empty())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Job markov is empty! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        if(m_job->getMarkov().empty())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Job markov is empty! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    std::ifstream markovFile;
-    markovFile.open((Config::markovDir + m_job->getMarkov()).c_str());
-    if (!markovFile.is_open())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open markov file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        std::ifstream markovFile;
+        markovFile.open((Config::markovDir + m_job->getMarkov()).c_str());
+        if (!markovFile.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to open markov file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    f << markovFile.rdbuf();
-    f.close();
+        f << markovFile.rdbuf();
+        f.close();
+    }
 
 
     /** Fill in the workunit parameters */
