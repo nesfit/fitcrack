@@ -104,8 +104,6 @@ bool ProcessWindows::isRunning() {
 }
 
 int ProcessWindows::run() {
-  killIfRunning();
-
   setStartTime();
   launchSubprocess();
   return 0;

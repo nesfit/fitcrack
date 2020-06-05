@@ -145,6 +145,7 @@ void TaskComputeBase::startComputation() {
   if(!process_hashcat_->isRunning())
   {
     hashcat_mutex_.lock();
+    process_hashcat_->killIfRunning();
     process_hashcat_->run();
     Logging::debugPrint(Logging::Detail::GeneralInfo,
                         "Hashcat process has started.");

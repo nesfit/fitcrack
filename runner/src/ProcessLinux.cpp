@@ -78,9 +78,6 @@ bool ProcessLinux::isRunning() {
 }
 
 int ProcessLinux::run() {
-
-  killIfRunning();
-
   setStartTime();
   process_identifier_ = fork();
 
