@@ -241,11 +241,15 @@ class JobByID(Resource):
         job.time_start = None if not args['time_start'] else datetime.datetime.strptime(args['time_start'], '%Y-%m-%dT%H:%M'),
         job.time_end = None if not args['time_end'] else datetime.datetime.strptime(args['time_end'], '%Y-%m-%dT%H:%M')
 
-        if job.attack_mode == attack_modes['prince']:      
-            # Recompute new keyspace/hc_keyspace
-            new_hc_keyspace = compute_prince_keyspace(args)
-            if new_hc_keyspace == -1:
-                abort(400, 'Unable to compute new job keyspace.\nJob \"' + job.name + '\" was not edited.')
+        if job.attack_mode == attack_modes['prince']:
+            opts_changing_keyspace = ["case_permute", "check_duplicates", "min_password_len", "max_password_len", "min_elem_in_chain", "max_elem_in_chain"]
+            if any(getattr(job, option) != args[option] for option in opts_changing_keyspace):
+                # Recompute new keyspace/hc_keyspace
+                new_hc_keyspace = compute_prince_keyspace(args)
+                if new_hc_keyspace == -1:
+                    abort(400, 'Unable to compute new job keyspace.\nJob \"' + job.name + '\" was not edited.')
+            else:
+                new_hc_keyspace = job.hc_keyspace
 
             random_rules_count = 0
             if args['generate_random_rules']:
