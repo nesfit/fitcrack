@@ -41,6 +41,9 @@ if [ $BUILD_SERVER = "y" ]; then
   # Reinstall daemons
   source installer/install_daemons.sh
 
+  pkill -f pcfg_monitor.py
+  pkill -f measureUsage.py
+
   echo "Starting Fitcrack server again..."
   MYDIR=$(pwd)
   cd $BOINC_PROJECT_DIR
