@@ -29,6 +29,9 @@
             {{ item.name }}
           </router-link>
         </template>
+        <template v-slot:item.keyspace="{ item }">
+          {{ fmt(item.keyspace) }}
+        </template>
         <template v-slot:item.time="{ item }">
           {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
         </template>
@@ -74,6 +77,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   import FileUploader from "@/components/fileUploader/fileUploader";
   export default {
@@ -102,6 +106,7 @@
       this.loadCharsets()
     },
     methods: {
+      fmt,
       loadCharsets: function () {
         this.loading = true;
         this.axios.get(this.$serverAddr + '/charset', {}).then((response) => {

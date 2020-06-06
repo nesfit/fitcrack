@@ -80,6 +80,12 @@
       <template v-slot:item.time="{ item }">
         {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
       </template>
+      <template v-slot:item.start_index_real="{ item }">
+        {{ fmt(item.start_index_real) }}
+      </template>
+      <template v-slot:item.keyspace="{ item }">
+        {{ fmt(item.keyspace) }}
+      </template>
       <template v-slot:item.retry="{ item }">
         <v-chip
           small

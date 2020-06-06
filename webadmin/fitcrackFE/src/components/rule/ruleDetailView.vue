@@ -42,7 +42,7 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title class="text-right">
-                  {{ data.count }}
+                  {{ fmt(data.count) }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
@@ -90,6 +90,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   import fcTextarea from '@/components/textarea/fc_textarea'
   export default {
@@ -107,6 +108,7 @@
       this.loadData()
     },
     methods: {
+      fmt,
       loadData: function ($state) {
         this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
           this.data = response.data

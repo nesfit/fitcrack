@@ -21,6 +21,9 @@
           </v-icon>
         </router-link>
       </template>
+      <template v-slot:item.dictionary.keyspace="{ item: { dictionary } }">
+        {{ fmt(dictionary.keyspace) }}
+      </template>
       <template v-slot:item.dictionary.time="{ item: { dictionary } }">
         {{ $moment(dictionary.time).format('DD.MM.YYYY HH:mm') }}
       </template>
@@ -38,7 +41,7 @@
             </router-link>
           </v-list-item-title>
           <span>
-            Keyspace: {{ data.rulesFile.count || 'not specified' }}
+            Keyspace: {{ fmt(data.rulesFile.count) || 'not specified' }}
           </span>
         </v-list-item-content>
       </v-list-item>
@@ -125,6 +128,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   export default {
     name: "PrinceDetail",
@@ -150,6 +154,7 @@
         ]
       }
     },
+    methods: { fmt }
   }
 </script>
 

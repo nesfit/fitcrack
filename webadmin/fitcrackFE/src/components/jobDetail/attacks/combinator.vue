@@ -24,6 +24,9 @@
           </v-icon>
         </router-link>
       </template>
+      <template v-slot:item.dictionary.keyspace="{ item: { dictionary } }">
+        {{ fmt(dictionary.keyspace) }}
+      </template>
     </v-data-table>
     <template v-if="data.rule_left !== ''">
       <v-list-item class="px-2 py-1">
@@ -58,6 +61,9 @@
           </v-icon>
         </router-link>
       </template>
+      <template v-slot:item.dictionary.keyspace="{ item: { dictionary } }">
+        {{ fmt(dictionary.keyspace) }}
+      </template>
       <template v-slot:item.progress="{ item: { current_index, dictionary: { keyspace } } }">
         <v-progress-circular
           size="16"
@@ -86,6 +92,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   export default {
     name: "CombinatorDetail",
@@ -112,7 +119,8 @@
           {text: 'Progress', value: 'progress', align: 'right'}
         ]
       }
-    }
+    },
+    methods: { fmt }
   }
 </script>
 

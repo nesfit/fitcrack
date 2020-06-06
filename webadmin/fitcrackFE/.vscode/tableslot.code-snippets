@@ -3,8 +3,20 @@
     "prefix": ["tableslot", "ts"],
     "body": ["<template v-slot:item.$1=\"{ item }\">", "\t$0", "</template>"]
   },
+  "Table item formatter": {
+    "prefix": ["tableformat", "tsf"],
+    "body": ["<template v-slot:item.$1=\"{ item }\">", "\t{{ fmt(item.$1) }}", "</template>"]
+  },
   "Footer props": {
     "prefix": ["ipp"],
     "body": [":footer-props=\"{itemsPerPageOptions: [${1:10,25,50}], itemsPerPageText: '${2:Items} per page'}\""]
-  }
+  },
+  "Import default": {
+    "prefix": ["i"],
+    "body": "import $1 from '@/${2|components,assets/scripts|}/$3'"
+  },
+  "Import specific": {
+    "prefix": ["ii"],
+    "body": "import { $1 } from '@/${2|components,assets/scripts|}/$3'"
+  },
 }

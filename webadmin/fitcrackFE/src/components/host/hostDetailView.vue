@@ -189,6 +189,12 @@
               {{ item.job.name || 'Detail' }}
             </router-link>
           </template>
+          <template v-slot:item.start_index_real="{ item }">
+            {{ fmt(item.start_index_real) }}
+          </template>
+          <template v-slot:item.hc_keyspace="{ item }">
+            {{ fmt(item.hc_keyspace) }}
+          </template>
           <template v-slot:item.time="{ item }">
             {{ $moment(item.time).format('D.M.YYYY H:mm:ss') }}
           </template>
@@ -205,6 +211,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import iconv from 'iconv-lite'
   import tile from '@/components/tile/fc_tile'
   export default {
@@ -219,7 +226,7 @@
           {text: 'Job', align: 'start', value: 'job_id'},
           {text: 'Cracking time', align: 'start', value: 'cracking_time_str'},
           {text: 'Generated', align: 'end', value: 'time'},
-          {text: 'Start index', align: 'end', value: 'start_index'},
+          {text: 'Start index', align: 'end', value: 'start_index_real'},
           {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
           {text: 'Retry', align: 'end', value: 'retry'},
           {text: 'Finish', align: 'end', value: 'finished'}
@@ -272,6 +279,7 @@
       this.loadData()
     },
     methods: {
+      fmt,
       loadData: function () {
         this.axios.get(this.$serverAddr + '/hosts/' + this.$route.params.id).then((response) => {
           this.data = response.data;

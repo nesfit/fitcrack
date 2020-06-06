@@ -32,6 +32,9 @@
             {{ name }}
           </router-link>
         </template>
+        <template v-slot:item.keyspace="{ item }">
+          {{ fmt(item.keyspace) }}
+        </template>
         <template v-slot:item.time_added="{ item }">
           {{ $moment(item.time_added).format('DD.MM.YYYY HH:mm') }}
         </template>
@@ -91,6 +94,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   import fileCreator from "@/components/fileUploader/fileCreator"
   export default {
@@ -121,6 +125,7 @@
       this.loadPcfg()
     },
     methods: {
+      fmt,
       loadPcfg: function () {
         this.loading = true
         this.axios.get(this.$serverAddr + '/pcfg', {}).then((response) => {

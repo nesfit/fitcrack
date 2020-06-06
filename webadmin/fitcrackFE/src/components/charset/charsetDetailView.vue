@@ -42,7 +42,7 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title class="text-right">
-                  {{ data.keyspace }}
+                  {{ fmt(data.keyspace) }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
@@ -100,6 +100,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import iconv from 'iconv-lite'
   import tile from '@/components/tile/fc_tile'
   export default {
@@ -140,6 +141,7 @@
       this.loadData()
     },
     methods: {
+      fmt,
       loadData: function ($state) {
         this.axios.get(this.$serverAddr + '/charset/' + this.$route.params.id).then((response) => {
           this.data = response.data

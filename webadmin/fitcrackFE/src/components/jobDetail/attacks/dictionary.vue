@@ -21,6 +21,9 @@
           </v-icon>
         </router-link>
       </template>
+      <template v-slot:item.dictionary.keyspace="{ item: { dictionary } }">
+        {{ fmt(dictionary.keyspace) }}
+      </template>
       <template v-slot:item.progress="{ item: { current_index, dictionary: { keyspace } } }">
         <v-progress-circular
           size="16"
@@ -54,6 +57,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   export default {
     name: "DictionaryDetail",
@@ -79,6 +83,7 @@
         ]
       }
     },
+    methods: { fmt }
   }
 </script>
 

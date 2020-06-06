@@ -26,7 +26,7 @@
             </router-link>
           </v-list-item-title>
           <span>
-            Keyspace: {{ data.grammar_keyspace || 'not specified' }}
+            Keyspace: {{ fmt(data.grammar_keyspace) || 'not specified' }}
           </span>
         </v-list-item-content>
       </v-list-item>
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   export default {
     name: "PcfgDetail",
@@ -80,6 +81,7 @@
         ]
       }
     },
+    methods: { fmt }
   }
 </script>
 

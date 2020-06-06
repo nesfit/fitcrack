@@ -25,6 +25,9 @@
         </v-icon>
       </router-link>
     </template>
+    <template v-slot:item.count="{ item }">
+      {{ fmt(item.count) }}
+    </template>
     <template v-slot:item.time="{ item }">
       {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
     </template>
@@ -32,6 +35,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import selector from './selectorMixin'
   export default {
     name: "RulesSelector",
@@ -50,6 +54,7 @@
       }
     },
     methods: {
+      fmt,
       getData() {
         this.loading = true
         this.axios.get(this.$serverAddr + '/rule').then((response) => {
