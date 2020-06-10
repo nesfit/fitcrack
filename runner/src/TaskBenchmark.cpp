@@ -53,19 +53,7 @@ void TaskBenchmark::parseHashcatBenchmark(std::string& output_line) {
   //HC prinst like so: printf ("RECSALT\t%d\t%d\t", hashcat_status->salts_done, hashcat_status->salts_cnt);
   if(m_saltCount <= 1)
   {
-    static const char marker[] = "RECSALT\t";
-    size_t found_at = output_line.find(marker);
-    if (found_at != std::string::npos) {
-      //-1 for terminating NULL
-      found_at += sizeof(marker)-1;
-      uint64_t dummy;
-      uint64_t saltCount;
-      std::istringstream parser(output_line.substr(found_at));
-      if(parser>>dummy && parser>>saltCount)
-      {
-        m_saltCount = saltCount;
-      }
-    }
+    m_saltCount = getSaltCountFromStatusLine(output_line);
   }
 
 }

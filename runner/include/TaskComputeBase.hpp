@@ -38,6 +38,8 @@ class TaskComputeBase: public TaskBase {
          */
         void getAllArguments();
 
+        uint64_t getSaltCountFromStatusLine(const std::string &outputLine);
+
     public:
 
 

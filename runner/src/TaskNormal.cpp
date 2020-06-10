@@ -41,7 +41,7 @@ bool TaskNormal::parseHashcatProgress(std::string& progress_line) {
 
   /** When this is the first parsed line */
   if (total_hashes_ == 0) {
-    setTotalHashesFromProgress(progress.first, progress.second);
+    setTotalHashesFromProgress(progress.first, progress.second, getSaltCountFromStatusLine(progress_line));
   }
 
   saveParsedProgress(progress.first);
@@ -78,7 +78,7 @@ void TaskNormal::saveParsedProgress(uint64_t currentProgress) {
   actualizeComputedHashes(difference_since_last_actualization);
 }
 
-void TaskNormal::setTotalHashesFromProgress(uint64_t current, uint64_t max) {
+void TaskNormal::setTotalHashesFromProgress(uint64_t current, uint64_t max, uint64_t saltCount) {
 
   std::string val;
   uint64_t limit = 0;
@@ -120,20 +120,6 @@ void TaskNormal::setTotalHashesFromProgress(uint64_t current, uint64_t max) {
       return;
     }
     File foundFile;
-    if(directory_.find("data", foundFile))
-    {
-      std::ifstream hashesStream(foundFile.getRelativePath().c_str());
-      size_t hashesCount = 0;
-      std::string line;
-      while(std::getline(hashesStream, line))
-      {
-        if(!line.empty())
-        {
-          ++hashesCount;
-        }
-      }
-      total_hashes_ *= hashesCount;
-    }
     if(directory_.find("rules", foundFile))
     {
       std::ifstream rulesStream(foundFile.getRelativePath().c_str());
@@ -150,6 +136,7 @@ void TaskNormal::setTotalHashesFromProgress(uint64_t current, uint64_t max) {
       ruleCount -= invalidRuleCount;
       total_hashes_ *= ruleCount;
     }
+    total_hashes_ *= saltCount;
   }
 
 }

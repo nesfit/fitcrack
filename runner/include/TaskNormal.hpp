@@ -57,7 +57,7 @@ class TaskNormal: public TaskComputeBase {
 	 * @brief   Sets total_hashes_ to the second value after PROGRESS
 	 * @param   progress_line [] Hashcat's progress line
 	 */
-	void setTotalHashesFromProgress(uint64_t current, uint64_t max);
+	void setTotalHashesFromProgress(uint64_t current, uint64_t max, uint64_t saltCount);
 
     public:
 

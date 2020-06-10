@@ -21,6 +21,25 @@ void TaskComputeBase::getAllArguments() {
   host_config_.parseArguments(hashcat_arguments_);
 }
 
+uint64_t TaskComputeBase::getSaltCountFromStatusLine(const std::string &outputLine)
+{
+  static const char marker[] = "RECSALT\t";
+  size_t found_at = outputLine.find(marker);
+  if (found_at != std::string::npos) {
+    //-1 for terminating NULL
+    found_at += sizeof(marker)-1;
+    uint64_t dummy;
+    uint64_t saltCount;
+    std::istringstream parser(outputLine.substr(found_at));
+    if(parser>>dummy && parser>>saltCount)
+    {
+      return saltCount;
+    }
+  }
+  //return 1 by default so that we assume there is only one salt
+  return 1;
+}
+
 /* Public */
 TaskComputeBase::TaskComputeBase(
   Directory& directory,
