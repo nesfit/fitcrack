@@ -101,6 +101,11 @@ std::vector<std::string> CAbstractGenerator::getStickyFiles(PtrJob &job) {
             stickyFiles.push_back(std::string(Config::appName) + "_rules_" +
                                   std::to_string(job->getId()));
           break;
+        
+        case Config::AttackMode::AttackHybridDictMask:
+          stickyFiles.push_back(std::string(Config::appName) + "_hybrid_" +
+                                std::to_string(job->getId())+".dict");
+          break;
 
         default:
           break;
