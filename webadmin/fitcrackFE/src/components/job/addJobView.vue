@@ -169,7 +169,7 @@
                   <v-alert
                     type="warning"
                   >
-                    Currently we support these formats:
+                    Currently, we support these formats:
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#">MS_OFFICE</a>,</span>
@@ -181,6 +181,12 @@
                         <span v-on="on"><a href="#">PDF</a>,</span>
                       </template>
                       <span>Hashtypes: 10400, 10500, 10600, 10700</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <span v-on="on"><a href="#">7Z</a>,</span>
+                      </template>
+                      <span>Hashtypes: 11600</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
