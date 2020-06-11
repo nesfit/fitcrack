@@ -25,6 +25,8 @@
 #include "app_ipc.h"
 #include "boinc_api.h"
 
+#include "hwMonitor.hpp"
+
 
 /** Class representing task created by the server */
 class TaskBase {
@@ -45,6 +47,8 @@ class TaskBase {
         std::string mode_;           /**< Mode of the task a-benchmark_all, b-benchmark, n-normal */
         std::string output_file_;   /**< Name of the hashcat output file */
 	std::string workunit_name_; /**< Name of the workunit assigned by boinc server */
+
+  hwMonitor hwMon;
 
 	/**
          * @brief   Actualizes member variables represeting progress

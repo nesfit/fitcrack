@@ -531,6 +531,35 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 
 -- --------------------------------------------------------
 
+--
+-- Struktura tabulky pro tabulku `fc_hw_stats`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_hw_stats` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `workunit_id` bigint unsigned NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `cpu_utilization` tinyint,
+  `memory_utilization` tinyint,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky pro tabulku `fc_hw_stats_device`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_hw_stats_device` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `fc_hw_stats_id` bigint unsigned NOT NULL,
+  `index` tinyint,
+  `utilization` tinyint,
+  `temperature` tinyint,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
 
 --
 -- Obmedzenie pre exportované tabuľky
@@ -589,3 +618,15 @@ ALTER TABLE `fc_user`
 ALTER TABLE `fc_user_permissions`
   ADD CONSTRAINT `fc_user_permissions_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fc_user_permissions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `fc_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Omezení pro tabulku `fc_hw_stats`
+--
+ALTER TABLE `fc_hw_stats`
+  ADD CONSTRAINT `fc_hw_stats_ibfk_1` FOREIGN KEY (`workunit_id`) REFERENCES `fc_workunit` (`id`);
+
+--
+-- Omezení pro tabulku `fc_hw_stats_device`
+--
+ALTER TABLE `fc_hw_stats_device`
+  ADD CONSTRAINT `fc_hw_stats_device_ibfk_1` FOREIGN KEY (`fc_hw_stats_id`) REFERENCES `fc_hw_stats` (`id`);

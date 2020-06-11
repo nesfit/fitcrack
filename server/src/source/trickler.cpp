@@ -45,6 +45,15 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     char buf[SQL_BUF_SIZE];
     char wu_name[SQL_BUF_SIZE];
 
+    int cpuUtil, memUtil, deviceUtil, deviceTemp, deviceIndex;
+    int fc_hw_stats_id;
+    std::string fc_workunit_id;
+    bool got_cpuUtil = false;
+    bool got_memUtil = false;
+    bool got_deviceUtil = false;
+    bool got_deviceTemp = false;
+    bool got_deviceIndex = false;
+
     std::cerr << std::endl;
     log_messages.printf(MSG_NORMAL,
                         "Got trickle-up message from hostId #%lu:\n%s\n\n", mfh.hostid, mfh.xml
@@ -77,7 +86,131 @@ int handle_trickle(MSG_FROM_HOST& mfh)
             got_progress = true;
             continue;
         }
+        
+        if (xp.parse_int("cpuUtil", cpuUtil))
+        {
+            if (std::isnan(cpuUtil))
+            {
+                std::cerr << "ERROR: cpuUtil cannot be nan." << std::endl;
+                return 1;
+            }
 
+            std::cerr << "Succesfully parsed cpuUtil: " << cpuUtil << std::endl;
+            got_cpuUtil = true;
+        }
+
+        if (xp.parse_int("memUtil", memUtil))
+        {
+            if (std::isnan(memUtil))
+            {
+                std::cerr << "ERROR: memUtil cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed memUtil: " << memUtil << std::endl;
+            got_memUtil = true;
+        }
+
+        if (got_cpuUtil && got_memUtil)
+        {
+            // SAVE SYSTEM STATS TO DB, KEEP INSERTED ID
+
+            // Obtain fc_workunit ID
+            snprintf(buf, SQL_BUF_SIZE, "SELECT id FROM workunit WHERE name = '%s' LIMIT 1 ;", wu_name);
+            int retval = boinc_db.do_query(buf);
+            if (retval)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+
+            MYSQL_RES* sqlResult;
+            sqlResult = mysql_store_result(boinc_db.mysql);
+            if (!sqlResult)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+
+            MYSQL_ROW row;
+            row = mysql_fetch_row(sqlResult);
+            fc_workunit_id = row[0];
+            mysql_free_result(sqlResult);
+            // fc_workunit ID obtained
+
+            // Insert row into fc_hw_stats
+            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats`(`workunit_id`, `cpu_utilization`, `memory_utilization`) VALUES(%s, %d, %d) ;",
+            fc_workunit_id.c_str(), cpuUtil, memUtil);
+
+            retval = boinc_db.do_query(buf);
+            if (retval)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+            // get ID of inserted row
+            fc_hw_stats_id = boinc_db.insert_id();
+
+            got_cpuUtil = got_memUtil = false;
+        }
+
+        if (xp.parse_int("util", deviceUtil))
+        {
+            if (std::isnan(deviceUtil))
+            {
+                std::cerr << "ERROR: util cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed util: " << deviceUtil << std::endl;
+            got_deviceUtil = true;
+        }
+
+        if (xp.parse_int("temp", deviceTemp))
+        {
+            if (std::isnan(deviceTemp))
+            {
+                std::cerr << "ERROR: temp cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed temp: " << deviceTemp << std::endl;
+            got_deviceTemp = true;
+        }
+
+        if (xp.parse_int("index", deviceIndex))
+        {
+            if (std::isnan(deviceIndex))
+            {
+                std::cerr << "ERROR: index cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed index: " << deviceIndex << std::endl;
+            got_deviceIndex = true;
+        }
+
+        if (got_deviceUtil && got_deviceTemp && got_deviceIndex)
+        {
+            // SAVE DEVICE STATS TO DB
+
+            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats_device`(`fc_hw_stats_id`, `index`, `utilization`, `temperature`) VALUES(%d, %d, %d, %d) ;",
+             fc_hw_stats_id, deviceIndex, deviceUtil, deviceTemp);
+
+            int retval = boinc_db.do_query(buf);
+            if (retval)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+
+            got_deviceUtil = got_deviceTemp = got_deviceIndex = false;
+        }
+        
         //std::cerr << "WARNING: Unexpected tag: " << xp.parsed_tag << std::endl;
     }
 

@@ -58,7 +58,7 @@ void TaskBase::reportProgress() {
   // Add call of the trickler progress message
   if (!boinc_is_standalone()) {
     std::string trickle_message = "<workunit_name>"+ workunit_name_ + "</workunit_name>\n<progress>" + RunnerUtils::toString(percent_done) + "</progress>";
-
+    trickle_message += "\n" + hwMon.GetHwInformation();
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wwrite-strings" // disable G++ warning about deprecated cast
     boinc_send_trickle_up(const_cast<char*>(BoincConstants::TrickleDeamonName.c_str()), const_cast<char*>(trickle_message.c_str())); // progress to boinc project server

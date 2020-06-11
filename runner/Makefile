@@ -33,6 +33,7 @@ windows: TARGET=runner.exe
 windows: CXX=x86_64-w64-mingw32-g++
 windows: ARCH=
 windows: CXXPATHS+=-L'./lib/windows_x86_64/'
+windows: LDXXFLAGS+=-lwbemuuid -lole32 -loleaut32
 windows: $(OBJDIR) $(BINDIR) runner
 
 $(OBJDIR): 

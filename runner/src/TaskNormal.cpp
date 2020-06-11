@@ -45,6 +45,7 @@ bool TaskNormal::parseHashcatProgress(std::string& progress_line) {
   }
 
   saveParsedProgress(progress.first);
+  hwMon.ParseProgressLine(progress_line);
   return true;
 }
 
