@@ -90,8 +90,11 @@ def cancel_wus(job_id, cursor):
 
 def purge_job(job_id, cursor):
     """Purges the job in case of some nasty crash before."""
+    cursor.execute('UPDATE fc_job SET status = 0 WHERE id = %s', (job_id, ))
+    sleep(2)
     cancel_wus(job_id, cursor)
-    cursor.execute('UPDATE fc_job SET indexes_verified = 0, current_index = 0 WHERE id = %s', (job_id, ))
+    sleep(2)
+    cursor.execute('UPDATE fc_job SET status = 10, indexes_verified = 0, current_index = 0 WHERE id = %s', (job_id, ))
 
 
 def job_id_to_port(job_id):
