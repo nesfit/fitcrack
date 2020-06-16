@@ -166,7 +166,7 @@ struct NormalAttackMaker
     }
 };
 
-void CSimpleGenerator::createWorkunit(PtrJob &job, PtrHost &host, bool isBenchmark)
+void CSimpleGenerator::createWorkunit(PtrJob job, PtrHost &host, bool isBenchmark)
 {
     uint64_t jobId = job->getId();
     uint64_t hostBoincId = host->getBoincHostId();

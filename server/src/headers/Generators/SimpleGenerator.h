@@ -41,7 +41,7 @@ class CSimpleGenerator : public CAbstractGenerator {
          * @param job [in] Parent job of this workunit
          * @param host [in] Host to whom the cracking workunit is sent
          */
-        void createWorkunit(PtrJob &job, PtrHost &host, bool isBenchmark);
+        void createWorkunit(PtrJob job, PtrHost &host, bool isBenchmark);
 
         /**
          * @brief Set job to timeout/exhausted/pause status
