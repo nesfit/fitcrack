@@ -611,6 +611,8 @@ class FcWorkunit(Base):
 
     result = relationship('Result',  uselist=False, primaryjoin="FcWorkunit.workunit_id==Result.workunitid", viewonly=True)
 
+    hw_stats = relationship('FcHwStats', back_populates="workunits")
+
     @hybrid_property
     def keyspace(self):
         if self.job.attack_mode == 8:
@@ -932,3 +934,24 @@ class FcServerUsage(Base):
     net_sent = Column(Integer, nullable=False)
     hdd_read = Column(Integer, nullable=False)
     hdd_write = Column(Integer, nullable=False)
+
+class FcHwStats(Base):
+    __tablename__ = 'fc_hw_stats'
+
+    id = Column(Integer, primary_key=True)
+    workunit_id = Column(BigInteger, ForeignKey(FcWorkunit.id), nullable=False)
+    time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    cpu_utilization = Column(Integer)
+    memory_utilization = Column(Integer)
+    devices = relationship('FcHwStatsDevice', back_populates='stats')
+    workunits = relationship('FcWorkunit', back_populates='hw_stats')
+    
+class FcHwStatsDevice(Base):
+    __tablename__ = 'fc_hw_stats_device'
+
+    id = Column(Integer, primary_key=True)
+    fc_hw_stats_id = Column(BigInteger, ForeignKey(FcHwStats.id), nullable=False)
+    index = Column(Integer)
+    utilization = Column(Integer)
+    temperature = Column(Integer)
+    stats = relationship('FcHwStats', back_populates='devices')

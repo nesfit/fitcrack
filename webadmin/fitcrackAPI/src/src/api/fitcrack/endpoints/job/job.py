@@ -37,7 +37,7 @@ from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, 
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcJob, Host, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, \
-    FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser, FcSetting
+    FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser, FcSetting, FcHwStats, FcHwStatsDevice
 
 log = logging.getLogger(__name__)
 
@@ -606,3 +606,114 @@ class lastJobs(Resource):
                 jobs_to_return.append(job)
 
         return {'items': jobs_to_return}
+
+@ns.route('/<int:job_id>/hwMon/<int:host_id>/systemStats')
+@api.response(404, 'System stats for this job and host not found.')
+class jobHostSystemStats(Resource):
+
+    #@api.marshal_with(nejaky_model)
+    def get(self, job_id, host_id):
+        """
+        Returns system stats for host that worked on concrete job.
+        """
+        if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
+        
+        workunitsInJob = FcWorkunit.query.filter(FcWorkunit.job_id == job_id).filter(FcWorkunit.boinc_host_id == host_id)
+        items = []
+        for wu in workunitsInJob:
+            for stats in wu.hw_stats:
+                items.append(
+                    {
+                        'time':stats.time.isoformat(),
+                        'cpu_utilization':stats.cpu_utilization,
+                        'memory_utilization':stats.memory_utilization
+                    })
+        return {'items':items}
+
+@ns.route('/<int:job_id>/hosts')
+@api.response(404, 'Hosts for this job not found.')
+class jobAllHosts(Resource):
+
+    #@api.marshal_with(nejaky_model)
+    def get(self, job_id):
+        """
+        Returns all hosts that worked on concrete job.
+        """
+        if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
+        
+        workunitsInJob = FcWorkunit.query.filter(FcWorkunit.job_id == job_id)
+        items = []
+        hosts = []
+        for wu in workunitsInJob:
+            hosts.append(wu.boinc_host_id)
+        hosts = list(set(hosts))
+        hostsWithId = Host.query.filter(Host.id.in_(hosts))
+        for host in hostsWithId:
+            items.append(
+                {
+                    'id':host.id,
+                    'name':host.domain_name
+                })
+        return {'items':items}
+
+@ns.route('/<int:job_id>/hwMon/<int:host_id>/deviceCount')
+@api.response(404, 'Device count for this job and host not found.')
+class jobHostSystemStats(Resource):
+
+    #@api.marshal_with(nejaky_model)
+    def get(self, job_id, host_id):
+        """
+        Returns number of devices of given host that were part of job computation.
+        """
+        if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
+        
+        deviceCount = 0
+        wusInJob = []
+
+        wus = FcWorkunit.query.filter(FcWorkunit.job_id == job_id).filter(FcWorkunit.boinc_host_id == host_id)
+        for wu in wus:
+            wusInJob.append(wu.id)
+        wusInJob = list(set(wusInJob))
+
+        hwStats = FcHwStats.query.filter(FcHwStats.workunit_id.in_(wusInJob))
+        for stat in hwStats:
+            for dvc in stat.devices:
+                if (dvc.index > deviceCount):
+                    deviceCount = dvc.index
+        return {'deviceCount':deviceCount}
+
+@ns.route('/<int:job_id>/hwMon/<int:host_id>/deviceStats/<int:index>')
+@api.response(404, 'Device stats for this job and host not found.')
+class jobHostDeviceStats(Resource):
+
+    #@api.marshal_with(nejaky_model)
+    def get(self, job_id, host_id, index):
+        """
+        Returns device stats for given job and host.
+        """
+        if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
+        
+        items = []
+        wusInJob = []
+
+        wus = FcWorkunit.query.filter(FcWorkunit.job_id == job_id).filter(FcWorkunit.boinc_host_id == host_id)
+        for wu in wus:
+            wusInJob.append(wu.id)
+        wusInJob = list(set(wusInJob))
+
+        hwStats = FcHwStats.query.filter(FcHwStats.workunit_id.in_(wusInJob))
+        for stat in hwStats:
+            for dvc in stat.devices:
+                if (dvc.index == index):
+                    items.append(
+                        {
+                            'time':stat.time.isoformat(),
+                            'utilization':dvc.utilization,
+                            'temperature':dvc.temperature
+                        }
+                    )
+        return {'items':items}

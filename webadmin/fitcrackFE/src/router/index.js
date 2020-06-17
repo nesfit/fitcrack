@@ -39,6 +39,7 @@ const EncryptedFiles = r => require.ensure([], () => r(require('@/components/enc
 const Server = r => require.ensure([], () => r(require('@/components/server/serverPage')))
 const Settings = r => require.ensure([], () => r(require('@/components/settings/settingsView')))
 const Transfer = r => require.ensure([], () => r(require('@/components/settings/dataTransfer')))
+const hwMon = r => require.ensure([], () => r(require('@/components/hwMon/hwMonView')))
 const UnauthorizedError = r => require.ensure([], () => r(require('@/components/errorPages/unauthorized')))
 
 Vue.use(Router);
@@ -315,6 +316,11 @@ const appRoutes = [
       icon: 'mdi-dolly',
       navtab: 2
     }
+  },
+  {
+    path: '/jobs/:id/hwMon',
+    name: 'hwMon',
+    component: hwMon,
   },
   {
     path: '/error/unauthorized',

@@ -358,6 +358,9 @@
             </v-icon>
           </v-btn>
           <template v-else-if="item.permissions.operate || $userCan('OPERATE_ALL_JOBS')">
+            <router-link :to="`/jobs/${item.id}/hwMon`">
+              <v-icon>mdi-gauge</v-icon>
+            </router-link>
             <v-btn
               v-if="item.status === '0'"
               :disabled="item.host_count == 0"
