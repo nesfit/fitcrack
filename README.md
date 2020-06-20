@@ -4,7 +4,7 @@ This README describes how to install and run Fitcrack distributed password crack
 There are four ways of deployment:
 
 * Using installer + [Step-by-step guide for Debian 9 / Ubuntu 18.04 LTS](#instdeb) (recommended way)
-* Using installer + [Step-by-step guide for CentOS/RHEL 7](#instcentos) (recommended way)
+* Using installer + [Step-by-step guide for CentOS/RHEL 8](#instcentos) (recommended way)
 * Using installer + [General installation instructions](#instgen)
 * Manual install:
   * For **BOINC and Fitcrack server**, see [server README](server/README.md)
@@ -112,7 +112,7 @@ If you wish to use SELINUX on Fitcrack server machine, you have to configure pol
 ```
 yum install -y m4 gcc gcc-c++ make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python2 python2-devel python3-devel python3 python2-pip python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel
 
-pip install mysqlclient
+pip2 install mysqlclient
 pip3 install mysqlclient
 
 alternatives --set python /usr/bin/python2
