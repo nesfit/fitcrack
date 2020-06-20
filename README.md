@@ -99,7 +99,7 @@ mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED B
 ```
 
 <a name="instcentos"></a>
-## Step-by-step: Install on CentOS/RHEL 7
+## Step-by-step: Install on CentOS/RHEL 8
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
@@ -107,34 +107,27 @@ Open a **root** terminal, go to the directory with Fitcrack sources and proceed 
 The following tutorial assumes **SELINUX** is disabled.
 If you wish to use SELINUX on Fitcrack server machine, you have to configure policies manually, or wait for an udpate of the tutorial.
 
-### Add MariaDB 10 repository
-Create file `/etc/yum.repos.d/MariaDB.repo` with the following contents:
-```
-[mariadb]
-name = MariaDB
-baseurl = http://yum.mariadb.org/10.1/centos7-amd64
-gpgkey = https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-gpgcheck = 1
-```
 
 ### Install prerequisities
-Enable IUS, EPEL, and SCL repositories
 ```
-yum install -y https://$(rpm -E '%{?centos:centos}%{!?centos:rhel}%{rhel}').iuscommunity.org/ius-release.rpm
-yum install -y epel-release centos-release-scl
+yum install -y m4 gcc gcc-c++ make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python2 python2-devel python3-devel python3 python2-pip python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel
+
+pip install mysqlclient
+pip3 install mysqlclient
+
+alternatives --set python /usr/bin/python2
 ```
 
-Install necessary packages:
+### Configure exceptions for firewalld:
 ```
-yum install -y devtoolset-7 m4 libtool autoconf automake  git vim httpd php php-mysql mod_wsgi mariadb-server mariadb-devel zlib libcurl-devel openssl-libs openssl-devel python python36 python36u-mod_wsgi python36u-setuptools  MySQL-python python2-PyMySQL  boost* pkgconfig libnotify
-```
-Set Python 3.6 as default Python3 version:
-```
-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 60
+firewall-cmd --zone=public --add-service=http --permanent
+firewall-cmd --zone=public --add-service=https --permanent
+firewall-cmd --zone=public --add-port=5000/tcp --permanent
+firewall-cmd --reload
 ```
 
+### Configure services
 ```
-easy_install-3.6 pip
 systemctl start httpd.service
 systemctl enable httpd.service
 systemctl start mariadb
@@ -150,9 +143,8 @@ mysql> create database fitcrack;
 mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
 ```
 
-### Switch to GCC6 and Install Fitcrack
+### Install Fitcrack
 ```
-scl enable devtoolset-7 bash
 ./install_fitcrack.sh
 ```
 
