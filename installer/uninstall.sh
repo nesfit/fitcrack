@@ -35,7 +35,7 @@ if [ -d "$BOINC_PROJECT_DIR" ]; then
         fi
       fi
       echo "Project removed. Restarting Apache..."
-      service $APACHE_SERVICE restart
+      service_restart $APACHE_SERVICE
     fi
   fi
 
@@ -150,7 +150,7 @@ if [ $UNINSTALL_WEBADMIN = "y" ]; then
   fi
 
   echo "WebAdmin Uninstalled. Restarting Apache..."
-  service $APACHE_SERVICE restart
+  service_restart $APACHE_SERVICE
 fi
 
 

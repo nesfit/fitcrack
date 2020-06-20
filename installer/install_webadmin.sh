@@ -306,5 +306,5 @@ echo "Done."
 ##################
 
 echo "WebAdmin installed. Restarting Apache..."
-service $APACHE_SERVICE restart
+service_restart $APACHE_SERVICE
 echo "Done."

@@ -75,7 +75,7 @@ else
 fi
 
 # Restart Apache service
-service $APACHE_SERVICE restart
+service_restart $APACHE_SERVICE
 
 #############################
 # Install Fitcrack database #

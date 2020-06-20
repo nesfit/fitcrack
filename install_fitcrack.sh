@@ -25,6 +25,9 @@ fi
 # Detect Linux distro and set distro-specific defaults
 source installer/detect_distro.sh
 
+# Get functions for sysvinit/systemd
+source installer/services.sh
+
 if [[ $1 == "-s" ]]; then
     # Set user variables (default values)
     source installer/set_default_vars.sh
