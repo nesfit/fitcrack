@@ -38,9 +38,9 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <sstream>
 #include <cstdlib>
 #include <math.h>
-#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <stdint.h>
 #include <inttypes.h>
@@ -87,6 +87,13 @@ std::string mysql_table_settings =      "fc_settings";
 std::string mysql_table_benchmark =     "fc_benchmark";
 std::string mysql_table_hash =          "fc_hash";
 
+template <typename T> T convert_str_to_number(const char *str) {
+  T num;
+  std::istringstream iss;
+  iss.str(str);
+  iss >> num;
+  return num;
+}
 
 /**
  * @brief JobStatus enum
@@ -154,17 +161,17 @@ class MysqlWorkunit
  */
 MysqlWorkunit::MysqlWorkunit(MYSQL_ROW row)
 {
-    this->m_id = boost::lexical_cast<uint64_t>(row[0]);
-    this->m_job_id = boost::lexical_cast<uint64_t>(row[1]);
-    this->m_workunit_id = boost::lexical_cast<uint64_t>(row[2]);
-    this->m_host_id = boost::lexical_cast<uint64_t>(row[3]);
-    this->m_boinc_host_id = boost::lexical_cast<uint64_t>(row[4]);
-    this->m_start_index = boost::lexical_cast<uint64_t>(row[5]);
-    this->m_start_index_2 = boost::lexical_cast<uint64_t>(row[6]);
-    this->m_hc_keyspace = boost::lexical_cast<uint64_t>(row[7]);
-    this->m_mask_id = boost::lexical_cast<uint64_t>(row[9]);
+    this->m_id = convert_str_to_number<uint64_t>(row[0]);
+    this->m_job_id = convert_str_to_number<uint64_t>(row[1]);
+    this->m_workunit_id = convert_str_to_number<uint64_t>(row[2]);
+    this->m_host_id = convert_str_to_number<uint64_t>(row[3]);
+    this->m_boinc_host_id = convert_str_to_number<uint64_t>(row[4]);
+    this->m_start_index = convert_str_to_number<uint64_t>(row[5]);
+    this->m_start_index_2 = convert_str_to_number<uint64_t>(row[6]);
+    this->m_hc_keyspace = convert_str_to_number<uint64_t>(row[7]);
+    this->m_mask_id = convert_str_to_number<uint64_t>(row[9]);
     this->m_duplicated = (row[11][0] == '0') ? true: false;
-    this->m_duplicate = boost::lexical_cast<uint64_t>(row[12]);
+    this->m_duplicate = convert_str_to_number<uint64_t>(row[12]);
     this->m_retry = (row[15][0] == '0') ? true: false;
     this->m_finished = (row[16][0] == '0') ? true: false;
 }
@@ -210,7 +217,7 @@ uint64_t get_num_from_mysql(char * query)
     while ((row = mysql_fetch_row(rp)))
     {
         if(row[0] != NULL)
-            result = boost::lexical_cast<uint64_t>(row[0]);
+            result = convert_str_to_number<uint64_t>(row[0]);
     }
 
     mysql_free_result(rp);
@@ -500,8 +507,8 @@ bool find_benchmark_results(std::map<uint32_t, uint64_t> & speed_map, uint64_t b
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(rp)))
     {
-        hash_type = boost::lexical_cast<uint32_t>(row[2]);
-        power = boost::lexical_cast<uint64_t>(row[3]);
+        hash_type = convert_str_to_number<uint32_t>(row[2]);
+        power = convert_str_to_number<uint64_t>(row[3]);
         speed_map.insert(std::pair<uint32_t, uint64_t>(hash_type, power));
     }
 
