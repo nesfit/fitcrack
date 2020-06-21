@@ -20,6 +20,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <mysql.h>
+#include <stdbool.h>
 
 #include "error_numbers.h"
 #include "str_util.h"
@@ -29,6 +30,11 @@
 #ifdef _USING_FCGI_
 #include "fcgi_stdio.h"
 #include "sched_msgs.h"
+#endif
+
+#if !defined(MARIADB_BASE_VERSION) && !defined(MARIADB_VERSION_ID) && \
+  MYSQL_VERSION_ID >= 80001 && MYSQL_VERSION_ID != 80002
+typedef bool my_bool;
 #endif
 
 bool g_print_queries = false;
