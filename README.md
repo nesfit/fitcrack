@@ -168,38 +168,23 @@ boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 ```
-## Optional: multiple workunits per hosts
+## Optional: workunit pipelining - multiple workunits per hosts
 
 In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary attack with big dictionaries.
 
-To achieve this behavior, in your project config, e.g. `/home/boincadm/projects/fitcrack/config.xml` add in `<boinc><config>` section find the following line:
+**Newly**, the feature is natively supported in Fitcrack without needing any extra modification on client site. The feature can be configured by the user in the installer and is enabled by default. If you want to change it later, in the project config, e.g. `/home/boincadm/projects/fitcrack/config.xml` in section `<boinc><config>` set:
 ```
 <max_wus_in_progress>1</max_wus_in_progress>
 ```
-and replace it to:
+to disable the pipelining feature, or
 ```
 <max_wus_in_progress>2</max_wus_in_progress>
 ```
-
-and restart the server (as BOINC user):
+to activate the pipelining. After modification, you need to restart
+the server (as BOINC user):
 ```
 boincadm@myserver:~$ cd projects/fitcrack
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
 
-Then on each node, you limit maximum concurrent workunits to 1 by creating `app_config.xml` file in your BOINC client project directory, e.g.:
-* `C:\ProgramData\BOINC\projects\myserver_fitcrack` (Windows)
-* `/var/lib/boinc-client/projects/myserver_fitcrack/app_config.xml` (Linux)
-Please note, that the project directory is created automatically once you add the project to you BOINC client (e.g. via BOINC Manager).
-
-To `app_config.xml` place the following contents:
-```
-<app_config>
-   <app>
-      <name>fitcrack</name>
-      <max_concurrent>1</max_concurrent>
-      <report_results_immediately/>
-    </app>
-</app_config>
-```
