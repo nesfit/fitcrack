@@ -11,6 +11,7 @@ echo "                                                              "
 ###################
 # Project cleanup #
 ###################
+function cleanup_project {
 if [ -d "$BOINC_PROJECT_DIR" ]; then
   read -e -p "Remove project $BOINC_PROJECT_DIR ? [y/N] (default: N): " DELETE_PROJECT_DIR
   DELETE_PROJECT_DIR=${DELETE_PROJECT_DIR:-N}
@@ -57,12 +58,13 @@ if [ -d "$BOINC_PROJECT_DIR" ]; then
     # Remove startup script
     rm -f /etc/init.d/fitcrack
   fi
-
 fi
+}
 
 ####################
 # Database cleanup #
 ####################
+function cleanup_db {
 read -e -p "Delete database $DB_NAME at $DB_HOST ? [y/N] (default: N): " DELETE_DB
 DELETE_DB=${DELETE_DB:-N}
 DB_ROOT_CLEANUP="N"
@@ -121,11 +123,13 @@ if [ $DB_ROOT_CLEANUP = "y" ]; then
       echo "Empty database created."
     fi
 fi
+}
 
 ####################
 # WebAdmin cleanup #
 ####################
 
+function cleanup_webadmin {
 read -e -p "Uninstall WebAdmin ? [y/N] (default: N): " UNINSTALL_WEBADMIN
 UNINSTALL_WEBADMIN=${UNINSTALL_WEBADMIN:-N}
 
@@ -152,13 +156,13 @@ if [ $UNINSTALL_WEBADMIN = "y" ]; then
   echo "WebAdmin Uninstalled. Restarting Apache..."
   service_restart $APACHE_SERVICE
 fi
-
-
+}
 
 #######################
 # Collections cleanup #
 #######################
 
+function cleanup_collections {
 read -e -p "Remove common collections (dictionaries, etc.) ? [y/N] (default: N): " REMOVE_COLLECTIONS
 REMOVE_COLLECTIONS=${REMOVE_COLLECTIONS:-N}
 
@@ -171,3 +175,4 @@ if [ $REMOVE_COLLECTIONS = "y" ]; then
   rm -rf /usr/share/collections/rules
   rm -rf /usr/share/collections/pcfg
 fi
+}

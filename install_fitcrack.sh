@@ -69,6 +69,10 @@ while ! $finished; do
       exit
     elif [ $OPERATION -eq 4 ]; then
       source installer/uninstall.sh
+      cleanup_project
+      cleanup_db
+      cleanup_webadmin
+      cleanup_collections
       exit
     elif [  $OPERATION -eq 5 ]; then
       echo "Bye."
@@ -122,6 +126,11 @@ fi
 if [ -d "$BOINC_PROJECT_DIR" ]; then
   read -e -p "3) Fitcrack project seems to be installed already. Reinstall? [y/N] (default: N): " INSTALL_PROJECT
   INSTALL_PROJECT=${INSTALL_PROJECT:-N}
+  if [ $INSTALL_PROJECT = "y" ]; then
+    source installer/uninstall.sh
+    cleanup_project
+    cleanup_db
+  fi
 else
   read -e -p "3) Install Fitcrack project? [y/N] (default: y): " INSTALL_PROJECT
   INSTALL_PROJECT=${INSTALL_PROJECT:-y}
@@ -137,6 +146,10 @@ fi
 if [ -d "$APACHE_DOCUMENT_ROOT/fitcrackFE" ]; then
   read -e -p "3) WebAdmin seems to be installed already. Reinstall? [y/N] (default: N): " INSTALL_WEBADMIN
   INSTALL_WEBADMIN=${INSTALL_WEBADMIN:-N}
+  if [ $INSTALL_WEBADMIN = "y" ]; then
+    source installer/uninstall.sh
+    cleanup_webadmin
+  fi
 else
   read -e -p "3) Install WebAdmin? [y/N] (default: y): " INSTALL_WEBADMIN
   INSTALL_WEBADMIN=${INSTALL_WEBADMIN:-y}
@@ -153,6 +166,10 @@ fi
 if [ -d "/usr/share/collections/dictionaries" ]; then
   read -e -p "3) Common collections directories seem to exist already. Reinstall? [y/N] (default: N): " INSTALL_COLLECTIONS
   INSTALL_COLLECTIONS=${INSTALL_COLLECTIONS:-N}
+  if [ $INSTALL_COLLECTIONS = "y" ]; then
+    source installer/uninstall.sh
+    cleanup_collections
+  fi
 else
   read -e -p "3) Create directories for common collections? [y/N] (default: y): " INSTALL_COLLECTIONS
   INSTALL_COLLECTIONS=${INSTALL_COLLECTIONS:-y}
