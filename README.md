@@ -12,7 +12,6 @@ There are four ways of deployment:
   * For **Custom build of Runner**, see [Runner README](runner/README.md)
 
 Once installed, see how to [Operate the server](#oper)
-Don't forget to activate [usage measure](#usage) of your server.
 
 <a name="instgen"></a>
 ## General installation instructions
@@ -168,20 +167,6 @@ boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ### Stop Fitcrack server
 ```
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
-```
-<a name="usage"></a>
-## Installing server usage measure
-First of all you need to edit line with address to your API (default is `http://localhost:5000`).
-```
-boincadm@myserver:~/projects/fitcrack$ edit ./bin/measureUsage.py
-```
-Next step is to add this script to your favorite job scheduler. Here is example for Cron.
-```
-boincadm@myserver:~/projects/fitcrack$ crontab -e
-```
-Add this text to last line (script will start every 5 minutes):
-```
-*/5 * * * * /home/boincadm/projects/fitcrack/bin/measureUsage.py
 ```
 ## Optional: multiple workunits per hosts
 
