@@ -104,8 +104,8 @@ mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED B
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
 ### SELINUX
-The following tutorial assumes **SELINUX** is disabled.
-If you wish to use SELINUX on Fitcrack server machine, you have to configure policies manually, or wait for an udpate of the tutorial.
+The following tutorial assumes **SELINUX** in permissive or disabled mode.
+If you wish to use SELINUX endorcing mode on Fitcrack server machine, you have to configure policies to allow apache access to project directory and others.
 
 
 ### Install prerequisities
