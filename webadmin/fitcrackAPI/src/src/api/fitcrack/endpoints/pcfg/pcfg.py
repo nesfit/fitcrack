@@ -213,39 +213,9 @@ class pcfgMakeFromDictionary(Resource):
             db.session().rollback()
             abort(500, 'PCFG with name '
                   + extractNameFromZipfile(dict.name) + ' already exists.')
-
-        #TODO dorobiť
         createPcfgGrammarBin(dict.name)
-
         return {
             'message': 'PCFG ' + dict.name + ' successfully uploaded.',
             'status': True
 
         }
-
-"""
-        filename = secure_filename(extractNameFromZipfile(dict.name))
-        path = os.path.join(HCSTATS_DIR, filename) + '.hcstat2'
-
-        # make hcstat2 file
-        shellExec(
-            HASHCAT_UTILS_PATH + '/hcstat2gen.' + EXE_OR_BIN + ' ' + path + '_tmp < ' + os.path.join(DICTIONARY_DIR,
-                                                                                                     dict.name))
-        # comprime hcstat2 file
-        shellExec('xz --compress --format=raw --stdout -9e ' + path + '_tmp > ' + path)
-        # delete non-comprimed file
-        os.remove(path + '_tmp')
-
-        hcstats = FcHcstat(name=filename + '.hcstat2', path=path)
-        try:
-            db.session.add(hcstats)
-            db.session.commit()
-        except exc.IntegrityError as e:
-            db.session().rollback()
-            abort(500, 'HcStats with name ' + filename + ' already exists.')
-
-        return {
-            'status': True,
-            'message': 'HcStat file with name ' + filename + ' created.'
-        }
-"""
