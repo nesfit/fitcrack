@@ -64,16 +64,6 @@ And proceed according to your preferences...
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
-### Debian 9: (Optional) Switch to MySQL
-In Debian 9, MariaDB is used by default instead of MySQL community server.
-If you wish to switch to MySQL, type:
-```
-wget https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
-dpkg -i mysql-apt-config_0.8.10-1_all.deb
-apt-get update
-```
-Otherwise, in the prerequisities below, you have to choose **libmariadb-dev**, instead of **libmysql-dev**, etc.
-
 ### Install prerequisities
 ```
 apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev curl
@@ -105,7 +95,7 @@ Open a **root** terminal, go to the directory with Fitcrack sources and proceed 
 
 ### SELINUX
 The following tutorial assumes **SELINUX** in permissive or disabled mode.
-If you wish to use SELINUX endorcing mode on Fitcrack server machine, you have to configure policies to allow apache access to project directory and others.
+If you wish to use SELINUX enforcing mode on Fitcrack server machine, you have to configure policies to allow apache access to project directory and others.
 
 
 ### Install prerequisities
