@@ -15,28 +15,24 @@
     />
     <v-divider />
 
-     <v-card-title>
-      <span>Select rule file</span>
-    </v-card-title>
-    <rules-selector 
-      v-model="rules"
-      @input="checkValid"
-    />
-    <v-divider />
-
     <v-checkbox
        v-model="checkDuplicates"
-       label="Check password duplicates"
+       label="Check for password duplicates"
     />
     <v-divider />
     <v-checkbox
        v-model="casePermute"
        label="Case permutation"
     />
+    <v-divider />
+    <v-checkbox
+       v-model="shuffleDict"
+       label="Purple Rain Attack"
+    />
 
     <v-divider />
     <v-card-title>
-      <span>Minimal length of passwords (1 - 16)</span>
+      <span>Minimal length of passwords (1 - 32)</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -47,14 +43,14 @@
         required
         type="number"
         min="1"
-        max="16"
+        max="32"
         @input="checkValid"
       />
     </v-card-text>
 
     <v-divider />
     <v-card-title>
-      <span>Maximal length of passwords (1 - 16)</span>
+      <span>Maximal length of passwords (1 - 32)</span>
     </v-card-title>
     <v-card-text>
       <v-text-field
@@ -65,12 +61,12 @@
         required
         type="number"
         min="1"
-        max="16"
+        max="32"
         @input="checkValid"
       />
     </v-card-text>
 
-        <v-divider />
+    <v-divider />
     <v-card-title>
       <span>Minimal number of elements per chain (1 - 16)</span>
     </v-card-title>
@@ -106,6 +102,46 @@
       />
     </v-card-text>
 
+    <v-card-title>
+      <span>Edit keyspace limit</span>
+    </v-card-title>
+    <v-text-field
+      v-model.number="keyspaceLimit"
+      text
+      single-line
+      :value="keyspaceLimit"
+      required
+      type="number"
+      suffix="passwords"
+      min="0"
+      max="keyspace"
+      @input="checkValid"
+    />
+
+    <v-divider />
+    <v-card-title>
+      <span>Select rule file</span>
+    </v-card-title>
+    <rules-selector
+      v-model="rules"
+      @input="checkValid"
+    />
+
+    <v-card-title>
+      <span>Generate random rules</span>
+    </v-card-title>
+    <v-text-field
+      v-model.number="generateRandomRules"
+      text
+      single-line
+      :value="generateRandomRules"
+      required
+      type="number"
+      suffix="rules"
+      min="0"
+      @input="checkValid"
+    />
+
   </div>
 </template>
 
@@ -122,8 +158,15 @@
       'dict-selector': dictSelector,
       'rules-selector': ruleSelector
     },
+    props: ['keyspace'],
+    watch: {
+      keyspace (val) {
+        this.keyspaceLimit = val
+      }
+    },
     computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'checkDuplicates',
-    'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain'])),
+    'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain', 
+    'shuffleDict', 'keyspaceLimit', 'generateRandomRules'])),
     methods: {
       checkValid: function () {
         if (this.minPasswordLen <= 0) {
@@ -142,23 +185,42 @@
             this.$error('Minimal number of elements per chain must be greater than 0.')
             return false;
         }
+        if (this.maxElemInChain <= 0) {
+            this.$error('Maximal number of elements per chain must be greater than 0.')
+            return false;
+        }
+        if (this.maxElemInChain > 16) {
+            this.$error('Maximal number of elements per chain must be to 16.')
+            return false;
+        }
         if (this.minPasswordLen > this.maxPasswordLen) {
             this.$error('Minimal length of passwords must be greater than maximal length of passwords.')
             return false;
         }
-        if (this.maxElemInChain > 0 && (this.minElemInChain > this.maxElemInChain)) {
+        if (this.minElemInChain > this.maxElemInChain) {
             this.$error('Minimal number of elements per chain must be smaller or equal than maximal number of elements per chain.')
-            return false;
-        }
-        if (this.minPasswordLen <= 0) {
-            this.$error('Minimal length of passwords must be greater than 0.')
             return false;
         }
         if (this.maxElemInChain > this.maxPasswordLen) {
             this.$error('Maximal number of elements per chain must be smaller or equal than maximal length of passwords.')
             return false;
         }
+        if (this.keyspaceLimit < 0) {
+            this.$error('Keyspace limit must be nonnegative value.')
+            return false;
+        }
+        if (this.generateRandomRules < 0) {
+            this.$error('Random rules count must be nonnegative value.')
+            return false;
+        }
 
+        if (this.rules.length > 0 && this.generateRandomRules > 0) {
+            this.$error('Cannot combine a rule file together with random rules generation.')
+            return false;
+        }
+
+        // Hide any previous error alert, new settings are valid
+        this.$hideAlert()
         return true
       }
     }

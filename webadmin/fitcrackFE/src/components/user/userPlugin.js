@@ -60,12 +60,8 @@ const UserPlugin = {
 
     Vue.prototype.$username = this.name;
 
-    Vue.prototype.$userCanManageUsers = function () {
-      return this.$store.state.user.userData.role.MANAGE_USERS
-    };
-
-    Vue.prototype.$userCanAddJob = function () {
-      return this.$store.state.user.userData.role.ADD_NEW_JOB
+    Vue.prototype.$userCan = function (what) {
+      return this.$store.state.user.userData.role[what]
     }
 
     Vue.prototype.$error = function (message) {
@@ -78,6 +74,13 @@ const UserPlugin = {
             { status: true,
               message: message
             }
+        })
+    }
+
+    Vue.prototype.$hideAlert = function () {
+      this.axios.interceptors.response.handlers["0"].fulfilled(
+        {data:
+            { hideAlert: true }
         })
     }
   }

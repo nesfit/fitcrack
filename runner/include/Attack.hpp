@@ -6,14 +6,6 @@
 #ifndef ATTACK_HPP
 #define ATTACK_HPP
 
-#include "AttackBase.hpp"
-#include "AttackBenchmark.hpp"
-#include "AttackCombinator.hpp"
-#include "AttackDictionary.hpp"
-#include "AttackMask.hpp"
-#include "AttackPCFG.hpp"
-#include "AttackPrince.hpp"
-
 #include "ConfigTask.hpp"
 
 #include "Directory.hpp"
@@ -27,8 +19,12 @@ enum AttackType {
   AT_Prince,
   AT_PCFG,
   AT_Benchmark,
+  AT_HybridDictMask,
+  AT_HybridMaskDict,
   AT_Unknown
 };
+
+class AttackBase;
 
 /** Namespace with function for creating new attack */
 namespace Attack {
@@ -39,7 +35,7 @@ namespace Attack {
      * @param   attack_type [in] Attack type
      * @return  Specific type of attack object base on config parameters
      */
-AttackBase *create(const ConfigTask &task_config, Directory &directory, enum AttackType attack_type);
+AttackBase *create(const ConfigTask &task_config, Directory &directory);
     /**
      * @brief	Detects attack type from task configuration
      * @param   task_config [in] Structure with sent parameters

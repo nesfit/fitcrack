@@ -6,7 +6,6 @@
 from datetime import datetime
 import re
 
-# package => job
 def log_parser(log):
     result = {
         'type': '',

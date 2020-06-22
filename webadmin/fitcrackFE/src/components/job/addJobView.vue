@@ -144,20 +144,19 @@
                   label="Select hash type"
                   :items="hashTypes"
                   item-text="name"
+                  :filter="hashTypeFilter"
                   return-object
                   required
                   hide-details
                   single-line
                   flat
                   solo-inverted
+                  no-data-text="No matching hash type"
                   @change="validateHashes(null)"
                 >
-                  <template
-                    slot="item"
-                    slot-scope="data"
-                  >
+                  <template #item="{ item }">
                     <v-list-item-content>
-                      <v-list-item-title><b>{{ data.item.code }}</b> - {{ data.item.name }}</v-list-item-title>
+                      <v-list-item-title><b>{{ item.code }}</b> - {{ item.name }}</v-list-item-title>
                     </v-list-item-content>
                   </template>
                 </v-autocomplete>
@@ -170,7 +169,7 @@
                   <v-alert
                     type="warning"
                   >
-                    Currently we support these formats:
+                    Currently, we support these formats:
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#">MS_OFFICE</a>,</span>
@@ -182,6 +181,12 @@
                         <span v-on="on"><a href="#">PDF</a>,</span>
                       </template>
                       <span>Hashtypes: 10400, 10500, 10600, 10700</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <span v-on="on"><a href="#">7Z</a>,</span>
+                      </template>
+                      <span>Hashtypes: 11600</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
@@ -232,7 +237,7 @@
                     v-if="inputMethod !== null"
                     ref="textarea"
                     v-model="hashList"
-                    :class="{error: hashListError}"
+                    :class="{'hasherror': hashListError}"
                     class="textarea"
                     max-height="500"
                     :readonly="!(inputMethod === 'multipleHashes' && !gotBinaryHash) "
@@ -369,7 +374,7 @@
                 </v-item>
               </v-item-group>
 
-              <v-component :is="attackSettingsTab" />
+              <v-component :is="attackSettingsTab" :keyspace="keyspace" />
 
               <v-row>
                 <v-spacer />
@@ -391,11 +396,13 @@
           </v-stepper-step>
           <v-stepper-content step="3">
             <v-subheader>Select which hosts to distribute workunits to</v-subheader>
-            <host-selector
-              v-model="hosts"
-              select-all
-              auto-refresh
-            />
+            <div class="scroller">
+              <host-selector
+                v-model="hosts"
+                select-all
+                auto-refresh
+              />
+            </div>
             <v-row>
               <v-spacer />
               <v-btn
@@ -427,14 +434,13 @@
               <v-row>
                 <v-col>
                   <div class="title mb-2">Planned start</div>
-                  <v-text-field
+                  <dt-picker
                     v-model="startDate"
                     outlined
                     hide-details
                     :disabled="startNow"
                     single-line
                     label=""
-                    mask="date-with-time"
                   />
                   <v-checkbox
                     v-model="startNow"
@@ -459,14 +465,12 @@
                 </v-col>
                 <v-col>
                   <div class="title mb-2">Planned end</div>
-                  <v-text-field
+                  <dt-picker
                     v-model="endDate"
                     outlined
                     hide-details
                     :disabled="endNever"
                     single-line
-                    label=""
-                    mask="date-with-time"
                   />
                   <v-checkbox
                     v-model="endNever"
@@ -491,18 +495,29 @@
         </v-row>
 
         <v-row
+          v-if="timeForJob < 180"
+          justify="center"
+        >
+          <v-alert
+            outlined
+            type="warning"
+          >
+            Setting extremely low time per workunit leads to high overhead. The cracking may take much longer than estimated. Consider choosing a higher value.
+          </v-alert>
+        </v-row>
+
+        <v-row
           justify="center"
           class="mb-5"
         >
           <template-modal
-            :inherited-name="name"
+            :inherited-name="selectedTemplateName"
             @templatesUpdated="fetchTemplates"
           />
           <v-btn
             large
             color="primary"
             class="ml-2"
-            :disabled="!valid || keyspace > 1.8446744e+19 /* 2^64 */ || (invalidHashes.length > 0 && !ignoreHashes)"
             @click="submit"
           >
             <v-icon left>
@@ -519,6 +534,7 @@
 <script>
   import sha1 from 'sha1'
   import numberFormat from '@/assets/scripts/numberFormat'
+  import { attackIcon } from '@/assets/scripts/iconMaps'
 
   import combinator from '@/components/job/attacks/combinator'
   import mask from '@/components/job/attacks/mask'
@@ -526,10 +542,12 @@
   import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist'
   import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask'
   import pcfgAttack from '@/components/job/attacks/pcfg'
+  import princeAttack from '@/components/job/attacks/prince'
   import FileUploader from "@/components/fileUploader/fileUploader";
   import fcTextarea from '@/components/textarea/fc_textarea'
   import hostSelector from '@/components/selector/hostSelector'
   import templateModal from '@/components/jobTemplate/templateModal'
+  import dtPicker from '@/components/picker/datetime'
 
   import {mapState, mapGetters, mapMutations} from 'vuex'
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
@@ -547,9 +565,11 @@
       'hybridMaskWordlist': hybridMaskWordlist,
       'hybridWordlistMask': hybridWordlistMask,
       'pcfgAttack': pcfgAttack,
+      'princeAttack': princeAttack,
       'fc-textarea': fcTextarea,
       'host-selector': hostSelector,
-      'template-modal': templateModal
+      'template-modal': templateModal,
+      dtPicker
     },
     data: function () {
       return {
@@ -560,6 +580,7 @@
         keyspace: null,
         gotBinaryHash: false,
         hashListError: false,
+        selectedTemplateName: '',
         attacks,
         templates: [
           {
@@ -612,14 +633,15 @@
     mounted: function () {
       this.loadSettings()
       this.getHashTypes()
-      this.startDate = this.$moment().format('DD/MM/YYYY HH:mm')
-      this.endDate = this.$moment().format('DD/MM/YYYY HH:mm')
+      this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm:ss')
+      this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm:ss')
       if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
     },
     methods: {
       ...mapMutations('jobForm', ['applyTemplate']),
       numberFormat,
+      attackIcon,
       async loadSettings () {
         if (!this.timeForJob) {
           const settings = await this.axios.get(this.$serverAddr + '/settings').then(r => r.data)
@@ -641,31 +663,25 @@
       fetchAndApplyTemplate (id) {
         if (id == 0) {
           this.applyTemplate()
+          this.selectedTemplateName = ''
           this.$store.commit('jobForm/selectedTemplateMut', 0)
           this.loadSettings()
           return
         }
         this.axios.get(this.$serverAddr + `/template/${id}`)
         .then((response) => {
-          console.log(response)
           if (response.data && response.data.template) {
-            this.applyTemplate(JSON.parse(response.data.template))
+            const data = JSON.parse(response.data.template)
+            this.applyTemplate(data)
+            this.selectedTemplateName = data.template
             this.$store.commit('jobForm/selectedTemplateMut', id)
           }
         })
         .catch(console.error)
       },
-      attackIcon (handler) {
-        const map = {
-          'dictionary': 'mdi-dictionary',
-          'combinator': 'mdi-vector-combine',
-          'maskattack': 'mdi-boxing-glove',
-          'hybridWordlistMask': 'mdi-vector-difference-ba',
-          'hybridMaskWordlist': 'mdi-vector-difference-ab',
-          'pcfgAttack': 'mdi-ray-start-end',
-          'princeAttack': 'mdi-crown'
-        }
-        return map[handler] || 'mdi-checkbox-blank-outline'
+      hashTypeFilter ({name, code}, query) {
+        const q = query.toLowerCase()
+        return name.toLowerCase().includes(q) || code.toLowerCase().includes(q)
       },
       subHashtypeChanged: function (key, val) {
         this.hashType.code = this.hashType.code.replace(key, val.code)
@@ -690,12 +706,6 @@
         if (data === '') {
           return
         }
-        ///
-        const hashType = parseInt(this.hashType.code)
-        if (hashType >= 17300 && hashType <= 18100) {
-          return // Until validator can deal with Hashcat 5 modes
-        }
-        ///
 
         this.axios.post(this.$serverAddr + '/job/verifyHash', {
           'hashtype': this.hashType.code,
@@ -776,8 +786,31 @@
       },
       submit () {
         // TODO: maybe delete this condition
+        if (this.name === '') {
+          this.$error('Job name can not be empty.')
+          return
+        }
+
         if (this.inputMethod === 'encryptedFile' && !this.$refs.encryptedFileUploader.fileUploaded ) {
           this.$error('No file uploaded.')
+          this.step = 1
+          return
+        }
+
+        if (this.hashType === null) {
+          this.$error('No hash type selected.')
+          this.step = 1
+          return
+        }
+
+        if (this.invalidHashes.length > 0 && !this.ignoreHashes) {
+          this.$error('Some hashes are invalid.')
+          this.step = 1
+          return
+        }
+
+        if (this.validatedHashes.length == 0) {
+          this.$error('List of validated hashes is empty.')
           this.step = 1
           return
         }
@@ -794,19 +827,23 @@
           return
         }
 
-      /*  if (this.attack_settings === "DictAttack" || "pcfg") {
-          this.$error('Error in attack settings.')
-          return
-        }*/
-
-        if (this.hashType === null) {
-          this.$error('No hash type selected.')
-          this.step = 1
+        if (this.keyspace > 1.8446744e+19 /* 2^64 */) {
+          this.$error('Job keyspace is higher than maximal allowed value 2^64.')
+          this.step = 2
           return
         }
 
-        if (this.name === '') {
-          this.$error('Job name can not be empty.')
+        if (this.timeForJob < 10) {
+          this.$error('Time per workunit must be higher or equal to 10 seconds.')
+          this.step = 4
+          return
+        }
+
+        // Check if all job settings are valid
+        if (!this.valid) {
+          // If all checks above passed and this one did not, it means that attack specific settings are incorrect.
+          this.$error('Error in attack settings.')
+          this.step = 2
           return
         }
 
@@ -873,14 +910,19 @@
     overflow: hidden;
   }
 
-  .textarea.error {
-    border-width: 2px;
-    border-style: solid;
-    border-radius: 5px
-  }
-
   .mode-btn {
     height: initial !important;
     margin: 1em;
+  }
+
+  .scroller {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+</style>
+
+<style>
+  .hasherror .scrollCont {
+    border-color: #e01 !important;
   }
 </style>

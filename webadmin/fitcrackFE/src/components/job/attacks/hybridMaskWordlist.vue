@@ -37,43 +37,14 @@
           select-all
           @input="checkValid"
         />
-      </v-col>
-
-      <v-col
-        cols="6"
-        class="border"
-      >
         <v-card-title>
           <span>Type rule</span>
         </v-card-title>
-      </v-col>
-      <v-col cols="6">
-        <v-card-title>
-          <span>Type rule</span>
-        </v-card-title>
-      </v-col>
-
-      <v-col
-        cols="6"
-        class="border px-2"
-      >
-        <v-text-field
-          v-model="ruleLeft"
-          outlined
-          single-line
-          placeholder="Rule left"
-          @input="checkValid"
-        />
-      </v-col>
-      <v-col
-        cols="6"
-        class="px-2"
-      >
         <v-text-field
           v-model="ruleRight"
           outlined
           single-line
-          placeholder="Rule right"
+          placeholder="Rule"
           @input="checkValid"
         />
       </v-col>

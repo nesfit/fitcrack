@@ -37,18 +37,11 @@ class CSimpleGenerator : public CAbstractGenerator {
         CSqlLoader * m_sqlLoader;   /**< SqlLoader for database access */
 
         /**
-         * @brief Creates Benchamrk workunit for supplied host
-         * @param job [in] Parent job of this benchmark
-         * @param host [in] Host to whom the benchmark is sent
-         */
-        void createBenchmark(PtrJob &job, PtrHost &host);
-
-        /**
          * @brief Creates Regular cracking workunit for supplied host
          * @param job [in] Parent job of this workunit
          * @param host [in] Host to whom the cracking workunit is sent
          */
-        void createRegularWorkunit(PtrJob &job, PtrHost &host);
+        void createWorkunit(PtrJob job, PtrHost &host, bool isBenchmark);
 
         /**
          * @brief Set job to timeout/exhausted/pause status

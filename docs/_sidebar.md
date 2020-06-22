@@ -12,14 +12,17 @@
 
 - Managing Jobs
   - [Jobs List](jobs/managing/list.md)
+  - [Job Bins](jobs/managing/bins.md)
   - [Detail View](jobs/managing/detail.md)
   - [Controlling Jobs](jobs/managing/actions.md)
+  - [Batch Cracking](jobs/managing/batches.md)
 
 - System Library
   - [Hash Cache](library/hashes.md)
   - [Cracking Assets](library/assets.md)
 
 - System Management
-  <!-- - [Users and Roles](system/users.md) -->
+  - [Users and Permissions](system/users.md)
   - [Host Management](system/hosts.md)
   - [Server Monitoring](system/server.md)
+  - [Data Transfer](system/transfer.md)

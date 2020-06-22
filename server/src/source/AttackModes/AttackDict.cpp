@@ -9,8 +9,8 @@
 #include <AttackDict.h>
 
 
-CAttackDict::CAttackDict(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-    :   AttackMode(job, host, seconds, sqlLoader)
+CAttackDict::CAttackDict(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
 
 }
@@ -52,8 +52,8 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    f << generateBasicConfig('n', m_job->getAttackMode(), m_job->getAttackSubmode(),
-            m_job->getName(), m_job->getHashType());
+    f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
+            m_job->getName(), m_job->getHashType(), 0, m_job->getHWTempAbort());
     f.close();
 
     /** Create data file */
@@ -88,49 +88,28 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    f.open(path);
-    if (!f.is_open())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open dict1 BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
 
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Creating dictionary fragment\n");
 
     /** Load current workunit dictionary */
-    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
-    std::ifstream* dictFile;
-    std::string passwd;
-    uint64_t currentIndex;
+    PtrDictionary workunitDict = GetWorkunitDict();
 
-    if(m_workunit->isDuplicated())
+    try
     {
-        /** Open new FD for retry workunits */
-        uint64_t startIndex = m_workunit->getStartIndex();
-        dictFile = new std::ifstream((Config::dictDir + workunitDict->getDictFileName()).c_str());
-        if (!(*dictFile))
-        {
-            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                                  "Cannot find dictionary file! Setting job to malformed.\n");
-            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-            return false;
-        }
+        auto inputDict = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
+
+        /** Add 'keyspace' passwords to dict file */
+
+        uint64_t workunitKeyspace = m_workunit->getHcKeyspace();
 
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                              "Skipping %" PRIu64 " passwords\n", startIndex);
-
-        /** Skip passwords in dictionary */
-        for (currentIndex = 0; currentIndex < startIndex; ++currentIndex)
-            std::getline(*dictFile, passwd);
-
-        /** No more passwords in dictionary */
-        if ((*dictFile).eof())
+                "Adding %" PRIu64 " passwords to host dictionary file\n", workunitKeyspace);
+        auto writtenPasswords = inputDict->WritePasswordsTo(workunitKeyspace, path);
+        if(writtenPasswords == 0 && workunitKeyspace > 0)
         {
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                                  "'start_index' parameter is too far away\n");
+                                "'start_index' parameter is too far away\n");
             if (!m_workunit->isDuplicated())
             {
                 workunitDict->updateIndex(workunitDict->getHcKeyspace());
@@ -138,57 +117,30 @@ bool CAttackDict::makeWorkunit()
             }
             return true;
         }
-    }
-    else {
-
-        dictFile = Tools::getStream(m_job->getId(), workunitDict->getDictionaryId(), workunitDict->getDictFileName());
-        if (!(*dictFile))
-        {
-            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                                  "Cannot find dictionary file! Setting job to malformed.\n");
-            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-            return false;
-        }
-    }
-    /** Add 'keyspace' passwords to dict file */
-
-    uint64_t workunitKeyspace = m_workunit->getHcKeyspace();
-
-    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-            "Adding %" PRIu64 " passwords to host dictionary file\n", workunitKeyspace);
-    for (currentIndex = 0; currentIndex < workunitKeyspace; ++currentIndex)
-    {
-        std::getline((*dictFile), passwd);
-        if (!passwd.empty())
-            f << passwd << '\n';
-
-        /** End of current dictionary */
-        if ((*dictFile).eof())
+        else if(writtenPasswords < workunitKeyspace)
         {
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                     "Ate all passwords, new workunit keyspace: %" PRIu64 "\nSetting job to Finishing\n",
-                              currentIndex);
+                                writtenPasswords);
 
             if (!m_workunit->isDuplicated())
             {
-                m_job->updateIndex(m_job->getCurrentIndex() - m_workunit->getHcKeyspace() + currentIndex);
+                m_job->updateIndex(m_job->getCurrentIndex() - m_workunit->getHcKeyspace() + writtenPasswords);
                 workunitDict->updateIndex(workunitDict->getHcKeyspace());
             }
 
-            m_workunit->setHcKeyspace(currentIndex);
-            break;
+            m_workunit->setHcKeyspace(writtenPasswords);
         }
+    }
+    catch(const InputDict::Exception &e)
+    {
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "A dictionary operation failed. Setting job to malformed. Message: %s\n", e.what());
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+        return false;
     }
 
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(), "Done.\n");
-
-    if (m_workunit->isDuplicated())
-    {
-        (*dictFile).close();
-        delete dictFile;
-    }
-
-    f.close();
 
     /** Fill in the workunit parameters */
     wu.clear();
@@ -238,13 +190,13 @@ bool CAttackDict::generateWorkunit()
             "Generating dictionary workunit ...\n");
 
     /** Compute password count */
-    uint64_t passCount = m_host->getPower() * m_seconds;
+    uint64_t passCount = getPasswordCountToProcess();
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     /** Load job dictionaries */
@@ -253,19 +205,7 @@ bool CAttackDict::generateWorkunit()
             "Dictionaries left for this job: %" PRIu64 "\n", dictVec.size());
 
     /** Find the following dictionary */
-    PtrDictionary currentDict;
-    for (PtrDictionary & dict : dictVec)
-    {
-        if (dict->getCurrentIndex() < dict->getHcKeyspace())
-        {
-            /** Dictionary for a new workunit found */
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Dict found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
-                    dict->getDictFileName().c_str(), dict->getCurrentIndex(), dict->getHcKeyspace());
-            currentDict = dict;
-            break;
-        }
-    }
+    PtrDictionary currentDict = FindCurrentDict(dictVec);
 
     if (!currentDict)
     {

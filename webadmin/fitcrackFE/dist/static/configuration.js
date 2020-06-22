@@ -13,7 +13,7 @@ window.theme = {
     error: '#FF5252',
     info: '#2196F3',
     success: '#4CAF50',
-    warning: '#f7b416'
+    warning: '#f5af09'
   },
   dark: {
     primary: '#f24b78',

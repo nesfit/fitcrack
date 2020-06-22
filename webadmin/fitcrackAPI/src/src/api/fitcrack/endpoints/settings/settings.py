@@ -37,14 +37,26 @@ class settings(Resource):
         Sets all system settings.
         """
         args = settings_arguments.parse_args(request)
-        spw, = args['default_seconds_per_workunit'], 
-        wtf, = args['default_workunit_timeout_factor'], 
-        dba = args['default_bench_all']
+        spw = args['default_seconds_per_workunit'] 
+        wtf = args['workunit_timeout_factor']
+        hta = args['hwmon_temp_abort']
+        dba = args['bench_all']
+        dca = args['distribution_coefficient_alpha']
+        tpmin = args['t_pmin']
+        ruw = args['ramp_up_workunits']
+        rdc = args['ramp_down_coefficient']
+        vhf = args['verify_hash_format']
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
-        if (wtf is not None): settings.default_workunit_timeout_factor = wtf
-        if (dba is not None): settings.default_bench_all = dba
+        if (wtf is not None): settings.workunit_timeout_factor = wtf
+        if (hta is not None): settings.hwmon_temp_abort = hta
+        if (dba is not None): settings.bench_all = dba
+        if (dca is not None): settings.distribution_coefficient_alpha = dca
+        if (tpmin is not None): settings.t_pmin = tpmin
+        if (ruw is not None): settings.ramp_up_workunits = ruw
+        if (rdc is not None): settings.ramp_down_coefficient = rdc
+        if (vhf is not None): settings.verify_hash_format = vhf
         db.session.commit()
 
         return {

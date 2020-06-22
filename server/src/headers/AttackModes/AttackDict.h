@@ -20,7 +20,7 @@ class CAttackDict : public AttackMode {
          * @param host [in] Instance of CHost which this attack belongs to
          * @param seconds [in] Number of seconds this instance of attack should take
          */
-        CAttackDict(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
+        CAttackDict(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader);
 
         /**
          * @brief Default destructor
@@ -32,6 +32,8 @@ class CAttackDict : public AttackMode {
          * @return True if a workunit was planned, False otherwise
          */
         bool makeWorkunit() override ;
+
+        virtual bool requiresDicts() const override {return true;}
 
     private:
         /**

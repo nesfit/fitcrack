@@ -13,7 +13,7 @@ echo "╚═╝     ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚
 echo "           Distributed password cracking system             "
 echo "                  * powered by hashcat *                    "
 echo "                                                            "
-echo "          (C) 2018 Fitcrack team - www.fitcrack.cz          "
+echo "          (C) 2020 Fitcrack team - www.fitcrack.cz          "
 echo "============================================================"
 
 # Root check
@@ -24,6 +24,9 @@ fi
 
 # Detect Linux distro and set distro-specific defaults
 source installer/detect_distro.sh
+
+# Get functions for sysvinit/systemd
+source installer/services.sh
 
 if [[ $1 == "-s" ]]; then
     # Set user variables (default values)
@@ -66,6 +69,10 @@ while ! $finished; do
       exit
     elif [ $OPERATION -eq 4 ]; then
       source installer/uninstall.sh
+      cleanup_project
+      cleanup_db
+      cleanup_webadmin
+      cleanup_collections
       exit
     elif [  $OPERATION -eq 5 ]; then
       echo "Bye."
@@ -119,6 +126,11 @@ fi
 if [ -d "$BOINC_PROJECT_DIR" ]; then
   read -e -p "3) Fitcrack project seems to be installed already. Reinstall? [y/N] (default: N): " INSTALL_PROJECT
   INSTALL_PROJECT=${INSTALL_PROJECT:-N}
+  if [ $INSTALL_PROJECT = "y" ]; then
+    source installer/uninstall.sh
+    cleanup_project
+    cleanup_db
+  fi
 else
   read -e -p "3) Install Fitcrack project? [y/N] (default: y): " INSTALL_PROJECT
   INSTALL_PROJECT=${INSTALL_PROJECT:-y}
@@ -134,6 +146,10 @@ fi
 if [ -d "$APACHE_DOCUMENT_ROOT/fitcrackFE" ]; then
   read -e -p "3) WebAdmin seems to be installed already. Reinstall? [y/N] (default: N): " INSTALL_WEBADMIN
   INSTALL_WEBADMIN=${INSTALL_WEBADMIN:-N}
+  if [ $INSTALL_WEBADMIN = "y" ]; then
+    source installer/uninstall.sh
+    cleanup_webadmin
+  fi
 else
   read -e -p "3) Install WebAdmin? [y/N] (default: y): " INSTALL_WEBADMIN
   INSTALL_WEBADMIN=${INSTALL_WEBADMIN:-y}
@@ -150,6 +166,10 @@ fi
 if [ -d "/usr/share/collections/dictionaries" ]; then
   read -e -p "3) Common collections directories seem to exist already. Reinstall? [y/N] (default: N): " INSTALL_COLLECTIONS
   INSTALL_COLLECTIONS=${INSTALL_COLLECTIONS:-N}
+  if [ $INSTALL_COLLECTIONS = "y" ]; then
+    source installer/uninstall.sh
+    cleanup_collections
+  fi
 else
   read -e -p "3) Create directories for common collections? [y/N] (default: y): " INSTALL_COLLECTIONS
   INSTALL_COLLECTIONS=${INSTALL_COLLECTIONS:-y}
@@ -158,6 +178,12 @@ fi
 if [ $INSTALL_COLLECTIONS = "y" ]; then
   source installer/install_collections.sh
 fi
+
+########################################
+
+read -e -p "Enter the number of workunits per hosts (default: 2): " MAX_WUS_IN_PROGRESS
+MAX_WUS_IN_PROGRESS=${MAX_WUS_IN_PROGRESS:-2}
+sed -i "s|<max_wus_in_progress>1</max_wus_in_progress>|<max_wus_in_progress>$MAX_WUS_IN_PROGRESS</max_wus_in_progress>|g" $BOINC_PROJECT_DIR/config.xml
 
 ########################################
 
@@ -184,4 +210,18 @@ else
   echo " cd $BOINC_PROJECT_DIR"
   echo " ./bin/start"
 fi
+
+if [ -x "$(command -v boinccmd)" ]; then
+  read -e -p "Attach this host to Fitcrack BOINC project? [y/N] (default: y)" FITCRACK_BOINC_ATTACH
+  FITCRACK_BOINC_ATTACH=${FITCRACK_BOINC_ATTACH:-y}
+  if [ $FITCRACK_BOINC_ATTACH = "y" ]; then
+    python3 installer/boinc_connect.py --url ${BOINC_URL}/${BOINC_PROJECT}
+    if [[ $? == 0 ]]; then
+      echo "Successfully attached."
+    else
+      echo "Unable to attach."
+    fi
+  fi
+fi
+
 echo " *** All done *** "

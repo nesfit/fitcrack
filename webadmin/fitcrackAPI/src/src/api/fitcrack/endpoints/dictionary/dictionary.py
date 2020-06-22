@@ -42,7 +42,8 @@ class dictionaryCollection(Resource):
         """
         Returns collection of dictionaries.
         """
-        dictionaries = getFilesFromFolder(DICTIONARY_DIR, FcDictionary, readingFromFolderPostProcces)
+        #dictionaries = getFilesFromFolder(DICTIONARY_DIR, FcDictionary, readingFromFolderPostProcces)
+        dictionaries = FcDictionary.query.filter_by(deleted=False).all()
         return {'items': dictionaries}
 
 @ns.route('/<id>')

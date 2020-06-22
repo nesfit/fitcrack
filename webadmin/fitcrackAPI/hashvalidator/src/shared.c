@@ -262,6 +262,111 @@ bool hc_path_create (const char *path)
   return true;
 }
 
+bool hc_path_has_bom (const char *path)
+{
+  u8 buf[8] = { 0 };
+
+  FILE *fp = fopen (path, "rb");
+
+  if (fp == NULL) return false;
+
+  const size_t nread = fread (buf, 1, sizeof (buf), fp);
+
+  fclose (fp);
+
+  if (nread < 1) return false;
+
+  /* signatures from https://en.wikipedia.org/wiki/Byte_order_mark#Byte_order_marks_by_encoding */
+
+  // utf-8
+
+  if ((buf[0] == 0xef)
+   && (buf[1] == 0xbb)
+   && (buf[2] == 0xbf)) return true;
+
+  // utf-16
+
+  if ((buf[0] == 0xfe)
+   && (buf[1] == 0xff)) return true;
+
+  if ((buf[0] == 0xff)
+   && (buf[1] == 0xfe)) return true;
+
+  // utf-32
+
+  if ((buf[0] == 0x00)
+   && (buf[1] == 0x00)
+   && (buf[2] == 0xfe)
+   && (buf[3] == 0xff)) return true;
+
+  if ((buf[0] == 0xff)
+   && (buf[1] == 0xfe)
+   && (buf[2] == 0x00)
+   && (buf[3] == 0x00)) return true;
+
+  // utf-7
+
+  if ((buf[0] == 0x2b)
+   && (buf[1] == 0x2f)
+   && (buf[2] == 0x76)
+   && (buf[3] == 0x38)) return true;
+
+  if ((buf[0] == 0x2b)
+   && (buf[1] == 0x2f)
+   && (buf[2] == 0x76)
+   && (buf[3] == 0x39)) return true;
+
+  if ((buf[0] == 0x2b)
+   && (buf[1] == 0x2f)
+   && (buf[2] == 0x76)
+   && (buf[3] == 0x2b)) return true;
+
+  if ((buf[0] == 0x2b)
+   && (buf[1] == 0x2f)
+   && (buf[2] == 0x76)
+   && (buf[3] == 0x2f)) return true;
+
+  if ((buf[0] == 0x2b)
+   && (buf[1] == 0x2f)
+   && (buf[2] == 0x76)
+   && (buf[3] == 0x38)
+   && (buf[4] == 0x2d)) return true;
+
+  // utf-1
+
+  if ((buf[0] == 0xf7)
+   && (buf[1] == 0x64)
+   && (buf[2] == 0x4c)) return true;
+
+  // utf-ebcdic
+
+  if ((buf[0] == 0xdd)
+   && (buf[1] == 0x73)
+   && (buf[2] == 0x66)
+   && (buf[3] == 0x73)) return true;
+
+  // scsu
+
+  if ((buf[0] == 0x0e)
+   && (buf[1] == 0xfe)
+   && (buf[2] == 0xff)) return true;
+
+  // bocu-1
+
+  if ((buf[0] == 0xfb)
+   && (buf[1] == 0xee)
+   && (buf[2] == 0x28)) return true;
+
+  // gb-18030
+
+  if ((buf[0] == 0x84)
+   && (buf[1] == 0x31)
+   && (buf[2] == 0x95)
+   && (buf[3] == 0x33)) return true;
+
+  return false;
+}
+
 bool hc_string_is_digit (const char *s)
 {
   if (s == NULL) return false;
@@ -308,6 +413,9 @@ void setup_environment_variables ()
 
   if (getenv ("POCL_KERNEL_CACHE") == NULL)
     putenv ((char *) "POCL_KERNEL_CACHE=0");
+
+  if (getenv ("CL_CONFIG_USE_VECTORIZER") == NULL)
+    putenv ((char *) "CL_CONFIG_USE_VECTORIZER=False");
 
   #if defined (__CYGWIN__)
   cygwin_internal (CW_SYNC_WINENV);
@@ -557,3 +665,130 @@ u64 round_up_multiple_64 (const u64 v, const u64 m)
 
   return v + m - r;
 }
+
+// difference to original strncat is no returncode and u8* instead of char*
+
+void hc_strncat (u8 *dst, u8 *src, const size_t n)
+{
+  const size_t dst_len = strlen ((char *) dst);
+
+  u8 *src_ptr = src;
+  u8 *dst_ptr = dst + dst_len;
+
+  for (size_t i = 0; i < n && *src_ptr != 0; i++)
+  {
+    *dst_ptr++ = *src_ptr++;
+  }
+
+  *dst_ptr = 0;
+}
+
+int count_char (const u8 *buf, const int len, const u8 c)
+{
+  int r = 0;
+
+  for (int i = 0; i < len; i++)
+  {
+    if (buf[i] == c) r++;
+  }
+
+  return r;
+}
+
+float get_entropy (const u8 *buf, const int len)
+{
+  float entropy = 0.0;
+
+  for (int c = 0; c < 256; c++)
+  {
+    const int r = count_char (buf, len, (const u8) c);
+
+    if (r == 0) continue;
+
+    float w = (float) r / len;
+
+    entropy += -w * log2 (w);
+  }
+
+  return entropy;
+}
+
+int select_read_timeout (int sockfd, const int sec)
+{
+  struct timeval tv;
+
+  tv.tv_sec  = sec;
+  tv.tv_usec = 0;
+
+  fd_set fds;
+
+  FD_ZERO (&fds);
+  FD_SET (sockfd, &fds);
+
+  return select (sockfd + 1, &fds, NULL, NULL, &tv);
+}
+
+int select_write_timeout (int sockfd, const int sec)
+{
+  struct timeval tv;
+
+  tv.tv_sec  = sec;
+  tv.tv_usec = 0;
+
+  fd_set fds;
+
+  FD_ZERO (&fds);
+  FD_SET (sockfd, &fds);
+
+  return select (sockfd + 1, NULL, &fds, NULL, &tv);
+}
+
+#if defined (_WIN)
+
+int select_read_timeout_console (const int sec)
+{
+  const HANDLE hStdIn = GetStdHandle (STD_INPUT_HANDLE);
+
+  const DWORD rc = WaitForSingleObject (hStdIn, sec * 1000);
+
+  if (rc == WAIT_OBJECT_0)
+  {
+    DWORD dwRead;
+
+    INPUT_RECORD inRecords;
+
+    inRecords.EventType = 0;
+
+    PeekConsoleInput (hStdIn, &inRecords, 1, &dwRead);
+
+    if (inRecords.EventType == 0)
+    {
+      // those are good ones
+
+      return 1;
+    }
+    else
+    {
+      // but we don't want that stuff like windows focus etc. in our stream
+
+      ReadConsoleInput (hStdIn, &inRecords, 1, &dwRead);
+    }
+
+    return select_read_timeout_console (sec);
+  }
+  else if (rc == WAIT_TIMEOUT)
+  {
+    return 0;
+  }
+
+  return -1;
+}
+
+#else
+
+int select_read_timeout_console (const int sec)
+{
+  return select_read_timeout (fileno (stdin), sec);
+}
+
+#endif

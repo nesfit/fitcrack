@@ -19,9 +19,11 @@ import 'vuetify/dist/vuetify.min.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueMoment from 'vue-moment'
-import moment from 'moment-timezone'
+import moment from 'moment'
+import mdfSetup from 'moment-duration-format'
 import VueVisible from 'vue-visible'
 import UserPlugin from '@/components/user/userPlugin'
+import paginator from '@/plugins/paginator'
 import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
@@ -34,6 +36,8 @@ link.href = require(`@/assets/icons/fitcrack.png`)
 document.getElementsByTagName('head')[0].appendChild(link);
 document.querySelector('meta[name="theme-color"]').setAttribute('content', window.theme.primary );
 
+mdfSetup(moment)
+
 Vue.use(VueHighlightJS)
 Vue.use(VueClip);
 Vue.use(VueVisible);
@@ -45,6 +49,7 @@ Vue.axios.defaults.withCredentials = true
 Vue.use(Vuetify);
 
 Vue.use(UserPlugin);
+Vue.use(paginator)
 
 Vue.use(VueProgressBar, {
   color: window.theme.light.primary,

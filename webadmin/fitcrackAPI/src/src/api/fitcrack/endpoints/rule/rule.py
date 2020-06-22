@@ -9,7 +9,7 @@ import os
 import re
 from itertools import islice
 
-from flask import request, redirect, send_from_directory
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
@@ -95,10 +95,7 @@ class rule(Resource):
         Deletes rule file.
         """
         rule = FcRule.query.filter(FcRule.id == id).one()
-        if (rule.deleted):
-            rule.deleted = False
-        else:
-            rule.deleted = True
+        rule.deleted = True
         db.session.commit()
 
         ruleFullPath = os.path.join(RULE_DIR, rule.path)
@@ -162,31 +159,5 @@ class downloadRule(Resource):
         """
 
         rule = FcRule.query.filter(FcRule.id == id).first()
-        return send_from_directory(RULE_DIR, rule.path)
-
-
-@ns.route('/<id>/update')
-class updateRule(Resource):
-
-    @api.expect(updateRule_parser)
-    @api.marshal_with(simpleResponse)
-    def post(self, id):
-        """
-        Replaces rule with new string.
-        """
-
-        args = updateRule_parser.parse_args(request)
-        newData = args.get('newRule', None)
-
-        rule = FcRule.query.filter(FcRule.id == id).first()
-        file = open(os.path.join(RULE_DIR, rule.path), 'r+')
-
-        file.seek(0)
-        file.write(newData)
-        file.truncate()
-        file.close()
-
-        return {
-            'message': 'File ' + rule.name + ' successfully changed.',
-            'status': True
-        }
+        path = os.path.join(RULE_DIR, rule.path)
+        return send_file(path, attachment_filename=rule.path, as_attachment=True)

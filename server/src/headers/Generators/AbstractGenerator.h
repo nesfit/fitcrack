@@ -32,13 +32,19 @@ class CAbstractGenerator
          * Calculates duration of workunit according to adaptive algorithm presented on ICDF2C
          * @return Number of seconds for a workunit
          */
-        uint64_t calculateSecondsIcdf2c(PtrJob &job);
+        uint64_t calculateSecondsIcdf2c(PtrJob &job, CSqlLoader &loader);
 
         /**
          * @brief Wait for the transitioner to create instances of the workunits we just created.
          * Otherwise we'll create too many workunits.
          */
         void activateJobs();
+
+        /**
+         * @brief Get list of job sticky files
+         * @param job CJob which is done
+         */
+        std::vector<std::string> getStickyFiles(PtrJob &job);
 
         /**
          * @brief Send all job host a message to delete job sticky files

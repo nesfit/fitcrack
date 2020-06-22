@@ -32,8 +32,11 @@
         <template v-slot:item.time="{ item }">
           {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
         </template>
+        <template v-slot:item.keyspace="{ item }">
+          {{ fmt(item.keyspace) }}
+        </template>
         <template v-slot:item.actions="{ item }">
-           <v-tooltip top>
+          <v-tooltip top>
             <template v-slot:activator="{ on }">
               <a
                 :href="$serverAddr + '/dictionary/' + item.id + '/download'"
@@ -65,7 +68,7 @@
           </v-tooltip>
         </template>
       </v-data-table>
-      <v-card-actions>
+      <v-card-actions v-if="$userCan('UPLOAD_DICTIONARIES')">
         <v-checkbox
           v-model="sortUploaded"
           label="Sort on upload"
@@ -121,6 +124,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile'
   import serverBrowser from '@/components/serverBrowser/serverBrowser'
   import FileUploader from "@/components/fileUploader/fileUploader";
@@ -155,6 +159,7 @@
       this.loadDictionaries()
     },
     methods: {
+      fmt,
       loadDictionaries: function () {
         this.loading = true;
         this.axios.get(this.$serverAddr + '/dictionary', {}).then((response) => {

@@ -11,7 +11,7 @@ Starting and Restarting
 
 Jobs that are ready can be started. Jobs that are no longer running, be it after successful finish or in an error state, can be restarted and will run again.
 
-Before a job can start, it has to have hosts assigned. If it doesn't, you will see a yellow warning and a button to assign the hosts instead of the typical job controls.
+Before a job can start, it has to have hosts assigned. If it doesn't, you will see a warning and a button to assign the hosts instead of the typical job controls.
 
 
 Stopping and Purging

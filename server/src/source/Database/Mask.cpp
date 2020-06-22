@@ -20,6 +20,7 @@ CMask::CMask(DbMap & maskMap, CSqlLoader * sqlLoader)
         this->m_mask = maskMap["mask"];
         this->m_currentIndex = std::stoull(maskMap["current_index"]);
         this->m_hcKeyspace = std::stoull(maskMap["hc_keyspace"]);
+        this->m_keyspace = std::stoull(maskMap["keyspace"]);
     }
     catch(std::logic_error & error)
     {
@@ -82,4 +83,9 @@ uint64_t CMask::getCurrentIndex() const
 uint64_t CMask::getHcKeyspace() const
 {
     return m_hcKeyspace;
+}
+
+uint64_t CMask::getKeyspace() const
+{
+    return m_keyspace;
 }

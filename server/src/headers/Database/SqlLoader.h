@@ -69,12 +69,21 @@ class CSqlLoader {
         uint64_t getBenchCount(uint64_t jobId, uint64_t hostId);
 
         /**
-         * @brief Return number of workunits in fc_workunit for supplied job-host combo
+         * @brief Return number of unfinished workunits in fc_workunit for supplied job-host combo
          * @param jobId Job ID used to filtering
          * @param hostId Host ID used for filtering
          * @return Number of workunit entries
          */
         uint64_t getWorkunitCount(uint64_t jobId, uint64_t hostId);
+
+        /**
+         * @brief Get the number of workunits created for this host-job combo. Counts @em all workunits, regardless of status
+         * 
+         * @param jobId 
+         * @param hostId 
+         * @return uint64_t 
+         */
+        uint64_t getTotalWorkunitCount(uint64_t jobId, uint64_t hostId);
 
         /**
          * @brief Return number of workunits in fc_workunit for supplied job
@@ -166,6 +175,24 @@ class CSqlLoader {
         unsigned int getTimeoutFactor();
 
         /**
+         * @brief Reads hwmon_temp_abort from fc_settings
+         * @return Number from DB
+         */
+        unsigned int getHWTempAbort();
+
+        /// Gets the distribution coefficient from the database
+        double getDistributionCoefficient();
+
+        /// Gets the setting for the absolute minimum time a workunit should take
+        unsigned getAbsoluteMinimumWorkunitSeconds();
+
+        /// returns whether there should be a ramp up of WU time
+        bool getEnableRampUp();
+
+        /// Gets the ramp-down coefficient from the database
+        double getRampDownCoefficient();
+
+        /**
          * Returns fresh host status from DB
          * @param host_id ID of the host
          * @return status column form fc_host
@@ -191,6 +218,13 @@ class CSqlLoader {
          * @return Vector of smart pointers to found masks
          */
         std::vector<Config::Ptr<CMask>> loadJobMasks(uint64_t jobId);
+
+        /**
+         * @brief Returns vector of masks which are not exhausted (taking normal keyspace) and belongs to supplied job
+         * @param jobId Job ID which masks we search for
+         * @return Vector of smart pointers to found masks
+         */
+        std::vector<Config::Ptr<CMask>> loadJobMasksWithNormalKeyspace(uint64_t jobId);
 
         /**
          * @brief Returns vector of dictionaries which are not exhausted and belongs to supplied job
@@ -290,11 +324,31 @@ private:
         void addNewHosts(uint64_t jobId);
 
         /**
-         * Returns number from database select
+         * Returns a string from database select
+         * @param query [in] An SQL query to execute
+         * @return A string from select
+         */
+        std::string getSqlString(const std::string & query);
+
+        /**
+         * @brief Get a result of the given type from the database.
+         * 
+         * @tparam Res 
+         * @param query 
+         * @return Res 
+         */
+        template <typename Res>
+        Res getSqlConverted(const std::string &query, Res(*conversionFn)(const std::string&));
+
+        /**
+         * Returns a number from database select
          * @param query [in] An SQL query to execute
          * @return Number from select
          */
         uint64_t getSqlNumber(const std::string & query);
+
+        ///Returns a floating point number from a database query
+        double getSqlDouble(const std::string & query);
 
         /**
          * @brief This is template function for loading different objects from database

@@ -10,10 +10,17 @@
 #ifndef SERVER_ATTACKPCFGCLIENT_H
 #define SERVER_ATTACKPCFGCLIENT_H
 
-
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
 #include <protocol.pb.h>
 #include <protocol.grpc.pb.h>
 #include <grpcpp/grpcpp.h>
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 
 using grpc::Channel;

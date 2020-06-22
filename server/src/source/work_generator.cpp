@@ -180,6 +180,20 @@ void parseArguments(int argc, char * argv[])
         exit(1);
     }
 
+    std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileHybridDictMask.c_str());
+    if (read_file_malloc(config.project_path(buf), Config::inTemplatePathHybridDictMask))
+    {
+        log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
+        exit(1);
+    }
+
+    std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileHybridMaskDict.c_str());
+    if (read_file_malloc(config.project_path(buf), Config::inTemplatePathHybridMaskDict))
+    {
+        log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
+        exit(1);
+    }
+
     std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileRule.c_str());
     if (read_file_malloc(config.project_path(buf), Config::inTemplatePathRule))
     {

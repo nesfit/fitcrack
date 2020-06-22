@@ -10,7 +10,6 @@ from src.api.apiConfig import api
 hcStat_model = api.model('HcStat', {
     'id': fields.Integer(readOnly=True, required=False),
     'name': fields.String(readOnly=True, required=False),
-    'keyspace': fields.Integer(readOnly=True),
     'time': fields.DateTime(readOnly=True, required=False),
 })
 hcStatsCollection_model = api.inherit('HcStats collection', {

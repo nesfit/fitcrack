@@ -257,7 +257,7 @@ if [ $INSTALL_BACKEND = "y" ]; then
   cd webadmin/fitcrackAPI/hashcat-utils/src
   make -j$COMPILER_THREADS
   cd ..
-  mkdir bin
+  mkdir -p bin
   cp src/*.bin bin/
   cd $INSTALLER_ROOT
 
@@ -273,6 +273,8 @@ if [ $INSTALL_BACKEND = "y" ]; then
 
   echo "Installed to $APACHE_DOCUMENT_ROOT/fitcrackAPI."
 fi
+
+sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $BOINC_PROJECT_DIR/bin/measureUsage.py
 
 #######################
 # Configure front-end #
@@ -304,5 +306,5 @@ echo "Done."
 ##################
 
 echo "WebAdmin installed. Restarting Apache..."
-systemctl restart $APACHE_SERVICE
+service_restart $APACHE_SERVICE
 echo "Done."

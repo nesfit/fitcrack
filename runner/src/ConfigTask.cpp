@@ -17,6 +17,8 @@ const char *ConfigTask::MIN_PASSWORD_LEN = "min_password_len";
 const char *ConfigTask::MAX_PASSWORD_LEN = "max_password_len";
 const char *ConfigTask::MIN_ELEM_IN_CHAIN = "min_elem_in_chain";
 const char *ConfigTask::MAX_ELEM_IN_CHAIN = "max_elem_in_chain";
+const char *ConfigTask::GENERATE_RANDOM_RULES = "generate_random_rules";
+const char *ConfigTask::HWMON_TEMP_ABORT = "hwmon_temp_abort";
 
 /* Private */
 
@@ -61,11 +63,15 @@ void ConfigTask::initSupported() {
   supported_.push_back("markov_threshold");
   supported_.push_back(ConfigTask::CASE_PERMUTE);
   supported_.push_back(ConfigTask::CHECK_DUPLICATES);
+  supported_.push_back("benchmark_dict1");
+  supported_.push_back("benchmark_dict2");
   supported_.push_back(ConfigTask::MIN_PASSWORD_LEN);
   supported_.push_back(ConfigTask::MAX_PASSWORD_LEN);
   supported_.push_back(ConfigTask::MIN_ELEM_IN_CHAIN);
   supported_.push_back(ConfigTask::MAX_ELEM_IN_CHAIN);
   supported_.push_back(ConfigTask::SKIP_FROM_START);
+  supported_.push_back(ConfigTask::GENERATE_RANDOM_RULES);
+  supported_.push_back(ConfigTask::HWMON_TEMP_ABORT);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

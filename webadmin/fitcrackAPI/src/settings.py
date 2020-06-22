@@ -11,18 +11,14 @@ HASHCAT_EXECUTABLE = 'hashcat64.bin'
 HASHCAT_DIR = ROOT_DIR + '/../hashcat-5.1.0/'
 HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
-MASK_PROCESSOR_PATH = ROOT_DIR + '/../maskprocessor/mp64.bin'
-PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princepreprocessor/pp64.bin'
+PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princeprocessor/pp64.bin'
 EXE_OR_BIN = 'bin'
 DICTIONARY_DIR = '/usr/share/collections/dictionaries'
 PCFG_DIR = '/usr/share/collections/pcfg'
 # PCFG Mower
-#PCFG_MOWER_DIR = ROOT_DIR + '/src/api/fitcrack/endpoints/pcfg/pcfg_mower/pcfg_mower.py'
 PCFG_MOWER_DIR = ROOT_DIR + '/../pcfg_mower/pcfg_mower.py'
 # PCFG Manager
-#PCFG_MANAGER_DIR = ROOT_DIR + '/src/api/fitcrack/endpoints/pcfg/pcfg_manager/pcfg-manager'
 PCFG_MANAGER_DIR = ROOT_DIR + '/../pcfg_manager/pcfg-manager'
-#PCFG_MANAGER = ROOT_DIR + '/src/api/fitcrack/endpoints/pcfg/pcfg_manager'
 PCFG_MANAGER = ROOT_DIR + '/../pcfg_manager'
 # PCFG Trainer
 PCFG_TRAINER_DIR = ROOT_DIR + '/../pcfg_trainer/pcfg_trainer.py'

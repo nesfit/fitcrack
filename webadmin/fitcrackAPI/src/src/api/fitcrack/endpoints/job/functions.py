@@ -17,20 +17,24 @@ import os
 from os.path import basename
 from uuid import uuid1
 from flask_restplus import abort
+from flask_login import current_user
 from sqlalchemy import exc
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, PCFG_MANAGER_DIR, ROOT_DIR, PCFG_MANAGER
+from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, ROOT_DIR
 from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
-from src.database.models import FcJob, FcHashcache, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash
+from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash, FcUserPermission, FcSetting
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
 def create_job(data):
     if data['name'] == '':
         abort(500, 'Name can not be empty.')
+    if len(data['hash_settings']['hash_list']) == 0:
+        abort(500, 'Hash list can not be empty.')
 
+    settings = FcSetting.query.first()
     for idx, hashObj in enumerate(data['hash_settings']['hash_list']):
 
         if hashObj['hash'].startswith('BASE64:'):
@@ -38,11 +42,13 @@ def create_job(data):
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(decoded)
                 fp.seek(0)
-                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+                if settings.verify_hash_format:
+                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= decoded
 
         else:
-            verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+            if settings.verify_hash_format:
+                verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= hashObj['hash'].encode()
 
     hybrid_mask_dict = False
@@ -54,38 +60,10 @@ def create_job(data):
     if not process_func:
         abort(400, "Unsupported attack type")
 
-    data['config'] = ''
     job = process_func(data)
 
     if job['attack_settings']['attack_mode'] == 3:
         job['attack_settings']['attack_submode'] = data['attack_settings']['attack_submode']
-
-    # nastavenie attack modu pre hybrid
-    if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7:
-        attack_settings_control = 1
-
-    else:
-        attack_settings_control = job['attack_settings']['attack_mode']
-
-    job['config'] += (
-                         '|||attack_mode|UInt|' + lenStr(str(attack_settings_control)) + '|' +
-                         str(attack_settings_control) + '|||\n' +
-                         '|||attack_submode|UInt|' + lenStr(str(job['attack_settings']['attack_submode'])) + '|' +
-                         str(job['attack_settings']['attack_submode']) + '|||\n' +
-                         '|||name|String|' + lenStr(job['name']) + '|' + job['name'] + '|||\n' +
-                         '|||hash_type|UInt|' + lenStr(job['hash_settings']['hash_type']) + '|' +
-                         job['hash_settings']['hash_type'] + '|||\n'
-                         )
-
-    if job['attack_settings'].get('rule_left') and job['attack_settings']['rule_left'] != '':
-        job['config'] += '|||rule_left|String|' + lenStr(str(job['attack_settings']['rule_left'])) + '|' + \
-                             job['attack_settings']['rule_left'] + '|||\n'
-
-    if job['attack_settings'].get('rule_right') and job['attack_settings']['rule_right'] != '':
-        job['config'] += '|||rule_right|String|' + lenStr(str(job['attack_settings']['rule_right'])) + '|' + \
-                             job['attack_settings']['rule_right'] + '|||\n'
-
-    token = uuid1()
 
     if job['time_start'] == '':
         job['time_start'] = None
@@ -93,16 +71,12 @@ def create_job(data):
     if job['time_end'] == '':
         job['time_end'] = None
 
-# db_package => db_job
     db_job = FcJob(
-        token=token.hex,
         attack=job['attack_name'],
-        attack_mode='1' if job['attack_settings']['attack_mode'] == 6 or job['attack_settings']['attack_mode'] == 7 else job['attack_settings']['attack_mode'],
+        attack_mode=job['attack_settings']['attack_mode'],
         attack_submode=job['attack_settings']['attack_submode'],
         hash_type=job['hash_settings']['hash_type'],
-        hash='check hashlist',
         status='0',
-        result=None,
         keyspace=job['keyspace'],
         hc_keyspace=job['hc_keyspace'],
         indexes_verified='0',
@@ -110,13 +84,10 @@ def create_job(data):
         current_index_2='0',
         name=job['name'],
         comment=job['comment'],
-        time_start=None if not job['time_start'] else  datetime.datetime.strptime(job['time_start'], '%d/%m/%Y %H:%M'),
-        time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%d/%m/%Y %H:%M'),
-        cracking_time='0',
+        time_start=None if not job['time_start'] else  datetime.datetime.strptime(job['time_start'], '%Y-%m-%dT%H:%M'),
+        time_end=None if not job['time_end'] else datetime.datetime.strptime(job['time_end'], '%Y-%m-%dT%H:%M'),
+        workunit_sum_time='0',
         seconds_per_workunit=job['seconds_per_job'] if job['seconds_per_job'] > 60 else 60,
-        config=job['config'],
-        dict1=job['dict1'] if job.get('dict1') else '',
-        dict2=job['dict2'] if job.get('dict2') else '',
         charset1=job['charset1'] if job.get('charset1') else '',
         charset2=job['charset2'] if job.get('charset2') else '',
         charset3=job['charset3'] if job.get('charset3') else '',
@@ -127,13 +98,13 @@ def create_job(data):
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',
         markov_threshold=job['markov_threshold'] if job.get('markov_threshold') else 0,
         grammar_id=job['attack_settings']['pcfg_grammar']['id'] if job['attack_settings'].get('pcfg_grammar') else 0,
-        case_permute=job['case_permute'] if job['attack_settings'].get('case_permute') else 0,
-        check_duplicates=job['attack_settings'].get('check_duplicates', 0),
+        case_permute=job['attack_settings'].get('case_permute', 0),
+        check_duplicates=job['attack_settings'].get('check_duplicates', 1),
         min_password_len=job['attack_settings'].get('min_password_len', 0),
         max_password_len=job['attack_settings'].get('max_password_len', 0),
         min_elem_in_chain=job['attack_settings'].get('min_elem_in_chain', 0),
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
-        replicate_factor=1,
+        generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         deleted=False
         )
 
@@ -165,27 +136,29 @@ def create_job(data):
         hash = FcHash(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
         db.session.add(hash)
 
+    perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)
+    db.session.add(perms)
+
     db.session.commit()
     return db_job
 
-def delete_job(id):
-    job = FcJob.query.filter(FcJob.id == id).one()
-    if (job.deleted):
-        job.deleted = False
-    else:
-        job.deleted = True
-    db.session.commit()
-
 
 def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
-    result = shellExec(
-        HASHVALIDATOR_PATH + ' -m ' + hash_type + ' ' + "'" + hash + "'", getReturnCode=True
-    )
+    hashes = []
+    settings = FcSetting.query.first()
+    if not settings.verify_hash_format:
+        with open(hash, "r") as hashFile:
+            hashes = [(hash.strip() + " OK") for hash in hashFile.readlines()]
+    else:
+        result = shellExec(
+            HASHVALIDATOR_PATH + ' -m ' + hash_type + ' ' + "'" + hash + "'", getReturnCode=True
+        )
 
-    if result['returnCode'] != 0:
-        abort(500, 'Error in hashValidator.')
+        if result['returnCode'] != 0:
+            abort(500, 'Error in hashValidator.')
 
-    hashes = result['msg'].rstrip().split('\n')
+        hashes = result['msg'].rstrip().split('\n')
+
     hashesArr = []
     hasError = False
     for hash in hashes:
@@ -288,12 +261,20 @@ def computeCrackingTime(data):
 
     elif attackSettings['attack_mode'] == 8:
         dictsKeyspace = compute_prince_keyspace(attackSettings)
-        rulesKeyspace = 1
+        if dictsKeyspace == -1:
+             abort(400, 'Unable to compute job keyspace.')
+        random_rules = 0
+        if attackSettings['generate_random_rules']:
+            random_rules = int(attackSettings['generate_random_rules'])
+        rulesKeyspace = random_rules
         if attackSettings['rules']:
             rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
             rulesKeyspace = rules.count
 
-        keyspace = dictsKeyspace * rulesKeyspace
+        if rulesKeyspace == 0:
+            keyspace = dictsKeyspace
+        else:
+            keyspace = dictsKeyspace * rulesKeyspace
 
     elif attackSettings['attack_mode'] == 9:
         if(attackSettings['keyspace_limit']):
@@ -321,7 +302,11 @@ def computeCrackingTime(data):
     if (total_power > 0):
         display_time = float(keyspace / total_power)
         try:
-            display_time = str(datetime.timedelta(seconds=math.floor(display_time)))
+            time_delta = datetime.timedelta(seconds=math.floor(display_time))
+            if time_delta.total_seconds() < 60:
+                display_time = 'About a minute'
+            else:
+                display_time = str(time_delta)
         except OverflowError:
             display_time = 'really long'
 
@@ -335,14 +320,28 @@ def computeCrackingTime(data):
 
     return result
 
-def calculate_port_number(job_id):
+# permission utils
+def perm_base ():
+    return db.session.query(FcUserPermission.job_id).filter_by(user_id=current_user.id)
 
-    portNumber = 50050 + job_id
-    return str(portNumber)
+def visible_jobs_ids ():
+    ids = perm_base().filter_by(can_view=True).all()
+    return [x[0] for x in ids]
 
+def editable_jobs_ids ():
+    ids = perm_base().filter_by(can_modify=True).all()
+    return [x[0] for x in ids]
 
-def start_pcfg_manager(job_id, grammar_name, keyspace):
+def actionable_jobs_ids ():
+    ids = perm_base().filter_by(can_operate=True).all()
+    return [x[0] for x in ids]
 
-    manager = PCFG_DIR + "/" + extractNameFromZipfile(grammar_name)
-    test = PCFG_MANAGER_DIR + " server " + "-p " + str(calculate_port_number(job_id)) + " -m " + str(keyspace) + " --hashlist " + PCFG_MANAGER + "/README.md" + " -r " + PCFG_DIR + "/" + grammar_name
-    process = subprocess.Popen([PCFG_MANAGER_DIR, "server", "-p", str(calculate_port_number(job_id)), "-m", str(keyspace), "--hashlist", PCFG_MANAGER + "/README.md", "-r", PCFG_DIR + "/" + grammar_name])
+def can_view_job (id):
+    return True if perm_base().filter_by(can_view=True).filter_by(job_id=id).one_or_none() else False
+
+def can_edit_job (id):
+    return True if perm_base().filter_by(can_modify=True).filter_by(job_id=id).one_or_none() else False
+
+def can_operate_job (id):
+    return True if perm_base().filter_by(can_operate=True).filter_by(job_id=id).one_or_none() else False
+

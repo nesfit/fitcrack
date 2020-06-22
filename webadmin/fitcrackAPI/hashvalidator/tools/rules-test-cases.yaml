@@ -1,0 +1,907 @@
+---
+::
+  input: |
+    AbCd
+    abcd
+    ABCD
+
+  expected_cpu: |
+    AbCd
+    abcd
+    ABCD
+
+  expected_opencl: |
+    AbCd
+    abcd
+    ABCD
+
+l:
+  input: |
+    AbCd
+    abcd
+    ABCD
+
+  expected_cpu: |
+    abcd
+    abcd
+    abcd
+
+  expected_opencl: |
+    abcd
+    abcd
+    abcd
+
+u:
+  input: |
+    AbCd
+    abcd
+    ABCD
+
+  expected_cpu: |
+    ABCD
+    ABCD
+    ABCD
+
+  expected_opencl: |
+    ABCD
+    ABCD
+    ABCD
+
+c:
+  input: |
+    AbCd
+    abcd
+    ABCD
+
+  expected_cpu: |
+    Abcd
+    Abcd
+    Abcd
+
+  expected_opencl: |
+    Abcd
+    Abcd
+    Abcd
+
+C:
+  input: |
+    AbCd
+    abcd
+    ABCD
+
+  expected_cpu: |
+    aBCD
+    aBCD
+    aBCD
+
+  expected_opencl: |
+    aBCD
+    aBCD
+    aBCD
+
+t:
+  input: |
+    AbCd
+    abcd
+    ABCD
+
+  expected_cpu: |
+    aBcD
+    ABCD
+    abcd
+
+  expected_opencl: |
+    aBcD
+    ABCD
+    abcd
+
+T5:
+  input: |
+    AbCde
+    abcdef
+    ABCDEFg
+
+  expected_cpu: |
+    AbCde
+    abcdeF
+    ABCDEfg
+
+  expected_opencl: |
+    AbCde
+    abcdeF
+    ABCDEfg
+
+r:
+  input: |
+    AbCd
+    abcd
+
+  expected_cpu: |
+    dCbA
+    dcba
+
+  expected_opencl: |
+    dCbA
+    dcba
+
+d:
+  input: |
+    3abc
+
+  expected_cpu: |
+    3abc3abc
+
+  expected_opencl: |
+    3abc3abc
+
+ddd:
+  input: |
+    3ab
+
+  expected_cpu: |
+    3ab3ab3ab3ab3ab3ab3ab3ab
+
+  expected_opencl: |
+    3ab3ab3ab3ab3ab3ab3ab3ab
+
+p0:
+  input: |
+    3abc
+
+  expected_cpu: |
+    3abc
+
+  expected_opencl: |
+    3abc
+
+p3:
+  input: |
+    3abc
+
+  expected_cpu: |
+    3abc3abc3abc3abc
+
+  expected_opencl: |
+    3abc3abc3abc3abc
+
+f:
+  input: |
+    3abc
+
+  expected_cpu: |
+    3abccba3
+
+  expected_opencl: |
+    3abccba3
+
+'{':
+  input: |
+    3abc
+    a
+
+  expected_cpu: |
+    abc3
+    a
+
+  expected_opencl: |
+    abc3
+    a
+
+'}':
+  input: |
+    3abc
+    a
+
+  expected_cpu: |
+    c3ab
+    a
+
+  expected_opencl: |
+    c3ab
+    a
+
+$1$2:
+  input: |
+    abc
+
+  expected_cpu: |
+    abc12
+
+  expected_opencl: |
+    abc12
+
+^1^2:
+  input: |
+    abc
+
+  expected_cpu: |
+    21abc
+
+  expected_opencl: |
+    21abc
+
+'[':
+  input: |
+    a
+    abc
+    123456790abcdefghijklmnopqrstuvw
+
+  expected_cpu: |
+
+    bc
+    23456790abcdefghijklmnopqrstuvw
+
+  expected_opencl: |
+
+    bc
+
+']':
+  input: |
+    a
+    abc
+    123456790abcdefghijklmnopqrstuvw
+
+  expected_cpu: |
+
+    ab
+    123456790abcdefghijklmnopqrstuv
+
+  expected_opencl: |
+
+    ab
+
+D3:
+  input: |
+    abc
+    abcd
+    abcde
+    123456790abcdefghijklmnopqrstuvw
+
+  expected_cpu: |
+    abc
+    abc
+    abce
+    12356790abcdefghijklmnopqrstuvw
+
+  expected_opencl: |
+    abc
+    abc
+    abce
+
+x14:
+  input: |
+    a
+    abc
+    abcde
+    abcdef
+    123456790abcdefghijklmnopqrstuvw
+
+  expected_cpu: |
+    a
+    abc
+    bcde
+    bcde
+    2345
+
+  expected_opencl: |
+    a
+    abc
+    bcde
+    bcde
+
+O22:
+  input: |
+    a
+    ab
+    abc
+    abcd
+    abcde
+    123456790abcdefghijklmnopqrstuvw
+
+  expected_cpu: |
+    a
+    ab
+    abc
+    ab
+    abe
+    1256790abcdefghijklmnopqrstuvw
+
+  expected_opencl: |
+    a
+    ab
+    abc
+    ab
+    abe
+
+O04:
+  input: |
+    a
+    abc
+    abcd
+    abcde
+    abcdef
+    123456790abcdefghijklmnopqrstuvw
+
+  expected_cpu: |
+    a
+    abc
+
+    e
+    ef
+    56790abcdefghijklmnopqrstuvw
+
+  expected_opencl: |
+    a
+    abc
+
+    e
+    ef
+
+i3!:
+  input: |
+    a
+    abc
+    abcd
+    abcde
+
+  expected_cpu: |
+    a
+    abc!
+    abc!d
+    abc!de
+
+  expected_cpu: |
+    a
+    abc!
+    abc!d
+    abc!de
+
+o3!:
+  input: |
+    a
+    abc
+    abcd
+    abcde
+
+  expected_cpu: |
+    a
+    abc
+    abc!
+    abc!e
+
+  expected_cpu: |
+    a
+    abc
+    abc!
+    abc!e
+
+'''4':
+  input: |
+    a
+    abc
+    abcd
+    abcde
+    abcdef
+
+  expected_cpu: |
+    a
+    abc
+    abcd
+    abcd
+    abcd
+
+  expected_opencl: |
+    a
+    abc
+    abcd
+    abcd
+    abcd
+
+sab:
+  input: |
+    123b
+    a123ba
+
+  expected_cpu: |
+    123b
+    b123bb
+
+  expected_opencl: |
+    123b
+    b123bb
+
+saa:
+  input: |
+    123b
+    a123ba
+
+  expected_cpu: |
+    123b
+    a123ba
+
+  expected_opencl: |
+    123b
+    a123ba
+
+
+'@a':
+  input: |
+    123b
+    aaa
+    a123ba
+    123456790abcdefghijklmnopqrstuvw
+
+  expected_cpu: |
+    123b
+
+    123b
+    123456790bcdefghijklmnopqrstuvw
+
+  expected_opencl: |
+    123b
+
+    123b
+
+z0:
+  input: |
+    abc
+
+  expected_cpu: |
+    abc
+
+  expected_opencl: |
+    abc
+
+z3:
+  input: |
+    abc
+
+  expected_cpu: |
+    aaaabc
+
+  expected_opencl: |
+    aaaabc
+
+Z0:
+  input: |
+    abc
+
+  expected_cpu: |
+    abc
+
+  expected_opencl: |
+    abc
+
+Z3:
+  input: |
+    abc
+
+  expected_cpu: |
+    abcccc
+
+  expected_opencl: |
+    abcccc
+
+q:
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+    aa
+    aabbcc
+
+  expected_opencl: |
+    aa
+    aabbcc
+
+qqq:
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+    aaaaaaaa
+    aaaaaaaabbbbbbbbcccccccc
+
+  expected_opencl: |
+    aaaaaaaa
+    aaaaaaaabbbbbbbbcccccccc
+
+uMlX134:
+  input: |
+    a
+    abc
+    abcd
+    abcdef
+
+  expected_cpu: |
+    abcdBCD
+    abcdBCDef
+
+uMl4:
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+    aA
+    abcABC
+
+uMl6:
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+    Aa
+    ABCabc
+
+<0:
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+
+<1:
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+    a
+
+'>0':
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+    a
+    abc
+
+'>2':
+  input: |
+    a
+    ab
+    abc
+
+  expected_cpu: |
+    ab
+    abc
+
+_2:
+  input: |
+    a
+    ab
+    abc
+
+  expected_cpu: |
+    ab
+
+'!a':
+  input: |
+    1
+    ab
+    abc
+    bcde
+
+  expected_cpu: |
+    1
+    bcde
+
+/a:
+  input: |
+    1
+    ab
+    abc
+    bcde
+
+  expected_cpu: |
+    ab
+    abc
+
+(a:
+  input: |
+    1
+    ab
+    bac
+    abc
+    bcde
+
+  expected_cpu: |
+    ab
+    abc
+
+)c:
+  input: |
+    1
+    ab
+    bac
+    abc
+    bcde
+
+  expected_cpu: |
+    bac
+    abc
+
+=2c:
+  input: |
+    1
+    ab
+    bac
+    abc
+    bcde
+
+  expected_cpu: |
+    bac
+    abc
+
+'%2a':
+  input: |
+    a
+    aa
+    aaa
+    aaaa
+    bcde
+
+  expected_cpu: |
+    aaa
+    aaaa
+
+'/a op4 %3a op4':
+  input: |
+    a
+    aa
+    aaa
+    aaaa
+    aaaaa
+
+  expected_cpu: |
+    4aa4
+    4aa4a
+
+Q:
+  input: |
+    a
+    abc
+
+  expected_cpu: |
+    a
+    abc
+
+rMrQ:
+  input: |
+    ab
+    abcba
+
+  expected_cpu: |
+    ab
+
+k:
+  input: |
+    a
+    ab
+    abc
+
+  expected_cpu: |
+    a
+    ba
+    bac
+
+  expected_opencl: |
+    a
+    ba
+    bac
+
+K:
+  input: |
+    a
+    ab
+    abc
+
+  expected_cpu: |
+    a
+    ba
+    acb
+
+  expected_opencl: |
+    a
+    ba
+    acb
+
+'*24':
+  input: |
+    a
+    ab
+    abc
+    abcd
+    abcde
+    abcdef
+
+  expected_cpu: |
+    a
+    ab
+    abc
+    abcd
+    abedc
+    abedcf
+
+  expected_opencl: |
+    a
+    ab
+    abc
+    abcd
+    abedc
+    abedcf
+
+L2:
+  input: |
+    a
+    ab
+    ab!
+
+  expected_cpu: |
+    a
+    ab
+    abB
+
+  expected_opencl: |
+    a
+    ab
+    abB
+
+R2:
+  input: |
+    a
+    ab
+    abB
+
+  expected_cpu: |
+    a
+    ab
+    ab!
+
+  expected_cpu: |
+    a
+    ab
+    ab!
+
++2:
+  input: |
+    a
+    ab
+    abc
+
+  expected_cpu: |
+    a
+    ab
+    abd
+
+  expected_opencl: |
+    a
+    ab
+    abd
+
+-2:
+  input: |
+    a
+    ab
+    abc
+
+  expected_cpu: |
+    a
+    ab
+    abb
+
+  expected_opencl: |
+    a
+    ab
+    abb
+
+.2:
+  input: |
+    a
+    ab
+    abc
+    abcd
+
+  expected_cpu: |
+    a
+    ab
+    abc
+    abdd
+
+  expected_opencl: |
+    a
+    ab
+    abc
+    abdd
+
+',2':
+  input: |
+    a
+    ab
+    abc
+    abcd
+
+  expected_cpu: |
+    a
+    ab
+    abb
+    abbd
+
+  expected_opencl: |
+    a
+    ab
+    abb
+    abbd
+
+y2:
+  input: |
+    a
+    ab
+    abc
+    123456790abcdefghijklmnopqrstuv
+
+  expected_cpu: |
+    a
+    abab
+    ababc
+
+  expected_opencl: |
+    a
+    abab
+    ababc
+    123456790abcdefghijklmnopqrstuv
+
+Y2:
+  input: |
+    a
+    ab
+    abc
+    123456790abcdefghijklmnopqrstuv
+
+  expected_cpu: |
+    a
+    abab
+    abcbc
+
+  expected_opencl: |
+    a
+    abab
+    abcbc
+    123456790abcdefghijklmnopqrstuv
+
+E:
+  input: |
+    a bc
+    ab c
+    abc
+
+  expected_cpu: |
+    A Bc
+    Ab C
+    Abc
+
+  expected_opencl: |
+    A Bc
+    Ab C
+    Abc
+
+e-:
+  input: |
+    a-bc
+    ab-c
+    abc
+
+  expected_cpu: |
+    A-Bc
+    Ab-C
+    Abc
+
+  expected_opencl: |
+    A-Bc
+    Ab-C
+    Abc

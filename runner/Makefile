@@ -9,10 +9,12 @@ TAB=$(shell echo -e '\t')
 
 GIT_REV=$(shell git rev-parse HEAD)
 
+$(shell echo 'void ehframe_dummy (void) { }' > $(BINDIR)/ehframe_dummy.C)
+
 CXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -pedantic -lboinc_api -lboinc -lzip -lz -static-libgcc -static-libstdc++ 
 CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'  
 ## Release
-LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -Wno-c++11-compat -O3 -flto -s -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -Wno-c++11-compat -O3 -g3 -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 ## Debug
 # LDXXFLAGS=-Wall -Wextra -Wno-c++11-compat -g -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 
@@ -22,6 +24,8 @@ OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))
 linux: TARGET=runner.bin
 linux: CXX=g++
 linux: CXXPATHS+=-L'./lib/x86_64_linux'
+#this is necessary because of https://bugzilla.redhat.com/show_bug.cgi?id=199788#c2 (15 yrs old and still not fixed -.-')
+linux: CXXFLAGS+= -lc $(BINDIR)/ehframe_dummy.C
 linux: ARCH=-m64
 linux: $(OBJDIR) $(BINDIR) runner
 
@@ -64,3 +68,6 @@ cleanbin:
 
 cleandoc:
 	rm -rf $(DOCDIR)*
+
+test_prince:
+	cd testground; python3 prince_tester.py; cd --

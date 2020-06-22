@@ -4,31 +4,40 @@
 */
 
 #include "TaskComputeBase.hpp"
+#include "Attack.hpp"
 #include <cassert>
 
 /* Protected */
 void TaskComputeBase::getAllArguments() {
 
   hashcat_arguments_ = attack_->getArguments();
-
-  switch (attack_type) {
-  case AT_PCFG:
-    external_generator_arguments_ =
-        static_cast<AttackPCFG *>(attack_)->getPCFGArguments();
-    break;
-  case AT_Prince:
-    external_generator_arguments_ =
-        static_cast<AttackPrince *>(attack_)->getPrinceArguments();
-    break;
-  default:
-    break;
-  }
+  
+  external_generator_arguments_ = attack_->getExternalGeneratorArguments();
 
   host_config_.read();
 
   host_config_.print();
 
   host_config_.parseArguments(hashcat_arguments_);
+}
+
+uint64_t TaskComputeBase::getSaltCountFromStatusLine(const std::string &outputLine)
+{
+  static const char marker[] = "RECSALT\t";
+  size_t found_at = outputLine.find(marker);
+  if (found_at != std::string::npos) {
+    //-1 for terminating NULL
+    found_at += sizeof(marker)-1;
+    uint64_t dummy;
+    uint64_t saltCount;
+    std::istringstream parser(outputLine.substr(found_at));
+    if(parser>>dummy && parser>>saltCount)
+    {
+      return saltCount;
+    }
+  }
+  //return 1 by default so that we assume there is only one salt
+  return 1;
 }
 
 /* Public */
@@ -43,7 +52,7 @@ TaskComputeBase::TaskComputeBase(
   attack_(nullptr),
   process_hashcat_(nullptr),
   process_external_generator_(nullptr),
-  hashcat_mutex_("FitcrackRunnerHashcatMutex"),
+  hashcat_mutex_(RunnerConstants::HashcatMutexName),
   attack_type(Attack::detectAttackType(task_config_))
 {}
 
@@ -58,7 +67,7 @@ TaskComputeBase::TaskComputeBase(
   attack_(nullptr),
   process_hashcat_(nullptr),
   process_external_generator_(nullptr),
-  hashcat_mutex_("FitcrackRunnerHashcatMutex"),
+  hashcat_mutex_(RunnerConstants::HashcatMutexName),
   attack_type(Attack::detectAttackType(task_config_))
 {}
 
@@ -112,38 +121,21 @@ void TaskComputeBase::initialize() {
   directory_.printFiles();
 
   if (attack_ == nullptr) {
-    attack_ = Attack::create(task_config_, directory_, attack_type);
+    attack_ = Attack::create(task_config_, directory_);
     getAllArguments();
   }
 
   if (process_hashcat_ == nullptr) {
-    switch (attack_type) {
-    case AT_PCFG: {
-      if (process_external_generator_ == nullptr) {
-        process_external_generator_ =
-            ProcessPCFG::create(external_generator_arguments_, directory_);
-      }
-      break;
-    }
-    case AT_Prince: {
-      if (process_external_generator_ == nullptr) {
-        process_external_generator_ =
-            ProcessPrince::create(external_generator_arguments_, directory_);
-      }
-      break;
-    }
-    default:
-      break;
-    }
-
-    if (process_hashcat_ == nullptr)
-      process_hashcat_ = Process::create(hashcat_arguments_, directory_);
-
-
-    if (process_external_generator_) {
-      assert(attack_type == AT_PCFG || attack_type == AT_Prince);
-      process_hashcat_->setInPipe(process_external_generator_->GetPipeOut());
-    }
+    process_hashcat_ = Process::create(hashcat_arguments_, directory_);
+  }
+  //create external generator if necessary
+  std::string externalGeneratorName = attack_->getExternalGeneratorName();
+  if(!externalGeneratorName.empty() && !process_external_generator_)
+  {
+    process_external_generator_ = Process::create(externalGeneratorName, attack_->getExternalGeneratorArguments(), directory_);
+  }
+  if (process_external_generator_) {
+    process_hashcat_->setInPipe(process_external_generator_->GetPipeOut());
   }
 }
 
@@ -162,23 +154,17 @@ void TaskComputeBase::printProcessErr() {
 }
 
 void TaskComputeBase::startComputation() {
-  switch (attack_type) {
-  case AT_Prince:
-  case AT_PCFG: {
-    if (!process_external_generator_->isRunning()) {
-      process_external_generator_->run();
-      Logging::debugPrint(Logging::Detail::GeneralInfo,
-                          "External generator process has started.");
-    }
-    break;
+  if (process_external_generator_ &&!process_external_generator_->isRunning()) {
+    process_external_generator_->run();
+    Logging::debugPrint(Logging::Detail::GeneralInfo,
+                        "External generator process has started. Waiting for start of output");
+    process_external_generator_->GetPipeOut()->waitForAvailableOutput();
+    Logging::debugPrint(Logging::Detail::GeneralInfo, "Waiting for the external generator output ended");
   }
-  default:
-    break;
-  }
-
   if(!process_hashcat_->isRunning())
   {
     hashcat_mutex_.lock();
+    process_hashcat_->killIfRunning();
     process_hashcat_->run();
     Logging::debugPrint(Logging::Detail::GeneralInfo,
                         "Hashcat process has started.");

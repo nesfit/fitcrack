@@ -112,7 +112,7 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
 
     if (status_ctx->devices_status == STATUS_INIT) continue;
 
-    if (hwmon_check == true)
+    if (hwmon_ctx->enabled == true)
     {
       hc_thread_mutex_lock (status_ctx->mux_hwmon);
 
@@ -122,24 +122,40 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
 
         if (device_param->skipped == true) continue;
 
+        if ((opencl_ctx->devices_param[device_id].device_type & CL_DEVICE_TYPE_GPU) == 0) continue;
 
+        const int temperature = hm_get_temperature_with_device_id (hashcat_ctx, device_id);
+
+        if (temperature > (int) user_options->hwmon_temp_abort)
+        {
+          EVENT_DATA (EVENT_MONITOR_TEMP_ABORT, &device_id, sizeof (u32));
+
+          myabort (hashcat_ctx);
+        }
       }
 
-      hc_thread_mutex_unlock (status_ctx->mux_hwmon);
-    }
-
-    if (hwmon_check == true)
-    {
-      hc_thread_mutex_lock (status_ctx->mux_hwmon);
-
       for (u32 device_id = 0; device_id < opencl_ctx->devices_cnt; device_id++)
       {
         hc_device_param_t *device_param = &opencl_ctx->devices_param[device_id];
 
         if (device_param->skipped == true) continue;
 
+        const int rc_throttle = hm_get_throttle_with_device_id (hashcat_ctx, device_id);
 
+        if (rc_throttle == -1) continue;
 
+        if (rc_throttle > 0)
+        {
+          slowdown_warnings++;
+
+          if (slowdown_warnings == 1) EVENT_DATA (EVENT_MONITOR_THROTTLE1, &device_id, sizeof (u32));
+          if (slowdown_warnings == 2) EVENT_DATA (EVENT_MONITOR_THROTTLE2, &device_id, sizeof (u32));
+          if (slowdown_warnings == 3) EVENT_DATA (EVENT_MONITOR_THROTTLE3, &device_id, sizeof (u32));
+        }
+        else
+        {
+          if (slowdown_warnings > 0) slowdown_warnings--;
+        }
       }
 
       hc_thread_mutex_unlock (status_ctx->mux_hwmon);
@@ -151,9 +167,9 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
 
       if (restore_left == 0)
       {
-//        const int rc = cycle_restore (hashcat_ctx);
+        const int rc = cycle_restore (hashcat_ctx);
 
-//        if (rc == -1) return -1;
+        if (rc == -1) return -1;
 
         restore_left = user_options->restore_timer;
       }
@@ -181,8 +197,9 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
         {
           hashes->digests_saved = hashes->digests_done;
 
-          //const int rc = save_hash (hashcat_ctx);
+          const int rc = save_hash (hashcat_ctx);
 
+          if (rc == -1) return -1;
         }
 
         remove_left = user_options->remove_timer;
@@ -227,7 +244,11 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
 
         exec_total += exec;
 
+        const int util = hm_get_utilization_with_device_id (hashcat_ctx, device_id);
 
+        if (util == -1) continue;
+
+        util_total += (double) util;
 
         util_cnt++;
       }
@@ -254,6 +275,34 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
         if (performance_warnings == 10) EVENT_DATA (EVENT_MONITOR_PERFORMANCE_HINT, NULL, 0);
       }
     }
+
+    // stdin read timeout check
+    // note: we skip the stdin timeout check if it was disabled with stdin_timeout_abort set to 0
+
+    if (user_options->stdin_timeout_abort != 0)
+    {
+      if (status_get_progress_done (hashcat_ctx) == 0)
+      {
+        if (status_ctx->stdin_read_timeout_cnt > 0)
+        {
+          if (status_ctx->stdin_read_timeout_cnt >= user_options->stdin_timeout_abort)
+          {
+            EVENT_DATA (EVENT_MONITOR_NOINPUT_ABORT, NULL, 0);
+
+            myabort (hashcat_ctx);
+
+            status_ctx->shutdown_inner = true;
+
+            break;
+          }
+
+          if ((status_ctx->stdin_read_timeout_cnt % STDIN_TIMEOUT_WARN) == 0)
+          {
+            EVENT_DATA (EVENT_MONITOR_NOINPUT_HINT, NULL, 0);
+          }
+        }
+      }
+    }
   }
 
   // final round of save_hash
@@ -262,8 +311,9 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
   {
     if (hashes->digests_saved != hashes->digests_done)
     {
-      //const int rc = save_hash (hashcat_ctx);
+      const int rc = save_hash (hashcat_ctx);
 
+      if (rc == -1) return -1;
     }
   }
 
@@ -271,15 +321,15 @@ static int monitor (hashcat_ctx_t *hashcat_ctx)
 
   if (restore_check == true)
   {
-//    const int rc = cycle_restore (hashcat_ctx);
+    const int rc = cycle_restore (hashcat_ctx);
 
-//    if (rc == -1) return -1;
+    if (rc == -1) return -1;
   }
 
   return 0;
 }
 
-void *thread_monitor (void *p)
+HC_API_CALL void *thread_monitor (void *p)
 {
   hashcat_ctx_t *hashcat_ctx = (hashcat_ctx_t *) p;
 

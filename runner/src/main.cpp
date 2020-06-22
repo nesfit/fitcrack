@@ -46,9 +46,13 @@ int main(int argc, char **argv) {
     error_value = task->saveAndFinish();
     error_value = (error_value == 1 ? 0 : error_value);
   }
-  catch (std::runtime_error& e) {
+  catch (const std::exception& e) {
     exception_message = e.what();
     Logging::debugPrint(Logging::Detail::Important, "Runner failed with std::runtime_error: \n what() : " + exception_message);
+  }
+  catch(...)
+  {
+    Logging::debugPrint(Logging::Detail::Important, "Runner failed with an unknown exception");
   }
 
   if (RunnerUtils::isStandalone()) {

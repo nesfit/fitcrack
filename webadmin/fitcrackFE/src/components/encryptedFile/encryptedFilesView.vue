@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <v-container class="max500">
+  <v-container class="max1000">
     <fc-tile
       title="Encrypted files"
       class="ma-2"
@@ -16,65 +16,30 @@
         :items="encryptedFiles.items"
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Files per page'}"
       >
-        <template
-          slot="items"
-          slot-scope="props"
-        >
-          <td>{{ props.item.name }}</td>
-          <td class="text-right">
-            {{ props.item.hash }}
-          </td>
-          <td class="text-right">
-            {{ $moment(props.item.time ).format('DD.MM.YYYY HH:mm') }}
-          </td>
-          <td class="text-right">
-            <a
-              :href="$serverAddr + '/protectedFiles/' + props.item.id"
-              target="_blank"
-            >
-              <v-btn
-                outlined
-                fab
-                small
-                color="primary"
+        <template v-slot:item.name="{ item }">
+          {{ item.name }}
+        </template>
+        <template v-slot:item.time="{ item }">
+          {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.actions="{ item }">
+           <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a
+                :href="$serverAddr + '/protectedFiles/' + item.id"
+                target="_blank"
+                download
+                v-on="on"
               >
-                <v-icon>file_download</v-icon>
-              </v-btn>
-            </a>
-          </td>
+                <v-btn icon>
+                  <v-icon>mdi-file-download-outline</v-icon>
+                </v-btn>
+              </a>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
         </template>
       </v-data-table>
-      <vue-clip
-        :options="uploadOptions"
-        :on-total-progress="uploadProgressChanged"
-        class="pa-2"
-        :on-complete="uploadComplete"
-      >
-        <template slot="clip-uploader-action">
-          <div class="dz-message">
-            <v-btn
-              outlined
-              text
-              color="primary"
-              class="noEvent"
-            >
-              Upload file
-            </v-btn>
-          </div>
-          <v-progress-linear
-            v-model="uploadProgress"
-            background-color="white"
-          />
-        </template>
-        <template
-          slot="clip-uploader-body"
-          slot-scope="props"
-        >
-          <div v-for="file in props.files">
-            {{ file.name }} {{ file.status }}
-          </div>
-        </template>
-      </vue-clip>
     </fc-tile>
   </v-container>
 </template>
@@ -95,12 +60,12 @@
         headers: [
           {
             text: 'Name',
-            align: 'left',
+            align: 'start',
             value: 'name'
           },
-          {text: 'Hash', value: 'hash', align: 'right'},
-          {text: 'Added', value: 'time', align: 'right'},
-          {text: 'Download', value: 'name', align: 'right'}
+          {text: 'Hash', value: 'hash', align: 'end'},
+          {text: 'Time', value: 'time', align: 'end'},
+          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
         ],
         encryptedFiles: [],
         uploadProgress: 0
@@ -111,7 +76,7 @@
     },
     methods: {
       loadFiles: function () {
-        this.axios.get(this.$serverAddr + '/protectedFiles', {}).then((response) => {
+        this.axios.get(this.$serverAddr + '/protectedFiles/', {}).then((response) => {
           this.encryptedFiles = response.data;
         })
       },
@@ -141,8 +106,8 @@
     text-align: center;
   }
 
-  .max500 {
-    max-width: 600px;
+  .max1000 {
+    max-width: 1000px;
   }
 
 </style>

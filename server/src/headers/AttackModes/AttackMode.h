@@ -17,6 +17,8 @@
 #include <Dictionary.h>
 #include <SqlLoader.h>
 #include <Config.h>
+#include <InputDict.h>
+#include <MaskSplitter.h>
 
 /** BOINC headers */
 #include <backend_lib.h>
@@ -55,6 +57,10 @@ class AttackMode {
          */
         void setDefaultWorkunitParams(DB_WORKUNIT * wu);
 
+        virtual bool requiresMasks() const {return false;}
+        virtual bool requiresDicts() const {return false;}
+        virtual bool masksUseRealKeyspace() const {return false;}
+
 protected:
         /**
         * @brief Base constructor for all attacks, saves supplied arguments to member variables
@@ -62,7 +68,7 @@ protected:
         * @param host [in] Instance of CHost which this attack belongs to
         * @param seconds [in] Number of seconds this instance of attack should take
         */
-        AttackMode(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+        AttackMode(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
         :   m_job(job),
             m_host(host),
             m_seconds(seconds),
@@ -86,10 +92,39 @@ protected:
          * @param charset4 Charset 4 if being used
          * @return Config string with newline at the end
          */
-        std::string generateBasicConfig(char wuMode, unsigned attackMode, unsigned attackSubmode, std::string name,
-                unsigned hashType, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
+        virtual std::string generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name,
+                unsigned hashType, unsigned generateRandomRules = 0, unsigned hwTempAbort = 90, std::string ruleLeft="", std::string ruleRight="", std::string charset1="",
                 std::string charset2="", std::string charset3="", std::string charset4="");
 
+        /**
+         * @brief Get the Mode Letter. This is 'n' for normal attack modes.
+         * 
+         * @return char The mode letter
+         */
+        virtual char getModeLetter() {return 'n';}
+
+        std::string makeConfigLine(const std::string &option, const std::string &type, const std::string &value);
+
+        virtual std::string makeLimitingConfigLine(const std::string &option, const std::string &type, const std::string &value)
+        {return makeConfigLine(option, type, value);}
+
+        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex, bool isSticky);
+
+        virtual bool hasStickyLeftDict() const {return false;}
+
+        virtual std::unique_ptr<MaskSplitter> makeMaskSplitter(std::vector<std::string> customCharsets = {});
+
+        virtual PtrDictionary FindCurrentDict(std::vector<PtrDictionary> &dicts) const;
+
+        virtual PtrDictionary GetWorkunitDict() const;
+
+        virtual PtrMask GetWorkunitMask() const;
+
+        virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace) const;
+
+        uint64_t getPasswordCountToProcess() const;
+
+        virtual uint64_t getMinPassCount() const {return Config::minPassCount;}
 
         PtrWorkunit m_workunit; /**< Instance of CWorkunit which is used to create this attack instance */
         PtrJob m_job;           /**< Instance of CJob which is parent of this attack instance */

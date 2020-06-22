@@ -21,7 +21,6 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_attackMode = std::stoul(jobMap["attack_mode"]);
         this->m_attackSubmode = std::stoul(jobMap["attack_submode"]);
         this->m_hashType = std::stoul(jobMap["hash_type"]);
-        this->m_hash = jobMap["hash"];
         this->m_status = std::stoul(jobMap["status"]);
         this->m_keyspace = std::stoull(jobMap["keyspace"]);
         this->m_hcKeyspace = std::stoull(jobMap["hc_keyspace"]);
@@ -29,9 +28,6 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_currentIndex2 = std::stoull(jobMap["current_index_2"]);
         this->m_name = jobMap["name"];
         this->m_secondsPerWorkunit = std::stoull(jobMap["seconds_per_workunit"]);
-        this->m_config = jobMap["config"];
-        this->m_dict1 = jobMap["dict1"];
-        this->m_dict2 = jobMap["dict2"];
         this->m_rules = jobMap["rules"];
         this->m_ruleLeft = jobMap["rule_left"];
         this->m_ruleRight = jobMap["rule_right"];
@@ -43,22 +39,24 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
             this->m_grammar_id = std::stoull(jobMap["grammar_id"]);
         this->m_markov = jobMap["markov_hcstat"];
         this->m_markovThreshold = std::stoul(jobMap["markov_threshold"]);
-        this->m_replicateFactor = std::stoul(jobMap["replicate_factor"]);
         this->m_casePermute = std::stoul(jobMap["case_permute"]);
         this->m_checkDuplicates = std::stoul(jobMap["check_duplicates"]);
         this->m_minPasswordLen = std::stoul(jobMap["min_password_len"]);
         this->m_maxPasswordLen = std::stoul(jobMap["max_password_len"]);
         this->m_minElemInChain = std::stoul(jobMap["min_elem_in_chain"]);
         this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
+        this->m_generateRandomRules = std::stoul(jobMap["generate_random_rules"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
+        uint64_t minSeconds = m_sqlLoader->getAbsoluteMinimumWorkunitSeconds();
+
         /** Check for valid values */
-        if (this->m_secondsPerWorkunit < Config::minSeconds)
+        if (this->m_secondsPerWorkunit < minSeconds)
         {
             Tools::printDebugJob(Config::DebugType::Warn, this->m_id,
                                  "Found seconds_per_workunit=%" PRIu64 ", falling back to minimum of %" PRIu64"s\n",
-                                 this->m_secondsPerWorkunit, Config::minSeconds);
-            this->m_secondsPerWorkunit = Config::minSeconds;
+                                 this->m_secondsPerWorkunit, minSeconds);
+            this->m_secondsPerWorkunit = minSeconds;
         }
 
         if (this->m_keyspace == 0 && this->m_id != Config::benchAllId)
@@ -69,9 +67,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         }
 
         /** Compute second dictionary size */
-        if ((this->m_attackMode == Config::AttackMode::AttackCombinator ||             /**< For combinator attacks*/
-            (this->m_attackMode == Config::AttackMode::AttackDict && this->m_attackSubmode > 0) ||    /**< and rules*/
-            (this->m_attackMode == Config::AttackMode::AttackPcfg && this->m_attackSubmode > 0)) &&   /**< and PCFG rules*/
+        if (this->m_attackMode == Config::AttackMode::AttackCombinator &&
             this->m_hcKeyspace != 0)
                 m_combSecDictSize = this->m_keyspace / this->m_hcKeyspace;
 
@@ -79,7 +75,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         m_secondsPassed = m_sqlLoader->getSecondsPassed(this->m_id);
         m_totalPower = m_sqlLoader->getTotalPower(this->m_id);
 
-        m_maxSeconds = m_secondsPassed + Config::minSeconds;
+        m_maxSeconds = m_secondsPassed + minSeconds;
 
         if(m_maxSeconds > this->m_secondsPerWorkunit)
             m_maxSeconds = this->m_secondsPerWorkunit;
@@ -93,6 +89,9 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
                                  this->m_timeoutFactor, Config::minTimeoutFactor);
             this->m_timeoutFactor = Config::minTimeoutFactor;
         }
+
+        /** Temperature threshold */
+        m_hwTempAbort = m_sqlLoader->getHWTempAbort();
     }
     catch(std::logic_error & error)
     {
@@ -163,10 +162,10 @@ void CJob::updateStartTime()
 }
 
 
-void CJob::loadMasks()
+void CJob::loadMasks(bool useNormalKeyspace)
 {
     m_masks.clear();
-    auto maskVec = m_sqlLoader->loadJobMasks(this->m_id);
+    auto maskVec = useNormalKeyspace ? m_sqlLoader->loadJobMasksWithNormalKeyspace(this->m_id) : m_sqlLoader->loadJobMasks(this->m_id);
     for (auto & mask : maskVec)
         this->addMask(mask);
 }
@@ -208,6 +207,18 @@ bool CJob::loadHashes()
     return true;
 }
 
+uint64_t CJob::getEndIndex() const
+{
+    switch(getAttackMode())
+    {
+    case Config::AttackMode::AttackCombinator:
+    case Config::AttackMode::AttackHybridDictMask:
+    case Config::AttackMode::AttackHybridMaskDict:
+        return getKeyspace()/getHcKeyspace();
+    default:
+        return getHcKeyspace();
+    }
+}
 
 /**
  * @section Table attributes getters
@@ -240,12 +251,6 @@ uint32_t CJob::getAttackSubmode() const
 uint32_t CJob::getHashType() const
 {
     return m_hashType;
-}
-
-
-const std::string &CJob::getHash() const
-{
-    return m_hash;
 }
 
 
@@ -291,24 +296,6 @@ uint64_t CJob::getSecondsPerWorkunit() const
 }
 
 
-const std::string & CJob::getConfig() const
-{
-    return m_config;
-}
-
-
-const std::string & CJob::getDict1() const
-{
-    return m_dict1;
-}
-
-
-const std::string & CJob::getDict2() const
-{
-    return m_dict2;
-}
-
-
 const std::string & CJob::getRules() const
 {
     return m_rules;
@@ -343,11 +330,10 @@ const std::string & CJob::getMarkov() const
 }
 
 
-uint32_t CJob::getReplicateFactor() const
+uint32_t CJob::getRandomRulesCount() const
 {
-    return m_replicateFactor;
+    return m_generateRandomRules;
 }
-
 
 bool CJob::getKillFlag() const
 {
@@ -440,6 +426,11 @@ uint64_t CJob::getCombSecDictSize() const
 unsigned int CJob::getTimeoutFactor() const
 {
     return m_timeoutFactor;
+}
+
+unsigned int CJob::getHWTempAbort() const
+{
+    return m_hwTempAbort;
 }
 
 

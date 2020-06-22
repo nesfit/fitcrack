@@ -87,23 +87,55 @@
         :items="userRoles"
         :loading="loading"
         hide-default-footer
+        disable-sort
       >
-        <template v-slot:item.ADD_NEW_JOB="{ item }">
-          <v-checkbox
-            v-model="item.ADD_NEW_JOB"
-            @change="roleChange($event, item.id, 'ADD_NEW_JOB')"
-          />
-        </template>
         <template v-slot:item.MANAGE_USERS="{ item }">
           <v-checkbox
             v-model="item.MANAGE_USERS"
+            :disabled="item.id == 1"
             @change="roleChange($event, item.id, 'MANAGE_USERS')"
+          />
+        </template>
+        <template v-slot:item.ADD_NEW_JOB="{ item }">
+          <v-checkbox
+            v-model="item.ADD_NEW_JOB"
+            :disabled="item.id == 1"
+            @change="roleChange($event, item.id, 'ADD_NEW_JOB')"
+          />
+        </template>
+        <template v-slot:item.VIEW_ALL_JOBS="{ item }">
+          <v-checkbox
+            v-model="item.VIEW_ALL_JOBS"
+            :disabled="item.id == 1"
+            @change="roleChange($event, item.id, 'VIEW_ALL_JOBS')"
+          />
+        </template>
+        <template v-slot:item.EDIT_ALL_JOBS="{ item }">
+          <v-checkbox
+            v-model="item.EDIT_ALL_JOBS"
+            :disabled="item.id == 1"
+            @change="roleChange($event, item.id, 'EDIT_ALL_JOBS')"
+          />
+        </template>
+        <template v-slot:item.OPERATE_ALL_JOBS="{ item }">
+          <v-checkbox
+            v-model="item.OPERATE_ALL_JOBS"
+            :disabled="item.id == 1"
+            @change="roleChange($event, item.id, 'OPERATE_ALL_JOBS')"
+          />
+        </template>
+        <template v-slot:item.UPLOAD_DICTIONARIES="{ item }">
+          <v-checkbox
+            v-model="item.UPLOAD_DICTIONARIES"
+            :disabled="item.id == 1"
+            @change="roleChange($event, item.id, 'UPLOAD_DICTIONARIES')"
           />
         </template>
         <template v-slot:item.id="{ item }">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
+                v-show="item.id > 1"
                 icon
                 class="mx-0"
                 @click="deleteRole(item.id)"
@@ -372,8 +404,12 @@
             align: 'start',
             value: 'name'
           },
-          {text: 'Add new job', value: 'ADD_NEW_JOB', align: 'start'},
           {text: 'Manage users', value: 'MANAGE_USERS', align: 'start'},
+          {text: 'Add new job', value: 'ADD_NEW_JOB', align: 'start'},
+          {text: 'View all jobs', value: 'VIEW_ALL_JOBS', align: 'start'},
+          {text: 'Edit all jobs', value: 'EDIT_ALL_JOBS', align: 'start'},
+          {text: 'Operate all jobs', value: 'OPERATE_ALL_JOBS', align: 'start'},
+          {text: 'Add new dictionaries', value: 'UPLOAD_DICTIONARIES', align: 'start'},
           {text: '', value: 'id', align: 'end'}
         ],
         userRoles: [],
@@ -411,6 +447,8 @@
           user_id: userId,
           role_id: roleId
         }).then((response) => {
+          this.$store.dispatch('refreshUser')
+          this.$store.dispatch('binInterface/load')
           console.log(response.data);
           console.log('user role changed')
         })
@@ -420,6 +458,8 @@
           key: key,
           value: value
         }).then((response) => {
+          this.$store.dispatch('refreshUser')
+          this.$store.dispatch('binInterface/load')
           console.log(response.data);
           console.log('user role changed')
         })
@@ -490,12 +530,12 @@
 
 <style scoped>
   .tinyselect {
-    max-width: 20ch;
+    max-width: 40ch;
   }
 
   .users {
     margin-top: 2em;
-    max-width: 550px;
+    max-width: 850px;
   }
 
   h2 {
@@ -504,7 +544,7 @@
   }
 
   .roleTable {
-    max-width: 550px;
+    max-width: 850px;
     margin: auto;
   }
 

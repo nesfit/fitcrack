@@ -20,9 +20,12 @@
 +# find . -name '*.h'
 +# find . -name '*.cpp'
 +fitcrack_sources = \
++    AttackBenchAll.h \
 +    AttackBench.h \
 +    AttackCombinator.h \
 +    AttackDict.h \
++    AttackHybridDictMask.h \
++    AttackHybridMaskDict.h \
 +    AttackMarkov.h \
 +    AttackMask.h \
 +    AttackMode.h \
@@ -31,15 +34,19 @@
 +    Config.h \
 +    Dictionary.h \
 +    Host.h \
++    InfileArray.h \
++    InputDict.h \
 +    Workunit.h \
 +    Mask.h \
 +    Job.h \
 +    SqlLoader.h \
 +    AbstractGenerator.h \
 +    SimpleGenerator.h \
-+    AttackBench.cpp \
++    AttackBenchAll.cpp \
 +    AttackCombinator.cpp \
 +    AttackDict.cpp \
++    AttackHybridDictMask.cpp \
++    AttackHybridMaskDict.cpp \
 +    AttackMarkov.cpp \
 +    AttackMask.cpp \
 +    AttackMode.cpp \
@@ -47,6 +54,8 @@
 +    Config.cpp \
 +    Dictionary.cpp \
 +    Host.cpp \
++    InfileArray.cpp \
++    InputDict.cpp \
 +    Workunit.cpp \
 +    Mask.cpp \
 +    Job.cpp \

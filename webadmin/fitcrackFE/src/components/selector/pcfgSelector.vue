@@ -15,7 +15,7 @@
     @input="updateSelected"
   >
     <template v-slot:item.name="{ item }">
-      <router-link :to="{name: 'pcfgDetail', params: { id: item.id}}" target='_blank'>
+      <router-link :to="{name: 'pcfgDetail', params: { id: item.id}}">
         {{ item.name }}
         <v-icon 
           small
@@ -25,6 +25,9 @@
         </v-icon>
       </router-link>
     </template>
+    <template v-slot:item.keyspace="{ item }">
+      {{ fmt(item.keyspace) }}
+    </template>
     <template v-slot:item.time_added="{ item }">
       {{ $moment(item.time_added).format('DD.MM.YYYY HH:mm') }}
     </template>
@@ -32,6 +35,7 @@
 </template>
 
 <script>
+  import fmt from '@/assets/scripts/numberFormat'
   import selector from './selectorMixin'
   export default {
     name: "PcfgSelector",
@@ -57,6 +61,7 @@
       }
     },
     methods: {
+      fmt,
       getData() {
         this.loading = true
         this.axios.get(this.$serverAddr + '/pcfg').then((response) => {

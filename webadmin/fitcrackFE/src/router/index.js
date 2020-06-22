@@ -6,18 +6,23 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+import store from '@/store'
+
 const home = r => require.ensure([], () => r(require('@/components/home/homeView')))
 const jobs = r => require.ensure([], () => r(require('@/components/job/jobsView')))
-const jobDetail = r => require.ensure([], () => r(require('@/components/job/jobDetailView')))
+const jobDetail = r => require.ensure([], () => r(require('@/components/jobDetail/jobDetailView')))
+const batchList = r => require.ensure([], () => r(require('@/components/batch/batchList')))
+const batchDetail = r => require.ensure([], () => r(require('@/components/batch/batchDetail')))
 const login = r => require.ensure([], () => r(require('@/components/user/loginView')))
 const mainPage = r => require.ensure([], () => r(require('@/components/mainPage')))
 const addJob = r => require.ensure([], () => r(require('@/components/job/addJobView')))
-const user = r => require.ensure([], () => r(require('@/components/user/userView')))
+const templates = r => require.ensure([], () => r(require('@/components/jobTemplate/templateList')))
 const hosts = r => require.ensure([], () => r(require('@/components/host/hostsView')))
 const hashes = r => require.ensure([], () => r(require('@/components/hashcache/hashCacheView')))
 const dictionaries = r => require.ensure([], () => r(require('@/components/dictionary/dictionariesView')))
 const dictionaryDetail = r => require.ensure([], () => r(require('@/components/dictionary/dictionaryDetailView')))
 const pcfg = r => require.ensure([], () => r(require('@/components/pcfg/pcfgView.vue')))
+const pcfgBrowser = r => require.ensure([], () => r(require('@/components/pcfg/pcfgBrowser.vue')))
 const manageUsers = r => require.ensure([], () => r(require('@/components/user/manageUsersView')))
 const myAccount = r => require.ensure([], () => r(require('@/components/myAccount/myAccountView')))
 const hostDetail = r => require.ensure([], () => r(require('@/components/host/hostDetailView')))
@@ -33,6 +38,8 @@ const PageNotFound = r => require.ensure([], () => r(require('@/components/pageN
 const EncryptedFiles = r => require.ensure([], () => r(require('@/components/encryptedFile/encryptedFilesView')))
 const Server = r => require.ensure([], () => r(require('@/components/server/serverPage')))
 const Settings = r => require.ensure([], () => r(require('@/components/settings/settingsView')))
+const Transfer = r => require.ensure([], () => r(require('@/components/settings/dataTransfer')))
+const UnauthorizedError = r => require.ensure([], () => r(require('@/components/errorPages/unauthorized')))
 
 Vue.use(Router);
 
@@ -52,26 +59,62 @@ const appRoutes = [
     component: testView
   },
   {
+    path: '/batches',
+    name: 'batches',
+    component: batchList,
+    meta: {
+      title: 'Batches',
+      icon: 'mdi-tray-full',
+      navtab: 0
+    }
+  },
+  {
+    path: '/batches/:id',
+    name: 'batch',
+    component: batchDetail,
+    meta: {
+      title: 'Batch Detail'
+    }
+  },
+  {
     path: '/jobs',
     name: 'jobs',
     component: jobs,
     meta: {
       title: 'Jobs',
-      icon: 'mdi-briefcase'
+      icon: 'mdi-briefcase',
+      navtab: 0
     }
   },
   {
-    path: '/jobs/hidden',
-    name: 'hiddenJobs',
-    component: jobs
+    path: '/bins/:id',
+    name: 'bins',
+    component: jobs,
+    meta: {
+      title: 'Bins',
+      icon: 'mdi-folder',
+      navtab: 0
+    }
+  },
+  {
+    path: '/bins/trash',
+    name: 'trash',
+    component: jobs,
+    meta: {
+      title: 'Trash',
+      icon: 'mdi-delete',
+      navtab: 0
+    }
   },
   {
     path: '/jobs/add',
     name: 'addJob',
     component: addJob,
     meta: {
+      guard: 'ADD_NEW_JOB',
       title: 'Create a job',
-      icon: 'mdi-briefcase-plus'
+      icon: 'mdi-briefcase-plus',
+      navtab: 0
     }
   },
   {
@@ -85,10 +128,11 @@ const appRoutes = [
   {
     path: '/templates',
     name: 'templates',
-    component: jobs,
+    component: templates,
     meta: {
       title: 'Job templates',
-      icon: 'mdi-file'
+      icon: 'mdi-file',
+      navtab: 2
     }
   },
   {
@@ -97,7 +141,8 @@ const appRoutes = [
     component: hosts,
     meta: {
       title: 'Hosts',
-      icon: 'mdi-desktop-classic'
+      icon: 'mdi-desktop-classic',
+      navtab: 2
     }
   },
   {
@@ -119,7 +164,8 @@ const appRoutes = [
     component: hashes,
     meta: {
       title: 'Hashes',
-      icon: 'mdi-book-lock'
+      icon: 'mdi-book-lock',
+      navtab: 1
     }
   },
   {
@@ -128,7 +174,8 @@ const appRoutes = [
     component: dictionaries,
     meta: {
       title: 'Dictionaries',
-      icon: 'mdi-dictionary'
+      icon: 'mdi-dictionary',
+      navtab: 1
     }
   },
   {
@@ -142,7 +189,16 @@ const appRoutes = [
     component: pcfg,
     meta: {
       title: 'PCFG',
-      icon: 'mdi-ray-start-end'
+      icon: 'mdi-ray-start-end',
+      navtab: 1
+    }
+  },
+  {
+    path: '/pcfg/:id',
+    name: 'pcfgBrowser',
+    component: pcfgBrowser,
+    meta: {
+      title: 'Inspect PCFG'
     }
   },
   {
@@ -151,7 +207,8 @@ const appRoutes = [
     component: rules,
     meta: {
       title: 'Rules',
-      icon: 'mdi-gavel'
+      icon: 'mdi-gavel',
+      navtab: 1
     }
   },
   {
@@ -165,7 +222,8 @@ const appRoutes = [
     component: charsets,
     meta: {
       title: 'Charsets',
-      icon: 'mdi-alphabetical'
+      icon: 'mdi-alphabetical',
+      navtab: 1
     }
   },
   {
@@ -179,7 +237,8 @@ const appRoutes = [
     component: masks,
     meta: {
       title: 'Masks',
-      icon: 'mdi-guy-fawkes-mask'
+      icon: 'mdi-guy-fawkes-mask',
+      navtab: 1
     }
   },
   {
@@ -193,26 +252,29 @@ const appRoutes = [
     component: markovChains,
     meta: {
       title: 'Markov chains',
-      icon: 'mdi-matrix'
+      icon: 'mdi-matrix',
+      navtab: 1
     }
   },
   {
     path: '/files',
     name: 'files',
-    component: EncryptedFiles
-  },
-  {
-    path: '/user',
-    name: 'user',
-    component: user
+    component: EncryptedFiles,
+    meta: {
+      title: 'Encrypted Files',
+      icon: 'mdi-file-lock',
+      navtab: 1
+    }
   },
   {
     path: '/user/manageUsers',
     name: 'manageUsers',
     component: manageUsers,
     meta: {
+      guard: 'MANAGE_USERS',
       title: 'Manage users',
-      icon: 'mdi-folder-account'
+      icon: 'mdi-folder-account',
+      navtab: 2
     }
   },
   {
@@ -230,7 +292,8 @@ const appRoutes = [
     component: Server,
     meta: {
       title: 'Server monitor',
-      icon: 'mdi-gauge'
+      icon: 'mdi-gauge',
+      navtab: 2
     }
   },
   {
@@ -239,7 +302,27 @@ const appRoutes = [
     component: Settings,
     meta: {
       title: 'Settings',
-      icon: 'mdi-cogs'
+      icon: 'mdi-cogs',
+      navtab: 2
+    }
+  },
+  {
+    path: '/transfer',
+    name: 'transfer',
+    component: Transfer,
+    meta: {
+      title: 'Data Transfer',
+      icon: 'mdi-dolly',
+      navtab: 2
+    }
+  },
+  {
+    path: '/error/unauthorized',
+    name: 'unauthorized',
+    component: UnauthorizedError,
+    meta: {
+      title: 'Access Denied',
+      icon: 'mdi-alert'
     }
   },
   {
@@ -262,6 +345,27 @@ const rt = new Router({
       children: appRoutes
     }
   ]
+})
+
+rt.beforeResolve(async (to, from, next) => {
+  const perm = to.meta.guard
+  if (!perm) {
+    next()
+    return
+  }
+  //
+  const hasAccess = await store.dispatch('hasPermission', perm)
+  if (hasAccess) {
+    next()
+  } else {
+    next({
+      name: 'unauthorized',
+      query: {
+        accessing: to.path,
+        missing: perm
+      }
+    })
+  }
 })
 
 rt.afterEach((to, from) => {

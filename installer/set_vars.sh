@@ -10,13 +10,16 @@ INSTALLER_ROOT=$(pwd)
 ###################
 # Compiler threads
 ###################
-read -e -p "Enter the number of compiler threads (default: 8): " COMPILER_THREADS
-COMPILER_THREADS=${COMPILER_THREADS:-8}
+read -e -p "Enter the number of compiler threads (default: 1, recommended): " COMPILER_THREADS
+COMPILER_THREADS=${COMPILER_THREADS:-1}
 
 re='^[0-9]+$'
 if ! [[ $COMPILER_THREADS =~ $re ]] ; then
    echo "Error: Entered value is not a number!"
    exit 1
+fi
+if [ "$COMPILER_THREADS" -gt "1" ]; then
+   echo "Warning: threads > 1 may cause unstable behavior."
 fi
 
 #############
@@ -133,7 +136,8 @@ fi
 read -e -p "Enter the name of Apache service (default: $DEFAULT_APACHE_SERVICE): " APACHE_SERVICE
 APACHE_SERVICE=${APACHE_SERVICE:-$DEFAULT_APACHE_SERVICE}
 
-systemctl | grep $APACHE_SERVICE >/dev/null 2>/dev/null
+
+service_exists $APACHE_SERVICE
 
 if [[ $? != 0 ]]; then
   echo "Error: $APACHE_SERVICE not found via systemctl."

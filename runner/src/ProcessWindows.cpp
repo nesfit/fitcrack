@@ -25,11 +25,11 @@ void ProcessWindows::launchSubprocess() {
   }
 
   if (!SetHandleInformation(startup_info_.hStdOutput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
-    RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
+    RunnerUtils::runtimeException("SetHandleInformation() for stdout failed", GetLastError());
   }
 
-  if (!SetHandleInformation(startup_info_.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
-    RunnerUtils::runtimeException("SetHandleInformation() for stderr failed", GetLastError());
+  if (startup_info_.hStdInput != GetStdHandle(STD_INPUT_HANDLE) && !SetHandleInformation(startup_info_.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)) {
+    RunnerUtils::runtimeException("SetHandleInformation() for stdin failed", GetLastError());
   }
 
   /** Start the child process */
@@ -104,10 +104,18 @@ bool ProcessWindows::isRunning() {
 }
 
 int ProcessWindows::run() {
-
   setStartTime();
   launchSubprocess();
   return 0;
+}
+
+void ProcessWindows::killIfRunning() {
+  std::string proc = getExecutable();
+  if (proc.find(".") == 0)
+    proc = proc.erase(0, 2);
+  std::string kill_cmd = "taskkill /F /IM " + proc + " >nul 2>&1";
+  int ret = system(kill_cmd.c_str());
+  (void)ret;
 }
 
 #endif // __WIN32

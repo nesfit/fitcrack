@@ -11,6 +11,8 @@
 
 #include <fstream>
 
+#include <algorithm>
+#include <sstream>
 
 void AttackMode::setWorkunit(PtrWorkunit &workunit)
 {
@@ -32,11 +34,11 @@ void AttackMode::setDefaultWorkunitParams(DB_WORKUNIT * wu)
 }
 
 
-std::string AttackMode::generateBasicConfig(char wuMode, unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType,
-                                            std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
+std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType, unsigned generateRandomRules,
+                                            unsigned hwTempAbort, std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
                                             std::string charset3, std::string charset4)
 {
-    std::string result = "|||mode|String|1|" + std::string(1, wuMode) + "|||\n";
+    std::string result = "|||mode|String|1|" + std::string(1, getModeLetter()) + "|||\n";
     result += "|||attack_mode|UInt|" + std::to_string(std::to_string(attackMode).length()) + "|" + std::to_string(attackMode) + "|||\n";
     result += "|||attack_submode|UInt|" + std::to_string(std::to_string(attackSubmode).length()) + "|" + std::to_string(attackSubmode) + "|||\n";
     result += "|||name|String|" + std::to_string(name.length()) + "|" + name + "|||\n";
@@ -63,6 +65,81 @@ std::string AttackMode::generateBasicConfig(char wuMode, unsigned attackMode, un
     if (!charset4.empty())
         result += "|||charset4|String|" + std::to_string(charset4.length()) + "|" + charset4 + "|||\n";
 
+    if (generateRandomRules)
+      result += "|||generate_random_rules|UInt|" +
+                std::to_string(std::to_string(generateRandomRules).length()) +
+                "|" + std::to_string(generateRandomRules) + "|||\n";
+
+    if (hwTempAbort)
+      result += "|||hwmon_temp_abort|UInt|" +
+                std::to_string(std::to_string(hwTempAbort).length()) + "|" +
+                std::to_string(hwTempAbort) + "|||\n";
+
+    Tools::printDebug("%s", result.c_str());
     return result;
 }
 
+std::string AttackMode::makeConfigLine(const std::string &option, const std::string &type, const std::string &value)
+{
+    std::ostringstream stream;
+    stream << "|||" << option << '|' << type << '|' << value.length() << '|' << value << "|||\n";
+    return stream.str();
+}
+
+std::unique_ptr<InputDict> AttackMode::makeInputDict(PtrDictionary dict, uint64_t startIndex, bool)
+{
+    return std::unique_ptr<InputDict>(new InputDict(dict, startIndex));
+}
+
+std::unique_ptr<MaskSplitter> AttackMode::makeMaskSplitter(std::vector<std::string> customCharsets)
+{
+    return std::unique_ptr<MaskSplitter>(new MaskSplitter(std::move(customCharsets)));
+}
+
+PtrDictionary AttackMode::FindCurrentDict(std::vector<PtrDictionary> &dicts) const
+{
+    for (PtrDictionary & dict : dicts)
+    {
+        if (dict->getCurrentIndex() < dict->getHcKeyspace())
+        {
+            /** Dictionary for a new workunit found */
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Dict found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
+                    dict->getDictFileName().c_str(), dict->getCurrentIndex(), dict->getHcKeyspace());
+            return dict;
+        }
+    }
+    return nullptr;
+}
+
+PtrDictionary AttackMode::GetWorkunitDict() const
+{
+    return m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+}
+
+PtrMask AttackMode::GetWorkunitMask() const
+{
+    return m_sqlLoader->loadMask(m_workunit->getMaskId());
+}
+
+PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace) const
+{
+    for (PtrMask & mask : masks)
+    {
+        auto maskKeyspace = useRealKeyspace ? mask->getKeyspace() : mask->getHcKeyspace();
+        if (mask->getCurrentIndex() < maskKeyspace)
+        {
+            /** Mask for a new workunit found */
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Mask found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
+                    mask->getMask().c_str(), mask->getCurrentIndex(), maskKeyspace);
+            return mask;
+        }
+    }
+    return nullptr;
+}
+
+uint64_t AttackMode::getPasswordCountToProcess() const
+{
+    return m_host->getPower()*m_seconds;
+}

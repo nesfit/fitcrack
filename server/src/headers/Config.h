@@ -49,7 +49,7 @@ namespace Config {
     extern std::string tableNameMask;
     extern std::string tableNameSettings;
     extern std::string tableNameDictionary;
-    extern std::string tableNamePckgDictionary;
+    extern std::string tableNameJobDictionary;
     extern std::string tableNameHash;
     extern std::string tableNamePcfgGrammar;
 
@@ -67,6 +67,8 @@ namespace Config {
     extern std::string inTemplateFileMarkov;
     extern std::string inTemplateFileDict;
     extern std::string inTemplateFileCombinator;
+    extern std::string inTemplateFileHybridDictMask;
+    extern std::string inTemplateFileHybridMaskDict;
     extern std::string inTemplateFileRule;
     extern std::string inTemplateFilePrince;
     extern std::string inTemplateFilePrinceRules;
@@ -80,6 +82,8 @@ namespace Config {
     extern char * inTemplatePathMarkov;
     extern char * inTemplatePathDict;
     extern char * inTemplatePathCombinator;
+    extern char * inTemplatePathHybridDictMask;
+    extern char * inTemplatePathHybridMaskDict;
     extern char * inTemplatePathRule;
     extern char * inTemplatePathPrince;
     extern char * inTemplatePathPrinceRules;
@@ -114,6 +118,8 @@ namespace Config {
         AttackDict = 0,
         AttackCombinator = 1,
         AttackMask = 3,
+        AttackHybridDictMask = 6,
+        AttackHybridMaskDict = 7,
         AttackPrince = 8,
         AttackPcfg = 9
     };
@@ -134,9 +140,6 @@ namespace Config {
 
     /** Maximum keyspace in PCFG Attack */
     const uint64_t MAX_PCFG_KEYSPACE = 60000000;
-
-    /** Minimum workunit time in seconds */
-    const uint64_t minSeconds = 60;
 
     /** Minimum timeout factor of seconds_per_workunit */
     const uint64_t minTimeoutFactor = 5;

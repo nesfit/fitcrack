@@ -24,9 +24,10 @@ unzipGrammarToPcfgFolder, deleteUnzipedFolderDirectory, extractNameFromZipfile, 
 createPcfgGrammarBin, calculateKeyspace, makePcfgFolder, moveGrammarToPcfgDir
 
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfgs_model, pcfgData_model, \
-    pcfg_model
-from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder
-from src.api.fitcrack.responseModels import simpleResponse
+    pcfg_model, pcfgTree_model
+from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder, directory_tree
+from src.api.fitcrack.responseModels import simpleResponse, file_content
+from src.api.fitcrack.argumentsParser import path
 from src.database import db
 from src.database.models import FcPcfg, FcDictionary
 
@@ -58,7 +59,7 @@ class pcfg(Resource):
 
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
         if not pcfg:
-            abort(500, 'Can\'t find PCFG grammar')
+            abort(404, 'Can\'t find PCFG grammar')
         path = os.path.join(PCFG_DIR, pcfg.path)
         is_dir = os.path.isdir(path)
         if not is_dir:
@@ -74,11 +75,7 @@ class pcfg(Resource):
         Deletes pcfg
         """
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).one()
-        if (pcfg.deleted):
-            pcfg.deleted = False
-        else:
-            pcfg.deleted = True
-
+        pcfg.deleted = True
         db.session.commit()
 
         pcfgFullPath = os.path.join(PCFG_DIR, pcfg.path)
@@ -89,6 +86,57 @@ class pcfg(Resource):
             'status': True,
             'message': 'PCFG sucesfully deleted.'
         }, 200
+
+
+@ns.route('/<id>/tree')
+class pcfgTree(Resource):
+
+    @api.marshal_with(pcfgTree_model)
+    @api.response(404, 'PCFG record not found in database')
+    @api.response(500, 'PCFG directory not readable from filesystem (zipped or missing)')
+    def get(self, id):
+        """
+        Returns a directory tree of the grammar
+        """
+        pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
+        if not pcfg:
+            abort(404, 'Can\'t find PCFG grammar')
+        dirname = Path(pcfg.path).stem
+        path = os.path.join(PCFG_DIR, dirname)
+        is_dir = os.path.isdir(path)
+        if not is_dir:
+            abort(500, 'PCFG is not unzipped or doesn\'t exist on the server')
+        return directory_tree(path)
+        
+
+@ns.route('/<id>/file')
+class pcfgFileRead(Resource):
+
+    @api.expect(path)
+    @api.marshal_with(file_content)
+    def get(self, id):
+        """
+        Returns requested PCFG file contents
+        """
+        target = path.parse_args(request).get('path')
+        pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
+        if not pcfg:
+            abort(404, 'Can\'t find PCFG grammar')
+        dirname = Path(pcfg.path).stem
+
+        with open(os.path.join(PCFG_DIR, dirname, target), mode='rb') as file:
+            filename = os.path.basename(file.name)
+            content = file.read()
+            try:
+                content = content.decode()
+            except UnicodeDecodeError:
+                content = 'Binary file HEX dump:\n' + content.hex()
+
+        return {
+            'name': filename,
+            'path': os.path.join(dirname, target),
+            'data': content
+        }        
 
 
 @ns.route('/add')
@@ -165,39 +213,9 @@ class pcfgMakeFromDictionary(Resource):
             db.session().rollback()
             abort(500, 'PCFG with name '
                   + extractNameFromZipfile(dict.name) + ' already exists.')
-
-        #TODO dorobiť
         createPcfgGrammarBin(dict.name)
-
         return {
             'message': 'PCFG ' + dict.name + ' successfully uploaded.',
             'status': True
 
         }
-
-"""
-        filename = secure_filename(extractNameFromZipfile(dict.name))
-        path = os.path.join(HCSTATS_DIR, filename) + '.hcstat2'
-
-        # make hcstat2 file
-        shellExec(
-            HASHCAT_UTILS_PATH + '/hcstat2gen.' + EXE_OR_BIN + ' ' + path + '_tmp < ' + os.path.join(DICTIONARY_DIR,
-                                                                                                     dict.name))
-        # comprime hcstat2 file
-        shellExec('xz --compress --format=raw --stdout -9e ' + path + '_tmp > ' + path)
-        # delete non-comprimed file
-        os.remove(path + '_tmp')
-
-        hcstats = FcHcstat(name=filename + '.hcstat2', path=path)
-        try:
-            db.session.add(hcstats)
-            db.session.commit()
-        except exc.IntegrityError as e:
-            db.session().rollback()
-            abort(500, 'HcStats with name ' + filename + ' already exists.')
-
-        return {
-            'status': True,
-            'message': 'HcStat file with name ' + filename + ' created.'
-        }
-"""

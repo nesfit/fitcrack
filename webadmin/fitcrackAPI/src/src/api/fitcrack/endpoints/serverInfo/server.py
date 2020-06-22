@@ -9,16 +9,16 @@ from time import sleep
 from flask_restplus import Resource
 from src.api.apiConfig import api
 from src.api.fitcrack.responseModels import simpleResponse
-from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo
+from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo, dependency_report
 from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
-from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument
+from src.api.fitcrack.endpoints.serverInfo.transfer import pack, unpack, dependency_check, ImportDependencyMissing
+from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options, dependency_list
 from src.api.fitcrack.endpoints.graph.argumentsParser import job_graph_arguments
-from src.api.fitcrack.functions import shellExec
 from src.database import db
 from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
 import platform
-from flask import request
+from flask import request, Response, stream_with_context
 from flask_restplus import abort
 import xml.etree.ElementTree as ET
 import urllib.request
@@ -58,37 +58,6 @@ class serverInfo(Resource):
         return {'subsystems': result}
 
 
-@ns.route('/control')
-class serverOperation(Resource):
-    @api.expect(operation)
-    @api.marshal_with(simpleResponse)
-    def get(self):
-        """
-        Operations with server(restart, start, stop).
-        """
-        args = operation.parse_args(request)
-        action = args.get('operation')
-
-
-        if action == "start":
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/start')
-        elif action == "stop":
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/stop')
-        elif action == "restart":
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/stop')
-            out = shellExec('/usr/bin/python ' + PROJECT_DIR + '/bin/start')
-        else:
-            abort(400, "Bad operation " + action)
-
-
-
-        return {
-            "status": True,
-            "message": "Operation " + action + " finished sucesfull."
-        }
-
-
-
 @ns.route('/getUsageData')
 class serverUtil(Resource):
 
@@ -124,7 +93,7 @@ class saveData(Resource):
 
     @api.expect(serverUsage_argument)
     @api.marshal_with(simpleResponse)
-    def get(self):
+    def post(self):
         """
         Function for saving of new data into the table fc_server_usage
         """
@@ -142,4 +111,62 @@ class saveData(Resource):
         return {
             'message': 'Usage data saved',
             'status': True
+        }
+
+
+@ns.route('/transfer')
+class systemTransfer(Resource):
+
+    @api.expect(export_options)
+    def get(self):
+        """
+        Configurable system data export to a package file
+        """
+        args = export_options.parse_args(request)
+        jobs = args.get('jobs')
+
+        return Response(stream_with_context(pack(jobs=jobs)), headers={"Content-disposition": "attachment; filename=fitcrack-export.fcp"})
+
+    @api.marshal_with(simpleResponse)
+    def post(self):
+        """
+        System data import from a package file
+        """
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            abort(500, 'No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            abort(500, 'No selected file')
+        try:
+            unpack(file)
+        except ImportDependencyMissing as dep_err:
+            return {
+                'message': f'Missing dependencies: {", ".join(dep_err.missing)}',
+                'status': False
+            }
+
+        return {
+            'message': 'Package data imported',
+            'status': True
+        }
+
+
+@ns.route('/transfer/validate')
+class systemTransfer(Resource):
+
+    @api.expect(dependency_list)
+    @api.marshal_with(dependency_report)
+    def post(self):
+        """
+        Pre-import dependency check
+        """
+        args = dependency_list.parse_args(request)
+        deps = args.get('deps')
+        _, missing = dependency_check(deps)
+        return {
+            'missing': missing
         }

@@ -84,7 +84,7 @@ Hybrid attacks combine the dictionary and brute-force approaches. The password c
 
 ![Hybrid attack](../../_media/img/attack-hybrid.jpg)
 
-Select one or more dictionaries for the left or right part of the password __(1)__, and a mask for the other part __(2)__. As with the combination attack, you can define a password-mangling rule for both sides __(3)__.
+Select one or more dictionaries for the left or right part of the password __(1)__, and a mask for the other part __(2)__. You can define a password-mangling rule for the dictionary as well __(3)__.
 
 
 PCFG Attack
@@ -95,3 +95,9 @@ PCFG Attack
 PCFGs (Probabilistic Context Free Grammars) generate passwords using machine learning magic trained on password sets.
 
 Select a grammar from the list __(1)__ and optionally limit the keyspace below __(2)__. You can select a ruleset __(3)__ to be used on the password candidates. These __do not, however, affect the keyspace__.
+
+
+PRINCE Attack
+-------------
+
+The PRINCE (PRobability INfinite Chained Elements) attack is an advanced combinator attack that uses the PRINCE algorithm to generate password candidates. There are various options that control the generation, such as a password length limit (both ends), element chaining limit or letter case permutation. Apart from the source dictionary, all the other configuration is optional.

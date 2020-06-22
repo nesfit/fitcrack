@@ -9,8 +9,8 @@
 #include <AttackPrince.h>
 
 
-CAttackPrince::CAttackPrince(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-    :   AttackMode(job, host, seconds, sqlLoader)
+CAttackPrince::CAttackPrince(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
 }
 
@@ -36,11 +36,11 @@ bool CAttackPrince::makeWorkunit()
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
-    std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
+    /** Same name of dict file - for sticky flag to work */
+    std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "", Config::appName, m_job->getId());
     if (with_rules) {
       /** Same name of rules file - for sticky flag to work */
-      std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "",
-                    Config::appName, m_job->getId());
+      std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId());
     }
 
     /** Append mode to config */
@@ -66,9 +66,9 @@ bool CAttackPrince::makeWorkunit()
     Tools::printDebug("CONFIG for new workunit:\n");
 
     /** Output original config from DB */
-    configFile << generateBasicConfig('n', m_job->getAttackMode(),
-                                      m_job->getAttackSubmode(),
-                                      m_job->getName(), m_job->getHashType());
+    configFile << generateBasicConfig(
+        m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getName(),
+        m_job->getHashType(), m_job->getRandomRulesCount(), m_job->getHWTempAbort());
 
     /** Output mode */
     uint64_t startIndex = m_workunit->getStartIndex();
@@ -161,29 +161,33 @@ bool CAttackPrince::makeWorkunit()
       return false;
     }
 
-    std::ofstream dictFile;
-    dictFile.open(path);
-    if (!dictFile.is_open()) {
-      Tools::printDebugHost(
-          Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-          "Failed to open dict1 BOINC input file! Setting job to malformed.\n");
-      m_sqlLoader->updateRunningJobStatus(m_job->getId(),
-                                          Config::JobState::JobMalformed);
-      return false;
-    }
+    if(!std::ifstream(path))
+    {
+      std::ofstream dictFile;
+      dictFile.open(path);
+      if (!dictFile.is_open()) {
+        Tools::printDebugHost(
+            Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+            "Failed to open dict1 BOINC input file! Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                            Config::JobState::JobMalformed);
+        return false;
+      }
 
-    std::ifstream princeDictFile;
-    princeDictFile.open(princeDictPath);
-    if (!princeDictFile.is_open()) {
-      Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
-                            m_host->getBoincHostId(),
-                            "Failed to open PRINCE attack dictionary! "
-                            "Setting job to malformed.\n");
+      std::ifstream princeDictFile;
+      princeDictFile.open(princeDictPath);
+      if (!princeDictFile.is_open()) {
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                              m_host->getBoincHostId(),
+                              "Failed to open PRINCE attack dictionary! "
+                              "Setting job to malformed.\n");
+      }
+
+      dictFile << princeDictFile.rdbuf();
+      dictFile.close();
+      princeDictFile.close();
+      Tools::printDebug("Copied PRINCE dictionary to data file.\n");
     }
-    dictFile << princeDictFile.rdbuf();
-    Tools::printDebug("Copied PRINCE dictionary to data file.\n");
-    dictFile.close();
-    princeDictFile.close();
 
     if (with_rules) {
       std::ofstream rulesFile;
@@ -199,40 +203,44 @@ bool CAttackPrince::makeWorkunit()
         return false;
       }
 
-      rulesFile.open(path);
-      if (!rulesFile.is_open()) {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
-                              m_host->getBoincHostId(),
-                              "Failed to open rules BOINC input file! Setting "
-                              "job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
-                                            Config::JobState::JobMalformed);
-        return false;
-      }
+      if(!std::ifstream(path))
+      {
 
-      if (m_job->getRules().empty()) {
-        Tools::printDebugHost(
-            Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-            "Rules is not set in database! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
-                                            Config::JobState::JobMalformed);
-        return false;
-      }
+        rulesFile.open(path);
+        if (!rulesFile.is_open()) {
+          Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                                m_host->getBoincHostId(),
+                                "Failed to open rules BOINC input file! Setting "
+                                "job to malformed.\n");
+          m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                              Config::JobState::JobMalformed);
+          return false;
+        }
 
-      std::ifstream rules;
-      rules.open((Config::rulesDir + m_job->getRules()).c_str());
-      if (!rules) {
-        Tools::printDebugHost(
-            Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-            "Failed to open rules file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(),
-                                            Config::JobState::JobMalformed);
-        return false;
-      }
+        if (m_job->getRules().empty()) {
+          Tools::printDebugHost(
+              Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+              "Rules is not set in database! Setting job to malformed.\n");
+          m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                              Config::JobState::JobMalformed);
+          return false;
+        }
 
-      rulesFile << rules.rdbuf();
-      rulesFile.close();
-      rules.close();
+        std::ifstream rules;
+        rules.open((Config::rulesDir + m_job->getRules()).c_str());
+        if (!rules) {
+          Tools::printDebugHost(
+              Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+              "Failed to open rules file! Setting job to malformed.\n");
+          m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                              Config::JobState::JobMalformed);
+          return false;
+        }
+
+        rulesFile << rules.rdbuf();
+        rulesFile.close();
+        rules.close();
+      }
     }
 
     /** Fill in the workunit parameters */
@@ -284,14 +292,14 @@ bool CAttackPrince::generateWorkunit() {
                         "Generating prince workunit ...\n");
 
   /** Compute password count */
-  uint64_t passwordsRange = m_host->getPower() * m_seconds;
+  uint64_t passwordsRange = getPasswordCountToProcess();
   uint64_t currentIndex = m_job->getCurrentIndex();
   uint64_t jobHcKeyspace = m_job->getHcKeyspace();
-  if (passwordsRange < Config::minPassCount) {
+  if (passwordsRange < getMinPassCount()) {
     Tools::printDebugHost(
         Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
         "Passwords range is too small! Falling back to minimum passwords\n");
-    passwordsRange = Config::minPassCount;
+    passwordsRange = getMinPassCount();
   }
 
   Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
@@ -303,12 +311,12 @@ bool CAttackPrince::generateWorkunit() {
   Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
                         m_host->getBoincHostId(),
                         "Passwords range: %" PRIu64 "\n", passwordsRange);
+  //check if the job isn't finished
+  if (currentIndex >= jobHcKeyspace)
+    return false;
   /** Adjust password range */
   if (currentIndex + passwordsRange > jobHcKeyspace)
     passwordsRange = jobHcKeyspace - currentIndex;
-
-  if (!passwordsRange)
-    return false;
 
   /** Create the workunit */
   m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),

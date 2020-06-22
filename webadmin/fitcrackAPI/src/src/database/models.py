@@ -8,17 +8,17 @@ import base64
 import datetime
 import math
 
-from flask_login import UserMixin, AnonymousUserMixin
-from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, String, Text, text, JSON, ForeignKey, \
+from flask_login import UserMixin, AnonymousUserMixin, current_user
+from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, Boolean, String, Table, Text, text, JSON, ForeignKey, \
     Numeric, func, LargeBinary, select, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.api.fitcrack.attacks.hashtypes import getHashById
-from src.api.fitcrack.functions import getStringBetween
+from src.api.fitcrack.functions import getStringBetween, get_batch_status
 from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
-    job_status_text_info_to_code_dict
+    job_status_text_info_to_code_dict, status_to_code
 from src.database import db
 
 Base = db.Model
@@ -42,26 +42,6 @@ class FcBenchmark(Base):
         }
 
 
-class FcHashcache(Base):
-    __tablename__ = 'fc_hashcache'
-
-    id = Column(BigInteger, primary_key=True)
-    hash_type = Column(Integer)
-    hash = Column(String(200, collation='utf8_bin'))
-    result = Column(Text(collation='utf8_bin'))
-    added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-
-    @hybrid_property
-    def hash_type_name(self):
-        return getHashById(str(self.hash_type))['name']
-
-    @hybrid_property
-    def password(self):
-       if self.result:
-           return base64.b64decode(self.result).decode("utf-8")
-       return None
-
-
 class FcHost(Base):
     __tablename__ = 'fc_host'
 
@@ -76,8 +56,6 @@ class FcHost(Base):
     def status_text(self):
         return host_status_text_to_code_dict.get(self.status)
 
-    #job = relationship("FcWorkunit", back_populates="hosts")
-    # workunits = relationship("FcWorkunit", back_populates="host")
     boinc_host = relationship("Host", uselist=False)
 
 
@@ -111,7 +89,6 @@ class FcDictionary(Base):
     keyspace = Column(BigInteger, nullable=False)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
-    modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
 
 class FcPcfg(Base):
@@ -123,7 +100,6 @@ class FcPcfg(Base):
     keyspace = Column(BigInteger, nullable=False)
     time_added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
-    modification_time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
 
 class FcHcstat(Base):
@@ -178,19 +154,20 @@ class FcJobDictionary(Base):
     is_left = Column(Integer, nullable=False, server_default=text("'1'"))
     dictionary = relationship("FcDictionary")
 
+bin_job_junction = Table('fc_bin_job', Base.metadata,
+    Column('job_id', Integer, ForeignKey('fc_job.id')),
+    Column('bin_id', Integer, ForeignKey('fc_bin.id'))
+)
 
 class FcJob(Base):
     __tablename__ = 'fc_job'
 
     id = Column(BigInteger, primary_key=True)
-    token = Column(String(64, 'utf8_bin'))
     attack = Column(String(20, 'utf8_bin'), nullable=False)
     attack_mode = Column(Integer, nullable=False)
     attack_submode = Column(Integer, nullable=False, server_default=text("'0'"))
     hash_type = Column(Integer, nullable=False)
-    hash = Column(String(200, collation='utf8_bin'), nullable=False)
     status = Column(SmallInteger, nullable=False, server_default=text("'0'"))
-    result = Column(Text(collation='utf8_bin'))
     keyspace = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
     indexes_verified = Column(BigInteger, nullable=False)
@@ -201,48 +178,47 @@ class FcJob(Base):
     comment = Column(Text(collation='utf8_bin'), nullable=False)
     time_start = Column(DateTime)
     time_end = Column(DateTime)
-    cracking_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
+    workunit_sum_time = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     seconds_per_workunit = Column(BigInteger, nullable=False, server_default=text("'3600'"))
-    config = Column(String(400, collation='utf8_bin'), nullable=False)
-    dict1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
-    dict2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_dictionary.path'), nullable=False)
-    charset1 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset2 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset3 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
-    charset4 = Column(String(100, 'utf8_bin'), ForeignKey('fc_charset.name'))
+    charset1 = Column(String(4096, 'utf8_bin'))
+    charset2 = Column(String(4096, 'utf8_bin'))
+    charset3 = Column(String(4096, 'utf8_bin'))
+    charset4 = Column(String(4096, 'utf8_bin'))
     rules = Column(String(100, 'utf8_bin'), ForeignKey('fc_rule.name'))
     rule_left = Column(String(255, 'utf8_bin'))
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
     markov_threshold = Column(Integer, nullable=False, server_default=text("'0'"))
-    grammar_id = Column(BigInteger, nullable=False)
+    grammar_id = Column(BigInteger, ForeignKey('fc_pcfg_grammar.id'), nullable=False)
     case_permute = Column(Integer, nullable=False, server_default=text("'0'"))
     check_duplicates = Column(Integer, nullable=False, server_default=text("'0'"))
     min_password_len = Column(Integer, nullable=False, server_default=text("'1'"))
     max_password_len = Column(Integer, nullable=False, server_default=text("'8'"))
     min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
     max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
-    replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
+    generate_random_rules = Column(Integer, nullable=False, server_default=text("'0'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
+    batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
+    queue_position = Column(Integer)
+
+    permission_records = relationship("FcUserPermission",
+                          primaryjoin="FcJob.id==FcUserPermission.job_id")
+
+    batch = relationship("FcBatch", back_populates="jobs")
 
     workunits = relationship("FcWorkunit")
     masks = relationship('FcMask')
-
-    charSet1 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset1==FcCharset.name")
-    charSet2 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset2==FcCharset.name")
-    charSet3 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset3==FcCharset.name")
-    charSet4 = relationship("FcCharset",
-                            primaryjoin="FcJob.charset4==FcCharset.name")
+    status_history = relationship('FcJobStatus')
 
     rulesFile = relationship("FcRule",
                              primaryjoin="FcJob.rules==FcRule.name")
 
     markov = relationship("FcHcstat",
                           primaryjoin="FcJob.markov_hcstat==FcHcstat.name")
+
+    pcfg = relationship("FcPcfg",
+                          primaryjoin="FcJob.grammar_id==FcPcfg.id")
 
     hosts = relationship("Host", secondary="fc_host_activity",
                          primaryjoin="FcJob.id == FcHostActivity.job_id",
@@ -253,19 +229,109 @@ class FcJob(Base):
     right_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == False))
 
     @hybrid_property
+    def cracked_hashes_str(self):
+        cracked = len([hash.result for hash in self.hashes if hash.result != None])
+        total = len(self.hashes)
+        if total == 0:
+            return ""
+        return "{} % ({}/{})".format(int((cracked * 100)/total), cracked, total)
+
+    @hybrid_property
     def host_count(self):
         return len(self.hosts)
+
+    @hybrid_property
+    def total_time(self):
+        if not self.time_start:
+            return 0
+        else:
+            now = datetime.datetime.now()
+            if now < self.time_start:
+                # Planned job
+                return 0
+
+            # Compute job total cracking time from job status history table
+            total_time = 0
+            last_run_time = self.time_start
+            for item in self.status_history:
+                # Skip all status change events before job start
+                if item.time <= self.time_start:
+                    continue
+
+                code = int(item.status)
+                if code == status_to_code['running']:
+                    # Job resumed
+                    last_run_time = item.time
+
+                if (code == status_to_code['ready'] or code == status_to_code['finished'] or \
+                    code == status_to_code['timeout'] or code == status_to_code['exhausted'] or \
+                    code == status_to_code['malformed']) and last_run_time:
+                    # Job paused/ended
+                    total_time += (item.time - last_run_time).total_seconds()
+                    last_run_time = None
+
+            if last_run_time:
+                # Job is running
+                total_time += (now - last_run_time).total_seconds()
+
+            return total_time
+
+    @hybrid_property
+    def efficiency(self):
+        if not self.time_start:
+            return 0
+        # Hosts which did more work on the job than just benchmarks
+        wu_active_hosts = [wu.boinc_host_id for wu in self.workunits if wu.hc_keyspace > 0 and wu.time >= self.time_start]
+        job_active_hosts_count = len(set(wu_active_hosts))
+        if job_active_hosts_count == 0 or self.workunit_sum_time == 0.0 or self.total_time == 0.0:
+            return 0
+        benchmarks_sum_time = sum([wu.cracking_time for wu in self.workunits if wu.hc_keyspace == 0 and wu.time >= self.time_start])
+        job_eff = (float(self.workunit_sum_time) - float(benchmarks_sum_time)) / (job_active_hosts_count * self.total_time)
+        return int(min(job_eff, 1.0) * 100)
+
 
     @hybrid_property
     def hash_type_name(self):
         return getHashById(str(self.hash_type))['name']
 
     @hybrid_property
-    def cracking_time_str(self):
+    def workunit_sum_time_str(self):
         try:
-            return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
+            return str(datetime.timedelta(seconds=math.floor(self.workunit_sum_time)))
         except OverflowError:
             return 'really long'
+
+    @hybrid_property
+    def estimated_cracking_time_str(self):
+        boinc_host_ids = [host.id for host in self.hosts if host.last_active.online]
+        jobHosts = FcHost.query.filter(FcHost.job_id == self.id). \
+            filter(FcHost.boinc_host_id.in_(boinc_host_ids)).all()
+
+        hostsPower = {}
+        for host in jobHosts:
+            hostsPower[host.boinc_host_id] = host.power
+
+        hostBenchmarks = FcBenchmark.query.filter(FcBenchmark.hash_type == self.hash_type). \
+            filter(FcBenchmark.boinc_host_id.in_(boinc_host_ids)).all()
+        total_power = 0
+        for benchmark in hostBenchmarks:
+            if hostsPower.get(benchmark.boinc_host_id, 0) == 0:
+                total_power += benchmark.power
+            else:
+                total_power += hostsPower[benchmark.boinc_host_id]
+
+        est_time = None
+        if (total_power > 0):
+            est_time = float(self.keyspace / total_power)
+            try:
+                time_delta = datetime.timedelta(seconds=math.floor(est_time))
+                if time_delta.total_seconds() < 60:
+                    est_time = 'About a minute'
+                else:
+                    est_time = str(time_delta)
+            except OverflowError:
+                est_time = 'Really long'
+        return est_time
 
     @hybrid_property
     def progress(self):
@@ -275,7 +341,7 @@ class FcJob(Base):
             return 100
         elif self.status == 2:
             return 100
-        elif self.attack_mode == 1:
+        elif self.attack_mode in [1, 6, 7]:
             return round((self.indexes_verified / self.keyspace) * 100)
         else:
             return round((self.indexes_verified / self.hc_keyspace) * 100)
@@ -294,16 +360,83 @@ class FcJob(Base):
 
     @hybrid_property
     def status_type(self):
-        if int(self.status) == 0 or int(self.status) == 10 or int(self.status) == 12:
+        code = int(self.status)
+        if code == status_to_code['ready'] or code == status_to_code['running'] or code == status_to_code['finishing']:
             return 'info'
-        if int(self.status) == 1:
+        if code == status_to_code['finished']:
             return 'success'
-        if int(self.status) == 0 or int(self.status) == 4:
+        if code == status_to_code['timeout']:
             return 'warning'
-        if int(self.status) == 1 or int(self.status) == 2 or int(self.status) == 3:
+        if code == status_to_code['exhausted'] or code == status_to_code['malformed']:
             return 'error'
 
+    @hybrid_property
+    def permissions(self):
+        base = {'view': False, 'edit': False, 'operate': False, 'owner': False}
+        record = db.session.query(FcUserPermission).filter_by(user_id=current_user.id).filter_by(job_id=self.id).one_or_none()
+        if record:
+            if record.owner:
+                base = {'view': True, 'edit': True, 'operate': True, 'owner': True}
+            else:
+                base['view'] = record.view
+                base['edit'] = record.modify
+                base['operate'] = record.operate
+        return base
+
     hashes = relationship("FcHash", back_populates="job")
+
+class FcBin(Base):
+    __tablename__ = 'fc_bin'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    position = Column(Integer)
+
+    jobs = relationship('FcJob',
+                    secondary=bin_job_junction,
+                    backref="bins",
+                    lazy='dynamic',
+                    passive_deletes=True)
+
+    @hybrid_property
+    def job_count(self):
+        query = self.jobs
+        if not current_user.role.VIEW_ALL_JOBS:
+            ids = db.session.query(FcUserPermission.job_id).filter_by(user_id=current_user.id).filter_by(view=1).all()
+            ids = [x[0] for x in ids]
+            query = query.filter(FcJob.id.in_(ids))
+        
+        return query.filter(FcJob.deleted == 0).count()
+
+class FcBatch(Base):
+    __tablename__ = 'fc_batch'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    creator_id = Column(ForeignKey('fc_user.id', ondelete='SET NULL'), index=True)
+
+    creator = relationship("FcUser", backref="batches")
+    jobs = relationship("FcJob")
+
+    @hybrid_property
+    def total_jobs(self):
+        return len(self.jobs)
+
+    @hybrid_property
+    def waiting_jobs(self):
+        return len([job for job in self.jobs if job.status == 0])
+
+    @hybrid_property
+    def status(self):
+        return get_batch_status(self.total_jobs, self.waiting_jobs, len([job for job in self.jobs if job.status >= 10]) > 0)
+
+    @hybrid_property
+    def current_user_can_edit(self):
+        return self.creator_id == current_user.id or current_user.role.EDIT_ALL_JOBS
+
+    @hybrid_property
+    def current_user_can_operate(self):
+        return self.creator_id == current_user.id or current_user.role.OPERATE_ALL_JOBS
 
 class FcTemplate(Base):
     __tablename__ = 'fc_template'
@@ -313,25 +446,25 @@ class FcTemplate(Base):
     created = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     template = Column(JSON, nullable=False)
 
-
 class FcSetting(Base):
     __tablename__ = 'fc_settings'
 
     id = Column(Integer, primary_key=True)
-    delete_finished_workunits = Column(Integer, nullable=False, server_default=text("'0'"))
     default_seconds_per_workunit = Column(Integer, nullable=False, server_default=text("'3600'"))
-    default_replicate_factor = Column(Integer, nullable=False, server_default=text("'1'"))
-    default_verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
-    default_check_hashcache = Column(Integer, nullable=False, server_default=text("'1'"))
-    default_workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
-    default_bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
-
+    workunit_timeout_factor = Column(Integer, nullable=False, server_default=text("'2'"))
+    hwmon_temp_abort = Column(Integer, nullable=False, server_default=text("'90'"))
+    bench_all = Column(Integer, nullable=False, server_default=text("'1'"))
+    distribution_coefficient_alpha = Column(Numeric(5, 2), nullable=False, server_default=text("'0.1'"))
+    t_pmin = Column(Integer, nullable=False, server_default=text("'20'"))
+    ramp_up_workunits = Column(Integer, nullable=False, server_default=text("'1'"))
+    ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
+    verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
 
     id = Column(BigInteger, primary_key=True)
-    progress = Column(Numeric(4, 2), nullable=False)
+    progress = Column(Numeric(5, 2), nullable=False)
     job_id = Column(ForeignKey('fc_job.id'), nullable=False, index=True)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
@@ -340,7 +473,7 @@ class FcJobGraph(Base):
     def as_graph(self):
         return {
             'time': str(getattr(self, 'time')),
-            getattr(self.job, 'id'): round(getattr(self, 'progress'))
+            getattr(self.job, 'id'): min(round(getattr(self, 'progress')), 100)
         }
 
 
@@ -362,13 +495,14 @@ class FcJobStatus(Base):
 
     @hybrid_property
     def status_type(self):
-        if int(self.status) == 0 or int(self.status) == 10 or int(self.status) == 12:
+        code = int(self.status)
+        if code == status_to_code['ready'] or code == status_to_code['running'] or code == status_to_code['finishing']:
             return 'info'
-        if int(self.status) == 1:
+        if code == status_to_code['finished']:
             return 'success'
-        if int(self.status) == 0 or int(self.status) == 4:
+        if code == status_to_code['timeout']:
             return 'warning'
-        if int(self.status) == 1 or int(self.status) == 2 or int(self.status) == 3:
+        if code == status_to_code['exhausted'] or code == status_to_code['malformed']:
             return 'error'
 
     job = relationship('FcJob')
@@ -426,14 +560,12 @@ class Host(Base):
     p_ngpus = Column(Integer, nullable=False)
     p_gpu_fpops = Column(Float(asdecimal=True), nullable=False)
 
-    #workunits = relationship("FcWorkunit", back_populates="host", order_by="desc(FcWorkunit.id)")
-    #fc_host = relationship("FcHost", uselist=False, back_populates="boinc_host")
     user = relationship("User", back_populates="hosts")
 
     workunits = relationship("FcWorkunit", secondary="fc_host_activity",
                         primaryjoin="Host.id == FcHostActivity.boinc_host_id",
                         secondaryjoin="FcHostActivity.job_id == FcWorkunit.id",
-                        viewonly=True, order_by="desc(FcWorkunit.id)")
+                        order_by="desc(FcWorkunit.id)")
 
     last_active = relationship("FcHostStatus", uselist=False)
 
@@ -441,8 +573,6 @@ class Host(Base):
                         primaryjoin="Host.id == FcHostActivity.boinc_host_id",
                         secondaryjoin="FcHostActivity.job_id == FcJob.id",
                         viewonly=True)
-
-    #job = relationship("FcWorkunit", back_populates="hosts")
 
     @hybrid_property
     def deleted(self):
@@ -477,10 +607,38 @@ class FcWorkunit(Base):
     finished = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship("FcJob", back_populates="workunits")
-    # host = relationship("FcHost", back_populates="workunits")
     host = relationship("Host", back_populates="workunits")
 
     result = relationship('Result',  uselist=False, primaryjoin="FcWorkunit.workunit_id==Result.workunitid", viewonly=True)
+
+    @hybrid_property
+    def keyspace(self):
+        if self.job.attack_mode == 8:
+            rules = self.job.generate_random_rules
+            if self.job.rulesFile:
+                rules = self.job.rulesFile.count
+            return self.hc_keyspace * rules if rules else self.hc_keyspace
+        else:
+            if self.job.rulesFile:
+                return self.hc_keyspace * self.job.rulesFile.count
+            return self.hc_keyspace
+
+    @hybrid_property
+    def start_index_real(self):
+        if self.job.attack_mode in [1,6,7]:
+            return self.start_index * self.job.hc_keyspace + self.start_index_2
+        else:
+            if self.job.attack_mode == 8:
+                rules = self.job.generate_random_rules
+                if self.job.rulesFile:
+                    rules = self.job.rulesFile.count
+                if rules != 0:
+                    return self.start_index * rules
+                return self.start_index * rules if rules else self.start_index
+            else:
+                if self.job.rulesFile:
+                    return self.start_index * self.job.rulesFile.count
+                return self.start_index
 
     def as_graph(self):
         return {
@@ -588,9 +746,19 @@ class FcUserPermission(Base):
     view = Column(Integer, nullable=False, server_default=text("'0'"))
     modify = Column(Integer, nullable=False, server_default=text("'0'"))
     operate = Column(Integer, nullable=False, server_default=text("'0'"))
+    owner = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship('FcJob')
     user = relationship('FcUser')
+
+    @hybrid_property
+    def can_view(self): return self.view == 1 or self.owner == 1
+
+    @hybrid_property
+    def can_modify(self): return self.modify == 1 or self.owner == 1
+
+    @hybrid_property
+    def can_operate(self): return self.operate == 1 or self.owner == 1
 
 
 class User(Base):
@@ -750,9 +918,9 @@ class Result(Base):
     @hybrid_property
     def stderr_out_text(self):
         try:
-            return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' )
+            return getStringBetween(self.stderr_out.decode("utf-8"), '<stderr_txt>', '</stderr_txt>' ).replace('\r', '')
         except:
-            return self.stderr_out.decode("utf-8")
+            return self.stderr_out.decode("utf-8", errors='ignore').replace('\r', '')
 class FcServerUsage(Base):
     __tablename__ = 'fc_server_usage'
 

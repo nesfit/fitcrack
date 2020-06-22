@@ -31,6 +31,8 @@ class ProcessLinux : public ProcessBase {
          */
         void launchSubprocess();
 
+        virtual char getQuoteChar() {return '\'';}
+
     public:
 
         /**
@@ -78,6 +80,10 @@ class ProcessLinux : public ProcessBase {
          */
         int run();
 
+        /**
+         * @brief   Kill process if currently running
+         */
+        void killIfRunning();
 };
 #endif // PROCESSLINUX_HPP
 

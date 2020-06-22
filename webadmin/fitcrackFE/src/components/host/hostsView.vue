@@ -5,16 +5,6 @@
 
 <template>
   <div class="cont">
-    <v-text-field
-      v-model="search"
-      class="px-2 pt-3"
-      clearable
-      outlined
-      prepend-inner-icon="mdi-table-search"
-      label="Search"
-      single-line
-      hide-details
-    />
     <div class="d-flex justify-space-between align-center px-4 pt-2">
       <v-switch
         v-model="viewHidden"
@@ -22,16 +12,14 @@
         :prepend-icon="viewHidden ? 'mdi-eye-off' : 'mdi-eye'"
         class="mr-4"
       />
-      <v-select
-        v-model="status"
-        :items="hosts_statuses"
-        label="Online status"
-        single-line
-        item-text="text"
-        item-value="text"
-        prepend-icon="mdi-power"
+      <v-text-field
+        v-model="search"
+        class="px-2 pt-3"
         clearable
-        @change="updateList"
+        prepend-inner-icon="mdi-table-search"
+        label="Search"
+        single-line
+        @input="updateList"
       />
     </div>
     <v-divider />
@@ -49,9 +37,9 @@
       <template v-slot:item.domain_name="{ item }">
         <router-link
           :to="{ name: 'hostDetail', params: {id: item.id} }"
-          class="middle"
+          class="middle font-weight-bold"
         >
-          {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name)  + ')' }}
+          {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
         </router-link>
       </template>
       <template v-slot:item.jobs="{ item }">
@@ -76,7 +64,7 @@
               icon
               class="mx-0"
               v-on="on"
-              @click="hideJob(item.id)"
+              @click="hideHost(item.id)"
             >
               <v-icon>
                 {{ item.deleted ? 'mdi-eye' : 'mdi-eye-off' }}
@@ -97,7 +85,6 @@
     data: function () {
       return {
         interval: null,
-        status: 'active',
         search: '',
         viewHidden: false,
         totalItems: 0,
@@ -165,7 +152,7 @@
         this.loading = true
         this.loadHosts()
       },
-      hideJob: function (id) {
+      hideHost: function (id) {
         this.loading = true
         this.axios.delete(this.$serverAddr + '/hosts/' + id)
           .then((response) => {

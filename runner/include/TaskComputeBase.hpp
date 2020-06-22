@@ -7,13 +7,11 @@
 #ifndef TASKCOMPUTEBASE_HPP
 #define TASKCOMPUTEBASE_HPP
 
-#include "Attack.hpp"
+#include "AttackBase.hpp"
 
 #include "TaskBase.hpp"
 
 #include "Process.hpp"
-#include "ProcessPCFG.hpp"
-#include "ProcessPrince.hpp"
 #include "NamedMutex.hpp"
 
 
@@ -25,7 +23,7 @@ class TaskComputeBase: public TaskBase {
 	    AttackBase *attack_;            /**< Pointer to Attack, set by initAttack */
 
         ProcessBase *process_hashcat_;          /**< Pointer to process executing the task */
-        ProcessBase *process_external_generator_; /**< Pointer to pcfg manager/princepreprocessor process executing the task */
+        ProcessBase *process_external_generator_; /**< Pointer to external generator process executing the task */
         ProcessBase *parent_process_; /**< Pointer to parent process */
 
         NamedMutex hashcat_mutex_; //!< Mutex to prevent multiple hashcat instances
@@ -39,6 +37,8 @@ class TaskComputeBase: public TaskBase {
          * @brief   Merges vectors with arguments from the member objects
          */
         void getAllArguments();
+
+        uint64_t getSaltCountFromStatusLine(const std::string &outputLine);
 
     public:
 

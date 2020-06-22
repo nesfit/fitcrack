@@ -6,10 +6,12 @@
 #include "AttackCombinator.hpp"
 
 AttackCombinator::AttackCombinator(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory) {
-  addSpecificArguments();
+  
 }
 
 void AttackCombinator::addSpecificArguments() {
+
+  AttackCrackingBase::addSpecificArguments();
 
   if (attack_submode_ == "0") {
 

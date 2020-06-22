@@ -41,6 +41,9 @@ htpasswd -cb $BOINC_PROJECT_DIR/html/ops/.htpasswd "$OPS_LOGIN" "$OPS_PW"
 # Copy server measure script
 cp -f server/server_bin/measureUsage.py $BOINC_PROJECT_DIR/bin/
 
+# Copy pcfg-monitor script
+cp -f server/server_bin/pcfg_monitor.py $BOINC_PROJECT_DIR/bin/
+
 # Copy client binaries
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack/1
@@ -72,22 +75,22 @@ else
 fi
 
 # Restart Apache service
-systemctl restart $APACHE_SERVICE
+service_restart $APACHE_SERVICE
 
 #############################
 # Install Fitcrack database #
 #############################
-
-echo "Crating Fitcrack tables..."
-mysql -h $DB_HOST -u $DB_USER -p"$DB_PW" -D"$DB_NAME" < server/sql/10_create_tables.sql  2>/dev/null
+export MYSQL_PWD="$DB_PW"
+echo "Creating Fitcrack tables..."
+mysql -h $DB_HOST -u $DB_USER -D"$DB_NAME" < server/sql/10_create_tables.sql
 if [[ $? != 0 ]]; then
   echo "Error: Unable to create Fitcrack DB tables"
   exit
 fi
 echo "Fitcrack tables created."
 
-echo "Crating Fitcrack database triggers..."
-mysql -h $DB_HOST -u $DB_USER -p"$DB_PW" -D"$DB_NAME" < server/sql/20_create_triggers.sql  2>/dev/null
+echo "Creating Fitcrack database triggers..."
+mysql -h $DB_HOST -u $DB_USER -D"$DB_NAME" < server/sql/20_create_triggers.sql
 if [[ $? != 0 ]]; then
   echo "Error: Unable to create Fitcrack DB tables"
   exit
@@ -95,7 +98,7 @@ fi
 echo "Fitcrack database triggers created."
 
 echo "Inserting initial data..."
-mysql -h $DB_HOST -u $DB_USER -p"$DB_PW" -D"$DB_NAME" < server/sql/30_insert_data.sql  2>/dev/null
+mysql -h $DB_HOST -u $DB_USER -D"$DB_NAME" < server/sql/30_insert_data.sql
 if [[ $? != 0 ]]; then
   echo "Error: Unable to create Fitcrack DB tables"
   exit

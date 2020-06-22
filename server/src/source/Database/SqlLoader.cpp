@@ -42,8 +42,18 @@ std::vector<PtrHost> CSqlLoader::loadActiveHosts(uint64_t jobId)
     addNewHosts(jobId);
 
     /** Return all active hosts for jobId */
-    return load<CHost>(formatQuery("WHERE (status = %d OR status = %d) AND `job_id` = %" PRIu64 "",
-                                   Config::HostState::HostBench, Config::HostState::HostNormal, jobId));
+    return customLoad<CHost>(formatQuery(
+        R"';..;'(
+            SELECT host_table.*, TIMESTAMPDIFF(SECOND, last_seen, UTC_TIMESTAMP()) as seconds_since_last_seen
+                FROM `%s` host_table INNER JOIN `%s_status` status_table ON host_table.`boinc_host_id` = status_table.`boinc_host_id`
+                WHERE (status = %d OR status = %d) AND `job_id` = %)';..;'" PRIu64 ";"
+        ,
+        CHost::getTableName().c_str(),
+        CHost::getTableName().c_str(),
+        Config::HostState::HostBench,
+        Config::HostState::HostNormal,
+        jobId
+    ));
 }
 
 
@@ -91,6 +101,13 @@ uint64_t CSqlLoader::getWorkunitCount(uint64_t jobId, uint64_t hostId)
      */
     return getRowCount<CWorkunit>(formatQuery(
             "WHERE `host_id` = %" PRIu64 " AND `job_id` = %" PRIu64 " AND `finished` = 0 AND `retry` = 0 AND `hc_keyspace` > 0",
+            hostId, jobId));
+}
+
+uint64_t CSqlLoader::getTotalWorkunitCount(uint64_t jobId, uint64_t hostId)
+{
+    return getRowCount<CWorkunit>(formatQuery(
+            "WHERE `host_id` = %" PRIu64 " AND `job_id` = %" PRIu64,
             hostId, jobId));
 }
 
@@ -167,8 +184,8 @@ void CSqlLoader::updateJobStatus(uint64_t jobId, uint32_t newStatus)
 
 void CSqlLoader::updateRunningJobStatus(uint64_t jobId, uint32_t newStatus)
 {
-    return updateSql(formatQuery("UPDATE `%s` SET status = %" PRIu32 " WHERE id = %" PRIu64 " AND status >= 10 LIMIT 1;",
-                                 CJob::getTableName().c_str(), newStatus, jobId));
+    return updateSql(formatQuery("CALL set_running_job_status(%" PRIu64 ", %" PRIu32 ");",
+                                 jobId, newStatus));
 }
 
 
@@ -193,8 +210,42 @@ void CSqlLoader::addNewWorkunit(PtrWorkunit workunit)
 
 unsigned int CSqlLoader::getTimeoutFactor()
 {
-    return (unsigned int)(getSqlNumber(formatQuery("SELECT `default_workunit_timeout_factor` FROM `%s` LIMIT 1",
+    return (unsigned int)(getSqlNumber(formatQuery("SELECT `workunit_timeout_factor` FROM `%s` LIMIT 1",
                                                   Config::tableNameSettings.c_str())));
+}
+
+unsigned int CSqlLoader::getHWTempAbort()
+{
+    return getSqlNumber(formatQuery("SELECT `hwmon_temp_abort` FROM `%s` LIMIT 1",
+                                                  Config::tableNameSettings.c_str()));
+}
+
+/// Gets the distribution coefficient from the database
+double CSqlLoader::getDistributionCoefficient()
+{
+    return getSqlDouble(formatQuery("SELECT `distribution_coefficient_alpha` FROM `%s` LIMIT 1",
+                                                Config::tableNameSettings.c_str()));
+}
+
+/// Gets the setting for the absolute minimum time a workunit should take
+unsigned CSqlLoader::getAbsoluteMinimumWorkunitSeconds()
+{
+    return getSqlNumber(formatQuery("SELECT `t_pmin` FROM `%s` LIMIT 1",
+                                                  Config::tableNameSettings.c_str()));
+}
+
+/// returns whether there should be a ramp up of WU time
+bool CSqlLoader::getEnableRampUp()
+{
+    return getSqlNumber(formatQuery("SELECT `ramp_up_workunits` FROM `%s` LIMIT 1",
+                                                  Config::tableNameSettings.c_str()));
+}
+
+/// Gets the ramp-down coefficient from the database
+double CSqlLoader::getRampDownCoefficient()
+{
+    return getSqlDouble(formatQuery("SELECT `ramp_down_coefficient` FROM `%s` LIMIT 1",
+                                                Config::tableNameSettings.c_str()));
 }
 
 
@@ -225,13 +276,19 @@ std::vector<Config::Ptr<CMask>> CSqlLoader::loadJobMasks(uint64_t jobId)
                                    jobId));
 }
 
+std::vector<Config::Ptr<CMask>> CSqlLoader::loadJobMasksWithNormalKeyspace(uint64_t jobId)
+{
+    return load<CMask>(formatQuery("WHERE `job_id` = %" PRIu64 " AND `current_index` < `keyspace` ORDER BY id ASC",
+                                   jobId));
+}
+
 
 std::vector<Config::Ptr<CDictionary>> CSqlLoader::loadJobDictionaries(uint64_t jobId) {
     return customLoad<CDictionary>(formatQuery("SELECT `%s`.*, `%s`.`path`, `%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = `%s`.`id` WHERE `job_id` = %" PRIu64 " AND `current_index` < `keyspace` ORDER BY `%s`.`id` ASC ;",
-                                               Config::tableNamePckgDictionary.c_str(), Config::tableNameDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), jobId, Config::tableNamePckgDictionary.c_str()));
+                                               Config::tableNameJobDictionary.c_str(), Config::tableNameDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), jobId, Config::tableNameJobDictionary.c_str()));
 }
 
 
@@ -279,10 +336,10 @@ Config::Ptr<CMask> CSqlLoader::loadMask(uint64_t maskId)
 Config::Ptr<CDictionary> CSqlLoader::loadDictionary(uint64_t dictId)
 {
     return customLoad<CDictionary>(formatQuery("SELECT `%s`.*, `%s`.`path`, `%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = `%s`.`id` WHERE `%s`.`id` = %" PRIu64 " LIMIT 1 ;",
-                                               Config::tableNamePckgDictionary.c_str(), Config::tableNameDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNamePckgDictionary.c_str(),
+                                               Config::tableNameJobDictionary.c_str(), Config::tableNameDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
+                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
                                                dictId)).front();
 }
 
@@ -470,13 +527,12 @@ void CSqlLoader::addNewHosts(uint64_t jobId)
 }
 
 
-uint64_t CSqlLoader::getSqlNumber(const std::string & query)
+std::string CSqlLoader::getSqlString(const std::string & query)
 {
-    uint64_t result = 0;
     updateSql(query.c_str());
 
-    MYSQL_RES* sqlResult;
-    sqlResult = mysql_store_result(boinc_db.mysql);
+    std::unique_ptr<MYSQL_RES, decltype(&mysql_free_result)> sqlResult(nullptr, &mysql_free_result);
+    sqlResult.reset(mysql_store_result(boinc_db.mysql));
     if (!sqlResult)
     {
         Tools::printDebugTimestamp("Problem with DB query.\nShutting down now.");
@@ -485,22 +541,58 @@ uint64_t CSqlLoader::getSqlNumber(const std::string & query)
     }
 
     MYSQL_ROW row;
-    while ((row = mysql_fetch_row(sqlResult)))
+    while ((row = mysql_fetch_row(sqlResult.get())))
     {
         if (row[0] == nullptr)
             continue;
 
-        try
-        {
-            result = std::stoull(row[0]);
-        }
-        catch (std::logic_error & error)
-        {
-            Tools::printDebugTimestamp("Error converting row count to uint64_t: %s\n", error.what());
-            continue;
-        }
+        return row[0];
     }
 
-    mysql_free_result(sqlResult);
-    return result;
+    return "";
+}
+
+template <typename Res>
+Res CSqlLoader::getSqlConverted(const std::string &query, Res(*conversionFn)(const std::string&))
+{
+    std::string sqlQuery = getSqlString(query);
+    try
+    {
+        return conversionFn(sqlQuery);
+    }
+    catch(const std::exception &e)
+    {
+        Tools::printDebugTimestamp("SQL query '%s' failed.\n", query.c_str());
+        Tools::printDebugTimestamp("Error converting db result to target type: %s\n", e.what());
+    }
+    catch(...)
+    {
+        Tools::printDebugTimestamp("SQL query '%s' failed.\n", query.c_str());
+        Tools::printDebugTimestamp("Unknown error converting db result to target type\n");
+    }
+    return {};
+}
+
+uint64_t CSqlLoader::getSqlNumber(const std::string & query)
+{
+    return getSqlConverted(
+        query,
+        static_cast<
+            unsigned long long(*)(const std::string &)
+        >(
+            [](const std::string &res){return std::stoull(res);}
+        )
+    );
+}
+
+double CSqlLoader::getSqlDouble(const std::string & query)
+{
+    return getSqlConverted(
+        query,
+        static_cast<
+            double(*)(const std::string &)
+        >(
+            [](const std::string &res){return std::stod(res);}
+        )
+    );
 }

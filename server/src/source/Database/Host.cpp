@@ -20,6 +20,15 @@ CHost::CHost(DbMap & hostMap, CSqlLoader * sqlLoader)
         this->m_power = std::stoull(hostMap["power"]);
         this->m_jobId = std::stoull(hostMap["job_id"]);
         this->m_status = std::stoul(hostMap["status"]);
+        static const std::string secondsSinceLastSeen = "seconds_since_last_seen";
+        if(hostMap.count(secondsSinceLastSeen))
+        {
+            this->m_secondsSinceLastSeen = std::stoull(hostMap[secondsSinceLastSeen]);
+        }
+        else
+        {
+            this->m_secondsSinceLastSeen = -1;
+        }
     }
     catch(std::logic_error & error)
     {
@@ -82,4 +91,9 @@ uint64_t CHost::getJobId() const
 uint32_t CHost::getStatus() const
 {
     return m_status;
+}
+
+uint64_t CHost::getSecondsSinceLastSeen() const
+{
+    return m_secondsSinceLastSeen;
 }

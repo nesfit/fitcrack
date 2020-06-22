@@ -5,21 +5,17 @@
 
 <template>
   <div>
-    <v-progress-circular
+    <v-progress-linear
       v-if="notifications === null"
       indeterminate
-      :size="50"
-      color="primary"
-      class="mx-auto mt-3 d-block"
     />
     <div v-else>
-      <v-list
-        class="notifContainer pa-0"
-      >
+      <v-list>
         <notification
           v-for="(item, i) in notifications.items"
           :key="i"
           :type="item.type"
+          :title="item.title"
           :text="item.text"
           :seen="item.seen"
           :time="item.time"

@@ -16,7 +16,7 @@
         type="warning"
         class="mb-0"
       >
-        Markov files must have a .hcstat extension.
+        Markov files must have a .hcstat2 extension.
       </v-alert>
       <v-data-table
         :headers="headers"
@@ -75,7 +75,7 @@
     <file-creator
       v-model="dialog"
       title="Add new HcStat"
-      :upload-url="this.$serverAddr + '/pcfg/add'"
+      :upload-url="this.$serverAddr + '/markovChains/add'"
       :working="working"
       @fileUploaded="loadMarkovChains"
       @dictionarySelected="makeHcStatFromDictionary"

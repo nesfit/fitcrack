@@ -39,7 +39,7 @@ PtrDictionary CDictionary::create(DbMap &dictMap, CSqlLoader *sqlLoader)
 
 std::string CDictionary::getTableName()
 {
-    return Config::tableNamePckgDictionary;
+    return Config::tableNameJobDictionary;
 }
 
 

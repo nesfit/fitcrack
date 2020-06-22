@@ -40,7 +40,7 @@ The [next section](/jobs/creating/input.md) takes an in-depth look at each of th
 
 After setting the hash type, each hash is validated. __Green checkmarks__ indicate the hash is valid for this type (algorithm). Hashes that have already been entered into the system and are stored in the cache will have a __yellow exclamation mark__. This is purely informational. Invalid hashes, on the other hand, should not be used in the configuration. If one or more hashes are invalid, the input field is marked __red__ and you won't be able to create the job.
 
-![Invalid input settings](../../_media/img/add-job-input-invalid.jpg){ width=250px }
+![Invalid input settings](../../_media/img/add-job-input-invalid.jpg)
 
 Note that you can override this using the _Ignore invalid hashes_ checkbox that will appear. However, if you do this, there is no guarantee the job will work.
 

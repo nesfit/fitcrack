@@ -1,9 +1,10 @@
-name: Build webadmin FE
+name: Build webadmin FE and Runner
 
 on:
   push:
     paths:
       - 'webadmin/fitcrackFE/**'
+      - 'runner/**'
 
 jobs:
   build:
@@ -15,33 +16,58 @@ jobs:
         node-version: [12.x]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
     - name: Extract branch name
       shell: bash
       run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
+    # Check changes
+    - name: Check for changes in dirs
+      shell: bash
+      run: |
+        echo "::set-env name=FE_CHANGES::$(git diff --name-only HEAD HEAD~1 | grep webadmin/fitcrackFE/ | wc -l)"
+        echo "::set-env name=RN_CHANGES::$(git diff --name-only HEAD HEAD~1 | grep runner/ | wc -l)"
+    # Node FE build
     - name: Set up Node ${{ matrix.node-version }}
+      if: env.FE_CHANGES > 0
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
     - name: Make ABSOLUTELY sure server address is LOCALHOST and NOTHING ELSE DEFINITELY YES REALLY
+      if: env.FE_CHANGES > 0
       working-directory: webadmin/fitcrackFE/static
       run: |
         sed -i 's/serverAddress.*/serverAddress = "http:\/\/localhost:5000"/g' configuration.js
     - name: Install deps and build it
+      if: env.FE_CHANGES > 0
       working-directory: webadmin/fitcrackFE
       env:
         CI: true
       run: |
         npm ci
         npm run build --if-present
+    # Runner build
+    - name: Install mingw g++
+      if: env.RN_CHANGES > 0
+      run: sudo apt-get install g++-mingw-w64-x86-64
+    - name: Build Runner
+      if: env.RN_CHANGES > 0
+      working-directory: runner
+      run: |
+        bash update_client_libs.sh
+        make clean
+    # Commit & push back
     - name: Commit files
       run: |
         git config --local user.email "me@ovi.moe"
         git config --local user.name "Webpacker"
         git add webadmin/fitcrackFE/static/configuration.js
-        git commit -m "Fix server address derp 🔨" || true
+        git add server/client_bin/windows_x86_64/runner1.exe -f
+        git add server/client_bin/x86_64-pc-linux-gnu/runner1.bin -f
+        git add runner/bin/*.debug -f
         git add .
-        git commit -m "Build webadmin frontend 🚀" || true
+        git commit -m "Build webadmin frontend and Runner 🚀"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:

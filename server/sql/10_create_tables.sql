@@ -64,22 +64,6 @@ CREATE TABLE IF NOT EXISTS `fc_dictionary` (
   `keyspace` bigint(20) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Štruktúra tabuľky pre tabuľku `fc_hashcache`
---
-
-CREATE TABLE IF NOT EXISTS `fc_hashcache` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `hash_type` int(11) unsigned DEFAULT NULL,
-  `hash` longtext COLLATE utf8_bin,
-  `result` text COLLATE utf8_bin,
-  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
@@ -238,6 +222,35 @@ CREATE TABLE IF NOT EXISTS `fc_protected_file` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_bin`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `position` int(11),
+  primary key (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_batch`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_batch` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `creator_id` int(11),
+  primary key (`id`),
+  key `creator_id` (`creator_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 -- --------------------------------------------------------
 
 --
@@ -246,14 +259,11 @@ CREATE TABLE IF NOT EXISTS `fc_protected_file` (
 
 CREATE TABLE IF NOT EXISTS `fc_job` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `token` varchar(64) COLLATE utf8_bin DEFAULT NULL,
   `attack` varchar(40) COLLATE utf8_bin NOT NULL,
   `attack_mode` tinyint(3) unsigned NOT NULL,
   `attack_submode` tinyint(3) NOT NULL DEFAULT '0',
   `hash_type` int(10) unsigned NOT NULL,
-  `hash` longtext COLLATE utf8_bin NOT NULL,
   `status` smallint(1) unsigned NOT NULL DEFAULT '0',
-  `result` text COLLATE utf8_bin,
   `keyspace` bigint(20) unsigned NOT NULL,
   `hc_keyspace` bigint(20) unsigned NOT NULL,
   `indexes_verified` bigint(20) unsigned NOT NULL,
@@ -264,11 +274,8 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `comment` text COLLATE utf8_bin NOT NULL,
   `time_start` timestamp NULL DEFAULT NULL,
   `time_end` timestamp NULL DEFAULT NULL,
-  `cracking_time` double NOT NULL DEFAULT '0',
+  `workunit_sum_time` double NOT NULL DEFAULT '0',
   `seconds_per_workunit` bigint(20) unsigned NOT NULL DEFAULT '3600',
-  `config` longtext COLLATE utf8_bin NOT NULL,
-  `dict1` varchar(255) COLLATE utf8_bin NOT NULL,
-  `dict2` varchar(255) COLLATE utf8_bin NOT NULL,
   `charset1` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
   `charset2` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
   `charset3` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
@@ -285,11 +292,29 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `max_password_len` int(10) unsigned NOT NULL DEFAULT '0',
   `min_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
   `max_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '0',
-  `replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
+  `generate_random_rules` int(10) unsigned NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  `batch_id` int(11),
+  `queue_position` int(11),
+  PRIMARY KEY (`id`),
+  KEY `batch_id` (`batch_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+--
+-- Štruktúra tabuľky pre tabuľku `fc_bin_job` (M2M junction)
+--
+
+CREATE TABLE IF NOT EXISTS `fc_bin_job` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `job_id` bigint(20) unsigned NOT NULL,
+  `bin_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `job_id` (`job_id`),
+  KEY `bin_id` (`bin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 
 -- --------------------------------------------------------
 
@@ -297,7 +322,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
 -- Štruktúra tabuľky pre tabuľku `fc_job_dictionary`
 --
 
-CREATE TABLE `fc_job_dictionary` (
+CREATE TABLE IF NOT EXISTS `fc_job_dictionary` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `job_id` bigint(20) unsigned NOT NULL,
   `dictionary_id` bigint(20) unsigned NOT NULL,
@@ -396,7 +421,6 @@ CREATE TABLE `fc_pcfg_grammar` (
   `path` varchar(400) NOT NULL,
   `keyspace` bigint(20) unsigned NOT NULL,
   `time_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modification_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
@@ -410,13 +434,15 @@ CREATE TABLE `fc_pcfg_grammar` (
 
 CREATE TABLE IF NOT EXISTS `fc_settings` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `delete_finished_workunits` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `default_seconds_per_workunit` int(10) unsigned NOT NULL DEFAULT '3600',
-  `default_replicate_factor` int(10) unsigned NOT NULL DEFAULT '1',
-  `default_verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `default_check_hashcache` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `default_workunit_timeout_factor` int(10) unsigned NOT NULL DEFAULT '6',
-  `default_bench_all` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `workunit_timeout_factor` int(10) unsigned NOT NULL DEFAULT '6',
+  `hwmon_temp_abort` int(10) unsigned NOT NULL DEFAULT '90',
+  `bench_all` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `distribution_coefficient_alpha` decimal(5,2) NOT NULL DEFAULT '0.1',
+  `t_pmin` int(10) unsigned NOT NULL DEFAULT '20',
+  `ramp_up_workunits` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
+  `verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -450,6 +476,7 @@ CREATE TABLE IF NOT EXISTS `fc_user_permissions` (
   `view` tinyint(1) NOT NULL DEFAULT '0',
   `modify` tinyint(1) NOT NULL DEFAULT '0',
   `operate` tinyint(1) NOT NULL DEFAULT '0',
+  `owner` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `job_id` (`job_id`),
   KEY `user_id` (`user_id`)
@@ -509,6 +536,17 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 -- Obmedzenie pre exportované tabuľky
 --
 
+--
+-- Obmedzenie pre tabuľku `fc_job`
+--
+ALTER TABLE `fc_job`
+  ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL;
+
+--
+-- Obmedzenie pre tabuľku `fc_batch`
+--
+ALTER TABLE `fc_batch`
+  ADD CONSTRAINT `user_link` FOREIGN KEY (`creator_id`) REFERENCES `fc_user` (`id`) ON DELETE SET NULL;
 
 --
 -- Omezeni pro tabulku `fc_job_status`
@@ -523,6 +561,15 @@ ALTER TABLE `fc_job_status`
 ALTER TABLE `fc_notification`
   ADD CONSTRAINT `fc_notification_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `fc_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fc_notification_ibfk_2` FOREIGN KEY (`source_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+--
+-- Obmedzenie pre junction tabuľku `fc_bin_job`
+--
+ALTER TABLE `fc_bin_job`
+  ADD CONSTRAINT `fc_bin_job_jobfk` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fc_bin_job_binfk` FOREIGN KEY (`bin_id`) REFERENCES `fc_bin` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 --
 -- Obmedzenie pre tabuľku `fc_job_graph`

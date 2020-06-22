@@ -59,6 +59,9 @@
       */
       this.axios.interceptors.response.use(
         function (response) {
+          if (response.data.hasOwnProperty('hideAlert') && response.data.hideAlert) {
+            this.alert = false;
+          }
           if (response.data.hasOwnProperty('status') && response.data.hasOwnProperty('message') && response.data.status) {
             this.alertType = 'success';
             this.alert = true;
@@ -83,6 +86,7 @@
             this.alertText = 'Can not connect to ' + this.$serverAddr
             //this.alertText = error.message
           }
+          return Promise.reject(error)
         }.bind(this)
       )
 
@@ -99,6 +103,12 @@
       } else if (!init || init == 'auto') {
         this.$vuetify.theme.dark = mql.matches
       }
+
+      window.addEventListener('keypress', e => {
+        if (localStorage.getItem('testmode') == 'true' && e.ctrlKey && e.shiftKey && e.code == 'KeyL') {
+          this.$vuetify.theme.dark = !this.$vuetify.theme.dark
+        }
+      })
     },
     mounted () {
       this.$root.$confirm = this.$refs.confirm.open
@@ -122,6 +132,10 @@
 
 </style>
 <style>
+  .theme--light.v-application {
+    background-color: #f5f5f5 !important;
+  }
+
   h1, h2 {
     font-weight: normal;
   }
@@ -138,6 +152,42 @@
     width: 100%;
   }
 
+  .table-link {
+    display: inline-block;
+    line-height: 3em;
+    font-weight: bold;
+  }
+
+  .drag-handle {
+    cursor: grab;
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+
+  /**/
+
+  .list-enter-active,
+  .list-leave-active,
+  .list-move {
+    transition: 200ms cubic-bezier(0.59, 0.12, 0.34, 0.95);
+    transition-property: opacity, transform;
+  }
+
+  .list-enter,
+  .list-leave-to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  .list-enter-to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .list-leave-active {
+    position: absolute;
+  }
 
 </style>
 

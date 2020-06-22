@@ -10,9 +10,11 @@
 
 #include <cmath>    /**< std::round */
 
+#include "InputDict.h"
 
-CAttackCombinator::CAttackCombinator(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-    :   AttackMode(job, host, seconds, sqlLoader)
+
+CAttackCombinator::CAttackCombinator(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
 
 }
@@ -58,12 +60,12 @@ bool CAttackCombinator::makeWorkunit()
         return false;
     }
 
-    f << generateBasicConfig('n', m_job->getAttackMode(), m_job->getAttackSubmode(),
-                             m_job->getName(), m_job->getHashType(), m_job->getRuleLeft(),
+    f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
+                             m_job->getName(), m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getRuleLeft(),
                              m_job->getRuleRight());
 
     /** Load current workunit dictionary */
-    PtrDictionary workunitDict = m_sqlLoader->loadDictionary(m_workunit->getDictionaryId());
+    PtrDictionary workunitDict = GetWorkunitDict();
 
     // Debug
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
@@ -83,324 +85,231 @@ bool CAttackCombinator::makeWorkunit()
         return false;
     }
 
-    std::ofstream f2;
-    f2.open(path);
-    if (!f2.is_open())
+    std::string outputDictPath = path;
+
+    try
     {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open second dictionary BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
 
-    std::ifstream dict2_file;
-    dict2_file.open((Config::dictDir + workunitDict->getDictFileName()).c_str());
-    if (!dict2_file)
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open second dictionary input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
+        auto dict2_file = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
 
-    /** Check combinator workunit type */
-    /** Dictionary is already fragmented, continue fragmenting */
-    if (m_workunit->getStartIndex2() != 0)
-    {
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Dictionary is already fragmented, we need to continue\n");
-
-        /** Ignore 'start_index' passwords */
-        uint64_t workunitStartIndex = m_workunit->getStartIndex();
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
-
-        std::string passwd;
-        uint64_t currentIndex;
-        for (currentIndex = 0; currentIndex < workunitStartIndex; ++currentIndex)
-            std::getline(dict2_file, passwd);
-
-        /** No more passwords in current dictionary */
-        if (dict2_file.eof())
+        /** Check combinator workunit type */
+        /** Dictionary is already fragmented, continue fragmenting */
+        if (m_workunit->getStartIndex2() != 0)
         {
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "'start_index' parameter is too far away\n");
-            if (!m_workunit->isDuplicated())
-                workunitDict->updateIndex(workunitDict->getHcKeyspace());
+                    "Dictionary is already fragmented, we need to continue\n");
 
-            return true;
-        }
-
-        /** Append a single password to second dict */
-        std::getline(dict2_file, passwd);
-        if (passwd.empty() || dict2_file.eof())
-        {
+            /** Will ignore 'start_index' passwords */
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Empty password or just reached EOF, skipping workunit\n");
-            if (!m_workunit->isDuplicated())
+                    "Skipping %" PRIu64 " passwords\n", m_workunit->getStartIndex());
+
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Adding a single password to host dict2 file");
+            if(!dict2_file->WritePasswordsTo(1, outputDictPath))
             {
-                workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
-                m_job->updateIndex(m_job->getCurrentIndex() + 1);
+                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                        "Source dict has no more passwords, skipping workunit\n");
+                if (!m_workunit->isDuplicated())
+                {
+                        workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
+                        m_job->updateIndex(m_job->getCurrentIndex() + 1);
+                }
+                return true;
             }
-            return true;
-        }
 
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adding a single password to host dict2 file: %s", passwd.c_str());
-        f2 << passwd << '\n';
+            /** Append skip and limit to config */
+            Tools::printDebug("Adding additional info to CONFIG:\n");
 
-        /** Append skip and limit to config */
-        Tools::printDebug("Adding additional info to CONFIG:\n");
+            uint64_t workunitStartIndex2 = m_workunit->getStartIndex2();
+            auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(workunitStartIndex2));
+            f << skipLine;
+            Tools::printDebug(skipLine.c_str());
 
-        uint64_t workunitStartIndex2 = m_workunit->getStartIndex2();
-        int digits = 0;
-        uint64_t num = workunitStartIndex2;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||start_index|BigUInt|" << digits << "|" << workunitStartIndex2 << "|||\n";
-        Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitStartIndex2);
-
-        /** Check if we reach the end of password keyspace in 1st dict */
-        if (m_workunit->getHcKeyspace() + workunitStartIndex2 >= m_job->getHcKeyspace())
-        {
-            m_workunit->setHcKeyspace(m_job->getHcKeyspace() - workunitStartIndex2);
-
-            if (!m_workunit->isDuplicated())
+            /** Check if we reach the end of password keyspace in 1st dict */
+            if (m_workunit->getHcKeyspace() + workunitStartIndex2 >= m_job->getHcKeyspace())
             {
-                workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
-                m_job->updateIndex(m_job->getCurrentIndex() + 1);
-                m_job->updateIndex2(0);
+                m_workunit->setHcKeyspace(m_job->getHcKeyspace() - workunitStartIndex2);
+
+                if (!m_workunit->isDuplicated())
+                {
+                    workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
+                    m_job->updateIndex(m_job->getCurrentIndex() + 1);
+                    m_job->updateIndex2(0);
+                }
+            }
+            else
+            {
+                uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
+                if (!m_workunit->isDuplicated())
+                        m_job->updateIndex2(workunitStartIndex2 + workunitHcKeyspace);
+
+                auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
+                f << limitLine;
+                Tools::printDebug(limitLine.c_str());
             }
         }
-        else
-        {
-            uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
-            if (!m_workunit->isDuplicated())
-                m_job->updateIndex2(workunitStartIndex2 + workunitHcKeyspace);
-
-            digits = 0;
-            num = workunitHcKeyspace;
-            do { num /= 10; ++digits; } while (num != 0);    // Count digits
-            f << "|||hc_keyspace|BigUInt|" << digits << "|" << workunitHcKeyspace << "|||\n";
-            Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitHcKeyspace);
-        }
-    }
-    /** Host has enough power, no fragments */
-    else if (m_workunit->getHcKeyspace() > (0.5f * m_job->getHcKeyspace()))
-    {
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Host has enough power, no fragments\n");
-
-        /** # of real passwords / # of passwords in first dictionaries = # of passwords to check from dict2*/
-        uint64_t secDictKeyspace = (uint64_t)(std::round(m_workunit->getHcKeyspace() / (float)(m_job->getHcKeyspace())));
-        uint64_t newCurrentIndex = m_workunit->getStartIndex() + secDictKeyspace;
-
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Rounded # of passwords from dict2: %" PRIu64 " passwords\n", secDictKeyspace);
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "New current index of current dict2: %" PRIu64 "\n", newCurrentIndex);
-
-        /** Check if we reached end of keyspace of current dict2 */
-        if (newCurrentIndex >= workunitDict->getHcKeyspace())
+        /** Host has enough power, no fragments */
+        else if (m_workunit->getHcKeyspace() > (0.5f * m_job->getHcKeyspace()))
         {
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "We reached the end of current dict2, modifiyng workunit keyspace\n");
+                    "Host has enough power, no fragments\n");
 
-            secDictKeyspace = workunitDict->getHcKeyspace() - m_workunit->getStartIndex();
-            newCurrentIndex = workunitDict->getHcKeyspace();
-        }
+            /** # of real passwords / # of passwords in first dictionaries = # of passwords to check from dict2*/
+            uint64_t secDictKeyspace = (uint64_t)(std::round(m_workunit->getHcKeyspace() / (float)(m_job->getHcKeyspace())));
+            uint64_t newCurrentIndex = m_workunit->getStartIndex() + secDictKeyspace;
 
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "The #passwords from second dict is therefore: %" PRIu64 "\n", secDictKeyspace);
-        if (!m_workunit->isDuplicated())
-        {
-            workunitDict->updateIndex(newCurrentIndex);
-            m_job->updateIndex(m_job->getCurrentIndex() + secDictKeyspace);
-        }
-
-        /** Exact number of passwords in workunit
-         * @warning Combinator sets real keyspace to hc_keyspace, as there is no such thing as hc_keyspace here
-         **/
-        m_workunit->setHcKeyspace(secDictKeyspace * m_job->getHcKeyspace());
-
-        /** Computation done, start creating dictionary dict2 */
-        /** Ignore 'start_index' passwords */
-        uint64_t workunitStartIndex = m_workunit->getStartIndex();
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
-
-        std::string passwd;
-        uint64_t currentIndex;
-        for (currentIndex = 0; currentIndex < workunitStartIndex; ++currentIndex)
-            std::getline(dict2_file, passwd);
-
-        /** No more passwords in dictionary */
-        if (dict2_file.eof())
-        {
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "'start_index' parameter is too far away\n");
+                    "Rounded # of passwords from dict2: %" PRIu64 " passwords\n", secDictKeyspace);
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "New current index of current dict2: %" PRIu64 "\n", newCurrentIndex);
+
+            /** Check if we reached end of keyspace of current dict2 */
+            if (newCurrentIndex >= workunitDict->getHcKeyspace())
+            {
+                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                        "We reached the end of current dict2, modifiyng workunit keyspace\n");
+
+                secDictKeyspace = workunitDict->getHcKeyspace() - m_workunit->getStartIndex();
+                newCurrentIndex = workunitDict->getHcKeyspace();
+            }
+
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "The #passwords from second dict is therefore: %" PRIu64 "\n", secDictKeyspace);
             if (!m_workunit->isDuplicated())
-                workunitDict->updateIndex(workunitDict->getHcKeyspace());
+            {
+                workunitDict->updateIndex(newCurrentIndex);
+                m_job->updateIndex(m_job->getCurrentIndex() + secDictKeyspace);
+            }
 
-            return true;
-        }
+            /** Exact number of passwords in workunit
+            * @warning Combinator sets real keyspace to hc_keyspace, as there is no such thing as hc_keyspace here
+            **/
+            m_workunit->setHcKeyspace(secDictKeyspace * m_job->getHcKeyspace());
 
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adding %" PRIu64 " passwords to host dict2 file\n", secDictKeyspace);
+            /** Computation done, start creating dictionary dict2 */
+            /** Ignore 'start_index' passwords */
+            uint64_t workunitStartIndex = m_workunit->getStartIndex();
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
 
-        /** Add 'keyspace' passwords to dict2 file */
-        for (currentIndex = 0; currentIndex < secDictKeyspace; ++currentIndex)
-        {
-            std::getline(dict2_file, passwd);
-            if (!passwd.empty())
-                f2 << passwd << '\n';
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Adding %" PRIu64 " passwords to host dict2 file\n", secDictKeyspace);
 
-            /** End of current dictionary */
-            if (dict2_file.eof())
+            /** Add 'keyspace' passwords to dict2 file */
+            auto addedPasswords = dict2_file->WritePasswordsTo(secDictKeyspace, outputDictPath);
+            if(addedPasswords != secDictKeyspace)
             {
                 Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                         "Ate all passwords from current dictionary\n");
-                m_workunit->setHcKeyspace(currentIndex * m_job->getHcKeyspace());
+                m_workunit->setHcKeyspace(addedPasswords * m_job->getHcKeyspace());
 
                 if (!m_workunit->isDuplicated())
                 {
                     workunitDict->updateIndex(workunitDict->getHcKeyspace());
-                    m_job->updateIndex(m_job->getCurrentIndex() + currentIndex);
+                    m_job->updateIndex(m_job->getCurrentIndex() + addedPasswords);
                 }
-
-                break;
             }
         }
-    }
-    /** Host doesn't have enough power, start fragmenting */
-    else
-    {
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Host doesn't have the power, start fragmenting\n");
-
-        /** Ignore 'start_index' passwords */
-        uint64_t workunitStartIndex = m_workunit->getStartIndex();
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
-        std::string passwd;
-        uint64_t currentIndex;
-        for (currentIndex = 0; currentIndex < workunitStartIndex; ++currentIndex)
-            std::getline(dict2_file, passwd);
-
-        /** No more passwords in current dictionary */
-        if (dict2_file.eof())
+        /** Host doesn't have enough power, start fragmenting */
+        else
         {
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "'start_index' parameter is too far away\n");
-            if (!m_workunit->isDuplicated())
-                workunitDict->updateIndex(workunitDict->getHcKeyspace());
+                    "Host doesn't have the power, start fragmenting\n");
 
-            return true;
-        }
-
-        std::getline(dict2_file, passwd);
-        if (passwd.empty() || dict2_file.eof())
-        {
+            /** Ignore 'start_index' passwords */
+            uint64_t workunitStartIndex = m_workunit->getStartIndex();
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Empty password or just reached EOF, skipping workunit\n");
-            if (!m_workunit->isDuplicated())
+                    "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
+
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Adding a single password to host dict2 file");
+            if(!dict2_file->WritePasswordsTo(1, outputDictPath))
             {
-                workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
-                m_job->updateIndex(m_job->getCurrentIndex() + 1);
+                Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                        "Source dict has no more passwords, skipping workunit\n");
+                if (!m_workunit->isDuplicated())
+                {
+                        workunitDict->updateIndex(workunitDict->getCurrentIndex() + 1);
+                        m_job->updateIndex(m_job->getCurrentIndex() + 1);
+                }
+                return true;
             }
-            return true;
+
+            /** Append skip and limit to config */
+            Tools::printDebug("Adding additional info to CONFIG:\n");
+
+            auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(0));
+            f << skipLine;
+            Tools::printDebug(skipLine.c_str());
+
+            auto workunitHcKeyspace = m_workunit->getHcKeyspace();
+            auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
+            f << limitLine;
+            Tools::printDebug(limitLine.c_str());
+
+            /** Update current_index_2 of the first fragmented dict */
+            if (!m_workunit->isDuplicated())
+                m_job->updateIndex2(workunitHcKeyspace);
         }
 
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adding a single password to host dict2 file: %s\n", passwd.c_str());
-        f2 << passwd << '\n';
+                "Done. Closing files\n");
 
-        /** Append skip and limit to config */
-        Tools::printDebug("Adding additional info to CONFIG:\n");
-
-        f << "|||start_index|BigUInt|1|0|||\n";
-        Tools::printDebug("|||start_index|BigUInt|1|0|||\n");
-
-        uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
-        int digits = 0;
-        uint64_t num = workunitHcKeyspace;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||hc_keyspace|BigUInt|" << digits << "|" << workunitHcKeyspace << "|||\n";
-        Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitHcKeyspace);
-
-        /** Update current_index_2 of the first fragmented dict */
-        if (!m_workunit->isDuplicated())
-            m_job->updateIndex2(workunitHcKeyspace);
-    }
-
-    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-            "Done. Closing files\n");
-
-    dict2_file.close();
-    f2.close();
-    f.close();
+        f.close();
 
 
-    /** Create data file */
-    retval = config.download_path(name2, path);
-    if (retval)
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - data. Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
-
-    f.open(path);
-    if (!f.is_open())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open data BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
-
-    f << m_job->getHashes();
-    f.close();
-
-    /** Create dict1 file */
-    retval = config.download_path(name3, path);
-    if (retval)
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to receive BOINC filename - dict1. Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
-
-    f.open(path);
-    if (!f.is_open())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open dict1 BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
-
-    auto dictVec = m_job->getDictionaries();
-    std::ifstream dictFile;
-    for (auto & dict : dictVec)
-    {
-        if (!dict->isLeft())
-            continue;
-
-        dictFile.open((Config::dictDir + dict->getDictFileName()).c_str());
-        if (!dictFile) {
+        /** Create data file */
+        retval = config.download_path(name2, path);
+        if (retval)
+        {
             Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                    "Failed to open dictionary file! Setting job to malformed.\n");
+                    "Failed to receive BOINC filename - data. Setting job to malformed.\n");
             m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
             return false;
         }
 
-        f << dictFile.rdbuf();
-        dictFile.close();
-    }
+        f.open(path);
+        if (!f)
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to open data BOINC input file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
 
-    f.close();
+        f << m_job->getHashes();
+        f.close();
+
+        /** Create dict1 file */
+        retval = config.download_path(name3, path);
+        if (retval)
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to receive BOINC filename - dict1. Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
+
+        if(!std::ifstream(path))
+        {
+            auto dictVec = m_job->getDictionaries();
+            for (auto & dict : dictVec)
+            {
+                if (!dict->isLeft())
+                    continue;
+
+                auto dictFile = makeInputDict(dict, 0, true);
+                dictFile->CopyTo(path);
+            }
+        }
+    }
+    catch(const InputDict::Exception &e)
+    {
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "A dictionary operation failed. Setting job to malformed. Message: %s\n", e.what());
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+        return false;
+    }
 
     /** Fill in the workunit parameters */
     wu.clear();
@@ -451,13 +360,13 @@ bool CAttackCombinator::generateWorkunit()
             "Generating combinator workunit ...\n");
 
     /** Compute password count */
-    uint64_t passCount = m_host->getPower() * m_seconds;
+    uint64_t passCount = getPasswordCountToProcess();
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     /** Load job RIGHT-side dictionaries */
@@ -466,19 +375,7 @@ bool CAttackCombinator::generateWorkunit()
             "Right-dictionaries remaining for this job: %" PRIu64 "\n", dictVec.size());
 
     /** Find the following dictionary */
-    PtrDictionary currentDict;
-    for (PtrDictionary & dict : dictVec)
-    {
-        if (dict->getCurrentIndex() < dict->getHcKeyspace())
-        {
-            /** Dictionary for a new workunit found */
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Dict found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
-                    dict->getDictFileName().c_str(), dict->getCurrentIndex(), dict->getHcKeyspace());
-            currentDict = dict;
-            break;
-        }
-    }
+    PtrDictionary currentDict = FindCurrentDict(dictVec);
 
     if (!currentDict)
     {

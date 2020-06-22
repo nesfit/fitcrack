@@ -3,7 +3,6 @@
    * Licence: MIT, see LICENSE
 '''
 
-# package_status_text_to_code_dict => job_status_text_to_code_dict
 job_status_text_to_code_dict = {
     0: 'ready',
     1: 'finished',
@@ -11,11 +10,9 @@ job_status_text_to_code_dict = {
     3: 'malformed',
     4: 'timeout',
     10: 'running',
-    11: 'validating',
     12: 'finishing'
 }
 
-# package_status_text_info_to_code_dict => job_status_text_info_to_code_dict
 job_status_text_info_to_code_dict = {
     0: 'The job has been created and waits for the start.',
     10: 'The job is running and new workunits will assigned to hosts.',
@@ -34,14 +31,13 @@ host_status_text_to_code_dict = {
     4: 'error.'
 }
 
-statuses = {
+status_to_code = {
     'ready': 0,
     'finished': 1,
     'exhausted': 2,
     'malformed': 3,
     'timeout': 4,
     'running': 10,
-    'validating': 11,
     'finishing': 12
 }
 
@@ -49,6 +45,8 @@ attack_modes = {
     'dictionary': 0,
     'combinator': 1,
     'mask': 3,
+    'hybrid (wordlist + mask)': 6,
+    'hybrid (mask + wordlist)': 7,
     'prince': 8,
     'pcfg': 9
 }

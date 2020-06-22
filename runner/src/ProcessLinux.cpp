@@ -78,7 +78,6 @@ bool ProcessLinux::isRunning() {
 }
 
 int ProcessLinux::run() {
-
   setStartTime();
   process_identifier_ = fork();
 
@@ -105,6 +104,13 @@ int ProcessLinux::run() {
   return 0;
 }
 
-
+void ProcessLinux::killIfRunning() {
+  std::string proc = getExecutable();
+  if (proc.find(".") == 0)
+    proc = proc.erase(0, 2);
+  std::string kill_cmd = "pkill -f " + proc;
+  int ret = system(kill_cmd.c_str());
+  (void)ret;
+}
 
 #endif // __linux__

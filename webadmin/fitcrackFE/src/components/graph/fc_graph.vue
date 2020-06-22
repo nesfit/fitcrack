@@ -24,7 +24,7 @@
       <div v-if="data.type === 'line'">
         <line-chart
           :id="id"
-          class="d-flex graph"
+          class="d-flex graph line"
           :data="data.data"
           :xkey="data.axies.x"
           :ykeys="data.axies.y"
@@ -32,20 +32,20 @@
           grid="true"
           :ymax="type === 'job' ? '100' : 'auto'"
           hide-hover="false"
-          resize="true"
+          :resize="true"
           :post-units="units"
           :smooth="false"
           :hover-callback="type === 'job' ? hoverCallbackJob : hoverCallbackWorkunit"
-          :line-colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
+          :line-colors="palette"
         />
       </div>
       <div v-else-if="data.type === 'pie'">
         <donut-chart
           :id="id || 'pie'"
-          class="d-flex graph"
+          class="d-flex graph donut"
           :data="data.data"
-          resize="true"
-          :colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
+          :resize="true"
+          :colors="palette"
         />
       </div>
     </div>
@@ -67,7 +67,11 @@
     props: ['data', 'id', 'units', 'type'],
     data: function () {
       return {
-        i: 1
+        i: 1,
+        palette: ['#f24b78', '#605f5e', '#1d3461', '#48beff', 
+                  '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', 
+                  '#d2f53c', '#ffd700', '#ff0051', '#65157f', 
+                  '#ff4300', '#193bdf', '#afe31b', '#c28f62']
       }
     },
     methods: {
@@ -94,7 +98,7 @@
           return
         var hostIdentifier = Object.keys(row)[1]
         var hostId = hostIdentifier.split('_')[0]
-        console.log(hostId)
+        var hashes = row[hostIdentifier];
         var time = this.$moment(row['time']).format('DD.MM.YYYY HH:mm');
         var hostName = '';
 
@@ -106,7 +110,7 @@
         }
 
         return '<b>' + time + '</b></br> Host <a href="/hosts/' + hostId + '"> ' +
-          hostName + '</a>'
+          hostName + '</a> ' + hashes + ' hashes'
       }
     }
   }
@@ -122,5 +126,18 @@
     padding: 20px;
     vertical-align: middle;
     font-weight: 200;
+  }
+
+  .donut.graph {
+    height: 250px
+  }
+</style>
+
+<style>
+  .donut.graph text {
+    font-family: Roboto !important;
+  }
+  .theme--dark .donut.graph text {
+    fill: #efefef;
   }
 </style>

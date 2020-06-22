@@ -1,15 +1,7 @@
 import Vue from 'vue'
+import { supermutator9000 } from '@/store'
 
 // Vuex module for the Add Job view
-const mut = prop => (state, val) => { state[prop] = val }
-
-function supermutator9000 (obj) {
-  const muts = {}
-  Object.keys(obj).forEach(key => {
-    muts[`${key}Mut`] = mut(key)
-  })
-  return muts
-}
 
 // Props that don't save to templates
 const base = {
@@ -51,12 +43,13 @@ export const empty = {
   pcfg: [],
   keyspaceLimit: 0,
   // prince
-  checkDuplicates: false,
+  checkDuplicates: true,
   casePermute: false,
   minPasswordLen: 1,
   maxPasswordLen: 8,
   minElemInChain: 1,
   maxElemInChain: 8,
+  generateRandomRules: 0,
   // other
   startNow: true,
   endNever: true,
@@ -96,13 +89,13 @@ export default {
         'max_password_len': parseInt(state.maxPasswordLen),
         'min_elem_in_chain': parseInt(state.minElemInChain),
         'max_elem_in_chain': parseInt(state.maxElemInChain),
+        'generate_random_rules': parseInt(state.generateRandomRules),
       }
     },
     jobSettings (state, { attackSettings }) {
       return {
         "name": state.name,
         "comment": state.comment,
-        "priority": 0,
         "hosts_ids": state.hosts.map(h => h.id),
         "seconds_per_job": parseInt(state.timeForJob),
         "time_start": (state.startNow ? '' : state.startDate),
@@ -137,20 +130,23 @@ export default {
             return false;
           if (state.maxPasswordLen <= 0)
             return false;
-
-          if (state.maxPasswordLen > 16)
+          if (state.maxPasswordLen > 32)
             return false;
-
+          if (state.maxElemInChain > 16)
+            return false;
           if (state.minElemInChain <= 0)
             return false;
-
+          if (state.maxElemInChain <= 0)
+            return false;
           if (state.minPasswordLen > state.maxPasswordLen)
             return false;
-
-          if (state.maxElemInChain > 0 && (state.minElemInChain > state.maxElemInChain))
+          if (state.minElemInChain > state.maxElemInChain)
             return false;
-
-          if (state.maxElemInChain > state.maxPasswordLen)
+          if (state.keyspaceLimit < 0)
+            return false;
+          if (state.generateRandomRules < 0)
+            return false;
+          if (state.rules.length > 0 && state.generateRandomRules > 0)
             return false;
 
           // All ok!
@@ -164,7 +160,8 @@ export default {
         !state.attackSettingsTab ||
         !attackSettings ||
         state.hashType == null ||
-        state.timeForJob < 60 ||
+        state.validatedHashes.length == 0 ||
+        state.timeForJob < 10 ||
         state.name === ''
       ) {
         return false
@@ -235,5 +232,6 @@ export const attacks = [
   {handler: 'maskattack', name: 'Brute-force', id: 3, serverName: 'mask'},
   {handler: 'hybridWordlistMask', name: 'Hybrid Wordlist + Mask', id: 6, serverName: 'Hybrid wordlist+mask'},
   {handler: 'hybridMaskWordlist', name: 'Hybrid Mask + Wordlist', id: 7, serverName: 'Hybrid mask+wordlist'},
+  {handler: 'princeAttack', name: 'PRINCE', id: 8, serverName: 'prince'},
   {handler: 'pcfgAttack', name: 'PCFG', id: 9, serverName: 'pcfg'}
 ]

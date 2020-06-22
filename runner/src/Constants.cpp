@@ -10,6 +10,8 @@ namespace BoincConstants {
   std::string TrickleDeamonName;
 };
 
+const std::string RunnerConstants::HashcatMutexName = "FitcrackRunnerHashcatMutex";
+
 void BoincConstants::setProjectName(const std::string& workunit_name) {
   if (workunit_name == "LocalWorkunit") {
     ProjectName = "standalone";

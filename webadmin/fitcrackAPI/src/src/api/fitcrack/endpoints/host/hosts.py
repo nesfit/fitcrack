@@ -2,9 +2,7 @@
    * Author : see AUTHORS
    * Licence: MIT, see LICENSE
 '''
-'''
-packageHost_parser => jobHost_parser
-'''
+
 import logging
 
 from flask import request
@@ -80,15 +78,12 @@ class HostByID(Resource):
 
     def delete(self, id):
         """
-        Removes host from table
+        Hides or shows a host from the list
         """
         hostStatus = FcHostStatus.query.filter(FcHostStatus.boinc_host_id == id).one()
-        if (hostStatus.deleted):
-            hostStatus.deleted = False
-        else:
-            hostStatus.deleted = True
+        hostStatus.deleted = not hostStatus.deleted
         db.session.commit()
-        return 'Host successfully deleted.', 204
+        return 'Host visibility toggled', 200
 
 
 

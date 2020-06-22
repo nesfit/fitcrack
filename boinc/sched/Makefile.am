@@ -74,8 +74,8 @@ endif
 all-local: $(all_local)
 
 $(LIBSCHED_STATIC): libsched.la
-	rm -f $(LIBSCHED_STATIC)
-	$(LN) .libs/$(LIBSCHED_STATIC) .
+	## rm -f $(LIBSCHED_STATIC)
+	$(LN) -f .libs/$(LIBSCHED_STATIC) .
 
 $(LIBSCHED_FCGI_STATIC): libsched_fcgi.la
 	rm -f $(LIBSCHED_FCGI_STATIC)
@@ -314,9 +314,12 @@ sched_driver_LDADD = $(SERVERLIBS)
 # find . -name '*.h'
 # find . -name '*.cpp'
 fitcrack_sources = \
+    AttackBenchAll.h \
     AttackBench.h \
     AttackCombinator.h \
     AttackDict.h \
+    AttackHybridDictMask.h \
+    AttackHybridMaskDict.h \
     AttackMarkov.h \
     AttackMask.h \
     AttackMode.h \
@@ -326,18 +329,23 @@ fitcrack_sources = \
     AttackPcfgClient.h \
     AttackPcfgRules.h \
     Base64.h \
+    BenchmarkClasses.h \
     Config.h \
     Dictionary.h \
     Host.h \
+    InputDict.h \
+    MaskSplitter.h \
     Workunit.h \
     Mask.h \
     Job.h \
     SqlLoader.h \
     AbstractGenerator.h \
     SimpleGenerator.h \
-    AttackBench.cpp \
+    AttackBenchAll.cpp \
     AttackCombinator.cpp \
     AttackDict.cpp \
+    AttackHybridDictMask.cpp \
+    AttackHybridMaskDict.cpp \
     AttackMarkov.cpp \
     AttackMask.cpp \
     AttackMode.cpp \
@@ -346,9 +354,12 @@ fitcrack_sources = \
     AttackPcfg.cpp \
     AttackPcfgClient.cpp \
     AttackPcfgRules.cpp \
+    BenchmarkClasses.cpp \
     Config.cpp \
     Dictionary.cpp \
     Host.cpp \
+    InputDict.cpp \
+    MaskSplitter.cpp \
     Workunit.cpp \
     Mask.cpp \
     Job.cpp \

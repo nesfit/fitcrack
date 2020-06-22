@@ -8,16 +8,18 @@
     v-model="selected"
     :headers="headers"
     :items="items"
-    :search="search"
+    :loading="loading"
     item-key="id"
     show-select
     :single-select="!selectAll"
+    disable-pagination
+    hide-default-footer
     @input="updateSelected"
   >
     <template v-slot:item.domain_name="{ item }">
       <router-link
         :to="{ name: 'hostDetail', params: {id: item.id} }"
-        class="middle" target='_blank'
+        class="middle" 
       >
         {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
         <v-icon 
@@ -27,6 +29,9 @@
           mdi-open-in-new
         </v-icon>
       </router-link>
+    </template>
+    <template v-slot:item.jobs="{ item }">
+      {{ item.jobs.map(j => j.status === 10 ? 1 : 0).reduce((a, b) => a + b, 0) }}
     </template>
     <template v-slot:item.p_model="{ item }">
       <span class="oneline">{{ item.p_model.replace(/(?:\(R\)|\(TM\)|Intel|AMD)/g, '') }}</span>
@@ -54,6 +59,7 @@
     },
     data() {
       return {
+        loading: false,
         headers: [
           {
             text: 'Name',
@@ -63,6 +69,7 @@
           {text: 'IP address', value: 'ip_address', align: 'end', sortable: false},
           {text: 'OS', value: 'os_name', align: 'end', sortable: false},
           {text: 'Processor', value: 'p_model', align: 'end', width: '200', sortable: false},
+          {text: 'Active jobs', value: 'jobs', align: 'center', sortable: false},
           {text: 'Online', value: 'last_active', align: 'end', sortable: false},
         ]
       }
@@ -77,7 +84,7 @@
     },
     methods: {
       getData(autorefreshing = false) {
-        this.loading = true
+        if (!autorefreshing) this.loading = true
         this.axios.get(this.$serverAddr + '/hosts', {
           params: {
             'all': true

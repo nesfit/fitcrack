@@ -6,17 +6,26 @@
 from flask_restplus import fields
 
 from src.api.apiConfig import api
+from src.api.fitcrack.endpoints.batches.responseModels import batch_model
 from src.api.fitcrack.endpoints.dictionary.responseModels import dictionary_model
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
 from src.api.fitcrack.responseModels import pagination, simpleResponse, job_short_model, \
-    boincHost_model
+    boincHost_model, job_permissions
 
 
 boincResult_model = api.model('boinc result', {
     'id': fields.String(),
     'stderr_out_text': fields.String(),
 
+})
+
+rule_model = api.model('Rule', {
+    'id': fields.Integer(readOnly=True, required=False),
+    'name': fields.String(readOnly=True, required=False),
+    'path': fields.String(readOnly=True, required=False),
+    'count': fields.Integer(readOnly=True),
+    'time': fields.DateTime(readOnly=True, required=False),
 })
 
 workunit_model = api.model('Workunit', {
@@ -27,7 +36,9 @@ workunit_model = api.model('Workunit', {
     'boinc_host_id': fields.Integer(),
     'start_index': fields.Integer(),
     'start_index_2': fields.Integer(),
+    'start_index_real': fields.Integer(),
     'hc_keyspace': fields.Integer(),
+    'keyspace': fields.Integer(),
     'mask_id': fields.Integer(),
     'duplicated': fields.Boolean(),
     'duplicate': fields.Integer(),
@@ -67,8 +78,8 @@ page_of_workunits_model = api.inherit('Page of workunits', pagination, {
 })
 
 verifyHash_model = api.model('Verified hash', {
-    'hash': fields.String(required=True, description='Hash ktory sa overoval'),
-    'result': fields.String(required=True, description='Ak ma hash spravny format tak OK'),
+    'hash': fields.String(required=True, description='Hash being validated'),
+    'result': fields.String(required=True, description='Whether the hash is valid'),
     'isInCache': fields.Boolean()
 })
 
@@ -85,7 +96,7 @@ host_cracking_time = api.model('host cracking time', {
 })
 
 crackingTime_model = api.model('Cracking time', {
-    'hash_code': fields.String(required=True, description='Typ hashu', default=None),
+    'hash_code': fields.String(required=True, description='Hash type', default=None),
     'keyspace': fields.Integer(required=True, default=None),
     'total_power': fields.Integer(required=True, default=None),
     'display_time': fields.String(required=True, default=None),
@@ -111,8 +122,9 @@ pcfgGrammar_model = api.model('PCFG job', {
 job_big_model = api.model('Job', {
     'id': fields.Integer(readOnly=True, required=False, description='id of the job'),
     'name': fields.String(required=True, description='name of the job'),
+    'batch': fields.Nested(batch_model),
     'comment': fields.String(required=False),
-    'priority': fields.Integer(),
+    'permissions': fields.Nested(job_permissions),
     'attack_mode': fields.String(required=True),
     'attack_submode': fields.Integer(),
     'attack': fields.String(required=True),
@@ -122,50 +134,53 @@ job_big_model = api.model('Job', {
     'status_type': fields.String(),
     'progress': fields.Float(required=False),
     'time': fields.DateTime(required=False),
-    'cracking_time': fields.Float(),
-    'cracking_time_str': fields.String(),
+    'cracked_hashes_str': fields.String(),
+    'total_time': fields.Float(),
+    'workunit_sum_time': fields.Float(),
+    'workunit_sum_time_str': fields.String(),
+    'estimated_cracking_time_str': fields.String(),
+    'efficiency': fields.Float(),
     'hash_type_name': fields.String(),
     'hash_type': fields.String(required=True),
-    'hash': fields.String(required=True),
     'keyspace': fields.String(required=True),
     'hc_keyspace': fields.String(required=True),
     'indexes_verified': fields.String(required=True, default='0'),
     'current_index': fields.String(required=True, default='0'),
     'current_index_2': fields.String(required=True, default='0'),
-    'time_start': fields.String(required=True),
-    'time_end': fields.String(required=True),
+    'time_start': fields.DateTime(required=True),
+    'time_end': fields.DateTime(required=True),
     'seconds_per_job': fields.String(attribute='seconds_per_workunit',required=True, default='0'),
-    'dict1': fields.String(required=True),
-    'dictionary1': fields.Nested(dictionary_model),
-    'dict2': fields.String(required=True),
-    'dictionary2': fields.Nested(dictionary_model),
-    'charSet1': fields.Nested(hcStat_model),
-    'charSet2': fields.Nested(hcStat_model),
-    'charSet3': fields.Nested(hcStat_model),
-    'charSet4': fields.Nested(hcStat_model),
-    'rulesFile': fields.Nested(hcStat_model),
+    'charset1': fields.String(),
+    'charset2': fields.String(),
+    'charset3': fields.String(),
+    'charset4': fields.String(),
+    'rulesFile': fields.Nested(rule_model),
     'rule_left': fields.String(),
     'rule_right': fields.String(),
     'markov': fields.Nested(hcStat_model),
     'markov_threshold': fields.Integer(),
-    'replicate_factor': fields.String(required=True),
     'hosts': fields.List(fields.Nested(boincHost_model)),
     'workunits': fields.List(fields.Nested(workunit_model)),
     'masks': fields.List(fields.Nested(mask_model)),
-    'password': fields.String(),
     'hashes': fields.List(fields.Nested(hash_model)),
     'left_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'grammar_id': fields.Integer(),
     'grammar_name': fields.String(),
-    'grammar_keyspace': fields.Integer()
-
-    #'grammar_id': fields.List(fields.Nested(pcfg_model))
+    'grammar_keyspace': fields.Integer(),
+    'case_permute': fields.Boolean(),
+    'check_duplicates': fields.Boolean(),
+    'min_password_len': fields.Integer(),
+    'max_password_len': fields.Integer(),
+    'min_elem_in_chain': fields.Integer(),
+    'max_elem_in_chain': fields.Integer(),
+    'generate_random_rules': fields.Integer()
 })
 
-job_nano_model = api.model('Package nano', {
-    'id': fields.Integer(readOnly=True, required=False, description='id package'),
-    'name': fields.String(required=True, description='meno package'),
+job_nano_model = api.model('Job nano', {
+    'id': fields.Integer(readOnly=True, required=False, description='job id'),
+    'name': fields.String(required=True, description='job name'),
+    'attack': fields.String(),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),
     'status_tooltip': fields.String(required=False),
@@ -173,6 +188,20 @@ job_nano_model = api.model('Package nano', {
     'progress': fields.Float(required=False),
 })
 
-job_nano_list_model = api.inherit('Package nano list', {
+job_nano_list_model = api.inherit('Job nano list', {
     'items': fields.List(fields.Nested(job_nano_model))
+})
+
+user_permissions = api.model('User with permissions', {
+    'id': fields.Integer(),
+    'username': fields.String(),
+    'mail': fields.String(),
+    'view': fields.Boolean(),
+    'modify': fields.Boolean(),
+    'operate': fields.Boolean(),
+    'owner': fields.Boolean()
+})
+
+job_user_permissions_model = api.model('List of users and their permissions on a job', {
+    'items': fields.List(fields.Nested(user_permissions))
 })

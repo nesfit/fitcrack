@@ -4,7 +4,7 @@ This README describes how to install and run Fitcrack distributed password crack
 There are four ways of deployment:
 
 * Using installer + [Step-by-step guide for Debian 9 / Ubuntu 18.04 LTS](#instdeb) (recommended way)
-* Using installer + [Step-by-step guide for CentOS/RHEL 7](#instcentos) (recommended way)
+* Using installer + [Step-by-step guide for CentOS/RHEL 8](#instcentos) (recommended way)
 * Using installer + [General installation instructions](#instgen)
 * Manual install:
   * For **BOINC and Fitcrack server**, see [server README](server/README.md)
@@ -12,7 +12,6 @@ There are four ways of deployment:
   * For **Custom build of Runner**, see [Runner README](runner/README.md)
 
 Once installed, see how to [Operate the server](#oper)
-Don't forget to activate [usage measure](#usage) of your server.
 
 <a name="instgen"></a>
 ## General installation instructions
@@ -38,6 +37,7 @@ Don't forget to activate [usage measure](#usage) of your server.
 * PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
 * Curl
+* Gtest (only if you intend to build the tests in server/src/tests)
 
 ### Installation
 Create a user for running BOINC server
@@ -62,16 +62,6 @@ And proceed according to your preferences...
 ## Step-by-step: Install on Debian 9 / Ubuntu 18.04 LTS
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
-
-### Debian 9: (Optional) Switch to MySQL
-In Debian 9, MariaDB is used by default instead of MySQL community server.
-If you wish to switch to MySQL, type:
-```
-wget https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
-dpkg -i mysql-apt-config_0.8.10-1_all.deb
-apt-get update
-```
-Otherwise, in the prerequisities below, you have to choose **libmariadb-dev**, instead of **libmysql-dev**, etc.
 
 ### Install prerequisities
 ```
@@ -98,42 +88,35 @@ mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED B
 ```
 
 <a name="instcentos"></a>
-## Step-by-step: Install on CentOS/RHEL 7
+## Step-by-step: Install on CentOS/RHEL 8
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
 ### SELINUX
-The following tutorial assumes **SELINUX** is disabled.
-If you wish to use SELINUX on Fitcrack server machine, you have to configure policies manually, or wait for an udpate of the tutorial.
+The following tutorial assumes **SELINUX** in permissive or disabled mode.
+If you wish to use SELINUX enforcing mode on Fitcrack server machine, you have to configure policies to allow apache access to project directory and others.
 
-### Add MariaDB 10 repository
-Create file `/etc/yum.repos.d/MariaDB.repo` with the following contents:
-```
-[mariadb]
-name = MariaDB
-baseurl = http://yum.mariadb.org/10.1/centos7-amd64
-gpgkey = https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-gpgcheck = 1
-```
 
 ### Install prerequisities
-Enable IUS, EPEL, and SCL repositories
 ```
-yum install -y https://$(rpm -E '%{?centos:centos}%{!?centos:rhel}%{rhel}').iuscommunity.org/ius-release.rpm
-yum install -y epel-release centos-release-scl
+yum install -y m4 gcc gcc-c++ make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python2 python2-devel python3-devel python3 python2-pip python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel
+
+pip2 install mysqlclient
+pip3 install mysqlclient
+
+alternatives --set python /usr/bin/python2
 ```
 
-Install necessary packages:
+### Configure exceptions for firewalld:
 ```
-yum install -y devtoolset-7 m4 libtool autoconf automake  git vim httpd php php-mysql mod_wsgi mariadb-server mariadb-devel zlib libcurl-devel openssl-libs openssl-devel python python36 python36u-mod_wsgi python36u-setuptools  MySQL-python python2-PyMySQL  boost* pkgconfig libnotify
-```
-Set Python 3.6 as default Python3 version:
-```
-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 60
+firewall-cmd --zone=public --add-service=http --permanent
+firewall-cmd --zone=public --add-service=https --permanent
+firewall-cmd --zone=public --add-port=5000/tcp --permanent
+firewall-cmd --reload
 ```
 
+### Configure services
 ```
-easy_install-3.6 pip
 systemctl start httpd.service
 systemctl enable httpd.service
 systemctl start mariadb
@@ -149,9 +132,8 @@ mysql> create database fitcrack;
 mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
 ```
 
-### Switch to GCC6 and Install Fitcrack
+### Install Fitcrack
 ```
-scl enable devtoolset-7 bash
 ./install_fitcrack.sh
 ```
 
@@ -186,52 +168,23 @@ boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 ```
-<a name="usage"></a>
-## Installing server usage measure
-First of all you need to edit line with address to your API (default is `http://localhost:5000`).
-```
-boincadm@myserver:~/projects/fitcrack$ edit ./bin/measureUsage.py
-```
-Next step is to add this script to your favorite job scheduler. Here is example for Cron.
-```
-boincadm@myserver:~/projects/fitcrack$ crontab -e
-```
-Add this text to last line (script will start every 5 minutes):
-```
-*/5 * * * * /home/boincadm/projects/fitcrack/bin/measureUsage.py
-```
-## Optional: multiple workunits per hosts
+## Optional: workunit pipelining - multiple workunits per hosts
 
 In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary attack with big dictionaries.
 
-To achieve this behavior, in your project config, e.g. `/home/boincadm/projects/fitcrack/config.xml` add in `<boinc><config>` section find the following line:
+**Newly**, the feature is natively supported in Fitcrack without needing any extra modification on client site. The feature can be configured by the user in the installer and is enabled by default. If you want to change it later, in the project config, e.g. `/home/boincadm/projects/fitcrack/config.xml` in section `<boinc><config>` set:
 ```
 <max_wus_in_progress>1</max_wus_in_progress>
 ```
-and replace it to:
+to disable the pipelining feature, or
 ```
 <max_wus_in_progress>2</max_wus_in_progress>
 ```
-
-and restart the server (as BOINC user):
+to activate the pipelining. After modification, you need to restart
+the server (as BOINC user):
 ```
 boincadm@myserver:~$ cd projects/fitcrack
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
 
-Then on each node, you limit maximum concurrent workunits to 1 by creating `app_config.xml` file in your BOINC client project directory, e.g.:
-* `C:\ProgramData\BOINC\projects\myserver_fitcrack` (Windows)
-* `/var/lib/boinc-client/projects/myserver_fitcrack/app_config.xml` (Linux)
-Please note, that the project directory is created automatically once you add the project to you BOINC client (e.g. via BOINC Manager).
-
-To `app_config.xml` place the following contents:
-```
-<app_config>
-   <app>
-      <name>fitcrack</name>
-      <max_concurrent>1</max_concurrent>
-      <report_results_immediately/>
-    </app>
-</app_config>
-```

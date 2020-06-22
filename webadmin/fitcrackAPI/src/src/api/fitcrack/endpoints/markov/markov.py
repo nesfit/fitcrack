@@ -6,7 +6,7 @@
 import logging
 import os
 
-from flask import request, redirect, send_from_directory
+from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 from werkzeug.utils import secure_filename
@@ -84,7 +84,8 @@ class markov(Resource):
         """
 
         HcStat = FcHcstat.query.filter(FcHcstat.id == id).first()
-        return send_from_directory(HCSTATS_DIR, HcStat.path)
+        path = os.path.join(HCSTATS_DIR, HcStat.path)
+        return send_file(path, attachment_filename=HcStat.path, as_attachment=True)
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
@@ -92,10 +93,7 @@ class markov(Resource):
         Deletes HcStat file.
         """
         markov = FcHcstat.query.filter(FcHcstat.id == id).one()
-        if (markov.deleted):
-            markov.deleted = False
-        else:
-            markov.deleted = True
+        markov.deleted = True
         db.session.commit()
         return {
             'status': True,

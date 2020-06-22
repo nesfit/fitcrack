@@ -31,13 +31,22 @@ class template(Resource):
 
     @api.expect(add_model)
     @api.marshal_with(simpleResponse)
-    def post(self):
+    def put(self):
         """
-        Add a job template.
+        Add or edit a job template.
         """
 
         data = request.json
-        template = FcTemplate(name=data['template'], template=data)
+        template_name = data['template']
+
+        template = FcTemplate.query.filter_by(name=template_name).one_or_none()
+        if not template:
+            template = FcTemplate(name=template_name, template=data)
+            action = 'added'
+        else:
+            template.template = data
+            action = 'changed'
+
         try:
             db.session.add(template)
             db.session.commit()
@@ -46,7 +55,7 @@ class template(Resource):
             abort(500, 'Couldn\'t add template.')
         return {
             'status': True,
-            'message': 'Template ' + data['template'] + ' added.'
+            'message': 'Template ' + template_name + ' ' + action
         }
 
     @api.marshal_with(templates_model)
@@ -72,3 +81,17 @@ class templateData(Resource):
             return {
                 'template': json.dumps(template.template) # uhm...
             }
+
+    @api.response(200, 'Deleted')
+    @api.response(500, 'Failed')
+    def delete(self, id):
+        """
+        Deletes a template
+        """
+        try:
+            FcTemplate.query.filter_by(id=id).delete()
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'Couldn\'t delete template.')
+        return ('Deleted', 200)

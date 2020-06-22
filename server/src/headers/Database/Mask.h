@@ -28,7 +28,7 @@ class CMask {
 
     public:
         /** Default destructor */
-        ~CMask() = default;
+        virtual ~CMask() = default;
 
 
         /**
@@ -49,7 +49,7 @@ class CMask {
          * @brief Updates index of this mask object and database entry
          * @param newIndex [in] New mask current index
          */
-        void updateIndex(uint64_t newIndex);
+        virtual void updateIndex(uint64_t newIndex);
 
 
     private:
@@ -65,6 +65,7 @@ class CMask {
         std::string m_mask;
         uint64_t    m_currentIndex;
         uint64_t    m_hcKeyspace;
+        uint64_t    m_keyspace;
 
     public:
 
@@ -77,6 +78,7 @@ class CMask {
         const std::string & getMask() const;
         uint64_t getCurrentIndex() const;
         uint64_t getHcKeyspace() const;
+        uint64_t getKeyspace() const;
 };
 
 #endif //WORKGENERATOR_MASK_H

@@ -2,8 +2,8 @@
 -- Insert default settings row
 --
 
-INSERT INTO `fc_settings` (`delete_finished_workunits`, `default_seconds_per_workunit`, `default_replicate_factor`, `default_verify_hash_format`, `default_check_hashcache`, `default_workunit_timeout_factor`, `default_bench_all`) VALUES
-(0, 3600, 1, 1, 1, 48, 0);
+INSERT INTO `fc_settings` (`default_seconds_per_workunit`, `workunit_timeout_factor`, `hwmon_temp_abort`, `bench_all`, `distribution_coefficient_alpha`, `t_pmin`, `ramp_up_workunits`, `ramp_down_coefficient`, `verify_hash_format`) VALUES
+(3600, 48, 90, 0, 0.1, 20, 0, 0.25, 1);
 
 
 --
@@ -25,15 +25,15 @@ INSERT INTO `fc_charset` (`id`, `name`, `path`, `keyspace`, `time`, `deleted`) V
 -- Insert default dictionaries
 --
 
-INSERT INTO `fc_dictionary` (`id`, `name`, `path`, `keyspace`, `time`, `deleted`, `modification_time`) VALUES
-(1,	'honeynet.txt',	'honeynet.txt',	226082,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(2,	'darkweb2017-top1000.txt',	'darkweb2017-top1000.txt',	1000,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(3,	'myspace.txt',	'myspace.txt',	37123,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(4,	'phpbb.txt',	'phpbb.txt',	184389,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(5,	'adobe100.txt',	'adobe100.txt',	100,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(6,	'twitter-banned-small.txt',	'twitter-banned-small.txt',	397,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(7,	'bible.txt',	'bible.txt',	12570,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00'),
-(8,	'english.txt',	'english.txt',	54308,	'2018-08-18 12:00:00',	0,	'2018-08-18 12:00:00');
+INSERT INTO `fc_dictionary` (`id`, `name`, `path`, `keyspace`, `time`, `deleted`) VALUES
+(1,	'honeynet.txt',	'honeynet.txt',	226082,	'2018-08-18 12:00:00',	0),
+(2,	'darkweb2017-top1000.txt',	'darkweb2017-top1000.txt',	1000,	'2018-08-18 12:00:00',	0),
+(3,	'myspace.txt',	'myspace.txt',	37123,	'2018-08-18 12:00:00',	0),
+(4,	'phpbb.txt',	'phpbb.txt',	184389,	'2018-08-18 12:00:00',	0),
+(5,	'adobe100.txt',	'adobe100.txt',	100,	'2018-08-18 12:00:00',	0),
+(6,	'twitter-banned-small.txt',	'twitter-banned-small.txt',	397,	'2018-08-18 12:00:00',	0),
+(7,	'bible.txt',	'bible.txt',	12570,	'2018-08-18 12:00:00',	0),
+(8,	'english.txt',	'english.txt',	54308,	'2018-08-18 12:00:00',	0);
 
 
 --
@@ -6549,7 +6549,9 @@ INSERT INTO `fc_hash` (`id`, `job_id`, `hash_type`, `hash`, `result`, `added`, `
 (6506,	5,	3200,	'$2a$05$x.vc.8a9scY/xAxAC8JhT.pChFRHfWyhRMoVQe5/filrMIDvcv1Nu',	NULL,	'2018-08-18 12:00:00',	NULL),
 (6507,	5,	3200,	'$2a$05$280UtM8rt/wiQ9v0XuIENumiXChrEeN6n5ZNZEuuIyFZ3v0sSwlW6',	NULL,	'2018-08-18 12:00:00',	NULL),
 (6508,	6,	1700,	'bed4efa1d4fdbd954bd3705d6a2a78270ec9a52ecfbfb010c61862af5c76af1761ffeb1aef6aca1bf5d02b3781aa854fabd2b69c790de74e17ecfec3cb6ac4bf',	NULL,	'2018-08-18 12:00:00',	NULL),
-(6509,	6,	1700,	'd3d497ac35e89161ffb3d1417f1320c1b40bb39273e85f1a5bf7c7f63a423c35b4113cf2fdca07741ea428e56af5f1ae55aa4192df72d06987103d376e193680',	NULL,	'2018-08-18 12:00:00',	NULL);
+(6509,	6,	1700,	'd3d497ac35e89161ffb3d1417f1320c1b40bb39273e85f1a5bf7c7f63a423c35b4113cf2fdca07741ea428e56af5f1ae55aa4192df72d06987103d376e193680',	NULL,	'2018-08-18 12:00:00',	NULL),
+(6510,	7,	0,	'718a39dfd0aa7a0acb662a8997aea285',	NULL,	'2018-08-18 12:00:00',	NULL),
+(6511,	7,	0,	'f30aa7a662c728b7407c54ae6bfd27d1',	NULL,	'2018-08-18 12:00:00',	NULL);
 
 
 --
@@ -6590,23 +6592,30 @@ INSERT INTO `fc_masks_set` (`id`, `name`, `path`, `time`, `deleted`) VALUES
 -- Instert default PCFGs
 --
 
-INSERT INTO `fc_pcfg_grammar` (`id`, `name`, `path`, `keyspace`, `time_added`, `modification_time`, `deleted`) VALUES
-(1, 'john', 'john.zip', 1321431161, '2019-08-30 12:14:53', '2019-08-30 12:14:53', 0),
-(2, 'facebook-pastebay', 'facebook-pastebay.zip', 999, '2019-08-30 12:15:08', '2019-08-30 12:15:08', 0),
-(3, 'twitter-banned', 'twitter-banned.zip', 1096, '2019-08-30 12:17:48', '2019-08-30 12:17:48', 0);
+INSERT INTO `fc_pcfg_grammar` (`id`, `name`, `path`, `keyspace`, `time_added`, `deleted`) VALUES
+(1, 'john', 'john.zip', 1321431161, '2019-08-30 12:14:53', 0),
+(2, 'facebook-pastebay', 'facebook-pastebay.zip', 999, '2019-08-30 12:15:08', 0),
+(3, 'twitter-banned', 'twitter-banned.zip', 1096, '2019-08-30 12:17:48', 0);
+
+--
+-- Create default job bins
+--
+
+INSERT INTO `fc_bin` (`name`) VALUES
+('Samples');
 
 --
 -- Insert default BENCH_ALL job and sample jobs
 --
 
-INSERT INTO `fc_job` (`id`, `token`, `attack`, `attack_mode`, `attack_submode`, `hash_type`, `hash`, `status`, `result`, `keyspace`, `hc_keyspace`, `indexes_verified`, `current_index`, `current_index_2`, `time`, `name`, `comment`, `time_start`, `time_end`, `cracking_time`, `seconds_per_workunit`, `config`, `dict1`, `dict2`, `charset1`, `charset2`, `charset3`, `charset4`, `rules`, `rule_left`, `rule_right`, `markov_hcstat`, `markov_threshold`, `grammar_id`, `replicate_factor`, `deleted`) VALUES
-(1, 'ad97b17dc57f0b4ab480bf57bea0f2e301ab4725386e12b9521ab86efb36f8d9', 'mask', 3, 0, 0, '', 0, NULL, 0, 0, 0, 0, 0, NULL, 'BENCH_ALL', 'This is default job for benchmarking all hosts.', NULL, NULL, 0, 3600, '|||attack_mode|UInt|1|3|||\n|||name|String|7|Test DB|||\n', '', '', '', '', '', '', NULL, '', '', NULL, 0, NULL, 1, 1),
-(2, 'f2c0bec0a2cc11e8b0320242ac140005',	'dictionary',	0,	0,	0,	'check hashlist',	0,	NULL,	92431,	92431,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick ',	'Default hashcat MD5 hashlist',	NULL,	NULL,	0,	120,	'|||attack_mode|UInt|1|0|||\n|||attack_submode|UInt|1|0|||\n|||name|String|22|sample-dict-md5-quick |||\n|||hash_type|UInt|1|0|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 1,	0),
-(3, '55214a34a2ce11e889a50242ac140005',	'dictionary',	0,	0,	3200,	'check hashlist',	0,	NULL,	226082,	226082,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-bcrypt',	'',	NULL,	NULL,	0,	60,	'|||attack_mode|UInt|1|0|||\n|||attack_submode|UInt|1|0|||\n|||name|String|18|sample-dict-bcrypt|||\n|||hash_type|UInt|4|3200|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 1,	0),
-(4, 'ed5245baa2ce11e885330242ac140005',	'mask',	3,	0,	18000,	'check hashlist',	0,	NULL,	217180147158,	13270583,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-mask-sha3',	'',	NULL,	NULL,	0,	60,	'|||attack_mode|UInt|1|3|||\n|||attack_submode|UInt|1|0|||\n|||name|String|16|sample-mask-sha3|||\n|||hash_type|UInt|5|18000|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 1,	0),
-(5, '6b873008a2cf11e8af3c0242ac140005',	'combinator',	1,	0,	3200,	'check hashlist',	0,	NULL,	397000,	1000,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-combinator-bcrypt',	'',	NULL,	NULL,	0,	60,	'|||attack_mode|UInt|1|1|||\n|||attack_submode|UInt|1|0|||\n|||name|String|24|sample-combinator-bcrypt|||\n|||hash_type|UInt|4|3200|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL,	1,	0),
-(6, 'ad97b17dc57f11e8af3c0242ac140005',	'pcfg',	9,	0,	1700,	'check hashlist',	0,	NULL,	999,	999,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-pcfg-sha512',	'',	NULL,	NULL,	0,	60,	'|||attack_mode|UInt|1|9|||\n|||attack_submode|UInt|1|0|||\n|||name|String|18|sample-pcfg-sha512|||\n|||hash_type|UInt|4|1700|||\n',	'',	'',	'',	'',	'',	'',	NULL,	'',	'',	'',	0, 3, 1,	0);
-
+INSERT INTO `fc_job` (`id`, `attack`, `attack_mode`, `attack_submode`, `hash_type`, `status`, `keyspace`, `hc_keyspace`, `indexes_verified`, `current_index`, `current_index_2`, `time`, `name`, `comment`, `time_start`, `time_end`, `workunit_sum_time`, `seconds_per_workunit`, `charset1`, `charset2`, `charset3`, `charset4`, `rules`, `rule_left`, `rule_right`, `markov_hcstat`, `markov_threshold`, `grammar_id`, `min_password_len`, `max_password_len`, `min_elem_in_chain`, `max_elem_in_chain`, `deleted`) VALUES
+(1, 'mask', 3, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'BENCH_ALL', 'This is default job for benchmarking all hosts.', NULL, NULL, 0, 3600, '', '', '', '', NULL, '', '', NULL, 0, NULL, 0, 0, 0, 0, 1),
+(2, 'dictionary',	0,	0,	0,	0,	92431,	92431,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick ',	'Default hashcat MD5 hashlist',	NULL,	NULL,	0,	120, '',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 0),
+(3, 'dictionary',	0,	0,	3200,	0,	226082,	226082,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 0),
+(4, 'mask',	3,	0,	18000,	0,	217180147158,	13270583,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-mask-sha3',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 0),
+(5, 'combinator',	1,	0,	3200,	0,	397000,	1000,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-combinator-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 0),
+(6,	'pcfg',	9,	0,	1700,	0,	1096,	1096,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-pcfg-sha512',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, 3, 0, 0, 0, 0, 0),
+(7, 'prince',	8,	0,	0,	0,	2306859,	2306859,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-prince-md5',	'',	NULL,	NULL,	0,	120,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 1, 8, 1, 8, 0);
 
 --
 -- Insert default job dictionaries
@@ -6618,7 +6627,21 @@ INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index
 (3,	2,	8,	0,	1),
 (4,	3,	1,	0,	1),
 (5,	5,	2,	0,	1),
-(6,	5,	6,	0,	0);
+(6,	5,	6,	0,	0),
+(7,	7,	2,	0,	1);
+
+
+--
+-- Assign sample jobs to Samples bin
+--
+
+INSERT INTO `fc_bin_job` (`job_id`, `bin_id`) VALUES
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 1);
 
 
 --
@@ -6629,7 +6652,9 @@ INSERT INTO `fc_rule` (`id`, `name`, `path`, `count`, `time`, `deleted`) VALUES
 (1,	'best64.rule',	'best64.rule',  77,  '2018-08-18 12:00:00',	0),
 (2,	'd3ad0ne.rule',	'd3ad0ne.rule', 34099,  '2018-08-18 12:00:00',	0),
 (3,	'leetspeak.rule',	'leetspeak.rule', 17, '2018-08-18 12:00:00',	0),
-(4,	'toggles1.rule',	'toggles1.rule',  15,	'2018-08-18 12:00:00',	0);
+(4,	'toggles1.rule',	'toggles1.rule',  15,	'2018-08-18 12:00:00',	0),
+(5,	'prince_generated.rule',	'prince_generated.rule', 8452, '2018-08-18 12:00:00',	0),
+(6,	'prince_optimized.rule',	'prince_optimized.rule',  1156,	'2018-08-18 12:00:00',	0);
 
 
 --
@@ -6641,3 +6666,16 @@ INSERT INTO `fc_role` (`name`, `MANAGE_USERS`, `ADD_NEW_JOB`, `UPLOAD_DICTIONARI
 
 INSERT INTO `fc_user` (`username`, `password`, `mail`, `role_id`, `deleted`) VALUES
 ('fitcrack', 'pbkdf2:sha256:50000$YqLJFcXh$430310718869b9783680c546a5fb1a50e9b34d7e49cc1bd1dd2a508b46c7409c', 'ihranicky@fit.vutbr.cz', 1, 0);
+
+--
+-- Give admin ownership of jobs shipping with fitcrack
+--
+
+INSERT INTO `fc_user_permissions` (`job_id`, `user_id`, `owner`) VALUES
+(1, 1, 1),
+(2, 1, 1),
+(3, 1, 1),
+(4, 1, 1),
+(5, 1, 1),
+(6, 1, 1),
+(7, 1, 1);

@@ -5,6 +5,9 @@
 
 #include "TaskNormal.hpp"
 
+#include <algorithm>
+#include <cctype>
+
 /* Protected */
 
 std::string TaskNormal::getPasswords() {
@@ -12,7 +15,7 @@ std::string TaskNormal::getPasswords() {
   return passwords_;
 }
 
-void TaskNormal::parseHashcatProgress(std::string& progress_line) {
+bool TaskNormal::parseHashcatProgress(std::string& progress_line) {
   /* example for parsing
   * STATUS	2	SPEED	0	1	EXEC_RUNTIME	0.182546	CURKU	0	PROGRESS	2028	17675	RECHASH 0	1	RECSALT 0	1	REJECTED	0
   * STATUS\t	%d\tSPEED\t<N x %PRIu64\t>1000\tEXEC_RUNTIME\t<N x %f\t>CURKU\t%PRIu64\tPROGRESS\t%PRIu64\t%PRIu64\tRECHASH\t%d\t%d\tRECSALT\t%d\t%d\tTEMP\t<N x %d\t>REJECTED\t%PRIu64\tUTIL\t<N x %d\t>
@@ -21,111 +24,120 @@ void TaskNormal::parseHashcatProgress(std::string& progress_line) {
   */
 
   //Logging::debugPrint(Logging::Detail::CustomOutput, "Progress line : " + progress_line);
-  if (progress_line.find("STATUS", 0) != 0) {
-    return;
-  }
-
-  /** When total_hashes_ wasn't specified in config file save hashcat's keyspace */
-  if (total_hashes_ == 0) {
-    setTotalHahsesFromProgressLine(progress_line);
-  }
-
-  std::string total_computed_hashes;
-  if (attack_type == AT_PCFG || attack_type == AT_Prince) {
-    total_computed_hashes = parseProgress(progress_line);
-  } else {
-    if (parse_curku_) {
-      total_computed_hashes = parseCurku(progress_line);
-    } else {
-      total_computed_hashes = parseProgress(progress_line);
+  if (progress_line.find("STATUS") != 0) {
+    static const std::string invalidRuleMessageStart = "Cannot convert rule for use on OpenCL device in file";
+    if(progress_line.substr(0, invalidRuleMessageStart.length()) == invalidRuleMessageStart)
+    {
+      invalidRuleCount += 1;
     }
+    return false;
   }
 
-  if (!total_computed_hashes.empty()) {
-    saveParsedProgress(total_computed_hashes);
+  ProgressPair progress = parseProgress(progress_line);
+  if(progress.second == 0 && progress.first == 0)
+  {
+    return false;
   }
+
+  /** When this is the first parsed line */
+  if (total_hashes_ == 0) {
+    setTotalHashesFromProgress(progress.first, progress.second, getSaltCountFromStatusLine(progress_line));
+  }
+
+  saveParsedProgress(progress.first);
+  return true;
 }
 
-std::string TaskNormal::parseCurku(const std::string& progress_line) {
-  size_t last = 0;
-  size_t found_at;
-  std::string curku;
+TaskNormal::ProgressPair TaskNormal::parseProgress(const std::string& progress_line) {
 
-  found_at = progress_line.find("CURKU", last);    // Find position of PROGRESS
+  size_t progressLoc = progress_line.find("PROGRESS");    // Find position of PROGRESS
 
-  if (found_at == std::string::npos) {
-    return std::string();
+  if (progressLoc == std::string::npos) {
+    return ProgressPair(0, 0);
   }
 
-  last = found_at+1;
-  found_at = progress_line.find("\t", last);	    // Skip CURKU word
+  size_t dataStart = progress_line.find('\t', progressLoc);	    // Get position of \t after PROGRESS
 
-  last = found_at+1;
-  found_at = progress_line.find("\t", last);	    // Get position after computed hashes
+  //find the delimiter for the next field
+  std::string::const_iterator dataEnd = std::find_if(progress_line.begin()+dataStart, progress_line.end(), ::isalpha);
+  //everything between is what we're interested in
+  std::istringstream parser(progress_line.substr(dataStart, dataEnd-progress_line.begin()+dataStart));
 
-  curku = progress_line.substr(last, found_at - last);	// Cut out the number
-  Logging::debugPrint(Logging::Detail::DevelDebug, "Parsed curku: " + curku);
-
-  return curku;
-}
-
-std::string TaskNormal::parseProgress(const std::string& progress_line) {
-  size_t last = 0;
-  size_t found_at;
-  std::string computed_hashes;
-
-  found_at = progress_line.find("PROGRESS", last);    // Find position of PROGRESS
-
-  if (last == std::string::npos) {
-    return std::string();
-  }
-
-  last = found_at +1;
-  found_at = progress_line.find("\t", last);	    // Get position of \t after PROGRESS
-
-  last = found_at +1;
-  found_at = progress_line.find("\t", last);	    // Get position of \t after computed hashes
-
-  computed_hashes = progress_line.substr(last, found_at - last);	// Cut out the number
-  Logging::debugPrint(Logging::Detail::DevelDebug, "Parsed computed_hashes: " + computed_hashes);
-  return computed_hashes;
+  uint64_t currentProgress, totalHashes;
+  parser>>currentProgress>>totalHashes;
+  return ProgressPair(currentProgress, totalHashes);
 
 }
 
-void TaskNormal::saveParsedProgress(const std::string& computed_hashes_index) {
-  unsigned long long total_computed_hashes = RunnerUtils::stoull(computed_hashes_index) - start_index_;
-  unsigned long long difference_since_last_actualization = total_computed_hashes - computed_hashes_;
+void TaskNormal::saveParsedProgress(uint64_t currentProgress) {
 
-  Logging::debugPrint(Logging::Detail::CustomOutput, "Computed_hashes_index: " + RunnerUtils::toString(computed_hashes_index));
+  uint64_t difference_since_last_actualization = currentProgress-start_index_-computed_hashes_;
+  Logging::debugPrint(Logging::Detail::CustomOutput, "Computed_hashes_index: " + RunnerUtils::toString(currentProgress));
   Logging::debugPrint(Logging::Detail::CustomOutput, "Difference_since_last_actualization: " + RunnerUtils::toString(difference_since_last_actualization));
 
   actualizeComputedHashes(difference_since_last_actualization);
 }
 
-void TaskNormal::setTotalHahsesFromProgressLine(const std::string& progress_line) {
-  size_t last = 0;
-  size_t found_at;
-  std::string total_hashes;
+void TaskNormal::setTotalHashesFromProgress(uint64_t current, uint64_t max, uint64_t saltCount) {
 
-  found_at = progress_line.find("PROGRESS", last);    // Find position of PROGRESS
-
-  if (last == std::string::npos) {
-    return;
+  std::string val;
+  uint64_t limit = 0;
+  if(
+    task_config_.find(ConfigTask::HC_KEYSPACE, val) ||
+    task_config_.find(ConfigTask::DICT_HC_KEYSPACE, val) ||
+    task_config_.find(ConfigTask::MASK_HC_KEYSPACE, val)
+  )
+  {
+    limit = RunnerUtils::stoull(val);
   }
-
-  last = found_at +1;
-  found_at = progress_line.find("\t", last);	    // Get position of \t after PROGRESS
-
-  last = found_at +1;
-  found_at = progress_line.find("\t", last);	    // Get position of \t after computed hashes
-
-  last = found_at +1;
-  found_at = progress_line.find("\t", last);	    // Get position of \t after total hashes
-
-  Logging::debugPrint(Logging::Detail::DevelDebug, "Parsed total_hashes " + total_hashes);
-  total_hashes = progress_line.substr(last, found_at - last);	// Cut out the number
-
-  total_hashes_ = RunnerUtils::stoull(total_hashes) - start_index_;
+  if(max)
+  {
+    if(limit)
+    {
+      uint64_t skip = 0;
+      if(task_config_.find("start_index", val))
+      {
+        skip = RunnerUtils::stoull(val);
+      }
+      uint64_t totalLimit = skip+limit;
+      start_index_ = max/totalLimit*skip;
+    }
+    else
+    {
+      //we have no way of finding out where it started, so just say that it was here ¯\_(ツ)_/¯
+      start_index_ = current;
+    }
+    total_hashes_ = max-start_index_;
+  }
+  else
+  {
+    //fed by pipe, no skip and no limit
+    start_index_ = 0;
+    total_hashes_ = limit;
+    if(total_hashes_ == 0)
+    {
+      //well, if we don't have any info about password count, we're screwed
+      return;
+    }
+    File foundFile;
+    if(directory_.find("rules", foundFile))
+    {
+      std::ifstream rulesStream(foundFile.getRelativePath().c_str());
+      size_t ruleCount = 0;
+      std::string line;
+      while(std::getline(rulesStream, line))
+      {
+        if(!line.empty())
+        {
+          ++ruleCount;
+        }
+      }
+      //subtract invalid rule count, as those are not applied
+      ruleCount -= invalidRuleCount;
+      total_hashes_ *= ruleCount;
+    }
+    total_hashes_ *= saltCount;
+  }
 
 }
 
@@ -158,12 +170,20 @@ void TaskNormal::readPasswordsFromFile() {
 
 /* Public */
 
-TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name), parse_curku_(false), start_index_(0) {
+TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name):
+  TaskComputeBase(directory, task_config, host_config, output_file, workunit_name),
+  start_index_(0),
+  invalidRuleCount(0)
+{
   mode_ = "n";
   initializeTotalHashes();
 }
 
-TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name) : TaskComputeBase (directory, task_config, host_config, output_file, workunit_name), parse_curku_(false), start_index_(0) {
+TaskNormal::TaskNormal (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name):
+  TaskComputeBase (directory, task_config, host_config, output_file, workunit_name),
+  start_index_(0),
+  invalidRuleCount(0)
+{
   mode_ = "n";
   initializeTotalHashes();
 }
@@ -207,36 +227,6 @@ std::string TaskNormal::generateOutputMessage() {
 return output_info;
 }
 
-void TaskNormal::initializeTotalHashes() {
-
-  std::string total_hc_keyspace;
-  std::string start_index;
-
-  // --limit or total keyspace of mask
-  if (task_config_.find(ConfigTask::HC_KEYSPACE, total_hc_keyspace) ||
-  task_config_.find(ConfigTask::DICT_HC_KEYSPACE, total_hc_keyspace) ||
-  task_config_.find(ConfigTask::MASK_HC_KEYSPACE, total_hc_keyspace)) {
-
-    parse_curku_ = true;
-    total_hashes_ = RunnerUtils::stoull(total_hc_keyspace);
-
-  } // else { when not specified in config parse from Hashcat progress_line }
-
-  if (task_config_.find(ConfigTask::START_INDEX, start_index)) {
-    start_index_ = RunnerUtils::stoull(start_index);
-  }
-
-  if (parse_curku_) { // --skip
-    start_computed_index_ = start_index_;
-  } else {
-    std::string start_computed_index;
-
-    if (task_config_.find(ConfigTask::START_HASH_INDEX, start_computed_index)) {
-      start_computed_index_ = RunnerUtils::stoull(start_computed_index);
-    }
-  }
-}
-
 bool TaskNormal::parseHashcatOutputLine(std::string& output_line) {
   if (!output_line.empty()) {
     Logging::debugPrint(Logging::Detail::CustomOutput, "Hashcat line: " + output_line);
@@ -244,8 +234,7 @@ bool TaskNormal::parseHashcatOutputLine(std::string& output_line) {
     return false;
   }
 
-  parseHashcatProgress(output_line);
-  return true;
+  return parseHashcatProgress(output_line);
 }
 
 void TaskNormal::progress() {

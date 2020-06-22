@@ -72,41 +72,35 @@
 <script>
   export default {
     name: 'LoginView',
-    data: function () {
+    data () {
       return {
         username: null,
         password: null,
         loading: true
       }
     },
-    created: function () {
-      this.isUserLoggedIn()
+    created () {
+      if (this.$store.state.user.loggedIn) {
+        this.$router.replace({name: 'home'})
+      } else {
+        this.loading = false
+      }
     },
     methods: {
-      submit() {
-        this.loading = true;
-        // Native form submission is not yet supported
-        this.axios.post(this.$serverAddr + '/user/login', {
+      async submit() {
+        this.loading = true
+        const succeeded = await this.$store.dispatch('signIn', {
           username: this.username,
           password: this.password
-        }).then((response) => {
-          this.loading = false;
-          console.log(response.data)
-          this.$logInUser(response.data)
         })
-      },
-      isUserLoggedIn: function () {
-        this.loading = true;
-        this.axios.get(this.$serverAddr + '/user/isLoggedIn').then((response) => {
-          this.loading = false;
-          if (response.data.loggedIn) {
-            this.$logInUser(response.data.user)
-          }
-        })
+        if (!succeeded) {
+          this.loading = false
+        }
       }
     }
   }
 </script>
+
 <style scoped>
   .hide {
     opacity: 0;

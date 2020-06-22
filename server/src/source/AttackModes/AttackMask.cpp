@@ -9,8 +9,8 @@
 #include <AttackMask.h>
 
 
-CAttackMask::CAttackMask(PtrJob &job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
-    :   AttackMode(job, host, seconds, sqlLoader)
+CAttackMask::CAttackMask(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
+    :   AttackMode(std::move(job), host, seconds, sqlLoader)
 {
 
 }
@@ -54,8 +54,8 @@ bool CAttackMask::makeWorkunit()
         return false;
     }
 
-    f << generateBasicConfig('n', m_job->getAttackMode(), m_job->getAttackSubmode(),
-                             m_job->getName(), m_job->getHashType(), "", "",
+    f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
+                             m_job->getName(), m_job->getHashType(), 0, m_job->getHWTempAbort(), "", "",
                              m_job->getCharset1(), m_job->getCharset2(), m_job->getCharset3(),
                              m_job->getCharset4());
 
@@ -64,11 +64,9 @@ bool CAttackMask::makeWorkunit()
     Tools::printDebug("|||mask|String|%d|%s|||\n", workunitMask->getMask().length(), workunitMask->getMask().c_str());
 
     /** Output start_index */
-    int digits = 0;
-    uint64_t num = m_workunit->getStartIndex();
-    do { num /= 10; ++digits; } while (num != 0);    // Count digits
-    f << "|||start_index|BigUInt|" << digits << "|" << m_workunit->getStartIndex() << "|||\n";
-    Tools::printDebug("|||start_index|BigUInt|%d|%" PRIu64 "|||\n", digits, m_workunit->getStartIndex());
+    auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(m_workunit->getStartIndex()));
+    f << skipLine;
+    Tools::printDebug(skipLine.c_str());
 
     uint64_t maskHcKeyspace = workunitMask->getHcKeyspace();
     uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
@@ -76,20 +74,18 @@ bool CAttackMask::makeWorkunit()
     /** Output stop_index - only if it is not the last workunit in the current mask */
     if (m_workunit->getStartIndex() + workunitHcKeyspace < maskHcKeyspace)
     {
-        digits = 0;
-        num = workunitHcKeyspace;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||hc_keyspace|BigUInt|" << digits << "|" << workunitHcKeyspace << "|||\n";
-        Tools::printDebug("|||hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, workunitHcKeyspace);
+        auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
+        f << limitLine;
+        Tools::printDebug(limitLine.c_str());
     }
     else
     {
         /** Otherwise, send whole mask_hc_keyspace for correct progress calculation, --limit is omitted */
-        digits = 0;
-        num = maskHcKeyspace;
-        do { num /= 10; ++digits; } while (num != 0);    // Count digits
-        f << "|||mask_hc_keyspace|BigUInt|" << digits << "|" << maskHcKeyspace << "|||\n";
-        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%" PRIu64 "|||\n", digits, maskHcKeyspace);
+        std::string maskHcKeyspaceStr = std::to_string(maskHcKeyspace);
+        f << "|||mask_hc_keyspace|BigUInt|" << maskHcKeyspaceStr.size() << "|"
+          << maskHcKeyspaceStr << "|||\n";
+        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%s|||\n",
+                          maskHcKeyspaceStr.size(), maskHcKeyspaceStr.c_str());
     }
 
     f.close();
@@ -164,15 +160,15 @@ bool CAttackMask::generateWorkunit()
             "Generating mask workunit ...\n");
 
     /** Compute password count */
-    uint64_t passCount = m_host->getPower() * m_seconds;
+    uint64_t passCount = getPasswordCountToProcess();
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Number of real passwords host could compute: %" PRIu64 "\n", passCount);
 
-    if (passCount < Config::minPassCount)
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = Config::minPassCount;
+        passCount = getMinPassCount();
     }
 
     std::vector<PtrMask> maskVec = m_job->getMasks();
@@ -180,19 +176,7 @@ bool CAttackMask::generateWorkunit()
             "Masks left for this job: %" PRIu64 "\n", maskVec.size());
 
     /** Find the following mask */
-    PtrMask currentMask;
-    for (PtrMask & mask : maskVec)
-    {
-        if (mask->getCurrentIndex() < mask->getHcKeyspace())
-        {
-            /** Mask for a new workunit found */
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Mask found: %s, current index: %" PRIu64 "/%" PRIu64 "\n",
-                    mask->getMask().c_str(), mask->getCurrentIndex(), mask->getHcKeyspace());
-            currentMask = mask;
-            break;
-        }
-    }
+    PtrMask currentMask = FindCurrentMask(maskVec, false);
 
     if (!currentMask)
     {
@@ -201,24 +185,29 @@ bool CAttackMask::generateWorkunit()
                 "No masks found for this job\n");
         return false;
     }
+    uint64_t maskHcKeyspace = currentMask->getHcKeyspace();
+    uint64_t maskKeyspace = currentMask->getKeyspace();
+
+    uint64_t hcDivisionFactor = maskKeyspace/maskHcKeyspace;
+    //round up
+    uint64_t hcKeyspace = (passCount+hcDivisionFactor-1)/hcDivisionFactor;
 
     uint64_t maskIndex = currentMask->getCurrentIndex();
-    uint64_t maskHcKeyspace = currentMask->getHcKeyspace();
-    if (maskIndex + passCount > maskHcKeyspace)
+    if (maskIndex + hcKeyspace > maskHcKeyspace)
     {
         /** Host is too powerful for this mask, it will finish it */
-        passCount = maskHcKeyspace - maskIndex;
+        hcKeyspace = maskHcKeyspace - maskIndex;
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adjusting #passwords, mask too small, new #: %" PRIu64 "\n", passCount);
+                "Adjusting #passwords, mask too small, new #: %" PRIu64 "\n", hcKeyspace);
     }
 
     /** Create new mask workunit */
-    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, passCount,
+    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), maskIndex, 0, hcKeyspace,
                          currentMask->getId(), 0, false, 0, false);
 
     /** Update indexes for job and mask*/
-    m_job->updateIndex(m_job->getCurrentIndex() + passCount);
-    currentMask->updateIndex(maskIndex + passCount);
+    m_job->updateIndex(m_job->getCurrentIndex() + hcKeyspace);
+    currentMask->updateIndex(maskIndex + hcKeyspace);
 
     return true;
 }
