@@ -633,8 +633,8 @@
     mounted: function () {
       this.loadSettings()
       this.getHashTypes()
-      this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm:ss')
-      this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm:ss')
+      this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm')
+      this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm')
       if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
     },

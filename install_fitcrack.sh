@@ -39,6 +39,10 @@ if [[ $1 == "-s" ]]; then
         exit
     elif [[ $2 == "-4" ]]; then
         source installer/uninstall.sh
+        cleanup_project
+        cleanup_db
+        cleanup_webadmin
+        cleanup_collections
         exit
     fi
 else

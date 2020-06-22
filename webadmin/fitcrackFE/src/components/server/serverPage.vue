@@ -165,8 +165,8 @@
         loading: false,
         fullDate: false,
         hoursBefore: '1',
-        fromDate: this.$moment().format('YYYY-MM-DDTHH:mm:ss'),
-        toDate: this.$moment().format('YYYY-MM-DDTHH:mm:ss'),
+        fromDate: this.$moment().format('YYYY-MM-DDTHH:mm'),
+        toDate: this.$moment().format('YYYY-MM-DDTHH:mm'),
       }
     },
     mounted: function () {
