@@ -1,29 +1,16 @@
--- phpMyAdmin SQL Dump
--- version 4.0.10deb1
--- http://www.phpmyadmin.net
---
--- Hostiteľ: localhost
--- Vygenerované: Št 05.Apr 2018, 20:48
--- Verzia serveru: 5.5.59-0ubuntu0.14.04.1
--- Verzia PHP: 5.5.9-1ubuntu4.24
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
-
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
---
--- Databáza: `fitcrack`
---
 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_benchmark`
+-- Table definition for `fc_benchmark`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_benchmark` (
@@ -38,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `fc_benchmark` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_charset`
+-- Table definition for `fc_charset`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_charset` (
@@ -54,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `fc_charset` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_dictionary`
+-- Table definition for `fc_dictionary`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_dictionary` (
@@ -70,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `fc_dictionary` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_hash`
+-- Table definition for `fc_hash`
 --
 
 CREATE TABLE IF NOT EXISTS`fc_hash` (
@@ -87,7 +74,7 @@ CREATE TABLE IF NOT EXISTS`fc_hash` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_hcstats`
+-- Table definition for `fc_hcstats`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_hcstats` (
@@ -102,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `fc_hcstats` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_host`
+-- Table definition for `fc_host`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_host` (
@@ -118,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `fc_host` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_host_activity`
+-- Table definition for `fc_host_activity`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_host_activity` (
@@ -131,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `fc_host_activity` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_workunit`
+-- Table definition for `fc_workunit`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_workunit` (
@@ -158,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `fc_workunit` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_mask`
+-- Table definition for `fc_mask`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_mask` (
@@ -174,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `fc_mask` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_masks_set`
+-- Table definition for `fc_masks_set`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_masks_set` (
@@ -189,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `fc_masks_set` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_notification`
+-- Table definition for `fc_notification`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_notification` (
@@ -209,7 +196,7 @@ CREATE TABLE IF NOT EXISTS `fc_notification` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_protected_file`
+-- Table definition for `fc_protected_file`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_protected_file` (
@@ -226,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `fc_protected_file` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_bin`
+-- Table definition for `fc_bin`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_bin` (
@@ -240,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `fc_bin` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_batch`
+-- Table definition for `fc_batch`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_batch` (
@@ -254,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `fc_batch` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_job`
+-- Table definition for `fc_job`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_job` (
@@ -302,7 +289,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_bin_job` (M2M junction)
+-- Table definition for `fc_bin_job` (M2M junction)
 --
 
 CREATE TABLE IF NOT EXISTS `fc_bin_job` (
@@ -319,7 +306,7 @@ CREATE TABLE IF NOT EXISTS `fc_bin_job` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_job_dictionary`
+-- Table definition for `fc_job_dictionary`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_job_dictionary` (
@@ -334,7 +321,7 @@ CREATE TABLE IF NOT EXISTS `fc_job_dictionary` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_job_graph`
+-- Table definition for `fc_job_graph`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_job_graph` (
@@ -349,7 +336,7 @@ CREATE TABLE IF NOT EXISTS `fc_job_graph` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_template`
+-- Table definition for `fc_template`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_template` (
@@ -363,7 +350,7 @@ CREATE TABLE IF NOT EXISTS `fc_template` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_role`
+-- Table definition for `fc_role`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_role` (
@@ -382,7 +369,7 @@ CREATE TABLE IF NOT EXISTS `fc_role` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_rule`
+-- Table definition for `fc_rule`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_rule` (
@@ -398,7 +385,7 @@ CREATE TABLE IF NOT EXISTS `fc_rule` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_pcfg_preterminals`
+-- Table definition for `fc_pcfg_preterminals`
 --
 
 CREATE TABLE `fc_pcfg_preterminals` (
@@ -412,7 +399,7 @@ CREATE TABLE `fc_pcfg_preterminals` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_pcfg_grammar`
+-- Table definition for `fc_pcfg_grammar`
 --
 
 CREATE TABLE `fc_pcfg_grammar` (
@@ -429,7 +416,7 @@ CREATE TABLE `fc_pcfg_grammar` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_settings`
+-- Table definition for `fc_settings`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_settings` (
@@ -449,7 +436,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_user`
+-- Table definition for `fc_user`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_user` (
@@ -466,7 +453,7 @@ CREATE TABLE IF NOT EXISTS `fc_user` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_user_permissions`
+-- Table definition for `fc_user_permissions`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_user_permissions` (
@@ -485,7 +472,7 @@ CREATE TABLE IF NOT EXISTS `fc_user_permissions` (
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `fc_host_status`
+-- Table definition for `fc_host_status`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_host_status` (
@@ -500,7 +487,7 @@ CREATE TABLE IF NOT EXISTS `fc_host_status` (
 
 
 --
--- Struktura tabulky pro tabulku `fc_job_status`
+-- Table definition for `fc_job_status`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_job_status` (
@@ -514,7 +501,7 @@ CREATE TABLE IF NOT EXISTS `fc_job_status` (
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky pro tabulku `fc_server_usage`
+-- Table definition for `fc_server_usage`
 --
 
 CREATE TABLE IF NOT EXISTS `fc_server_usage` (
@@ -531,32 +518,27 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 
 -- --------------------------------------------------------
 
-
 --
--- Obmedzenie pre exportované tabuľky
---
-
---
--- Obmedzenie pre tabuľku `fc_job`
+-- Constraints for `fc_job`
 --
 ALTER TABLE `fc_job`
   ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL;
 
 --
--- Obmedzenie pre tabuľku `fc_batch`
+-- Constraints for `fc_batch`
 --
 ALTER TABLE `fc_batch`
   ADD CONSTRAINT `user_link` FOREIGN KEY (`creator_id`) REFERENCES `fc_user` (`id`) ON DELETE SET NULL;
 
 --
--- Omezeni pro tabulku `fc_job_status`
+-- Constraints for `fc_job_status`
 --
 ALTER TABLE `fc_job_status`
   ADD CONSTRAINT `fc_job_status_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 --
--- Obmedzenie pre tabuľku `fc_notification`
+-- Constraints for `fc_notification`
 --
 ALTER TABLE `fc_notification`
   ADD CONSTRAINT `fc_notification_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `fc_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -564,7 +546,7 @@ ALTER TABLE `fc_notification`
 
 
 --
--- Obmedzenie pre junction tabuľku `fc_bin_job`
+-- Constraints for `fc_bin_job`
 --
 ALTER TABLE `fc_bin_job`
   ADD CONSTRAINT `fc_bin_job_jobfk` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -572,19 +554,19 @@ ALTER TABLE `fc_bin_job`
 
 
 --
--- Obmedzenie pre tabuľku `fc_job_graph`
+-- Constraints for `fc_job_graph`
 --
 ALTER TABLE `fc_job_graph`
   ADD CONSTRAINT `fc_job_graph_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`);
 
 --
--- Obmedzenie pre tabuľku `fc_user`
+-- Constraints for `fc_user`
 --
 ALTER TABLE `fc_user`
   ADD CONSTRAINT `fc_user_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `fc_role` (`id`);
 
 --
--- Obmedzenie pre tabuľku `fc_user_permissions`
+-- Constraints for `fc_user_permissions`
 --
 ALTER TABLE `fc_user_permissions`
   ADD CONSTRAINT `fc_user_permissions_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `fc_job` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
