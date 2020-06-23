@@ -125,8 +125,26 @@ bool CAttackCombinator::makeWorkunit()
             f << skipLine;
             Tools::printDebug(skipLine.c_str());
 
+            uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
+            uint64_t remainingPasswords = m_job->getHcKeyspace()-workunitStartIndex2;
+            //if it's at least three quarters, take the whole thing
+            if(workunitHcKeyspace > 0.75*remainingPasswords)
+            {
+                workunitHcKeyspace = remainingPasswords;
+            }
+            //otherwise take at most half
+            else if(workunitHcKeyspace > 0.5*remainingPasswords)
+            {
+                workunitHcKeyspace = remainingPasswords*0.5;
+            }
+
+            if(m_workunit->getHcKeyspace() != workunitHcKeyspace)
+            {
+                m_workunit->setHcKeyspace(workunitHcKeyspace);
+            }
+
             /** Check if we reach the end of password keyspace in 1st dict */
-            if (m_workunit->getHcKeyspace() + workunitStartIndex2 >= m_job->getHcKeyspace())
+            if (workunitHcKeyspace + workunitStartIndex2 >= m_job->getHcKeyspace())
             {
                 m_workunit->setHcKeyspace(m_job->getHcKeyspace() - workunitStartIndex2);
 
@@ -139,9 +157,8 @@ bool CAttackCombinator::makeWorkunit()
             }
             else
             {
-                uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
                 if (!m_workunit->isDuplicated())
-                        m_job->updateIndex2(workunitStartIndex2 + workunitHcKeyspace);
+                    m_job->updateIndex2(workunitStartIndex2 + workunitHcKeyspace);
 
                 auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
                 f << limitLine;
