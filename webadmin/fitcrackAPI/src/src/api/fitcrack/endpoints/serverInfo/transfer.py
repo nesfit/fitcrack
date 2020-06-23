@@ -99,7 +99,7 @@ class JobSerializer:
         # descend nested values by the path from earlier
         for key in path:
           val = val[key] if isinstance(val, dict) else getattr(val, key)
-        tv = f'{DEP_MAP[dep]}/{val}'
+        tv = '{}/{}'.format(DEP_MAP[dep], val)
         # check if this dep is already recorded, if not, add it
         try:
           dep_index = self.dependencies.index(tv)
