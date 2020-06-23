@@ -216,8 +216,8 @@ else
 fi
 
 if [ -x "$(command -v boinccmd)" ]; then
-  read -e -p "Attach this host to Fitcrack BOINC project? [y/N] (default: y)" FITCRACK_BOINC_ATTACH
-  FITCRACK_BOINC_ATTACH=${FITCRACK_BOINC_ATTACH:-y}
+  read -e -p "Attach this host to Fitcrack BOINC project? [y/N] (default: N)" FITCRACK_BOINC_ATTACH
+  FITCRACK_BOINC_ATTACH=${FITCRACK_BOINC_ATTACH:-N}
   if [ $FITCRACK_BOINC_ATTACH = "y" ]; then
     python3 installer/boinc_connect.py --url ${BOINC_URL}/${BOINC_PROJECT}
     if [[ $? == 0 ]]; then
