@@ -1,5 +1,5 @@
 --
--- Spúšťače 
+-- Triggers 
 --
 DROP TRIGGER IF EXISTS `job_notification`;
 DELIMITER // 
@@ -139,7 +139,7 @@ END
 DELIMITER ;
 
 --
--- Trigger na ukladani zmen stavu pri vytvoreni
+-- Log job creations in status history table
 --
 DROP TRIGGER IF EXISTS `job_status_changes_new`;
 DELIMITER //
@@ -152,7 +152,8 @@ DELIMITER ;
 
 
 --
--- Trigger na ukladani zmen stavu a casu pri aktualizaci fc_job
+-- Log changes to job status in history
+-- Update job end time if needed
 --
 DROP TRIGGER IF EXISTS `job_status_changes_edit`;
 DELIMITER //
