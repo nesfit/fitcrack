@@ -181,7 +181,7 @@ class multiJobsHost(Resource):
 
         return {
             'status': True,
-            'message': f'Hosts assigned to {str(len(ids))} job(s).{" " + str(skipped) + " skipped due to permissions." if skipped else ""}'
+            'message': 'Hosts assigned to {} job(s).{}'.format(str(len(ids)), " " + str(skipped) + " skipped due to permissions." if skipped else "")
         }
 
 @ns.route('/<int:id>')

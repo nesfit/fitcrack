@@ -145,7 +145,7 @@ class systemTransfer(Resource):
             unpack(file)
         except ImportDependencyMissing as dep_err:
             return {
-                'message': f'Missing dependencies: {", ".join(dep_err.missing)}',
+                'message': 'Missing dependencies: {}'.format(", ".join(dep_err.missing)),
                 'status': False
             }
 

@@ -150,4 +150,4 @@ class assign_bin(Resource):
             except exc.IntegrityError as e:
                 db.session().rollback()
                 abort(500, 'Couldn\'t assign to bin.')
-            return (f'included {include}, excluded {exclude}', 200)
+            return ('included {}, excluded {}'.format(include, exclude), 200)
