@@ -1,5 +1,5 @@
 --
--- Spúšťače 
+-- Triggers 
 --
 DROP TRIGGER IF EXISTS `job_notification`;
 DELIMITER // 
@@ -139,7 +139,7 @@ END
 DELIMITER ;
 
 --
--- Trigger na ukladani zmen stavu pri vytvoreni
+-- Log job creations in status history table
 --
 DROP TRIGGER IF EXISTS `job_status_changes_new`;
 DELIMITER //
@@ -152,7 +152,8 @@ DELIMITER ;
 
 
 --
--- Trigger na ukladani zmen stavu pri aktualizaci fc_job
+-- Log changes to job status in history
+-- Update job end time if needed
 --
 DROP TRIGGER IF EXISTS `job_status_changes_edit`;
 DELIMITER //
@@ -161,25 +162,14 @@ BEGIN
     IF NEW.status <> OLD.status THEN
     	INSERT INTO fc_job_status (`job_id`, `status`, `time`)
     	VALUES (NEW.id, NEW.status, NOW());
+			-- update end time if stopping
+			IF NEW.status BETWEEN 1 AND 9 THEN
+				set NEW.time_end = now();
+			END IF;
     END IF;
 END
 //
 DELIMITER ;
-
---
--- Trigger for saving job end time on finish
---
-drop trigger if exists set_end_time;
-
-delimiter //
-create trigger set_end_time
-before update on fc_job for each row
-begin
-if NEW.status <> OLD.status and NEW.status between 1 and 9 then
-  set NEW.time_end = now();
-end if;
-end //
-delimiter ;
 
 --
 -- Procedure for changing status of running job and continuing batch if applicable
