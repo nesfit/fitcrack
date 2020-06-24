@@ -552,7 +552,7 @@ CREATE TABLE IF NOT EXISTS `fc_hw_stats` (
 
 CREATE TABLE IF NOT EXISTS `fc_hw_stats_device` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `fc_hw_stats_id` bigint unsigned NOT NULL,
+  `hw_stats_id` bigint unsigned NOT NULL,
   `index` tinyint,
   `utilization` tinyint,
   `temperature` tinyint,
@@ -623,10 +623,10 @@ ALTER TABLE `fc_user_permissions`
 -- Omezení pro tabulku `fc_hw_stats`
 --
 ALTER TABLE `fc_hw_stats`
-  ADD CONSTRAINT `fc_hw_stats_ibfk_1` FOREIGN KEY (`workunit_id`) REFERENCES `fc_workunit` (`id`);
+  ADD CONSTRAINT `fc_hw_stats_ibfk_1` FOREIGN KEY (`workunit_id`) REFERENCES `fc_workunit` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Omezení pro tabulku `fc_hw_stats_device`
 --
 ALTER TABLE `fc_hw_stats_device`
-  ADD CONSTRAINT `fc_hw_stats_device_ibfk_1` FOREIGN KEY (`fc_hw_stats_id`) REFERENCES `fc_hw_stats` (`id`);
+  ADD CONSTRAINT `fc_hw_stats_device_ibfk_1` FOREIGN KEY (`hw_stats_id`) REFERENCES `fc_hw_stats` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;

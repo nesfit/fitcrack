@@ -950,7 +950,7 @@ class FcHwStatsDevice(Base):
     __tablename__ = 'fc_hw_stats_device'
 
     id = Column(Integer, primary_key=True)
-    fc_hw_stats_id = Column(BigInteger, ForeignKey(FcHwStats.id), nullable=False)
+    hw_stats_id = Column(BigInteger, ForeignKey(FcHwStats.id), nullable=False)
     index = Column(Integer)
     utilization = Column(Integer)
     temperature = Column(Integer)

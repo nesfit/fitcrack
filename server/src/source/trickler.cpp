@@ -45,8 +45,8 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     char buf[SQL_BUF_SIZE];
     char wu_name[SQL_BUF_SIZE];
 
-    int cpuUtil, memUtil, deviceUtil, deviceTemp, deviceIndex;
-    int fc_hw_stats_id;
+    int time, cpuUtil, memUtil, deviceUtil, deviceTemp, deviceIndex;
+    int hw_stats_id;
     std::string fc_workunit_id;
     bool got_cpuUtil = false;
     bool got_memUtil = false;
@@ -67,6 +67,18 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     /** Parse XML message */
     while (!xp.get_tag())
     {
+        if (xp.parse_int("time", time))
+        {
+            if (std::isnan(time))
+            {
+                std::cerr << "ERROR: time cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed time: " << time << std::endl;
+            continue;
+        }
+
         if (xp.parse_str("workunit_name", wu_name, SQL_BUF_SIZE))
         {
             std::cerr << "Succesfully parsed workunit_name: " << wu_name << std::endl;
@@ -141,8 +153,8 @@ int handle_trickle(MSG_FROM_HOST& mfh)
             // fc_workunit ID obtained
 
             // Insert row into fc_hw_stats
-            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats`(`workunit_id`, `cpu_utilization`, `memory_utilization`) VALUES(%s, %d, %d) ;",
-            fc_workunit_id.c_str(), cpuUtil, memUtil);
+            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats`(`workunit_id`, `time`, `cpu_utilization`, `memory_utilization`) VALUES(%s, FROM_UNIXTIME(%d), %d, %d) ;",
+            fc_workunit_id.c_str(), time, cpuUtil, memUtil);
 
             retval = boinc_db.do_query(buf);
             if (retval)
@@ -152,7 +164,7 @@ int handle_trickle(MSG_FROM_HOST& mfh)
                 exit(1);
             }
             // get ID of inserted row
-            fc_hw_stats_id = boinc_db.insert_id();
+            hw_stats_id = boinc_db.insert_id();
 
             got_cpuUtil = got_memUtil = false;
         }
@@ -197,8 +209,8 @@ int handle_trickle(MSG_FROM_HOST& mfh)
         {
             // SAVE DEVICE STATS TO DB
 
-            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats_device`(`fc_hw_stats_id`, `index`, `utilization`, `temperature`) VALUES(%d, %d, %d, %d) ;",
-             fc_hw_stats_id, deviceIndex, deviceUtil, deviceTemp);
+            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats_device`(`hw_stats_id`, `index`, `utilization`, `temperature`) VALUES(%d, %d, %d, %d) ;",
+             hw_stats_id, deviceIndex, deviceUtil, deviceTemp);
 
             int retval = boinc_db.do_query(buf);
             if (retval)
