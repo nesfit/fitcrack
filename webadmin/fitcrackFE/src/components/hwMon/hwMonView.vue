@@ -6,7 +6,10 @@
 <template>
   <v-container fluid>
       <v-select v-model="selectedHost" :items="hosts" label="Host name" item-text="name" item-value="id" v-on:change="hostSelected()"/>
-        <v-container class="flex2">
+        <v-alert type="error" v-if="selectedHost == null">
+          Select host to monitor
+        </v-alert>
+        <v-container class="flex2" v-if="selectedHost">
             <fc-tile
             title="CPU & Memory"
             icon="mdi-memory"
@@ -27,7 +30,7 @@
             class="mx-3 mb-5 maxh300 flex1"
             >
             <fc-graph
-                :id="'jobGraph1'+i"
+                :id="'jobGraph'+i+1"
                 :data="deviceUsage[i]"
                 type="job"
                 :labels="deviceLabels"
@@ -62,6 +65,11 @@ export default {
         dataObtainedForDevices:0
       }
     },
+    watch: {
+      deviceCount: function () {
+        this.getDeviceStats();
+      }
+    },
     mounted: function () {
       this.loadData();
       this.interval = setInterval(function () {
@@ -90,6 +98,9 @@ export default {
           console.log('/job/'+this.$route.params.id+'/hwMon/'+this.selectedHost+'/deviceCount', response.data.deviceCount);
           this.deviceCount = response.data.deviceCount;
         });
+        this.getDeviceStats();
+      },
+      getDeviceStats: function () {
         for (let i = 1; i <= this.deviceCount; i++) {
             this.axios.get(this.$serverAddr + '/job/'+this.$route.params.id+'/hwMon/'+this.selectedHost+'/deviceStats/'+i).then((response) => {
             console.log('/job/'+this.$route.params.id+'/hwMon/'+this.selectedHost+'/deviceStats/'+i, response.data.items);
