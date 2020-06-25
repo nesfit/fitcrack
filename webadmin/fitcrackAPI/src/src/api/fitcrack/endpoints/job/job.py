@@ -30,7 +30,8 @@ from src.api.fitcrack.endpoints.job.functions import verifyHashFormat, create_jo
     can_view_job, can_edit_job, can_operate_job
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, \
-    job_nano_list_model, job_user_permissions_model
+    job_nano_list_model, job_user_permissions_model, hwMonSystemStatsListModel, hwMonHostListModel, \
+    hwMonDeviceCountModel, hwMonDeviceStatsListModel 
 from src.api.fitcrack.functions import shellExec
 from src.api.fitcrack.attacks.functions import compute_prince_keyspace
 from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, attack_modes
@@ -611,7 +612,7 @@ class lastJobs(Resource):
 @api.response(404, 'System stats for this job and host not found.')
 class jobHostSystemStats(Resource):
 
-    #@api.marshal_with(nejaky_model)
+    @api.marshal_with(hwMonSystemStatsListModel)
     def get(self, job_id, host_id):
         """
         Returns system stats for host that worked on concrete job.
@@ -635,7 +636,7 @@ class jobHostSystemStats(Resource):
 @api.response(404, 'Hosts for this job not found.')
 class jobAllHosts(Resource):
 
-    #@api.marshal_with(nejaky_model)
+    @api.marshal_with(hwMonHostListModel)
     def get(self, job_id):
         """
         Returns all hosts that worked on concrete job.
@@ -662,7 +663,7 @@ class jobAllHosts(Resource):
 @api.response(404, 'Device count for this job and host not found.')
 class jobHostSystemStats(Resource):
 
-    #@api.marshal_with(nejaky_model)
+    @api.marshal_with(hwMonDeviceCountModel)
     def get(self, job_id, host_id):
         """
         Returns number of devices of given host that were part of job computation.
@@ -689,7 +690,7 @@ class jobHostSystemStats(Resource):
 @api.response(404, 'Device stats for this job and host not found.')
 class jobHostDeviceStats(Resource):
 
-    #@api.marshal_with(nejaky_model)
+    @api.marshal_with(hwMonDeviceStatsListModel)
     def get(self, job_id, host_id, index):
         """
         Returns device stats for given job and host.

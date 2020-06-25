@@ -205,3 +205,36 @@ user_permissions = api.model('User with permissions', {
 job_user_permissions_model = api.model('List of users and their permissions on a job', {
     'items': fields.List(fields.Nested(user_permissions))
 })
+
+hwMonSystemStatsModel = api.model('hwMonitor - system stats model', {
+    "time": fields.DateTime(),
+    "cpu_utilization": fields.Integer(),
+    "memory_utilization": fields.Integer()
+})
+
+hwMonSystemStatsListModel = api.model('hwMonitor - system stats list model', {
+    'items': fields.List(fields.Nested(hwMonSystemStatsModel))
+})
+
+hwMonHostModel = api.model('hwMonitor - host model', {
+    "id": fields.Integer(),
+    "name": fields.String()
+})
+
+hwMonHostListModel = api.model('hwMonitor - host list model', {
+    'items': fields.List(fields.Nested(hwMonHostModel))
+})
+
+hwMonDeviceCountModel = api.model('hwMonitor - device count model', {
+    'deviceCount': fields.Integer()
+})
+
+hwMonDeviceStatsModel = api.model('hwMonitor - device stats model', {
+    "time": fields.DateTime(),
+    "utilization": fields.Integer(),
+    "temperature": fields.Integer()
+})
+
+hwMonDeviceStatsListModel = api.model('hwMonitor - device stats list model', {
+    'items': fields.List(fields.Nested(hwMonDeviceStatsModel))
+})
