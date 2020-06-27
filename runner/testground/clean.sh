@@ -4,6 +4,7 @@ rm -rf \
     boinc_lockfile \
     mask.hcmask \
     kernels/ \
+    modules/ \
     OpenCL/ \
     out \
     stderr.txt \

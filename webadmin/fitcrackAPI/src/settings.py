@@ -7,8 +7,8 @@ import os
 
 # HashCat settings
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-HASHCAT_EXECUTABLE = 'hashcat64.bin'
-HASHCAT_DIR = ROOT_DIR + '/../hashcat-5.1.0/'
+HASHCAT_EXECUTABLE = 'hashcat.bin'
+HASHCAT_DIR = ROOT_DIR + '/../hashcat-6.0.0/'
 HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
 PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princeprocessor/pp64.bin'
@@ -34,9 +34,6 @@ SERVER_BROWSER_ROOT = '/usr/share/collections/import'
 #XtoHashCat settings
 XTOHASHCAT_EXECUTABLE = ROOT_DIR + '/../xtohashcat/XtoHashcat.py'
 XTOHASHCAT_PATH = ROOT_DIR + '/../xtohashcat/'
-
-#Hashvalidator settings
-HASHVALIDATOR_PATH = ROOT_DIR + '/../hashvalidator/hashValidator'
 
 # Fitcrack Settings
 SECONDS_PER_JOB = 3600
