@@ -127,7 +127,7 @@ int handle_trickle(MSG_FROM_HOST& mfh)
         {
             // SAVE SYSTEM STATS TO DB, KEEP INSERTED ID
 
-            // Obtain fc_workunit ID
+            // Obtain fc_workunit.id, ...need workunit.id first
             snprintf(buf, SQL_BUF_SIZE, "SELECT id FROM workunit WHERE name = '%s' LIMIT 1 ;", wu_name);
             int retval = boinc_db.do_query(buf);
             if (retval)
@@ -150,8 +150,30 @@ int handle_trickle(MSG_FROM_HOST& mfh)
             row = mysql_fetch_row(sqlResult);
             fc_workunit_id = row[0];
             mysql_free_result(sqlResult);
-            // fc_workunit ID obtained
+            // workunit.id obtained
 
+            snprintf(buf, SQL_BUF_SIZE, "SELECT id FROM fc_workunit WHERE workunit_id = '%s' LIMIT 1 ;", fc_workunit_id.c_str());
+            retval = boinc_db.do_query(buf);
+            if (retval)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+
+            sqlResult = mysql_store_result(boinc_db.mysql);
+            if (!sqlResult)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+
+            row = mysql_fetch_row(sqlResult);
+            fc_workunit_id = row[0];
+            mysql_free_result(sqlResult);
+            // fc_workunit ID obtained
+            
             // Insert row into fc_hw_stats
             snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats`(`workunit_id`, `time`, `cpu_utilization`, `memory_utilization`) VALUES(%s, FROM_UNIXTIME(%d), %d, %d) ;",
             fc_workunit_id.c_str(), time, cpuUtil, memUtil);
