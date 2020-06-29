@@ -31,14 +31,15 @@ from src.api.fitcrack.endpoints.job.functions import verifyHashFormat, create_jo
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, \
     job_nano_list_model, job_user_permissions_model, hwMonSystemStatsListModel, hwMonHostListModel, \
-    hwMonDeviceCountModel, hwMonDeviceStatsListModel 
+    hwMonDeviceCountModel, hwMonDeviceStatsListModel, hwMonPlatformModelList
 from src.api.fitcrack.functions import shellExec
 from src.api.fitcrack.attacks.functions import compute_prince_keyspace
 from src.api.fitcrack.lang import status_to_code, job_status_text_to_code_dict, attack_modes
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcJob, Host, FcHost, FcWorkunit, FcHostActivity, FcMask, FcJobGraph, \
-    FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser, FcSetting, FcHwStats, FcHwStatsDevice
+    FcJobDictionary, FcPcfg, FcJobStatus, FcRule, FcUserPermission, FcUser, FcSetting, FcHwStats, \
+    FcHwStatsDevice, FcHwPlatform, FcHwPlatformDevice
 
 log = logging.getLogger(__name__)
 
@@ -717,4 +718,47 @@ class jobHostDeviceStats(Resource):
                             'temperature':dvc.temperature
                         }
                     )
+        return {'items':items}
+
+@ns.route('/<int:job_id>/hwMon/<int:host_id>/platforms')
+@api.response(404, 'Platforms for this job and host not found.')
+class jobHostPlatforms(Resource):
+
+    @api.marshal_with(hwMonPlatformModelList)
+    def get(self, job_id, host_id):
+        """
+        Returns platforms and their devices for given job and host.
+        """
+        if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
+            abort(401, 'Unauthorized access to job.')
+        
+        items = []
+        wusInJob = []
+
+        wus = FcWorkunit.query.filter(FcWorkunit.job_id == job_id).filter(FcWorkunit.boinc_host_id == host_id)
+        for wu in wus:
+            wusInJob.append(wu.id)
+        wusInJob = list(set(wusInJob))
+
+        workunitId = None
+        hwPlatforms = FcHwPlatform.query.filter(FcHwPlatform.workunit_id.in_(wusInJob))
+        for platform in hwPlatforms:
+            workunitId = platform.workunit_id
+            break
+
+        hwPlatforms = FcHwPlatform.query.filter(FcHwPlatform.workunit_id == workunitId)
+        for platform in hwPlatforms:
+            platformDvcs = []
+            for dvc in platform.platformDevices:
+                platformDvcs.append(
+                    {
+                        'type':dvc.deviceType,
+                        'name':dvc.name
+                    }
+                )
+            items.append({
+                'name':platform.name,
+                'version':platform.version,
+                'platformDevices':platformDvcs
+            })
         return {'items':items}

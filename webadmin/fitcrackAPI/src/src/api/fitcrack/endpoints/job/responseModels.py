@@ -238,3 +238,18 @@ hwMonDeviceStatsModel = api.model('hwMonitor - device stats model', {
 hwMonDeviceStatsListModel = api.model('hwMonitor - device stats list model', {
     'items': fields.List(fields.Nested(hwMonDeviceStatsModel))
 })
+
+hwMonPlatformDeviceModel = api.model('hwMonitor - platform device model', {
+    'type': fields.String(),
+    'name': fields.String()
+})
+
+hwMonPlatformModel = api.model('hwMonitor - platform model', {
+    'name': fields.String(),
+    'version': fields.String(),
+    'platformDevices': fields.List(fields.Nested(hwMonPlatformDeviceModel))
+})
+
+hwMonPlatformModelList = api.model('hwMonitor - platform list model', {
+    'items': fields.List(fields.Nested(hwMonPlatformModel))
+})

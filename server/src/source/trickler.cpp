@@ -45,14 +45,25 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     char buf[SQL_BUF_SIZE];
     char wu_name[SQL_BUF_SIZE];
 
+    char platformName[SQL_BUF_SIZE];
+    char platformVersion[SQL_BUF_SIZE];
+    char platformDeviceType[SQL_BUF_SIZE];
+    char platformDeviceName[SQL_BUF_SIZE];
+
     int time, cpuUtil, memUtil, deviceUtil, deviceTemp, deviceIndex;
-    int hw_stats_id;
+    int hw_stats_id, hw_platform_id;
     std::string fc_workunit_id;
+
     bool got_cpuUtil = false;
     bool got_memUtil = false;
     bool got_deviceUtil = false;
     bool got_deviceTemp = false;
     bool got_deviceIndex = false;
+
+    bool got_platformName = false;
+    bool got_platformVersion = false;
+    bool got_platformDeviceType= false;
+    bool got_platformDeviceName = false;
 
     std::cerr << std::endl;
     log_messages.printf(MSG_NORMAL,
@@ -83,49 +94,6 @@ int handle_trickle(MSG_FROM_HOST& mfh)
         {
             std::cerr << "Succesfully parsed workunit_name: " << wu_name << std::endl;
             got_wu_name = true;
-            continue;
-        }
-
-        if (xp.parse_double("progress", progress))
-        {
-            if (std::isnan(progress))
-            {
-                std::cerr << "ERROR: Progress cannot be nan." << std::endl;
-                return 1;
-            }
-
-            std::cerr << "Succesfully parsed progress: " << progress << std::endl;
-            got_progress = true;
-            continue;
-        }
-        
-        if (xp.parse_int("cpuUtil", cpuUtil))
-        {
-            if (std::isnan(cpuUtil))
-            {
-                std::cerr << "ERROR: cpuUtil cannot be nan." << std::endl;
-                return 1;
-            }
-
-            std::cerr << "Succesfully parsed cpuUtil: " << cpuUtil << std::endl;
-            got_cpuUtil = true;
-        }
-
-        if (xp.parse_int("memUtil", memUtil))
-        {
-            if (std::isnan(memUtil))
-            {
-                std::cerr << "ERROR: memUtil cannot be nan." << std::endl;
-                return 1;
-            }
-
-            std::cerr << "Succesfully parsed memUtil: " << memUtil << std::endl;
-            got_memUtil = true;
-        }
-
-        if (got_cpuUtil && got_memUtil)
-        {
-            // SAVE SYSTEM STATS TO DB, KEEP INSERTED ID
 
             // Obtain fc_workunit.id, ...need workunit.id first
             snprintf(buf, SQL_BUF_SIZE, "SELECT id FROM workunit WHERE name = '%s' LIMIT 1 ;", wu_name);
@@ -173,12 +141,116 @@ int handle_trickle(MSG_FROM_HOST& mfh)
             fc_workunit_id = row[0];
             mysql_free_result(sqlResult);
             // fc_workunit ID obtained
-            
+            continue;
+        }
+
+        if (xp.parse_double("progress", progress))
+        {
+            if (std::isnan(progress))
+            {
+                std::cerr << "ERROR: Progress cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed progress: " << progress << std::endl;
+            got_progress = true;
+            continue;
+        }
+
+        if (xp.parse_str("platformName", platformName, SQL_BUF_SIZE))
+        {
+            std::cerr << "Succesfully parsed platformName: " << platformName << std::endl;
+            got_platformName = true;
+            continue;
+        }
+
+        if (xp.parse_str("platformVersion", platformVersion, SQL_BUF_SIZE))
+        {
+            std::cerr << "Succesfully parsed platformVersion: " << platformVersion << std::endl;
+            got_platformVersion = true;
+        }
+
+        if (got_platformName && got_platformVersion)
+        {
+            // SAVE PLATFORM TO DB, KEEP INSERTED ID
+            // Insert row into fc_hw_platform
+            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_platform`(`host_id`, `workunit_id`, `name`, `version`) VALUES(%lu, '%s', '%s', '%s') ;",
+            mfh.hostid, fc_workunit_id.c_str(), platformName, platformVersion);
+
+            int retval = boinc_db.do_query(buf);
+            if (retval)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+            // get ID of inserted row
+            hw_platform_id = boinc_db.insert_id();
+            got_platformName = got_platformVersion = false;
+        }
+
+        if (xp.parse_str("deviceType", platformDeviceType, SQL_BUF_SIZE))
+        {
+            std::cerr << "Succesfully parsed deviceType: " << platformDeviceType << std::endl;
+            got_platformDeviceType = true;
+            continue;
+        }
+
+        if (xp.parse_str("deviceName", platformDeviceName, SQL_BUF_SIZE))
+        {
+            std::cerr << "Succesfully parsed deviceName: " << platformDeviceName << std::endl;
+            got_platformDeviceName = true;
+        }
+
+        if (got_platformDeviceType && got_platformDeviceName)
+        {
+            // SAVE PLATFORM DEVICE TO DB
+            // Insert row into fc_hw_platform_device
+            snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_platform_device`(`hw_platform_id`, `deviceType`, `name`) VALUES(%d, '%s', '%s') ;",
+            hw_platform_id, platformDeviceType, platformDeviceName);
+
+            int retval = boinc_db.do_query(buf);
+            if (retval)
+            {
+                std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+                boinc_db.close();
+                exit(1);
+            }
+            got_platformDeviceType = got_platformDeviceName = false;
+        }
+        
+        if (xp.parse_int("cpuUtil", cpuUtil))
+        {
+            if (std::isnan(cpuUtil))
+            {
+                std::cerr << "ERROR: cpuUtil cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed cpuUtil: " << cpuUtil << std::endl;
+            got_cpuUtil = true;
+        }
+
+        if (xp.parse_int("memUtil", memUtil))
+        {
+            if (std::isnan(memUtil))
+            {
+                std::cerr << "ERROR: memUtil cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed memUtil: " << memUtil << std::endl;
+            got_memUtil = true;
+        }
+
+        if (got_cpuUtil && got_memUtil)
+        {
+            // SAVE SYSTEM STATS TO DB, KEEP INSERTED ID
             // Insert row into fc_hw_stats
             snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `fc_hw_stats`(`workunit_id`, `time`, `cpu_utilization`, `memory_utilization`) VALUES(%s, FROM_UNIXTIME(%d), %d, %d) ;",
             fc_workunit_id.c_str(), time, cpuUtil, memUtil);
 
-            retval = boinc_db.do_query(buf);
+            int retval = boinc_db.do_query(buf);
             if (retval)
             {
                 std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;

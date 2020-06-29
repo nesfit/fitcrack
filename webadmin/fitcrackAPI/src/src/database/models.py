@@ -613,6 +613,8 @@ class FcWorkunit(Base):
 
     hw_stats = relationship('FcHwStats', back_populates="workunits")
 
+    hw_platform = relationship('FcHwPlatform', back_populates="workunits")
+
     @hybrid_property
     def keyspace(self):
         if self.job.attack_mode == 8:
@@ -955,3 +957,25 @@ class FcHwStatsDevice(Base):
     utilization = Column(Integer)
     temperature = Column(Integer)
     stats = relationship('FcHwStats', back_populates='devices')
+
+class FcHwPlatform(Base):
+    __tablename__ = 'fc_hw_platform'
+
+    id = Column(Integer, primary_key=True)
+    host_id = Column(BigInteger, ForeignKey(Host.id), nullable=False)
+    workunit_id = Column(BigInteger, ForeignKey(FcWorkunit.id), nullable=False)
+    name = Column(String(128), nullable=False)
+    version = Column(String(128), nullable=False)
+
+    platformDevices = relationship('FcHwPlatformDevice', back_populates='platforms')
+    workunits = relationship('FcWorkunit', back_populates='hw_platform')
+    
+class FcHwPlatformDevice(Base):
+    __tablename__ = 'fc_hw_platform_device'
+
+    id = Column(Integer, primary_key=True)
+    hw_platform_id = Column(BigInteger, ForeignKey(FcHwPlatform.id), nullable=False)
+    deviceType = Column(String(128), nullable=False)
+    name = Column(String(128), nullable=False)
+
+    platforms = relationship('FcHwPlatform', back_populates='platformDevices')

@@ -9,11 +9,13 @@
         <v-alert type="error" v-if="selectedHost == null">
           Select host to monitor
         </v-alert>
-        <v-container class="flex2" v-if="selectedHost">
+        <v-row>
+          <v-col cols="8">
+        <v-container v-if="selectedHost">
             <fc-tile
             title="CPU & Memory"
             icon="mdi-memory"
-            class="mx-3 mb-5 maxh300 flex1"
+            class="mx-3 mb-5"
             >
             <fc-graph
                 id="jobGraph1"
@@ -27,7 +29,7 @@
             <fc-tile v-if="dataObtainedForDevices >= i"
             :title="'OpenCL device (' + i +')'"
             icon="mdi-gauge"
-            class="mx-3 mb-5 maxh300 flex1"
+            class="mx-3 mb-5"
             >
             <fc-graph
                 :id="'jobGraph'+i+1"
@@ -39,6 +41,26 @@
             </fc-tile>
             </div>
         </v-container>
+        </v-col>
+        <v-col cols="4">
+        <v-container v-if="platforms != null">
+          <fc-tile title="Detected platforms">
+            <v-divider/>
+              <template v-for="platform in platforms">
+                <v-row><v-col class="bold" >Platform </v-col><v-col  md="auto">{{ platform.name }}</v-col></v-row>
+                <v-row><v-col class="bold" >Version </v-col><v-col  md="auto">{{ platform.version }}</v-col></v-row>
+                <template v-for="dvcs in platform.platformDevices">
+                  <v-row>
+                    <v-col class="bold">{{ dvcs.type }}</v-col>
+                    <v-col md="auto">{{ dvcs.name }}</v-col>
+                  </v-row>
+                </template>
+                <v-divider/>
+              </template>
+          </fc-tile>
+        </v-container>
+        </v-col>
+        </v-row>
   </v-container>
 </template>
 
@@ -62,6 +84,7 @@ export default {
         deviceLabels: ['utilization', 'temperature'],
         deviceLabelsFriendly: ['Utilization [%]', 'Temperature [°C]'],
         deviceUsage:[],
+        platforms: null,
         dataObtainedForDevices:0
       }
     },
@@ -99,6 +122,10 @@ export default {
           this.deviceCount = response.data.deviceCount;
         });
         this.getDeviceStats();
+        this.axios.get(this.$serverAddr + '/job/'+this.$route.params.id+'/hwMon/'+this.selectedHost+'/platforms').then((response) => {
+          console.log('/job/'+this.$route.params.id+'/hwMon/'+this.selectedHost+'/platforms', response.data.items);
+          this.platforms = response.data.items;
+        });
       },
       getDeviceStats: function () {
         for (let i = 1; i <= this.deviceCount; i++) {
@@ -112,3 +139,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+  .bold {
+    font-weight: bold;
+  }
+</style>

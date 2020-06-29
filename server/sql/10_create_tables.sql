@@ -562,6 +562,35 @@ CREATE TABLE IF NOT EXISTS `fc_hw_stats_device` (
 -- --------------------------------------------------------
 
 --
+-- Struktura tabulky pro tabulku `fc_hw_platform`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_hw_platform` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `host_id` bigint unsigned NOT NULL,
+  `workunit_id` bigint unsigned NOT NULL,
+  `name` varchar(128) NOT NULL,
+  `version` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky pro tabulku `fc_hw_platform_device`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_hw_platform_device` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `hw_platform_id` bigint unsigned NOT NULL,
+  `deviceType` varchar(128) NOT NULL,
+  `name` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Obmedzenie pre exportované tabuľky
 --
 
@@ -630,3 +659,15 @@ ALTER TABLE `fc_hw_stats`
 --
 ALTER TABLE `fc_hw_stats_device`
   ADD CONSTRAINT `fc_hw_stats_device_ibfk_1` FOREIGN KEY (`hw_stats_id`) REFERENCES `fc_hw_stats` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Omezení pro tabulku `fc_hw_platform`
+--
+ALTER TABLE `fc_hw_platform`
+  ADD CONSTRAINT `fc_hw_platform_ibfk_1` FOREIGN KEY (`workunit_id`) REFERENCES `fc_workunit` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Omezení pro tabulku `fc_hw_platform_device`
+--
+ALTER TABLE `fc_hw_platform_device`
+  ADD CONSTRAINT `fc_hw_platform_device_ibfk_1` FOREIGN KEY (`hw_platform_id`) REFERENCES `fc_hw_platform` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
