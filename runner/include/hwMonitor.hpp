@@ -9,6 +9,7 @@
 #include <numeric>
 #include <stdlib.h>
 #include "Directory.hpp"
+#include "File.hpp"
 #include "Logging.hpp"
 
 #ifdef _WIN32
@@ -48,6 +49,21 @@ class hwMonitor
 
 		int deviceCount;
 
+		typedef struct
+		{
+			std::string type;
+			std::string name;
+		} device;
+
+		typedef struct
+		{
+			std::string name;
+			std::string version;
+			std::vector<device> devices;
+		} platform;
+
+		std::vector<platform> platforms;
+
 		struct systemStats
 		{
 			std::string cpuUtilization;
@@ -66,8 +82,9 @@ class hwMonitor
 
 #endif // _WIN32
 
-		
 
+		void getHashcatInfo();
+	
 		/**
 		 * @brief   Parses TEMP values from hashcat progress line
 		 * @param   progress_line [] Hashcat's progress line

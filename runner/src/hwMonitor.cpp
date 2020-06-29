@@ -11,13 +11,15 @@ hwMonitor::hwMonitor(void)
 #endif // __linux__
 	systemStats.cpuUtilization = -1;
 	systemStats.memoryUtilization = -1;
+
+	additionalDataSent = false;
 }
 
 std::string hwMonitor::GetHwInformation()
 {
 	std::string XML;
 	XML.clear();
-
+	
 #ifdef _WIN32
 	GetWMIdata();
 #elif __linux__
@@ -26,6 +28,35 @@ std::string hwMonitor::GetHwInformation()
 #endif // _WIN32
 
 	XML += "<hwStats>\n";
+
+		if (!additionalDataSent)
+		{
+		getHashcatInfo();
+
+		XML += "<platforms>\n";
+			int platformCount = platforms.size();
+			for (int i = 0; i < platformCount; i++)
+			{
+				XML += "<platform>\n";
+					XML += "<platformName>" + platforms[i].name + "</platformName>\n";
+					XML += "<platformVersion>" + platforms[i].version + "</platformVersion>\n";
+
+					XML += "<platformDevices>\n";
+						int platformDeviceCount = platforms[i].devices.size();
+						for (int n = 0; n < platformDeviceCount; n++)
+						{
+							XML += "<platformDevice>\n";
+								XML += "<deviceType>" + platforms[i].devices[n].type + "</deviceType>\n";
+								XML += "<deviceName>" + platforms[i].devices[n].name + "</deviceName>\n";
+							XML += "</platformDevice>\n";
+						}
+					XML += "</platformDevices>\n";
+				XML += "</platform>\n";
+			}
+		XML += "</platforms>\n";
+
+		additionalDataSent = true;
+		}
 
 		XML += "<systemStats>\n";
 			XML += "<cpuUtil>" + systemStats.cpuUtilization + "</cpuUtil>\n";
@@ -60,8 +91,6 @@ std::string hwMonitor::GetHwInformation()
 		hres = CoInitializeEx(0, COINIT_MULTITHREADED);
 		if (FAILED(hres))
 		{
-			std::cout << "Failed to initialize COM library. Error code = 0x"
-				<< std::hex << hres << std::endl;
 			return 1;                  // Program has failed.
 		}
 
@@ -83,8 +112,6 @@ std::string hwMonitor::GetHwInformation()
 
 		if (FAILED(hres))
 		{
-			std::cout << "Failed to initialize security. Error code = 0x"
-				<< std::hex << hres << std::endl;
 			CoUninitialize();
 			return 1;                    // Program has failed.
 		}
@@ -102,9 +129,6 @@ std::string hwMonitor::GetHwInformation()
 
 		if (FAILED(hres))
 		{
-			std::cout << "Failed to create IWbemLocator object."
-				<< " Err code = 0x"
-				<< std::hex << hres << std::endl;
 			CoUninitialize();
 			return 1;                 // Program has failed.
 		}
@@ -130,8 +154,6 @@ std::string hwMonitor::GetHwInformation()
 
 		if (FAILED(hres))
 		{
-			std::cout << "Could not connect. Error code = 0x"
-				<< std::hex << hres << std::endl;
 			pLoc->Release();
 			CoUninitialize();
 			return 1;                // Program has failed.
@@ -153,8 +175,6 @@ std::string hwMonitor::GetHwInformation()
 
 		if (FAILED(hres))
 		{
-			std::cout << "Could not set proxy blanket. Error code = 0x"
-				<< std::hex << hres << std::endl;
 			pSvc->Release();
 			pLoc->Release();
 			CoUninitialize();
@@ -174,9 +194,6 @@ std::string hwMonitor::GetHwInformation()
 
 		if (FAILED(hres))
 		{
-			std::cout << "Query for operating system name failed."
-				<< " Error code = 0x"
-				<< std::hex << hres << std::endl;
 			pSvc->Release();
 			pLoc->Release();
 			CoUninitialize();
@@ -227,9 +244,6 @@ std::string hwMonitor::GetHwInformation()
 
 		if (FAILED(hres))
 		{
-			std::cout << "Query for operating system name failed."
-				<< " Error code = 0x"
-				<< std::hex << hres << std::endl;
 			pSvc->Release();
 			pLoc->Release();
 			CoUninitialize();
@@ -427,5 +441,82 @@ std::string hwMonitor::GetHwInformation()
 			utilizations.push_back(sectionWithUtilizations.substr(last, found_at - last)); // Cut out utilization value
 			last = found_at + 1;
 		}
+	}
+
+	void hwMonitor::getHashcatInfo(){
+		File executable;
+
+		Directory directory(".");
+		directory.scanForEntities();
+
+		std::string command = "";
+		std::string line;
+
+		#ifdef __linux__
+			directory.findVersionedFile("hashcat", "bin", executable);
+			command += "./";
+		#elif _WIN32
+			directory.findVersionedFile("hashcat", "exe", executable);
+		#endif
+
+		command += executable.getName() + " -I > hashcatInfoOutput.txt";
+
+		int retVal = system(command.c_str());
+		if (retVal != 0) return;
+
+		std::ifstream hashcatInfo("hashcatInfoOutput.txt");
+
+		while(getline(hashcatInfo, line))
+		{
+			if (line.find("Platform") != std::string::npos)
+			{
+				platform platform;
+				// If Platform found, search for its name and version
+				while(getline(hashcatInfo, line))
+				{
+					int position;
+					if (line.find("Name") != std::string::npos)
+					{
+						position = line.find(":");
+						platform.name = line.substr(position+2);
+						continue;
+					}
+					if (line.find("Version") != std::string::npos)
+					{
+						position = line.find(":");
+						platform.version = line.substr(position+2);
+						break;
+					}
+				}
+				// Ended searching for platform's name and version
+				platforms.push_back(platform);
+			}
+			if (line.find("Device") != std::string::npos)
+			{
+				// If Device found, search for its type and name
+				device device;
+
+				while(getline(hashcatInfo, line))
+				{
+					int position;
+					if (line.find("Type") != std::string::npos)
+					{
+						position = line.find(":");
+						device.type = line.substr(position+2);
+						continue;
+					}
+					if (line.find("Name") != std::string::npos)
+					{
+						position = line.find(":");
+						device.name = line.substr(position+2);
+						break;
+					}
+				}
+				// Ended searching for device's name and version
+				// Add that device to last found platform
+				platforms[platforms.size()-1].devices.push_back(device);
+			}
+		}
+		remove("hashcatInfoOutput.txt");
 	}
 
