@@ -3,7 +3,9 @@
 hwMonitor::hwMonitor(void)
 {
 #ifdef _WIN32
-	
+	previousPercentIdleTime = 0;
+	previousTimeStamp_Sys100NS = 0;
+	GetWMIdata(previousPercentIdleTime, previousTimeStamp_Sys100NS);
 #elif __linux__
 	previousIdleTime = 0;
 	previousTotalTime = 0;
@@ -21,7 +23,7 @@ std::string hwMonitor::GetHwInformation()
 	XML.clear();
 	
 #ifdef _WIN32
-	GetWMIdata();
+	getCpuAndMemoryUtilizationWindows();
 #elif __linux__
 	getCpuUtilizationLinux();
 	getMemoryUtilizationLinux();
@@ -59,8 +61,8 @@ std::string hwMonitor::GetHwInformation()
 		}
 
 		XML += "<systemStats>\n";
-			XML += "<cpuUtil>" + systemStats.cpuUtilization + "</cpuUtil>\n";
-			XML += "<memUtil>" + systemStats.memoryUtilization + "</memUtil>\n";
+			XML += "<cpuUtil>" + intToString(systemStats.cpuUtilization) + "</cpuUtil>\n";
+			XML += "<memUtil>" + intToString(systemStats.memoryUtilization) + "</memUtil>\n";
 		XML += "</systemStats>\n";
 
 		XML += "<devicesStats>\n";
@@ -80,7 +82,7 @@ std::string hwMonitor::GetHwInformation()
 }
 
 #ifdef _WIN32
-	int hwMonitor::GetWMIdata()
+	int hwMonitor::GetWMIdata(uint64_t& percentIdleTime, uint64_t& timeStamp_Sys100NS)
 	{
 		// https://docs.microsoft.com/en-us/windows/win32/wmisdk/example--getting-wmi-data-from-the-local-computer
 		HRESULT hres;
@@ -227,7 +229,7 @@ std::string hwMonitor::GetHwInformation()
 			freePhysicalMemory = ConvertBSTRToMBS(vtProp.bstrVal);
 			VariantClear(&vtProp);
 			int ramUtil = (100 - ((atoi(freePhysicalMemory.c_str()) / (double)(atoi(totalVisibleMemorySize.c_str()))) * 100));
-			systemStats.memoryUtilization = intToString(ramUtil);
+			systemStats.memoryUtilization = ramUtil;
 
 			pclsObj->Release();
 		}
@@ -237,7 +239,7 @@ std::string hwMonitor::GetHwInformation()
 
 		hres = pSvc->ExecQuery(
 			_bstr_t(L"WQL"),
-			_bstr_t(L"SELECT * FROM Win32_Processor"),
+			_bstr_t(L"SELECT * FROM Win32_PerfRawData_PerfOS_Processor WHERE Name='_Total'"),
 			WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
 			NULL,
 			&pEnumerator);
@@ -265,10 +267,15 @@ std::string hwMonitor::GetHwInformation()
 
 			VARIANT vtProp;
 
-			// Get the value of the LoadPercentage property
-			pclsObj->Get(L"LoadPercentage", 0, &vtProp, 0, 0);
-			systemStats.cpuUtilization = intToString(vtProp.intVal);
+			// Get the value of the PercentProcessorTime property
+			pclsObj->Get(L"PercentIdleTime", 0, &vtProp, 0, 0);
+			percentIdleTime = RunnerUtils::stoull(ConvertBSTRToMBS(vtProp.bstrVal));
 			VariantClear(&vtProp);
+			// Get the value of the TimeStamp_Sys100NS property
+			pclsObj->Get(L"TimeStamp_Sys100NS", 0, &vtProp, 0, 0);
+			timeStamp_Sys100NS = RunnerUtils::stoull(ConvertBSTRToMBS(vtProp.bstrVal));
+			VariantClear(&vtProp);
+
 
 
 			pclsObj->Release();
@@ -283,6 +290,21 @@ std::string hwMonitor::GetHwInformation()
 		CoUninitialize();
 
 		return 0;   // Program successfully completed.
+	}
+
+	void hwMonitor::getCpuAndMemoryUtilizationWindows()
+	{
+
+		uint64_t percentIdleTime = 0, timeStamp_Sys100NS = 0;
+
+		GetWMIdata(percentIdleTime, timeStamp_Sys100NS);
+
+		uint64_t percentIdleTime_delta = percentIdleTime - previousPercentIdleTime;
+		uint64_t timeStamp_Sys100NS_delta = timeStamp_Sys100NS - previousTimeStamp_Sys100NS;
+		int cpuUtil = (1.0 - (percentIdleTime_delta / (double)timeStamp_Sys100NS_delta))*100;
+		systemStats.cpuUtilization = cpuUtil;
+		previousPercentIdleTime = percentIdleTime;
+		previousTimeStamp_Sys100NS = timeStamp_Sys100NS;
 	}
 
 	std::string hwMonitor::ConvertBSTRToMBS(BSTR bstr)
@@ -332,7 +354,7 @@ std::string hwMonitor::GetHwInformation()
 		const float idle_time_delta = idle_time - previousIdleTime;
 		const float total_time_delta = total_time - previousTotalTime;
 		int cpuUtil = 100.0 * (1.0 - idle_time_delta / total_time_delta);
-		systemStats.cpuUtilization = intToString(cpuUtil);
+		systemStats.cpuUtilization = cpuUtil;
 		previousIdleTime = idle_time;
 		previousTotalTime = total_time;
 
@@ -359,7 +381,7 @@ std::string hwMonitor::GetHwInformation()
 		MemFree = extractNumberFromMemInfoLine(MemFree);
 		proc_meminfo.close();
 		int memUtil = (100 - ((atoi(MemFree.c_str()) / (double)(atoi(MemTotal.c_str()))) * 100));
-		systemStats.memoryUtilization = intToString(memUtil);
+		systemStats.memoryUtilization = memUtil;
 	}
 
 #endif
@@ -368,13 +390,6 @@ std::string hwMonitor::GetHwInformation()
 	{
 		parseTemp(progressLine);
 		parseUtil(progressLine);
-	}
-
-	std::string hwMonitor::intToString(int integer)
-	{
-		std::stringstream intStringStream;
-		intStringStream << integer;
-		return intStringStream.str();
 	}
 
 	void hwMonitor::parseTemp(const std::string& progress_line) {
@@ -441,6 +456,13 @@ std::string hwMonitor::GetHwInformation()
 			utilizations.push_back(sectionWithUtilizations.substr(last, found_at - last)); // Cut out utilization value
 			last = found_at + 1;
 		}
+	}
+
+	std::string hwMonitor::intToString(int integer)
+	{
+		std::stringstream intStringStream;
+		intStringStream << integer;
+		return intStringStream.str();
 	}
 
 	void hwMonitor::getHashcatInfo(){
