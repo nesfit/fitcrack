@@ -1613,10 +1613,6 @@ hashtypes = [
 
 
 def getHashById(code):
-  if code.startswith("137"):
-      code = "137XY"
-  if code.startswith("62"):
-      code = "62XY"
   for hash in hashtypes:
     if hash['code'] == code:
       return hash

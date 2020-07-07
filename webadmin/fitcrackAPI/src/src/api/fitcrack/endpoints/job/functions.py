@@ -43,7 +43,7 @@ def create_job(data):
                 fp.write(decoded)
                 fp.seek(0)
                 if settings.verify_hash_format:
-                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'], binaryHash=hashObj['hash'])
             data['hash_settings']['hash_list'][idx]['hash']= decoded
 
         else:
