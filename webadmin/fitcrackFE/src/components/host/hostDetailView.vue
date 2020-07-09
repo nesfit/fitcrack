@@ -55,6 +55,18 @@
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <template v-for="gpu in gpus">
+            <v-list-item>
+              <v-list-item-icon>
+                <v-icon>mdi-expansion-card</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ gpu }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
         </v-list>
       </fc-tile>
 
@@ -273,6 +285,7 @@
             'code': 12
           }
         ],
+        gpus: null,
       }
     },
     mounted: function () {
@@ -283,6 +296,9 @@
       loadData: function () {
         this.axios.get(this.$serverAddr + '/hosts/' + this.$route.params.id).then((response) => {
           this.data = response.data;
+        })
+        this.axios.get(this.$serverAddr + '/hosts/' + this.$route.params.id + '/hwMon/gpus').then((response) => {
+          this.gpus = response.data.items;
         })
       },
       yesNo: function (val) {

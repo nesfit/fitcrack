@@ -10,7 +10,7 @@ import math
 
 from flask_login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, SmallInteger, Boolean, String, Table, Text, text, JSON, ForeignKey, \
-    Numeric, func, LargeBinary, select, and_
+    Numeric, func, LargeBinary, select, and_, desc
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash

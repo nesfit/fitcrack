@@ -4,7 +4,8 @@
 -->
 
 <template>
-  <div class="w-100 mx-2 my-2 d-flex">
+
+  <div class="mx-2 my-2 d-flex">
     <div class="flex-grow-2 mx-2">
       <v-card>
         <v-card-title>Hosts</v-card-title>
@@ -29,10 +30,14 @@
         <fc-graph
           id="jobGraph1"
           :data="usageData"
-          type="job"
           :labels="cpumemLabels"
           :labels-text="cpumemLabelsFriendly"
+          :colors="['#2641A3','#19C019']"
         />
+        <p class="d-flex justify-center align-center mt-2 py-3"> 
+          <v-icon color="#2641A3">mdi-square-medium</v-icon> CPU utilization (%)
+          <v-icon color="#19C019" class="pl-2">mdi-square-medium</v-icon> RAM utilization (%)
+        </p>
       </v-card>
       <div v-for="i in deviceCount" v-bind:key="i">
         <v-card class="mb-4" v-if="dataObtainedForDevices >= i">
@@ -43,10 +48,14 @@
           <fc-graph
             :id="'jobGraph'+i+1"
             :data="deviceUsage[i]"
-            type="job"
             :labels="deviceLabels"
             :labels-text="deviceLabelsFriendly"
+            :colors="['#2641A3','#F01F1F']"
           />
+          <p class="d-flex justify-center align-center mt-2 py-3"> 
+            <v-icon color="#2641A3">mdi-square-medium</v-icon> Utilization (%)
+            <v-icon color="#F01F1F" class="pl-2">mdi-square-medium</v-icon> Temperature (°C)
+          </p>
         </v-card>
       </div>
     </div>
@@ -59,18 +68,18 @@
 
         <template v-for="platform in platforms">
           <v-row class="mx-1">
-            <v-col class="bold">Platform</v-col>
+            <v-col cols="4" class="bold">Platform</v-col>
             <v-col>{{ platform.name }}</v-col>
           </v-row>
 
           <v-row class="mx-1">
-            <v-col class="bold">Version</v-col>
+            <v-col cols="4" class="bold">Version</v-col>
             <v-col>{{ platform.version }}</v-col>
           </v-row>
 
           <template v-for="dvcs in platform.platformDevices">
             <v-row class="mx-1">
-              <v-col class="bold">{{ dvcs.type }}</v-col>
+              <v-col cols="4" class="bold">{{ dvcs.type }}</v-col>
               <v-col>{{ dvcs.name }}</v-col>
             </v-row>
           </template>
@@ -139,7 +148,7 @@ export default {
       this.axios
         .get(this.$serverAddr + "/job/" + this.$route.params.id + "/hosts")
         .then(response => {
-          console.log("/job/"+this.$route.params.id+"/hosts",response.data.items);
+          //console.log("/job/"+this.$route.params.id+"/hosts",response.data.items);
           this.hosts = response.data.items;
         });
       if (this.selectedHost != null) this.hostSelected();
@@ -150,20 +159,20 @@ export default {
         this.axios
           .get(this.$serverAddr+"/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/systemStats")
           .then(response => {
-            console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/systemStats",response.data.items);
+            //console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/systemStats",response.data.items);
             this.usageData = response.data.items;
           });
         this.axios
           .get(this.$serverAddr+"/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/deviceCount")
           .then(response => {
-            console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/deviceCount",response.data.deviceCount);
+            //console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/deviceCount",response.data.deviceCount);
             this.deviceCount = response.data.deviceCount;
           });
         this.getDeviceStats();
         this.axios
           .get(this.$serverAddr+"/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/platforms")
           .then(response => {
-            console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/platforms",response.data.items);
+            //console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost+"/platforms",response.data.items);
             this.platforms = response.data.items;
           });
       }
@@ -174,7 +183,7 @@ export default {
           this.axios
             .get(this.$serverAddr +"/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost + "/deviceStats/"+i)
             .then(response => {
-              console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost +"/deviceStats/"+i,response.data.items);
+              //console.log("/job/"+this.$route.params.id+"/hwMon/"+this.selectedHost +"/deviceStats/"+i,response.data.items);
               this.deviceUsage[i] = response.data.items;
               this.dataObtainedForDevices++;
             });

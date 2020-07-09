@@ -29,3 +29,7 @@ boincHostDetail_model = api.model('Host detail boinc', {
     'workunits': fields.List(fields.Nested(workunitWithJob_model)),
     'jobs': fields.List(fields.Nested(job_short_model))
 })
+
+hwMonGpuList = api.model('hwMonitor - host gpu list', {
+    'items': fields.List(fields.String())
+})

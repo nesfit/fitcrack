@@ -33,7 +33,7 @@
         hide-hover="false"
         resize="true"
         :smooth="true"
-        :line-colors="['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']"
+        :line-colors="colors"
       />
     </div>
   </div>
@@ -51,7 +51,17 @@
         components: {
             LineChart,
         },
-        props: ['data', 'id', 'type', 'labels', 'labelsText']
+        props: {
+          data: Array,
+          id: String,
+          type: String,
+          labels: Array,
+          labelsText: Array,
+          colors: {
+            type: Array,
+            default: ['#1a50a3', '#00b752', '#dc3043', '#eecd3b', '#768ea2', '#b300ec', '#a9d2f9', '#ffd8b1', '#008080', '#d2f53c']
+          }
+        }
     }
 </script>
 

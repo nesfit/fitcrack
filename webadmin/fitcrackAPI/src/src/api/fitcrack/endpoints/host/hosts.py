@@ -10,9 +10,10 @@ from flask_restplus import Resource
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
-from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, boincHostDetail_model
+from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, boincHostDetail_model, hwMonGpuList
 from src.database import db
-from src.database.models import Host, FcHostActivity, FcHostStatus
+from src.database.models import Host, FcHostActivity, FcHostStatus, FcHwPlatform, \
+    FcHwPlatformDevice
 
 log = logging.getLogger(__name__)
 ns = api.namespace('hosts', description='Operations with hosts.')
@@ -107,3 +108,27 @@ class hostsInfo(Resource):
             'activeHosts': activeHosts,
             'inactiveHosts': inactiveHosts
         }
+
+@ns.route('/<int:host_id>/hwMon/gpus')
+@api.response(404, 'Graphic cards for this host not found.')
+class hostGpus(Resource):
+
+    @api.marshal_with(hwMonGpuList)
+    def get(self, host_id):
+        """
+        Returns graphic cards for given host.
+        """
+
+        items = []
+        mostRecentPlatform = None
+        
+        platforms = FcHwPlatform.query.filter(FcHwPlatform.host_id == host_id).order_by(FcHwPlatform.workunit_id.desc())
+        for platform in platforms:
+            mostRecentPlatform = platform.workunit_id
+            break
+        platforms = platforms.filter(FcHwPlatform.workunit_id == mostRecentPlatform)
+        for platform in platforms:
+            for device in platform.platformDevices:
+                if ((device.deviceType == "GPU") or (device.deviceType == "gpu")):
+                    items.append(device.name)
+        return {'items':items}
