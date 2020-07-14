@@ -100,6 +100,7 @@
                   <v-col cols="8">
                     <host-table
                       :hosts="data.hosts"
+                      show-chart-patterns
                     />
                     <div class="d-flex mt-2">
                       <v-spacer />
@@ -116,10 +117,7 @@
                     </div>
                   </v-col>
                   <v-col cols="4">
-                    <graph
-                      id="hostPercentageGraph"
-                      :data="hostPercentageGraph"
-                    />
+                    <job-contribution-chart :id="data.id" />
                   </v-col>
                 </v-row>
               </v-expansion-panel-content>
@@ -139,21 +137,11 @@
                   <!-- sorry mobile, i have had enough of this -->
                   <v-col cols="6">
                     <v-card-title>Progress over time</v-card-title>
-                    <graph
-                      id="progressGraph"
-                      :data="progressGraph"
-                      units="%"
-                      type="job"
-                    />
+                    <job-progress-chart :id="data.id" />
                   </v-col>
                   <v-col cols="6">
                     <v-card-title>Hashes in workunits</v-card-title>
-                    <graph
-                      id="hostGraph"
-                      :data="hostGraph"
-                      units=" hashes"
-                      type="host"
-                    />
+                    <job-workunit-chart :id="data.id" />
                   </v-col>
                 </v-row>
               </v-expansion-panel-content>
@@ -194,6 +182,11 @@ import hostEditor from './hostEditor'
 import permsEditor from './jobPermissions'
 //
 import graph from '@/components/graph/fc_graph'
+//
+import jobProgressChart from '@/components/chart/jobProgress'
+import jobWorkunitChart from '@/components/chart/jobWorkunits'
+import jobContributionChart from '@/components/chart/jobContribution'
+//
 import combinatorDetail from '@/components/jobDetail/attacks/combinator'
 import hybridDetail from '@/components/jobDetail/attacks/hybrid'
 import maskDetail from '@/components/jobDetail/attacks/mask'
@@ -215,6 +208,9 @@ export default {
     hostEditor,
     permsEditor,
     graph,
+    jobProgressChart,
+    jobWorkunitChart,
+    jobContributionChart,
     combinatorDetail,
     hybridDetail,
     maskDetail,
