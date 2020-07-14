@@ -13,6 +13,7 @@ from flask import abort, make_response, jsonify
 import settings
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.graph.graph import ns as graph_namespace
+from src.api.fitcrack.endpoints.chart.chart import ns as chart_namespace
 from src.api.fitcrack.endpoints.hashcat.hashcat import ns as hashcat_namespace
 from src.api.fitcrack.endpoints.host.hosts import ns as hosts_namespace
 from src.api.fitcrack.endpoints.notifications.notifications import ns as notifications_namespace
@@ -63,6 +64,7 @@ def initialize_app(flask_app):
     api.add_namespace(job_namespace)
     api.add_namespace(bins_namespace)
     api.add_namespace(batches_namespace)
+    api.add_namespace(chart_namespace)
     api.add_namespace(hosts_namespace)
     api.add_namespace(hashcat_namespace)
     api.add_namespace(server_namespace)
