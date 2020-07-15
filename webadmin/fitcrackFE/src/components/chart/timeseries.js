@@ -1,4 +1,6 @@
 import { Line } from 'vue-chartjs'
+import deepMerge from 'deepmergefn'
+import { gridColor } from './helpers'
 
 export default {
   extends: Line,
@@ -13,7 +15,7 @@ export default {
     }
   },
   mounted () {
-    this.renderChart(this.chartdata, {
+    this.renderChart(this.chartdata, deepMerge({
       elements: {
         line: {
           tension: 0,
@@ -23,18 +25,20 @@ export default {
       scales: {
         x: {
           type: "time",
-          time: {
-            displayFormats: {
-              hour: "H:mm"
-            }
+          gridLines: {
+            color: gridColor
+          }
+        },
+        y: {
+          gridLines: {
+            color: gridColor
           }
         }
       },
       tooltips: {
         mode: "nearest",
         intersect: false
-      },
-      ...this.options
-    })
+      }
+    }, this.options))
   }
 }

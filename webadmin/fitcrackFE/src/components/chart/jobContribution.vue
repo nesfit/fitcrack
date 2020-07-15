@@ -2,6 +2,7 @@
   <div class="container">
     <doughnut
       v-if="loaded"
+      class="chart"
       :chartdata="chartdata"
       :options="options"
     />
@@ -10,7 +11,7 @@
 
 <script>
 import Doughnut from './doughnut'
-import { patterns } from './helpers'
+import { getColors } from './helpers'
 
 export default {
   components: { Doughnut },
@@ -24,12 +25,6 @@ export default {
     loaded: false,
     chartdata: null,
     options: {
-      elements: {
-        line: {
-          fill: true,
-          tension: 0
-        }
-      },
       legend: {
         display: false
       }
@@ -42,6 +37,10 @@ export default {
     loadData () {
       let target = `${this.$serverAddr}/chart/jobContribution/${this.id}`
       this.axios.get(target).then(r => {
+
+        const datasetCount = r.data.labels.length
+        const patterns = getColors(datasetCount, true)
+
         this.chartdata = {
           labels: r.data.labels,
           datasets: [
@@ -57,3 +56,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.chart {
+  height: 250px;
+}
+</style>

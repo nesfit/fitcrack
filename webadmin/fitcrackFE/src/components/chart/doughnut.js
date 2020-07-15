@@ -1,4 +1,5 @@
 import { Doughnut } from 'vue-chartjs'
+import deepMerge from 'deepmergefn'
 
 export default {
   extends: Doughnut,
@@ -13,12 +14,12 @@ export default {
     }
   },
   mounted () {
-    this.renderChart(this.chartdata, {
+    this.renderChart(this.chartdata, deepMerge({
+      maintainAspectRatio: false,
       tooltips: {
         mode: "index",
         intersect: true
-      },
-      ...this.options
-    })
+      }
+    }, this.options))
   }
 }

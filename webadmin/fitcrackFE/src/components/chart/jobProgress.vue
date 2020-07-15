@@ -32,6 +32,21 @@ export default {
       },
       legend: {
         display: false
+      },
+      scales: {
+        x: {
+          type: "time",
+          gridLines: {
+            display: false
+          }
+        },
+        y: {
+          ticks: {
+            callback (val) {
+              return `${val} %`
+            }
+          }
+        }
       }
     }
   }),

@@ -39,7 +39,7 @@
 
 <script>
 import fixUserNameEncoding from '@/assets/scripts/unswedishify'
-import { patterns } from '@/components/chart/helpers'
+import { getColors } from '@/components/chart/helpers'
 
 export default {
   props: {
@@ -65,7 +65,9 @@ export default {
   mounted () {
     // draw patterns if shown
     if (this.showChartPatterns) {
-      Object.values(this.$refs).forEach((cvs, i) => {
+      const canvases = Object.values(this.$refs)
+      const patterns = getColors(canvases.length, true)
+      canvases.forEach((cvs, i) => {
         const tc = cvs.getContext("2d")
         tc.rect(0, 0, cvs.width, cvs.height)
         tc.fillStyle = patterns[i]
@@ -94,8 +96,11 @@ export default {
 }
 .pattern {
   margin-right: 1ch;
+  display: flex;
+  align-items: center;
 }
 .pattern canvas {
+  border: 2px solid #fffd;
   border-radius: 5px;
 }
 </style>
