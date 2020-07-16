@@ -21,7 +21,8 @@ export default {
     id: {
       type: Number,
       default: undefined
-    }
+    },
+    batch: Boolean
   },
   data: () => ({
     loaded: false,
@@ -34,7 +35,8 @@ export default {
   }),
   methods: {
     loadData () {
-      let target = `${this.$serverAddr}/chart/jobContribution/${this.id}`
+      const endpoint = this.batch ? 'batch' : 'job'
+      let target = `${this.$serverAddr}/chart/${endpoint}Contribution/${this.id}`
       this.axios.get(target).then(r => {
 
         const datasetCount = r.data.labels.length

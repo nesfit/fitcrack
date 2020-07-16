@@ -20,20 +20,34 @@ export default {
     id: {
       type: Number,
       default: undefined
-    }
+    },
+    batch: Boolean
   },
   data: () => ({
     loaded: false,
     chartdata: null,
-    options: {
-      legend: {
-        display: false
+  }),
+  computed: {
+    options () {
+      return {
+        legend: {
+          display: false
+        },
+        scales: {
+          y: {
+            type: this.batch ? 'logarithmic' : 'linear',
+            ticks: {
+              autoSkipPadding: 15
+            }
+          }
+        }
       }
     }
-  }),
+  },
   methods: {
     loadData () {
-      let target = `${this.$serverAddr}/chart/jobWorkunits`
+      const endpoint = this.batch ? 'batch' : 'job'
+      let target = `${this.$serverAddr}/chart/${endpoint}Workunits`
       if (this.id) target += `/${this.id}`
       this.axios.get(target).then(r => {
         this.chartdata = {

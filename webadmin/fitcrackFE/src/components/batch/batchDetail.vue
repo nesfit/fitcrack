@@ -202,10 +202,7 @@
               <v-card-title>
                 Host contribution
               </v-card-title>
-              <graph
-                id="hostPercentageGraph"
-                :data="hostPercentageGraph"
-              />
+              <contribution-chart batch :id="batchId" />
               <div class="mt-4 caption text-justify">
                 For each host that contributed, this is a sum of all hashes from all job's workunits in this batch.
                 For more info on distribution and progress, see detailed view for each job.
@@ -215,12 +212,7 @@
               <v-card-title>
                 Hashes in workunits over time
               </v-card-title>
-              <graph
-                id="hostGraph"
-                :data="hostGraph"
-                units=" hashes"
-                type="host"
-              />
+              <workunit-chart batch :id="batchId" />
             </v-col>
           </v-row>
         </v-card-text>
@@ -232,13 +224,15 @@
 <script>
 import { attackIcon, jobIcon } from '@/assets/scripts/iconMaps'
 
-import graph from '@/components/graph/fc_graph'
+import workunitChart from '@/components/chart/jobWorkunits'
+import contributionChart from '@/components/chart/jobContribution'
 import draggable from 'vuedraggable'
 
 export default {
   components: {
     draggable,
-    graph
+    contributionChart,
+    workunitChart
   },
   data () {
     return {
@@ -253,6 +247,9 @@ export default {
     }
   },
   computed: {
+    batchId () {
+      return parseInt(this.$route.params.id)
+    },
     totalProgress () {
       if (!this.data) return 0
       const total = this.data.jobs.reduce((prev, curr) => prev += curr.progress, 0)
@@ -278,22 +275,9 @@ export default {
     attackIcon,
     jobIcon,
     async load () {
-      this.loadGraphs()
-      this.data = await this.axios.get(`${this.$serverAddr}/batches/${this.$route.params.id}`).then(r => r.data)
+      this.data = await this.axios.get(`${this.$serverAddr}/batches/${this.batchId}`).then(r => r.data)
       this.original = {...this.data}
       this.loading = false
-    },
-    async loadGraphs () {
-      const id = this.$route.params.id
-      const graphPromises = [
-        this.axios.get(`${this.$serverAddr}/graph/hostPercentage/batch/${id}`).then(r => r.data),
-        this.axios.get(`${this.$serverAddr}/graph/hostsComputing/batch/${id}`).then(r => r.data)
-      ]
-      try {
-        [this.hostPercentageGraph, this.hostGraph] = await Promise.all(graphPromises)
-      } catch (e) {
-        console.error('Error getting batch graphs', e)
-      }
     },
     deleteBatchConfirm () {
       this.$root.$confirm('Unlink Batch', `This will unlink jobs from this batch and remove the batch. Jobs will not be discarded. If a job is currently running, it will finish normally. Are you sure?`)
