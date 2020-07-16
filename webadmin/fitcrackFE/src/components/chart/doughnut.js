@@ -1,20 +1,17 @@
-import { Doughnut } from 'vue-chartjs'
+import { Doughnut, mixins } from 'vue-chartjs'
 import deepMerge from 'deepmergefn'
 
 export default {
   extends: Doughnut,
+  mixins: [mixins.reactiveProp],
   props: {
-    chartdata: {
-      type: Object,
-      default: null
-    },
     options: {
       type: Object,
       default: null
     }
   },
   mounted () {
-    this.renderChart(this.chartdata, deepMerge({
+    this.renderChart(this.chartData, deepMerge({
       maintainAspectRatio: false,
       tooltips: {
         mode: "index",

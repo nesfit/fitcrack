@@ -1,21 +1,18 @@
-import { Line } from 'vue-chartjs'
+import { Line, mixins } from 'vue-chartjs'
 import deepMerge from 'deepmergefn'
 import { gridColor } from './helpers'
 
 export default {
   extends: Line,
+  mixins: [mixins.reactiveProp],
   props: {
-    chartdata: {
-      type: Object,
-      default: null
-    },
     options: {
       type: Object,
       default: null
     }
   },
   mounted () {
-    this.renderChart(this.chartdata, deepMerge({
+    this.renderChart(this.chartData, deepMerge({
       elements: {
         line: {
           tension: 0,

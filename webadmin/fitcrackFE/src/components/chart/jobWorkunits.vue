@@ -2,7 +2,7 @@
   <div class="container">
     <timeseries
       v-if="loaded"
-      :chartdata="chartdata"
+      :chart-data="chartdata"
       :options="options"
     />
   </div>
@@ -11,9 +11,11 @@
 <script>
 import Timeseries from './timeseries'
 import { prepareLines } from './helpers'
+import autoload from './autoupdateMixin'
 
 export default {
   components: { Timeseries },
+  mixins: [autoload],
   props: {
     id: {
       type: Number,
@@ -29,9 +31,6 @@ export default {
       }
     }
   }),
-  mounted () {
-    this.loadData()
-  },
   methods: {
     loadData () {
       let target = `${this.$serverAddr}/chart/jobWorkunits`

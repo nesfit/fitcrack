@@ -3,7 +3,7 @@
     <doughnut
       v-if="loaded"
       class="chart"
-      :chartdata="chartdata"
+      :chart-data="chartdata"
       :options="options"
     />
   </div>
@@ -12,9 +12,11 @@
 <script>
 import Doughnut from './doughnut'
 import { getColors } from './helpers'
+import autoload from './autoupdateMixin'
 
 export default {
   components: { Doughnut },
+  mixins: [autoload],
   props: {
     id: {
       type: Number,
@@ -30,9 +32,6 @@ export default {
       }
     }
   }),
-  mounted () {
-    this.loadData()
-  },
   methods: {
     loadData () {
       let target = `${this.$serverAddr}/chart/jobContribution/${this.id}`
