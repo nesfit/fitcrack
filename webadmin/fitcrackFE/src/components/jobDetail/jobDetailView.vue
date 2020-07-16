@@ -24,11 +24,11 @@
           class="jd-main"
         >
           <v-expansion-panels 
+            v-model="openPanels"
             accordion
             multiple
             flat
             hover
-            :value="openPanels"
           >
             <v-expansion-panel>
               <v-expansion-panel-header>
@@ -122,7 +122,7 @@
                 </v-row>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel>
+            <v-expansion-panel @change="statsToggled">
               <v-divider />
               <v-expansion-panel-header>
                 <span class="expansion-header">
@@ -133,7 +133,7 @@
                 </span>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <v-row>
+                <v-row ref="chartrow">
                   <!-- sorry mobile, i have had enough of this -->
                   <v-col cols="6">
                     <v-card-title>Progress over time</v-card-title>
@@ -181,8 +181,6 @@ import hostTable from './hostTable'
 import hostEditor from './hostEditor'
 import permsEditor from './jobPermissions'
 //
-import graph from '@/components/graph/fc_graph'
-//
 import jobProgressChart from '@/components/chart/jobProgress'
 import jobWorkunitChart from '@/components/chart/jobWorkunits'
 import jobContributionChart from '@/components/chart/jobContribution'
@@ -207,7 +205,6 @@ export default {
     hostTable,
     hostEditor,
     permsEditor,
-    graph,
     jobProgressChart,
     jobWorkunitChart,
     jobContributionChart,
@@ -229,7 +226,9 @@ export default {
       hostEditorOpen: false,
       permsEditorOpen: false,
       openPanels: [0,1,2],
-      purging: false
+      purging: false,
+      //
+      chartHeight: '0px'
     }
   },
   computed: {
@@ -273,23 +272,9 @@ export default {
       this.data = await this.axios.get(this.$serverAddr + '/job/' + this.$route.params.id).then(r => r.data)
       document.title = `${this.data.name} – ${this.$store.state.project}`
     },
-    async loadGraphs () {
-      const id = this.$route.params.id
-      const graphPromises = [
-        this.axios.get(this.$serverAddr + '/graph/jobsProgress/'   + id).then(r => r.data),
-        this.axios.get(this.$serverAddr + '/graph/hostsComputing/' + id).then(r => r.data),
-        this.axios.get(this.$serverAddr + '/graph/hostPercentage/' + id).then(r => r.data)
-      ]
-      try {
-        [this.progressGraph, this.hostGraph, this.hostPercentageGraph] = await Promise.all(graphPromises)
-      } catch (e) {
-        console.error('Error getting job graphs', e)
-      }
-    },
     loadAll () {
       this.loadData()
       this.loadHistory()
-      this.loadGraphs()
     },
     //
     operateJob (operation) {
@@ -300,7 +285,6 @@ export default {
       }).then(this.loadAll)
     },
     purgeHandler () {
-      console.log(this.shouldConfirmPurge)
       if (this.shouldConfirmPurge && !this.purging) {
         this.purging = true
         setTimeout(() => {
@@ -310,6 +294,18 @@ export default {
         this.purging = false
         this.operateJob('kill')
       }
+    },
+    statsToggled () {
+      // hack to restore chart height after closing the panel
+      const wrappers = this.$refs.chartrow.querySelectorAll('.container div')
+      Array.from(wrappers).forEach(w => {
+        const current = getComputedStyle(w).getPropertyValue('height')
+        if (current !== '0px' && current !== 'auto') {
+          this.chartHeight = current
+        } else {
+          w.style.height = this.chartHeight
+        }
+      })
     }
   }
 }

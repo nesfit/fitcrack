@@ -7,7 +7,7 @@ const FORMATS = {
 	millisecond: 'H:mm:ss.SSS',
 	second: 'H:mm:ss',
 	minute: 'H:mm',
-	hour: 'H',
+	hour: 'H[h]',
 	day: 'MMM D',
 	week: 'll',
 	month: 'MMM YYYY',

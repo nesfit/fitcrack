@@ -13,6 +13,7 @@ export default {
   },
   mounted () {
     this.renderChart(this.chartData, deepMerge({
+      maintainAspectRatio: false,
       elements: {
         line: {
           tension: 0,
