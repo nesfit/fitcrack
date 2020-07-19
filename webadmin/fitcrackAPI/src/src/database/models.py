@@ -191,7 +191,7 @@ class FcJob(Base):
     markov_threshold = Column(Integer, nullable=False, server_default=text("'0'"))
     grammar_id = Column(BigInteger, ForeignKey('fc_pcfg_grammar.id'), nullable=False)
     case_permute = Column(Integer, nullable=False, server_default=text("'0'"))
-    check_duplicates = Column(Integer, nullable=False, server_default=text("'0'"))
+    check_duplicates = Column(Integer, nullable=False, server_default=text("'1'"))
     min_password_len = Column(Integer, nullable=False, server_default=text("'1'"))
     max_password_len = Column(Integer, nullable=False, server_default=text("'8'"))
     min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
