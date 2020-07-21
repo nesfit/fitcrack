@@ -261,11 +261,18 @@ if [ $INSTALL_BACKEND = "y" ]; then
   cp src/*.bin bin/
   cd $INSTALLER_ROOT
 
+  echo "Building xtohashcat tools"
+  cd webadmin/fitcrackAPI/xtohashcat/scripts/
+  make -j$COMPILER_THREADS
+  cd $INSTALLER_ROOT
+
   echo "Installing Fitcrack WebAdmin back-end..."
 
 
   mkdir $APACHE_DOCUMENT_ROOT/fitcrackAPI
   cp -Rf webadmin/fitcrackAPI/* $APACHE_DOCUMENT_ROOT/fitcrackAPI/
+
+  rm -f webadmin/fitcrackAPI/xtohashcat/scripts/zip2john
 
   # Set permissions and ownership to Apache user and group
   chmod -R 775 $APACHE_DOCUMENT_ROOT/fitcrackAPI
