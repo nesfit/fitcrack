@@ -180,7 +180,16 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
                     line = line.replace("\x1b[0m", "")
                     bad_hash = line.split(":")[0]
                     error = line.split(":")[1]
-                    hash_validity[bad_hash] = error
+                    if bad_hash.find("...") > 0:
+                        # if the hash is longer than a certain length, it's abbreviated with ... 
+                        bad_hash_parts = bad_hash.split("...")
+                        for h in hash_validity.keys():
+                            if h.startswith(bad_hash_parts[0]) and h.endswith(bad_hash_parts[1]):
+                                # Hash can be ok, but hashcat is unable to verify it. Detect this situation and be optimistic.
+                                hash_validity[h] = error if "Token length exception" not in error else "OK"
+                                break
+                    else:
+                        hash_validity[bad_hash] = error
 
             hashes = []
             for h, s in hash_validity.items():
