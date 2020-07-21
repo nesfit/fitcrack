@@ -804,7 +804,7 @@ class FcEncryptedFile(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     path = Column(String(400), nullable=False)
-    hash = Column(String(1000), nullable=False)
+    hash = Column(LargeBinary, nullable=False)
     hash_type = Column(String(50), nullable=False)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 

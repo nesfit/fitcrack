@@ -57,7 +57,10 @@ class filesAdd(Resource):
         uploadedFile = fileUpload(file, PROTECTEDFILES_DIR, ALLOWED_EXTENSIONS, withTimestamp=True)
         if uploadedFile:
             hash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
-            encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=hash['hash'],
+            print("test")
+            print(hash['hash'])
+            print(len(hash['hash']))
+            encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=hash['hash'].encode(),
                                       hash_type=hash['hash_type'])
             try:
                 db.session.add(encFile)

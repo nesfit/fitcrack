@@ -36,7 +36,6 @@ def create_job(data):
 
     settings = FcSetting.query.first()
     for idx, hashObj in enumerate(data['hash_settings']['hash_list']):
-
         if hashObj['hash'].startswith('BASE64:'):
             decoded = base64.decodebytes(hashObj['hash'][7:].encode())
             with tempfile.NamedTemporaryFile() as fp:
@@ -48,7 +47,10 @@ def create_job(data):
 
         else:
             if settings.verify_hash_format:
-                verifyHashFormat(hashObj['hash'], data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+                with tempfile.NamedTemporaryFile() as fp:
+                    fp.write(hashObj['hash'].encode())
+                    fp.seek(0)
+                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
             data['hash_settings']['hash_list'][idx]['hash']= hashObj['hash'].encode()
 
     hybrid_mask_dict = False
