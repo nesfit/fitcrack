@@ -24,6 +24,7 @@ Once installed, see how to [Operate the server](#oper)
 * automake (1.8+)
 * GCC (6.3.0+)
 * pkg-config (0.15+)
+* Perl + libcompress
 * Python 2 (2.2+)
 * Python 3
 * pip for Python 3
@@ -65,7 +66,7 @@ Open a **root** terminal, go to the directory with Fitcrack sources and proceed 
 
 ### Install prerequisities
 ```
-apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev curl
+apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
 
 mysql_secure_installation # Set MySQL root password
 
@@ -187,4 +188,3 @@ boincadm@myserver:~$ cd projects/fitcrack
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
-
