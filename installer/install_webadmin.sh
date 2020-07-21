@@ -273,6 +273,7 @@ if [ $INSTALL_BACKEND = "y" ]; then
   cp -Rf webadmin/fitcrackAPI/* $APACHE_DOCUMENT_ROOT/fitcrackAPI/
 
   rm -f webadmin/fitcrackAPI/xtohashcat/scripts/zip2john
+  rm -f webadmin/fitcrackAPI/xtohashcat/scripts/rar2john
 
   # Set permissions and ownership to Apache user and group
   chmod -R 775 $APACHE_DOCUMENT_ROOT/fitcrackAPI
