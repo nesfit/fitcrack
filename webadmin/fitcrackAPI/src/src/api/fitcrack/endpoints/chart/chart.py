@@ -24,9 +24,9 @@ from src.api.fitcrack.endpoints.batches.functions import getIdsFromBatch
 log = logging.getLogger(__name__)
 ns = api.namespace('chart', description='Endpoints for charting data')
 
-def try_bounds (query, bounds):
+def try_bounds (query, model, bounds):
     try:
-        query = set_bounds_filter(query, bounds)
+        query = set_bounds_filter(query, model, bounds)
     except DateFormatError:
         abort(400, 'Couldn\'t parse dates. Format should be {}.'.format(dateformat))
     except DatePrecedenceError:
@@ -44,7 +44,7 @@ class jobProgress(Resource):
         """
         query = FcJobGraph.query
         bounds = time_series_bounds.parse_args(request)
-        query = try_bounds(query, bounds)
+        query = try_bounds(query, FcJobGraph, bounds)
             
         return {
             'datasets': build_job_datasets(query)
@@ -61,7 +61,7 @@ class jobProgressSingle(Resource):
         """
         query = FcJobGraph.query
         bounds = time_series_bounds.parse_args(request)
-        query = try_bounds(query, bounds)
+        query = try_bounds(query, FcJobGraph, bounds)
         query = query.filter_by(job_id=id)
             
         return {
@@ -80,7 +80,7 @@ class jobWorkunits(Resource):
         """
         query = FcWorkunit.query
         bounds = time_series_bounds.parse_args(request)
-        query = try_bounds(query, bounds)
+        query = try_bounds(query, FcWorkunit, bounds)
             
         return {
             'datasets': build_wu_datasets(query)
@@ -98,7 +98,7 @@ class jobWorkunitsSingle(Resource):
         """
         query = FcWorkunit.query
         bounds = time_series_bounds.parse_args(request)
-        query = try_bounds(query, bounds)
+        query = try_bounds(query, FcWorkunit, bounds)
         query = query.filter_by(job_id=id)
             
         return {
@@ -117,7 +117,7 @@ class batchWorkunits(Resource):
         job_ids = getIdsFromBatch(id)
         query = FcWorkunit.query
         bounds = time_series_bounds.parse_args(request)
-        query = try_bounds(query, bounds)
+        query = try_bounds(query, FcWorkunit, bounds)
         query = query.filter(FcWorkunit.job_id.in_(job_ids))
             
         return {
