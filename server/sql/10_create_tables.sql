@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `fc_protected_file` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `path` varchar(400) NOT NULL,
-  `hash` varchar(4000) NOT NULL,
+  `hash` longblob NOT NULL,
   `hash_type` varchar(50) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
