@@ -40,6 +40,8 @@
  * If any of the files is uncompressed, this is preferred even if larger
  * Add METHOD to output
  *
+ * Edited by David Bolvansky (david.bolvansky@gmail.com)
+ * Changes: rar2john is now standalone utility, does not require john
  */
 
 #include <stdint.h>

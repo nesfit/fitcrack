@@ -106,6 +106,9 @@
  *    DF = compressed data DF can be Le*2 hex bytes, and if so, then it is the ENTIRE file blob written 'inline', unused currently
  *    Au = authentication code, a 8 byte hex value that contains a CRC32 checksum, unused currently
  *    Fn = filename within zip file
+ *
+ * Edited by David Bolvansky (david.bolvansky@gmail.com)
+ * Changes: zip2john is now standalone utility, does not require john
  */
 
 #include <stdint.h>
