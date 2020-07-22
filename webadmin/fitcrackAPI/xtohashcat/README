@@ -68,11 +68,3 @@ folder.
 
 To run the tests, simply use './test.sh' and watch the magic happen.
 If there are no errors, all the tests should turn green.
-
-
-5) POSSIBLE PROBLEMS
-
-rar2john and zip2john are present as binaries, compiled on 64b
-Ubuntu. If there are any problems with ZIP/RAR format, you should
-recompile john on your system and replace these binaries.
-
