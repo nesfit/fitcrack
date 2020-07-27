@@ -29,6 +29,12 @@ void AttackCrackingBase::addSpecificArguments() {
   addArgument("--outfile");
   addArgument(output_file_);
 
+  // Set format of output file (new feature in hashcat 6)
+  // 1 | hash[:salt]
+  // 2 | plain
+  // 3 | hex_plain
+  addArgument("--outfile-format=1,3");
+
   addArgument("--outfile-format="+RunnerUtils::toString(HashcatConstant::OutputFormat));
   addArgument("--quiet");
   addArgument("--status");
@@ -36,7 +42,6 @@ void AttackCrackingBase::addSpecificArguments() {
   addArgument("--restore-disable");
   addArgument("--potfile-disable");
   addArgument("--logfile-disable");
-  //    addArgument("--gpu-temp-disable");
 }
 
 void AttackCrackingBase::addRequiredFile(const std::string& file_name) {
