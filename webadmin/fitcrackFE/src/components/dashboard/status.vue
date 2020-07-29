@@ -59,18 +59,32 @@
         <v-card-title class="py-0">
           Hosts
         </v-card-title>
+        <div class="host-summary mx-4">
+          <span class="mono">{{ hosts.activeHosts }}</span> of <span class="mono">{{ hosts.totalHosts }}</span> online
+        </div>
         <host-grid
           class="ma-3"
           :active="hosts.activeHosts"
           :inactive="hosts.inactiveHosts"
         />
-        <div class="host-summary mx-4">
-          <span class="mono">{{ hosts.activeHosts }}</span> of <span class="mono">{{ hosts.totalHosts }}</span> online
-        </div>
       </div>
       <div class="status-tile server">
-        <v-card-title class="py-0">
+        <v-card-title class="py-0 d-flex justify-space-between">
           Server
+          <v-btn
+            x-small
+            color="info"
+            elevation="0"
+            :to="{name: 'server'}"
+          >
+            <v-icon
+              small
+              left
+            >
+              mdi-chart-multiline
+            </v-icon>
+            <span>Monitor</span>
+          </v-btn>
         </v-card-title>
         <div class="server-wrapper">
           <slot />
