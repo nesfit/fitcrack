@@ -4,13 +4,13 @@
       v-if="loaded"
       class="chart"
       :chart-data="chartdata"
-      :options="options"
+      :overrides="options"
     />
   </div>
 </template>
 
 <script>
-import Doughnut from './doughnut'
+import Doughnut from './types/doughnut'
 import { getColors } from './helpers'
 import autoload from './autoupdateMixin'
 

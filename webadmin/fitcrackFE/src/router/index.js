@@ -8,7 +8,7 @@ import Router from 'vue-router'
 
 import store from '@/store'
 
-const home = r => require.ensure([], () => r(require('@/components/home/homeView')))
+const home = r => require.ensure([], () => r(require('@/components/dashboard/dashboard')))
 const jobs = r => require.ensure([], () => r(require('@/components/job/jobsView')))
 const jobDetail = r => require.ensure([], () => r(require('@/components/jobDetail/jobDetailView')))
 const batchList = r => require.ensure([], () => r(require('@/components/batch/batchList')))

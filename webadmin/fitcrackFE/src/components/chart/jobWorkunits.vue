@@ -3,13 +3,13 @@
     <timeseries
       v-if="loaded"
       :chart-data="chartdata"
-      :options="options"
+      :overrides="options"
     />
   </div>
 </template>
 
 <script>
-import Timeseries from './timeseries'
+import Timeseries from './types/timeseries'
 import { prepareLines } from './helpers'
 import autoload from './autoupdateMixin'
 
@@ -21,7 +21,16 @@ export default {
       type: Number,
       default: undefined
     },
-    batch: Boolean
+    from: {
+      type: String,
+      default: undefined
+    },
+    to: {
+      type: String,
+      default: undefined
+    },
+    batch: Boolean,
+    logarithmic: Boolean
   },
   data: () => ({
     loaded: false,
@@ -35,12 +44,19 @@ export default {
         },
         scales: {
           y: {
-            type: this.batch ? 'logarithmic' : 'linear',
+            type: this.batch || this.logarithmic ? 'logarithmic' : 'linear',
             ticks: {
               autoSkipPadding: 15
             }
           }
         }
+      }
+    },
+    fromTime () {
+      if (!this.id && !this.from) {
+        return this.$moment().subtract(24, 'hours').format('YYYY-M-DTH:mm:ss')
+      } else {
+        return this.from
       }
     }
   },
@@ -49,7 +65,12 @@ export default {
       const endpoint = this.batch ? 'batch' : 'job'
       let target = `${this.$serverAddr}/chart/${endpoint}Workunits`
       if (this.id) target += `/${this.id}`
-      this.axios.get(target).then(r => {
+      this.axios.get(target, {
+        params: {
+          from: this.fromTime,
+          to: this.to
+        }
+      }).then(r => {
         this.chartdata = {
           datasets: prepareLines(r.data.datasets)
         }
