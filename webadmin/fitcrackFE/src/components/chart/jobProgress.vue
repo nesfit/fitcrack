@@ -1,5 +1,10 @@
 <template>
   <div class="container">
+    <v-progress-linear
+      v-show="loading"
+      indeterminate
+      absolute
+    />
     <timeseries
       v-if="loaded"
       :chart-data="chartdata"
@@ -12,10 +17,11 @@
 import Timeseries from './types/timeseries'
 import { prepareLines } from './helpers'
 import autoload from './autoupdateMixin'
+import watcher from './boundWatcherMixin'
 
 export default {
   components: { Timeseries },
-  mixins: [autoload],
+  mixins: [autoload, watcher],
   props: {
     id: {
       type: Number,
@@ -32,6 +38,7 @@ export default {
   },
   data: () => ({
     loaded: false,
+    loading: false,
     chartdata: null,
     options: {
       elements: {
@@ -70,7 +77,10 @@ export default {
     }
   },
   methods: {
-    loadData () {
+    loadData (manual = false) {
+      if (manual) {
+        this.loading = true
+      }
       let target = `${this.$serverAddr}/chart/jobProgress`
       if (this.id) target += `/${this.id}`
       this.axios.get(target, {
@@ -82,9 +92,16 @@ export default {
         this.chartdata = {
           datasets: prepareLines(r.data.datasets)
         }
+        this.loading = false
         this.loaded = true
       })
     }
   }
 }
 </script>
+
+<style scoped>
+.container {
+  position: relative;
+}
+</style>

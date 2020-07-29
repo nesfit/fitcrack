@@ -62,10 +62,19 @@
         />
       </div>
     </v-sheet>
-    <v-toolbar flat>
-      <dt-picker v-model="chartsFrom" />
-      <dt-picker v-model="chartsTo" />
-    </v-toolbar>
+    <v-sheet class="dash-row px-8 justify-end">
+      <div class="d-flex">
+        <dt-picker
+          v-model="chartsFrom"
+          class="mr-4"
+          label="From"
+        />
+        <dt-picker
+          v-model="chartsTo"
+          label="To"
+        />
+      </div>
+    </v-sheet>
   </div>
 </template>
 
