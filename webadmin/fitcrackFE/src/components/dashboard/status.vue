@@ -1,12 +1,37 @@
 <template>
   <div class="dashboard-status">
-    <div class="py-4 px-8 top-panel">
-      <h1>Hello, {{ $store.state.user.userData.username }}!</h1>
-      <h2>
-        There {{ pluralJobs ? 'are' : 'is' }} currently 
-        {{ activeJobs }} active job{{ pluralJobs ? 's' : '' }} 
-        with {{ hosts.activeHosts }} host{{ pluralHosts ? 's' : '' }} connected.
-      </h2>
+    <div class="py-4 px-8 top-panel d-flex justify-space-between align-center">
+      <div>
+        <h1>Hello, {{ $store.state.user.userData.username }}!</h1>
+        <h2>
+          There {{ pluralJobs ? 'are' : 'is' }} currently 
+          {{ activeJobs }} active job{{ pluralJobs ? 's' : '' }} 
+          with {{ hosts.activeHosts }} host{{ pluralHosts ? 's' : '' }} connected.
+        </h2>
+      </div>
+      <div class="shortcuts">
+        <v-btn
+          large
+          text
+          :to="{name: 'hashes'}"
+        >
+          <v-icon left>
+            mdi-book-lock
+          </v-icon>
+          <span>Hashes</span>
+        </v-btn>
+        <v-btn
+          large
+          color="primary"
+          elevation="0"
+          :to="{name: 'addJob'}"
+        >
+          <v-icon left>
+            mdi-briefcase-plus
+          </v-icon>
+          <span>New job</span>
+        </v-btn>
+      </div>
     </div>
     <v-divider />
     <div class="d-flex flex-wrap">
