@@ -4,7 +4,7 @@ const gridColor = '#9997'
 export { gridColor }
 
 function* colorGenerator () {
-  let hue = 360
+  let hue = 380
   while (true) {
     hue *= 1.2
     yield `hsl(${hue}, 80%, 55%)`
@@ -40,4 +40,23 @@ export function prepareLines (data) {
     set.borderColor = colors[i]
     return set
   })
+}
+
+export function plotUsage (usageData, metric) {
+  return take(usageData, 180)
+    .reduce((data, point) => ({
+      ...data,
+      [point.time]: point[metric]
+    }), {})
+}
+
+function take (array, amount) {
+  if (array.length <= amount) return array
+  const step = Math.floor(array.length / amount)
+  let result = []
+  for (let i = array.length - 1; i > 0; i -= step) {
+    if (i < 0) break
+    result.push(array[i])
+  }
+  return result
 }
