@@ -186,6 +186,8 @@ job_nano_model = api.model('Job nano', {
     'status_tooltip': fields.String(required=False),
     'status_type': fields.String(),
     'progress': fields.Float(required=False),
+    'cracked_hashes_str': fields.String(),
+    'estimated_cracking_time_str': fields.String(),
 })
 
 job_nano_list_model = api.inherit('Job nano list', {
