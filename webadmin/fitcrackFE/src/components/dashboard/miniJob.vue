@@ -28,19 +28,55 @@
         class="minijob-list"
       >
         <v-list-item>
-          <v-list-item-icon>
+          <v-list-item-action>
             <v-icon>{{ jobIcon(data.status_text) }}</v-icon>
-          </v-list-item-icon>
+          </v-list-item-action>
           <v-list-item-content class="text-capitalize">
-            {{ data.status_text }}
+            <v-list-item-subtitle class="overline">
+              Status
+            </v-list-item-subtitle>
+            <v-list-item-title>
+              {{ data.status_text }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item>
-          <v-list-item-icon>
+          <v-list-item-action>
             <v-icon>{{ attackIcon(data.attack) }}</v-icon>
-          </v-list-item-icon>
+          </v-list-item-action>
           <v-list-item-content class="text-capitalize">
-            {{ data.attack }} attack
+            <v-list-item-subtitle class="overline">
+              Type
+            </v-list-item-subtitle>
+            <v-list-item-title>
+              {{ data.attack }} attack
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-show="parseInt(data.status) > 0">
+          <v-list-item-action>
+            <v-icon>mdi-textbox-password</v-icon>
+          </v-list-item-action>
+          <v-list-item-content class="text-capitalize">
+            <v-list-item-subtitle class="overline">
+              Cracked Hashes
+            </v-list-item-subtitle>
+            <v-list-item-title>
+              {{ data.cracked_hashes_str }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-show="parseInt(data.status) >= 10">
+          <v-list-item-action>
+            <v-icon>mdi-bell-check-outline</v-icon>
+          </v-list-item-action>
+          <v-list-item-content class="text-capitalize">
+            <v-list-item-subtitle class="overline">
+              ETA
+            </v-list-item-subtitle>
+            <v-list-item-title>
+              {{ data.estimated_cracking_time_str }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
