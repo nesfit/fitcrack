@@ -24,7 +24,6 @@ import mdfSetup from 'moment-duration-format'
 import VueVisible from 'vue-visible'
 import UserPlugin from '@/components/user/userPlugin'
 import paginator from '@/plugins/paginator'
-import VueClip from 'vue-clip'
 import VueProgressBar from 'vue-progressbar'
 import VueHighlightJS from 'vue-highlightjs'
 
@@ -43,7 +42,6 @@ document.querySelector('meta[name="theme-color"]').setAttribute('content', windo
 mdfSetup(moment)
 
 Vue.use(VueHighlightJS)
-Vue.use(VueClip);
 Vue.use(VueVisible);
 Vue.use(VueMoment, {
   moment
