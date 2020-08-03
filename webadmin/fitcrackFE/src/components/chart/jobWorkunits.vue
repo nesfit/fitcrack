@@ -9,6 +9,7 @@
       v-if="loaded"
       :chart-data="chartdata"
       :overrides="options"
+      class="chart-wrapper"
     />
   </div>
 </template>

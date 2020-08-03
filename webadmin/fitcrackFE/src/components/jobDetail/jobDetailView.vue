@@ -297,7 +297,7 @@ export default {
     },
     statsToggled () {
       // hack to restore chart height after closing the panel
-      const wrappers = this.$refs.chartrow.querySelectorAll('.container div')
+      const wrappers = this.$refs.chartrow.querySelectorAll('.chart-wrapper')
       Array.from(wrappers).forEach(w => {
         const current = getComputedStyle(w).getPropertyValue('height')
         if (current !== '0px' && current !== 'auto') {

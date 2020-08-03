@@ -2,7 +2,7 @@
   <div class="container">
     <doughnut
       v-if="loaded"
-      class="chart"
+      class="chart chart-wrapper"
       :chart-data="chartdata"
       :overrides="options"
     />
