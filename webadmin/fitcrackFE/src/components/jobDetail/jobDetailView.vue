@@ -5,7 +5,7 @@
       indeterminate
       color="secondary"
     />
-    <div class="jd-split">
+    <v-sheet class="jd-split">
       <transition name="info">
         <job-info
           v-if="data"
@@ -149,7 +149,7 @@
           </v-expansion-panels>
         </div>
       </transition>
-    </div>
+    </v-sheet>
     <v-divider />
     <workunits
       v-if="data"

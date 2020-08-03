@@ -1,173 +1,175 @@
 <template>
   <div class="job-info">
-    <!-- TOP SHEET -->
-    <v-sheet
-      class="info-sheet top-sheet pa-4"
-      dark
-      tile
-      :color="statusColor"
-    >
-      <v-icon
-        class="attack-icon"
-        aria-hidden
+    <div class="sticky-wrap">
+      <!-- TOP SHEET -->
+      <v-sheet
+        class="info-sheet top-sheet pa-4"
+        dark
+        tile
+        :color="statusColor"
       >
-        {{ attackIcon(data.attack) }}
-      </v-icon>
-      <div class="top-sheet-bar mb-2">
-        <div>
-          <div class="name title mb-2">
-            {{ data.name }}
-          </div>
-          <div class="subtitle-2 ">
-            <b class="text-capitalize">{{ data.attack }}</b> Attack
-            <br>
-            <b>{{ data.hash_type_name }}</b>
+        <v-icon
+          class="attack-icon"
+          aria-hidden
+        >
+          {{ attackIcon(data.attack) }}
+        </v-icon>
+        <div class="top-sheet-bar mb-2">
+          <div>
+            <div class="name title mb-2">
+              {{ data.name }}
+            </div>
+            <div class="subtitle-2 ">
+              <b class="text-capitalize">{{ data.attack }}</b> Attack
+              <br>
+              <b>{{ data.hash_type_name }}</b>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="status">
-        <v-progress-circular
-          class="fu"
-          :value="data.progress"
-          :indeterminate="indtProgress"
-          size="26"
-          rotate="-90"
-        />
-        <span class="text-capitalize pt-1 ml-2">
-          <span v-if="data.batch && data.batch.id && data.status == 0">
-            Enqueued
-          </span>
-          <span v-else>
-            <b v-show="data.progress > 0 && data.progress < 100">{{ data.progress }} %</b>
-            {{ data.status_text }}
-          </span>
-        </span>
-      </div>
-    </v-sheet>
-    <!-- ACTION SHEET -->
-    <v-sheet
-      class="info-sheet cta-sheet pa-2 d-flex"
-      dark
-      tile
-      :color="statusColor"
-    >
-      <template v-if="!editing">
-        <!-- action button -->
-        <template v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')">
-          <v-btn
-            v-if="data.batch && data.batch.id && data.status == 0"
-            key="batch-link"
-            text
-            :to="`/batches/${data.batch.id}`"
-          >
-            <v-icon left>
-              mdi-tray-full
-            </v-icon>
-            <span>Go to Batch</span>
-          </v-btn>
-          <v-btn
-            v-else-if="data.hosts.length > 0"
-            key="operate"
-            text
-            :disabled="data.status === '12'"
-            @click="$emit('operate', operation.text)"
-          >
-            <v-icon left>
-              {{ operation.icon }}
-            </v-icon>
-            <span>{{ operation.text }}</span>
-          </v-btn>
-          <v-btn
-            v-else
-            key="assign"
-            text
-            @click="$emit('edit-hosts')"
-          >
-            <v-icon left>
-              mdi-desktop-classic
-            </v-icon>
-            <span>Add Hosts</span>
-          </v-btn>
-        </template>
-        <v-spacer />
-        <!-- edit button -->
-        <v-btn
-          v-if="data.permissions.edit || $userCan('EDIT_ALL_JOBS')"
-          key="edit-enter"
-          text
-          @click="editing = true"
-        >
-          <span>Edit</span>
-          <v-icon right>
-            mdi-pencil
-          </v-icon>
-        </v-btn>
-      </template>
-      <template v-else>
-        <v-btn
-          v-if="data.permissions.owner"
-          key="edit-perms"
-          text
-          @click="$emit('edit-permissions')"
-        >
-          <v-icon left>
-            mdi-account
-          </v-icon>
-          Permissions
-        </v-btn>
-        <v-spacer />
-        <!-- cancel edit button -->
-        <v-btn
-          key="edit-cancel"
-          text
-          @click="editing = false"
-        >
-          <span>Cancel</span>
-          <v-icon right>
-            mdi-undo-variant
-          </v-icon>
-        </v-btn>
-      </template>
-    </v-sheet>
-    <!-- INFO LIST -->
-    <v-list
-      class="info-list"
-      inactive
-      two-line
-    >
-      <transition name="fade" mode="out-in">
-        <transition-group
-          v-if="!editing"
-          tag="div"
-          name="list"
-        >
-          <v-list-item
-            v-for="({title, icon, value}) in details"
-            :key="title"
-          >
-            <v-list-item-content>
-              <v-list-item-subtitle class="overline mb-1">
-                <v-icon
-                  class="mr-1"
-                  small
-                >
-                  {{ icon }}
-                </v-icon>
-                {{ title }}
-              </v-list-item-subtitle>
-              <v-list-item-title class="pre">{{ value }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </transition-group>
-        <!-- EDITOR -->
-        <template v-else>
-          <job-editor
-            :data="data"
-            @save="saveEdit"
+        <div class="status">
+          <v-progress-circular
+            class="fu"
+            :value="data.progress"
+            :indeterminate="indtProgress"
+            size="26"
+            rotate="-90"
           />
+          <span class="text-capitalize pt-1 ml-2">
+            <span v-if="data.batch && data.batch.id && data.status == 0">
+              Enqueued
+            </span>
+            <span v-else>
+              <b v-show="data.progress > 0 && data.progress < 100">{{ data.progress }} %</b>
+              {{ data.status_text }}
+            </span>
+          </span>
+        </div>
+      </v-sheet>
+      <!-- ACTION SHEET -->
+      <v-sheet
+        class="info-sheet cta-sheet pa-2 d-flex"
+        dark
+        tile
+        :color="statusColor"
+      >
+        <template v-if="!editing">
+          <!-- action button -->
+          <template v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')">
+            <v-btn
+              v-if="data.batch && data.batch.id && data.status == 0"
+              key="batch-link"
+              text
+              :to="`/batches/${data.batch.id}`"
+            >
+              <v-icon left>
+                mdi-tray-full
+              </v-icon>
+              <span>Go to Batch</span>
+            </v-btn>
+            <v-btn
+              v-else-if="data.hosts.length > 0"
+              key="operate"
+              text
+              :disabled="data.status === '12'"
+              @click="$emit('operate', operation.text)"
+            >
+              <v-icon left>
+                {{ operation.icon }}
+              </v-icon>
+              <span>{{ operation.text }}</span>
+            </v-btn>
+            <v-btn
+              v-else
+              key="assign"
+              text
+              @click="$emit('edit-hosts')"
+            >
+              <v-icon left>
+                mdi-desktop-classic
+              </v-icon>
+              <span>Add Hosts</span>
+            </v-btn>
+          </template>
+          <v-spacer />
+          <!-- edit button -->
+          <v-btn
+            v-if="data.permissions.edit || $userCan('EDIT_ALL_JOBS')"
+            key="edit-enter"
+            text
+            @click="editing = true"
+          >
+            <span>Edit</span>
+            <v-icon right>
+              mdi-pencil
+            </v-icon>
+          </v-btn>
         </template>
-      </transition>
-    </v-list>
+        <template v-else>
+          <v-btn
+            v-if="data.permissions.owner"
+            key="edit-perms"
+            text
+            @click="$emit('edit-permissions')"
+          >
+            <v-icon left>
+              mdi-account
+            </v-icon>
+            Permissions
+          </v-btn>
+          <v-spacer />
+          <!-- cancel edit button -->
+          <v-btn
+            key="edit-cancel"
+            text
+            @click="editing = false"
+          >
+            <span>Cancel</span>
+            <v-icon right>
+              mdi-undo-variant
+            </v-icon>
+          </v-btn>
+        </template>
+      </v-sheet>
+      <!-- INFO LIST -->
+      <v-list
+        class="info-list"
+        inactive
+        two-line
+      >
+        <transition name="fade" mode="out-in">
+          <transition-group
+            v-if="!editing"
+            tag="div"
+            name="list"
+          >
+            <v-list-item
+              v-for="({title, icon, value}) in details"
+              :key="title"
+            >
+              <v-list-item-content>
+                <v-list-item-subtitle class="overline mb-1">
+                  <v-icon
+                    class="mr-1"
+                    small
+                  >
+                    {{ icon }}
+                  </v-icon>
+                  {{ title }}
+                </v-list-item-subtitle>
+                <v-list-item-title class="pre">{{ value }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </transition-group>
+          <!-- EDITOR -->
+          <template v-else>
+            <job-editor
+              :data="data"
+              @save="saveEdit"
+            />
+          </template>
+        </transition>
+      </v-list>
+    </div>
   </div>
 </template>
 
@@ -281,8 +283,14 @@ export default {
 
 <style scoped>
 .job-info {
+  position: relative;
   display: flex;
   flex-direction: column;
+}
+
+.sticky-wrap {
+  position: sticky;
+  top: 64px;
 }
 
 .info-sheet {
@@ -301,10 +309,6 @@ export default {
   height: 100%;
   background-color: rgba(0,0,0,.25);
   z-index: -1;
-}
-
-.info-list {
-  flex-grow: 1;
 }
 
 .wrap { white-space: normal; }
