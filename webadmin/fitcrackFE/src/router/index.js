@@ -8,7 +8,7 @@ import Router from 'vue-router'
 
 import store from '@/store'
 
-const home = r => require.ensure([], () => r(require('@/components/home/homeView')))
+const home = r => require.ensure([], () => r(require('@/components/dashboard/dashboard')))
 const jobs = r => require.ensure([], () => r(require('@/components/job/jobsView')))
 const jobDetail = r => require.ensure([], () => r(require('@/components/jobDetail/jobDetailView')))
 const batchList = r => require.ensure([], () => r(require('@/components/batch/batchList')))
@@ -36,7 +36,7 @@ const maskDetail = r => require.ensure([], () => r(require('@/components/mask/ma
 const testView = r => require.ensure([], () => r(require('@/components/test/test')))
 const PageNotFound = r => require.ensure([], () => r(require('@/components/pageNotFound')))
 const EncryptedFiles = r => require.ensure([], () => r(require('@/components/encryptedFile/encryptedFilesView')))
-const Server = r => require.ensure([], () => r(require('@/components/server/serverPage')))
+const Server = r => require.ensure([], () => r(require('@/components/server/serverMonitor')))
 const Settings = r => require.ensure([], () => r(require('@/components/settings/settingsView')))
 const Transfer = r => require.ensure([], () => r(require('@/components/settings/dataTransfer')))
 const UnauthorizedError = r => require.ensure([], () => r(require('@/components/errorPages/unauthorized')))

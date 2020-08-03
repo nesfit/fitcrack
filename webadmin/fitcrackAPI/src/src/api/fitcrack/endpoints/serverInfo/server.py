@@ -12,8 +12,7 @@ from src.api.fitcrack.responseModels import simpleResponse
 from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo, dependency_report
 from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
 from src.api.fitcrack.endpoints.serverInfo.transfer import pack, unpack, dependency_check, ImportDependencyMissing
-from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options, dependency_list
-from src.api.fitcrack.endpoints.graph.argumentsParser import job_graph_arguments
+from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options, dependency_list, job_graph_arguments
 from src.database import db
 from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
