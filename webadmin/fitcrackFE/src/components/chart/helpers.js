@@ -4,15 +4,18 @@ const gridColor = '#9997'
 export { gridColor }
 
 function* colorGenerator () {
-  let hue = 380
+  let hue = 24 * 8
   while (true) {
-    hue *= 1.2
-    yield `hsl(${hue}, 80%, 55%)`
+    hue += 24 * 11 // 24deg base step = 15 colors
+    yield `hsl(${hue}, 70%, 55%)`
   }
 }
 let gen = colorGenerator()
 let colors = []
 let patterns = []
+
+getColors(15)
+patterns = [...colors]
 
 export function getColors (count, usePatterns = false) {
   const missingColors = count - colors.length
