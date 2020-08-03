@@ -403,6 +403,7 @@
                 auto-refresh
               />
             </div>
+            <v-subheader><b>({{ hosts.length }} selected)</b></v-subheader>
             <v-row>
               <v-spacer />
               <v-btn

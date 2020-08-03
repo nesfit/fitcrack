@@ -33,6 +33,7 @@
           Host List
         </v-btn>
         <v-spacer />
+        <b class="mr-4">{{ hosts.length }} selected</b>
         <v-btn 
           :loading="saving"
           color="success"
