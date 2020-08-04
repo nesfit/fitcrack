@@ -18,7 +18,7 @@ def getNotifications(userID, page, per_page, markAsSeen):
         notifications.append(
             {
                 'job_id': notif.source_id,
-                'title': notif.source.name,
+                'title': notif.source.name if notif.source else '<Removed Job>',
                 'text': job_status_text_info_to_code_dict[notif.new_value],
                 'type': getNotifType(notif.new_value),
                 'seen': notif.seen,
