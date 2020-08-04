@@ -332,6 +332,26 @@
         </v-col>
       </v-row>
       <v-spacer />
+      <v-badge
+        :value="notificationsCount > 0"
+        :content="notificationsCount"
+        color="red"
+        overlap
+        left
+        top
+        offset-y="18"
+      >
+        <v-btn
+          large
+          rounded
+          icon
+          @click.stop="toggleNotifications"
+        >
+          <v-icon>
+            {{ notificationsCount > 0 ? 'mdi-bell' : 'mdi-bell-outline' }}
+          </v-icon>
+        </v-btn>
+      </v-badge>
       <v-menu
         v-model="userFlyout"
         :close-on-content-click="false"
@@ -342,7 +362,7 @@
             large
             rounded
             text
-            class="pr-2"
+            class="pr-2 pl-3"
             v-on="on"
           >
             <div class="text-none text-end subtitle-2 mr-2">
@@ -425,25 +445,6 @@
           </v-card-actions>
         </v-card>
       </v-menu>
-      <v-badge
-        :value="notificationsCount > 0"
-        :content="notificationsCount"
-        color="red"
-        overlap
-        top
-        left
-      >
-        <v-btn
-          large
-          rounded
-          icon
-          @click.stop="toggleNotifications"
-        >
-          <v-icon>
-            {{ notificationsCount > 0 ? 'mdi-bell-ring' : 'mdi-bell-outline' }}
-          </v-icon>
-        </v-btn>
-      </v-badge>
     </v-app-bar>
     <!-- CONTENT -->
     <v-content class="height100 main">
@@ -464,7 +465,11 @@
       app
       width="450"
     >
-      <notifications-wrapper ref="notifWrapper" />
+      <notifications-wrapper
+        ref="notifWrapper"
+        :count="notificationsCount"
+        @close="rightDrawer = false"
+      />
     </v-navigation-drawer>
     <!-- D A E M O N (。>︿<) A L E R T -->
     <v-dialog
