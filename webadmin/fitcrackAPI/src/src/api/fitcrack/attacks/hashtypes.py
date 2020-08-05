@@ -495,6 +495,11 @@ hashtypes = [
       "name": "IKE-PSK SHA1",
     },
     {
+      "code": "23200",
+      "category": "Network Protocols",
+      "name": "XMPP SCRAM PBKDF2-SHA1",
+    },
+    {
       "code": "2500",
       "category": "Network Protocols",
       "name": "WPA-EAPOL-PBKDF2",
@@ -1383,6 +1388,11 @@ hashtypes = [
       "code": "18800",
       "category": "Password Managers",
       "name": "Blockchain, My Wallet, Second Password (SHA256)",
+    },
+    {
+      "code": "23100",
+      "category": "Password Managers",
+      "name": "Apple Keychain",
     },
     {
       "code": "16300",

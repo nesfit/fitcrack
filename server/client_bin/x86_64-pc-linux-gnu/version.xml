@@ -1,6 +1,6 @@
 <version>
-	<file><physical_name>hashcat64_v600_1.bin</physical_name><copy_file/></file>
-	<file><physical_name>hashcat_files_v600_1.zip</physical_name><copy_file/></file>
+	<file><physical_name>hashcat64_v611_1.bin</physical_name><copy_file/></file>
+	<file><physical_name>hashcat_files_v611_1.zip</physical_name><copy_file/></file>
 	<file><physical_name>pcfg-manager1.bin</physical_name><copy_file/></file>
 	<file><physical_name>princeprocessor1.bin</physical_name><copy_file/></file>
 	<file><physical_name>runner1.bin</physical_name>

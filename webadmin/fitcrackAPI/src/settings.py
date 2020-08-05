@@ -8,7 +8,7 @@ import os
 # HashCat settings
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 HASHCAT_EXECUTABLE = 'hashcat.bin'
-HASHCAT_DIR = ROOT_DIR + '/../hashcat-6.0.0/'
+HASHCAT_DIR = ROOT_DIR + '/../hashcat-6.1.1/'
 HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
 PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princeprocessor/pp64.bin'
