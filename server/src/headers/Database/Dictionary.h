@@ -66,6 +66,7 @@ class CDictionary {
         uint64_t    m_currentIndex;
         uint64_t    m_hcKeyspace;
         std::string m_dictFileName;
+        std::string m_passwordDistribution;
         bool        m_isLeft;
 
     public:
@@ -80,6 +81,7 @@ class CDictionary {
         uint64_t getCurrentIndex() const;
         uint64_t getHcKeyspace() const;
         const std::string & getDictFileName() const;
+        const std::string & getPasswordDistribution() const;
         bool isLeft() const;
 };
 

@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `fc_dictionary` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `path` varchar(400) NOT NULL,
+  `password_distribution` text COLLATE utf8_bin NOT NULL,
   `keyspace` bigint(20) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',

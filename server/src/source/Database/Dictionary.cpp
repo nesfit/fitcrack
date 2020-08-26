@@ -21,6 +21,7 @@ CDictionary::CDictionary(DbMap &dictMap, CSqlLoader *sqlLoader)
         this->m_currentIndex = std::stoull(dictMap["current_index"]);
         this->m_hcKeyspace = std::stoull(dictMap["keyspace"]);
         this->m_dictFileName = dictMap["path"];
+        this->m_passwordDistribution = dictMap["password_distribution"];
         this->m_isLeft = (bool)(std::stoi(dictMap["is_left"]));
     }
     catch(std::logic_error & error)
@@ -90,6 +91,11 @@ uint64_t CDictionary::getHcKeyspace() const
 const std::string &CDictionary::getDictFileName() const
 {
     return m_dictFileName;
+}
+
+const std::string &CDictionary::getPasswordDistribution() const
+{
+    return m_passwordDistribution;
 }
 
 

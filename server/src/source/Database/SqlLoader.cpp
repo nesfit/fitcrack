@@ -282,15 +282,22 @@ std::vector<Config::Ptr<CMask>> CSqlLoader::loadJobMasksWithNormalKeyspace(uint6
                                    jobId));
 }
 
-
-std::vector<Config::Ptr<CDictionary>> CSqlLoader::loadJobDictionaries(uint64_t jobId) {
-    return customLoad<CDictionary>(formatQuery("SELECT `%s`.*, `%s`.`path`, `%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = `%s`.`id` WHERE `job_id` = %" PRIu64 " AND `current_index` < `keyspace` ORDER BY `%s`.`id` ASC ;",
-                                               Config::tableNameJobDictionary.c_str(), Config::tableNameDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), jobId, Config::tableNameJobDictionary.c_str()));
+std::vector<Config::Ptr<CDictionary>>
+CSqlLoader::loadJobDictionaries(uint64_t jobId) {
+  return customLoad<CDictionary>(formatQuery(
+      "SELECT `%s`.*, `%s`.`path`, `%s`.`password_distribution`, "
+      "`%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = "
+      "`%s`.`id` WHERE `job_id` = %" PRIu64
+      " AND `current_index` < `keyspace` ORDER BY `%s`.`id` ASC ;",
+      Config::tableNameJobDictionary.c_str(),
+      Config::tableNameDictionary.c_str(), Config::tableNameDictionary.c_str(),
+      Config::tableNameDictionary.c_str(),
+      Config::tableNameJobDictionary.c_str(),
+      Config::tableNameDictionary.c_str(),
+      Config::tableNameJobDictionary.c_str(),
+      Config::tableNameDictionary.c_str(), jobId,
+      Config::tableNameJobDictionary.c_str()));
 }
-
 
 std::vector<std::string> CSqlLoader::loadJobHashes(uint64_t jobId)
 {
@@ -332,15 +339,23 @@ Config::Ptr<CMask> CSqlLoader::loadMask(uint64_t maskId)
     return load<CMask>(formatQuery("WHERE `id` = %" PRIu64 " LIMIT 1", maskId)).front();
 }
 
-
-Config::Ptr<CDictionary> CSqlLoader::loadDictionary(uint64_t dictId)
-{
-    return customLoad<CDictionary>(formatQuery("SELECT `%s`.*, `%s`.`path`, `%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = `%s`.`id` WHERE `%s`.`id` = %" PRIu64 " LIMIT 1 ;",
-                                               Config::tableNameJobDictionary.c_str(), Config::tableNameDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
-                                               Config::tableNameDictionary.c_str(), Config::tableNameJobDictionary.c_str(),
-                                               dictId)).front();
+Config::Ptr<CDictionary> CSqlLoader::loadDictionary(uint64_t dictId) {
+  return customLoad<CDictionary>(
+             formatQuery(
+                 "SELECT `%s`.*, `%s`.`path`, `%s`.`password_distribution`, "
+                 "`%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON "
+                 "`%s`.`dictionary_id` = `%s`.`id` WHERE `%s`.`id` = %" PRIu64
+                 " LIMIT 1 ;",
+                 Config::tableNameJobDictionary.c_str(),
+                 Config::tableNameDictionary.c_str(),
+                 Config::tableNameDictionary.c_str(),
+                 Config::tableNameDictionary.c_str(),
+                 Config::tableNameJobDictionary.c_str(),
+                 Config::tableNameDictionary.c_str(),
+                 Config::tableNameJobDictionary.c_str(),
+                 Config::tableNameDictionary.c_str(),
+                 Config::tableNameJobDictionary.c_str(), dictId))
+      .front();
 }
 
 

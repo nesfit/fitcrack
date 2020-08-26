@@ -11,6 +11,7 @@ HASHCAT_EXECUTABLE = 'hashcat.bin'
 HASHCAT_DIR = ROOT_DIR + '/../hashcat-6.1.1/'
 HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
+PWD_DIST_PATH =  ROOT_DIR + '/../pwd_dist/pwd_dist.bin'
 PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princeprocessor/pp64.bin'
 EXE_OR_BIN = 'bin'
 DICTIONARY_DIR = '/usr/share/collections/dictionaries'

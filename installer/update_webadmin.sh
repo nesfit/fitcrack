@@ -85,6 +85,11 @@ if [ $INSTALL_BACKEND = "y" ]; then
   make -j$COMPILER_THREADS
   cd $INSTALLER_ROOT
 
+  echo "Building pwd-dist tool"
+  cd webadmin/fitcrackAPI/pwd_dist
+  make -j$COMPILER_THREADS
+  cd $INSTALLER_ROOT
+
   echo "Updating Fitcrack WebAdmin back-end..."
   mkdir $APACHE_DOCUMENT_ROOT/fitcrackAPI
   cp -Rf webadmin/fitcrackAPI/* $APACHE_DOCUMENT_ROOT/fitcrackAPI/

@@ -104,7 +104,7 @@ bool CAttackCombinator::makeWorkunit()
                     "Skipping %" PRIu64 " passwords\n", m_workunit->getStartIndex());
 
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Adding a single password to host dict2 file");
+                    "Adding a single password to host dict2 file\n");
             if(!dict2_file->WritePasswordsTo(1, outputDictPath))
             {
                 Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
@@ -239,7 +239,7 @@ bool CAttackCombinator::makeWorkunit()
                     "Skipping %" PRIu64 " passwords\n", workunitStartIndex);
 
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Adding a single password to host dict2 file");
+                    "Adding a single password to host dict2 file\n");
             if(!dict2_file->WritePasswordsTo(1, outputDictPath))
             {
                 Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
