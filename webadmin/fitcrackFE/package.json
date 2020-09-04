@@ -33,7 +33,7 @@
     "vue-json-pretty": "^1.6.1",
     "vue-json-tree-view": "^2.1.4",
     "vue-json-viewer": "^1.0.4",
-    "vue-moment": "^3.2.0",
+    "vue-moment": "^4.1.0",
     "vue-morris": "^1.1.0",
     "vue-progressbar": "^0.7.5",
     "vue-router": "^3.1.2",
