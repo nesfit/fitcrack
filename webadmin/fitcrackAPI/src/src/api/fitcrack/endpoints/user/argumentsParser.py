@@ -30,3 +30,8 @@ new_user_arguments.add_argument('mail', type=str, help='email', required=True, l
 new_user_arguments.add_argument('username', type=str, help='username', required=True, location='json')
 new_user_arguments.add_argument('password', type=str, help='password', required=True, location='json')
 new_user_arguments.add_argument('role_id', type=int, help='id role', required=True, location='json')
+
+edit_user_arguments = reqparse.RequestParser()
+edit_user_arguments.add_argument('mail', type=str, help='email', required=False, location='json')
+edit_user_arguments.add_argument('username', type=str, help='username', required=False, location='json')
+edit_user_arguments.add_argument('password', type=str, help='new password', required=False, location='json')
