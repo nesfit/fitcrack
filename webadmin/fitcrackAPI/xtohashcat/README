@@ -13,7 +13,13 @@ sudo apt-get install python3 perl liblzma-dev zlib
 sudo cpan -i Compress::Raw::Zlib
 sudo cpan -i Compress::Raw::Lzma
 
-  b) and set privileges for scripts
+  b) make rar2john and zip2john binaries
+
+cd scripts
+make
+cd ..
+
+  c) and set privileges for scripts
 
 chmod +x scripts/*
 chmod +x XtoHashcat.py
@@ -30,7 +36,7 @@ where:
       Microsoft Office documents versions 97-2016 (-f 9400-9800)
       PDF documents (-f 10400-10700)
       RAR archives (-f 12500/13000)
-      ZIP archives (-f 13600)
+      ZIP archives (-f 13600/17200/23001)
       7-Zip archives (-f 11600)
 
 Note that there is a single script for each type of document, so
