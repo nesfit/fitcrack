@@ -13,6 +13,7 @@
 # @date 17.7.2017 Added StaticHelper class, tool now prints hashType after newline
 # @date 28.7.2017 Format numbers in -f are same as hashcat's --hash-type
 # @date 06.7.2018 Added check for pkzip and special return code, new RAR/ZIP john2hashcat parsing
+# @date 06.10.2020 Added support for PKZIP, SecureZIP, new RAR3-p. Refactorization.
 
 # RETURN CODES:
 #  * 0 = Everything OK
