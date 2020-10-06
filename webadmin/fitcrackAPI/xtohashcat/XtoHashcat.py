@@ -34,7 +34,7 @@ class StaticHelper:
     SupportedFormats = {
         'MS_OFFICE': [9400, 9500, 9600, 9700, 9800],
         'PDF': [10400, 10500, 10600, 10700],
-        'RAR': [12500, 13000],
+        'RAR': [12500, 13000, 23700, 23800],
         'ZIP': [13600, 17200, 17210, 17225, 23001, 23002, 23003],
         '7-ZIP': [11600]
     }
@@ -72,10 +72,26 @@ class StaticHelper:
 
         # RAR
         elif formatId == 2:
-            if hashStr[1:5].lower() == 'rar3':
+            if hashStr[1:8].lower() == 'rar3$*0':
                 return '12500'          # RAR3-hp
-            else:
+            elif hashStr[1:5].lower() == 'rar5':
                 return '13000'          # RAR5
+            elif hashStr[1:8].lower() == 'rar3$*1':
+                try:
+                    method = int(hashStr[-2:])
+                    if method == 30:
+                        return '23700'  # RAR3-p Uncompressed
+                    elif 36 > method > 30:
+                        return '23800'  # RAR3-p Compressed
+                    else:
+                        print(f'Unknown RAR archive (method {method}) "{hashStr[0:9]}..."!', file=stderr)
+                        return '-1'
+                except ValueError:
+                    print(f'Unknown RAR archive (method{hashStr[-2:]}) "{hashStr[0:9]}..."!', file=stderr)
+                    return '-1'
+            else:
+                print(f'Unknown RAR archive "{hashStr[0:9]}..."!', file=stderr)
+                return '-1'
 
         # ZIP
         elif formatId == 3:
@@ -92,7 +108,7 @@ class StaticHelper:
                     return '23003'      # SecureZIP AES-256
                 else:
                     print(f'Unknown AES encryption type "{enc_type}" for SecureZIP!', file=stderr)
-                    return -1
+                    return '-1'
             elif hashStr[1:6] == 'pkzip':
                 hashCount = hashStr[hashStr.find('*') - 1]
                 if hashCount == '1':
