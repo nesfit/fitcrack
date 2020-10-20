@@ -196,7 +196,9 @@ class JobByID(Resource):
         if not current_user.role.VIEW_ALL_JOBS and not can_view_job(id):
             abort(401, 'Unauthorized access to job.')
 
-        job = FcJob.query.filter(FcJob.id == id).one()
+        job = FcJob.query.filter(FcJob.id == id).one_or_none()
+        if not job:
+            abort(404, 'Job not found.')
 
         if job.grammar_id:
             pcfg = FcPcfg.query.filter(FcPcfg.id == job.grammar_id).one()

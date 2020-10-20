@@ -75,74 +75,41 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
     std::ostringstream configBuilder;
     configBuilder << AttackMode::generateBasicConfig(attackMode, attackSubmode, name,
         hashType, generateRandomRules, hwTempAbort, ruleLeft, ruleRight, charset1, charset2, charset3, charset4);
-    size_t curLen = 0;
-    size_t curCount = 0;
     auto dicts = this->m_job->getDictionaries();
     bool hasRightDicts = false;
-    //count numbers of passwords of different lengths
-    //do left dicts first
-    std::ostringstream pwdCountBuilder;
-    auto CountPasswords = [&](PtrDictionary &dict) {
-        std::string passwd;
-        std::ifstream input(Config::dictDir + dict->getDictFileName());
-        if(!input)
-        {
-            Tools::printDebugHost(Config::DebugType::Error, this->m_job->getId(), this->m_host->getBoincHostId(),
-                    "Failed to open an input dictionary. Setting job to malformed.\n");
-            this->m_sqlLoader->updateRunningJobStatus(this->m_job->getId(), Config::JobState::JobMalformed);
-            throw std::runtime_error("Failed to open an input dictionary");
+    if (!this->hasStickyLeftDict()) {
+      std::string pwd_dist;
+      for (auto &dict : dicts) {
+        if (!dict->isLeft()) {
+          hasRightDicts = true;
+          continue;
         }
-        while(std::getline(input, passwd))
-        {
-            ++curCount;
-            if(passwd.size() != curLen)
-            {
-                if(curCount != 0)
-                {
-                    pwdCountBuilder<<curLen<<':'<<curCount<<';';
-                    curCount = 0;
-                }
-                curLen = passwd.size();
-            }
-        }
-    };
-    if(!this->hasStickyLeftDict())
-    {
-        for(auto &dict: dicts)
-        {
-            if(!dict->isLeft())
-            {
-                hasRightDicts = true;
-                continue;
-            }
-            CountPasswords(dict);
-        }
-        {
-            auto tmp = pwdCountBuilder.str();
-            if(!tmp.empty())
-            {
-                configBuilder<<"|||benchmark_dict1|String|"<<tmp.size()<<'|'<<tmp<<"|||\n";
-            }
-        }
+
+        pwd_dist += dict->getPasswordDistribution();
+      }
+
+      if (!pwd_dist.empty()) {
+        configBuilder << "|||benchmark_dict1|String|" << pwd_dist.size() << '|'
+                      << pwd_dist << "|||\n";
+      }
     }
-    if(this->hasStickyLeftDict() || hasRightDicts)
-    {
-        pwdCountBuilder.str("");
-        for(auto &dict: dicts)
-        {
-            if(dict->isLeft())
-            {
-                continue;
-            }
-            hasRightDicts = true;
-            CountPasswords(dict);
+
+    if (this->hasStickyLeftDict() || hasRightDicts) {
+      std::string pwd_dist;
+      for (auto &dict : dicts) {
+        if (dict->isLeft()) {
+          continue;
         }
-        if(hasRightDicts)
-        {
-            auto tmp = pwdCountBuilder.str();
-            configBuilder<<"|||benchmark_dict2|String|"<<tmp.size()<<'|'<<tmp<<"|||\n";
-        }
+        hasRightDicts = true;
+
+        pwd_dist += dict->getPasswordDistribution();
+      }
+      if (hasRightDicts) {
+        configBuilder << "|||benchmark_dict2|String|" << pwd_dist.size() << '|'
+                      << pwd_dist << "|||\n";
+      }
     }
+
     return configBuilder.str();
 }
 

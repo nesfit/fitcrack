@@ -29,14 +29,13 @@ void AttackCrackingBase::addSpecificArguments() {
   addArgument("--outfile");
   addArgument(output_file_);
 
-  addArgument("--outfile-format="+RunnerUtils::toString(HashcatConstant::OutputFormat));
+  addArgument("--outfile-format=" + HashcatConstant::OutputFormat);
   addArgument("--quiet");
   addArgument("--status");
   addArgument("--machine-readable");
   addArgument("--restore-disable");
   addArgument("--potfile-disable");
   addArgument("--logfile-disable");
-  //    addArgument("--gpu-temp-disable");
 }
 
 void AttackCrackingBase::addRequiredFile(const std::string& file_name) {

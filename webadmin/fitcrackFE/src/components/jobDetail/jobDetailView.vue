@@ -5,7 +5,7 @@
       indeterminate
       color="secondary"
     />
-    <div class="jd-split">
+    <v-sheet class="jd-split">
       <transition name="info">
         <job-info
           v-if="data"
@@ -24,11 +24,11 @@
           class="jd-main"
         >
           <v-expansion-panels 
+            v-model="openPanels"
             accordion
             multiple
             flat
             hover
-            :value="openPanels"
           >
             <v-expansion-panel>
               <v-expansion-panel-header>
@@ -100,6 +100,7 @@
                   <v-col cols="8">
                     <host-table
                       :hosts="data.hosts"
+                      show-chart-patterns
                     />
                     <div class="d-flex mt-2">
                       <v-spacer />
@@ -116,15 +117,12 @@
                     </div>
                   </v-col>
                   <v-col cols="4">
-                    <graph
-                      id="hostPercentageGraph"
-                      :data="hostPercentageGraph"
-                    />
+                    <job-contribution-chart :id="data.id" />
                   </v-col>
                 </v-row>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel>
+            <v-expansion-panel @change="statsToggled">
               <v-divider />
               <v-expansion-panel-header>
                 <span class="expansion-header">
@@ -135,25 +133,15 @@
                 </span>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <v-row>
+                <v-row ref="chartrow">
                   <!-- sorry mobile, i have had enough of this -->
                   <v-col cols="6">
                     <v-card-title>Progress over time</v-card-title>
-                    <graph
-                      id="progressGraph"
-                      :data="progressGraph"
-                      units="%"
-                      type="job"
-                    />
+                    <job-progress-chart :id="data.id" />
                   </v-col>
                   <v-col cols="6">
                     <v-card-title>Hashes in workunits</v-card-title>
-                    <graph
-                      id="hostGraph"
-                      :data="hostGraph"
-                      units=" hashes"
-                      type="host"
-                    />
+                    <job-workunit-chart :id="data.id" />
                   </v-col>
                 </v-row>
               </v-expansion-panel-content>
@@ -161,7 +149,7 @@
           </v-expansion-panels>
         </div>
       </transition>
-    </div>
+    </v-sheet>
     <v-divider />
     <workunits
       v-if="data"
@@ -193,7 +181,10 @@ import hostTable from './hostTable'
 import hostEditor from './hostEditor'
 import permsEditor from './jobPermissions'
 //
-import graph from '@/components/graph/fc_graph'
+import jobProgressChart from '@/components/chart/jobProgress'
+import jobWorkunitChart from '@/components/chart/jobWorkunits'
+import jobContributionChart from '@/components/chart/jobContribution'
+//
 import combinatorDetail from '@/components/jobDetail/attacks/combinator'
 import hybridDetail from '@/components/jobDetail/attacks/hybrid'
 import maskDetail from '@/components/jobDetail/attacks/mask'
@@ -214,7 +205,9 @@ export default {
     hostTable,
     hostEditor,
     permsEditor,
-    graph,
+    jobProgressChart,
+    jobWorkunitChart,
+    jobContributionChart,
     combinatorDetail,
     hybridDetail,
     maskDetail,
@@ -233,7 +226,9 @@ export default {
       hostEditorOpen: false,
       permsEditorOpen: false,
       openPanels: [0,1,2],
-      purging: false
+      purging: false,
+      //
+      chartHeight: '0px'
     }
   },
   computed: {
@@ -277,23 +272,9 @@ export default {
       this.data = await this.axios.get(this.$serverAddr + '/job/' + this.$route.params.id).then(r => r.data)
       document.title = `${this.data.name} – ${this.$store.state.project}`
     },
-    async loadGraphs () {
-      const id = this.$route.params.id
-      const graphPromises = [
-        this.axios.get(this.$serverAddr + '/graph/jobsProgress/'   + id).then(r => r.data),
-        this.axios.get(this.$serverAddr + '/graph/hostsComputing/' + id).then(r => r.data),
-        this.axios.get(this.$serverAddr + '/graph/hostPercentage/' + id).then(r => r.data)
-      ]
-      try {
-        [this.progressGraph, this.hostGraph, this.hostPercentageGraph] = await Promise.all(graphPromises)
-      } catch (e) {
-        console.error('Error getting job graphs', e)
-      }
-    },
     loadAll () {
       this.loadData()
       this.loadHistory()
-      this.loadGraphs()
     },
     //
     operateJob (operation) {
@@ -304,7 +285,6 @@ export default {
       }).then(this.loadAll)
     },
     purgeHandler () {
-      console.log(this.shouldConfirmPurge)
       if (this.shouldConfirmPurge && !this.purging) {
         this.purging = true
         setTimeout(() => {
@@ -314,6 +294,18 @@ export default {
         this.purging = false
         this.operateJob('kill')
       }
+    },
+    statsToggled () {
+      // hack to restore chart height after closing the panel
+      const wrappers = this.$refs.chartrow.querySelectorAll('.chart-wrapper')
+      Array.from(wrappers).forEach(w => {
+        const current = getComputedStyle(w).getPropertyValue('height')
+        if (current !== '0px' && current !== 'auto') {
+          this.chartHeight = current
+        } else {
+          w.style.height = this.chartHeight
+        }
+      })
     }
   }
 }

@@ -13,6 +13,8 @@
 #include <string>
 #include <sstream>
 
+static const int DICT_GEN_TIME_LIMIT = 5;
+
 /** Class representing hashcat's attack benchmark */
 template <typename BaseAttack>
 class AttackBenchmark: public BaseAttack {
@@ -120,7 +122,9 @@ void AttackBenchmark<BaseAttack>::addRequiredFile(const std::string &file_name)
 		std::ofstream dict(resolvedFile.getRelativePath().c_str(), std::ios::binary);
 		std::istringstream convertor(shape);
 		PasswordLenCount pwdLenCount;
-		while(convertor>>pwdLenCount)
+		time_t startTime = time(NULL);
+		bool running = true;
+		while(running && convertor>>pwdLenCount)
 		{
 			//we don't really expect passwords that long, but better safe than sorry
 			//-1 for the newline
@@ -140,12 +144,17 @@ void AttackBenchmark<BaseAttack>::addRequiredFile(const std::string &file_name)
 				std::memcpy(buf+i*lineLen, buf, lineLen);
 			}
 			//do the writes
-			while(pwdLenCount.count)
+			while(running && pwdLenCount.count)
 			{
 				size_t linesToWrite = std::min(repetitions, pwdLenCount.count);
 				dict.write(buf, lineLen*linesToWrite);
 				pwdLenCount.count -= linesToWrite;
+				running = time(NULL)-startTime < DICT_GEN_TIME_LIMIT;
 			}
+		}
+		if(!running)
+		{
+			Logging::debugPrint(Logging::Detail::CustomOutput, "Generating interrupted due to passed time limit");
 		}
 	}
 	return BaseAttack::addRequiredFile(file_name);

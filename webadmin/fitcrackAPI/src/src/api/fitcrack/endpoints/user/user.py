@@ -12,7 +12,7 @@ from sqlalchemy import exc
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.user.argumentsParser import user_login_arguments, change_user_role_arguments, \
-    change_role_arguments, new_role_arguments, new_user_arguments, user_change_password_arguments
+    change_role_arguments, new_role_arguments, new_user_arguments, user_change_password_arguments, edit_user_arguments
 from src.api.fitcrack.endpoints.user.responseModels import fc_user_model, isLoggedIn_model, role_list_model, \
     user_list_model, userSuccessResponse_model
 from src.api.fitcrack.responseModels import simpleResponse
@@ -60,6 +60,32 @@ class userCollection(Resource):
 
 @ns.route('/<int:id>')
 class user(Resource):
+
+    @api.expect(edit_user_arguments)
+    @api.marshal_with(simpleResponse)
+    def patch(self, id):
+        """
+        Edits user.
+        """
+        args = edit_user_arguments.parse_args(request)
+        
+        username = args.get('username', None)
+        mail = args.get('mail', None)
+        password = args.get('password', None)
+
+        user = FcUser.query.filter_by(id=id).one()
+        if username:
+            user.username = username
+        if mail:
+            user.mail = mail
+        if password:
+            user.set_password(password)
+
+        db.session.commit()
+        return {
+            'status': True,
+            'message': 'User updated.'
+        }
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):

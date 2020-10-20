@@ -26,6 +26,7 @@ def shellExec(cmd, abortOnError=True, cwd=None, getOnlyReturnCode=False, getRetu
     """
 
     try:
+        print(cmd)
         process = subprocess.Popen(cmd, shell=True,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
@@ -34,23 +35,22 @@ def shellExec(cmd, abortOnError=True, cwd=None, getOnlyReturnCode=False, getRetu
         # wait for the process to terminate
         out, err = process.communicate()
         rtnCode = process.returncode
-        print(out.decode('utf-8'), file= sys.stderr)
-        print(err.decode('utf-8'), file=sys.stderr)
     except subprocess.CalledProcessError as err:
         print('SHELL ERROR:', err)
         if abortOnError:
             abort(400, 'Error with shell execution ' + err.decode('utf-8'))
         return rtnCode
     else:
+        out = out.decode('utf-8', errors='ignore')
         if getOnlyReturnCode:
             return rtnCode
         elif getReturnCode:
             return {
                 'returnCode': rtnCode,
-                'msg': out.decode('utf-8')
+                'msg': out
             }
         else:
-            return out.decode('utf-8')
+            return out
 
 
 def getStringBetween(string, substring1, substring2):

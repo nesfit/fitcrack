@@ -10,9 +10,12 @@ from flask_cors import CORS
 from flask_login import login_required, current_user
 from flask import abort, make_response, jsonify
 
+from werkzeug.http import dump_cookie
+from werkzeug.wrappers import Response
+
 import settings
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.graph.graph import ns as graph_namespace
+from src.api.fitcrack.endpoints.chart.chart import ns as chart_namespace
 from src.api.fitcrack.endpoints.hashcat.hashcat import ns as hashcat_namespace
 from src.api.fitcrack.endpoints.host.hosts import ns as hosts_namespace
 from src.api.fitcrack.endpoints.notifications.notifications import ns as notifications_namespace
@@ -52,7 +55,21 @@ def configure_app(flask_app):
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
     flask_app.config['ERROR_404_HELP'] = settings.RESTPLUS_ERROR_404_HELP
+    flask_app.config['SESSION_COOKIE_SAMESITE'] = None
+    flask_app.config['SESSION_COOKIE_SECURE'] = True
     # flask_app.config['DEBUG'] = True
+
+def set_cookie(response, *args, **kwargs):
+    cookie = dump_cookie(*args, **kwargs)
+
+    if 'samesite' in kwargs and kwargs['samesite'] is None:
+        cookie = "{}; {}".format(cookie, b'SameSite=None'.decode('latin1'))
+
+    response.headers.add(
+        'Set-Cookie',
+        cookie
+    )
+Response.set_cookie = set_cookie
 
 
 def initialize_app(flask_app):
@@ -63,10 +80,10 @@ def initialize_app(flask_app):
     api.add_namespace(job_namespace)
     api.add_namespace(bins_namespace)
     api.add_namespace(batches_namespace)
+    api.add_namespace(chart_namespace)
     api.add_namespace(hosts_namespace)
     api.add_namespace(hashcat_namespace)
     api.add_namespace(server_namespace)
-    api.add_namespace(graph_namespace)
     api.add_namespace(user_namespace)
     api.add_namespace(notifications_namespace)
     api.add_namespace(dictionary_namespace)
@@ -108,7 +125,7 @@ def check_valid_login():
 def bake_cookies(response):
     "just a workaround"
     if (response.headers.get('Set-Cookie')):
-        response.headers['Set-Cookie'] += '; SameSite=Lax'
+        response.headers['Set-Cookie'] += '; SameSite=None; Secure; HttpOnly'
     return response
 
 

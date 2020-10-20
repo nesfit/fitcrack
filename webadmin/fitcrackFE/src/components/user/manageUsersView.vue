@@ -37,7 +37,7 @@
                     color="primary"
                     class="addBtn"
                     text
-                    @click="editDialog=true"
+                    @click="editUser(item.id)"
                   >
                     Edit
                   </v-btn>
@@ -218,6 +218,9 @@
           <h2>Edit user</h2>
         </v-card-title>
         <v-card-text>
+          <p>
+            All fields are optional. Empty will be left unchanged.
+          </p>
           <v-form
             ref="form"
             lazy-validation
@@ -225,42 +228,25 @@
             <v-text-field
               v-model="newUsername"
               label="Username"
+              :rules="usernameRules"
               :counter="10"
-              required
+              autocomplete="off"
             />
             <v-text-field
               v-model="newEmail"
               label="E-mail"
               :rules="emailRules"
-              required
+              autocomplete="off"
             />
+            <p>
+              Only change user's password if it's absolutely needed, for example
+              if they forgot. Otherwise, you'll lock them out.
+            </p>
             <v-text-field
-              v-model="oldPassword"
-              type="password"
-              label="Old password"
-              required
-            />
-            <v-text-field
-              v-model="newPassword0"
+              v-model="newPassword"
               type="password"
               label="New password"
-              required
-            />
-            <v-text-field
-              v-model="newPassword1"
-              type="password"
-              label="New password"
-              :rules="newPasswordRules"
-              required
-            />
-            <v-select
-              v-model="newUserRoleID"
-              label="User role"
-              item-text="name"
-              item-value="id"
-              :items="userRoles"
-              :rules="[v => !!v || 'Item is required']"
-              required
+              autocomplete="off"
             />
           </v-form>
         </v-card-text>
@@ -269,15 +255,14 @@
           <v-btn
             color="primary"
             text
-            @click.stop="editDialog=false"
+            @click.stop="editUserCancel"
           >
             Cancel
           </v-btn>
           <v-btn
             color="primary"
             text
-            disabled="true"
-            @click.stop="editUser"
+            @click.stop="editUserConfirm"
           >
             Edit
           </v-btn>
@@ -314,6 +299,7 @@
             <v-text-field
               v-model="newUsername"
               label="Username"
+              :rules="usernameRules"
               :counter="10"
               required
             />
@@ -385,15 +371,13 @@
         roleDialog: false,
         newPassword: null,
         newUsername: null,
-        newUserRoleID: null,
         newEmail: null,
+        newUserRoleID: null,
         editingUser: false,
+        editingUserId: null,
         editDialog: false,
         addingUser: false,
         userDialog: false,
-        oldPassword: null,
-        newPassword0: null,
-        newPassword1: null,
         users: [],
         totalItems: 0,
         pagination: {},
@@ -416,12 +400,10 @@
         validEditUserForm: true,
         validNewUserForm: true,
         emailRules: [
-          v => !!v || 'E-mail is required',
-          v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+          v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v)
         ],
-        newPasswordRules: [
-          v => !!v || 'Repeat new password',
-          v => this.newPassword0 != this.newPassword1 || 'match!'
+        usernameRules: [
+          v => /^\w+.*$/.test(v)
         ]
       }
     },
@@ -500,23 +482,35 @@
           this.newUserRoleID = ''
         })
       },
-      editUser() {
-        this.editingUser = true;
-        this.axios.post(this.$serverAddr + '/user/', {
-          username: this.newUsername,
-          mail: this.newEmail,
-          password: this.newPassword,
-          role_id: this.role_id //insert anything with the same ID => rewrite row
-        }).then((response) => {
-          console.log(response.data);
-          this.loadUsers();
-          this.editDialog = false;
-          this.edittingUser = false;
-          this.newUsername = '';
-          this.newEmail = '';
-          this.newPassword = '';
-          this.newUserRoleID = ''
-        })
+      editUser(id) {
+        this.editDialog = true
+        this.editingUserId = id
+      },
+      editUserCancel () {
+        this.editDialog = false
+        this.editingUserId = null
+      },
+      async editUserConfirm () {
+        const nullify = x => /^\s*$/.test(x) ? null : x
+
+        this.editingUser = true
+        const username = nullify(this.newUsername)
+        const mail = nullify(this.newEmail)
+        const password = nullify(this.newPassword)
+
+        const res = await this.axios.patch(
+          this.$serverAddr + '/user/' + this.editingUserId, 
+          { username, mail, password }
+        )
+
+        this.editingUser = false
+        this.editDialog = false
+
+        this.newUsername = ''
+        this.newEmail = ''
+        this.newPassword = ''
+
+        this.loadUsers()
       },
       deleteUser(id) {
         this.axios.delete(this.$serverAddr + '/user/' + id).then((response) => {

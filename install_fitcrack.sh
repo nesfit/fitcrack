@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Fitcrack server installer (main script)
-# Author: Radek Hranicky (ihranicky@fit.vutbr.cz)
+# Author: see installer/AUTHORS
+# License: MIT, see installer/LICENSE
 
 echo "                                                            "
 echo "███████╗██╗████████╗ ██████╗██████╗  █████╗  ██████╗██╗  ██╗"

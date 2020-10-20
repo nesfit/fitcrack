@@ -1,5 +1,5 @@
 #ifndef BOINCAPI_HPP
-#define CONSTBBOINCAPI_HPPOINCAPI_HPPANTS_HPP
+#define BOINCAPI_HPP
 
 #if defined(__GNUC__) && (__GNUC__ >= 8)
 #pragma GCC diagnostic push

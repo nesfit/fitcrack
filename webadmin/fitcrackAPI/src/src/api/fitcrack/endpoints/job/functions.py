@@ -19,7 +19,7 @@ from uuid import uuid1
 from flask_restplus import abort
 from flask_login import current_user
 from sqlalchemy import exc
-from settings import DICTIONARY_DIR, HASHVALIDATOR_PATH, RULE_DIR, PCFG_DIR, ROOT_DIR
+from settings import DICTIONARY_DIR, HASHCAT_PATH, RULE_DIR, PCFG_DIR, ROOT_DIR
 from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr
@@ -42,7 +42,7 @@ def create_job(data):
                 fp.write(decoded)
                 fp.seek(0)
                 if settings.verify_hash_format:
-                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'], binaryHash=hashObj['hash'])
             data['hash_settings']['hash_list'][idx]['hash']= decoded
 
         else:
@@ -136,7 +136,13 @@ def create_job(data):
 
     for hashObj in data['hash_settings']['hash_list']:
         hash = FcHash(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
-        db.session.add(hash)
+        try:
+            db.session.add(hash)
+            db.session.commit()
+        except exc.SQLAlchemyError as err:
+            print(err,  file=sys.stderr)
+            abort(400, 'Unable to save hash to database.')
+
 
     perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)
     db.session.add(perms)
@@ -149,22 +155,48 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
     hashes = []
     settings = FcSetting.query.first()
     if not settings.verify_hash_format:
-        with open(hash, "r") as hashFile:
-            hashes = [(hash.strip() + " OK") for hash in hashFile.readlines()]
+        if binaryHash:
+            hashes = ["HASH OK"]
+        else:
+            with open(hash, "r") as hashFile:
+                hashes = [(h.strip() + " OK") for h in hashFile.readlines()]
     else:
         result = shellExec(
-            HASHVALIDATOR_PATH + ' -m ' + hash_type + ' ' + "'" + hash + "'", getReturnCode=True
+            "{} -m {} {} --show".format(HASHCAT_PATH, hash_type, hash), getReturnCode=True
         )
 
-        if result['returnCode'] != 0:
-            abort(500, 'Error in hashValidator.')
+        if binaryHash:
+            hashes = ["HASH OK" if result['returnCode'] == 0 else "HASH Token length exception"]
+        else:
+            hash_validity = {}
+            with open(hash, "r") as hashFile:
+                for h in hashFile.readlines():
+                    hash_validity[h.strip()] = "OK"
 
-        hashes = result['msg'].rstrip().split('\n')
+            bad_hash_lines = result['msg'].rstrip().split('\n')
+            for line in bad_hash_lines:
+                if line.find('(') > 0:
+                    line = line[line.find('(') + 1:].replace("): ", ":")
+                    line = line.replace("\x1b[0m", "")
+                    bad_hash = line.split(":")[0]
+                    error = line.split(":")[1]
+                    if bad_hash.find("...") > 0:
+                        # if the hash is longer than a certain length, it's abbreviated with ... 
+                        bad_hash_parts = bad_hash.split("...")
+                        for h in hash_validity.keys():
+                            if h.startswith(bad_hash_parts[0]) and h.endswith(bad_hash_parts[1]):
+                                hash_validity[h] = error
+                    else:
+                        hash_validity[bad_hash] = error
+
+            hashes = []
+            for h, s in hash_validity.items():
+                hashes.append("{} {}".format(h, s))
 
     hashesArr = []
     hasError = False
     for hash in hashes:
-        hashArr = hash.split(' ')
+        hashArr = hash.split(' ', 1)
 
         isInCache = False
         dbHash = FcHash.query.filter(FcHash.hash == bytes(hashArr[0], 'utf8'), FcHash.result != None).first()

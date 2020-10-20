@@ -16,7 +16,7 @@ from flask import request, redirect, send_file
 from flask_restplus import Resource, abort
 from sqlalchemy import exc
 
-from settings import DICTIONARY_DIR, HASHCAT_PATH, HASHCAT_DIR
+from settings import DICTIONARY_DIR, HASHCAT_PATH, HASHCAT_DIR, PWD_DIST_PATH
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.dictionary.argumentsParser import dictionary_parser, dictionaryFromFile_parser
 from src.api.fitcrack.endpoints.dictionary.functions import readingFromFolderPostProcces
@@ -166,8 +166,9 @@ class dictionaryAdd(Resource):
                 os.remove(dict_path)
                 move(dict_path + '_sorted', dict_path)
 
+            pwd_dist = shellExec(PWD_DIST_PATH + " " + dict_path)
             hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + dict_path, cwd=HASHCAT_DIR))
-            dictionary = FcDictionary(name=uploadedFile['filename'], path=uploadedFile['path'], keyspace=hc_keyspace)
+            dictionary = FcDictionary(name=uploadedFile['filename'], path=uploadedFile['path'], password_distribution=pwd_dist, keyspace=hc_keyspace)
             try:
                 db.session.add(dictionary)
                 db.session.commit()
@@ -208,8 +209,9 @@ class dictionary(Resource):
                 sorted_cp(file['path'], newPath)
             else:
                 os.symlink(file['path'], newPath)
+            pwd_dist = shellExec(PWD_DIST_PATH + " " + newPath)
             hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + newPath, cwd=HASHCAT_DIR))
-            dictionary = FcDictionary(name=file['name'], path=newName, keyspace=hc_keyspace)
+            dictionary = FcDictionary(name=file['name'], path=newName, password_distribution=pwd_dist, keyspace=hc_keyspace)
             try:
                 db.session.add(dictionary)
                 db.session.commit()
