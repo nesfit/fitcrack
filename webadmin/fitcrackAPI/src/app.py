@@ -10,6 +10,9 @@ from flask_cors import CORS
 from flask_login import login_required, current_user
 from flask import abort, make_response, jsonify
 
+from werkzeug.http import dump_cookie
+from werkzeug.wrappers import Response
+
 import settings
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.chart.chart import ns as chart_namespace
@@ -52,7 +55,21 @@ def configure_app(flask_app):
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
     flask_app.config['ERROR_404_HELP'] = settings.RESTPLUS_ERROR_404_HELP
+    flask_app.config['SESSION_COOKIE_SAMESITE'] = None
+    flask_app.config['SESSION_COOKIE_SECURE'] = True
     # flask_app.config['DEBUG'] = True
+
+def set_cookie(response, *args, **kwargs):
+    cookie = dump_cookie(*args, **kwargs)
+
+    if 'samesite' in kwargs and kwargs['samesite'] is None:
+        cookie = "{}; {}".format(cookie, b'SameSite=None'.decode('latin1'))
+
+    response.headers.add(
+        'Set-Cookie',
+        cookie
+    )
+Response.set_cookie = set_cookie
 
 
 def initialize_app(flask_app):
@@ -108,7 +125,7 @@ def check_valid_login():
 def bake_cookies(response):
     "just a workaround"
     if (response.headers.get('Set-Cookie')):
-        response.headers['Set-Cookie'] += '; SameSite=Lax'
+        response.headers['Set-Cookie'] += '; SameSite=None; Secure; HttpOnly'
     return response
 
 
