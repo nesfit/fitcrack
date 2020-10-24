@@ -1,5 +1,7 @@
 # Fitcrack (Distributed password cracking system)
 
+Note: A detailed documentation and other information can be found at [https://fitcrack.fit.vutbr.cz](https://fitcrack.fit.vutbr.cz)
+
 This README describes how to install and run Fitcrack distributed password cracking system.
 There are four ways of deployment:
 
@@ -11,7 +13,9 @@ There are four ways of deployment:
   * For **Fitcrack WebAdmin**, see [WebAdmin README](webadmin/README.md)
   * For **Custom build of Runner**, see [Runner README](runner/README.md)
 
-Once installed, see how to [Operate the server](#oper)
+Once installed:
+ * See how to [Operate the server](#oper)
+ * See the [Fitcrack's webadmin user guide] (https://nesfit.github.io/fitcrack/#/)
 
 <a name="instgen"></a>
 ## General installation instructions
