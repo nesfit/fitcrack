@@ -15,7 +15,7 @@ There are four ways of deployment:
 
 Once installed:
  * See how to [Operate the server](#oper)
- * See the [Fitcrack's webadmin user guide] (https://nesfit.github.io/fitcrack/#/)
+ * See the [Fitcrack WebAdmin user guide](https://nesfit.github.io/fitcrack/#/)
 
 <a name="instgen"></a>
 ## General installation instructions
