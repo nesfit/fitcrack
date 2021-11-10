@@ -1,6 +1,6 @@
 // This file is part of BOINC.
 // http://boinc.berkeley.edu
-// Copyright (C) 2008 University of California
+// Copyright (C) 2019 University of California
 //
 // BOINC is free software; you can redistribute it and/or modify it
 // under the terms of the GNU Lesser General Public License
@@ -257,9 +257,9 @@ int main(int argc, char** argv) {
         if (retval) die("cannot scan_hex_data");
         certpath = check_validity(argv[4], argv[2], signature.data, argv[5]);
         if (certpath == NULL) {
-            die("signature cannot be verfied.\n\n");
+            die("signature cannot be verified.\n\n");
         } else {
-            printf("siganture verified using certificate '%s'.\n\n", certpath);
+            printf("signature verified using certificate '%s'.\n\n", certpath);
             free(certpath);
         }
         // this converts, but an executable signed with sign_executable,
@@ -328,7 +328,7 @@ int main(int argc, char** argv) {
         //enc=EVP_get_cipherbyname("des");
         //if (enc == NULL)
         //    die("could not get cypher.\n");
-        // no encription yet.
+        // no encryption yet.
         bio_out=BIO_new(BIO_s_file());
         if (BIO_write_filename(bio_out,argv[5]) <= 0) {
             perror(argv[5]);
@@ -434,5 +434,3 @@ int main(int argc, char** argv) {
     }
     return 0;
 }
-
-const char *BOINC_RCSID_6633b596b9 = "$Id$";

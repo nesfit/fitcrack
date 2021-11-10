@@ -300,7 +300,7 @@ void CAccountManagerProcessingPage::OnStateChange( CAccountManagerProcessingPage
                 wxEventLoopBase::GetActive()->YieldFor(wxEVT_CATEGORY_USER_INPUT);
             }
     
-            if (!iReturnValue && !reply.error_num) {
+            if (!iReturnValue && (!reply.error_num && reply.messages.size() == 0)) {
                 SetProjectAttachSucceeded(true);
                 pWA->SetAttachedToProjectSuccessfully(true);
             } else {
@@ -337,7 +337,7 @@ void CAccountManagerProcessingPage::OnStateChange( CAccountManagerProcessingPage
             SetNextState(ATTACHACCTMGR_END);
             break;
         default:
-            // Allow a glimps of what the result was before advancing to the next page.
+            // Allow a glimpse of what the result was before advancing to the next page.
             wxSleep(1);
             pWA->EnableNextButton();
             pWA->EnableBackButton();
@@ -382,7 +382,6 @@ wxWizardPageEx* CAccountManagerProcessingPage::GetNext() const
         // The project much be down for maintenance
         return PAGE_TRANSITION_NEXT(ID_COMPLETIONERRORPAGE);
     } 
-    return NULL;
 }
 
 /*!

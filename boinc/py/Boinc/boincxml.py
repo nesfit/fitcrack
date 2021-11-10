@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-# $Id$
+# boincxml.py - XML utilities for boinc
 
-# boincxml.py - xml utilities for boinc
-
+from __future__ import print_function
 import sys, os
 import xml.dom.minidom
 
@@ -29,7 +28,7 @@ def get_element(node, name, optional=True):
         raise SystemExit("ERROR: Couldn't find xml node <%s>"% name)
 
 def _None2Str(object):
-    if object == None:
+    if object is None:
         return ''
     else:
         return object
@@ -89,14 +88,15 @@ class ConfigDict:
             set_element( get_element(self._node,key,1), str(self.__dict__[key]) )
     def debug_print(self):
         for key in self.__dict__.keys():
-            print key.rjust(15), '=', self.__dict__[key]
+            print(key.rjust(15), '=', self.__dict__[key])
 
 class ConfigDictList(list):
     def __init__(self, dom_node, item_class=ConfigDict):
         self._node = dom_node
         list.__init__(self, map(item_class, get_child_elements(self._node)))
     def save(self):
-        map(ConfigDict.save, self)
+        for item in self:
+            ConfigDict.save(item)
     def make_node_and_append(self, name):
         '''Make a new ConfigDict and append it. Returns new ConfigDict.'''
         new_element = append_new_element(self._node, name)
@@ -129,13 +129,13 @@ class XMLConfig:
             except:
                 if not failopen_ok:
                     raise Exception("Couldn't parse XML config\n")
-                print >>sys.stderr, "Warning: couldn't parse XML file"
+                print("Warning: couldn't parse XML file", file=sys.stderr)
                 self._init_empty_xml()
         try:
             self._get_elements()
         except:
             if not failopen_ok:
-                raise Exception("%s: Couldn't get elements from XML file");
+                raise Exception("%s: Couldn't get elements from XML file")
         return self
     def _get_elements(self):
         pass
@@ -145,7 +145,7 @@ class XMLConfig:
         if not output:
             output = open(self.filename,'w')
         self.xml.writexml(output, "", " "*4, "\n")
-        print >>output
+        output.write('')
         return self
     def _set_elements(self):
         pass
