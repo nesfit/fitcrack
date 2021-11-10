@@ -849,9 +849,6 @@ void boinc_exit(int status) {
     // note: the above CAN return!
     Sleep(1000);
     DebugBreak();
-#elif defined(__APPLE_CC__)
-    // stops endless exit()/atexit() loops.
-    _exit(status);
 #else
     // arrange to exit with given status even if errors happen
     // in atexit() functions

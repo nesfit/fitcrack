@@ -12,8 +12,8 @@ require_once("../inc/util.inc");
 
 //-------------- Project name and owner
 
-define("PROJECT", "REPLACE WITH PROJECT NAME");
-define("COPYRIGHT_HOLDER", "REPLACE WITH COPYRIGHT HOLDER");
+define("PROJECT", "Fitcrack");
+define("COPYRIGHT_HOLDER", "Fitcrack team");
 
 //-------------- URLs and directories
 

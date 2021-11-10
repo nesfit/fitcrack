@@ -283,9 +283,10 @@ def create_database(srcdir, config = None, drop_first = False):
     connect(config, nodb=True)
     dbcon = get_dbconnection()
     cursor = dbcon.cursor()
-    if drop_first:
-        cursor.execute("drop database if exists %s"%config.db_name)
-    cursor.execute("create database %s"%config.db_name)
+    # Commented (Radek), since we expect an empty database
+    # if drop_first:
+    #     cursor.execute("drop database if exists %s"%config.db_name)
+    # cursor.execute("create database %s"%config.db_name)
     cursor.execute("use %s"%config.db_name)
     for file in ['schema.sql', 'constraints.sql', 'content.sql']:
         _execute_sql_script(cursor, os.path.join(srcdir, 'db', file))

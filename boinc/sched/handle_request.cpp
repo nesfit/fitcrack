@@ -1139,6 +1139,15 @@ static void log_request() {
     log_messages.set_indent_level(2);
 }
 
+static void notify_status() {
+    char buf[256];
+    snprintf(buf, 256, "UPDATE fc_host_status SET last_seen = UTC_TIMESTAMP() WHERE boinc_host_id = %lu ;", g_reply->host.id);
+
+    int retval = boinc_db.do_query(buf);
+    if (retval)
+        log_messages.printf(MSG_DEBUG, "Failed to update host status!\n");
+}
+
 bool bad_install_type() {
     if (config.no_vista_sandbox) {
         if (!strcmp(g_request->host.os_name, "Microsoft Windows Vista")) {
@@ -1264,6 +1273,7 @@ void process_request(char* code_sign_key) {
     g_reply->nucleus_only = false;
 
     log_request();
+    notify_status();
 
 #if 0
     // if you need to debug a problem w/ a particular host or user,

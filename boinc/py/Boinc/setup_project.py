@@ -521,6 +521,15 @@ class Project:
             config.min_sendwork_interval = 6
         self.scheduler_url = os.path.join(cgi_url     , 'cgi')
 
+        # FITCRACK-specific config options
+        config.enable_assignment = 1
+        config.next_rpc_delay = 10
+        config.maintenance_delay = 60
+        config.max_wus_in_progress = 1
+        config.max_ncpus = 1
+        config.prefer_primary_platform = 1
+        config.min_sendwork_interval = 6
+
     def dest(self, *dirs):
         location = self.project_dir
         for x in dirs:
