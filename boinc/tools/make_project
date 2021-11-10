@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-# MAKE PROJECT for Fitcrack - fitcrack.cz
-# 2018 - modified by Fitcrack team
-
-# $Id$
 # Creates a new BOINC project.
 
+from __future__ import print_function
 import boinc_path_config
 from Boinc.setup_project import *
 from Boinc import database, db_mid, configxml, tools, projectxml
@@ -45,7 +42,7 @@ Dir-options:
    --project_root       default: HOME/projects/PROJECT
    --key_dir            default: PROJECT_ROOT/keys
    --project_host       default: $HOSTNAME (%(NODENAME)s)
-   --url_base           default: http://PROJECT_HOST/
+   --url_base           default: https://PROJECT_HOST/
 
    --html_user_url      default: URL_BASE/PROJECT/
    --html_ops_url       default: URL_BASE/PROJECT_ops/
@@ -57,10 +54,10 @@ Other:
    --db_host            default: None
 
 Example command line:
-  ./make_project --project_root $HOME/boinc/projects --url_base http://tah.org/ tah 'Test@home'
+  ./make_project --project_root $HOME/boinc/projects --url_base https://tah.org/ tah 'Test@home'
 
 Then upload_dir = $HOME/boinc/projects/tah/upload
-and  cgi_url    = http://tah.org/tah_cgi/
+and  cgi_url    = https://tah.org/tah_cgi/
 
 By default, directory options will be queried if they do not exist yet.
 
@@ -70,7 +67,7 @@ def syntax_error(str):
     raise SystemExit('%s; See "%s --help" for help\n' % (str,sys.argv[0]))
 
 def usage():
-    print HELP
+    print(HELP)
     raise SystemExit
 
 try:
@@ -99,7 +96,7 @@ try:
             'web_only',
             ]
         )
-except getopt.GetoptError, e:
+except getopt.GetoptError as e:
     syntax_error(e)
 
 options.url_base = None
@@ -168,12 +165,12 @@ def defopt(name, v, isdir=True):
     options.__dict__[name] = opt_repls[name.upper()] = add_slash(replopt(options.__dict__.get(name) or v), isdir)
 
 defopt('project_host'  , NODENAME, isdir=False)
-defopt('url_base'      , 'http://%s/'%options.project_host)
+defopt('url_base'      , 'https://%s/'%options.project_host)
 # strip project_host to get short hostname
 options.project_host=options.project_host.split('.')[0]
 
 if not isurl(options.url_base):
-    syntax_error('url_base needs to be an URL')
+    syntax_error('url_base must be a URL')
 
 defopt('html_user_url' , 'URL_BASE/PROJECT')
 defopt('html_ops_url'  , 'URL_BASE/PROJECT_ops')
@@ -187,7 +184,7 @@ defopt('db_user'       , 'USER_NAME', isdir=False)
 defopt('db_passwd'     , '', isdir=False)
 defopt('db_host'       , '', isdir=False)
 
-print "Creating project '%s' (short name '%s'):" %(project_longname, project_shortname)
+print("Creating project '%s' (short name '%s'):" %(project_longname, project_shortname))
 for k in [
     'project_root',
     'project_host',
@@ -198,7 +195,7 @@ for k in [
     'db_name',
     'db_host',
     ]:
-    print k.upper().rjust(15), "=", options.__dict__[k]
+    print(k.upper().rjust(15), "=", options.__dict__[k])
 
 project_root_parent = os.path.realpath(os.path.join(options.project_root,'..'))
 if not os.path.exists(project_root_parent):
@@ -209,7 +206,7 @@ if os.path.exists(options.project_root):
         if not options.no_query:
             if not query_noyes('Delete %s?'%options.project_root):
                 raise SystemExit('Aborted')
-        print "Deleting", options.project_root
+        print("Deleting", options.project_root)
         rmtree(options.project_root)
     else:
         raise SystemExit('Project root already exists! Specify --delete_prev_inst --drop_db_first to clobber')
@@ -241,13 +238,10 @@ proot = delete_slash(options.project_root)
 project.sched_install('feeder')
 project.sched_install('transitioner')
 project.sched_install('file_deleter')
-
-project.config.daemons.make_node_and_append("daemon").cmd = 'work_generator -d 3 --app fitcrack'
-project.config.daemons.make_node_and_append("daemon").cmd = 'bitwise_validator -d 3 --app fitcrack'
-project.config.daemons.make_node_and_append("daemon").cmd = 'assimilator -d 3 --app fitcrack'
-project.config.daemons.make_node_and_append("daemon").cmd = 'trickler --variety fitcrack'
-project.config.daemons.make_node_and_append("daemon").cmd = 'measureUsage.py'
-project.config.daemons.make_node_and_append("daemon").cmd = 'pcfg_monitor.py'
+if options.test_app:
+    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_work_generator -d 3 --app example_app'
+    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_bitwise_validator -d 3 --app example_app'
+    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_assimilator -d 3 --app example_app'
 
 # set up default tasks
 
@@ -323,21 +317,30 @@ if not options.no_db:
     try:
         os.system('cd '+proot+'/html/ops; ./db_schemaversion.php > '+proot+'/db_revision')
     except:
-        print '''Couldn't set db schema version number'''
+        print('''Couldn't set db schema version number''')
 
 try:
     os.system('cd '+proot+'/html/ops; ./update_translations.php -d 1')
 except:
-    print '''Couldn't install translation files'''
+    print('''Couldn't install translation files''')
 
-print '''Done installing default daemons.'''
+print ('''Done installing default daemons.''')
 
-# Add Fitcrack app
-pf = projectxml.ProjectFile(os.path.join(proot,'project.xml')).read()
-a = pf.elements.make_node_and_append('app')
-a.name = 'fitcrack'
-a.user_friendly_name = 'Fitcrack'
-pf.write()
+# copy the test app if needed
+if options.test_app:
+    app_dir = proot+'/apps/example_app/'
+    os.mkdir(app_dir)
+    os.system('cp -r ../samples/example_app/bin/* ' + app_dir);
+    shutil.copy('example_app_in', proot+'/templates/')
+    shutil.copy('example_app_out', proot+'/templates/')
+    shutil.copy('../tools/create_work_example', proot+'/bin/')
+
+    #add app to project.xml
+    pf = projectxml.ProjectFile(os.path.join(proot,'project.xml')).read()
+    a = pf.elements.make_node_and_append('app')
+    a.name = 'example_app'
+    a.user_friendly_name = 'Example Application'
+    pf.write()
 
 
 httpd_conf_template_filename = os.path.join(
@@ -345,8 +348,7 @@ httpd_conf_template_filename = os.path.join(
     project_shortname+'.httpd.conf'
     )
 
-print >>open(httpd_conf_template_filename,'w'), '''
-
+content ='''
     ## Settings for BOINC project %(project_longname)s
 
     Alias /%(project_shortname)s/download %(proot)s/download
@@ -356,7 +358,7 @@ print >>open(httpd_conf_template_filename,'w'), '''
 
     Alias /%(project_shortname)s_ops %(proot)s/html/ops
     ScriptAlias /%(project_shortname)s_cgi %(proot)s/cgi-bin
-
+    
     # In the following, the "denied" and "granted" lines are for Apache 2.4
     # For Apache 2.2, replace them with the lines
     # Order deny,allow
@@ -364,7 +366,7 @@ print >>open(httpd_conf_template_filename,'w'), '''
     #      or
     # Order allow,deny
     # Allow from all
-
+    
     # NOTE: Turn off access to certain default directories
     <Directory "%(proot)s/keys">
         Require all denied
@@ -401,30 +403,55 @@ print >>open(httpd_conf_template_filename,'w'), '''
         Require all granted
     </Directory>
 
-''' %locals()
+''' % locals()
+f = open(httpd_conf_template_filename,'w')
+f.write(content)
+f.close()
 
 htaccess_filename = options.project_root+'/html/ops/.htaccess'
 htpasswd_filename = options.project_root+'/html/ops/.htpasswd'
 
-print >>open(htaccess_filename, 'w'), '''
+content = '''
 AuthName "%(project_shortname)s"
 AuthType Basic
 AuthUserFile %(htpasswd_filename)s
 require valid-user
 '''%locals()
+f = open(htaccess_filename, 'w')
+f.write(content)
+f.close()
 
 cronjob_filename = os.path.join(
     options.project_root,
     project_shortname+'.cronjob'
     )
-print >>open(cronjob_filename,'w'), '''0,5,10,15,20,25,30,35,40,45,50,55 * * * * cd %(proot)s ; %(proot)s/bin/start --cron
-'''%locals()
+
+f = open(cronjob_filename,'w')
+f.write('0,5,10,15,20,25,30,35,40,45,50,55 * * * * cd %(proot)s ; %(proot)s/bin/start --cron\n' %locals())
+f.close()
 
 readme_filename = os.path.join(
     options.project_root,
     project_shortname+'.readme'
     )
 
+test_app_msg = ''
+if options.test_app:
+    test_app_msg = '''
+-  The project is configured with a test application.
+   To install this application (recommended) run:
+        cd %(proot)s
+        bin/update_versions
+'''%locals()
+
+xadd_msg = ''
+if not options.web_only:
+    xadd_msg = '''
+-  In the project home directory (%(proot)s) run
+
+    bin/xadd
+'''%locals()
+    
 compute_msg = ''
 if not options.web_only:
     compute_msg = '''
@@ -433,13 +460,13 @@ if not options.web_only:
 To use this project for your own computations, you'll need to
 - Port your application(s) and add them
 - Develop programs to submit and handle jobs
-See the online documentation at http://boinc.berkeley.edu/
+See the online documentation at https://boinc.berkeley.edu/
 '''
 
 html_user_url = options.html_user_url
 html_ops_url = options.html_ops_url
 
-print >>open(readme_filename,'w'), '''Steps to complete installation:
+content = '''Steps to complete installation:
 
 -  Change Apache configuration (as root):
 
@@ -463,6 +490,7 @@ print >>open(readme_filename,'w'), '''Steps to complete installation:
 
     0,5,10,15,20,25,30,35,40,45,50,55 * * * * cd %(proot)s ; %(proot)s/bin/start --cron
 
+%(xadd_msg)s%(test_app_msg)s
 -  Add a .htpasswd file in the project's html/ops directory:
     (You'll need this to access the project's Administrative page)
 
@@ -485,9 +513,12 @@ Home page (and master URL): %(html_user_url)s
 Administrative page:        %(html_ops_url)s
 %(compute_msg)s
 '''%locals()
+f = open(readme_filename,'w')
+f.write(content)
+f.close()
 
-print '''
+print('''
 Done creating project.  Please view
 %(readme_filename)s
 for important additional instructions.
-'''%locals()
+'''%locals())

@@ -72,6 +72,15 @@ static FloppyIOException   __FloppyIOExceptionSingleton;
 //
 
 FloppyIO::FloppyIO(const char * filename, int flags) {
+  // initialize class members
+  ofsInput = 0;
+  szInput = 0;
+  ofsOutput = 0;
+  szOutput = 0;
+  ofsCtrlByteIn = 0;
+  ofsCtrlByteOut = 0;
+  synchronized = false;
+  syncTimeout = 0;
   // Clear error flag
   this->error = 0;
   
@@ -177,7 +186,7 @@ void FloppyIO::reset() {
     return;
   }
   
-  // Reset to the beginnig of file and fill with zeroes
+  // Reset to the beginning of file and fill with zeroes
   this->fIO->seekp(0);
   char * buffer = new char[this->szFloppy];
   memset(buffer, 0, this->szFloppy);
@@ -189,7 +198,7 @@ void FloppyIO::reset() {
 // Send data to the floppy image I/O
 //
 // @param strData   The string to send
-// @return          The number of bytes sent if successful or -1 if an error occured.
+// @return          The number of bytes sent if successful or -1 if an error occurred.
 //
 int FloppyIO::send(string strData) {
     // Prepare send buffer
@@ -269,7 +278,7 @@ string FloppyIO::receive() {
 // Receive the input buffer contents
 //
 // @param string   A pointer to a string object that will receive the data
-// @return         Returns the length of the data received or -1 if an error occured.
+// @return         Returns the length of the data received or -1 if an error occurred.
 //
 int FloppyIO::receive(string * ansBuffer) {
     char * dataToReceive = new char[this->szInput];
@@ -319,7 +328,7 @@ int FloppyIO::receive(string * ansBuffer) {
 // @param controlByteOffset The offset (from the beginning of file) where to look for the control byte
 // @param state             The state the controlByte must be for this function to exit.
 // @param timeout           The time (in seconds) to wait for a change. 0 Will wait forever
-// @return                  Returns 0 if everything succeeded, -1 if an error occured, -2 if timed out.
+// @return                  Returns 0 if everything succeeded, -1 if an error occurred, -2 if timed out.
 
 int  FloppyIO::waitForSync(int controlByteOffset, char state, int timeout) {
     time_t tExpired = time (NULL) + timeout;

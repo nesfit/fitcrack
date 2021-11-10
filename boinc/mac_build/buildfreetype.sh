@@ -2,7 +2,7 @@
 
 # This file is part of BOINC.
 # http://boinc.berkeley.edu
-# Copyright (C) 2017 University of California
+# Copyright (C) 2021 University of California
 #
 # BOINC is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License
@@ -30,11 +30,15 @@
 # Updated 4/8/15 to check for spaces in path
 # Updated 1/5/16 for FreeType-2.6.2
 # Updated 1/25/18 for any version of FreeType (changed only comments)
+# Updated 1/23/19 use libc++ instead of libstdc++ for Xcode 10 compatibility
+# Updated 8/22/20 to build Apple Silicon / arm64 and x86_64 Universal binary
+# Updated 5/18/21 for compatibility with zsh
+# Updated 10/18/21 for for building freetype 2.11.0
 #
-## This script requires OS 10.6 or later
+## This script requires OS 10.8 or later
 #
-## If you drag-install Xcode 4.3 or later, you must have opened Xcode
-## and clicked the Install button on the dialog which appears to
+## After first installing Xcode, you must have opened Xcode and
+## clicked the Install button on the dialog which appears to
 ## complete the Xcode installation before running this script.
 #
 ## Where x.x.x is the freetype version number:
@@ -86,19 +90,39 @@ while [[ $# -gt 0 ]]; do
     shift # past argument or value
 done
 
-if [ "${doclean}" != "yes" ]; then
-    if [ -f "${libPath}/libfreetype.a" ]; then
-        cwd=$(pwd)
-        dirname=${cwd##*/}
-        echo "${dirname} already built"
-        return 0
-    fi
-fi
-
 GCCPATH=`xcrun -find gcc`
 if [ $? -ne 0 ]; then
     echo "ERROR: can't find gcc compiler"
     return 1
+fi
+
+GCC_can_build_x86_64="no"
+GCC_can_build_arm64="no"
+GCC_archs=`lipo -info "${GCCPATH}"`
+if [[ "${GCC_archs}" = *"x86_64"* ]]; then GCC_can_build_x86_64="yes"; fi
+if [[ "${GCC_archs}" = *"arm64"* ]]; then GCC_can_build_arm64="yes"; fi
+
+if [ "${doclean}" != "yes" ]; then
+    if [ -f "${libPath}/libfreetype.a" ]; then
+        alreadyBuilt=1
+
+        if [ $GCC_can_build_x86_64 = "yes" ]; then
+            lipo "${libPath}/libfreetype.a" -verify_arch x86_64
+            if [ $? -ne 0 ]; then alreadyBuilt=0; doclean="yes"; fi
+        fi
+        
+        if [ $alreadyBuilt -eq 1 ] && [ $GCC_can_build_arm64 = "yes" ]; then
+            lipo "${libPath}/libfreetype.a" -verify_arch arm64
+            if [ $? -ne 0 ]; then alreadyBuilt=0; doclean="yes"; fi
+        fi
+        
+        if [ $alreadyBuilt -eq 1 ]; then
+            cwd=$(pwd)
+            dirname=${cwd##*/}
+            echo "${dirname} already built"
+            return 0
+        fi
+    fi
 fi
 
 GPPPATH=`xcrun -find g++`
@@ -127,23 +151,26 @@ export PATH="${TOOLSPATH1}":"${TOOLSPATH2}":$PATH
 
 SDKPATH=`xcodebuild -version -sdk macosx Path`
 
-# Build for i386 architecture
-export CC="${GCCPATH}";export CXX="${GPPPATH}"
-export LDFLAGS="-Wl,-syslibroot,${SDKPATH},-arch,i386"
-export CPPFLAGS="-isysroot ${SDKPATH} -arch i386 -DMAC_OS_X_VERSION_MAX_ALLOWED=1060 -DMAC_OS_X_VERSION_MIN_REQUIRED=1060"
-export CFLAGS="-isysroot ${SDKPATH} -arch i386 -DMAC_OS_X_VERSION_MAX_ALLOWED=1060 -DMAC_OS_X_VERSION_MIN_REQUIRED=1060"
-export SDKROOT="${SDKPATH}"
-export MACOSX_DEPLOYMENT_TARGET=10.6
-
-cp -p objs/README README-objs
-rm -fR objs/*.*
-rm -fR objs/*
-cp -p README-objs objs/README
-rm -f README-objs
 # this directory is only used when no --prefix argument was given
 rm -fR "../freetype_install/"
 
-./configure --enable-shared=NO --prefix=${lprefix} --host=i386
+# Build for x86_64 architecture
+
+## The "-Werror=unguarded-availability" compiler flag generates an error if
+## there is an unguarded API not available in our Deployment Target. This
+## helps ensure FreeType won't try to use unavailable APIs on older Mac
+## systems supported by BOINC.
+## It also causes configure to reject any such APIs for which it tests.
+##
+export CC="${GCCPATH}";export CXX="${GPPPATH}"
+export LDFLAGS="-Wl,-syslibroot,${SDKPATH},-arch,x86_64"
+export CPPFLAGS="-isysroot ${SDKPATH} -Werror=unguarded-availability -arch x86_64 -mmacosx-version-min=10.10 -stdlib=libc++ -DMAC_OS_X_VERSION_MAX_ALLOWED=101000 -DMAC_OS_X_VERSION_MIN_REQUIRED=101000"
+export CXXFLAGS="-isysroot ${SDKPATH} -Werror=unguarded-availability -arch x86_64 -mmacosx-version-min=10.10 -stdlib=libc++ -DMAC_OS_X_VERSION_MAX_ALLOWED=101000 -DMAC_OS_X_VERSION_MIN_REQUIRED=101000"
+export CFLAGS="-isysroot ${SDKPATH} -Werror=unguarded-availability -arch x86_64 -mmacosx-version-min=10.10 -DMAC_OS_X_VERSION_MAX_ALLOWED=101000 -DMAC_OS_X_VERSION_MIN_REQUIRED=101000"
+export SDKROOT="${SDKPATH}"
+export MACOSX_DEPLOYMENT_TARGET=10.10
+
+./configure --enable-shared=NO --prefix=${lprefix} --enable-freetype-config --without-png --host=x86_64
 if [ $? -ne 0 ]; then return 1; fi
 
 if [ "${doclean}" = "yes" ]; then
@@ -153,45 +180,64 @@ fi
 make 1>$stdout_target
 if [ $? -ne 0 ]; then return 1; fi
 
-# save i386 lib for later use
-mv -f objs/.libs/libfreetype.a objs/.libs/libfreetype_i386.a
+# Now see if we can build for arm64
+# Note: Some versions of Xcode 12 don't support building for arm64
+if [ $GCC_can_build_arm64 = "yes" ]; then
 
-# Build for x86_64 architecture
-make clean 1>$stdout_target
+    export CC="${GCCPATH}";export CXX="${GPPPATH}"
+    export LDFLAGS="-Wl,-syslibroot,${SDKPATH},-arch,arm64"
+    export CPPFLAGS="-isysroot ${SDKPATH} -Werror=unguarded-availability -target arm64-apple-macos -mmacosx-version-min=10.10 -stdlib=libc++ -DMAC_OS_X_VERSION_MAX_ALLOWED=101000 -DMAC_OS_X_VERSION_MIN_REQUIRED=101000"
+    export CXXFLAGS="-isysroot ${SDKPATH} -Werror=unguarded-availability -target arm64-apple-macos -mmacosx-version-min=10.10 -stdlib=libc++ -DMAC_OS_X_VERSION_MAX_ALLOWED=101000 -DMAC_OS_X_VERSION_MIN_REQUIRED=101000"
+    export CFLAGS="-isysroot ${SDKPATH} -Werror=unguarded-availability -mmacosx-version-min=10.10 -target arm64-apple-macos -DMAC_OS_X_VERSION_MAX_ALLOWED=101000 -DMAC_OS_X_VERSION_MIN_REQUIRED=101000"
+    export SDKROOT="${SDKPATH}"
+    export MACOSX_DEPLOYMENT_TARGET=10.10
 
-export CC="${GCCPATH}";export CXX="${GPPPATH}"
-export LDFLAGS="-Wl,-syslibroot,${SDKPATH},-arch,x86_64"
-export CPPFLAGS="-isysroot ${SDKPATH} -arch x86_64 -DMAC_OS_X_VERSION_MAX_ALLOWED=1060 -DMAC_OS_X_VERSION_MIN_REQUIRED=1060"
-export CFLAGS="-isysroot ${SDKPATH} -arch x86_64 -DMAC_OS_X_VERSION_MAX_ALLOWED=1060 -DMAC_OS_X_VERSION_MIN_REQUIRED=1060"
-export SDKROOT="${SDKPATH}"
-export MACOSX_DEPLOYMENT_TARGET=10.6
+    ./configure --enable-shared=NO --prefix=${lprefix} --enable-freetype-config --without-png --host=arm
+    if [ $? -ne 0 ]; then
+        echo "              ******"
+        echo "Freetype: x86_64 build succeeded but could not build for arm64."
+        echo "              ******"
+    else
 
-./configure --enable-shared=NO --prefix=${lprefix} --host=x86_64
-if [ $? -ne 0 ]; then return 1; fi
-make 1>$stdout_target
-if [ $? -ne 0 ]; then return 1; fi
+        # save x86_64 lib for later use
+        mv -f objs/.libs/libfreetype.a objs/.libs/libfreetype_x86_64.a
 
-mv -f objs/.libs/libfreetype.a objs/.libs/libfreetype_x86_64.a
-# combine i386 and x86_64 libraries
-lipo -create objs/.libs/libfreetype_i386.a objs/.libs/libfreetype_x86_64.a -output objs/.libs/libfreetype.a
-if [ $? -ne 0 ]; then return 1; fi
+        # Build for arm64 architecture
+        make clean 1>$stdout_target
 
-rm -f objs/.libs/libfreetype_i386.a
-rm -f objs/.libs/libfreetype_x86_64.a
+        make 1>$stdout_target
+        if [ $? -ne 0 ]; then 
+            rm -f objs/.libs/libfreetype_x86_64.a
+            return 1
+        fi
+
+        mv -f objs/.libs/libfreetype.a objs/.libs/libfreetype_arm64.a
+        # combine x86_64 and arm libraries
+        lipo -create objs/.libs/libfreetype_x86_64.a objs/.libs/libfreetype_arm64.a -output objs/.libs/libfreetype.a
+        if [ $? -ne 0 ]; then
+            rm -f objs/.libs/libfreetype_x86_64.a  objs/.libs/libfreetype_arm64.a
+            return 1
+         fi
+
+        rm -f objs/.libs/libfreetype_x86_64.a
+        rm -f objs/.libs/libfreetype_arm64.a
+    fi
+fi
 
 # Building ftgl requires [install-path]/bin/freetype-config
-# this installs the modified library
+# this installs the x86_64 library in case we can't build for arm64
 make install 1>$stdout_target
 if [ $? -ne 0 ]; then return 1; fi
 
 # remove installed items not needed by ftgl build
 # this directory is only used when no --prefix argument was given
 rm -fR "../freetype_install/share"
-rm -fR "../freetype_install/lib"
+rm -f ../freetype_install/lib/libfreetype.*
 
 lprefix=""
 export CC="";export CXX=""
 export LDFLAGS=""
+export CXXFLAGS=""
 export CPPFLAGS=""
 export CFLAGS=""
 export SDKROOT=""

@@ -36,7 +36,7 @@
 *  Note: if address 1a23 is hex, use 0x1a23.  
 *
 *  To demangle mangled C++ symbols, use the c++filt command-line tool. 
-*  You may need to prefix C++ symbols with an additonal underscore before 
+*  You may need to prefix C++ symbols with an additional underscore before 
 *  passing them to c++filt (so they begin with two underscore characters).
 *
 * A very useful shell script to add symbols to a crash dump can be found at:
@@ -139,7 +139,7 @@ First checked in.
 #include <mach-o/nlist.h>
 #include <mach-o/stab.h>
 
-#if TARGET_CPU_X86 || TARGET_CPU_X86_64
+#if TARGET_CPU_X86 || TARGET_CPU_X86_64 || TARGET_CPU_ARM64
 #include <mach/mach_vm.h>
 #endif
 
@@ -196,7 +196,7 @@ typedef struct QMOImage QMOImage;
 // Image Type Callbacks
 // --------------------
 // There are various types of QMOImage (local, from a remote task, from disk) that have 
-// lots in common.  However, in some cases it's necessary to do things diffently for each 
+// lots in common.  However, in some cases it's necessary to do things differently for each 
 // type of image to do different things.  In that case, the common code calls the image 
 // type specific code to do the work.
 
@@ -808,7 +808,7 @@ static int QMOImageCreate(
         // It is vital that we call the create callback (if any) before any 
         // other failure (other than the calloc).  If there was a failure 
         // point before this, we could end up calling the destroy callback 
-        // before calling the create callback.  Thatd woul be bad for image 
+        // before calling the create callback.  That would be bad for image 
         // types where a NULL refcon isn't appropriate as a nil value.  
         //
         // An example of this is the file image type.  The in this case, the 
@@ -2070,7 +2070,7 @@ static int FindTaskDyld(task_t task, cpu_type_t cputype, QTMAddr *dyldAddrPtr)
 	int                     err;
         kern_return_t           kr;
 	QTMAddr                 localDyldAddr;
-#if TARGET_CPU_X86 || TARGET_CPU_X86_64
+#if TARGET_CPU_X86 || TARGET_CPU_X86_64 || TARGET_CPU_ARM64
 	mach_vm_address_t	thisRegion;
 #else
 	vm_address_t		thisRegion;
@@ -2114,7 +2114,7 @@ static int FindTaskDyld(task_t task, cpu_type_t cputype, QTMAddr *dyldAddrPtr)
 
                 mach_msg_type_number_t                  infoCount;
 
-#if TARGET_CPU_X86 || TARGET_CPU_X86_64
+#if TARGET_CPU_X86 || TARGET_CPU_X86_64 || TARGET_CPU_ARM64
 
                 mach_vm_size_t				thisRegionSize;
                 vm_region_basic_info_data_64_t          info;

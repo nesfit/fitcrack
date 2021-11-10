@@ -28,9 +28,9 @@ for user in database.Users.find():
 
 '''
 
-import configxml
-from util import *
-from db_base import *
+from Boinc import configxml
+from Boinc.util import *
+from Boinc.db_base import *
 
 ID = '$Id$'
 
@@ -253,7 +253,7 @@ def connect(config = None, nodb = False):
         db = ''
     else:
         db = config.db_name
-
+    
     host=config.__dict__.get('db_host','')
     port=""
     if ':' in host:
@@ -283,12 +283,9 @@ def create_database(srcdir, config = None, drop_first = False):
     connect(config, nodb=True)
     dbcon = get_dbconnection()
     cursor = dbcon.cursor()
-
-    # Commented (Radek), since we expect an empty database
-    #if drop_first:
-    #    cursor.execute("drop database if exists %s"%config.db_name)
-    #cursor.execute("create database %s"%config.db_name)
-
+    if drop_first:
+        cursor.execute("drop database if exists %s"%config.db_name)
+    cursor.execute("create database %s"%config.db_name)
     cursor.execute("use %s"%config.db_name)
     for file in ['schema.sql', 'constraints.sql', 'content.sql']:
         _execute_sql_script(cursor, os.path.join(srcdir, 'db', file))

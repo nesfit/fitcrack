@@ -171,10 +171,15 @@ function stage_file($a, $v, $p, $fd) {
             die ("Error: files $path and $dl_path differ.\nBOINC files are immutable.\nIf you change a file, you must give it a new name.\n");
         }
     } else {
+        $subdirs = dirname($name);
+        if ($subdirs) {
+            echo 'mkdir -p '.$download_dir.'/'.$subdirs.PHP_EOL;
+            system('mkdir -p '.$download_dir.'/'.$subdirs);
+        }
         echo("cp $path $dl_path\n");
         system("cp $path $dl_path");
     }
-
+    
     if (!sizeof($fd->url)) {
         $fd->url = "$download_url/$name";
     }
@@ -216,10 +221,16 @@ function confirm_sig_gen($name) {
     NOTICE: You have not provided a signature file for $name,
     and your project's code-signing private key is on your server.
 
-    IF YOUR PROJECT IS PUBLICLY ACCESSABLE, THIS IS A SECURITY VULNERABILITY.
+    IF YOUR PROJECT IS PUBLICLY ACCESSIBLE, THIS IS A SECURITY VULNERABILITY.
     PLEASE STOP YOUR PROJECT IMMEDIATELY AND READ:
     https://boinc.berkeley.edu/trac/wiki/CodeSigning
-    ";
+
+    Continue (y/n)? ";
+
+    $x = trim(fgets(STDIN));
+    if ($x != "y") {
+        exit;
+    }
     $sig_gen_confirmed = true;
 }
 
@@ -272,13 +283,16 @@ function process_file($a, $v, $p, $name, $fds) {
 // scan the directory, and process files.
 // "fds" is the list of files described in version.xml;
 // return this list, augmented with any files not in version.xml
-//
+// 
 //
 function process_files($a, $v, $p, $fds) {
     $d = opendir("apps/$a/$v/$p");
     while ($f = readdir_aux($d)) {
         if ($f == "version.xml") continue;
         if (strstr($f, ".sig") == ".sig") continue;
+        if (is_dir('apps/'.$a.'/'.$v.'/'.$p.'/'.$f)) { // Skip folder structure, it will get processed later
+            continue;
+        }
         $fds = process_file($a, $v, $p, $f, $fds);
     }
     return $fds;
@@ -358,7 +372,9 @@ function confirm($fds, $v) {
     if ($v->beta) echo "        beta\n";
     if ($v->file_prefix) echo "        file prefix: $v->file_prefix\n";
     echo "        API version: $v->api_version\n";
-    return true;
+    echo "    Do you want to add this app version (y/n)? ";
+    $x = trim(fgets(STDIN));
+    return ($x == "y");
 }
 
 function get_bool($xml_element, $name) {
@@ -428,6 +444,17 @@ function process_version($a, $v, $p) {
     }
 
     $fds = process_files($a, $v, $p, $vers->files);
+
+    // Process any unprocessed files from subdirectories
+    foreach ($fds as $fd) {
+        if ($fd->present) {
+            continue;
+        }
+        if (strpos($fd->physical_name, '/') === false) {
+            continue;
+        }
+        $fds = process_file($a, $v, $p, $fd->physical_name, $fds);
+    }
 
     if (missing_files($fds)) return;
     if (sizeof($fds) == 1) {

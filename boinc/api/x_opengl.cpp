@@ -2,7 +2,7 @@
 
 // This file is part of BOINC.
 // http://boinc.berkeley.edu
-// Copyright (C) 2008 University of California
+// Copyright (C) 2019 University of California
 //
 // BOINC is free software; you can redistribute it and/or modify it
 // under the terms of the GNU Lesser General Public License
@@ -392,7 +392,7 @@ void KillWindow() {
             glutReshapeWindow(win_width, win_height);
         }
         
-        // On Intel Macs (but not on PowerPC Macs) GLUT's destuctors often crash when 
+        // On Intel Macs (but not on PowerPC Macs) GLUT's destructors often crash when 
         // glutDestroyWindow() is called.  So far, this has only been reported for
         // SETI@home. Since it doesn't occur on PowerPC Macs, we suspect a bug in GLUT.  
         // To work around this, we just hide the window instead.  Though this does not 
@@ -671,6 +671,3 @@ void xwin_graphics_event_loop() {
     glutMainLoop();
     if (debug) fprintf(stderr, "glutMainLoop() returned!! This should never happen...\n");
 }
-
-
-const char *BOINC_RCSID_c457a14644 = "$Id$";

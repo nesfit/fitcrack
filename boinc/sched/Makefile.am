@@ -74,8 +74,8 @@ endif
 all-local: $(all_local)
 
 $(LIBSCHED_STATIC): libsched.la
-	## rm -f $(LIBSCHED_STATIC)
-	$(LN) -f .libs/$(LIBSCHED_STATIC) .
+	rm -f $(LIBSCHED_STATIC)
+	$(LN) .libs/$(LIBSCHED_STATIC) .
 
 $(LIBSCHED_FCGI_STATIC): libsched_fcgi.la
 	rm -f $(LIBSCHED_FCGI_STATIC)
@@ -124,11 +124,7 @@ schedshare_PROGRAMS = \
     trickle_credit \
     trickle_deadline \
     trickle_echo \
-    update_stats \
-    assimilator \
-    work_generator \
-    bitwise_validator \
-    trickler
+    update_stats
 
 schedcgi_PROGRAMS= \
     cgi \
@@ -311,82 +307,6 @@ adjust_user_priority_LDADD = $(SERVERLIBS)
 sched_driver_SOURCES = sched_driver.cpp
 sched_driver_LDADD = $(SERVERLIBS)
 
-# find . -name '*.h'
-# find . -name '*.cpp'
-fitcrack_sources = \
-    AttackBenchAll.h \
-    AttackBench.h \
-    AttackCombinator.h \
-    AttackDict.h \
-    AttackHybridDictMask.h \
-    AttackHybridMaskDict.h \
-    AttackMarkov.h \
-    AttackMask.h \
-    AttackMode.h \
-    AttackRules.h \
-    AttackPrince.h \
-    AttackPcfg.h \
-    AttackPcfgClient.h \
-    AttackPcfgRules.h \
-    Base64.h \
-    BenchmarkClasses.h \
-    Config.h \
-    Dictionary.h \
-    Host.h \
-    InputDict.h \
-    MaskSplitter.h \
-    Workunit.h \
-    Mask.h \
-    Job.h \
-    SqlLoader.h \
-    AbstractGenerator.h \
-    SimpleGenerator.h \
-    AttackBenchAll.cpp \
-    AttackCombinator.cpp \
-    AttackDict.cpp \
-    AttackHybridDictMask.cpp \
-    AttackHybridMaskDict.cpp \
-    AttackMarkov.cpp \
-    AttackMask.cpp \
-    AttackMode.cpp \
-    AttackRules.cpp \
-    AttackPrince.cpp \
-    AttackPcfg.cpp \
-    AttackPcfgClient.cpp \
-    AttackPcfgRules.cpp \
-    BenchmarkClasses.cpp \
-    Config.cpp \
-    Dictionary.cpp \
-    Host.cpp \
-    InputDict.cpp \
-    MaskSplitter.cpp \
-    Workunit.cpp \
-    Mask.cpp \
-    Job.cpp \
-    SqlLoader.cpp \
-    AbstractGenerator.cpp \
-    SimpleGenerator.cpp \
-    protocol.grpc.pb.h \
-    protocol.grpc.pb.cc \
-    protocol.pb.h \
-    protocol.pb.cc
-
-assimilator_SOURCES = $(ASSIMILATOR_SOURCES) \
-	$(fitcrack_sources) \
-	work_assimilator.cpp
-assimilator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
-
-work_generator_SOURCES = $(fitcrack_sources) \
-	work_generator.cpp
-work_generator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
-
-bitwise_validator_SOURCES = $(VALIDATOR_SOURCES) \
-	sample_bitwise_validator.cpp
-bitwise_validator_LDADD = $(SERVERLIBS)
-
-trickler_SOURCES = trickler.cpp trickle_handler.cpp
-trickler_LDADD = $(SERVERLIBS)
-
 if ENABLE_FCGI
 
 schedcgi_PROGRAMS += fcgi fcgi_file_upload_handler
@@ -414,4 +334,4 @@ PHONY-start:
 status stop: PHONY-start
 	@test -f $@ || @LN_S@ start $@ && test -f $@
 
-CLEANFILES = status stop
+CLEANFILES = status stop *.gcno *.gcda *.gcov *.a

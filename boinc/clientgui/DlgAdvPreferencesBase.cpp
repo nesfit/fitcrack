@@ -137,7 +137,7 @@ CDlgAdvPreferencesBase::CDlgAdvPreferencesBase( wxWindow* parent, int id, wxStri
 
     wxBoxSizer* notebookSizer = new wxBoxSizer( wxVERTICAL );
 
-    m_Notebook = new wxNotebook( m_panelControls, ID_DEFAULT, wxDefaultPosition, wxDefaultSize, wxNB_FLAT|wxNB_TOP );
+    m_Notebook = new wxNotebook( m_panelControls, ID_DEFAULT, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
     m_Notebook->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
 
     wxImageList* pImageList = new wxImageList(ADJUSTFORXDPI(16), ADJUSTFORYDPI(16), true, 0);
@@ -271,7 +271,7 @@ wxPanel* CDlgAdvPreferencesBase::createProcessorTab(wxNotebook* notebook)
     wxStaticText* staticText22 = new wxStaticText(
         usageLimitsStaticBox, ID_DEFAULT, _("Use at most"), wxDefaultPosition, wxDefaultSize, 0 );
 
-    m_txtProcUseCPUTime = new wxTextCtrl( usageLimitsStaticBox, ID_TXTPOCUSECPUTIME, wxEmptyString, wxDefaultPosition, textCtrlSize, wxTE_RIGHT );
+    m_txtProcUseCPUTime = new wxTextCtrl( usageLimitsStaticBox, ID_TXTPROCUSECPUTIME, wxEmptyString, wxDefaultPosition, textCtrlSize, wxTE_RIGHT );
 
     /*xgettext:no-c-format*/
     wxStaticText* staticText23 = new wxStaticText( usageLimitsStaticBox, ID_DEFAULT, _("% of CPU time"), wxDefaultPosition, wxDefaultSize, 0 );

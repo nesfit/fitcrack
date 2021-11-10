@@ -30,7 +30,9 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <time.h>
 
+#include "str_util.h"
 #include "md5_file.h"
 #include "parse.h"
 #include "remote_submit.h"
@@ -101,6 +103,9 @@ struct COMMAND {
     double min_mod_time;
 
     COMMAND(char* _in) {
+        id = 0;
+        lease_end_time = 0.0;
+        min_mod_time = 0.0;
         in = _in;
         out = NULL;
     }
@@ -540,7 +545,7 @@ void handle_fetch_output(COMMAND& c) {
             int j = output_file_index(td, lname);
             if (j < 0) {
                 if (i >= td.output_files.size()) {
-                      sprintf(buf, "too\\ many\\ output\\ files\\ specified\\ submit:%d\\ template:%d",
+                      sprintf(buf, "too\\ many\\ output\\ files\\ specified\\ submit:%u\\ template:%lu",
                           i, td.output_files.size()
                       );
                     s = string(buf);

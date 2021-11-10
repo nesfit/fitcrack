@@ -801,9 +801,11 @@ namespace vboxmanage {
                 return deregister_vm(false);
             } else {
                 command  = "closemedium dvd \"" + virtual_machine_slot_directory + "/" + iso_image_filename + "\" ";
+                // coverity[CHECKED_RETURN]
                 vbm_popen(command, output, "remove virtual ISO 9660 disk", false);
                 if (enable_cache_disk) {
                      command  = "closemedium disk \"" + virtual_machine_slot_directory + "/" + cache_disk_filename + "\" ";
+                     // coverity[CHECKED_RETURN]
                      vbm_popen(command, output, "remove virtual cache disk", false);
                 }
             }
@@ -1522,7 +1524,7 @@ namespace vboxmanage {
     // 2. Vboxmanage not being able to communicate with vboxsvc for some reason
     // 3. VirtualBox driver not loaded for the current Linux kernel.
     //
-    // Luckly both of the above conditions can be detected by attempting to detect the host information
+    // Luckily both of the above conditions can be detected by attempting to detect the host information
     // via vboxmanage and it is cross platform.
     //
     bool VBOX_VM::is_system_ready(std::string& message) {
