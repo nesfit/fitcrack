@@ -90,11 +90,6 @@ hashtypes = [
       "name": "Half MD5",
     },
     {
-      "code": "18700",
-      "category": "Raw Hash",
-      "name": "Java Object hashCode()",
-    },
-    {
       "code": "17700",
       "category": "Raw Hash",
       "name": "Keccak-224",
@@ -115,11 +110,6 @@ hashtypes = [
       "name": "Keccak-512",
     },
     {
-      "code": "21400",
-      "category": "Raw Hash",
-      "name": "sha256(sha256_bin($pass))",
-    },
-    {
       "code": "6100",
       "category": "Raw Hash",
       "name": "Whirlpool",
@@ -130,9 +120,29 @@ hashtypes = [
       "name": "SipHash",
     },
     {
-      "code": "21000",
+      "code": "70",
       "category": "Raw Hash",
-      "name": "BitShares v0.x - sha512(sha512_bin(pass))",
+      "name": "md5(utf16le($pass))",
+    },
+    {
+      "code": "170",
+      "category": "Raw Hash",
+      "name": "sha1(utf16le($pass))",
+    },
+    {
+      "code": "1470",
+      "category": "Raw Hash",
+      "name": "sha256(utf16le($pass))",
+    },
+    {
+      "code": "10870",
+      "category": "Raw Hash",
+      "name": "sha384(utf16le($pass))",
+    },
+    {
+      "code": "1770",
+      "category": "Raw Hash",
+      "name": "sha512(utf16le($pass))",
     },
     {
       "code": "10",
@@ -185,6 +195,11 @@ hashtypes = [
       "name": "md5(md5($pass).md5($salt))",
     },
     {
+      "code": "3500",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "md5(md5(md5($pass)))",
+    },
+    {
       "code": "4400",
       "category": "Raw Hash, Salted and/or Iterated",
       "name": "md5(sha1($pass))",
@@ -230,6 +245,11 @@ hashtypes = [
       "name": "sha1($salt.sha1($pass))",
     },
     {
+      "code": "24300",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha1($salt.sha1($pass.$salt))",
+    },
+    {
       "code": "140",
       "category": "Raw Hash, Salted and/or Iterated",
       "name": "sha1($salt.utf16le($pass))",
@@ -270,6 +290,16 @@ hashtypes = [
       "name": "sha1(sha1($pass))",
     },
     {
+      "code": "4510",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha1(sha1($pass).$salt)",
+    },
+    {
+      "code": "5000",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha1(sha1($salt.$pass.$salt))",
+    },
+    {
       "code": "130",
       "category": "Raw Hash, Salted and/or Iterated",
       "name": "sha1(utf16le($pass).$salt)",
@@ -290,6 +320,11 @@ hashtypes = [
       "name": "sha256($salt.$pass.$salt)",
     },
     {
+      "code": "20720",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha256($salt.sha256($pass))",
+    },
+    {
       "code": "1440",
       "category": "Raw Hash, Salted and/or Iterated",
       "name": "sha256($salt.utf16le($pass))",
@@ -305,9 +340,34 @@ hashtypes = [
       "name": "sha256(sha256($pass).$salt)",
     },
     {
+      "code": "21400",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha256(sha256_bin($pass))",
+    },
+    {
       "code": "1430",
       "category": "Raw Hash, Salted and/or Iterated",
       "name": "sha256(utf16le($pass).$salt)",
+    },
+    {
+      "code": "10810",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha384($pass.$salt)",
+    },
+    {
+      "code": "10820",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha384($salt.$pass)",
+    },
+    {
+      "code": "10840",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha384($salt.utf16le($pass))",
+    },
+    {
+      "code": "10830",
+      "category": "Raw Hash, Salted and/or Iterated",
+      "name": "sha384(utf16le($pass).$salt)",
     },
     {
       "code": "1710",
@@ -328,11 +388,6 @@ hashtypes = [
       "code": "1730",
       "category": "Raw Hash, Salted and/or Iterated",
       "name": "sha512(utf16le($pass).$salt)",
-    },
-    {
-      "code": "19500",
-      "category": "Raw Hash, Salted and/or Iterated",
-      "name": "Ruby on Rails Restful-Authentication",
     },
     {
       "code": "50",
@@ -400,6 +455,16 @@ hashtypes = [
       "name": "CRC32",
     },
     {
+      "code": "18700",
+      "category": "Raw Checksum",
+      "name": "Java Object hashCode()",
+    },
+    {
+      "code": "25700",
+      "category": "Raw Checksum",
+      "name": "MurmurHash",
+    },
+    {
       "code": "14100",
       "category": "Raw Cipher, Known-Plaintext attack",
       "name": "3DES (PT = $salt, key = $pass)",
@@ -410,9 +475,29 @@ hashtypes = [
       "name": "DES (PT = $salt, key = $pass)",
     },
     {
+      "code": "26401",
+      "category": "Raw Cipher, Known-Plaintext attack",
+      "name": "AES-128-ECB NOKDF (PT = $salt, key = $pass)",
+    },
+    {
+      "code": "26402",
+      "category": "Raw Cipher, Known-Plaintext attack",
+      "name": "AES-192-ECB NOKDF (PT = $salt, key = $pass)",
+    },
+    {
+      "code": "26403",
+      "category": "Raw Cipher, Known-Plaintext attack",
+      "name": "AES-256-ECB NOKDF (PT = $salt, key = $pass)",
+    },
+    {
       "code": "15400",
       "category": "Raw Cipher, Known-Plaintext attack",
       "name": "ChaCha20",
+    },
+    {
+      "code": "14500",
+      "category": "Raw Cipher, Known-Plaintext attack",
+      "name": "Linux Kernel Crypto API (2.4)",
     },
     {
       "code": "14900",
@@ -450,31 +535,6 @@ hashtypes = [
       "name": "phpass",
     },
     {
-      "code": "16900",
-      "category": "Generic KDF",
-      "name": "Ansible Vault",
-    },
-    {
-      "code": "12001",
-      "category": "Generic KDF",
-      "name": "Atlassian (PBKDF2-HMAC-SHA1)",
-    },
-    {
-      "code": "20200",
-      "category": "Generic KDF",
-      "name": "Python passlib pbkdf2-sha512",
-    },
-    {
-      "code": "20300",
-      "category": "Generic KDF",
-      "name": "Python passlib pbkdf2-sha256",
-    },
-    {
-      "code": "20400",
-      "category": "Generic KDF",
-      "name": "Python passlib pbkdf2-sha1",
-    },
-    {
       "code": "16100",
       "category": "Network Protocols",
       "name": "TACACS+",
@@ -495,9 +555,39 @@ hashtypes = [
       "name": "IKE-PSK SHA1",
     },
     {
-      "code": "23200",
+      "code": "25100",
       "category": "Network Protocols",
-      "name": "XMPP SCRAM PBKDF2-SHA1",
+      "name": "SNMPv3 HMAC-MD5-96",
+    },
+    {
+      "code": "25000",
+      "category": "Network Protocols",
+      "name": "SNMPv3 HMAC-MD5-96/HMAC-SHA1-96",
+    },
+    {
+      "code": "25200",
+      "category": "Network Protocols",
+      "name": "SNMPv3 HMAC-SHA1-96",
+    },
+    {
+      "code": "26700",
+      "category": "Network Protocols",
+      "name": "SNMPv3 HMAC-SHA224-128",
+    },
+    {
+      "code": "26800",
+      "category": "Network Protocols",
+      "name": "SNMPv3 HMAC-SHA256-192",
+    },
+    {
+      "code": "26900",
+      "category": "Network Protocols",
+      "name": "SNMPv3 HMAC-SHA384-256",
+    },
+    {
+      "code": "27300",
+      "category": "Network Protocols",
+      "name": "SNMPv3 HMAC-SHA512-384",
     },
     {
       "code": "2500",
@@ -540,24 +630,29 @@ hashtypes = [
       "name": "CRAM-MD5",
     },
     {
-      "code": "4800",
-      "category": "Network Protocols",
-      "name": "iSCSI CHAP authentication, MD5(CHAP)",
-    },
-    {
       "code": "16500",
       "category": "Network Protocols",
       "name": "JWT (JSON Web Token)",
     },
     {
-      "code": "22600",
+      "code": "19600",
       "category": "Network Protocols",
-      "name": "Telegram Desktop App Passcode (PBKDF2-HMAC-SHA1)",
+      "name": "Kerberos 5, etype 17, TGS-REP",
     },
     {
-      "code": "22301",
+      "code": "19800",
       "category": "Network Protocols",
-      "name": "Telegram Mobile App Passcode (SHA256)",
+      "name": "Kerberos 5, etype 17, Pre-Auth",
+    },
+    {
+      "code": "19700",
+      "category": "Network Protocols",
+      "name": "Kerberos 5, etype 18, TGS-REP",
+    },
+    {
+      "code": "19900",
+      "category": "Network Protocols",
+      "name": "Kerberos 5, etype 18, Pre-Auth",
     },
     {
       "code": "7500",
@@ -575,29 +670,14 @@ hashtypes = [
       "name": "Kerberos 5, etype 23, AS-REP",
     },
     {
-      "code": "19600",
-      "category": "Network Protocols",
-      "name": "Kerberos 5, etype 17, TGS-REP",
-    },
-    {
-      "code": "19700",
-      "category": "Network Protocols",
-      "name": "Kerberos 5, etype 18, TGS-REP",
-    },
-    {
-      "code": "19800",
-      "category": "Network Protocols",
-      "name": "Kerberos 5, etype 17, Pre-Auth",
-    },
-    {
-      "code": "19900",
-      "category": "Network Protocols",
-      "name": "Kerberos 5, etype 18, Pre-Auth",
-    },
-    {
       "code": "5500",
       "category": "Network Protocols",
       "name": "NetNTLMv1 / NetNTLMv1+ESS",
+    },
+    {
+      "code": "27000",
+      "category": "Network Protocols",
+      "name": "NetNTLMv1 / NetNTLMv1+ESS (NT)",
     },
     {
       "code": "5600",
@@ -605,19 +685,14 @@ hashtypes = [
       "name": "NetNTLMv2",
     },
     {
-      "code": "23",
+      "code": "27100",
       "category": "Network Protocols",
-      "name": "Skype",
+      "name": "NetNTLMv2 (NT)",
     },
     {
-      "code": "11100",
+      "code": "4800",
       "category": "Network Protocols",
-      "name": "PostgreSQL CRAM (MD5)",
-    },
-    {
-      "code": "11200",
-      "category": "Network Protocols",
-      "name": "MySQL CRAM (SHA1)",
+      "name": "iSCSI CHAP authentication, MD5(CHAP)",
     },
     {
       "code": "8500",
@@ -695,21 +770,6 @@ hashtypes = [
       "name": "NTLM",
     },
     {
-      "code": "122",
-      "category": "Operating System",
-      "name": "macOS v10.4, macOS v10.5, MacOS v10.6",
-    },
-    {
-      "code": "1722",
-      "category": "Operating System",
-      "name": "macOS v10.7",
-    },
-    {
-      "code": "7100",
-      "category": "Operating System",
-      "name": "macOS v10.8+ (PBKDF2-SHA512)",
-    },
-    {
       "code": "9900",
       "category": "Operating System",
       "name": "Radmin2",
@@ -718,31 +778,6 @@ hashtypes = [
       "code": "5800",
       "category": "Operating System",
       "name": "Samsung Android Password/PIN",
-    },
-    {
-      "code": "3200",
-      "category": "Operating System",
-      "name": "bcrypt $2*$, Blowfish (Unix)",
-    },
-    {
-      "code": "500",
-      "category": "Operating System",
-      "name": "md5crypt, MD5 (Unix), Cisco-IOS $1$ (MD5)",
-    },
-    {
-      "code": "1500",
-      "category": "Operating System",
-      "name": "descrypt, DES (Unix), Traditional DES",
-    },
-    {
-      "code": "7400",
-      "category": "Operating System",
-      "name": "sha256crypt $5$, SHA256 (Unix)",
-    },
-    {
-      "code": "1800",
-      "category": "Operating System",
-      "name": "sha512crypt $6$, SHA512 (Unix)",
     },
     {
       "code": "13800",
@@ -800,6 +835,11 @@ hashtypes = [
       "name": "FortiGate (FortiOS)",
     },
     {
+      "code": "26300",
+      "category": "Operating System",
+      "name": "FortiGate256 (FortiOS256)",
+    },
+    {
       "code": "125",
       "category": "Operating System",
       "name": "ArubaOS",
@@ -820,6 +860,56 @@ hashtypes = [
       "name": "Juniper/NetBSD sha1crypt",
     },
     {
+      "code": "26500",
+      "category": "Operating System",
+      "name": "iPhone passcode (UID key + System Keybag)",
+    },
+    {
+      "code": "122",
+      "category": "Operating System",
+      "name": "macOS v10.4, macOS v10.5, macOS v10.6",
+    },
+    {
+      "code": "1722",
+      "category": "Operating System",
+      "name": "macOS v10.7",
+    },
+    {
+      "code": "7100",
+      "category": "Operating System",
+      "name": "macOS v10.8+ (PBKDF2-SHA512)",
+    },
+    {
+      "code": "3200",
+      "category": "Operating System",
+      "name": "bcrypt $2*$, Blowfish (Unix)",
+    },
+    {
+      "code": "500",
+      "category": "Operating System",
+      "name": "md5crypt, MD5 (Unix), Cisco-IOS $1$ (MD5)",
+    },
+    {
+      "code": "1500",
+      "category": "Operating System",
+      "name": "descrypt, DES (Unix), Traditional DES",
+    },
+    {
+      "code": "7400",
+      "category": "Operating System",
+      "name": "sha256crypt $5$, SHA256 (Unix)",
+    },
+    {
+      "code": "1800",
+      "category": "Operating System",
+      "name": "sha512crypt $6$, SHA512 (Unix)",
+    },
+    {
+      "code": "24600",
+      "category": "Database Server",
+      "name": "SQLCipher",
+    },
+    {
       "code": "131",
       "category": "Database Server",
       "name": "MSSQL (2000)",
@@ -835,9 +925,24 @@ hashtypes = [
       "name": "MSSQL (2012, 2014)",
     },
     {
+      "code": "24100",
+      "category": "Database Server",
+      "name": "MongoDB ServerKey SCRAM-SHA-1",
+    },
+    {
+      "code": "24200",
+      "category": "Database Server",
+      "name": "MongoDB ServerKey SCRAM-SHA-256",
+    },
+    {
       "code": "12",
       "category": "Database Server",
       "name": "PostgreSQL",
+    },
+    {
+      "code": "11100",
+      "category": "Database Server",
+      "name": "PostgreSQL CRAM (MD5)",
     },
     {
       "code": "3100",
@@ -860,6 +965,11 @@ hashtypes = [
       "name": "MySQL $A$ (sha256crypt)",
     },
     {
+      "code": "11200",
+      "category": "Database Server",
+      "name": "MySQL CRAM (SHA1)",
+    },
+    {
       "code": "200",
       "category": "Database Server",
       "name": "MySQL323",
@@ -875,14 +985,14 @@ hashtypes = [
       "name": "Sybase ASE",
     },
     {
-      "code": "1421",
-      "category": "FTP, HTTP, SMTP, LDAP Server",
-      "name": "hMailServer",
-    },
-    {
       "code": "8300",
       "category": "FTP, HTTP, SMTP, LDAP Server",
       "name": "DNSSEC (NSEC3)",
+    },
+    {
+      "code": "25900",
+      "category": "FTP, HTTP, SMTP, LDAP Server",
+      "name": "KNX IP Secure - Device Authentication Code",
     },
     {
       "code": "16400",
@@ -898,6 +1008,11 @@ hashtypes = [
       "code": "1711",
       "category": "FTP, HTTP, SMTP, LDAP Server",
       "name": "SSHA-512(Base64), LDAP {SSHA512}",
+    },
+    {
+      "code": "24900",
+      "category": "FTP, HTTP, SMTP, LDAP Server",
+      "name": "Dahua Authentication MD5",
     },
     {
       "code": "10901",
@@ -928,6 +1043,11 @@ hashtypes = [
       "code": "1441",
       "category": "FTP, HTTP, SMTP, LDAP Server",
       "name": "Episerver 6.x >= .NET 4",
+    },
+    {
+      "code": "1421",
+      "category": "FTP, HTTP, SMTP, LDAP Server",
+      "name": "hMailServer",
     },
     {
       "code": "101",
@@ -980,6 +1100,16 @@ hashtypes = [
       "name": "SolarWinds Orion",
     },
     {
+      "code": "21501",
+      "category": "Enterprise Application Software (EAS)",
+      "name": "SolarWinds Orion v2",
+    },
+    {
+      "code": "24",
+      "category": "Enterprise Application Software (EAS)",
+      "name": "SolarWinds Serv-U",
+    },
+    {
       "code": "8600",
       "category": "Enterprise Application Software (EAS)",
       "name": "Lotus Notes/Domino 5",
@@ -993,6 +1123,11 @@ hashtypes = [
       "code": "9100",
       "category": "Enterprise Application Software (EAS)",
       "name": "Lotus Notes/Domino 8",
+    },
+    {
+      "code": "26200",
+      "category": "Enterprise Application Software (EAS)",
+      "name": "OpenEdge Progress Encode",
     },
     {
       "code": "20600",
@@ -1010,14 +1145,14 @@ hashtypes = [
       "name": "AuthMe sha256",
     },
     {
-      "code": "12200",
-      "category": "Full-Disk Encryption (FDE)",
-      "name": "eCryptfs",
-    },
-    {
       "code": "22400",
       "category": "Full-Disk Encryption (FDE)",
       "name": "AES Crypt (SHA256)",
+    },
+    {
+      "code": "27400",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "VMware VMX (PBKDF2-HMAC-SHA1 + AES-256-CBC)",
     },
     {
       "code": "14600",
@@ -1115,6 +1250,21 @@ hashtypes = [
       "name": "VeraCrypt Streebog-512 + XTS 1536 bit",
     },
     {
+      "code": "13781",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "VeraCrypt Streebog-512 + XTS 512 bit + boot-mode",
+    },
+    {
+      "code": "13782",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "VeraCrypt Streebog-512 + XTS 1024 bit + boot-mode",
+    },
+    {
+      "code": "13783",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "VeraCrypt Streebog-512 + XTS 1536 bit + boot-mode",
+    },
+    {
       "code": "13731",
       "category": "Full-Disk Encryption (FDE)",
       "name": "VeraCrypt Whirlpool + XTS 512 bit",
@@ -1130,9 +1280,24 @@ hashtypes = [
       "name": "VeraCrypt Whirlpool + XTS 1536 bit",
     },
     {
+      "code": "23900",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "BestCrypt v3 Volume Encryption",
+    },
+    {
       "code": "16700",
       "category": "Full-Disk Encryption (FDE)",
       "name": "FileVault 2",
+    },
+    {
+      "code": "27500",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "VirtualBox (PBKDF2-HMAC-SHA256 & AES-128-XTS)",
+    },
+    {
+      "code": "27600",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "VirtualBox (PBKDF2-HMAC-SHA256 & AES-256-XTS)",
     },
     {
       "code": "20011",
@@ -1230,6 +1395,11 @@ hashtypes = [
       "name": "TrueCrypt Whirlpool + XTS 1536 bit",
     },
     {
+      "code": "12200",
+      "category": "Full-Disk Encryption (FDE)",
+      "name": "eCryptfs",
+    },
+    {
       "code": "10400",
       "category": "Documents",
       "name": "PDF 1.1 - 1.3 (Acrobat 2 - 4)",
@@ -1248,6 +1418,11 @@ hashtypes = [
       "code": "10500",
       "category": "Documents",
       "name": "PDF 1.4 - 1.6 (Acrobat 5 - 8)",
+    },
+    {
+      "code": "25400",
+      "category": "Documents",
+      "name": "PDF 1.4 - 1.6 (Acrobat 5 - 8) - edit password",
     },
     {
       "code": "10600",
@@ -1275,6 +1450,11 @@ hashtypes = [
       "name": "MS Office 2013",
     },
     {
+      "code": "25300",
+      "category": "Documents",
+      "name": "MS Office 2016 - SheetProtection",
+    },
+    {
       "code": "9700",
       "category": "Documents",
       "name": "MS Office <= 2003 $0/$1, MD5 + RC4",
@@ -1290,11 +1470,6 @@ hashtypes = [
       "name": "MS Office <= 2003 $0/$1, MD5 + RC4, collider #2",
     },
     {
-      "code": "9800",
-      "category": "Documents",
-      "name": "MS Office <= 2003 $3/$4, SHA1 + RC4",
-    },
-    {
       "code": "9810",
       "category": "Documents",
       "name": "MS Office <= 2003 $3, SHA1 + RC4, collider #1",
@@ -1303,6 +1478,11 @@ hashtypes = [
       "code": "9820",
       "category": "Documents",
       "name": "MS Office <= 2003 $3, SHA1 + RC4, collider #2",
+    },
+    {
+      "code": "9800",
+      "category": "Documents",
+      "name": "MS Office <= 2003 $3/$4, SHA1 + RC4",
     },
     {
       "code": "18400",
@@ -1320,9 +1500,9 @@ hashtypes = [
       "name": "Apple Secure Notes",
     },
     {
-      "code": "15500",
-      "category": "Password Managers",
-      "name": "JKS Java Key Store Private Keys (SHA1)",
+      "code": "23300",
+      "category": "Documents",
+      "name": "Apple iWork",
     },
     {
       "code": "6600",
@@ -1355,69 +1535,29 @@ hashtypes = [
       "name": "KeePass 1 (AES/Twofish) and KeePass 2 (AES)",
     },
     {
-      "code": "11300",
+      "code": "23400",
       "category": "Password Managers",
-      "name": "Bitcoin/Litecoin wallet.dat",
+      "name": "Bitwarden",
     },
     {
-      "code": "16600",
+      "code": "16900",
       "category": "Password Managers",
-      "name": "Electrum Wallet (Salt-Type 1-3)",
+      "name": "Ansible Vault",
     },
     {
-      "code": "21700",
+      "code": "26000",
       "category": "Password Managers",
-      "name": "Electrum Wallet (Salt-Type 4)",
+      "name": "Mozilla key3.db",
     },
     {
-      "code": "21800",
+      "code": "26100",
       "category": "Password Managers",
-      "name": "Electrum Wallet (Salt-Type 5)",
-    },
-    {
-      "code": "12700",
-      "category": "Password Managers",
-      "name": "Blockchain, My Wallet",
-    },
-    {
-      "code": "15200",
-      "category": "Password Managers",
-      "name": "Blockchain, My Wallet, V2",
-    },
-    {
-      "code": "18800",
-      "category": "Password Managers",
-      "name": "Blockchain, My Wallet, Second Password (SHA256)",
+      "name": "Mozilla key4.db",
     },
     {
       "code": "23100",
       "category": "Password Managers",
       "name": "Apple Keychain",
-    },
-    {
-      "code": "16300",
-      "category": "Password Managers",
-      "name": "Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256",
-    },
-    {
-      "code": "15600",
-      "category": "Password Managers",
-      "name": "Ethereum Wallet, PBKDF2-HMAC-SHA256",
-    },
-    {
-      "code": "15700",
-      "category": "Password Managers",
-      "name": "Ethereum Wallet, SCRYPT",
-    },
-    {
-      "code": "22500",
-      "category": "Password Managers",
-      "name": "MultiBit Classic .key (MD5)",
-    },
-    {
-      "code": "22700",
-      "category": "Password Managers",
-      "name": "MultiBit HD (scrypt)",
     },
     {
       "code": "11600",
@@ -1430,19 +1570,29 @@ hashtypes = [
       "name": "RAR3-hp",
     },
     {
+      "code": "23800",
+      "category": "Archives",
+      "name": "RAR3-p (Compressed)",
+    },
+    {
+      "code": "23700",
+      "category": "Archives",
+      "name": "RAR3-p (Uncompressed)",
+    },
+    {
       "code": "13000",
       "category": "Archives",
       "name": "RAR5",
     },
     {
-      "code": "17200",
-      "category": "Archives",
-      "name": "PKZIP (Compressed)",
-    },
-    {
       "code": "17220",
       "category": "Archives",
       "name": "PKZIP (Compressed Multi-File)",
+    },
+    {
+      "code": "17200",
+      "category": "Archives",
+      "name": "PKZIP (Compressed)",
     },
     {
       "code": "17225",
@@ -1470,16 +1620,6 @@ hashtypes = [
       "name": "PKZIP Master Key (6 byte optimization)",
     },
     {
-      "code": "14700",
-      "category": "Archives",
-      "name": "iTunes backup < 10.0",
-    },
-    {
-      "code": "14800",
-      "category": "Archives",
-      "name": "iTunes backup >= 10.0",
-    },
-    {
       "code": "23001",
       "category": "Archives",
       "name": "SecureZIP AES-128",
@@ -1505,29 +1645,44 @@ hashtypes = [
       "name": "Android Backup",
     },
     {
+      "code": "24700",
+      "category": "Archives",
+      "name": "Stuffit5",
+    },
+    {
       "code": "13200",
       "category": "Archives",
-      "name": "AxCrypt",
+      "name": "AxCrypt 1",
     },
     {
       "code": "13300",
       "category": "Archives",
-      "name": "AxCrypt in-memory SHA1",
+      "name": "AxCrypt 1 in-memory SHA1",
+    },
+    {
+      "code": "23500",
+      "category": "Archives",
+      "name": "AxCrypt 2 AES-128",
+    },
+    {
+      "code": "23600",
+      "category": "Archives",
+      "name": "AxCrypt 2 AES-256",
+    },
+    {
+      "code": "14700",
+      "category": "Archives",
+      "name": "iTunes backup < 10.0",
+    },
+    {
+      "code": "14800",
+      "category": "Archives",
+      "name": "iTunes backup >= 10.0",
     },
     {
       "code": "8400",
       "category": "Forums, CMS, E-Commerce",
       "name": "WBB3 (Woltlab Burning Board)",
-    },
-    {
-      "code": "2611",
-      "category": "Forums, CMS, E-Commerce",
-      "name": "vBulletin < v3.8.5",
-    },
-    {
-      "code": "2711",
-      "category": "Forums, CMS, E-Commerce",
-      "name": "vBulletin >= v3.8.5",
     },
     {
       "code": "2612",
@@ -1548,6 +1703,11 @@ hashtypes = [
       "code": "4521",
       "category": "Forums, CMS, E-Commerce",
       "name": "Redmine",
+    },
+    {
+      "code": "24800",
+      "category": "Forums, CMS, E-Commerce",
+      "name": "Umbraco HMAC-SHA1",
     },
     {
       "code": "11",
@@ -1575,11 +1735,6 @@ hashtypes = [
       "name": "Drupal7",
     },
     {
-      "code": "21",
-      "category": "Forums, CMS, E-Commerce",
-      "name": "osCommerce, xt:Commerce",
-    },
-    {
       "code": "4522",
       "category": "Forums, CMS, E-Commerce",
       "name": "PunBB",
@@ -1588,6 +1743,31 @@ hashtypes = [
       "code": "2811",
       "category": "Forums, CMS, E-Commerce",
       "name": "MyBB 1.2+, IPB2+ (Invision Power Board)",
+    },
+    {
+      "code": "2611",
+      "category": "Forums, CMS, E-Commerce",
+      "name": "vBulletin < v3.8.5",
+    },
+    {
+      "code": "2711",
+      "category": "Forums, CMS, E-Commerce",
+      "name": "vBulletin >= v3.8.5",
+    },
+    {
+      "code": "25600",
+      "category": "Forums, CMS, E-Commerce",
+      "name": "bcrypt(md5($pass)) / bcryptmd5",
+    },
+    {
+      "code": "25800",
+      "category": "Forums, CMS, E-Commerce",
+      "name": "bcrypt(sha1($pass)) / bcryptsha1",
+    },
+    {
+      "code": "21",
+      "category": "Forums, CMS, E-Commerce",
+      "name": "osCommerce, xt:Commerce",
     },
     {
       "code": "18100",
@@ -1618,9 +1798,178 @@ hashtypes = [
       "code": "124",
       "category": "Framework",
       "name": "Django (SHA-1)",
-    }
-  ]
-
+    },
+    {
+      "code": "12001",
+      "category": "Framework",
+      "name": "Atlassian (PBKDF2-HMAC-SHA1)",
+    },
+    {
+      "code": "19500",
+      "category": "Framework",
+      "name": "Ruby on Rails Restful-Authentication",
+    },
+    {
+      "code": "27200",
+      "category": "Framework",
+      "name": "Ruby on Rails Restful Auth (one round, no sitekey)",
+    },
+    {
+      "code": "20200",
+      "category": "Framework",
+      "name": "Python passlib pbkdf2-sha512",
+    },
+    {
+      "code": "20300",
+      "category": "Framework",
+      "name": "Python passlib pbkdf2-sha256",
+    },
+    {
+      "code": "20400",
+      "category": "Framework",
+      "name": "Python passlib pbkdf2-sha1",
+    },
+    {
+      "code": "24410",
+      "category": "Private Key",
+      "name": "PKCS#8 Private Keys (PBKDF2-HMAC-SHA1 + 3DES/AES)",
+    },
+    {
+      "code": "24420",
+      "category": "Private Key",
+      "name": "PKCS#8 Private Keys (PBKDF2-HMAC-SHA256 + 3DES/AES)",
+    },
+    {
+      "code": "15500",
+      "category": "Private Key",
+      "name": "JKS Java Key Store Private Keys (SHA1)",
+    },
+    {
+      "code": "22911",
+      "category": "Private Key",
+      "name": "RSA/DSA/EC/OpenSSH Private Keys ($0$)",
+    },
+    {
+      "code": "22921",
+      "category": "Private Key",
+      "name": "RSA/DSA/EC/OpenSSH Private Keys ($6$)",
+    },
+    {
+      "code": "22931",
+      "category": "Private Key",
+      "name": "RSA/DSA/EC/OpenSSH Private Keys ($1, $3$)",
+    },
+    {
+      "code": "22941",
+      "category": "Private Key",
+      "name": "RSA/DSA/EC/OpenSSH Private Keys ($4$)",
+    },
+    {
+      "code": "22951",
+      "category": "Private Key",
+      "name": "RSA/DSA/EC/OpenSSH Private Keys ($5$)",
+    },
+    {
+      "code": "23200",
+      "category": "Instant Messaging Service",
+      "name": "XMPP SCRAM PBKDF2-SHA1",
+    },
+    {
+      "code": "22600",
+      "category": "Instant Messaging Service",
+      "name": "Telegram Desktop < v2.1.14 (PBKDF2-HMAC-SHA1)",
+    },
+    {
+      "code": "24500",
+      "category": "Instant Messaging Service",
+      "name": "Telegram Desktop >= v2.1.14 (PBKDF2-HMAC-SHA512)",
+    },
+    {
+      "code": "22301",
+      "category": "Instant Messaging Service",
+      "name": "Telegram Mobile App Passcode (SHA256)",
+    },
+    {
+      "code": "23",
+      "category": "Instant Messaging Service",
+      "name": "Skype",
+    },
+    {
+      "code": "26600",
+      "category": "Cryptocurrency Wallet",
+      "name": "MetaMask Wallet",
+    },
+    {
+      "code": "21000",
+      "category": "Cryptocurrency Wallet",
+      "name": "BitShares v0.x - sha512(sha512_bin(pass))",
+    },
+    {
+      "code": "11300",
+      "category": "Cryptocurrency Wallet",
+      "name": "Bitcoin/Litecoin wallet.dat",
+    },
+    {
+      "code": "16600",
+      "category": "Cryptocurrency Wallet",
+      "name": "Electrum Wallet (Salt-Type 1-3)",
+    },
+    {
+      "code": "21700",
+      "category": "Cryptocurrency Wallet",
+      "name": "Electrum Wallet (Salt-Type 4)",
+    },
+    {
+      "code": "21800",
+      "category": "Cryptocurrency Wallet",
+      "name": "Electrum Wallet (Salt-Type 5)",
+    },
+    {
+      "code": "12700",
+      "category": "Cryptocurrency Wallet",
+      "name": "Blockchain, My Wallet",
+    },
+    {
+      "code": "15200",
+      "category": "Cryptocurrency Wallet",
+      "name": "Blockchain, My Wallet, V2",
+    },
+    {
+      "code": "18800",
+      "category": "Cryptocurrency Wallet",
+      "name": "Blockchain, My Wallet, Second Password (SHA256)",
+    },
+    {
+      "code": "25500",
+      "category": "Cryptocurrency Wallet",
+      "name": "Stargazer Stellar Wallet XLM",
+    },
+    {
+      "code": "16300",
+      "category": "Cryptocurrency Wallet",
+      "name": "Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256",
+    },
+    {
+      "code": "15600",
+      "category": "Cryptocurrency Wallet",
+      "name": "Ethereum Wallet, PBKDF2-HMAC-SHA256",
+    },
+    {
+      "code": "15700",
+      "category": "Cryptocurrency Wallet",
+      "name": "Ethereum Wallet, SCRYPT",
+    },
+    {
+      "code": "22500",
+      "category": "Cryptocurrency Wallet",
+      "name": "MultiBit Classic .key (MD5)",
+    },
+    {
+      "code": "22700",
+      "category": "Cryptocurrency Wallet",
+      "name": "MultiBit HD (scrypt)",
+    },
+]
 
 def getHashById(code):
   for hash in hashtypes:
