@@ -179,7 +179,7 @@ function stage_file($a, $v, $p, $fd) {
         echo("cp $path $dl_path\n");
         system("cp $path $dl_path");
     }
-    
+
     if (!sizeof($fd->url)) {
         $fd->url = "$download_url/$name";
     }
@@ -277,7 +277,7 @@ function process_file($a, $v, $p, $name, $fds) {
 // scan the directory, and process files.
 // "fds" is the list of files described in version.xml;
 // return this list, augmented with any files not in version.xml
-// 
+//
 //
 function process_files($a, $v, $p, $fds) {
     $d = opendir("apps/$a/$v/$p");
@@ -367,7 +367,15 @@ function confirm($fds, $v) {
     if ($v->file_prefix) echo "        file prefix: $v->file_prefix\n";
     echo "        API version: $v->api_version\n";
     echo "    Do you want to add this app version (y/n)? ";
-    $x = trim(fgets(STDIN));
+
+
+    if ((isset($argv[1]) && $argv[1] == '-y')
+      || (isset($argv[2]) && $argv[2] == '-y')) {
+      echo "yes (automatic)";
+      $x = "y";
+    } else {
+      $x = trim(fgets(STDIN));
+    }
     return ($x == "y");
 }
 

@@ -15,6 +15,7 @@ usermod -a -G $BOINC_GROUP $APACHE_USER
 # Make project
 echo "Making BOINC project."
 ./boinc/tools/make_project \
+ --no_query \
  --url_base $BOINC_URL \
  --srcdir boinc \
  --user_name $BOINC_USER \
@@ -26,11 +27,15 @@ echo "Making BOINC project."
  $BOINC_PROJECT
 
 # Create htaccess file for PROJECT OPS
-read -e -p "Enter user name for accessing ${BOINC_URL}/${BOINC_PROJECT}_ops (default: $BOINC_USER)" OPS_LOGIN
-OPS_LOGIN=${OPS_LOGIN:-$BOINC_USER}
+if [ -z ${OPS_LOGIN+x} ]; then
+  read -e -p "Enter user name for accessing ${BOINC_URL}/${BOINC_PROJECT}_ops (default: $BOINC_USER)" OPS_LOGIN
+  OPS_LOGIN=${OPS_LOGIN:-$BOINC_USER}
+fi
 
-read -e -p "Enter user name for accessing ${BOINC_URL}/${BOINC_PROJECT}_ops (default: mypassword)" OPS_PW
-OPS_PW=${OPS_PW:-mypassword}
+if [ -z ${OPS_PW+x} ]; then
+  read -e -p "Enter user name for accessing ${BOINC_URL}/${BOINC_PROJECT}_ops (default: mypassword)" OPS_PW
+  OPS_PW=${OPS_PW:-mypassword}
+fi
 
 htpasswd -cb $BOINC_PROJECT_DIR/html/ops/.htpasswd "$OPS_LOGIN" "$OPS_PW"
 
@@ -56,7 +61,7 @@ source installer/install_daemons.sh
 MYDIR=$(pwd)
 cd $BOINC_PROJECT_DIR
 sudo -u $BOINC_USER ./bin/xadd
-sudo -u $BOINC_USER ./bin/update_versions
+sudo -u $BOINC_USER ./bin/update_versions -y
 cd $MYDIR
 
 #######################################
@@ -106,9 +111,13 @@ fi
 echo "Initial data inserted."
 
 # Install startup scripts
-echo "Adding Fitcrack as a service runs the daemons automatically on startup."
-read -e -p "Add Fitcrack as a system service? [y/N] (default: y)" SERVICE_INSTALL
-SERVICE_INSTALL=${SERVICE_INSTALL:-y}
+if [ -z ${SERVICE_INSTALL+x} ]; then
+  echo "Adding Fitcrack as a service runs the daemons automatically on startup."
+  read -e -p "Add Fitcrack as a system service? [y/N] (default: y)" SERVICE_INSTALL
+  SERVICE_INSTALL=${SERVICE_INSTALL:-y}
+else
+  SERVICE_INSTALL='y'
+fi
 
 if [ $SERVICE_INSTALL = "y" ]; then
   # Add startup script
