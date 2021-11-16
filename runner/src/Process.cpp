@@ -18,7 +18,9 @@ ProcessBase* Process::create(std::string prefix, const std::vector<std::string>&
 {
   File executable;
   #ifdef PROCESSLINUX_HPP
-  directory.findVersionedFile(prefix, "bin", executable);
+  if(!directory.findVersionedFile(prefix, "bin", executable)) {
+    RunnerUtils::runtimeException("Couldn't find: " + prefix + ".bin");
+  }
   executable.setExecutableMode();
   return new ProcessLinux(executable.getRelativePath(), arguments, false);
   #elif defined (PROCESSWINDOWS_HPP)
