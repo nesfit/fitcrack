@@ -207,6 +207,16 @@ void ConfigTask::parse() {
   File::openReadStream(file, path_);
 
   /** While can readLine return new line get the lines and parse values form it and save tem to vector */
+
+   while (!File::readLine(file, line).eof()) {
+    Logging::debugPrint(Logging::Detail::CustomOutput, "Recv key: " + line);
+  }
+
+  if (file.is_open())
+  file.close();
+
+  File::openReadStream(file, path_);
+
   while (!File::readLine(file, line).eof()) {
     convertLineToOption(line);
   }
