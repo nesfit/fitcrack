@@ -351,6 +351,7 @@ function check_main_program($fds) {
 }
 
 function confirm($fds, $v) {
+    global $argv;
     echo "    Files:\n";
     foreach ($fds as $fd) {
         echo "        $fd->physical_name";
