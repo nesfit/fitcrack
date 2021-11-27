@@ -16,7 +16,7 @@ import os
 
 from os.path import basename
 from uuid import uuid1
-from flask_restplus import abort
+from flask_restx import abort
 from flask_login import current_user
 from sqlalchemy import exc
 from settings import DICTIONARY_DIR, HASHCAT_PATH, RULE_DIR, PCFG_DIR, ROOT_DIR

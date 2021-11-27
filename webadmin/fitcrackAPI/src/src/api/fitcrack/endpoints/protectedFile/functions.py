@@ -4,7 +4,7 @@
 '''
 
 import os
-from flask_restplus import abort
+from flask_restx import abort
 
 from settings import XTOHASHCAT_PATH, XTOHASHCAT_EXECUTABLE, PROTECTEDFILES_DIR
 from src.api.fitcrack.functions import shellExec

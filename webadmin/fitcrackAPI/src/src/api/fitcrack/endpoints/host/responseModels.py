@@ -3,7 +3,7 @@
    * Licence: MIT, see LICENSE
 '''
 
-from flask_restplus import fields
+from flask_restx import fields
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.job.responseModels import workunit_model

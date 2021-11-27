@@ -3,7 +3,7 @@
    * Licence: MIT, see LICENSE
 '''
 
-from flask_restplus import reqparse, inputs
+from flask_restx import reqparse, inputs
 from src.api.apiConfig import api
 # from src.api.fitcrack.argumentsParser import pagination
 

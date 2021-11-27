@@ -3,7 +3,7 @@
    * Licence: MIT, see LICENSE
 '''
 
-from flask_restplus import inputs
+from flask_restx import inputs
 
 from src.api.fitcrack.argumentsParser import pagination
 

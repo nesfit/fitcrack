@@ -4,7 +4,7 @@
 '''
 
 
-from flask_restplus import reqparse, inputs
+from flask_restx import reqparse, inputs
 from settings import SECONDS_PER_JOB
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination

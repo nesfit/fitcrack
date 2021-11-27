@@ -11,8 +11,8 @@ import datetime
 import tempfile
 
 from flask import request
-from flask_restplus import Resource
-from flask_restplus import abort
+from flask_restx import Resource
+from flask_restx import abort
 from flask_login import current_user
 from sqlalchemy import func, exc
 

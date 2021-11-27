@@ -5,7 +5,7 @@
 
 """response models which are used in multiple endpoints"""
 
-from flask_restplus import fields
+from flask_restx import fields
 
 from src.api.apiConfig import api
 

@@ -7,7 +7,7 @@ import logging
 
 from flask import request
 from flask_login import login_user, logout_user, current_user, LoginManager
-from flask_restplus import Resource, abort
+from flask_restx import Resource, abort
 from sqlalchemy import exc
 
 from src.api.apiConfig import api

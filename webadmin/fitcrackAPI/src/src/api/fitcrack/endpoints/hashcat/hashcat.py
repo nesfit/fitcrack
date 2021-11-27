@@ -5,7 +5,7 @@
 
 import logging
 
-from flask_restplus import Resource
+from flask_restx import Resource
 from src.api.apiConfig import api
 from src.api.fitcrack.attacks.hashtypes import hashtypes
 from src.api.fitcrack.endpoints.hashcat.functions import getTable

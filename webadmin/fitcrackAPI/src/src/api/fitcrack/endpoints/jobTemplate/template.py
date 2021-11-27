@@ -8,8 +8,8 @@ import json
 
 from flask import request
 
-from flask_restplus import Resource
-from flask_restplus import reqparse
+from flask_restx import Resource
+from flask_restx import reqparse
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.jobTemplate.responseModels import templates_model, template_data

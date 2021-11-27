@@ -8,7 +8,7 @@ import os
 import re
 import time
 
-from flask_restplus import abort
+from flask_restx import abort
 from werkzeug.utils import secure_filename
 
 from settings import DICTIONARY_DIR, HASHCAT_EXECUTABLE, PRINCE_PROCESSOR_PATH

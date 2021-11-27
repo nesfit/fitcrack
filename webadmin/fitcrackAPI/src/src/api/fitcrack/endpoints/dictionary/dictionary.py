@@ -13,7 +13,7 @@ from pathlib import Path
 from shutil import move
 
 from flask import request, redirect, send_file
-from flask_restplus import Resource, abort
+from flask_restx import Resource, abort
 from sqlalchemy import exc
 
 from settings import DICTIONARY_DIR, HASHCAT_PATH, HASHCAT_DIR, PWD_DIST_PATH

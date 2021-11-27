@@ -11,7 +11,7 @@ from pathlib import Path
 import sys
 import os
 import datetime
-from flask_restplus import abort
+from flask_restx import abort
 from sqlalchemy import exc
 from werkzeug.utils import secure_filename
 

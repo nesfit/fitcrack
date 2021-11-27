@@ -6,7 +6,7 @@
 import logging
 
 from flask import request
-from flask_restplus import Resource, abort
+from flask_restx import Resource, abort
 
 from sqlalchemy import func, Integer, desc
 

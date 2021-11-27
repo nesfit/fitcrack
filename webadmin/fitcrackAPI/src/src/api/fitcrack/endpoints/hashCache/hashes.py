@@ -8,7 +8,7 @@ import logging
 from operator import or_
 
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.hashCache.argumentsParser import hashes_parser

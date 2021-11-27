@@ -5,7 +5,7 @@
 
 from datetime import datetime
 
-from flask_restplus import reqparse
+from flask_restx import reqparse
 
 newLogs_argument = reqparse.RequestParser()
 newLogs_argument.add_argument('log', type=str, required=True)

@@ -7,7 +7,7 @@ import logging
 
 import os
 from flask import request, redirect, send_file
-from flask_restplus import Resource, abort
+from flask_restx import Resource, abort
 from sqlalchemy import exc
 
 from settings import CHARSET_DIR

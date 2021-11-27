@@ -3,7 +3,7 @@
    * Licence: MIT, see LICENSE
 '''
 
-from flask_restplus import reqparse
+from flask_restx import reqparse
 
 settings_arguments = reqparse.RequestParser()
 settings_arguments.add_argument('default_seconds_per_workunit', type=int, help='', required=False, location='json')

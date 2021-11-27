@@ -7,7 +7,7 @@ import logging
 
 from flask import request
 from flask_login import current_user, login_required
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.notifications.argumentsParser import notifications_parser

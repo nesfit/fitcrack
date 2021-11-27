@@ -7,7 +7,7 @@ import logging
 
 import os
 from pathlib import Path
-from flask_restplus import Resource, abort
+from flask_restx import Resource, abort
 from flask import request
 
 from settings import SERVER_BROWSER_ROOT as prefix

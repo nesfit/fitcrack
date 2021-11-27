@@ -1,12 +1,11 @@
-flask-restplus
+flask-restx
 Flask-SQLAlchemy
-pymysql
 flask-cors
 flask-login
 flask-migrate
 flask_script
-psutil
-werkzeug==0.15.4
-msgpack
+pymysql
 mysql-connector
+psutil
+msgpack
 

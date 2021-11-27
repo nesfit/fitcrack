@@ -4,7 +4,7 @@
 '''
 
 import logging
-from flask_restplus import Resource
+from flask_restx import Resource
 from flask import request
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.logs.argumentsParser import newLogs_argument, logs_argument

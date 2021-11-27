@@ -7,7 +7,7 @@ import sys
 import os
 
 from pathlib import Path
-from flask_restplus import abort
+from flask_restx import abort
 from settings import HASHCAT_DIR, HASHCAT_PATH, EXE_OR_BIN, DICTIONARY_DIR, RULE_DIR, HCSTATS_DIR, CHARSET_DIR
 from src.api.fitcrack.attacks.functions import check_mask_syntax, compute_keyspace_from_mask, compute_prince_keyspace
 from src.api.fitcrack.functions import shellExec, lenStr

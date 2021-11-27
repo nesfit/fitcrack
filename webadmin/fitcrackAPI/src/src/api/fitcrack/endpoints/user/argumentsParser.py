@@ -3,7 +3,7 @@
    * Licence: MIT, see LICENSE
 '''
 
-from flask_restplus import reqparse
+from flask_restx import reqparse
 
 user_login_arguments = reqparse.RequestParser()
 user_login_arguments.add_argument('username', type=str, help='username', required=True, location='json')

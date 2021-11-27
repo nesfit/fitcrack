@@ -3,7 +3,7 @@
    * Licence: MIT, see LICENSE
 '''
 
-from flask_restplus import reqparse
+from flask_restx import reqparse
 
 """Parser for arguments which are used in multiple endpoints"""
 

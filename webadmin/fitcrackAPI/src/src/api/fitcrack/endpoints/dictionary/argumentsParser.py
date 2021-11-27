@@ -4,7 +4,7 @@
 '''
 
 from src.api.fitcrack.argumentsParser import pagination
-from flask_restplus import reqparse
+from flask_restx import reqparse
 
 dictionary_parser = pagination.copy()
 dictionary_parser.add_argument('search', type=str, required=False)

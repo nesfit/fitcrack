@@ -4,7 +4,7 @@
 '''
 
 import datetime
-from flask_restplus.errors import abort
+from flask_restx.errors import abort
 from src.api.fitcrack.functions import shellExec
 from src.database.models import FcServerUsage
 

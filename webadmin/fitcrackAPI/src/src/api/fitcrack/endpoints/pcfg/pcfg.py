@@ -12,7 +12,7 @@ import time
 from pathlib import Path
 
 from flask import request, redirect, send_file
-from flask_restplus import Resource, abort
+from flask_restx import Resource, abort
 from sqlalchemy import exc
 
 from settings import PCFG_DIR, HASHCAT_PATH, HASHCAT_DIR, ROOT_DIR, PCFG_TRAINER_DIR, PCFG_TRAINER_RULE_DIR

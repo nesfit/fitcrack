@@ -6,7 +6,7 @@
 import logging
 from time import sleep
 
-from flask_restplus import Resource
+from flask_restx import Resource
 from src.api.apiConfig import api
 from src.api.fitcrack.responseModels import simpleResponse
 from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo, dependency_report
@@ -18,7 +18,7 @@ from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
 import platform
 from flask import request, Response, stream_with_context
-from flask_restplus import abort
+from flask_restx import abort
 import xml.etree.ElementTree as ET
 import urllib.request
 
