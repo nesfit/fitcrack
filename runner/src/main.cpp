@@ -24,7 +24,10 @@ int main(int argc, char **argv) {
 
     directory.scanForEntities();
 
-    directory.findVersionedFile("hashcat_files", "zip", file);
+    if (!directory.findVersionedFile("hashcat_files", "zip", file)) {
+      RunnerUtils::runtimeException("Couldn't find hashcat_files archive.");
+      return -1;
+    }
 
     unsigned long long extraction_start = RunnerUtils::timeInMs();
     FileZip hashcatkernels(file);

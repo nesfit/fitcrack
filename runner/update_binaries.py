@@ -61,6 +61,6 @@ os.remove(FITCRACK_APPS_DIR + str(last_ver + 1) +
           "/windows_x86_64/runner" + str(last_ver) + ".exe")
 
 os.chdir(FITCRACK_BASE_DIR)
-subprocess.run(["perl", "./bin/update_versions"])
+subprocess.run(["perl", "./bin/update_versions", "-y"])
 
 print("Binaries were successfully updated!")

@@ -29,12 +29,35 @@ public:
           handle =
               open(runner_mutex.c_str(), O_CREAT | O_RDONLY | O_CLOEXEC,
                    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+
+          // /tmp may not work on newer Linux systems (new security feature to protect /tmp)
+		  // Try other directories...
+          // https://github.com/BOINC/boinc/issues/4125
+          if (handle == -1) {
+            runner_mutex = "/var/lib/boinc-client/FitcrackRunnerMutex_" +
+                           name; // Almost all distros.
+            handle =
+                open(runner_mutex.c_str(), O_CREAT | O_RDONLY | O_CLOEXEC,
+                     S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+
+            if (handle == -1) {
+              runner_mutex =
+                  "/var/lib/boinc/FitcrackRunnerMutex_" + name; // Debian
+              handle = open(
+                  runner_mutex.c_str(), O_CREAT | O_RDONLY | O_CLOEXEC,
+                  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+            }
+          }
+
           if (handle == -1) {
             RunnerUtils::runtimeException(
                 "Failed to create a file for mutual exclusion purposes", errno);
           }
+
+          Logging::debugPrint(Logging::Detail::CustomOutput,
+                              "Named mutex created: " + runner_mutex);
         }
-	//!Destructor
+        //!Destructor
 	~NamedMutexHandle()
 	{
 		close(handle);
