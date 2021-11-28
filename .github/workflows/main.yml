@@ -20,10 +20,14 @@ jobs:
       with:
         fetch-depth: 2
     - name: Extract branch name
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       shell: bash
       run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
     # Check changes
     - name: Check for changes in dirs
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       shell: bash
       run: |
         echo "::set-env name=FE_CHANGES::$(git diff --name-only HEAD HEAD~1 | grep webadmin/fitcrackFE/ | wc -l)"
