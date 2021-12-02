@@ -10,9 +10,6 @@ from flask_cors import CORS
 from flask_login import login_required, current_user
 from flask import abort, make_response, jsonify
 
-from werkzeug.http import dump_cookie
-from werkzeug.wrappers import Response
-
 import settings
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.chart.chart import ns as chart_namespace
@@ -59,18 +56,6 @@ def configure_app(flask_app):
     flask_app.config['SESSION_COOKIE_SECURE'] = True
     # flask_app.config['DEBUG'] = True
 
-def set_cookie(response, *args, **kwargs):
-    cookie = dump_cookie(*args, **kwargs)
-
-    if 'samesite' in kwargs and kwargs['samesite'] is None:
-        cookie = "{}; {}".format(cookie, b'SameSite=None'.decode('latin1'))
-
-    response.headers.add(
-        'Set-Cookie',
-        cookie
-    )
-Response.set_cookie = set_cookie
-
 
 def initialize_app(flask_app):
     configure_app(flask_app)
@@ -109,7 +94,9 @@ def initialize_app(flask_app):
 
 @app.before_request
 def check_valid_login():
-    if request.path == '/' or request.blueprint == 'RESTX_doc' or request.path == '/swagger.json':
+    SKIP_EXACT = {'/', '/swagger.json'}
+    SKIP_FROM = ('/swaggerui')
+    if request.path in SKIP_EXACT or request.path.startswith(SKIP_FROM) or request.blueprint == 'RESTX_doc':
         return
     if not app.view_functions.get(request.endpoint):
         abort(make_response(jsonify(message=('Endpoint ' + request.url + ' not exists.' )), 400))
@@ -120,13 +107,6 @@ def check_valid_login():
         if not login_valid:
             abort(401)
     return
-
-@app.after_request
-def bake_cookies(response):
-    "just a workaround"
-    if (response.headers.get('Set-Cookie')):
-        response.headers['Set-Cookie'] += '; SameSite=None; Secure; HttpOnly'
-    return response
 
 
 def main():
