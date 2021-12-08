@@ -42,6 +42,9 @@ PROJECT_USER = 'root'
 PROJECT_NAME = 'fitcrack'
 PROJECT_DIR = '/home/' + PROJECT_USER + '/projects/' + PROJECT_NAME
 
+# Webadmin security
+ALLOW_TOKEN_SIGNIN = True # Disable this for installations exposed to the internet!!!
+
 # Flask settings
 FLASK_SERVER_NAME = 'localhost:5000'
 FLASK_DEBUG = True  # Do not use debug mode in production

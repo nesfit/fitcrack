@@ -30,13 +30,19 @@ fc_user_model = api.model('User', {
     'role': fields.Nested(role_model)
 })
 
+login_response = api.model('Login response', {
+    'user': fields.Nested(fc_user_model),
+    'token': fields.String()
+})
+
 user_list_model = api.model('User list', {
     'items': fields.List(fields.Nested(fc_user_model))
 })
 
 isLoggedIn_model = api.model('isLoggedIn', {
     'user': fields.Nested(fc_user_model),
-    'loggedIn': fields.Boolean()
+    'loggedIn': fields.Boolean(),
+    'token': fields.String()
 })
 
 userSuccessResponse_model = api.model('200', {

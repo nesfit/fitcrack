@@ -57,6 +57,19 @@
         })
       }
       */
+     this.axios.interceptors.request.use(
+        function (request) {
+          const token = localStorage.getItem('jwt')
+          if (token && token !== '') {
+            request.headers.common.Authorization = `Bearer ${token}`
+          }
+          return request
+        }.bind(this),
+        function (error) {
+          return Promise.reject(error)
+        }.bind(this)
+      )
+      
       this.axios.interceptors.response.use(
         function (response) {
           if (response.data.hasOwnProperty('hideAlert') && response.data.hideAlert) {

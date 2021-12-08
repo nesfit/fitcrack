@@ -39,8 +39,9 @@ export default {
   },
   actions: {
     async refreshUser ({ commit }) {
-      const user = await axios.get(`${api}/user/isLoggedIn`).then(r => r.data)
-      commit('_setUser', user.loggedIn ? user.user : null)
+      const {user, loggedIn, token} = await axios.get(`${api}/user/isLoggedIn`).then(r => r.data)
+      localStorage.setItem('jwt', token)
+      commit('_setUser', loggedIn ? user : null)
       return user
     },
     async resume ({ state, dispatch }) {
@@ -50,7 +51,8 @@ export default {
     },
     async signIn ({ commit }, credentials) {
       try {
-        const user = await axios.post(`${api}/user/login`, credentials).then(r => r.data)
+        const {user, token} = await axios.post(`${api}/user/login`, credentials).then(r => r.data)
+        localStorage.setItem('jwt', token)
         commit('_setUser', user)
         const redirect = sessionStorage.getItem('loginRedirect')
         sessionStorage.removeItem('loginRedirect')

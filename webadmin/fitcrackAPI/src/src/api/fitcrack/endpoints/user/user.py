@@ -4,16 +4,19 @@
 '''
 
 import logging
+import jwt
+import settings
 
-from flask import request
+from flask import request, current_app
 from flask_login import login_user, logout_user, current_user, LoginManager
 from flask_restx import Resource, abort
 from sqlalchemy import exc
+from datetime import datetime, timedelta
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.user.argumentsParser import user_login_arguments, change_user_role_arguments, \
     change_role_arguments, new_role_arguments, new_user_arguments, user_change_password_arguments, edit_user_arguments
-from src.api.fitcrack.endpoints.user.responseModels import fc_user_model, isLoggedIn_model, role_list_model, \
+from src.api.fitcrack.endpoints.user.responseModels import fc_user_model, login_response, isLoggedIn_model, role_list_model, \
     user_list_model, userSuccessResponse_model
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
@@ -28,6 +31,28 @@ login_manager.anonymous_user = AnonUser
 @login_manager.user_loader
 def load_user(user_id):
     return FcUser.query.get(int(user_id))
+
+@login_manager.request_loader
+def load_user_from_request(request):
+    allowed = settings.ALLOW_TOKEN_SIGNIN
+    if not allowed:
+        return None
+    auth_headers = request.headers.get('Authorization', '').split()
+    if len(auth_headers) != 2:
+        return None
+    try:
+        token = auth_headers[1]
+        data = jwt.decode(token, current_app.config['SECRET_KEY'], leeway=10, algorithms=["HS256"])
+        user = FcUser.query.filter_by(mail=data['sub']).one()
+        if user:
+            return user
+    except jwt.ExpiredSignatureError:
+        print('EXPIRED TOKEN')
+        return None
+    except (jwt.InvalidTokenError, Exception) as e:
+        print(e)
+        return None
+    return None
 
 
 @ns.route('/')
@@ -218,24 +243,42 @@ class change_my_password(Resource):
             'message': 'Password changed.'
         }
 
-
+def issue_token (user):
+    return jwt.encode({
+                'sub': user.mail,
+                'iat': datetime.utcnow(),
+                'exp': datetime.utcnow() + timedelta(minutes=30)
+            }, current_app.config['SECRET_KEY'])
 
 @ns.route('/login')
 class login(Resource):
     is_public = True
 
     @api.expect(user_login_arguments)
-    @api.marshal_with(fc_user_model)
+    @api.marshal_with(login_response)
     def post(self):
         """
         User login.
         """
         args = user_login_arguments.parse_args(request)
         user = FcUser.query.filter_by(username=args['username'], deleted=False).first()
-        if not (user and user.check_password(args['password'])):
+        if not user:
             abort(400, 'User not found')
+        if not user.check_password(args['password']):
+            abort(400, 'Invalid credentials')
+
         login_user(user, remember=True)
-        return user
+
+        allowed = settings.ALLOW_TOKEN_SIGNIN
+        if not allowed:
+            token = ''
+        else:
+            token = issue_token(user)
+
+        return {
+            'user': user,
+            'token': token
+        }
 
 
 @ns.route('/logout')
@@ -259,12 +302,19 @@ class isLoggedIn(Resource):
         Finds out if user is logged in and returns him.
         """
         if current_user.is_authenticated:
+            allowed = settings.ALLOW_TOKEN_SIGNIN
+            if not allowed:
+                token = ''
+            else:
+                token = issue_token(current_user)
             return {
                 'user': current_user,
-                'loggedIn': True
+                'loggedIn': True,
+                'token': token
             }
         else:
             return {
                 'user': None,
-                'loggedIn': False
+                'loggedIn': False,
+                'token': ''
             }
