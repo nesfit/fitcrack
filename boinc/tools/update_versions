@@ -351,6 +351,7 @@ function check_main_program($fds) {
 }
 
 function confirm($fds, $v) {
+    global $argv;
     echo "    Files:\n";
     foreach ($fds as $fd) {
         echo "        $fd->physical_name";
@@ -367,7 +368,15 @@ function confirm($fds, $v) {
     if ($v->file_prefix) echo "        file prefix: $v->file_prefix\n";
     echo "        API version: $v->api_version\n";
     echo "    Do you want to add this app version (y/n)? ";
-    $x = trim(fgets(STDIN));
+
+
+    if ((isset($argv[1]) && $argv[1] == '-y')
+      || (isset($argv[2]) && $argv[2] == '-y')) {
+      echo "yes (automatic)";
+      $x = "y";
+    } else {
+      $x = trim(fgets(STDIN));
+    }
     return ($x == "y");
 }
 
