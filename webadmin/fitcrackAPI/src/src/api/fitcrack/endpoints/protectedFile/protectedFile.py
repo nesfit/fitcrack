@@ -56,9 +56,9 @@ class filesAdd(Resource):
 
         uploadedFile = fileUpload(file, PROTECTEDFILES_DIR, ALLOWED_EXTENSIONS, withTimestamp=True)
         if uploadedFile:
-            hash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
-            encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=hash['hash'].encode(),
-                                      hash_type=hash['hash_type'])
+            loadedHash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
+            encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=loadedHash['hash'].encode(),
+                                      hash_type=loadedHash['hash_type'])
             try:
                 db.session.add(encFile)
                 db.session.commit()
@@ -66,10 +66,10 @@ class filesAdd(Resource):
                 db.session().rollback()
                 abort(500, 'File with name ' + uploadedFile['filename'] + ' already exists.')
             return {
-                'message': 'Successfully extracted hash form file.',
+                'message': 'Successfully extracted hash from uploaded file.',
                 'status': True,
-                'hash': hash['hash'],
-                'hash_type': hash['hash_type'],
+                'hash': loadedHash['hash'],
+                'hash_type': loadedHash['hash_type'],
                 'hash_type_name': encFile.hash_type_name,
                 'file_id': encFile.id
             }
