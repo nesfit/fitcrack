@@ -112,7 +112,7 @@ class PdfParser:
         output = '$pdf$'+v.decode('ascii')+'*'+r.decode('ascii')+'*'+length.decode('ascii')+'*'
         output += p.decode('ascii')+'*'+meta+'*'
         output += str(int(len(i_d)/2))+'*'+i_d.decode('ascii')+'*'+passwords
-        sys.stdout.write("%s\n" % output.encode('UTF-8'))
+        sys.stdout.write("%s\n" % output)
 
     def get_passwords_for_JtR(self, encryption_dictionary):
         output = ""
