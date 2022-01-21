@@ -204,8 +204,8 @@ class Extractor:
 
         # Create Formats dynamically
         self.extractorFormats = []
-        self.extractorFormats.append(Format(0, ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'], [b'd0cf11e0a1b11ae1'], 'scripts/office2hashcat.py', 'python'))
-        self.extractorFormats.append(Format(1, ['.pdf'], [b'25504446'], 'scripts/pdf2hashcat.py', 'python'))
+        self.extractorFormats.append(Format(0, ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'], [b'd0cf11e0a1b11ae1'], 'scripts/office2hashcat.py', 'python3'))
+        self.extractorFormats.append(Format(1, ['.pdf'], [b'25504446'], 'scripts/pdf2hashcat.py', 'python3'))
         self.extractorFormats.append(Format(2, ['.rar'], [b'526172211a07'], 'scripts/rar2john', ''))
         self.extractorFormats.append(Format(3, ['.zip'], [b'504b0304'], 'scripts/zip2john', ''))
         self.extractorFormats.append(Format(4, ['.7z'], [b'377abcaf271c'], 'scripts/7z2hashcat.pl', 'perl'))
