@@ -227,7 +227,7 @@ class FcJob(Base):
                          viewonly=True)
 
     left_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == True))
-    right_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == False))
+    right_dictionaries = relationship("FcJobDictionary", primaryjoin=and_(FcJobDictionary.job_id == id, FcJobDictionary.is_left == False), overlaps="left_dictionaries")
 
     @hybrid_property
     def cracked_hashes_str(self):
