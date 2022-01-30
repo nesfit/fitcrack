@@ -47,38 +47,33 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
-          <v-row class="mx-2">
+          <v-row class="mx-2 mb-2">
             <v-col>
               <v-btn
                 v-if="!edit"
-                class="ma-0"
-                outlined
                 color="primary"
                 @click="edit=true"
               >
-                Edit <v-icon class="ml-2">
+                Edit <v-icon right>
                   mdi-pencil
                 </v-icon>
               </v-btn>
               <v-btn
                 v-else
-                class="ma-0"
-                outlined
                 color="primary"
                 @click="saveMask"
               >
-                Save <v-icon class="ml-2">
-                  mdi-save
+                Save <v-icon right>
+                  mdi-nuke
                 </v-icon>
               </v-btn>
               <v-btn
-                class="ma-0"
-                outlined
                 color="primary"
                 :href="$serverAddr + '/masks/' + data.id + '/download'"
                 target="_blank"
+                class="ml-2"
               >
-                Download <v-icon class="ml-2">mdi-download</v-icon>
+                Download <v-icon right>mdi-download</v-icon>
               </v-btn>
             </v-col>
           </v-row>
@@ -101,7 +96,7 @@
 </template>
 
 <script>
-  import tile from '@/components/tile/fc_tile'
+  import tile from '@/components/tile/fc_tile.vue'
   export default {
     name: "MaskDetailView",
     components: {
@@ -148,11 +143,10 @@
   }
   .dictContent {
     overflow: auto;
-    background: #eee;
   }
 
   .dictContent.editing {
-
+    border: 1px solid;
   }
 
   .code::before {
@@ -162,6 +156,7 @@
     width: 100%;
     background: transparent;
     color: #000;
+    white-space: pre-wrap;
   }
   .width100 {
     width: 100%;

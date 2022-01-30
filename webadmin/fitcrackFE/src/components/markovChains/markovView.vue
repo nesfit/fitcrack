@@ -84,8 +84,8 @@
 </template>
 
 <script>
-  import tile from '@/components/tile/fc_tile'
-  import fileCreator from "@/components/fileUploader/fileCreator";
+  import tile from '@/components/tile/fc_tile.vue'
+  import fileCreator from "@/components/fileUploader/fileCreator.vue";
   export default {
     name: "MarkovView",
     components: {

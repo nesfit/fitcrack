@@ -62,7 +62,7 @@
       multiple: Boolean,
       url: {
         type: String,
-        default: this.$serverAddr
+        default: window.$serverAddr
       },
       noUpload: Boolean,
       label: {
@@ -93,17 +93,27 @@
         this.progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
         console.log(this.progress)
       },
-      fileChange(fileList) {
+      fileChange(fileOrList) {
         this.files = new FormData()
         this.selectedFiles = []
-        for (var i = 0; i < fileList.length; i++) {
-          this.selectedFiles.push({
-              'name': fileList[i].name,
-              'type': fileList[i].type || 'n/a',
-              'size': fileList[i].size,
-              'modified': fileList[i].lastModifiedDate ? fileList[i].lastModifiedDate.toLocaleDateString() : 'n/a'
+        if (this.multiple) {
+          for (var i = 0; i < fileOrList.length; i++) {
+            this.selectedFiles.push({
+              'name': fileOrList[i].name,
+              'type': fileOrList[i].type || 'n/a',
+              'size': fileOrList[i].size,
+              'modified': fileOrList[i].lastModifiedDate ? fileOrList[i].lastModifiedDate.toLocaleDateString() : 'n/a'
             })
-          this.files.append("file", fileList[i], fileList[i].name);
+            this.files.append("file", fileOrList[i], fileOrList[i].name);
+          }
+        } else {
+          this.selectedFiles.push({
+              'name': fileOrList.name,
+              'type': fileOrList.type || 'n/a',
+              'size': fileOrList.size,
+              'modified': fileOrList.lastModifiedDate ? fileOrList[i].lastModifiedDate.toLocaleDateString() : 'n/a'
+            })
+            this.files.append("file", fileOrList, fileOrList.name);
         }
         if (this.args) {
           for (let [name, val] of Object.entries(this.args)) {
@@ -112,7 +122,7 @@
         }
         this.fileUploaded = false
         this.progress = 0
-        this.$emit('filesChanged', fileList)
+        this.$emit('filesChanged', fileOrList)
       },
       upload() {
         this.showProgress = true

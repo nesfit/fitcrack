@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import element from '@/components/logs/logsView'
+  import element from '@/components/logs/logsView.vue'
   export default {
     name: "Test",
     components: {

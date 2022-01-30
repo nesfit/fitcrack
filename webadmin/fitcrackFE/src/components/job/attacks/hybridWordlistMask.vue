@@ -51,8 +51,8 @@
 </template>
 
 <script>
-  import dictSelector from '@/components/selector/dictionarySelector'
-  import maskSingle from '@/components/mask/maskSingle'
+  import dictSelector from '@/components/selector/dictionarySelector.vue'
+  import maskSingle from '@/components/mask/maskSingle.vue'
 
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
   import {twoWayMap} from '@/store'

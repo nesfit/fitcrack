@@ -120,7 +120,7 @@
 <script>
 import fixUserNameEncoding from '@/assets/scripts/unswedishify'
 import fmt from '@/assets/scripts/numberFormat'
-import fcTextarea from '@/components/textarea/fc_textarea'
+import fcTextarea from '@/components/textarea/fc_textarea.vue'
 
 export default {
   components: {

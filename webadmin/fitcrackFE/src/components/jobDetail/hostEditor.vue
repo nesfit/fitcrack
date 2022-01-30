@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import hostSelector from '@/components/selector/hostSelector'
+import hostSelector from '@/components/selector/hostSelector.vue'
 
 export default {
   components: {

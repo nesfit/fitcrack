@@ -52,7 +52,6 @@ const UserPlugin = {
     Vue.prototype.$needLogin = true
 
     Vue.prototype.$serverAddr = window.serverAddress
-    // Vue.prototype.$serverAddr = 'http://147.229.14.131/api';
 
     Vue.prototype.$user = function () {
       return this.user

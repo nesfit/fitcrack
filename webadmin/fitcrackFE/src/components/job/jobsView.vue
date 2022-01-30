@@ -442,9 +442,9 @@
   import { twoWayMap } from '@/store'
   import { mapState, mapMutations, mapActions } from 'vuex'
 
-  import BinIllust from '@/components/details/binIllustration'
-  import HostEditor from '@/components/jobDetail/hostEditor'
-  import BatchCreator from '@/components/batch/batchCreator'
+  import BinIllust from '@/components/details/binIllustration.vue'
+  import HostEditor from '@/components/jobDetail/hostEditor.vue'
+  import BatchCreator from '@/components/batch/batchCreator.vue'
 
   export default {
     name: 'JobsView',

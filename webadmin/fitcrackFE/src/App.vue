@@ -5,6 +5,10 @@
 
 <template>
   <v-app>
+    <Connection 
+      :visible="connectionAssistant" 
+      @connect="handleReconnection"
+    />
     <v-snackbar
       v-model="alert"
       :timeout="6000"
@@ -28,24 +32,26 @@
       :is-dark="isDark" 
       @alert="setAlert"
     />
-    <vue-progress-bar />
     <confirm ref="confirm" />
   </v-app>
 </template>
 
 <script>
-  import confirm from "@/components/confirmDialog/confirm";
+  import confirm from "@/components/confirmDialog/confirm.vue";
+  import Connection from "./components/errorPages/connection.vue";
   export default {
     name: 'App',
     components: {
-      'confirm': confirm
-    },
+    "confirm": confirm,
+    Connection
+},
     data: function () {
       return {
         alert: false,
         alertText: '',
         alertType: 'error',
-        isDark: false
+        isDark: false,
+        connectionAssistant: false
       }
     },
     created: function () {
@@ -57,7 +63,8 @@
         })
       }
       */
-     this.axios.interceptors.request.use(
+     
+      this.axios.interceptors.request.use(
         function (request) {
           const token = localStorage.getItem('jwt')
           if (token && token !== '') {
@@ -69,7 +76,7 @@
           return Promise.reject(error)
         }.bind(this)
       )
-      
+       
       this.axios.interceptors.response.use(
         function (response) {
           if (response.data.hasOwnProperty('hideAlert') && response.data.hideAlert) {
@@ -89,12 +96,16 @@
             if (error.response.data.message === 'Input payload validation failed') {
               let property = Object.keys(error.response.data.errors)[0]
               this.alertText = 'Wrong settings. ' +  property + ' (' + error.response.data.errors[property] + ')'
-            }
-            else {
+            } else {
               this.alertText = error.response.data.message
             }
           } else if (error.message !== undefined) {
-            this.alertText = error.message
+            if (error.message === 'Network Error') {
+              this.alert = false
+              this.connectionAssistant = true
+            } else {
+              this.alertText = error.message
+            }
           } else {
             this.alertText = 'Can not connect to ' + this.$serverAddr
             //this.alertText = error.message
@@ -131,6 +142,10 @@
         this.alertType = type
         this.alertText = text
         this.alert = true
+      },
+      handleReconnection () {
+        this.connectionAssistant = false
+        this.$router.go() // .replace({ name: 'login' })
       }
     }
   }

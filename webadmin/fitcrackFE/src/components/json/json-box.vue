@@ -24,11 +24,11 @@
 </template>
 
 <script>
-import JsonString from '@/components/json/types/json-string';
-import JsonNumber from '@/components/json/types/json-number';
-import JsonBoolean from '@/components/json/types/json-boolean';
-import JsonObject from '@/components/json/types/json-object';
-import JsonArray from '@/components/json/types/json-array';
+import JsonString from '@/components/json/types/json-string.vue';
+import JsonNumber from '@/components/json/types/json-number.vue';
+import JsonBoolean from '@/components/json/types/json-boolean.vue';
+import JsonObject from '@/components/json/types/json-object.vue';
+import JsonArray from '@/components/json/types/json-array.vue';
 
 export default {
     name: 'JsonBox',

@@ -47,8 +47,10 @@ export default {
           fill: true
         }
       },
-      legend: {
-        display: false
+      plugins: {
+        legend: {
+          display: false
+        }
       },
       scales: {
         x: {

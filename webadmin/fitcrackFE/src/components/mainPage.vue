@@ -17,13 +17,13 @@
       <router-link :to="{ name: 'home'}">
         <img
           v-if="$vuetify.theme.dark"
-          :src="require('@/assets/fitcrack-glow.svg')"
+          :src="require('@/assets/NeoDark.svg')"
           class="mx-auto px-2 mt-2 d-block logo"
           alt="logo"
         >
         <img
           v-else
-          :src="require('@/assets/fitcrack.svg')"
+          :src="require('@/assets/NeoLight.svg')"
           class="mx-auto px-2 mt-2 d-block logo"
           alt="logo"
         >
@@ -369,7 +369,7 @@
               {{ user.username }}
             </div>
             <v-avatar
-              :color="daemonWarning ? 'secondary' : avatarColor"
+              :color="daemonWarning ? 'secondary' : 'primary'"
               size="32"
             >
               <span class="white--text">
@@ -447,14 +447,14 @@
       </v-menu>
     </v-app-bar>
     <!-- CONTENT -->
-    <v-content class="height100 main">
+    <v-main class="height100 main">
       <transition
         name="route"
         mode="out-in"
       >
         <router-view />
       </transition>
-    </v-content>
+    </v-main>
     <!-- NOTIFICATION DRAWER -->
     <v-navigation-drawer
       v-model="rightDrawer"
@@ -545,8 +545,8 @@
 </template>
 
 <script>
-  import notifications from '@/components/notification/fc_notifications_wrapper'
-  import bins from '@/components/job/bins'
+  import notifications from '@/components/notification/fc_notifications_wrapper.vue'
+  import bins from '@/components/job/bins.vue'
   import { routeIcon } from '@/router'
   import store from '@/store'
 
@@ -572,13 +572,6 @@
       user () {
         return this.$store.state.user.userData
       },
-      avatarColor () {
-        const hue = this.user.username
-          .split('')
-          .map(c => c.charCodeAt(0) * 10)
-          .reduce((p,c) => p + c << 2, 0)
-        return `hsl(${hue}, 80%, 40%)`
-      },
       roleList () {
         return Object.entries(this.user.role)
           .filter(e => e[1] === true)
@@ -600,15 +593,20 @@
       }
     },
     async beforeRouteEnter (to, from, next) {
-      const loggedIn = await store.dispatch('resume')
-      if (!loggedIn) {
-        if (from.path === '/login') {
+      try {
+        const loggedIn = await store.dispatch('resume')
+        if (!loggedIn) {
+          if (from.path === '/login') {
+            next()
+          }
+          sessionStorage.setItem('loginRedirect', to.path)
+          next('/login')
+        } else {
           next()
         }
-        sessionStorage.setItem('loginRedirect', to.path)
+      } catch (e) {
+        store.commit('_setUser', null)
         next('/login')
-      } else {
-        next()
       }
     },
     mounted: function () {

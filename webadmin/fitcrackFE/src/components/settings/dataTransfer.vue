@@ -236,7 +236,7 @@ import { mapState, mapGetters, mapMutations } from 'vuex'
 import { attackIcon } from '@/assets/scripts/iconMaps'
 import { decode as msgpackDecode } from 'msgpack-lite'
 
-import box from '@/components/details/boxIllustration'
+import box from '@/components/details/boxIllustration.vue'
 
 export default {
   components: {

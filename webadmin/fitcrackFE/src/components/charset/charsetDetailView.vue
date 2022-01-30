@@ -58,7 +58,7 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
-          <v-row class="mx-2 align-center">
+          <v-row class="mx-2 mb-2 align-center">
             <v-col>
               <v-combobox
                 v-model="as"
@@ -71,8 +71,6 @@
             </v-col>
             <v-col>
               <v-btn
-                class="ma-0"
-                outlined
                 color="primary"
                 :href="$serverAddr + '/charset/' + data.id + '/download'"
                 target="_blank"
@@ -102,7 +100,8 @@
 <script>
   import fmt from '@/assets/scripts/numberFormat'
   import iconv from 'iconv-lite'
-  import tile from '@/components/tile/fc_tile'
+  import tile from '@/components/tile/fc_tile.vue'
+  import { Buffer } from 'buffer'
   export default {
     name: "CharsetDetailView",
     components: {

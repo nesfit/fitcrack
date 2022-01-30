@@ -174,7 +174,7 @@
 </template>
 
 <script>
-import JobEditor from './jobEditor'
+import JobEditor from './jobEditor.vue'
 
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 import fmt from '@/assets/scripts/numberFormat'

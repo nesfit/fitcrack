@@ -1,6 +1,6 @@
 import router from '@/router'
 
-import axios from 'axios'
+import {axios} from '@bundled-es-modules/axios'
 const api = window.serverAddress
 
 const emptyUser = {

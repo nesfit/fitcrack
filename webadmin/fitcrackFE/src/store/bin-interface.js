@@ -1,7 +1,7 @@
 import { supermutator9000 } from '@/store'
 
 import router from '@/router'
-import axios from 'axios'
+import {axios} from '@bundled-es-modules/axios'
 const api = window.serverAddress
 
 // Vuex module for the Bins UI and job views communication

@@ -204,7 +204,7 @@
 </template>
 
 <script>
-import Picker from '@/components/picker/datetime'
+import Picker from '@/components/picker/datetime.vue'
 
 export default {
   components: {

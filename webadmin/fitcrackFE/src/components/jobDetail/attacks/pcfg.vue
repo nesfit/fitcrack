@@ -60,7 +60,7 @@
 
 <script>
   import fmt from '@/assets/scripts/numberFormat'
-  import tile from '@/components/tile/fc_tile'
+  import tile from '@/components/tile/fc_tile.vue'
   export default {
     name: "PcfgDetail",
     components: {

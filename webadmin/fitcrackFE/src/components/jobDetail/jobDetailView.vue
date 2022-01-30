@@ -173,24 +173,24 @@
 
 <script>
 // Components
-import jobInfo from './jobInfo'
-import workunits from './workunits'
-import statusTimeline from './statusTimeline'
-import hashTable from './hashTable'
-import hostTable from './hostTable'
-import hostEditor from './hostEditor'
-import permsEditor from './jobPermissions'
+import jobInfo from './jobInfo.vue'
+import workunits from './workunits.vue'
+import statusTimeline from './statusTimeline.vue'
+import hashTable from './hashTable.vue'
+import hostTable from './hostTable.vue'
+import hostEditor from './hostEditor.vue'
+import permsEditor from './jobPermissions.vue'
 //
-import jobProgressChart from '@/components/chart/jobProgress'
-import jobWorkunitChart from '@/components/chart/jobWorkunits'
-import jobContributionChart from '@/components/chart/jobContribution'
+import jobProgressChart from '@/components/chart/jobProgress.vue'
+import jobWorkunitChart from '@/components/chart/jobWorkunits.vue'
+import jobContributionChart from '@/components/chart/jobContribution.vue'
 //
-import combinatorDetail from '@/components/jobDetail/attacks/combinator'
-import hybridDetail from '@/components/jobDetail/attacks/hybrid'
-import maskDetail from '@/components/jobDetail/attacks/mask'
-import dictionaryDetail from '@/components/jobDetail/attacks/dictionary'
-import princeDetail from '@/components/jobDetail/attacks/prince'
-import pcfgDetail from '@/components/jobDetail/attacks/pcfg'
+import combinatorDetail from '@/components/jobDetail/attacks/combinator.vue'
+import hybridDetail from '@/components/jobDetail/attacks/hybrid.vue'
+import maskDetail from '@/components/jobDetail/attacks/mask.vue'
+import dictionaryDetail from '@/components/jobDetail/attacks/dictionary.vue'
+import princeDetail from '@/components/jobDetail/attacks/prince.vue'
+import pcfgDetail from '@/components/jobDetail/attacks/pcfg.vue'
 // Scripts
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 //

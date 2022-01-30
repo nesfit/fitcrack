@@ -38,7 +38,7 @@
 </template>
 
 <script>
-  import logItem from '@/components/logs/logItem'
+  import logItem from '@/components/logs/logItem.vue'
   import InfiniteLoading from 'vue-infinite-loading';
   export default {
     name: "LogsView",

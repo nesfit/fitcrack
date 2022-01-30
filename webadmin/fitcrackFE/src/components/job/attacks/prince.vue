@@ -141,8 +141,8 @@
 </template>
 
 <script>
-  import dictSelector from '@/components/selector/dictionarySelector'
-  import ruleSelector from '@/components/selector/rulesSelector'
+  import dictSelector from '@/components/selector/dictionarySelector.vue'
+  import ruleSelector from '@/components/selector/rulesSelector.vue'
 
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
   import {twoWayMap} from '@/store'

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-  import FcTile from '@/components/tile/fc_tile'
+  import FcTile from '@/components/tile/fc_tile.vue'
   export default {
     components: {
       FcTile

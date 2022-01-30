@@ -162,10 +162,10 @@
 </template>
 
 <script>
-  import maskSingle from '@/components/mask/maskSingle'
-  import CharsetSelector from '@/components/selector/charsetSelector'
-  import markovSelector from '@/components/selector/markovSelector'
-  import maskFileSelector from '@/components/selector/loadMaskFileSelector'
+  import maskSingle from '@/components/mask/maskSingle.vue'
+  import CharsetSelector from '@/components/selector/charsetSelector.vue'
+  import markovSelector from '@/components/selector/markovSelector.vue'
+  import maskFileSelector from '@/components/selector/loadMaskFileSelector.vue'
 
   import {mapMutations} from 'vuex'
   import {mapTwoWayState} from 'spyfu-vuex-helpers'

@@ -1,4 +1,4 @@
-import { Doughnut, mixins } from 'vue-chartjs'
+import { Doughnut, mixins } from '@oviovocny/vue-chartjs'
 import deepMerge from 'deepmerge'
 
 export default {
@@ -14,10 +14,12 @@ export default {
     options () {
       return deepMerge({
         maintainAspectRatio: false,
-        tooltips: {
-          mode: "index",
-          intersect: true
-        }
+        plugins: {
+          tooltip: {
+            mode: "index",
+            intersect: true
+          }
+        },
       }, this.overrides)
     }
   },

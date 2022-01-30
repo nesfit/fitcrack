@@ -213,7 +213,7 @@
 <script>
   import fmt from '@/assets/scripts/numberFormat'
   import iconv from 'iconv-lite'
-  import tile from '@/components/tile/fc_tile'
+  import tile from '@/components/tile/fc_tile.vue'
   export default {
     name: "HostDetailView",
     components: {
