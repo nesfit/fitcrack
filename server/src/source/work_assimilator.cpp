@@ -878,11 +878,25 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                         std::cerr << __LINE__ << " - Hash: " << hash_string << std::endl;
                         std::cerr << __LINE__ << " - Cracked password: " << found_hash << std::endl;
 
-                        /** Save the password to DB */
-                        std::snprintf(buf, SQL_BUF_SIZE,
-                                      "UPDATE `%s` SET `result` = '%s', `time_cracked` = NOW() WHERE `job_id` = %" PRIu64 " AND LOWER(CONVERT(`hash` USING latin1)) = LOWER(CONVERT('%s' USING latin1)) AND `result` IS NULL ; ",
-                                      mysql_table_hash.c_str(), found_hash, job_id, hash_string);
-                        update_mysql(buf);
+                        char *sql_buf =
+                            (char *)malloc(SQL_BUF_SIZE + MAX_HASH_SIZE);
+                        // We need a bit bigger buffer than just 'buf' if we process very long hashes.
+                        if (sql_buf) {
+                          /** Save the password to DB */
+                          std::snprintf(
+                              sql_buf, SQL_BUF_SIZE + MAX_HASH_SIZE,
+                              "UPDATE `%s` SET `result` = '%s', `time_cracked` "
+                              "= NOW() WHERE `job_id` = %" PRIu64
+                              " AND LOWER(CONVERT(`hash` USING latin1)) = "
+                              "LOWER(CONVERT('%s' USING latin1)) AND `result` "
+                              "IS NULL ; ",
+                              mysql_table_hash.c_str(), found_hash, job_id,
+                              hash_string);
+                          update_mysql(sql_buf);
+                          free(sql_buf);
+                        }
+
+                        std::cerr << __LINE__ << " - Updated: " << hash_string << std::endl;
                     }
                 }
 
