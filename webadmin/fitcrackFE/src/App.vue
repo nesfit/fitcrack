@@ -55,7 +55,7 @@
       }
     },
     created: function () {
-      /*
+      /* ...
       this.$store.state.loggedInLink = this.$route;
       if (this.$needLogin) {
         this.$router.push({
