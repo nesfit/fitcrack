@@ -100,9 +100,8 @@ int TaskComputeBase::finish() {
   PRINT_POSITION_IN_CODE();
 
   if (exit_code_ == (unsigned char)-1) {
-    printProcessErr();
-    RunnerUtils::runtimeException("Hashcat failed to run! Exit code: -1. "
-                                  "Invalid arguments or input files.");
+    std::string msg = std::string("Hashcat failed to run! Exit code: -1. ") + process_hashcat_->readErrPipeAvailableLines();
+    RunnerUtils::runtimeException(msg);
   } else if (exit_code_ == (unsigned char)-2) {
     printProcessErr();
     RunnerUtils::runtimeException(
