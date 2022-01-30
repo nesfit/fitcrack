@@ -96,6 +96,7 @@
         <span class="overline g-label-text">Services</span>
       </div>
       <v-sheet
+        rounded
         v-if="failedServices.length > 0"
         color="error"
         dark
@@ -144,7 +145,7 @@
 
 <script>
 /* eslint-disable vue/prop-name-casing */
-import Gauge from '@/components/chart/gauge'
+import Gauge from '@/components/chart/gauge.vue'
 
 export default {
   components: { Gauge },

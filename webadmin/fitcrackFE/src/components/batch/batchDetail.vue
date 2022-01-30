@@ -178,7 +178,7 @@
               />
             </v-list-item-title>
             <v-list-item-subtitle>
-              <span v-show="progress > 0 && progress < 100">{{ progress }} %</span> <span class="text-capitalize">{{ status_text }}</span>
+              <strong><span v-show="progress > 0 && progress < 100">{{ progress }} %</span> <span class="text-capitalize">{{ status_text }} </span></strong>
               <span>{{ attack }} attack</span>
             </v-list-item-subtitle>
           </v-list-item-content>
@@ -224,8 +224,8 @@
 <script>
 import { attackIcon, jobIcon } from '@/assets/scripts/iconMaps'
 
-import workunitChart from '@/components/chart/jobWorkunits'
-import contributionChart from '@/components/chart/jobContribution'
+import workunitChart from '@/components/chart/jobWorkunits.vue'
+import contributionChart from '@/components/chart/jobContribution.vue'
 import draggable from 'vuedraggable'
 
 export default {

@@ -509,7 +509,7 @@
 
         <v-row
           justify="center"
-          class="mb-5"
+          class="mb-5 mt-2"
         >
           <template-modal
             :inherited-name="selectedTemplateName"
@@ -537,18 +537,18 @@
   import numberFormat from '@/assets/scripts/numberFormat'
   import { attackIcon } from '@/assets/scripts/iconMaps'
 
-  import combinator from '@/components/job/attacks/combinator'
-  import mask from '@/components/job/attacks/mask'
-  import dictionary from '@/components/job/attacks/dictionary'
-  import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist'
-  import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask'
-  import pcfgAttack from '@/components/job/attacks/pcfg'
-  import princeAttack from '@/components/job/attacks/prince'
-  import FileUploader from "@/components/fileUploader/fileUploader";
-  import fcTextarea from '@/components/textarea/fc_textarea'
-  import hostSelector from '@/components/selector/hostSelector'
-  import templateModal from '@/components/jobTemplate/templateModal'
-  import dtPicker from '@/components/picker/datetime'
+  import combinator from '@/components/job/attacks/combinator.vue'
+  import mask from '@/components/job/attacks/mask.vue'
+  import dictionary from '@/components/job/attacks/dictionary.vue'
+  import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist.vue'
+  import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask.vue'
+  import pcfgAttack from '@/components/job/attacks/pcfg.vue'
+  import princeAttack from '@/components/job/attacks/prince.vue'
+  import FileUploader from "@/components/fileUploader/fileUploader.vue";
+  import fcTextarea from '@/components/textarea/fc_textarea.vue'
+  import hostSelector from '@/components/selector/hostSelector.vue'
+  import templateModal from '@/components/jobTemplate/templateModal.vue'
+  import dtPicker from '@/components/picker/datetime.vue'
 
   import {mapState, mapGetters, mapMutations} from 'vuex'
   import {mapTwoWayState} from 'spyfu-vuex-helpers'

@@ -78,8 +78,8 @@
 
 <script>
   import fmt from '@/assets/scripts/numberFormat'
-  import tile from '@/components/tile/fc_tile'
-  import FileUploader from "@/components/fileUploader/fileUploader";
+  import tile from '@/components/tile/fc_tile.vue'
+  import FileUploader from "@/components/fileUploader/fileUploader.vue";
   export default {
     name: "CharsetView",
     components: {

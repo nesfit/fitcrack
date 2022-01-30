@@ -1,4 +1,4 @@
-import { Line, mixins } from 'vue-chartjs'
+import { Line, mixins } from '@oviovocny/vue-chartjs'
 import deepMerge from 'deepmerge'
 import { gridColor } from '../helpers'
 
@@ -34,9 +34,11 @@ export default {
             }
           }
         },
-        tooltips: {
-          mode: "nearest",
-          intersect: false
+        plugins: {
+          tooltip: {
+            mode: "nearest",
+            intersect: false
+          }
         }
       }, this.overrides)
     }

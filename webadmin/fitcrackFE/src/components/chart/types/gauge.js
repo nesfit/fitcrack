@@ -1,4 +1,4 @@
-import { Doughnut, mixins } from 'vue-chartjs'
+import { Doughnut, mixins } from '@oviovocny/vue-chartjs'
 import deepMerge from 'deepmerge'
 
 export default {
@@ -14,8 +14,10 @@ export default {
     options () {
       return deepMerge({
         maintainAspectRatio: false,
-        tooltips: {
-          enabled: false
+        plugins: {
+          tooltip: {
+            enabled: false
+          }
         },
         hover: {
           mode: null
@@ -23,9 +25,9 @@ export default {
         animation: {
           animateScale: true
         },
-        cutoutPercentage: 65,
-        rotation: .75 * Math.PI,
-        circumference: 1.5 * Math.PI
+        cutout: "65%",
+        rotation: -135,
+        circumference: 270
       }, this.overrides)
     }
   },

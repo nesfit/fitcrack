@@ -20,7 +20,7 @@
     </v-card-title>
     <div
       v-if="lastJobs"
-      class="overflowing dash-row pt-0 pb-7 px-8"
+      class="minijobs overflowing dash-row pt-0 pb-7 px-8"
     >
       <minijob
         detailed
@@ -79,15 +79,15 @@
 </template>
 
 <script>
-  import status from '@/components/dashboard/status'
-  import minijob from '@/components/dashboard/miniJob'
-  import serverGauges from '@/components/dashboard/serverGauges'
+  import status from '@/components/dashboard/status.vue'
+  import minijob from '@/components/dashboard/miniJob.vue'
+  import serverGauges from '@/components/dashboard/serverGauges.vue'
   
-  import jobProgress from '@/components/chart/jobProgress'
-  import jobWorkunits from '@/components/chart/jobWorkunits'
+  import jobProgress from '@/components/chart/jobProgress.vue'
+  import jobWorkunits from '@/components/chart/jobWorkunits.vue'
 
   import { attackIcon } from '@/assets/scripts/iconMaps'
-  import dtPicker from '@/components/picker/datetime'
+  import dtPicker from '@/components/picker/datetime.vue'
 
   export default {
     name: 'Dashboard',
@@ -157,6 +157,9 @@
 .overflowing {
   flex-wrap: nowrap;
   overflow-x: auto;
+}
+.minijobs {
+  align-items: stretch;
 }
 
 .half {

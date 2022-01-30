@@ -74,8 +74,8 @@
 </template>
 
 <script>
-import dictSelector from '@/components/selector/dictionarySelector'
-import fileUploader from '@/components/fileUploader/fileUploader'
+import dictSelector from '@/components/selector/dictionarySelector.vue'
+import fileUploader from '@/components/fileUploader/fileUploader.vue'
 
 export default {
   components: {

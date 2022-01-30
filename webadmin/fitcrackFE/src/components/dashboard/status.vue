@@ -14,6 +14,7 @@
           large
           text
           :to="{name: 'hashes'}"
+          class="mr-2"
         >
           <v-icon left>
             mdi-book-lock
@@ -95,7 +96,7 @@
 </template>
 
 <script>
-import hostGrid from '@/components/dashboard/hostGrid'
+import hostGrid from '@/components/dashboard/hostGrid.vue'
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 
 export default {

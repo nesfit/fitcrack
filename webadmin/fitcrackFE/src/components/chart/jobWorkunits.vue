@@ -48,8 +48,10 @@ export default {
   computed: {
     options () {
       return {
-        legend: {
-          display: false
+        plugins: {
+          legend: {
+            display: false
+          }
         },
         scales: {
           y: {

@@ -28,9 +28,11 @@ export default {
     loaded: false,
     chartdata: null,
     options: {
-      legend: {
-        display: false
-      }
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
     }
   }),
   methods: {

@@ -13,7 +13,7 @@
 
 <script>
 import Vue from 'vue';
-import JsonBox from '@/components/json/json-box'
+import JsonBox from '@/components/json/json-box.vue'
 Vue.component(JsonBox.name, JsonBox);
 export default {
     name: 'JsonViewer',

@@ -1,10 +1,11 @@
 <template>
-  <v-card :class="['minijob', {detailed}]">
+  <v-card :class="['minijob rounded-lg', {detailed}]">
     <div class="minijob-main">
       <v-sheet
-        class="bottom-tiled minijob-sheet"
+        class="ma-2 overflow-hidden minijob-sheet"
         :color="data.status_type"
         dark
+        rounded
       >
         <router-link
           :to="{name: 'jobDetail', params: {id: data.id}}"
@@ -84,6 +85,7 @@
     <v-divider
       v-if="detailed"
       vertical
+      class="ml-2"
     />
     <div
       v-if="detailed"
@@ -95,7 +97,7 @@
 </template>
 
 <script>
-import wu from '@/components/chart/jobWorkunits'
+import wu from '@/components/chart/jobWorkunits.vue'
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 
 export default {
@@ -139,13 +141,13 @@ export default {
   min-width: calc(var(--mj-basis) + var(--mj-detail));
 }
 
-.minijob-sheet {
-  box-shadow: 0 1em 3em -1em #2224;
-}
-
 .minijob-list {
   background: transparent;
   margin-top: .5em;
+}
+
+.minijob-sheet {
+  box-shadow: 0 .3em 1em -.5em rgba(0,0,0,.3);
 }
 
 .transparent-link {

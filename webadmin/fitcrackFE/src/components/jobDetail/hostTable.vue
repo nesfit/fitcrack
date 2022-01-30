@@ -39,7 +39,7 @@
 
 <script>
 import fixUserNameEncoding from '@/assets/scripts/unswedishify'
-import { getColors } from '@/components/chart/helpers'
+import { getColors } from '@/components/chart/helpers.js'
 
 export default {
   props: {

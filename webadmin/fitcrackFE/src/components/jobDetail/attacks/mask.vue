@@ -47,7 +47,7 @@
 </template>
 
 <script>
-  import tile from '@/components/tile/fc_tile'
+  import tile from '@/components/tile/fc_tile.vue'
   export default {
     name: "MaskDetail",
     components: {

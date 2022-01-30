@@ -35,8 +35,8 @@
 </template>
 
 <script>
-  import pcfgSelector from '@/components/selector/pcfgSelector'
-  import ruleSelector from '@/components/selector/rulesSelector'
+  import pcfgSelector from '@/components/selector/pcfgSelector.vue'
+  import ruleSelector from '@/components/selector/rulesSelector.vue'
 
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
   import {twoWayMap} from '@/store'

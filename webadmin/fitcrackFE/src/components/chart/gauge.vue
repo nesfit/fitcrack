@@ -50,9 +50,11 @@ export default {
   },
   data: () => ({
     options: {
-      legend: {
-        display: false
-      }
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
     }
   }),
   computed: {

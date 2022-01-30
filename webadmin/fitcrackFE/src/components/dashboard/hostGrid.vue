@@ -1,15 +1,17 @@
 <template>
   <div class="host-grid">
     <v-sheet
+      rounded
       v-for="host in active"
       :key="'ha' + host"
-      class="host-icon host-online"
+      class="host-icon host-online rounded-xl"
       color="success"
     />
     <v-sheet
+      rounded
       v-for="host in inactive"
       :key="'hi' + host"
-      class="host-icon host-offline"
+      class="host-icon host-offline rounded-xl"
     />
   </div>
 </template>

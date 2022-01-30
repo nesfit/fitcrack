@@ -58,11 +58,9 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
-          <v-row class="mx-2">
+          <v-row class="mx-2 mb-2">
             <v-col>
               <v-btn
-                class="ma-0"
-                outlined
                 color="primary"
                 :href="$serverAddr + '/rule/' + data.id + '/download'"
                 target="_blank"
@@ -91,8 +89,8 @@
 
 <script>
   import fmt from '@/assets/scripts/numberFormat'
-  import tile from '@/components/tile/fc_tile'
-  import fcTextarea from '@/components/textarea/fc_textarea'
+  import tile from '@/components/tile/fc_tile.vue'
+  import fcTextarea from '@/components/textarea/fc_textarea.vue'
   export default {
     name: "RuleDetailView",
     components: {

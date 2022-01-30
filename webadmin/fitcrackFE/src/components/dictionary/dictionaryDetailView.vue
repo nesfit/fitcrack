@@ -78,8 +78,8 @@
 
 <script>
   import fmt from '@/assets/scripts/numberFormat'
-  import fcTextarea from '@/components/textarea/fc_textarea'
-  import tile from '@/components/tile/fc_tile'
+  import fcTextarea from '@/components/textarea/fc_textarea.vue'
+  import tile from '@/components/tile/fc_tile.vue'
   export default {
     name: "DictionaryView",
     components: {

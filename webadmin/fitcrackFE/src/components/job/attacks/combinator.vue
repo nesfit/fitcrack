@@ -80,7 +80,7 @@
 </template>
 
 <script>
-  import dictSelector from '@/components/selector/dictionarySelector'
+  import dictSelector from '@/components/selector/dictionarySelector.vue'
 
   import {mapTwoWayState} from 'spyfu-vuex-helpers'
   import {twoWayMap} from '@/store'

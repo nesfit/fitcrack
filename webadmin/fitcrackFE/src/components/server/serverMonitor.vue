@@ -143,8 +143,8 @@
 </template>
 
 <script>
-import ResMon from '@/components/chart/resourceMonitor'
-import DtPicker from '@/components/picker/datetime'
+import ResMon from '@/components/chart/resourceMonitor.vue'
+import DtPicker from '@/components/picker/datetime.vue'
 
 export default {
   components: { ResMon, DtPicker },
