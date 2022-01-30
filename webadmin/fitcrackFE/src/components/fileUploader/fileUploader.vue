@@ -101,8 +101,7 @@
             this.selectedFiles.push({
               'name': fileOrList[i].name,
               'type': fileOrList[i].type || 'n/a',
-              'size': fileOrList[i].size,
-              'modified': fileOrList[i].lastModifiedDate ? fileOrList[i].lastModifiedDate.toLocaleDateString() : 'n/a'
+              'size': fileOrList[i].size
             })
             this.files.append("file", fileOrList[i], fileOrList[i].name);
           }
@@ -110,8 +109,7 @@
           this.selectedFiles.push({
               'name': fileOrList.name,
               'type': fileOrList.type || 'n/a',
-              'size': fileOrList.size,
-              'modified': fileOrList.lastModifiedDate ? fileOrList[i].lastModifiedDate.toLocaleDateString() : 'n/a'
+              'size': fileOrList.size
             })
             this.files.append("file", fileOrList, fileOrList.name);
         }
