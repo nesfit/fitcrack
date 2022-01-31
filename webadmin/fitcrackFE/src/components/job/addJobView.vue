@@ -167,36 +167,37 @@
                   cols="12"
                 >
                   <v-alert
-                    type="warning"
+                    type="info"
+                    text
                   >
                     Currently, we support these formats:
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#">MS_OFFICE</a>,</span>
+                        <span v-on="on"><a href="#" class="filetype-link">MS_OFFICE</a>,</span>
                       </template>
                       <span>Hashtypes: 9400, 9500, 9600, 9700, 9800</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#">PDF</a>,</span>
+                        <span v-on="on"><a href="#" class="filetype-link">PDF</a>,</span>
                       </template>
                       <span>Hashtypes: 10400, 10500, 10600, 10700</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#">7Z</a>,</span>
+                        <span v-on="on"><a href="#" class="filetype-link">7Z</a>,</span>
                       </template>
                       <span>Hashtypes: 11600</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#">RAR</a> and </span>
+                        <span v-on="on"><a href="#" class="filetype-link">RAR</a> and </span>
                       </template>
                       <span>Hashtypes: 12500, 13000</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#">ZIP</a>.</span>
+                        <span v-on="on"><a href="#" class="filetype-link">ZIP</a>.</span>
                       </template>
                       <span>Hashtypes: 13600</span>
                     </v-tooltip>
@@ -212,8 +213,8 @@
                   cols="12"
                 >
                   <v-alert
-                    type="warning"
-                    class="mt-0 mb-0"
+                    type="info"
+                    text
                   >
                     Input to hashcat. Can be binary hash (WPA/WPA2), or hashlist.
                   </v-alert>
@@ -903,6 +904,10 @@
     right: 1.2em;
     padding: 0.5em 1.5em;
     border-radius: 2em;
+  }
+
+  .filetype-link {
+    color: inherit
   }
 
   .hashCeckContainer {
