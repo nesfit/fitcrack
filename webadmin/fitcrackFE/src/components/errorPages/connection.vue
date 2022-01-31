@@ -8,6 +8,9 @@
         <v-card-title>
           API Server {{retries > 5 ? 'Really ' : ''}}Unreachable
         </v-card-title>
+        <v-card-subtitle>
+          {{ addr }}
+        </v-card-subtitle>
         <v-card-text>
           <span v-if="retries <= 5">
             We'll keep trying to connect in case it hasn't started yet.
@@ -182,6 +185,9 @@ export default {
     }
   },
   computed: {
+    addr () {
+      return window.serverAddress
+    },
     statusColor () {
       if (this.retries == 0) {
         return 'blue'
