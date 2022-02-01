@@ -374,6 +374,10 @@ class OperationWithJob(Resource):
             graphData = FcJobGraph.query.filter(FcJobGraph.job_id == id).all()
             for item in graphData:
                 db.session.delete(item)
+
+            for job_hash in job.hashes:
+                job_hash.result = None
+                job_hash.time_cracked = None
         else:
             abort(400, 'Bad operation with job!')
 

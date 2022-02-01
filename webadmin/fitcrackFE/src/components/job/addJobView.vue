@@ -170,36 +170,36 @@
                     type="info"
                     text
                   >
-                    Currently, we support these formats:
+                    Supported formats:
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">MS_OFFICE</a>,</span>
                       </template>
-                      <span>Hashtypes: 9400, 9500, 9600, 9700, 9800</span>
+                      <span>Hash types: 9400, 9500, 9600, 9700, 9800</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">PDF</a>,</span>
                       </template>
-                      <span>Hashtypes: 10400, 10500, 10600, 10700</span>
+                      <span>Hash types: 10400, 10500, 10600, 10700</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">7Z</a>,</span>
                       </template>
-                      <span>Hashtypes: 11600</span>
+                      <span>Hash type: 11600</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">RAR</a> and </span>
                       </template>
-                      <span>Hashtypes: 12500, 13000</span>
+                      <span>Hash types: 12500, 13000</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">ZIP</a>.</span>
                       </template>
-                      <span>Hashtypes: 13600</span>
+                      <span>Hash types: 13600</span>
                     </v-tooltip>
                   </v-alert>
                   <file-uploader
