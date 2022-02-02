@@ -5,7 +5,7 @@ flask-login
 flask-migrate
 flask_script
 pymysql
-mysql-connector
+mysql-connector-python
 psutil
 msgpack
 pyjwt
