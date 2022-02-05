@@ -1,3 +1,0 @@
-web: https://hashcat.net
-discord: https://discord.gg/HFS523HGBT
-irc: Libera Chat #hashcat

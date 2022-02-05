@@ -1,6 +1,6 @@
 <version>
-	<file><physical_name>hashcat64_v624_1.exe</physical_name><copy_file/></file>
-	<file><physical_name>hashcat_files_v624_1.zip</physical_name><copy_file/></file>
+	<file><physical_name>hashcat64_v625_1.exe</physical_name><copy_file/></file>
+	<file><physical_name>hashcat_files_v625_1.zip</physical_name><copy_file/></file>
 	<file><physical_name>pcfg-manager1.exe</physical_name><copy_file/></file>
 	<file><physical_name>princeprocessor1.exe</physical_name><copy_file/></file>
 	<file><physical_name>runner1.exe</physical_name>
