@@ -113,7 +113,7 @@ def get_grammar_name(job_id, cursor):
     cursor.execute('SELECT fc_pcfg_grammar.name FROM fc_pcfg_grammar '
                    'LEFT JOIN fc_job ON fc_pcfg_grammar.id = fc_job.grammar_id '
                    'WHERE fc_job.id = %s', (job_id,))
-    return cursor.fetchone()[0].decode('utf-8')
+    return cursor.fetchone()[0].encode('utf-8').decode('utf-8')
 
 
 def run_new_manager(job_id, cursor):
