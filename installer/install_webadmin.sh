@@ -293,7 +293,7 @@ sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $BOINC_PROJECT_DIR
 # Configure front-end #
 #######################
 
-echo "Configuring front-end..."
+echo "Configuring frontend..."
 # Set port to backend
 sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $APACHE_DOCUMENT_ROOT/fitcrackFE/static/configuration.js
 echo "Done."
@@ -302,7 +302,14 @@ echo "Done."
 # Configure back-end #
 #######################
 
-echo "Configuring backend-end..."
+echo "Configuring backend..."
+
+read -e -p "Exposed to the internet? Do you wish to disable token signin and install HTTPS manually? [y/N] (default: N) " EXPOSED_INTERNET
+EXPOSED_INTERNET=${EXPOSED_INTERNET:-N}
+if [ $EXPOSED_INTERNET = "y" ]; then
+  sed -i "s|ALLOW_TOKEN_SIGNIN = .*|ALLOW_TOKEN_SIGNIN = False|g" $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/settings.py
+fi
+
 # Set credentials
 sed -i "s|PROJECT_USER = '.*|PROJECT_USER = '$BOINC_USER'|g" $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/settings.py
 sed -i "s|PROJECT_NAME = '.*|PROJECT_NAME = '$BOINC_PROJECT'|g" $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/settings.py
