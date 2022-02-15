@@ -30,8 +30,8 @@ case "$1" in
     ;;
 
   restart)
-    sudo -u boincadm $DAEMON $START_OPTION
     sudo -u boincadm $DAEMON $STOP_OPTION
+    sudo -u boincadm $DAEMON $START_OPTION
     ;;
 
   *)
