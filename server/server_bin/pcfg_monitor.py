@@ -113,7 +113,14 @@ def get_grammar_name(job_id, cursor):
     cursor.execute('SELECT fc_pcfg_grammar.name FROM fc_pcfg_grammar '
                    'LEFT JOIN fc_job ON fc_pcfg_grammar.id = fc_job.grammar_id '
                    'WHERE fc_job.id = %s', (job_id,))
-    return cursor.fetchone()[0].encode('utf-8').decode('utf-8')
+    grammarName = cursor.fetchone()[0];
+    try:
+        # Older mySQL connectors return bytes
+        grammarName = grammarName.decode('utf-8')
+    except (UnicodeDecodeError, AttributeError):
+        # Newer mySQL connectors return str
+        pass
+    return grammarName
 
 
 def run_new_manager(job_id, cursor):
