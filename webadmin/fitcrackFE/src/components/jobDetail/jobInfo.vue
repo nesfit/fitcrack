@@ -191,7 +191,8 @@ export default {
   },
   data () {
     return {
-      editing: false
+      editing: false,
+      testmode: localStorage.getItem('testmode') == 'true' || false
     }
   },
   computed: {
@@ -230,12 +231,13 @@ export default {
         {title: 'Estimated Cracking Time', icon: 'mdi-bell-ring-outline', value: d.estimated_cracking_time_str},
         {title: 'Start', icon: 'mdi-ray-start', value: this.startTime},
         {title: 'End', icon: 'mdi-ray-end', value: this.endTime},
-        {title: 'Efficiency', icon: 'mdi-chart-timeline-variant', value: d.efficiency, format: v => `${v} %`},
+        {title: 'Efficiency', hide: () => !this.testmode, icon: 'mdi-chart-timeline-variant', value: d.efficiency, format: v => `${v} %`},
         {title: 'Cracked Hashes', icon: 'mdi-textbox-password', value: d.cracked_hashes_str},
         {title: 'Time per workunit', icon: 'mdi-timeline-clock', value: d.seconds_per_job, format: v => `${v} seconds`},
       ]
       // Leave out missing stuff and format fields
       return items
+        .filter(i => !i.hide || !i.hide()) // only leave fields without hide condition or when it resolves false
         .filter(i => i.value != null && i.value != undefined & i.value !== '')
         .map(i => {
           if (i.format) {
