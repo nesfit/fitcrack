@@ -64,6 +64,9 @@
             </v-btn>
           </v-form>
         </div>
+        <div class="version">
+          {{ version }}
+        </div>
       </div>
     </v-container>
   </transition>
@@ -76,7 +79,8 @@
       return {
         username: null,
         password: null,
-        loading: true
+        loading: true,
+        version: __APP_VERSION__
       }
     },
     created () {
@@ -123,6 +127,17 @@
   .content {
     position: relative;
     max-width: 600px;
+  }
+
+  .version {
+    position: fixed;
+    bottom: 1.5em;
+    left: 0;
+    width: 100%;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #888;
+    text-align: center;
   }
 
   .progress {

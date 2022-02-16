@@ -9,5 +9,8 @@ export default defineConfig({
       '@' : path.resolve(__dirname, './src')
     }
   },
-  plugins: [createVuePlugin()]
+  plugins: [createVuePlugin()],
+  define: {
+    '__APP_VERSION__': JSON.stringify(process.env.npm_package_version)
+  }
 })

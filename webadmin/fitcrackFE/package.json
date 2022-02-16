@@ -1,6 +1,6 @@
 {
-  "name": "fitcrack-frontend",
-  "version": "3.0.0",
+  "name": "fitcrack",
+  "version": "2.4.0-dev",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
