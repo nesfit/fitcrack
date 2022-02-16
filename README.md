@@ -33,6 +33,7 @@ mysql> SET GLOBAL log_bin_trust_function_creators = 1;
 ```
 ./install_fitcrack.sh
 ```
+You can read about the "expose to internet" option [here](#about-webadmin-security).
 
 <a name="oper"></a>
 ## Operating the server
@@ -40,6 +41,18 @@ mysql> SET GLOBAL log_bin_trust_function_creators = 1;
 The **default** login credentials to the WebAdmin are:
 * login: ``fitcrack``
 * password: ``FITCRACK``
+
+### About WebAdmin security
+When WebAdmin authenticates with the backend, cross-origin cookies are used. As browsers tightened their security policies, this method now **requires the connection to be encrypted (HTTPS)**.
+
+To get around this when you just want to test out fitcrack, we introduced an alternative (localstorage workaround) authentication method using [JWT](https://jwt.io). This enables auth over HTTP, but it **is not secure** and should **never ever** be used for installations accessible over the internet.
+
+When you set the installation as exposed to the internet during installation, the JWT login flow will be disabled. Which one is used is completely transparent to the user, just remeber that you'll need HTTPS to use WebAdmin then.
+
+
+To change this decision later, modify [this line](webadmin/fitcrackAPI/src/settings.py#L46) in `settings.py`.
+
+### Server daemons
 
 At the end of the installation, the installer asks you if you wish to start
 the server daemons. If you decide not to, you can do that manually as described below:
