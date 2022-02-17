@@ -130,14 +130,11 @@ def process_job_3(job, hashcatKeyspace=True):
             abort(500, 'Maximum of charsets files is 4.')
         for i, charset in enumerate(job['attack_settings']['charset'], 1):
             charsetPath = os.path.join(CHARSET_DIR, charset['name'] + '.hcchr')
-            charsetsSize = dict()
+            charsetsSize[i] = int(charset['keyspace'])
+            hashcatArgs += ' -' + str(i) + ' ' + charsetPath
             with open(charsetPath, 'rb') as f:
                 content = f.read()
-                charsetsSize[i] = len(content)
-
-            hashcatArgs += ' -' + str(i) + ' ' + charsetPath
-            hexCharset = content.hex()
-            job['charset' + str(i)] = hexCharset
+                job['charset' + str(i)] = content.hex()
 
     # compute keyspace
     if job['attack_settings'].get(
