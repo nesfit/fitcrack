@@ -10,15 +10,19 @@ INSERT INTO `fc_settings` (`default_seconds_per_workunit`, `workunit_timeout_fac
 -- Insert default charsets
 
 INSERT INTO `fc_charset` (`id`, `name`, `path`, `keyspace`, `time`, `deleted`) VALUES
-(1,	'de_ISO-8859-15',	'de_ISO-8859-15.hcchr', 8, '2018-08-18 12:00:00',	0),
-(2,	'de_ISO-8859-1',	'de_ISO-8859-1.hcchr', 7, '2018-08-18 12:00:00',	0),
-(3,	'de_cp1252',	'de_cp1252.hcchr', 8, '2018-08-18 12:00:00',	0),
-(4,	'ru_KOI8-R',	'ru_KOI8-R.hcchr', 66, '2018-08-18 12:00:00',	0),
-(5,	'ru_ISO-8859-5',	'ru_ISO-8859-5.hcchr', 67, '2018-08-18 12:00:00',	0),
-(6,	'ru_cp1251',	'ru_cp1251.hcchr', 67, '2018-08-18 12:00:00',	0),
-(7,	'sk_cp1250',	'sk_cp1250.hcchr', 35, '2018-08-18 12:00:00',	0),
-(8,	'sk_ISO-8859-2',	'sk_ISO-8859-2.hcchr', 34, '2018-08-18 12:00:00',	0),
-(9,	'cz_ISO-8859-2',	'cz_ISO-8859-2.hcchr', 29, '2018-08-18 12:00:00',	0);
+-- generic charsets
+(1,	'alpha_ci',	'alpha_ci.hcchr', 52, '2022-02-17 12:00:00',	0),
+(2,	'alphanum_ci',	'alphanum_ci.hcchr', 62, '2022-02-17 12:00:00',	0),
+-- classic charsets
+(3,	'de_ISO-8859-15',	'de_ISO-8859-15.hcchr', 8, '2018-08-18 12:00:00',	0),
+(4,	'de_ISO-8859-1',	'de_ISO-8859-1.hcchr', 7, '2018-08-18 12:00:00',	0),
+(5,	'de_cp1252',	'de_cp1252.hcchr', 8, '2018-08-18 12:00:00',	0),
+(6,	'ru_KOI8-R',	'ru_KOI8-R.hcchr', 66, '2018-08-18 12:00:00',	0),
+(7,	'ru_ISO-8859-5',	'ru_ISO-8859-5.hcchr', 67, '2018-08-18 12:00:00',	0),
+(8,	'ru_cp1251',	'ru_cp1251.hcchr', 67, '2018-08-18 12:00:00',	0),
+(9,	'sk_cp1250',	'sk_cp1250.hcchr', 35, '2018-08-18 12:00:00',	0),
+(10,	'sk_ISO-8859-2',	'sk_ISO-8859-2.hcchr', 34, '2018-08-18 12:00:00',	0),
+(11,	'cz_ISO-8859-2',	'cz_ISO-8859-2.hcchr', 29, '2018-08-18 12:00:00',	0);
 
 
 --
