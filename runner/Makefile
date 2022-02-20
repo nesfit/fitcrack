@@ -7,7 +7,7 @@ DOCDIR=./doc/
 TESTDIR=./testground/
 TAB=$(shell echo -e '\t')
 
-GIT_REV=$(shell git rev-parse HEAD)
+GIT_REV=$(shell git rev-parse HEAD 2> /dev/null)
 
 $(shell echo 'void ehframe_dummy (void) { }' > $(BINDIR)/ehframe_dummy.C)
 
