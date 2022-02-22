@@ -142,6 +142,8 @@ export default {
             return false;
           if (state.minElemInChain > state.maxElemInChain)
             return false;
+          if (state.maxElemInChain > state.maxPasswordLen)
+            return false;
           if (state.keyspaceLimit < 0)
             return false;
           if (state.generateRandomRules < 0)
