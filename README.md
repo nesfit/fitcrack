@@ -78,22 +78,21 @@ boincadm@myserver:~/projects/fitcrack$ ./bin/start
 ```
 boincadm@myserver:~/projects/fitcrack$ ./bin/stop
 ```
-## Optional: workunit pipelining - multiple workunits per hosts
 
-In Fitcrack, it is possible to assign 2 (or more) workunits per node, and make a node compute a single one, while the others are downloading in backgroud. This reduces the overhead for traffic-extensive attacks - e.g. dictionary attack with big dictionaries.
+#### Advanced: Host specific configuration
+Sometimes you need to configure specific behavior for individual hosts.
+Fitcrack allows you to define additional **host-specific hashcat arguments**.
+This gives you options to select what GPUs to use for cracking,
+configure the workload profile for fine-tuning of the performance, etc.
+Simply create a file `/etc/fitcrack.conf` (Linux hosts) or 
+`C:\ProgramData\BOINC\fitcrack.conf` (Windows hosts).
+If the file exists and is readable for the BOINC client user, the
+**Runner** subsystem will append the contents to **hashcat's arguments**.
 
-**Newly**, the feature is natively supported in Fitcrack without needing any extra modification on client site. The feature can be configured by the user in the installer and is enabled by default. If you want to change it later, in the project config, e.g. `/home/boincadm/projects/fitcrack/config.xml` in section `<boinc><config>` set:
+##### Example
 ```
-<max_wus_in_progress>1</max_wus_in_progress>
+$ echo '-w 4 -d 1,2 --force' > /etc/fitcrack.conf
 ```
-to disable the pipelining feature, or
-```
-<max_wus_in_progress>2</max_wus_in_progress>
-```
-to activate the pipelining. After modification, you need to restart
-the server (as BOINC user):
-```
-boincadm@myserver:~$ cd projects/fitcrack
-boincadm@myserver:~/projects/fitcrack$ ./bin/stop
-boincadm@myserver:~/projects/fitcrack$ ./bin/start
-```
+Hashcat will use OpenCL devices 1 and 2. The workload profile will be set to level 4 (Nightmare).
+The cracking session will be forced and all warnings ignored.
+
