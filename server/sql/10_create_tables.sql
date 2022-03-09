@@ -132,6 +132,7 @@ CREATE TABLE IF NOT EXISTS `fc_workunit` (
   `start_index_2` bigint(20) unsigned NOT NULL,
   `hc_keyspace` bigint(20) unsigned NOT NULL,
   `progress` double NOT NULL DEFAULT '0',
+  `speed` bigint(20) unsigned NOT NULL DEFAULT '0',
   `mask_id` bigint(20) unsigned NOT NULL,
   `dictionary_id` bigint(20) unsigned NOT NULL,
   `duplicated` tinyint(1) NOT NULL DEFAULT '0',
