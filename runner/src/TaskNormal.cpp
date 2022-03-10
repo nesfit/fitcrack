@@ -15,6 +15,37 @@ std::string TaskNormal::getPasswords() {
   return passwords_;
 }
 
+bool TaskNormal::parseHashcatSpeed(std::string& progress_line) {
+  /* example for parsing
+  * STATUS	2	SPEED	0	1	EXEC_RUNTIME	0.182546	CURKU	0	PROGRESS	2028	17675	RECHASH 0	1	RECSALT 0	1	REJECTED	0
+  * STATUS\t	%d\tSPEED\t<N x %PRIu64\t>1000\tEXEC_RUNTIME\t<N x %f\t>CURKU\t%PRIu64\tPROGRESS\t%PRIu64\t%PRIu64\tRECHASH\t%d\t%d\tRECSALT\t%d\t%d\tTEMP\t<N x %d\t>REJECTED\t%PRIu64\tUTIL\t<N x %d\t>
+  * Above line is taken from
+  * https://github.com/hashcat/hashcat/blob/8903adb164ce6e6c554dc9cb9634a725dabcceb0/src/terminal.c#L781
+  */
+
+  //Logging::debugPrint(Logging::Detail::CustomOutput, "Progress line : " + progress_line);
+  if (progress_line.find("STATUS") != 0) {
+    static const std::string invalidRuleMessageStart = "Cannot convert rule for use on OpenCL device in file";
+    if(progress_line.substr(0, invalidRuleMessageStart.length()) == invalidRuleMessageStart)
+    {
+      invalidRuleCount += 1;
+    }
+    return false;
+  }
+
+  ProgressPair progress = parseSpeed(progress_line);
+  if(progress.second == 0 && progress.first == 0)
+  {
+    return false;
+  }
+
+  /** When this is the first parsed line */
+  HPU_ = progress.first;
+  timeUnit_ = progress.second;
+
+  return true;
+}
+
 bool TaskNormal::parseHashcatProgress(std::string& progress_line) {
   /* example for parsing
   * STATUS	2	SPEED	0	1	EXEC_RUNTIME	0.182546	CURKU	0	PROGRESS	2028	17675	RECHASH 0	1	RECSALT 0	1	REJECTED	0
@@ -46,6 +77,27 @@ bool TaskNormal::parseHashcatProgress(std::string& progress_line) {
 
   saveParsedProgress(progress.first);
   return true;
+}
+
+TaskNormal::ProgressPair TaskNormal::parseSpeed(const std::string& progress_line) {
+
+  size_t speedLoc = progress_line.find("SPEED");    // Find position of SPEED
+
+  if (speedLoc == std::string::npos) {
+    return ProgressPair(0, 0);
+  }
+
+  size_t dataStart = progress_line.find('\t', speedLoc);    // Get position of \t after SPEED
+
+  std::string::const_iterator dataEnd = std::find_if(progress_line.begin()+dataStart, progress_line.end(), ::isalpha);
+
+  std::istringstream parser(progress_line.substr(dataStart, dataEnd-progress_line.begin()+dataStart));
+
+  //HPU == Hashes per unit time
+  uint64_t HPU, timeUnit;
+  parser>>HPU>>timeUnit;
+  return ProgressPair(HPU, timeUnit);
+
 }
 
 TaskNormal::ProgressPair TaskNormal::parseProgress(const std::string& progress_line) {
@@ -234,7 +286,14 @@ bool TaskNormal::parseHashcatOutputLine(std::string& output_line) {
     return false;
   }
 
-  return parseHashcatProgress(output_line);
+  if (!parseHashcatProgress(output_line)) {
+    return false;
+  }
+
+  if (!parseHashcatSpeed(output_line)) {
+    return false;
+  }
+  return true;
 }
 
 void TaskNormal::progress() {
