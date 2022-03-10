@@ -40,8 +40,9 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     /** Define local variables */
     bool got_progress = false;
     bool got_wu_name = false;
+    bool got_speed = false;
 
-    double progress;
+    double progress, speed;
     char buf[SQL_BUF_SIZE];
     char wu_name[SQL_BUF_SIZE];
 
@@ -78,11 +79,24 @@ int handle_trickle(MSG_FROM_HOST& mfh)
             continue;
         }
 
+        if (xp.parse_double("speed", speed))
+        {
+            if (std::isnan(speed))
+            {
+                std::cerr << "ERROR: Speed cannot be nan." << std::endl;
+                return 1;
+            }
+
+            std::cerr << "Succesfully parsed progress: " << progress << std::endl;
+            got_speed = true;
+            continue;
+        }
+
         //std::cerr << "WARNING: Unexpected tag: " << xp.parsed_tag << std::endl;
     }
 
     /** Check values */
-    if (!got_progress || !got_wu_name)
+    if (!got_progress || !got_wu_name || !got_speed)
     {
         std::cerr << "ERROR: Could not parse all mandatory data." << std::endl;
         return 1;
@@ -96,12 +110,24 @@ int handle_trickle(MSG_FROM_HOST& mfh)
 
     /** Update workunit progress in DB */
     snprintf(buf, SQL_BUF_SIZE, "UPDATE `fc_workunit` SET `progress` = %f WHERE `progress` < %f AND `workunit_id` IN (SELECT id FROM workunit WHERE name = '%s') LIMIT 1 ;",
-             progress, progress, wu_name);
+            progress, progress, wu_name);
 
     int retval = boinc_db.do_query(buf);
     if (retval)
     {
-        std::cerr << "Problem with DB query: " << buf << "\nShutting down now." << std::endl;
+        std::cerr << "Problem with progress DB query: " << buf << "\nShutting down now." << std::endl;
+        boinc_db.close();
+        exit(1);
+    }
+
+    char speed_buf[1024];
+    snprintf(speed_buf, SQL_BUF_SIZE, "UPDATE `fc_workunit` SET `speed` = %f WHERE `workunit_id` IN (SELECT id FROM workunit WHERE name = '%s') LIMIT 1 ;",
+            speed, wu_name);
+
+    retval = boinc_db.do_query(speed_buf);
+    if (retval)
+    {
+        std::cerr << "Problem with speed DB query: " << buf << "\nShutting down now." << std::endl;
         boinc_db.close();
         exit(1);
     }
