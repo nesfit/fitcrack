@@ -89,15 +89,25 @@
       }
     },
     methods: {
+      nextPage () {
+        if (this.pages && this.page < this.pages) {
+          this.pages += 1
+          return true
+        } else {
+          return false
+        }
+      },
       loadNotifications () {
-        this.axios.get(this.$serverAddr + '/notifications', {
-          params: {
-            page: this.page++
-          }
-        }).then((response) => {
-          this.notifications = [...this.notifications, ...response.data.items]
-          this.pages = response.data.pages
-        })
+        if (this.nextPage() || !this.pages) {
+          this.axios.get(this.$serverAddr + '/notifications', {
+            params: {
+              page: this.page
+            }
+          }).then((response) => {
+            this.notifications = [...this.notifications, ...response.data.items]
+            this.pages = response.data.pages
+          })
+        }
       }
     }
   }
