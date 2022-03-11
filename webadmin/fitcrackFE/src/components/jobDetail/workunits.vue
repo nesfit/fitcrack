@@ -57,16 +57,29 @@
       show-expand
     >
       <template v-slot:item.boinc_host_id="{ item }">
-        <router-link
-          :to="{ name: 'hostDetail', params: { id: item.host.id}}"
-          class="middle"
-        >
-          {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user.name) + ')' }}
-        </router-link>
+        <div class="hostname">
+          <div
+            v-if="showChartPatterns"
+            class="pattern"
+          >
+            <canvas
+              :ref="`pattern-${item.id}`"
+              :data-host-id="item.boinc_host_id"
+              width="15"
+              height="15"
+            />
+          </div>
+          <router-link
+            :to="{ name: 'hostDetail', params: { id: item.host.id}}"
+            class="middle"
+          >
+            {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user.name) + ')' }}
+          </router-link>
+        </div>
       </template>
       <template v-slot:item.progress="{ item }">
         <div class="d-flex align-center justify-end">
-          <span class="mr-2">{{ item.progress }} %</span>
+          <span class="mr-2">{{ item.progress }}&nbsp;%</span>
           <v-progress-circular
             size="18"
             :width="3"
@@ -118,6 +131,7 @@
 </template>
 
 <script>
+import { getColors } from '@/components/chart/helpers.js'
 import fixUserNameEncoding from '@/assets/scripts/unswedishify'
 import fmt from '@/assets/scripts/numberFormat'
 import fcTextarea from '@/components/textarea/fc_textarea.vue'
@@ -130,6 +144,21 @@ export default {
     data: {
       type: Object,
       default: () => {}
+    },
+    showChartPatterns: Boolean
+  },
+  mounted () {
+    // draw patterns if shown
+    if (this.showChartPatterns) {
+      const canvases = Object.values(this.$refs)
+      const patterns = getColors(canvases.length, true)
+      canvases.forEach(cvs => {
+        console.log(cvs)
+        const tc = cvs.getContext("2d")
+        tc.rect(0, 0, cvs.width, cvs.height)
+        tc.fillStyle = patterns[cvs.dataset.hostId - 1]
+        tc.fill()
+      })
     }
   },
   data () {
@@ -215,5 +244,21 @@ export default {
 .workunit-child:not(:last-child) {
   margin-right: 2px;
   user-select: none;
+}
+</style>
+
+<style scoped>
+.hostname {
+  display: flex;
+  align-items: center;
+}
+.pattern {
+  margin-right: 1ch;
+  display: flex;
+  align-items: center;
+}
+.pattern canvas {
+  border: 2px solid #fffd;
+  border-radius: 5px;
 }
 </style>

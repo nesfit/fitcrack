@@ -153,6 +153,7 @@
     <v-divider />
     <workunits
       v-if="data"
+      show-chart-patterns
       class="wu-container"
       :data="data"
     />
