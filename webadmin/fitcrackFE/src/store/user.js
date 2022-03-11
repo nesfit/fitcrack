@@ -47,7 +47,7 @@ export default {
     async resume ({ state, dispatch }) {
       if (state.loggedIn) return true
       const user = await dispatch('refreshUser')
-      return user.loggedIn
+      return user.id != null
     },
     async signIn ({ commit }, credentials) {
       try {
