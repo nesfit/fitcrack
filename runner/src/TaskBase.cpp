@@ -55,9 +55,14 @@ void TaskBase::reportProgress() {
 
   Logging::debugPrint(Logging::Detail::DevelDebug, "Progress : " + RunnerUtils::toString(fraction_done) + " percent done : " + RunnerUtils::toString(percent_done) + " rinted : " + RunnerUtils::toString(::rint(percent_done)));
 
-  uint64_t hashSpeed;
+  double hashSpeed;
   if (HPU_ && timeUnit_) {
-    hashSpeed = (HPU_ / timeUnit_) * 1000;
+    if (timeUnit_ == 1000) {
+       hashSpeed = HPU_;
+    }
+    else {
+      hashSpeed = (HPU_ * (timeUnit_ / 1000));
+    }
   }
   else {
     hashSpeed = 0;
