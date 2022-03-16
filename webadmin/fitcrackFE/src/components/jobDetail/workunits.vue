@@ -66,7 +66,7 @@
       </template>
       <template v-slot:item.progress="{ item }">
         <div class="d-flex align-center justify-end">
-          <span class="mr-2">{{ item.progress }} %</span>
+          <span class="mr-2">{{ item.progress }}&nbsp;%</span>
           <v-progress-circular
             size="18"
             :width="3"
@@ -76,6 +76,9 @@
             :value="item.progress"
           />
         </div>
+      </template>
+      <template v-slot:item.speed="{ item }">
+        {{ fmt(item.speed) }}&nbsp;H/s
       </template>
       <template v-slot:item.time="{ item }">
         {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
@@ -146,6 +149,7 @@ export default {
           value: 'boinc_host_id',
         },
         {text: 'Progress', align: 'end', value: 'progress'},
+        {text: 'Speed', align: 'end', value: 'speed'},
         {text: 'Cracking time', align: 'end', value: 'cracking_time_str'},
         {text: 'Generated', align: 'end', value: 'time'},
         {text: 'Start index', align: 'end', value: 'start_index_real'},
