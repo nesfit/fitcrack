@@ -57,12 +57,17 @@
       show-expand
     >
       <template v-slot:item.boinc_host_id="{ item }">
-        <router-link
-          :to="{ name: 'hostDetail', params: { id: item.host.id}}"
-          class="middle"
-        >
-          {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user.name) + ')' }}
-        </router-link>
+        <v-tooltip top>
+          <template #activator="{ on }">
+            <router-link
+              :to="{ name: 'hostDetail', params: { id: item.host.id}}"
+              class="middle"
+            >
+              <span v-on="on">{{ item.host.domain_name }}</span>
+            </router-link>
+          </template>
+          <span>User: {{ fixUserNameEncoding(item.host.user.name) }}</span>
+        </v-tooltip>
       </template>
       <template v-slot:item.progress="{ item }">
         <div class="d-flex align-center justify-end">
