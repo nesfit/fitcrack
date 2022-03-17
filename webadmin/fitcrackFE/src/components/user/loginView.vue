@@ -16,13 +16,13 @@
       <div class="main mx-auto">
         <img
           v-if="$vuetify.theme.dark"
-          :src="require(`@/assets/NeoDark.svg`)"
+          :src="require(`@/assets/logo-dark.svg`)"
           class="mx-auto pt-3 pb-3 d-block logo"
           alt="logo"
         >
         <img
           v-else
-          :src="require(`@/assets/NeoLight.svg`)"
+          :src="require(`@/assets/logo-light.svg`)"
           class="mx-auto pt-3 pb-3 d-block logo"
           alt="logo"
         >

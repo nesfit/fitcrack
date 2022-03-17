@@ -15,18 +15,18 @@
       width="290"
     >
       <router-link :to="{ name: 'home'}">
-        <img
-          v-if="$vuetify.theme.dark"
-          :src="require('@/assets/NeoDark.svg')"
-          class="mx-auto px-2 mt-2 d-block logo"
-          alt="logo"
-        >
-        <img
-          v-else
-          :src="require('@/assets/NeoLight.svg')"
-          class="mx-auto px-2 mt-2 d-block logo"
-          alt="logo"
-        >
+        <div class="logo">
+          <img
+            v-if="$vuetify.theme.dark"
+            :src="require('@/assets/logo-dark.svg')"
+            alt="logo"
+          >
+          <img
+            v-else
+            :src="require('@/assets/logo-light.svg')"
+            alt="logo"
+          >
+        </div>
       </router-link>
 
       <div class="dash-link">
@@ -649,6 +649,7 @@
     display: flex;
     justify-content: center;
     padding: 1em;
+    padding-top: 0;
   }
 
   .notifHeader {
@@ -656,9 +657,15 @@
   }
 
   .logo {
+    display: flex;
     width: 100%;
+    min-height: 10em;
+    margin: 1em auto;
+    justify-content: center;
+    align-items: center;
+  }
+  .logo img {
     max-width: 150px;
-    margin-bottom: -1em;
   }
 
   .logoText {
