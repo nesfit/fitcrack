@@ -216,11 +216,13 @@
                     type="info"
                     text
                   >
-                    Input to hashcat. Can be binary hash (WPA/WPA2), or hashlist.
+                    Input to hashcat. Select a binary hash (WPA/WPA2), or plain text hashlist.
                   </v-alert>
                   <file-uploader
                     ref="hashFileUploader"
-                    :no-upload="true"
+                    :multiple="false"
+                    no-upload
+                    label="Select a file to read"
                     @filesChanged="hashFileSelected"
                   />
                 </v-col>
@@ -749,7 +751,7 @@
         }
         return false
       },
-      hashFileSelected: function (files) {
+      hashFileSelected: function (file) {
         var reader = new FileReader()
         reader.onloadend = function(evt) {
           if (evt.target.readyState == FileReader.DONE) {
@@ -764,7 +766,7 @@
                   this.gotBinaryHash = true
                 }
               }.bind(this)
-              binReader.readAsDataURL(files[0])
+              binReader.readAsDataURL(file)
 
             } else {
               // we got hashlists
@@ -779,7 +781,7 @@
             }
           }
         }.bind(this)
-        reader.readAsText(files[0], 'utf-8')
+        reader.readAsText(file, 'utf-8')
       },
       clearInput () {
         this.hashType = null
