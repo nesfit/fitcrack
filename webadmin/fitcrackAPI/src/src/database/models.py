@@ -598,6 +598,7 @@ class FcWorkunit(Base):
     start_index_2 = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
     progress = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
+    speed = Column(BigInteger, nullable=False, server_default=text("'0'"))
     mask_id = Column(BigInteger, nullable=False)
     dictionary_id = Column(BigInteger, nullable=False)
     duplicated = Column(Integer, nullable=False, server_default=text("'0'"))

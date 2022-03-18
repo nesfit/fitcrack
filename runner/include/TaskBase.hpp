@@ -42,6 +42,9 @@ class TaskBase {
         unsigned long long computed_hashes_;    /**< Already computed hashes */
         unsigned long long total_hashes_;     /**< Total number or hashes to compute in the task */
 
+        unsigned long long HPU_;   /**< Hashes per unit (of time) */
+        unsigned long long timeUnit_;   /**< unit of time in milliseconds */
+
         std::string mode_;           /**< Mode of the task a-benchmark_all, b-benchmark, n-normal */
         std::string output_file_;   /**< Name of the hashcat output file */
 	std::string workunit_name_; /**< Name of the workunit assigned by boinc server */

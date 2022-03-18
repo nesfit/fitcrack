@@ -55,9 +55,22 @@ void TaskBase::reportProgress() {
 
   Logging::debugPrint(Logging::Detail::DevelDebug, "Progress : " + RunnerUtils::toString(fraction_done) + " percent done : " + RunnerUtils::toString(percent_done) + " rinted : " + RunnerUtils::toString(::rint(percent_done)));
 
+  double hashSpeed;
+  if (HPU_ && timeUnit_) {
+    if (timeUnit_ == 1000) {
+       hashSpeed = HPU_;
+    }
+    else {
+      hashSpeed = (HPU_ * (timeUnit_ / 1000));
+    }
+  }
+  else {
+    hashSpeed = 0;
+  }
+
   // Add call of the trickler progress message
   if (!boinc_is_standalone()) {
-    std::string trickle_message = "<workunit_name>"+ workunit_name_ + "</workunit_name>\n<progress>" + RunnerUtils::toString(percent_done) + "</progress>";
+    std::string trickle_message = "<workunit_name>"+ workunit_name_ + "</workunit_name>\n<progress>" + RunnerUtils::toString(percent_done) + "</progress>\n<speed>" + RunnerUtils::toString(hashSpeed) + "</speed>";
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wwrite-strings" // disable G++ warning about deprecated cast

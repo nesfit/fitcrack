@@ -27,6 +27,12 @@ class TaskNormal: public TaskComputeBase {
         std::string getPasswords();
 
 	/**
+	 * @brief   Parses Hashcat's speed output line
+	 * @param   progress_line [in] Line of the hashcat's output
+	 */
+	bool parseHashcatSpeed(std::string& progress_line);
+
+	/**
 	 * @brief   Parses Hashcat's progress output line
 	 * @param   progress_line [in] Line of the hashcat's output
 	 */
@@ -45,6 +51,13 @@ class TaskNormal: public TaskComputeBase {
 	 * @return  Parsed PROGRESS value
 	 */
 	ProgressPair parseProgress(const std::string& progress_line);
+
+	/**
+	 * @brief   Parses SPEED value from hashcat progress line
+	 * @param   progress_line [] Hashcat's progress line
+	 * @return  Parsed SPEED value
+	 */
+	ProgressPair parseSpeed(const std::string& progress_line);
 
 	/**
 	 * @brief   Saves value from parameter into computed_hashes_
