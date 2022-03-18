@@ -99,6 +99,12 @@ FOR EACH ROW BEGIN
 	DECLARE benchAll INT;
 	DECLARE currentState INT;
 
+	DECLARE autoAddHostsToRunningJobs INT;
+	DECLARE runningJobId int;
+	DECLARE done INT DEFAULT FALSE;
+	DECLARE runningJobsCursor CURSOR FOR (SELECT `id` FROM `fc_job` WHERE `status` = 10);
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
 	-- Add host to host_status
 	INSERT INTO fc_host_status (`id`, `boinc_host_id`, `last_seen`) VALUES (DEFAULT, NEW.id, DEFAULT);
 
@@ -117,6 +123,20 @@ FOR EACH ROW BEGIN
 
 		INSERT INTO `fc_host_activity` (`boinc_host_id`, `job_id`) VALUES (NEW.id, 1);
 		UPDATE `fc_job` SET `status` = 10, `time_end` = NULL WHERE `id` = 1 LIMIT 1;
+	END IF;
+
+	SET autoAddHostsToRunningJobs = (SELECT `auto_add_hosts_to_running_jobs` FROM `fc_settings` LIMIT 1);
+	IF (autoAddHostsToRunningJobs)
+	THEN
+		OPEN runningJobsCursor;
+			running_jobs_loop: LOOP
+				FETCH runningJobsCursor INTO runningJobId;
+				IF done THEN
+					LEAVE running_jobs_loop;
+				END IF;
+				INSERT INTO `fc_host_activity` (`boinc_host_id`, `job_id`) VALUES (NEW.id, runningJobId);
+			END LOOP;
+		CLOSE runningJobsCursor;
 	END IF;
 END
 //

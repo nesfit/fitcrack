@@ -146,6 +146,15 @@
               persistent-hint
               class="mb-4"
             />
+            <v-switch
+              v-model="settings.auto_add_hosts_to_running_jobs"
+              :loading="loading"
+              outlined
+              label="Add new hosts to running jobs"
+              hint="If enabled, Fitcrack automatically adds newly connected hosts to currently running jobs."
+              persistent-hint
+              class="mb-4"
+            />
             <v-text-field
               v-model="settings.distribution_coefficient_alpha"
               :loading="loading"

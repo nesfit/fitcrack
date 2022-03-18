@@ -46,6 +46,7 @@ class settings(Resource):
         ruw = args['ramp_up_workunits']
         rdc = args['ramp_down_coefficient']
         vhf = args['verify_hash_format']
+        aahtrj = args['auto_add_hosts_to_running_jobs']
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
@@ -57,6 +58,7 @@ class settings(Resource):
         if (ruw is not None): settings.ramp_up_workunits = ruw
         if (rdc is not None): settings.ramp_down_coefficient = rdc
         if (vhf is not None): settings.verify_hash_format = vhf
+        if (aahtrj is not None): settings.auto_add_hosts_to_running_jobs = aahtrj
         db.session.commit()
 
         return {
