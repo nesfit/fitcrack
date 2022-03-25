@@ -69,12 +69,17 @@
               height="15"
             />
           </div>
-          <router-link
-            :to="{ name: 'hostDetail', params: { id: item.host.id}}"
-            class="middle"
-          >
-            {{ item.host.domain_name + ' (' + fixUserNameEncoding(item.host.user.name) + ')' }}
-          </router-link>
+          <v-tooltip top>
+          <template #activator="{ on }">
+            <router-link
+              :to="{ name: 'hostDetail', params: { id: item.host.id}}"
+              class="middle"
+            >
+              <span v-on="on">{{ item.host.domain_name }}</span>
+            </router-link>
+          </template>
+          <span>User: {{ fixUserNameEncoding(item.host.user.name) }}</span>
+        </v-tooltip>
         </div>
       </template>
       <template v-slot:item.progress="{ item }">
@@ -89,9 +94,6 @@
             :value="item.progress"
           />
         </div>
-      </template>
-      <template v-slot:item.speed="{ item }">
-        {{ fmt(item.speed) }}&nbsp;H/s
       </template>
       <template v-slot:item.time="{ item }">
         {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
@@ -178,7 +180,6 @@ export default {
           value: 'boinc_host_id',
         },
         {text: 'Progress', align: 'end', value: 'progress'},
-        {text: 'Speed', align: 'end', value: 'speed'},
         {text: 'Cracking time', align: 'end', value: 'cracking_time_str'},
         {text: 'Generated', align: 'end', value: 'time'},
         {text: 'Start index', align: 'end', value: 'start_index_real'},
