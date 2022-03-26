@@ -131,7 +131,7 @@ export default {
     height: 2px;
     background-color: #888;
     margin: 0 2em;
-    top: 1.75em;
+    top: 2.75em;
   }
 
   .history-entry {
