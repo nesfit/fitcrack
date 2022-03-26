@@ -31,8 +31,7 @@ void AttackCrackingBase::addSpecificArguments() {
 
   addArgument("--outfile-format=" + HashcatConstant::OutputFormat);
   addArgument("--quiet");
-  addArgument("--status");
-  addArgument("--machine-readable");
+  addArgument("--status-json");
   addArgument("--restore-disable");
   addArgument("--potfile-disable");
   addArgument("--logfile-disable");

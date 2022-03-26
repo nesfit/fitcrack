@@ -38,7 +38,6 @@ void AttackBase::initializeArguments() {
   findAndAddRequired("hash_type", "-m");
 
   addArgument("--optimized-kernel-enable");
-  addArgument("--machine-readable");
   //    addArgument("--force");
 }
 

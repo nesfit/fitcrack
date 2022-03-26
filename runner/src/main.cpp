@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     const char *config = argc > 1 ?argv[1] : "config";
     directory.find(config, file);
 
-    std::auto_ptr<TaskBase> task(Task::create(file, directory));
+    std::unique_ptr<TaskBase> task(Task::create(file, directory));
 
     task->initialize();
     task->startComputation();

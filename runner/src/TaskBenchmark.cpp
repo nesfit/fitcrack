@@ -121,8 +121,8 @@ unsigned long long TaskBenchmark::getTotalSpeed() {
   unsigned long long speed_sum = 0;
 
   /** Sum speeds of all OCL devices used by hashcat on given node */
-  for (std::vector<unsigned long long>::iterator it = device_speeds_.begin(); it != device_speeds_.end(); it++) {
-    speed_sum += *it;
+  for (unsigned long long speed : device_speeds_) {
+    speed_sum += speed;
   }
 
   return speed_sum;

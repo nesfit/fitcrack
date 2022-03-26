@@ -14,7 +14,7 @@ $(shell echo 'void ehframe_dummy (void) { }' > $(BINDIR)/ehframe_dummy.C)
 CXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -pedantic -lboinc_api -lboinc -lzip -lz -static-libgcc -static-libstdc++ 
 CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'  
 ## Release
-LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -Wno-c++11-compat -O3 -g3 -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -O3 -g3 -std=c++11 #-D_GLIBCXX_USE_CXX11_ABI=0
 ## Debug
 # LDXXFLAGS=-Wall -Wextra -Wno-c++11-compat -g -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
 
