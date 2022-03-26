@@ -56,7 +56,7 @@
       :items="data.workunits"
       show-expand
     >
-      <template v-slot:item.boinc_host_id="{ item }">
+      <template v-slot:item.host_id="{ item }">
         <div class="hostname">
           <div
             v-if="showChartPatterns"
@@ -64,7 +64,7 @@
           >
             <canvas
               :ref="`pattern-${item.id}`"
-              :data-host-id="item.boinc_host_id"
+              :data-host-id="item.host_id"
               width="15"
               height="15"
             />
@@ -180,7 +180,7 @@ export default {
       headers: [
         {
           text: 'Host',
-          value: 'boinc_host_id',
+          value: 'host_id',
         },
         {text: 'Progress', align: 'end', value: 'progress'},
         {text: 'Speed', align: 'end', value: 'speed'},
