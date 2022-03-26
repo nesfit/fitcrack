@@ -96,7 +96,13 @@
         </div>
       </template>
       <template v-slot:item.speed="{ item }">
-        {{ fmt(item.speed) }}&nbsp;H/s
+        <span v-if="item.speed >= 1000000">
+          {{ fmt(item.speed / 1000, {maximumFractionDigits: 0}) }}&nbsp;kH/s
+        </span>
+        <span v-else-if="item.speed > 0">
+          {{ fmt(item.speed) }}&nbsp;H/s
+        </span>
+        <span v-else>–</span>
       </template>
       <template v-slot:item.time="{ item }">
         {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
