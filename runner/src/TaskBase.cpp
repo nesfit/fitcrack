@@ -57,6 +57,7 @@ void TaskBase::reportProgress() {
 
   // Add call of the trickler progress message
   if (!boinc_is_standalone()) {
+    unsigned long long hashes_per_sec = status_info_.at("devices").at(0).at("speed");
     std::string trickle_message = "<workunit_name>"+ workunit_name_ + "</workunit_name>\n<progress>" + RunnerUtils::toString(percent_done) + "</progress>\n<speed>" + RunnerUtils::toString(hashes_per_sec) + "</speed>";
 
     #pragma GCC diagnostic push

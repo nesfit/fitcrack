@@ -17,22 +17,20 @@ std::string TaskNormal::getPasswords() {
 
 bool TaskNormal::parseHashcatStatus(const std::string &progress_line) {
   using namespace nlohmann;
-  json status_info = json::parse(progress_line, nullptr, false);
-  if (status_info.is_discarded()) {
+  status_info_ = json::parse(progress_line, nullptr, false);
+  if (status_info_.is_discarded()) {
     // JSON parse error
     return false;
   }
 
-  uint64_t current_progress = status_info.at("progress").at(0);
-  uint64_t total_hashes = status_info.at("progress").at(1);
+  uint64_t current_progress = status_info_.at("progress").at(0);
+  uint64_t total_hashes = status_info_.at("progress").at(1);
 
-  uint64_t salt_count = status_info.at("recovered_salts").at(1);
+  uint64_t salt_count = status_info_.at("recovered_salts").at(1);
 
   if (current_progress == 0 && total_hashes == 0) {
     return false;
   }
-
-  hashes_per_sec = status_info.at("devices").at(0).at("speed");
 
   /** When this is the first parsed line */
   if (total_hashes_ == 0) {
