@@ -24,7 +24,7 @@
 
 #include "app_ipc.h"
 #include "boinc_api.h"
-
+#include "json.hpp"
 
 /** Class representing task created by the server */
 class TaskBase {
@@ -42,7 +42,7 @@ class TaskBase {
         unsigned long long computed_hashes_;    /**< Already computed hashes */
         unsigned long long total_hashes_;     /**< Total number or hashes to compute in the task */
 
-        unsigned long long hashes_per_sec;   /**< Hashes per second */
+        nlohmann::json status_info_;   /**< Hashcat status info in json format */
 
         std::string mode_;           /**< Mode of the task a-benchmark_all, b-benchmark, n-normal */
         std::string output_file_;   /**< Name of the hashcat output file */
