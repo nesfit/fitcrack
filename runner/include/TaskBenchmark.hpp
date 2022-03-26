@@ -7,6 +7,7 @@
 #define TASKBENCHMARK_HPP
 
 #include "TaskComputeBase.hpp"
+#include "json.hpp"
 #include <set>
 
 /** Class representing benchmark task */
@@ -17,15 +18,15 @@ protected:
 
 	std::vector<unsigned long long> device_speeds_;    /**< Storage of speeds for all OCL deviced used by hashcat */
 
-	std::set<uint64_t> m_benchmarked_speeds;
+	std::set<uint64_t> benchmarked_speeds_;
 
-	uint64_t m_saltCount;
+	uint64_t salt_count_;
 
 	/**
 	 * @brief Parse hashcat benchmark line  
 	 * @param output_line
 	 */
-	void parseHashcatBenchmark(std::string& output_line);
+	bool parseHashcatBenchmark(std::string& output_line);
 
 public:
 

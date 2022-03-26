@@ -27,6 +27,7 @@ bool TaskNormal::parseHashcatStatus(const std::string &progress_line) {
   uint64_t total_hashes = status_info_.at("progress").at(1);
 
   uint64_t salt_count = status_info_.at("recovered_salts").at(1);
+  salt_count = std::max<uint64_t>(salt_count, 1);
 
   if (current_progress == 0 && total_hashes == 0) {
     return false;
