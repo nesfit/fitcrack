@@ -165,7 +165,9 @@ void TaskBenchmark::progress() {
 
     PRINT_POSITION_IN_CODE();
 
-    parseHashcatOutputLine(line);
+    if (parseHashcatOutputLine(line)) {
+      reportProgress();
+    }
   }
   PRINT_POSITION_IN_CODE();
 }

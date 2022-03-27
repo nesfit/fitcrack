@@ -21,25 +21,6 @@ void TaskComputeBase::getAllArguments() {
   host_config_.parseArguments(hashcat_arguments_);
 }
 
-uint64_t TaskComputeBase::getSaltCountFromStatusLine(const std::string &outputLine)
-{
-  static const char marker[] = "RECSALT\t";
-  size_t found_at = outputLine.find(marker);
-  if (found_at != std::string::npos) {
-    //-1 for terminating NULL
-    found_at += sizeof(marker)-1;
-    uint64_t dummy;
-    uint64_t saltCount;
-    std::istringstream parser(outputLine.substr(found_at));
-    if(parser>>dummy && parser>>saltCount)
-    {
-      return saltCount;
-    }
-  }
-  //return 1 by default so that we assume there is only one salt
-  return 1;
-}
-
 /* Public */
 TaskComputeBase::TaskComputeBase(
   Directory& directory,
@@ -99,10 +80,10 @@ int TaskComputeBase::finish() {
 
   PRINT_POSITION_IN_CODE();
 
-  if (exit_code_ == (unsigned char)-1) {
+  if (exit_code_ == (unsigned char)HashcatConstant::status_codes::Error) {
     std::string msg = std::string("Hashcat failed to run! Exit code: -1. ") + process_hashcat_->readErrPipeAvailableLines();
     RunnerUtils::runtimeException(msg);
-  } else if (exit_code_ == (unsigned char)-2) {
+  } else if (exit_code_ == (unsigned char)HashcatConstant::status_codes::GpuAlarm) {
     printProcessErr();
     RunnerUtils::runtimeException(
         "Hashcat failed to run! Exit code: -2. GPU-watchdog alarm - "

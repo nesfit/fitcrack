@@ -87,7 +87,7 @@ int handle_trickle(MSG_FROM_HOST& mfh)
                 return 1;
             }
 
-            std::cerr << "Succesfully parsed progress: " << progress << std::endl;
+            std::cerr << "Succesfully parsed speed: " << speed << std::endl;
             got_speed = true;
             continue;
         }
