@@ -2,7 +2,6 @@
 
 #include "NamedMutex.hpp"
 
-#include "nullptr.hpp"
 #include "RunnerUtils.hpp"
 #include "Logging.hpp"
 

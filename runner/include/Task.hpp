@@ -15,8 +15,6 @@
 #include "TaskBenchmarkAll.hpp"
 #include "TaskNormal.hpp"
 
-#include "nullptr.hpp"
-
 /** Namespace with function for creating new Task */
 namespace Task {
     extern std::string HostConfigPath; /**< OS dependent path to the ConfigHost file */

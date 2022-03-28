@@ -6,8 +6,6 @@
 #ifndef RUNNERUTILS_HPP 
 #define RUNNERUTILS_HPP
 
-#include "nullptr.hpp"
-
 #include "BoincApi.hpp"
 
 #include <cerrno>

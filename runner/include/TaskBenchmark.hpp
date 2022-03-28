@@ -15,9 +15,6 @@ class TaskBenchmark: public TaskComputeBase {
 	//! No copying
 	TaskBenchmark(const TaskBenchmark&);
 protected:
-
-	std::vector<unsigned long long> device_speeds_;    /**< Storage of speeds for all OCL deviced used by hashcat */
-
 	std::set<uint64_t> benchmarked_speeds_;
 
 	uint64_t salt_count_;
@@ -54,13 +51,7 @@ public:
 	 * @brief   Generates task result information
 	 * @return  Information as string 
 	 */
-	std::string generateOutputMessage(); 
-
-	/**
-	 * @brief   Computes total speed of node
-	 * @return  Total speed
-	 */
-	unsigned long long getTotalSpeed();
+	std::string generateOutputMessage();
 
 	uint64_t getBenchmarkedSpeed();
 

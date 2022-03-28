@@ -14,11 +14,6 @@ bool TaskBenchmark::parseHashcatBenchmark(std::string &output_line) {
     return false;
   }
 
-  for (const auto &device : status_info_.at("devices")) {
-    uint64_t device_speed = device.at("speed");
-    device_speeds_.push_back(device_speed);
-  }
-
   benchmarked_speeds_.insert(getTotalSpeed());
 
   if (salt_count_ <= 1) {
@@ -84,17 +79,6 @@ std::string TaskBenchmark::generateOutputMessage() {
   }
 
   return output_message;
-}
-
-unsigned long long TaskBenchmark::getTotalSpeed() {
-  unsigned long long speed_sum = 0;
-
-  /** Sum speeds of all OCL devices used by hashcat on given node */
-  for (unsigned long long speed : device_speeds_) {
-    speed_sum += speed;
-  }
-
-  return speed_sum;
 }
 
 uint64_t TaskBenchmark::getBenchmarkedSpeed() {
