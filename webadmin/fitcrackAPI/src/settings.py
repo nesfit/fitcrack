@@ -8,7 +8,7 @@ import os
 # HashCat settings
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 HASHCAT_EXECUTABLE = 'hashcat.bin'
-HASHCAT_DIR = ROOT_DIR + '/../hashcat-6.2.5/'
+HASHCAT_DIR = ROOT_DIR + '/../hashcat/'
 HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
 PWD_DIST_PATH =  ROOT_DIR + '/../pwd_dist/pwd_dist.bin'
