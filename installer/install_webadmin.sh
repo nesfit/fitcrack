@@ -186,6 +186,7 @@ else
   echo "<VirtualHost *:$BACKEND_PORT>" >> $BE_CONFIG_FILE
   echo "  WSGIDaemonProcess fitcrack user=$APACHE_USER group=$APACHE_USER threads=5" >> $BE_CONFIG_FILE
   echo "  WSGIScriptAlias / $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/wsgi.py" >> $BE_CONFIG_FILE
+  echo "  WSGIPassAuthorization On" >> $BE_CONFIG_FILE
   echo "  <Directory $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/>" >> $BE_CONFIG_FILE
   echo "    WSGIProcessGroup fitcrack" >> $BE_CONFIG_FILE
   echo "    WSGIApplicationGroup %{GLOBAL}" >> $BE_CONFIG_FILE
