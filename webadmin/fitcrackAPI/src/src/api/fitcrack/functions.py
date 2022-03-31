@@ -26,7 +26,7 @@ def shellExec(cmd, abortOnError=True, cwd=None, getOnlyReturnCode=False, getRetu
     """
 
     try:
-        print(cmd)
+        print(cmd, file=sys.stderr)
         process = subprocess.Popen(cmd, shell=True,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
@@ -36,7 +36,7 @@ def shellExec(cmd, abortOnError=True, cwd=None, getOnlyReturnCode=False, getRetu
         out, err = process.communicate()
         rtnCode = process.returncode
     except subprocess.CalledProcessError as err:
-        print('SHELL ERROR:', err)
+        print('SHELL ERROR:', err, file=sys.stderr)
         if abortOnError:
             abort(400, 'Error with shell execution ' + err.decode('utf-8'))
         return rtnCode
@@ -178,7 +178,6 @@ def directory_tree (path):
         # go to current root in dict
         root = listing
         for d in nest_in:
-            print('root is now', root['name'])
             for child in root['children']:
                 if child['name'] == d:
                     root = child

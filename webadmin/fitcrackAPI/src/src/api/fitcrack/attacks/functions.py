@@ -69,7 +69,6 @@ def compute_prince_keyspace(attackSettings):
         run_cmd.append("--elem-cnt-max=" + str(attackSettings['max_elem_in_chain']))
     run_cmd.append("--keyspace")
     compute_keyspace_command = ' '.join(run_cmd)
-    print(compute_keyspace_command)
     try:
         return int(shellExec(compute_keyspace_command))
     except Exception:

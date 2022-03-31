@@ -6,6 +6,7 @@
 import logging
 import jwt
 import settings
+import sys
 
 from flask import request, current_app
 from flask_login import login_user, logout_user, current_user, LoginManager
@@ -39,6 +40,7 @@ def load_user_from_request(request):
         return None
     auth_headers = request.headers.get('Authorization', '').split()
     if len(auth_headers) != 2:
+        print('No Authorization header found', file=sys.stderr)
         return None
     try:
         token = auth_headers[1]
@@ -47,10 +49,10 @@ def load_user_from_request(request):
         if user:
             return user
     except jwt.ExpiredSignatureError:
-        print('EXPIRED TOKEN')
+        print('JWT is expired', file=sys.stderr)
         return None
     except (jwt.InvalidTokenError, Exception) as e:
-        print(e)
+        print('Invalid JWT error:', e, file=sys.stderr)
         return None
     return None
 
