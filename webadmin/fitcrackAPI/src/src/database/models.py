@@ -15,7 +15,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from src.api.fitcrack.attacks.hashtypes import getHashById
+from src.api.fitcrack.attacks.hashinfo import getHashNameById
 from src.api.fitcrack.functions import getStringBetween, get_batch_status
 from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
     job_status_text_info_to_code_dict, status_to_code
@@ -293,7 +293,7 @@ class FcJob(Base):
 
     @hybrid_property
     def hash_type_name(self):
-        return getHashById(str(self.hash_type))['name']
+        return getHashNameById(self.hash_type)
 
     @hybrid_property
     def workunit_sum_time_str(self):
