@@ -67,6 +67,10 @@ int ProcessLinux::getExitCode() const {
   return WEXITSTATUS(status_);
 }
 
+bool ProcessLinux::kill() const {
+  return ::kill(process_identifier_, SIGTERM) == 0;
+}
+
 int ProcessLinux::getProcessIdentifier() const {
   return process_identifier_;
 }

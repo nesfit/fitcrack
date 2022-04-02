@@ -9,15 +9,15 @@
 #include "TaskBase.hpp"
 #include "TaskBenchmark.hpp"
 
+#include <cinttypes>
+
 /** Class representing benchmark all class, runs multiple TaskBenchmark*/
 class TaskBenchmarkAll: public TaskBase {
 private:
 
-	std::map<std::string, uint64_t> m_results; ///< Results for each hash
-	std::vector<std::string> m_modes;
-	std::string m_lastErrString;
-	double m_totalExecutionTime;
-	NamedMutex m_hcMutex;
+	std::map<unsigned, uint64_t> results_; ///< Results for each hash
+	double total_exec_time_;
+	NamedMutex hashcat_mutex_;
 
 public:
 

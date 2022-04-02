@@ -77,6 +77,12 @@ class ProcessBase {
         virtual int getExitCode() const = 0;
 
         /**
+         * @brief   Kill child process
+         * @return  Success or failure
+         */
+        virtual bool kill() const = 0;
+
+        /**
          * @brief   Makes readable string of command to be executed out of arguments_ vector
          * @return  Excutable command
          */

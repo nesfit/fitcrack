@@ -78,30 +78,33 @@ void TaskBase::reportProgress() {
 
     trickle_xml.addElement("workunit_name", workunit_name_);
     trickle_xml.addElement("progress", percent_done);
-    trickle_xml.addElement("speed", getTotalSpeed());
 
-    std::string device_ids;
-    for (const auto &device : status_info_.at("devices"))
-      device_ids += std::to_string((int)device.at("device_id")) + ",";
+    if (!status_info_.empty()) {
+      trickle_xml.addElement("speed", getTotalSpeed());
 
-    if (!device_ids.empty())
-      device_ids.pop_back(); // remove last ','
+      std::string device_ids;
+      for (const auto &device : status_info_.at("devices"))
+        device_ids += std::to_string((int)device.at("device_id")) + ",";
 
-    trickle_xml.addElement("device_ids", device_ids);
+      if (!device_ids.empty())
+        device_ids.pop_back(); // remove last ','
 
-    for (const auto &device : status_info_.at("devices")) {
-      std::string id = std::to_string((int)device.at("device_id"));
-      std::string name = device.at("device_name");
-      std::string type = device.at("device_type");
-      uint64_t speed = device.at("speed");
-      uint64_t temp = device.at("temp");
-      uint64_t util = device.at("util");
+      trickle_xml.addElement("device_ids", device_ids);
 
-      trickle_xml.addElement("device_" + id + "_name", name);
-      trickle_xml.addElement("device_" + id + "_type", type);
-      trickle_xml.addElement("device_" + id + "_speed", speed);
-      trickle_xml.addElement("device_" + id + "_temp", temp);
-      trickle_xml.addElement("device_" + id + "_util", util);
+      for (const auto &device : status_info_.at("devices")) {
+        std::string id = std::to_string((int)device.at("device_id"));
+        std::string name = device.at("device_name");
+        std::string type = device.at("device_type");
+        uint64_t speed = device.at("speed");
+        uint64_t temp = device.at("temp");
+        uint64_t util = device.at("util");
+
+        trickle_xml.addElement("device_" + id + "_name", name);
+        trickle_xml.addElement("device_" + id + "_type", type);
+        trickle_xml.addElement("device_" + id + "_speed", speed);
+        trickle_xml.addElement("device_" + id + "_temp", temp);
+        trickle_xml.addElement("device_" + id + "_util", util);
+      }
     }
 
     const std::string &trickle_message = trickle_xml.getXml();
@@ -149,6 +152,9 @@ void TaskBase::saveResult() {
 }
 
 uint64_t TaskBase::getTotalSpeed() {
+  if (!status_info_.contains("devices"))
+    return 0;
+
   uint64_t speed_sum = 0;
   for (const auto &device : status_info_.at("devices")) {
     uint64_t device_speed = device.at("speed");

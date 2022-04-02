@@ -96,6 +96,10 @@ int ProcessWindows::getExitCode() const {
 return (int)exit_code;
 }
 
+bool ProcessWindows::kill() const {
+  return TerminateProcess(process_information_.hProcess, 1);
+}
+
 bool ProcessWindows::isRunning() {
   DWORD exit_code;
   GetExitCodeProcess(process_information_.hProcess, &exit_code);

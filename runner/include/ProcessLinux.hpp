@@ -61,6 +61,12 @@ class ProcessLinux : public ProcessBase {
         int getExitCode() const;
 
         /**
+         * @brief   Kill child process
+         * @return  Success or failure
+         */
+        bool kill() const;
+
+        /**
          * @brief   Overrides virtual getProcessInformation(), is usefull for determining
          *	        whether code is executed by parrent or child
          * @return  ProcessBase ID

@@ -53,6 +53,12 @@ class ProcessWindows : public ProcessBase {
       int getExitCode() const;
 
       /**
+       * @brief   Kill child process
+       * @return  Success or failure
+       */
+      bool kill() const;
+
+      /**
        * @brief   Checks if process is still running
        *
        */
