@@ -86,10 +86,10 @@ void TaskBenchmarkAll::progress() {
     int filled_vars =
         sscanf(line.c_str(), "%d:%u:%d:%d:%f:%" PRIu64, &device_id, &hash_mode,
                &corespeed_dev, &memoryspeed_dev, &exec_msec_dev, &speed);
-    if (filled_vars == 6) {
-      results_[hash_mode] += speed;
-    }
+    if (filled_vars != 6)
+      continue;
 
+    results_[hash_mode] += speed;
     if (benchmarked_modes.insert(hash_mode).second) { // first time
       actualizeComputedHashes(1);
       reportProgress();
