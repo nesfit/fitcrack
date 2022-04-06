@@ -241,7 +241,15 @@ def computeCrackingTime(data):
     # -1 is indicator that no hash type was selected in webadmin
     if data['hash_type_code'] != -1 and len(data['boinc_host_ids']) > 0:
         hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == data['hash_type_code']). \
+            filter(FcBenchmark.attack_mode == attackSettings['attack_mode']). \
             filter(FcBenchmark.boinc_host_id.in_(data['boinc_host_ids'])).all()
+
+        if not hosts:
+            # We were unable to find benchmark data for (host, job_hash_type, job_attack_mode).
+            # Instead of no data, try to use less precise data for (host, job_hash_type, X)
+            # where X is any attack mode
+            hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == data['hash_type_code']). \
+                filter(FcBenchmark.boinc_host_id.in_(data['boinc_host_ids'])).all()
 
         for host in hosts:
             total_power += host.power

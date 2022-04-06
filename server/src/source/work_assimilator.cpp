@@ -702,6 +702,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 /** Update fc_benchmark power */
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT hash_type FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
                 uint64_t hash_type = get_num_from_mysql(buf);
+                std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_mode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
+                uint8_t attack_mode = get_num_from_mysql(buf);
                 std::map<uint32_t, uint64_t> speed_map;
 
                 if (find_benchmark_results(speed_map, boinc_host_id) && speed_map.find(hash_type) != speed_map.end())
@@ -716,8 +718,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 {
                     /** Entry does not exist, create it */
                     std::cerr << __LINE__ << " - Adding new entry to fc_benchmark: " << hash_type << ":" << original_power << std::endl;
-                    std::snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `%s` (`boinc_host_id`,`hash_type`,`power`) VALUES (%" PRIu64 ", %" PRIu64 ", %llu) ;",
-                        mysql_table_benchmark.c_str(), boinc_host_id, hash_type, original_power);
+                    std::snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `%s` (`boinc_host_id`,`hash_type`,`attack_mode`,`power`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64 ", %" PRIu64 ") ;",
+                        mysql_table_benchmark.c_str(), boinc_host_id, hash_type, attack_mode, original_power);
                     update_mysql(buf);
                 }
 
@@ -1064,8 +1066,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                         {
                             /** Entry does not exist, create it */
                             std::cerr << __LINE__ << " - Adding new entry to fc_benchmark: " << hash_type << ":" << power << std::endl;
-                            std::snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `%s` (`boinc_host_id`,`hash_type`,`power`) VALUES (%" PRIu64 ", %u, %llu) ;",
-                                mysql_table_benchmark.c_str(), boinc_host_id, hash_type, power);
+                            std::snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `%s` (`boinc_host_id`,`hash_type`,`attack_mode`,`power`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64 ", %" PRIu64 ") ;",
+                                mysql_table_benchmark.c_str(), boinc_host_id, hash_type, 3 /* consider hashcat benchmark as a brute force attack */, power);
                             update_mysql(buf);
                         }
                     }

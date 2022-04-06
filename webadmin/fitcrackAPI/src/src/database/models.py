@@ -29,7 +29,8 @@ class FcBenchmark(Base):
 
     id = Column(Integer, primary_key=True)
     boinc_host_id = Column(BigInteger, nullable=False)
-    hash_type = Column(Integer)
+    hash_type = Column(Integer, nullable=False)
+    attack_mode = Column(Integer, nullable=False)
     power = Column(BigInteger, nullable=False, server_default=text("'0'"))
     last_update = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
@@ -813,7 +814,7 @@ class FcEncryptedFile(Base):
 
     @hybrid_property
     def hash_type_name(self):
-        return getHashById(str(self.hash_type))['name']
+        return getHashNameById(self.hash_type)
 
 
 class FcHostStatus(Base):
@@ -874,7 +875,7 @@ class FcHash(Base):
 
     @hybrid_property
     def hash_type_name(self):
-        return getHashById(str(self.hash_type))['name']
+        return getHashNameById(self.hash_type)
 
 
 class Result(Base):

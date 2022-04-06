@@ -91,7 +91,8 @@ verifyHashes_model = api.model('Verified hashes', {
 
 host_cracking_time = api.model('host cracking time', {
     'boinc_host_id': fields.Integer(required=True, default=None),
-    'hash_type': fields.String(requireed=True, default=None),
+    'hash_type': fields.Integer(required=True, default=None),
+    'attack_mode': fields.Integer(required=True, default=None),
     'last_update': fields.DateTime(required=True, default=None),
     'power': fields.Integer(required=True, default=0)
 })
