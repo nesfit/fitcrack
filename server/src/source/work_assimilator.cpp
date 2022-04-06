@@ -36,7 +36,7 @@
 /**********************************/
 
 #include <vector>
-#include <map>
+#include <set>
 #include <string>
 #include <sstream>
 #include <cstdlib>
@@ -141,17 +141,9 @@ class MysqlWorkunit
         uint64_t m_id;
         uint64_t m_job_id;
         uint64_t m_workunit_id;
-        uint64_t m_host_id;
-        uint64_t m_boinc_host_id;
 
-        uint64_t m_start_index;
-        uint64_t m_start_index_2;
-        uint64_t m_hc_keyspace;
-        uint64_t m_mask_id;
-        bool     m_duplicated;
-        uint64_t m_duplicate;
-        bool     m_retry;
-        bool     m_finished;
+        // add more if need
+        // SYNC with DB schema and models.py!
 };
 
 
@@ -164,16 +156,6 @@ MysqlWorkunit::MysqlWorkunit(MYSQL_ROW row)
     this->m_id = convert_str_to_number<uint64_t>(row[0]);
     this->m_job_id = convert_str_to_number<uint64_t>(row[1]);
     this->m_workunit_id = convert_str_to_number<uint64_t>(row[2]);
-    this->m_host_id = convert_str_to_number<uint64_t>(row[3]);
-    this->m_boinc_host_id = convert_str_to_number<uint64_t>(row[4]);
-    this->m_start_index = convert_str_to_number<uint64_t>(row[5]);
-    this->m_start_index_2 = convert_str_to_number<uint64_t>(row[6]);
-    this->m_hc_keyspace = convert_str_to_number<uint64_t>(row[7]);
-    this->m_mask_id = convert_str_to_number<uint64_t>(row[9]);
-    this->m_duplicated = (row[11][0] == '0') ? true: false;
-    this->m_duplicate = convert_str_to_number<uint64_t>(row[12]);
-    this->m_retry = (row[15][0] == '0') ? true: false;
-    this->m_finished = (row[16][0] == '0') ? true: false;
 }
 
 
@@ -294,9 +276,9 @@ void assimilate_handler_usage()
     //);
 }
 
-vector<MysqlWorkunit *> find_workunits2(uint64_t job_id, std::string query)
+vector<MysqlWorkunit *> find_workunits(uint64_t job_id, std::string query)
 {
-    log_messages.printf(MSG_DEBUG, "find_workunits2: job_id-%" PRIu64 ", query-%s\n", job_id, query.c_str());
+    log_messages.printf(MSG_DEBUG, "find_workunits: job_id-%" PRIu64 ", query-%s\n", job_id, query.c_str());
 
     vector<MysqlWorkunit *> result;
 
@@ -327,63 +309,15 @@ vector<MysqlWorkunit *> find_workunits2(uint64_t job_id, std::string query)
 
     mysql_free_result(rp);
 
-    log_messages.printf(MSG_DEBUG, "find_workunits2-result: %lu workunits\n", result.size());
+    log_messages.printf(MSG_DEBUG, "find_workunits-result: %lu workunits\n", result.size());
 
     return result;
 }
 
 
-// TODO: NOT USBALE
-vector<MysqlWorkunit *> find_workunit_duplicates2(uint64_t job_id, uint64_t host_id)
+void cancel_workunits(vector<MysqlWorkunit *> workunits)
 {
-    log_messages.printf(MSG_DEBUG, "find_workunit_duplicates2: job_id-%" PRIu64 ", host_id-%" PRIu64 "\n", job_id, host_id);
-
-    vector<MysqlWorkunit *> result, temp;
-    char buf[SQL_BUF_SIZE];
-
-    std::snprintf(buf, SQL_BUF_SIZE, "SELECT * FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_workunit.c_str(), host_id);
-    log_messages.printf(MSG_DEBUG, "find_workunit_duplicates2-query: %s\n", buf);
-
-    update_mysql(buf);
-
-    MYSQL_RES* rp;
-    rp = mysql_store_result(boinc_db.mysql);
-    if (!rp)
-    {
-        printf ("Problem with db\n");
-        boinc_db.close();
-        exit(1);
-    }
-
-    MYSQL_ROW row;
-    while ((row = mysql_fetch_row(rp)))
-    {
-        result.push_back(new MysqlWorkunit(row));
-    }
-
-    mysql_free_result(rp);
-
-    log_messages.printf(MSG_DEBUG, "find_workunit_duplicates2-result init: %lu workunits\n", result.size());
-
-    for (unsigned long int index = 0; index < result.size(); ++index)
-    {
-        log_messages.printf(MSG_DEBUG, "find_workunit_duplicates2-duplicate1: %lu : %lu workunits\n", index, result.size());
-
-        std::snprintf(buf, SQL_BUF_SIZE, "`duplicate`='%" PRIu64 "'", result[index]->m_id);
-        temp = find_workunits2(job_id, buf);
-
-        result.insert(result.end(), temp.begin(), temp.end());
-
-        log_messages.printf(MSG_DEBUG, "find_workunit_duplicates2-duplicate2: %lu : %lu workunits\n", index, result.size());
-    }
-
-    return result;
-}
-
-
-void cancel_workunits2(vector<MysqlWorkunit *> workunits)
-{
-    log_messages.printf(MSG_DEBUG, "cancel_workunits2: %lu workunits\n", workunits.size());
+    log_messages.printf(MSG_DEBUG, "cancel_workunits: %lu workunits\n", workunits.size());
 
     std::vector<MysqlWorkunit *>::iterator workunit;
 
@@ -479,14 +413,16 @@ void update_power(uint64_t host_id, uint64_t count, double elapsed_time)
 
 /**
  * @brief Search fc_benchmark table for all entries of current host
- * @param speed_map out Returned map of speeds in format <hash_type, power>
+ * @param benchmarked_hashtypes out Returned set of benchmarked hash types
+ * @param benchmarked_attackmodes out Returned set of benchmarked attack modes
  * @param host_id in Host ID used for searching
- * @return True is map is non-empty, False otherwise
+ * @return True if any benchmark results found, False otherwise
  */
-bool find_benchmark_results(std::map<uint32_t, uint64_t> & speed_map, uint64_t boinc_host_id)
+bool find_benchmark_results(std::set<uint32_t> & benchmarked_hashtypes, std::set<uint32_t> & benchmarked_attackmodes, uint64_t boinc_host_id)
 {
     uint64_t power;
     uint32_t hash_type;
+    uint32_t attack_mode;
 
     char buf[SQL_BUF_SIZE];
 
@@ -508,13 +444,15 @@ bool find_benchmark_results(std::map<uint32_t, uint64_t> & speed_map, uint64_t b
     while ((row = mysql_fetch_row(rp)))
     {
         hash_type = convert_str_to_number<uint32_t>(row[2]);
-        power = convert_str_to_number<uint64_t>(row[3]);
-        speed_map.insert(std::pair<uint32_t, uint64_t>(hash_type, power));
+        attack_mode = convert_str_to_number<uint32_t>(row[3]);
+        power = convert_str_to_number<uint64_t>(row[4]);
+        benchmarked_hashtypes.insert(hash_type);
+        benchmarked_attackmodes.insert(attack_mode);
     }
 
     mysql_free_result(rp);
 
-    if (speed_map.empty())
+    if (benchmarked_hashtypes.empty())
         return false;
     return true;
 }
@@ -701,26 +639,62 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                 /** Update fc_benchmark power */
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT hash_type FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-                uint64_t hash_type = get_num_from_mysql(buf);
+                uint32_t hash_type = get_num_from_mysql(buf);
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_mode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
-                uint8_t attack_mode = get_num_from_mysql(buf);
-                std::map<uint32_t, uint64_t> speed_map;
+                uint32_t attack_mode = get_num_from_mysql(buf);
+                std::set<uint32_t> benchmarked_hashtypes;
+                std::set<uint32_t> benchmarked_attackmodes;
 
-                if (find_benchmark_results(speed_map, boinc_host_id) && speed_map.find(hash_type) != speed_map.end())
-                {
-                    /** Entry already exist, we must update it */
-                    std::cerr << __LINE__ << " - Updating entry in fc_benchmark: " << hash_type << ":" << original_power << std::endl;
-                    std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET `power` = %llu, `last_update` = now() WHERE `boinc_host_id` = %" PRIu64 " AND `hash_type` = %" PRIu64 " LIMIT 1 ;",
-                        mysql_table_benchmark.c_str(), original_power, boinc_host_id, hash_type);
+                if (find_benchmark_results(benchmarked_hashtypes, benchmarked_attackmodes, boinc_host_id)) {
+                  if (benchmarked_hashtypes.find(hash_type) != benchmarked_hashtypes.end()) {
+                    /** Entry with this hash type already exist */
+                    if (benchmarked_attackmodes.find(attack_mode) != benchmarked_attackmodes.end()) {
+                      /** Entry with this hash type and this attack mode already exists, update it */
+                      std::snprintf(
+                          buf, SQL_BUF_SIZE,
+                          "UPDATE `%s` SET `power` = %llu, `last_update` = "
+                          "now() "
+                          "WHERE `boinc_host_id` = %" PRIu64
+                          " AND `hash_type` = %" PRIu64
+                          " AND `attack_mode` = %" PRIu64 " LIMIT 1 ;",
+                          mysql_table_benchmark.c_str(), original_power,
+                          boinc_host_id, hash_type, attack_mode);
+                      update_mysql(buf);
+                    } else {
+                      /* Found entry with this hash type but we have NO matching
+                       * attack mode, so create new entry */
+                      std::snprintf(
+                          buf, SQL_BUF_SIZE,
+                          "INSERT INTO `%s` "
+                          "(`boinc_host_id`,`hash_type`,`attack_mode`,`"
+                          "power`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64
+                          ", %" PRIu64 ") ;",
+                          mysql_table_benchmark.c_str(), boinc_host_id,
+                          hash_type, attack_mode, original_power);
+                      update_mysql(buf);
+                    }
+                  } else {
+                    /** Entry with this hash type does NOT exist, create it */
+                    std::snprintf(buf, SQL_BUF_SIZE,
+                                  "INSERT INTO `%s` "
+                                  "(`boinc_host_id`,`hash_type`,`attack_mode`,`"
+                                  "power`) VALUES (%" PRIu64 ", %" PRIu64
+                                  ", %" PRIu64 ", %" PRIu64 ") ;",
+                                  mysql_table_benchmark.c_str(), boinc_host_id,
+                                  hash_type, attack_mode, original_power);
                     update_mysql(buf);
-                }
-                else
-                {
-                    /** Entry does not exist, create it */
-                    std::cerr << __LINE__ << " - Adding new entry to fc_benchmark: " << hash_type << ":" << original_power << std::endl;
-                    std::snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `%s` (`boinc_host_id`,`hash_type`,`attack_mode`,`power`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64 ", %" PRIu64 ") ;",
-                        mysql_table_benchmark.c_str(), boinc_host_id, hash_type, attack_mode, original_power);
-                    update_mysql(buf);
+                  }
+                } else {
+                  /** We have no benchmark results for this host, insert first
+                   * entry */
+                  std::snprintf(buf, SQL_BUF_SIZE,
+                                "INSERT INTO `%s` "
+                                "(`boinc_host_id`,`hash_type`,`attack_mode`,`"
+                                "power`) VALUES (%" PRIu64 ", %" PRIu64
+                                ", %" PRIu64 ", %" PRIu64 ") ;",
+                                mysql_table_benchmark.c_str(), boinc_host_id,
+                                hash_type, attack_mode, original_power);
+                  update_mysql(buf);
                 }
 
                 /** Update fc_host power */
@@ -910,8 +884,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                     update_mysql(buf);
 
                     std::cerr << __LINE__ << " - Canceling all workunits for job_id " << job_id << std::endl;
-                    workunits = find_workunits2(job_id, "");
-                    cancel_workunits2(workunits);
+                    workunits = find_workunits(job_id, "");
+                    cancel_workunits(workunits);
 
                     finish_workunits(workunits);
 
@@ -986,8 +960,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 std::snprintf(buf, SQL_BUF_SIZE, "`host_id`='%" PRIu64 "'", host_id);
 
                 std::cerr << __LINE__ << " - Canceling all workunits for host_id " << host_id << " with job_id" << job_id << std::endl;
-                workunits = find_workunits2(job_id, buf);
-                cancel_workunits2(workunits);
+                workunits = find_workunits(job_id, buf);
+                cancel_workunits(workunits);
 
                 std::cerr << __LINE__ << " - Adding them to Retry and deleting them from Workunits" << std::endl;
                 std::vector<MysqlWorkunit *>::iterator workunitIt;
@@ -1042,34 +1016,63 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 update_mysql(buf);
 
                 /** Read the results */
-                std::map<uint32_t, uint64_t> speed_map; /** Use map as fastest STL container for find */
+                std::set<uint32_t> benchmarked_hashtypes; /** Use set as fastest STL container for find */
+                std::set<uint32_t> benchmarked_attackmodes; /** Note: Currently unused below by design */
+                const uint32_t attack_mode = 3; /** Consider benchmark as a brute force attack */
                 uint32_t hash_type;
 
-                if (find_benchmark_results(speed_map, boinc_host_id))
+                if (find_benchmark_results(benchmarked_hashtypes, benchmarked_attackmodes, boinc_host_id))
                 {
                     /** benchmark was already run in the past */
                     while (std::fscanf(f,"%u:%llu\n", &hash_type, &power) == 2)
                     {
-                        auto it = speed_map.find(hash_type);
-                        if (it != speed_map.end())
-                        {
-                            /** Entry already exist, we must update it */
-                            std::cerr << __LINE__ << " - Updating entry in fc_benchmark: " << hash_type << ":" << power << std::endl;
-                            std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET `power` = %llu, `last_update` = now() WHERE `boinc_host_id` = %" PRIu64 " AND `hash_type` = %u LIMIT 1 ;",
-                                mysql_table_benchmark.c_str(), power, boinc_host_id, hash_type);
-                            update_mysql(buf);
+                      auto it = benchmarked_hashtypes.find(hash_type);
+                      if (it != benchmarked_hashtypes.end()) {
+                        /** Entry with this hash type already exist */
+                        if (benchmarked_attackmodes.find(attack_mode) !=
+                            benchmarked_attackmodes.end()) {
+                          /** Entry with this hash type and this attack mode
+                           * already exists, update it */
 
-                            /** Remove updated entry for near-constant search time */
-                            speed_map.erase(it);
+                          std::snprintf(
+                              buf, SQL_BUF_SIZE,
+                              "UPDATE `%s` SET `power` = %llu, `last_update` = "
+                              "now() WHERE `boinc_host_id` = %" PRIu64
+                              " AND `hash_type` = %" PRIu64
+                              " AND `attack_mode` = %" PRIu64 " LIMIT 1 ;",
+                              mysql_table_benchmark.c_str(), power,
+                              boinc_host_id, attack_mode, hash_type);
+                          update_mysql(buf);
+                        } else {
+                          /* Found entry with this hash type but we have NO matching
+                           * attack mode, so create new entry */
+                          std::snprintf(buf, SQL_BUF_SIZE,
+                                        "INSERT INTO `%s` "
+                                        "(`boinc_host_id`,`hash_type`,`attack_"
+                                        "mode`,`power`"
+                                        ") VALUES (%" PRIu64 ", %" PRIu64
+                                        ", %" PRIu64 ", %" PRIu64 ") ;",
+                                        mysql_table_benchmark.c_str(),
+                                        boinc_host_id, hash_type, attack_mode,
+                                        power);
+                          update_mysql(buf);
                         }
-                        else
-                        {
-                            /** Entry does not exist, create it */
-                            std::cerr << __LINE__ << " - Adding new entry to fc_benchmark: " << hash_type << ":" << power << std::endl;
-                            std::snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `%s` (`boinc_host_id`,`hash_type`,`attack_mode`,`power`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64 ", %" PRIu64 ") ;",
-                                mysql_table_benchmark.c_str(), boinc_host_id, hash_type, 3 /* consider hashcat benchmark as a brute force attack */, power);
-                            update_mysql(buf);
-                        }
+
+                        /** Remove updated entry for near-constant search time
+                         */
+                        benchmarked_hashtypes.erase(it);
+                      } else {
+                        /** Entry does NOT exist, create it */
+                        std::snprintf(
+                            buf, SQL_BUF_SIZE,
+                            "INSERT INTO `%s` "
+                            "(`boinc_host_id`,`hash_type`,`attack_mode`,`power`"
+                            ") VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64
+                            ", %" PRIu64 ") ;",
+                            mysql_table_benchmark.c_str(), boinc_host_id,
+                            hash_type, attack_mode, power);
+                        update_mysql(buf);
+                      }
                     }
                 }
                 else
@@ -1077,10 +1080,15 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                     /** No results for this host yet */
                     while (std::fscanf(f,"%u:%llu\n", &hash_type, &power) == 2)
                     {
-                        std::cerr << __LINE__ << " - Adding new entry to fc_benchmark: " << hash_type << ":" << power << std::endl;
-                        std::snprintf(buf, SQL_BUF_SIZE, "INSERT INTO `%s` (`boinc_host_id`,`hash_type`,`power`) VALUES (%" PRIu64 ", %u, %llu) ;",
-                            mysql_table_benchmark.c_str(), boinc_host_id, hash_type, power);
-                        update_mysql(buf);
+                      std::snprintf(
+                          buf, SQL_BUF_SIZE,
+                          "INSERT INTO `%s` "
+                          "(`boinc_host_id`,`hash_type`,`attack_mode`,`power`"
+                          ") VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64
+                          ", %" PRIu64 ") ;",
+                          mysql_table_benchmark.c_str(), boinc_host_id,
+                          hash_type, attack_mode, power);
+                      update_mysql(buf);
                     }
                 }
 

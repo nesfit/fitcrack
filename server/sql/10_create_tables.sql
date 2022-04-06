@@ -16,8 +16,8 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `fc_benchmark` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `boinc_host_id` bigint(20) unsigned NOT NULL,
-  `hash_type` int(11) unsigned NOT NULL,
-  `attack_mode` tinyint(3) unsigned NOT NULL,
+  `hash_type` int(11) unsigned DEFAULT NULL,
+  `attack_mode` tinyint(3) unsigned DEFAULT NULL,
   `power` bigint(20) unsigned NOT NULL DEFAULT '0',
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

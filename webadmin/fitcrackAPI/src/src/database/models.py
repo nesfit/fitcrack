@@ -29,8 +29,8 @@ class FcBenchmark(Base):
 
     id = Column(Integer, primary_key=True)
     boinc_host_id = Column(BigInteger, nullable=False)
-    hash_type = Column(Integer, nullable=False)
-    attack_mode = Column(Integer, nullable=False)
+    hash_type = Column(Integer) # 0 - MD5
+    attack_mode = Column(Integer) # 0 - Dict attack
     power = Column(BigInteger, nullable=False, server_default=text("'0'"))
     last_update = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
