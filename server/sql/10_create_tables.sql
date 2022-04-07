@@ -107,6 +107,36 @@ CREATE TABLE IF NOT EXISTS `fc_host` (
 -- --------------------------------------------------------
 
 --
+-- Table definition for `fc_device`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_device` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `boinc_host_id` bigint(20) unsigned NOT NULL,
+  `hc_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table definition for `fc_device_info`
+--
+
+CREATE TABLE IF NOT EXISTS `fc_device_info` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `device_id` bigint(20) unsigned NOT NULL,
+  `speed` bigint(20) unsigned NOT NULL,
+  `temperature` int(11) unsigned NOT NULL,
+  `utilization` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table definition for `fc_host_activity`
 --
 
