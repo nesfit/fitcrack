@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include <cmath>
+#include <cinttypes>
+#include <map>
 #include "util.h"
 #include "sched_msgs.h"
 #include "trickle_handler.h"
@@ -24,6 +26,13 @@
 
 const unsigned int SQL_BUF_SIZE = 1024;
 
+struct Device {
+  std::string name;
+  std::string type;
+  std::string speed;
+  std::string temp;
+  std::string util;
+};
 
 int handle_trickle_init(int argc, char** argv)
 {
@@ -40,11 +49,13 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     /** Define local variables */
     bool got_progress = false;
     bool got_wu_name = false;
-    bool got_speed = false;
+    bool got_total_speed = false;
 
-    double progress, speed;
+    double progress;
     char buf[SQL_BUF_SIZE];
-    char wu_name[SQL_BUF_SIZE];
+    std::string wu_name;
+    std::string total_speed;
+    std::map<uint32_t, Device> devices;
 
     std::cerr << std::endl;
     log_messages.printf(MSG_NORMAL,
@@ -59,7 +70,7 @@ int handle_trickle(MSG_FROM_HOST& mfh)
     /** Parse XML message */
     while (!xp.get_tag())
     {
-        if (xp.parse_str("workunit_name", wu_name, SQL_BUF_SIZE))
+        if (xp.parse_string("workunit_name", wu_name))
         {
             std::cerr << "Succesfully parsed workunit_name: " << wu_name << std::endl;
             got_wu_name = true;
@@ -79,24 +90,65 @@ int handle_trickle(MSG_FROM_HOST& mfh)
             continue;
         }
 
-        if (xp.parse_double("speed", speed))
+        if (xp.parse_string("total_speed", total_speed))
         {
-            if (std::isnan(speed))
-            {
-                std::cerr << "ERROR: Speed cannot be nan." << std::endl;
-                return 1;
-            }
-
-            std::cerr << "Succesfully parsed speed: " << speed << std::endl;
-            got_speed = true;
+            std::cerr << "Succesfully parsed total speed: " << total_speed << std::endl;
+            got_total_speed = true;
             continue;
+        }
+
+        char s1[SQL_BUF_SIZE];
+        char s2[SQL_BUF_SIZE];
+        char s3[SQL_BUF_SIZE];
+        if (sscanf(xp.parsed_tag, "%[^_]_%[^_]_%s", s1, s2, s3) == 3) {
+          if (strcmp(s1, "device") != 0)
+            continue;
+          uint32_t device_id = strtoul(s2, NULL, 10);
+          std::string tag = std::string(s3);
+          if (tag == "name") {
+            std::string device_name;
+            if (xp.parse_string(xp.parsed_tag, device_name)) {
+              devices[device_id].name = device_name;
+              continue;
+            }
+          } else if (tag == "type") {
+            std::string device_type;
+            if (xp.parse_string(xp.parsed_tag, device_type)) {
+              devices[device_id].type = device_type;
+              continue;
+            }
+          } else if (tag == "speed") {
+            std::string device_speed;
+            if (xp.parse_string(xp.parsed_tag, device_speed)) {
+              devices[device_id].speed = device_speed;
+              continue;
+            }
+          } else if (tag == "temp") {
+            std::string device_temp;
+            if (xp.parse_string(xp.parsed_tag, device_temp)) {
+              devices[device_id].temp = device_temp;
+              continue;
+            }
+          } else if (tag == "util") {
+            std::string device_util;
+            if (xp.parse_string(xp.parsed_tag, device_util)) {
+              devices[device_id].util = device_util;
+              continue;
+            }
+          }
         }
 
         //std::cerr << "WARNING: Unexpected tag: " << xp.parsed_tag << std::endl;
     }
 
+    std::cerr << " DEV ---- \n";
+    for (auto &d : devices)
+      std::cerr << d.first << " " << d.second.name << " " << d.second.type
+                << " " << d.second.speed << " " << d.second.temp << " "
+                << d.second.util << "\n";
+    std::cerr << " DEV ---- \n";
     /** Check values */
-    if (!got_progress || !got_wu_name || !got_speed)
+    if (!got_progress || !got_wu_name || !got_total_speed)
     {
         std::cerr << "ERROR: Could not parse all mandatory data." << std::endl;
         return 1;
@@ -110,7 +162,7 @@ int handle_trickle(MSG_FROM_HOST& mfh)
 
     /** Update workunit progress in DB */
     snprintf(buf, SQL_BUF_SIZE, "UPDATE `fc_workunit` SET `progress` = %f WHERE `progress` < %f AND `workunit_id` IN (SELECT id FROM workunit WHERE name = '%s') LIMIT 1 ;",
-            progress, progress, wu_name);
+            progress, progress, wu_name.c_str());
 
     int retval = boinc_db.do_query(buf);
     if (retval)
@@ -120,14 +172,14 @@ int handle_trickle(MSG_FROM_HOST& mfh)
         exit(1);
     }
 
-    char speed_buf[1024];
-    snprintf(speed_buf, SQL_BUF_SIZE, "UPDATE `fc_workunit` SET `speed` = %f WHERE `workunit_id` IN (SELECT id FROM workunit WHERE name = '%s') LIMIT 1 ;",
-            speed, wu_name);
+    char total_speed_buf[1024];
+    snprintf(total_speed_buf, SQL_BUF_SIZE, "UPDATE `fc_workunit` SET `speed` = %" PRIu64 " WHERE `workunit_id` IN (SELECT id FROM workunit WHERE name = '%s') LIMIT 1 ;",
+            std::stoull(total_speed), wu_name.c_str());
 
-    retval = boinc_db.do_query(speed_buf);
+    retval = boinc_db.do_query(total_speed_buf);
     if (retval)
     {
-        std::cerr << "Problem with speed DB query: " << buf << "\nShutting down now." << std::endl;
+        std::cerr << "Problem with total speed DB query: " << buf << "\nShutting down now." << std::endl;
         boinc_db.close();
         exit(1);
     }

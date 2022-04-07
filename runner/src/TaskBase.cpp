@@ -80,16 +80,7 @@ void TaskBase::reportProgress() {
     trickle_xml.addElement("progress", percent_done);
 
     if (!status_info_.empty()) {
-      trickle_xml.addElement("speed", getTotalSpeed());
-
-      std::string device_ids;
-      for (const auto &device : status_info_.at("devices"))
-        device_ids += std::to_string((int)device.at("device_id")) + ",";
-
-      if (!device_ids.empty())
-        device_ids.pop_back(); // remove last ','
-
-      trickle_xml.addElement("device_ids", device_ids);
+      trickle_xml.addElement("total_speed", getTotalSpeed());
 
       for (const auto &device : status_info_.at("devices")) {
         std::string id = std::to_string((int)device.at("device_id"));
