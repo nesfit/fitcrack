@@ -94,6 +94,8 @@ def main():
         if minutes == MINUTES_IN_MONTH:
             cursor.execute(
                     "DELETE FROM fc_server_usage WHERE time < (NOW() - INTERVAL 30 DAY)")
+            cursor.execute(
+                    "DELETE FROM fc_device_info WHERE time < (NOW() - INTERVAL 30 DAY)")
             fitcrack_db.commit()
             minutes = 0
 
