@@ -4,10 +4,11 @@
 -->
 
 <template>
-  <v-container>
+  <v-container class="rmw mt-4">
     <v-row>
       <v-col>
         <v-card flat>
+
           <v-card-title>
             <v-icon left>
               mdi-palette
@@ -52,54 +53,80 @@
               </v-btn>
             </v-btn-toggle>
             <div class="mt-2 ml-1">
-              {{ appearanceHint }}<span v-show="testmode">. Temporarily toggle with CTRL+SHIFT+L anywhere.</span>
+              {{ appearanceHint }}.<span v-show="testmode"> Temporarily toggle with CTRL+SHIFT+L anywhere.</span>
             </div>
-            <v-switch
-                v-model="confirmpurge"
-                label="Ask to confirm job purge"
-                hint="If enabled, Fitcrack asks for confirmation after clicking on Purge button."
-                persistent-hint
-                class="mb-4"
-            />
+            </v-card-text>
+
+            <v-card-title>
+            <v-icon left>
+              mdi-cursor-pointer
+            </v-icon>
+            <span>Behavior</span>
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col class="mw">
+                <v-switch
+                    v-model="confirmpurge"
+                    label="Job purge confirmation"
+                    hint="Job purge requires clicking the button twice."
+                    persistent-hint
+                    class="mb-4 mt-0"
+                />
+                <v-switch
+                  v-model="settings.verify_hash_format"
+                  :loading="loading"
+                  outlined
+                  label="Verify hash format"
+                  hint="Check if the format of every user-entered hash is valid."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
+              </v-col>
+              <v-col class="mw">
+                <v-switch
+                  v-model="settings.auto_add_hosts_to_running_jobs"
+                  :loading="loading"
+                  outlined
+                  label="Add new hosts to running jobs"
+                  hint="Automatically assign newly connected hosts to currently running jobs."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
+                <v-switch
+                  v-model="settings.bench_all"
+                  :loading="loading"
+                  outlined
+                  label="Fully benchmark new hosts"
+                  hint="Run a complete first-time benchmark on new hosts connected to the system."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
+              </v-col>
+            </v-row>
            </v-card-text>
         </v-card>
-        <v-card flat class="mt-6">
-          <v-card-title>
-            <v-icon left>
-              mdi-test-tube
-            </v-icon>
-            <span>Development</span>
-          </v-card-title>
-          <v-card-text>
-            <v-switch
-              v-model="testmode"
-              label="Developer mode"
-              hint="Enables useful utilities throughout the app when developing Fitcrack."
-              persistent-hint
-              class="mb-4"
-            />
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- // system -->
-      <v-col>
-        <v-card
-          flat
-          min-width="300"
-        >
-          <v-card-title>
-            <v-icon left>
-              mdi-settings-box
-            </v-icon>
-            <span>System preferences</span>
-          </v-card-title>
-          <v-card-text>
+        <v-expansion-panels flat class="mt-6">
+          <v-expansion-panel>
+            <v-expansion-panel-header class="px-4">
+              <template v-slot:default="{ open }">
+              <span class="d-flex align-center">
+                <v-icon left>
+                  mdi-puzzle
+                </v-icon>
+                <span class="text-h6">{{ open ? '' : 'Show '}}Advanced Settings</span>
+              </span>
+              </template>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-card-text>
             <v-text-field
               v-model="settings.default_seconds_per_workunit"
               :loading="loading"
               outlined
               type="number"
               label="Default time per workunit"
+              :min="10"
               :hint="wuTimeHint"
               :color="settings.default_seconds_per_workunit < wutthresh ? 'warning' : ''"
               persistent-hint
@@ -114,44 +141,6 @@
               min="5"
               label="Workunit timeout factor"
               hint="Multiplying factor for workunit timeout — the time after which a workunit is considered failed."
-              persistent-hint
-              class="mb-4"
-            />
-            <v-text-field
-              v-model="settings.hwmon_temp_abort"
-              :loading="loading"
-              outlined
-              type="number"
-              label="Temperature threshold"
-              hint="Abort cracking if temperature of the client's PC reaches this threshold"
-              persistent-hint
-              suffix="°C"
-              class="mb-4"
-            />
-            <v-switch
-              v-model="settings.bench_all"
-              :loading="loading"
-              outlined
-              label="Run full benchmark on join"
-              hint="If enabled, new hosts connected to the system will run a complete first-time benchmark."
-              persistent-hint
-              class="mb-4"
-            />
-            <v-switch
-              v-model="settings.verify_hash_format"
-              :loading="loading"
-              outlined
-              label="Verify hash format"
-              hint="If enabled, Fitcrack checks if the format of every user-entered hash is valid."
-              persistent-hint
-              class="mb-4"
-            />
-            <v-switch
-              v-model="settings.auto_add_hosts_to_running_jobs"
-              :loading="loading"
-              outlined
-              label="Add new hosts to running jobs"
-              hint="If enabled, Fitcrack automatically adds newly connected hosts to currently running jobs."
               persistent-hint
               class="mb-4"
             />
@@ -199,8 +188,28 @@
               persistent-hint
               class="mb-4"
             />
+            <v-text-field
+              v-model="settings.hwmon_temp_abort"
+              :loading="loading"
+              outlined
+              type="number"
+              label="Temperature threshold"
+              hint="Abort cracking if temperature of the client's PC reaches this threshold"
+              persistent-hint
+              suffix="°C"
+              class="mb-4"
+            />
+            <v-switch
+              v-model="testmode"
+              label="Developer mode"
+              hint="Enables useful utilities throughout the app when developing Fitcrack."
+              persistent-hint
+              class="mb-4"
+            />
           </v-card-text>
-        </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-col>
     </v-row>
   </v-container>
@@ -315,5 +324,12 @@
 <style scoped>
 .neutral {
   color: unset !important
+}
+
+.mw {
+  min-width: 300px;
+}
+.rmw {
+  max-width: 900px;
 }
 </style>
