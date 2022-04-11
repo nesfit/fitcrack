@@ -200,19 +200,6 @@
               class="mb-4"
             />
           </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="primary"
-              :loading="saving"
-              @click="saveSettings"
-            >
-              <v-icon left>
-                mdi-content-save
-              </v-icon>
-              Save
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -266,10 +253,22 @@
         },
         confirmpurge (value) {
           localStorage.setItem('confirmpurge', value)
+        },
+        settings: {
+          deep: true,
+          immediate: false,
+          handler (val, old) {
+            if (!this.loading && Object.keys(old).length > 0) {
+              this.saveSettings()
+            }
+          }
         }
       },
       mounted () {
         this.loadSettings()
+      },
+      beforeRouteLeave (to, from, next) {
+        if (!this.saving) next()
       },
       methods: {
         async loadSettings () {
