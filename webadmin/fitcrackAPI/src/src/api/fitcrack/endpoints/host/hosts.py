@@ -10,9 +10,9 @@ from flask_restx import Resource
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
-from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, boincHostDetail_model
+from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, boincHostDetail_model, boincHostBenchmarks_model
 from src.database import db
-from src.database.models import Host, FcHostActivity, FcHostStatus
+from src.database.models import Host, FcHostActivity, FcHostStatus, FcBenchmark
 
 log = logging.getLogger(__name__)
 ns = api.namespace('hosts', description='Operations with hosts.')
@@ -86,6 +86,18 @@ class HostByID(Resource):
         return 'Host visibility toggled', 200
 
 
+@ns.route('/<int:id>/benchmarks')
+@api.response(404, 'Host not found.')
+class BenchmarksByID(Resource):
+
+    @api.marshal_with(boincHostBenchmarks_model)
+    def get(self, id):
+        """
+        Returns benchmarks for this host.
+        """
+
+        benchmarks = FcBenchmark.query.filter(FcBenchmark.boinc_host_id == id).all()
+        return benchmarks
 
 @ns.route('/info')
 class hostsInfo(Resource):

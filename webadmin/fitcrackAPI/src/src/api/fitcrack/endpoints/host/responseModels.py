@@ -29,3 +29,9 @@ boincHostDetail_model = api.model('Host detail boinc', {
     'workunits': fields.List(fields.Nested(workunitWithJob_model)),
     'jobs': fields.List(fields.Nested(job_short_model))
 })
+
+boincHostBenchmarks_model = api.model('Boinc host benchmarks', {
+    'hash_type': fields.Integer(),
+    'attack_mode': fields.Integer(),
+    'power': fields.Integer()
+})

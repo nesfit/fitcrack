@@ -38,6 +38,7 @@ class FcBenchmark(Base):
         return {
             'boinc_host_id': getattr(self, 'boinc_host_id'),
             'hash_type': getattr(self, 'hash_type'),
+            'attack_mode': getattr(self, 'attack_mode'),
             'power': getattr(self, 'power'),
             'last_update': getattr(self, 'last_update').isoformat()
         }
