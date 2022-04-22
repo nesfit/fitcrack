@@ -30,8 +30,12 @@ boincHostDetail_model = api.model('Host detail boinc', {
     'jobs': fields.List(fields.Nested(job_short_model))
 })
 
-boincHostBenchmarks_model = api.model('Boinc host benchmarks', {
+boincHostBenchmark_model = api.model('Boinc host benchmarks', {
     'hash_type': fields.Integer(),
     'attack_mode': fields.Integer(),
     'power': fields.Integer()
+})
+
+boincHostBenchmarks_model = api.inherit('Benchmarks for Boinc hosts', {
+    'items': fields.List(fields.Nested(boincHostBenchmark_model))
 })

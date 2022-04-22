@@ -14,6 +14,8 @@ from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, 
 from src.database import db
 from src.database.models import Host, FcHostActivity, FcHostStatus, FcBenchmark
 
+from sqlalchemy import exc
+
 log = logging.getLogger(__name__)
 ns = api.namespace('hosts', description='Operations with hosts.')
 
@@ -96,8 +98,32 @@ class BenchmarksByID(Resource):
         Returns benchmarks for this host.
         """
 
-        benchmarks = FcBenchmark.query.filter(FcBenchmark.boinc_host_id == id).all()
-        return benchmarks
+        benchmarks = FcBenchmark.query.filter(FcBenchmark.boinc_host_id == id)
+        return {
+            'items': benchmarks.all()
+        }
+
+    @api.expect(boincHostBenchmarks_model)
+    def post(self, id):
+        """
+        Uploads benchmarks for boinc host.
+        """
+
+        benchmarks = request.get_json().get('items')
+        for benchmark in benchmarks:
+            existing_bench = FcBenchmark.query.filter(FcBenchmark.boinc_host_id == id,
+                                                      FcBenchmark.hash_type == benchmark['hash_type'],
+                                                      FcBenchmark.attack_mode == benchmark['attack_mode']).first()
+            if existing_bench:
+                existing_bench.power = benchmark['power']
+                db.session.commit()
+            else:
+                new_bench = FcBenchmark(boinc_host_id=id, hash_type=benchmark['hash_type'], attack_mode=benchmark['attack_mode'], power=benchmark['power'])
+                try:
+                    db.session.add(new_bench)
+                    db.session.commit()
+                except exc.SQLAlchemyError:
+                    pass
 
 @ns.route('/info')
 class hostsInfo(Resource):
