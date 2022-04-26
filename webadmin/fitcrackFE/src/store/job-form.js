@@ -37,7 +37,7 @@ export const empty = {
   masks: [''],
   hybridMask: '',
   charset: [],
-  submode: 2,
+  submode: 0,
   markov: [], // init!
   markovThresh: NaN,
   pcfg: [],
