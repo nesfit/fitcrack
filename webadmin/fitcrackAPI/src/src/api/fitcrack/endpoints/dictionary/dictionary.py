@@ -82,7 +82,7 @@ class dictionary(Resource):
 class dictionaryDownload(Resource):
     def get(self, id):
         """
-        Sends zipped PCFG as attachment
+        Sends dictionary as attachment
         """
 
         dictionary = FcDictionary.query.filter(FcDictionary.id == id).one()

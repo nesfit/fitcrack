@@ -73,7 +73,25 @@
                   </v-col>
                   <v-col>
                     <v-card flat>
-                      <v-card-title>Hashes</v-card-title>
+                      <v-card-title>
+                        <span>Hashes</span>
+                        <v-spacer />
+                        <a
+                          :href="$serverAddr + '/job/' + data.id + '/exportCrackedHashes'"
+                          target="_blank"
+                          download
+                          v-on="on"
+                        >
+                          <v-btn
+                           color="success"
+                          >
+                            <span>Export cracked hashes</span>
+                            <v-icon right>
+                              mdi-file-download-outline
+                            </v-icon>
+                          </v-btn>
+                        </a>
+                      </v-card-title>
                       <v-card-text>
                         <hash-table
                           class="grow"

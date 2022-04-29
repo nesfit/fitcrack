@@ -9,8 +9,9 @@ import logging
 
 import datetime
 import tempfile
+import io
 
-from flask import request
+from flask import request, send_file
 from flask_restx import Resource
 from flask_restx import abort
 from flask_login import current_user
@@ -522,7 +523,26 @@ class workunitsJob(Resource):
 
         return jobs_page
 
+@ns.route('/<int:id>/exportCrackedHashes')
+@api.response(404, 'job not found.')
+class exportCrackedHashes(Resource):
+    def get(self, id):
+        """
+        Exports cracked password hashes
+        """
+        crackedHashes = io.BytesIO()
 
+        job = FcJob.query.filter(FcJob.id == id).one()
+        for job_hash in job.hashes:
+            if job_hash.result:
+                crackedHashes.write(job_hash.hashText.encode('utf-8'))
+                crackedHashes.write(b':')
+                crackedHashes.write(job_hash.password.encode('utf-8'))
+                crackedHashes.write(b'\n')
+
+        crackedHashes.seek(0)
+        filename = job.name + ".txt"
+        return send_file(crackedHashes, attachment_filename=filename, as_attachment=True, mimetype="text/plain")
 
 
 @ns.route('/verifyHash')
