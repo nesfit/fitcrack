@@ -167,8 +167,15 @@ class multiJobsHost(Resource):
         for host in beforeHosts:
             db.session.delete(host)
 
+        newIds = args['newHost_ids']
+        if not newIds:
+             return {
+                'status': True,
+                'message': 'Hosts unassigned.'
+            }
+
         for jobId in ids:
-            for hostId in args['newHost_ids']:
+            for hostId in newIds:
                 host = FcHostActivity(boinc_host_id=hostId, job_id=jobId)
                 db.session.add(host)
 
