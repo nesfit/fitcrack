@@ -264,11 +264,11 @@ int handle_trickle(MSG_FROM_HOST &mfh) {
     std::snprintf(buf, SQL_BUF_SIZE,
                   "INSERT INTO `fc_device_info` "
                   "(`device_id`,`workunit_id`,`speed`,`temperature`,`"
-                  "utilization`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64
-                  ", %" PRIu64 ", %" PRIu64 ");",
-                  fc_device_id, fc_workunit_id, std::stoull(device.second.speed),
-                  std::stoull(device.second.temp),
-                  std::stoull(device.second.util));
+                  "utilization`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRId64
+                  ", %" PRId64 ", %" PRId64 ");",
+                  fc_device_id, fc_workunit_id, std::stoll(device.second.speed),
+                  std::stoll(device.second.temp),
+                  std::stoll(device.second.util));
     retval = boinc_db.do_query(buf);
     if (retval) {
       std::cerr << "Problem with DB query: " << buf << "\nShutting down now."
