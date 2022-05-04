@@ -162,7 +162,7 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
                 hashes = [(h.strip() + " OK") for h in hashFile.readlines()]
     else:
         result = shellExec(
-            "{} -m {} {} --show".format(HASHCAT_PATH, hash_type, hash), getReturnCode=True
+            "{} -m {} {} --show --machine-readable".format(HASHCAT_PATH, hash_type, hash), getReturnCode=True
         )
 
         if binaryHash:
@@ -175,11 +175,11 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
 
             bad_hash_lines = result['msg'].rstrip().split('\n')
             for line in bad_hash_lines:
-                if line.find('(') > 0:
-                    line = line[line.find('(') + 1:].replace("): ", ":")
-                    line = line.replace("\x1b[0m", "")
-                    bad_hash = line.split(":")[0]
-                    error = line.split(":")[1]
+                line_parts = line.split(":")
+                if len(line_parts) == 4:
+                    # hashfile : line : hash : status
+                    bad_hash = line_parts[2]
+                    error = line_parts[3]
                     if bad_hash.find("...") > 0:
                         # if the hash is longer than a certain length, it's abbreviated with ... 
                         bad_hash_parts = bad_hash.split("...")
@@ -196,7 +196,7 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
     hashesArr = []
     hasError = False
     for hash in hashes:
-        hashArr = hash.split(' ', 1)
+        hashArr = hash.rsplit(' ', 1)
 
         isInCache = False
         dbHash = FcHash.query.filter(FcHash.hash == bytes(hashArr[0], 'utf8'), FcHash.result != None).first()
