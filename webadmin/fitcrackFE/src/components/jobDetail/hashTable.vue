@@ -6,7 +6,7 @@
   >
     <template #item.hashText="{ item }">
       <span class="hash">
-        {{ item.hashText }}
+        {{ truncateHashIfNeeded(item.hashText) }}
       </span>
     </template>
   </v-data-table>
@@ -34,6 +34,11 @@ export default {
         itemsPerPageOptions: [10,25,50,100,{text: 'All', value: -1}], 
         itemsPerPageText: 'Hashes per page'
       }
+    }
+  },
+  methods: {
+    truncateHashIfNeeded (hashText) {
+      return (hashText.length > 80) ? hashText.substr(0, 70) + '...' : hashText;
     }
   }
 }
