@@ -37,6 +37,7 @@
 
 #include <vector>
 #include <set>
+#include <map>
 #include <string>
 #include <sstream>
 #include <cstdlib>
@@ -410,15 +411,13 @@ void update_power(uint64_t host_id, uint64_t count, double elapsed_time)
 */
 }
 
-
 /**
  * @brief Search fc_benchmark table for all entries of current host
- * @param benchmarked_hashtypes out Returned set of benchmarked hash types
- * @param benchmarked_attackmodes out Returned set of benchmarked attack modes
+ * @param benchmarked_attackmodes_per_types out Returned set of benchmarked attack modes per hash types
  * @param host_id in Host ID used for searching
  * @return True if any benchmark results found, False otherwise
  */
-bool find_benchmark_results(std::set<uint32_t> & benchmarked_hashtypes, std::set<uint32_t> & benchmarked_attackmodes, uint64_t boinc_host_id)
+bool find_benchmark_results(std::map<uint32_t, std::set<uint32_t>> & benchmarked_attackmodes_per_types, uint64_t boinc_host_id)
 {
     uint64_t power;
     uint32_t hash_type;
@@ -445,14 +444,12 @@ bool find_benchmark_results(std::set<uint32_t> & benchmarked_hashtypes, std::set
     {
         hash_type = convert_str_to_number<uint32_t>(row[2]);
         attack_mode = convert_str_to_number<uint32_t>(row[3]);
-        power = convert_str_to_number<uint64_t>(row[4]);
-        benchmarked_hashtypes.insert(hash_type);
-        benchmarked_attackmodes.insert(attack_mode);
+        benchmarked_attackmodes_per_types[hash_type].insert(attack_mode);
     }
 
     mysql_free_result(rp);
 
-    if (benchmarked_hashtypes.empty())
+    if (benchmarked_attackmodes_per_types.empty())
         return false;
     return true;
 }
@@ -642,13 +639,13 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 uint32_t hash_type = get_num_from_mysql(buf);
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT attack_mode FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
                 uint32_t attack_mode = get_num_from_mysql(buf);
-                std::set<uint32_t> benchmarked_hashtypes;
-                std::set<uint32_t> benchmarked_attackmodes;
+                std::map<uint32_t, std::set<uint32_t>> benchmarked_attackmodes_per_types;
 
-                if (find_benchmark_results(benchmarked_hashtypes, benchmarked_attackmodes, boinc_host_id)) {
-                  if (benchmarked_hashtypes.find(hash_type) != benchmarked_hashtypes.end()) {
+                if (find_benchmark_results(benchmarked_attackmodes_per_types, boinc_host_id)) {
+                  auto it = benchmarked_attackmodes_per_types.find(hash_type);
+                  if (it != benchmarked_attackmodes_per_types.end()) {
                     /** Entry with this hash type already exist */
-                    if (benchmarked_attackmodes.find(attack_mode) != benchmarked_attackmodes.end()) {
+                    if (it->second.count(attack_mode)) {
                       /** Entry with this hash type and this attack mode already exists, update it */
                       std::snprintf(
                           buf, SQL_BUF_SIZE,
@@ -1016,21 +1013,20 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 update_mysql(buf);
 
                 /** Read the results */
-                std::set<uint32_t> benchmarked_hashtypes; /** Use set as fastest STL container for find */
-                std::set<uint32_t> benchmarked_attackmodes; /** Note: Currently unused below by design */
+                std::map<uint32_t, std::set<uint32_t>> benchmarked_attackmodes_per_types;
                 const uint32_t attack_mode = 3; /** Consider benchmark as a brute force attack */
                 uint32_t hash_type;
 
-                if (find_benchmark_results(benchmarked_hashtypes, benchmarked_attackmodes, boinc_host_id))
+                if (find_benchmark_results(benchmarked_attackmodes_per_types, boinc_host_id))
                 {
                     /** benchmark was already run in the past */
                     while (std::fscanf(f,"%u:%llu\n", &hash_type, &power) == 2)
                     {
-                      auto it = benchmarked_hashtypes.find(hash_type);
-                      if (it != benchmarked_hashtypes.end()) {
+                      auto it =
+                          benchmarked_attackmodes_per_types.find(hash_type);
+                      if (it != benchmarked_attackmodes_per_types.end()) {
                         /** Entry with this hash type already exist */
-                        if (benchmarked_attackmodes.find(attack_mode) !=
-                            benchmarked_attackmodes.end()) {
+                        if (it->second.count(attack_mode)) {
                           /** Entry with this hash type and this attack mode
                            * already exists, update it */
 
@@ -1060,7 +1056,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                         /** Remove updated entry for near-constant search time
                          */
-                        benchmarked_hashtypes.erase(it);
+                        benchmarked_attackmodes_per_types.erase(it);
                       } else {
                         /** Entry does NOT exist, create it */
                         std::snprintf(

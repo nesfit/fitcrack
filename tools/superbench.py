@@ -1,15 +1,29 @@
-import json, requests, argparse, time
+import json, requests, argparse, time, threading
 
 HASH_INFO_PATH = '../webadmin/fitcrackAPI/hashcat/hash_info.json'
+
+# FC issue 13761
+
+
+def kill_job(session, args, id):
+    resp = session.get(args.api_url + '/job/' + str(id))
+    if int(resp.json()['status']) >= 10: # still running or finishing
+        resp = session.get(args.api_url + '/job/' + str(id) + '/action?operation=kill')
+        assert resp.json()['status'] == True
 
 def create_and_start_job(session, args, job_name, attack_job_template):
     job_json_data = json.loads(attack_job_template)
     resp = session.post(args.api_url + '/job', json=job_json_data)
     assert resp.status_code == 200
-    resp = session.get(args.api_url + '/job/' + str(resp.json()['job_id']) + '/action?operation=start')
+    job_id = resp.json()['job_id']
+    resp = session.get(args.api_url + '/job/' + str(job_id) + '/action?operation=start')
     assert resp.json()['status'] == True
     if args.debug:
         print("Job", job_name, "created and running.")
+
+    t = threading.Timer(
+        4 * 60, kill_job, args=[session, args, job_id])
+    t.start()
 
 def create_job_dict_attack(session, args, hashtype, hash, host):
     job_name = 'superbench-dict-%s' % (hashtype)
@@ -60,10 +74,11 @@ def main():
     parser.add_argument("--api-url", action="store", default='http://localhost:5000')
     parser.add_argument("--user", action="store", default='fitcrack')
     parser.add_argument("--password", action="store", default='FITCRACK')
-    parser.add_argument("--host-id", action="store", default=1)
+    parser.add_argument("--host-id", action="store", type=int, default=1)
     parser.add_argument("--host-name", action="store")
-    parser.add_argument("--delay", action="store", default=60, type=int)
+    parser.add_argument("--delay", action="store", type=int, default=60)
     parser.add_argument("--debug", action="store_true", default=False)
+    parser.add_argument("--attack-modes", action="store")
 
     arguments = parser.parse_args()
 
@@ -83,54 +98,62 @@ def main():
 
     assert host_id != None
 
-    if arguments.debug:
-        print("=========== Benchmarking (dictionary attack) ===========")
-    for hashcode in hash_info:
-        hash_to_crack = hash_info[hashcode]['example_hash']
-        create_job_dict_attack(s, arguments, hashcode, hash_to_crack, host_id)
-        time.sleep(arguments.delay)
+    if "0" in arguments.attack_modes:
+        if arguments.debug:
+            print("=========== Benchmarking (dictionary attack) ===========")
+        for hashcode in hash_info:
+            hash_to_crack = hash_info[hashcode]['example_hash']
+            create_job_dict_attack(s, arguments, hashcode, hash_to_crack, host_id)
+            time.sleep(arguments.delay)
 
-    if arguments.debug:
-        print("=========== Benchmarking (combinatory attack) ===========")   
-    for hashcode in hash_info:
-        hash_to_crack = hash_info[hashcode]['example_hash']
-        create_job_comb_attack(s, arguments, hashcode, hash_to_crack, host_id)
-        time.sleep(arguments.delay)
+    if "1" in arguments.attack_modes:
+        if arguments.debug:
+            print("=========== Benchmarking (combinatory attack) ===========")
+        for hashcode in hash_info:
+            if int(hashcode) > 11:
+                hash_to_crack = hash_info[hashcode]['example_hash']
+                create_job_comb_attack(s, arguments, hashcode, hash_to_crack, host_id)
+                time.sleep(arguments.delay)
 
-    if arguments.debug:
-        print("=========== Benchmarking (mask attack) ===========")
-    for hashcode in hash_info:
-        hash_to_crack = hash_info[hashcode]['example_hash']
-        create_job_mask_attack(s, arguments, hashcode, hash_to_crack, host_id)
-        time.sleep(arguments.delay)
+    if "3" in arguments.attack_modes:
+        if arguments.debug:
+            print("=========== Benchmarking (mask attack) ===========")
+        for hashcode in hash_info:
+            hash_to_crack = hash_info[hashcode]['example_hash']
+            create_job_mask_attack(s, arguments, hashcode, hash_to_crack, host_id)
+            time.sleep(arguments.delay)
 
-    if arguments.debug:
-        print("=========== Benchmarking (hybrid wordlist + mask attack) ===========")
-    for hashcode in hash_info:
-        hash_to_crack = hash_info[hashcode]['example_hash']
-        create_job_hybrid_wm_attack(s, arguments, hashcode, hash_to_crack, host_id)
-        time.sleep(arguments.delay)
+    if "6" in arguments.attack_modes:
+        if arguments.debug:
+            print("=========== Benchmarking (hybrid wordlist + mask attack) ===========")
+        for hashcode in hash_info:
+            hash_to_crack = hash_info[hashcode]['example_hash']
+            create_job_hybrid_wm_attack(s, arguments, hashcode, hash_to_crack, host_id)
+            time.sleep(arguments.delay)
 
-    if arguments.debug:
-        print("=========== Benchmarking (hybrid mask + wordlist attack) ===========")
-    for hashcode in hash_info:
-        hash_to_crack = hash_info[hashcode]['example_hash']
-        create_job_hybrid_mw_attack(s, arguments, hashcode, hash_to_crack, host_id)
-        time.sleep(arguments.delay)
+    if "7" in arguments.attack_modes:
+        if arguments.debug:
+            print("=========== Benchmarking (hybrid mask + wordlist attack) ===========")
+        for hashcode in hash_info:
+            hash_to_crack = hash_info[hashcode]['example_hash']
+            create_job_hybrid_mw_attack(s, arguments, hashcode, hash_to_crack, host_id)
+            time.sleep(arguments.delay)
 
-    if arguments.debug:
-        print("=========== Benchmarking (prince attack) ===========")
-    for hashcode in hash_info:
-        hash_to_crack = hash_info[hashcode]['example_hash']
-        create_job_prince_attack(s, arguments, hashcode, hash_to_crack, host_id)
-        time.sleep(arguments.delay)
+    if "8" in arguments.attack_modes:
+        if arguments.debug:
+            print("=========== Benchmarking (prince attack) ===========")
+        for hashcode in hash_info:
+            hash_to_crack = hash_info[hashcode]['example_hash']
+            create_job_prince_attack(s, arguments, hashcode, hash_to_crack, host_id)
+            time.sleep(arguments.delay)
 
-    if arguments.debug:
-        print("=========== Benchmarking (pcfg attack) ===========")
-    for hashcode in hash_info:
-        hash_to_crack = hash_info[hashcode]['example_hash']
-        create_job_pcfg_attack(s, arguments, hashcode, hash_to_crack, host_id)
-        time.sleep(arguments.delay)
+    if "9" in arguments.attack_modes:
+        if arguments.debug:
+            print("=========== Benchmarking (pcfg attack) ===========")
+        for hashcode in hash_info:
+            hash_to_crack = hash_info[hashcode]['example_hash']
+            create_job_pcfg_attack(s, arguments, hashcode, hash_to_crack, host_id)
+            time.sleep(arguments.delay)
 
 if __name__ == "__main__":
     main()

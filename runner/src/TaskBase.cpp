@@ -86,9 +86,9 @@ void TaskBase::reportProgress() {
         std::string id = std::to_string((int)device.at("device_id"));
         std::string name = device.at("device_name");
         std::string type = device.at("device_type");
-        int64_t speed = device.value("speed", -1);
+        int64_t speed = device.at("speed");
         int64_t temp = device.value("temp", -1); // -1 when hwmon is disabled
-        int64_t util = device.value("util", -1);
+        int64_t util = device.at("util");
 
         trickle_xml.addElement("device_" + id + "_name", name);
         trickle_xml.addElement("device_" + id + "_type", type);
