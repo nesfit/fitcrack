@@ -1,9 +1,13 @@
-import json, requests, argparse, time, threading
+import json, requests, argparse, time, threading, base64
 
 HASH_INFO_PATH = '../webadmin/fitcrackAPI/hashcat/hash_info.json'
 
 # FC issue 13761
+# python3 superbench.py --debug --delay 150 --host-id 1 --api-url http://192.168.101.5:5001 --user root --password xxxx --attack-modes 1
 
+def base64encode(text):
+    base64_bytes = base64.b64encode(text.encode('ascii'))
+    return "BASE64:" + base64_bytes.decode('ascii')
 
 def kill_job(session, args, id):
     resp = session.get(args.api_url + '/job/' + str(id))
@@ -14,7 +18,9 @@ def kill_job(session, args, id):
 def create_and_start_job(session, args, job_name, attack_job_template):
     job_json_data = json.loads(attack_job_template)
     resp = session.post(args.api_url + '/job', json=job_json_data)
-    assert resp.status_code == 200
+    if resp.status_code != 200:
+        print(resp.json())
+        return
     job_id = resp.json()['job_id']
     resp = session.get(args.api_url + '/job/' + str(job_id) + '/action?operation=start')
     assert resp.json()['status'] == True
@@ -102,7 +108,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (dictionary attack) ===========")
         for hashcode in hash_info:
-            hash_to_crack = hash_info[hashcode]['example_hash']
+            if hash_info[hashcode]['example_hash_format'] == "plain":
+                hash_to_crack = hash_info[hashcode]['example_hash']
+            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
+                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
+            else:
+                continue
             create_job_dict_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -110,16 +121,25 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (combinatory attack) ===========")
         for hashcode in hash_info:
-            if int(hashcode) > 11:
+            if hash_info[hashcode]['example_hash_format'] == "plain":
                 hash_to_crack = hash_info[hashcode]['example_hash']
-                create_job_comb_attack(s, arguments, hashcode, hash_to_crack, host_id)
-                time.sleep(arguments.delay)
+            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
+                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
+            else:
+                continue
+            create_job_comb_attack(s, arguments, hashcode, hash_to_crack, host_id)
+            time.sleep(arguments.delay)
 
     if "3" in arguments.attack_modes:
         if arguments.debug:
             print("=========== Benchmarking (mask attack) ===========")
         for hashcode in hash_info:
-            hash_to_crack = hash_info[hashcode]['example_hash']
+            if hash_info[hashcode]['example_hash_format'] == "plain":
+                hash_to_crack = hash_info[hashcode]['example_hash']
+            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
+                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
+            else:
+                continue
             create_job_mask_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -127,7 +147,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (hybrid wordlist + mask attack) ===========")
         for hashcode in hash_info:
-            hash_to_crack = hash_info[hashcode]['example_hash']
+            if hash_info[hashcode]['example_hash_format'] == "plain":
+                hash_to_crack = hash_info[hashcode]['example_hash']
+            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
+                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
+            else:
+                continue
             create_job_hybrid_wm_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -135,7 +160,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (hybrid mask + wordlist attack) ===========")
         for hashcode in hash_info:
-            hash_to_crack = hash_info[hashcode]['example_hash']
+            if hash_info[hashcode]['example_hash_format'] == "plain":
+                hash_to_crack = hash_info[hashcode]['example_hash']
+            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
+                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
+            else:
+                continue
             create_job_hybrid_mw_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -143,7 +173,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (prince attack) ===========")
         for hashcode in hash_info:
-            hash_to_crack = hash_info[hashcode]['example_hash']
+            if hash_info[hashcode]['example_hash_format'] == "plain":
+                hash_to_crack = hash_info[hashcode]['example_hash']
+            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
+                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
+            else:
+                continue
             create_job_prince_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -151,7 +186,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (pcfg attack) ===========")
         for hashcode in hash_info:
-            hash_to_crack = hash_info[hashcode]['example_hash']
+            if hash_info[hashcode]['example_hash_format'] == "plain":
+                hash_to_crack = hash_info[hashcode]['example_hash']
+            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
+                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
+            else:
+                continue
             create_job_pcfg_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
