@@ -497,13 +497,13 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
     std::cerr << __LINE__ << " - Incoming workunit result with id " << wu.id << std::endl;
 
     int retval;         // fscanf return values
-    char buf[SQL_BUF_SIZE];     // SQL queries
+    char buf[SQL_BUF_SIZE] = {0};     // SQL queries
     char mode;          // Result mode (b/n)
     int code;           // Result status code (0 OK, 1 notFound/err, etc.)
     long long unsigned int power; // Host power (bench)
     double cracking_time;       // Cracking time
-    char param[256];    // Other string params (err msg)
-    char hash_string[MAX_HASH_SIZE];   // hash results
+    char param[256] = {0};    // Other string params (err msg)
+    char hash_string[MAX_HASH_SIZE] = {0};   // hash results
 
     uint64_t host_id, boinc_host_id, job_id;
     std::vector<MysqlWorkunit *> workunits;
