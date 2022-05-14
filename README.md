@@ -33,6 +33,11 @@ mysql> SET GLOBAL log_bin_trust_function_creators = 1;
 ```
 ./install_fitcrack.sh
 ```
+
+And proceed according to your preferences...
+
+![Installer](img/insta.png)
+
 You can read about the "expose to internet" option [here](#about-webadmin-security).
 
 <a name="oper"></a>
