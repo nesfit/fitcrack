@@ -8,7 +8,7 @@ from flask_restx import fields
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.job.responseModels import workunit_model
 from src.api.fitcrack.responseModels import pagination, host_short_model, job_short_model, boincHost_model, \
-    user_model
+    user_model, device_model
 
 page_of_hosts_model = api.inherit('Page of hosts', pagination, {
     'items': fields.List(fields.Nested(boincHost_model))
@@ -27,7 +27,8 @@ boincHostDetail_model = api.model('Host detail boinc', {
     'fc_host': fields.Nested(host_short_model),
     'active': fields.Boolean(),
     'workunits': fields.List(fields.Nested(workunitWithJob_model)),
-    'jobs': fields.List(fields.Nested(job_short_model))
+    'jobs': fields.List(fields.Nested(job_short_model)),
+    'devices': fields.List(fields.Nested(device_model))
 })
 
 boincHostBenchmark_model = api.model('Boinc host benchmarks', {

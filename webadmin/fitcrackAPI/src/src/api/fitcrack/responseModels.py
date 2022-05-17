@@ -61,6 +61,39 @@ job_nano_model = api.model('Job nano', {
     'status': fields.Integer(readOnly=True, required=False, description='state of the job'),
 })
 
+device_info_model = api.model('Compute device info log', {
+    # id = Column(BigInteger, primary_key=True)
+    'id': fields.Integer(readOnly=True, required=False, description='id of the log'),
+    # device_id = Column(BigInteger, ForeignKey('fc_device.id'), nullable=False)
+    # workunit_id = Column(BigInteger, ForeignKey('fc_workunit.id'), nullable=False)
+    'workunit_id': fields.Integer(readOnly=True, required=False, description='id of the workunit being processed'),
+    # speed = Column(BigInteger, nullable=False)
+    # temperature = Column(Integer, nullable=False)
+    # utilization = Column(Integer, nullable=False)
+    'speed': fields.Integer(readOnly=True, required=False, description='computing speed'),
+    'temperature': fields.Integer(readOnly=True, required=False, description='device temperature'),
+    'utilization': fields.Integer(readOnly=True, required=False, description='device utilization'),
+    # time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    'time': fields.DateTime()
+})
+
+device_model = api.model('Compute device', {
+    # id = Column(BigInteger, primary_key=True)
+    'id': fields.Integer(readOnly=True, required=False, description='id of the device'),
+    # boinc_host_id = Column(BigInteger, ForeignKey('host.id'), nullable=False)
+    # hc_id = Column(BigInteger, nullable=False)
+    'hc_id': fields.Integer(readOnly=True, required=False, description='hashcat device identifier'),
+    # name = Column(String(255), nullable=False)
+    'name': fields.String(description='device name'),
+    # type = Column(String(255), nullable=False)
+    'type': fields.String(description='device type'),
+
+    # host = relationship("Host")
+    ###'host': fields.Nested(host_short_model),
+    # device_info = relationship("FcDeviceInfo", back_populates="device")
+    'device_info': fields.List(fields.Nested(device_info_model))
+})
+
 boincHost_model = api.model('Host boinc', {
     'id': fields.Integer(readOnly=True, required=False),
     'domain_name': fields.String(),

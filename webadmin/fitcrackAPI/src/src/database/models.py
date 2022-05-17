@@ -59,6 +59,37 @@ class FcHost(Base):
         return host_status_text_to_code_dict.get(self.status)
 
     boinc_host = relationship("Host", uselist=False)
+    #devices = relationship("FcDevice", primaryjoin="FcHost.boinc_host_id==FcDevice.boinc_host_id", back_populates="host")
+
+
+class FcDevice(Base):
+    __tablename__ = 'fc_device'
+
+    id = Column(BigInteger, primary_key=True)
+    boinc_host_id = Column(BigInteger, ForeignKey('host.id'), nullable=False)
+    hc_id = Column(BigInteger, nullable=False)
+    name = Column(String(255), nullable=False)
+    type = Column(String(255), nullable=False)
+
+    host = relationship("Host")
+    device_info = relationship("FcDeviceInfo", back_populates="device", order_by="desc(FcDeviceInfo.id)", lazy='dynamic')
+    #host = relationship("FcHost", primaryjoin="FcDevice.boinc_host_id==FcHost.boinc_host_id", back_populates="devices")
+    #boinc_host = relationship("Host", uselist=False)
+
+
+class FcDeviceInfo(Base):
+    __tablename__ = 'fc_device_info'
+
+    id = Column(BigInteger, primary_key=True)
+    device_id = Column(BigInteger, ForeignKey('fc_device.id'), nullable=False)
+    workunit_id = Column(BigInteger, ForeignKey('fc_workunit.id'), nullable=False)
+    speed = Column(BigInteger, nullable=False)
+    temperature = Column(Integer, nullable=False)
+    utilization = Column(Integer, nullable=False)
+    time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+    device = relationship("FcDevice")
+    workunit = relationship("FcWorkunit", back_populates="device_info")
 
 
 class FcMask(Base):
@@ -566,6 +597,8 @@ class Host(Base):
 
     user = relationship("User", back_populates="hosts")
 
+    devices = relationship("FcDevice", primaryjoin="Host.id == FcDevice.boinc_host_id", back_populates="host")
+
     workunits = relationship("FcWorkunit", secondary="fc_host_activity",
                         primaryjoin="Host.id == FcHostActivity.boinc_host_id",
                         secondaryjoin="FcHostActivity.job_id == FcWorkunit.id",
@@ -613,6 +646,7 @@ class FcWorkunit(Base):
 
     job = relationship("FcJob", back_populates="workunits")
     host = relationship("Host", back_populates="workunits")
+    device_info = relationship("FcDeviceInfo")
 
     result = relationship('Result',  uselist=False, primaryjoin="FcWorkunit.workunit_id==Result.workunitid", viewonly=True)
 
