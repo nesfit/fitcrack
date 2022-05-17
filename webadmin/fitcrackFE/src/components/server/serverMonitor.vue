@@ -95,7 +95,6 @@
           :usage-data="usageData"
           :metrics="['cpu']"
           :max="100"
-          :unit-callback="x => `${x}%`"
         />
       </v-sheet>
       <v-sheet class="monitor-sheet chart">
@@ -109,7 +108,6 @@
           :usage-data="usageData"
           :metrics="['ram']"
           :max="100"
-          :unit-callback="x => `${x}%`"
         />
       </v-sheet>
       <v-sheet class="monitor-sheet chart">
@@ -122,7 +120,6 @@
         <res-mon
           :usage-data="usageData"
           :metrics="['hdd_read', 'hdd_write']"
-          :unit-callback="x => `${x} kb/s`"
         />
       </v-sheet>
       <v-sheet class="monitor-sheet chart">
@@ -135,7 +132,6 @@
         <res-mon
           :usage-data="usageData"
           :metrics="['net_recv', 'net_sent']"
-          :unit-callback="x => `${x} kb/s`"
         />
       </v-sheet>
     </div>
@@ -154,7 +150,7 @@ export default {
       dataInterval: null,
       //
       fullDate: false,
-      hoursBefore: '1',
+      hoursBefore: '3',
       chartsFrom: this.$moment().subtract(1, 'hours').format('YYYY-MM-DDTHH:mm'),
       chartsTo: this.$moment().format('YYYY-MM-DDTHH:mm'),
       //

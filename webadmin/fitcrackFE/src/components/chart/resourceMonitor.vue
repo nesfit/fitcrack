@@ -34,6 +34,21 @@ export default {
     max: {
       type: Number,
       default: undefined
+    },
+    rightScale: {
+      type: Boolean
+    },
+    unitCallbackRight: {
+      type: Function,
+      default: x => x
+    },
+    minRight: {
+      type: Number,
+      default: 0
+    },
+    maxRight: {
+      type: Number,
+      default: undefined
     }
   },
   computed: {
@@ -57,27 +72,49 @@ export default {
             radius: 0
           }
         },
-        tooltips: {
-          mode: "index",
-          position: "nearest",
-          callbacks: {
-            label: x => {
-              return this.unitCallback(x.value)
+        plugins: {
+          tooltip: {
+            mode: "index",
+            position: "nearest",
+            callbacks: {
+              label: ctx => {
+                const name = ctx.dataset.label
+                return `${ctx.formattedValue} ${this.labelUnit(name)}`
+              }
             }
           }
         },
         scales: {
           x: {
-            gridLines: {
+            type: 'time',
+            time: {
+              stepSize: 5
+            },
+            grid: {
               display: false
             }
           },
           y: {
             ticks: {
-              callback: this.unitCallback
+              callback: x => {
+                const name = this.metricLabel(this.metrics[0])
+                return `${x} ${this.labelUnit(name)}`
+              }
             },
             min: this.min,
             max: this.max
+          },
+          y1: {
+            position: 'right',
+            display: this.rightScale,
+            ticks: {
+              callback: x => {
+                const name = this.metricLabel(this.metrics[1])
+                return `${x} ${this.labelUnit(name)}`
+              }
+            },
+            min: this.minRight,
+            max: this.maxRight
           }
         }
       }
@@ -91,9 +128,26 @@ export default {
         hdd_write: 'Disk Write',
         net_recv: 'Download',
         net_sent: 'Upload',
-        ram: 'Memory'
+        ram: 'Memory',
+        speed: 'Speed',
+        temperature: 'Temperature',
+        utilization: 'Utilization'
       }
       return map[metric]
+    },
+    labelUnit (label) {
+      const map = {
+        'CPU': '%',
+        'Disk Read': 'kb/s',
+        'Disk Write': 'kb/s',
+        'Download': 'kb/s',
+        'Upload': 'kb/s',
+        'Memory': '%',
+        'Speed': 'H/s',
+        'Temperature': '°C',
+        'Utilization': '%'
+      }
+      return map[label]
     }
   }
 }
