@@ -194,6 +194,16 @@
             </v-icon>
             {{ isTrash ? 'Restore' : 'Discard' }}
           </v-btn>
+          <v-btn
+            text
+            class="mr-2"
+            @click="multiStop"
+          >
+            <v-icon left>
+              mdi-stop
+            </v-icon>
+            Stop
+          </v-btn>
         </div>
       </transition>
     </div>
@@ -669,6 +679,18 @@
         this.loading = true
         this.axios.patch(this.$serverAddr + '/job', {
           job_ids: this.selectedJobs.map(j => j.id)
+        })
+        .then((response) => {
+          this.loadJobs()
+        })
+      },
+      multiStop () {
+        if (this.selectedJobs.length == 0) return
+        //
+        this.loading = true
+        this.axios.post(this.$serverAddr + '/job/multiJobOperation', {
+          job_ids: this.selectedJobs.map(j => j.id),
+          operation: 'stop'
         })
         .then((response) => {
           this.loadJobs()

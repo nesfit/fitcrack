@@ -25,7 +25,7 @@ from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model
 from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWorkunit_parser, \
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
-    editJob_argument, multiEditHosts_argument, jobList_argument, job_permissions_arguments
+    editJob_argument, multiEditHosts_argument, jobList_argument, multiJobOperation_argument, job_permissions_arguments
 from src.api.fitcrack.endpoints.job.functions import verifyHashFormat, create_job, \
     computeCrackingTime, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
     can_view_job, can_edit_job, can_operate_job
@@ -141,6 +141,41 @@ class jobsCollection(Resource):
             return 'Oops', 500
 
         return 'Moved', 200
+
+
+@ns.route('/multiJobOperation')
+class multiJobOperation(Resource):
+    @api.expect(multiJobOperation_argument)
+    @api.marshal_with(simpleResponse)
+    def post(self):
+        args = multiJobOperation_argument.parse_args(request)
+        ids = args['job_ids']
+        operation = args['operation']
+        query = FcJob.query.filter(FcJob.id.in_(ids))
+        if not current_user.role.EDIT_ALL_JOBS:
+            editable = editable_jobs_ids()
+            query = query.filter(FcJob.id.in_(editable))
+        jobs = query.all()
+        if (len(jobs) == 0):
+            abort(400, 'No jobs selected or you don\'t have permissions on them.')
+
+        for job in jobs:
+            if operation == 'stop':
+                job.status = status_to_code['finishing']
+
+        try:
+            db.session.commit()
+        except:
+            return {
+                'status': False,
+                'message': 'Something went wrong.'
+            }
+
+        return {
+            'status': False,
+            'message': 'Jobs ' + operation + "ed."
+        }
+
 
 
 @ns.route('/host')
