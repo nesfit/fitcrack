@@ -133,6 +133,10 @@ class jobsCollection(Resource):
             abort(400, 'No jobs selected or you don\'t have permissions on them.')
 
         for job in jobs:
+            if not job.deleted and job.status == status_to_code['running']:
+                # before moving to trash, stop job if running
+                job.status = status_to_code['finishing']
+
             job.deleted = not job.deleted
             
         try:
