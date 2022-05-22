@@ -197,12 +197,32 @@
           <v-btn
             text
             class="mr-2"
+            @click="multiStart"
+          >
+            <v-icon left>
+              mdi-start
+            </v-icon>
+            Start
+          </v-btn>
+          <v-btn
+            text
+            class="mr-2"
             @click="multiStop"
           >
             <v-icon left>
               mdi-stop
             </v-icon>
             Stop
+          </v-btn>
+          <v-btn
+            text
+            class="mr-2"
+            @click="multiPurge"
+          >
+            <v-icon left>
+              mdi-undo-variant
+            </v-icon>
+            Purge
           </v-btn>
         </div>
       </transition>
@@ -691,6 +711,30 @@
         this.axios.post(this.$serverAddr + '/job/multiJobOperation', {
           job_ids: this.selectedJobs.map(j => j.id),
           operation: 'stop'
+        })
+        .then((response) => {
+          this.loadJobs()
+        })
+      },
+      multiStart () {
+        if (this.selectedJobs.length == 0) return
+        //
+        this.loading = true
+        this.axios.post(this.$serverAddr + '/job/multiJobOperation', {
+          job_ids: this.selectedJobs.map(j => j.id),
+          operation: 'start'
+        })
+        .then((response) => {
+          this.loadJobs()
+        })
+      },
+      multiPurge () {
+        if (this.selectedJobs.length == 0) return
+        //
+        this.loading = true
+        this.axios.post(this.$serverAddr + '/job/multiJobOperation', {
+          job_ids: this.selectedJobs.map(j => j.id),
+          operation: 'kill'
         })
         .then((response) => {
           this.loadJobs()

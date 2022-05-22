@@ -22,11 +22,64 @@ from sqlalchemy import exc
 from settings import DICTIONARY_DIR, HASHCAT_PATH, RULE_DIR, PCFG_DIR, ROOT_DIR
 from src.api.fitcrack.attacks import processJob as attacks
 from src.api.fitcrack.attacks.functions import compute_keyspace_from_mask, compute_prince_keyspace
+from src.api.fitcrack.lang import status_to_code, attack_modes
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
-from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcRule, FcHash, FcUserPermission, FcSetting
+from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcJobDictionary, \
+    FcJobGraph, FcRule, FcHash, FcMask, FcUserPermission, FcSetting, FcWorkunit
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
+
+def stop_job(job):
+    job.status = status_to_code['finishing']
+
+def kill_job(job, db):
+    id = job.id
+    # Job is stopped in Generator after sending BOINC commands
+    if (int(job.status) != status_to_code['running']) and (int(job.status) != status_to_code['finishing']):
+        job.status = status_to_code['ready']
+        workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
+        for item in workunits:
+            pass
+            # We cannot delete wus as device_info uses their ids.
+            # db.session.delete(item)
+            # FIXME: introduce new deleted field and then item.deleted = True
+    else:
+        job.kill = True
+
+    job.indexes_verified = 0
+    job.current_index = 0
+    job.current_index_2 = 0
+    job.workunit_sum_time = 0
+    job.time_start = job.time_end = None
+    if job.attack_mode == attack_modes['mask'] or job.attack_mode == attack_modes['hybrid (wordlist + mask)']:
+        masks = FcMask.query.filter(FcMask.job_id == id).all()
+        for mask in masks:
+            mask.current_index = 0
+    elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
+        dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
+        for dictionary in dictionaries:
+            dictionary.current_index = 0
+
+    hosts = FcHostActivity.query.filter(FcHostActivity.job_id == id).all()
+    for host in hosts:
+        host.status = 0
+
+    graphData = FcJobGraph.query.filter(FcJobGraph.job_id == id).all()
+    for item in graphData:
+        db.session.delete(item)
+
+    for job_hash in job.hashes:
+        job_hash.result = None
+        job_hash.time_cracked = None
+
+def start_job(job, db):
+    hosts = [ a[0] for a in db.session.query(Host.id).all() ]
+    if job.host_count == 0:
+        for hostId in hosts:
+            host = FcHostActivity(boinc_host_id=hostId, job_id=job.id)
+            db.session.add(host)
+    job.status = status_to_code['running']
 
 def create_job(data):
     if data['name'] == '':

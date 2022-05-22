@@ -240,7 +240,7 @@ multiEditHosts_argument = editHostMapping_argument.copy()
 multiEditHosts_argument.add_argument('job_ids', type=list, required=True, location='json', help='An array of job IDs')
 
 multiJobOperation_argument = reqparse.RequestParser()
-multiJobOperation_argument.add_argument('operation', type=str, required=True,  help='job action', choices=["stop"])
+multiJobOperation_argument.add_argument('operation', type=str, required=True,  help='job action', choices=["start", "stop", "kill"])
 multiJobOperation_argument.add_argument('job_ids', type=list, required=True, location='json', help='An array of job IDs')
 
 editJob_argument = reqparse.RequestParser()

@@ -27,7 +27,7 @@ from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWo
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
     editJob_argument, multiEditHosts_argument, jobList_argument, multiJobOperation_argument, job_permissions_arguments
 from src.api.fitcrack.endpoints.job.functions import verifyHashFormat, create_job, \
-    computeCrackingTime, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
+    stop_job, start_job, kill_job, computeCrackingTime, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
     can_view_job, can_edit_job, can_operate_job
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, \
@@ -135,7 +135,7 @@ class jobsCollection(Resource):
         for job in jobs:
             if not job.deleted and job.status == status_to_code['running']:
                 # before moving to trash, stop job if running
-                job.status = status_to_code['finishing']
+                stop_job(job)
 
             job.deleted = not job.deleted
             
@@ -165,7 +165,11 @@ class multiJobOperation(Resource):
 
         for job in jobs:
             if operation == 'stop':
-                job.status = status_to_code['finishing']
+                stop_job(job)
+            elif operation == 'start':
+                start_job(job, db)
+            elif operation == 'kill':
+                kill_job(job, db)
 
         try:
             db.session.commit()
@@ -363,15 +367,9 @@ class OperationWithJob(Resource):
         job = FcJob.query.filter(FcJob.id == id).one()
 
         if action == 'start':
-            # check hosts
-            hosts = [ a[0] for a in db.session.query(Host.id).all() ]
-            if job.host_count == 0:
-                for hostId in hosts:
-                    host = FcHostActivity(boinc_host_id=hostId, job_id=job.id)
-                    db.session.add(host)
-            job.status = status_to_code['running']
+            start_job(job, db)
         elif action == 'stop':
-            job.status = status_to_code['finishing']
+            stop_job(job, db)
         elif action == 'restart':
             job.status = status_to_code['running']
             job.indexes_verified = 0
@@ -393,38 +391,7 @@ class OperationWithJob(Resource):
                 db.session.delete(item)
             db.session.add(FcJobGraph(progress=0, job_id=job.id))
         elif action == 'kill':
-            # Job is stopped in Generator after sending BOINC commands
-            if (int(job.status) != status_to_code['running']) and (int(job.status) != status_to_code['finishing']):
-                job.status = status_to_code['ready']
-                workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
-                for item in workunits:
-                    db.session.delete(item)
-            else:
-                job.kill = True
-
-            job.indexes_verified = 0
-            job.current_index = 0
-            job.current_index_2 = 0
-            job.workunit_sum_time = 0
-            job.time_start = job.time_end = None
-            if job.attack_mode == attack_modes['mask'] or job.attack_mode == attack_modes['hybrid (wordlist + mask)']:
-                masks = FcMask.query.filter(FcMask.job_id == id).all()
-                for mask in masks:
-                    mask.current_index = 0
-            elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
-                dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
-                for dictionary in dictionaries:
-                    dictionary.current_index = 0
-            hosts = FcHostActivity.query.filter(FcHostActivity.job_id == id).all()
-            for host in hosts:
-                host.status = 0
-            graphData = FcJobGraph.query.filter(FcJobGraph.job_id == id).all()
-            for item in graphData:
-                db.session.delete(item)
-
-            for job_hash in job.hashes:
-                job_hash.result = None
-                job_hash.time_cracked = None
+            kill_job(job, db)
         else:
             abort(400, 'Bad operation with job!')
 
