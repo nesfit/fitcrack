@@ -26,7 +26,7 @@ from src.api.fitcrack.lang import status_to_code, attack_modes
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcJobDictionary, \
-    FcJobGraph, FcRule, FcHash, FcMask, FcUserPermission, FcSetting, FcWorkunit
+    FcJobGraph, FcRule, FcHash, FcMask, FcUserPermission, FcSetting, FcWorkunit, FcDeviceInfo
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
@@ -39,11 +39,12 @@ def kill_job(job, db):
     if (int(job.status) != status_to_code['running']) and (int(job.status) != status_to_code['finishing']):
         job.status = status_to_code['ready']
         workunits = FcWorkunit.query.filter(FcWorkunit.job_id == id).all()
-        for item in workunits:
-            pass
-            # We cannot delete wus as device_info uses their ids.
-            # db.session.delete(item)
-            # FIXME: introduce new deleted field and then item.deleted = True
+        for wu in workunits:
+            device_info_for_wu = FcDeviceInfo.query.filter(FcDeviceInfo.workunit_id == wu.id).all()
+            for device_info in device_info_for_wu:
+                db.session.delete(device_info)
+
+            db.session.delete(wu)
     else:
         job.kill = True
 
