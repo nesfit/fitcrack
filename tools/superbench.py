@@ -2,12 +2,11 @@ import json, requests, argparse, time, threading, base64
 
 HASH_INFO_PATH = '../webadmin/fitcrackAPI/hashcat/hash_info.json'
 
-# FC issue 13761
 # python3 superbench.py --debug --delay 150 --host-id 1 --api-url http://192.168.101.5:5001 --user root --password xxxx --attack-modes 1
 
-def base64encode(text):
-    base64_bytes = base64.b64encode(text.encode('ascii'))
-    return "BASE64:" + base64_bytes.decode('ascii')
+def hextobase64(hash_in_hex):
+    b64 = base64.b64encode(bytes.fromhex(hash_in_hex)).decode()
+    return "BASE64:" + b64
 
 def kill_job(session, args, id):
     resp = session.get(args.api_url + '/job/' + str(id))
@@ -108,12 +107,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (dictionary attack) ===========")
         for hashcode in hash_info:
-            if hash_info[hashcode]['example_hash_format'] == "plain":
-                hash_to_crack = hash_info[hashcode]['example_hash']
-            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
-                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
-            else:
+            if "N/A" in hash_info[hashcode]['example_hash_format']:
                 continue
+            elif "binary file only" in hash_info[hashcode]['example_hash_format']:
+                hash_to_crack = hextobase64(hash_info[hashcode]['example_hash'])
+            else:
+                hash_to_crack = hash_info[hashcode]['example_hash']
             create_job_dict_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -121,12 +120,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (combinatory attack) ===========")
         for hashcode in hash_info:
-            if hash_info[hashcode]['example_hash_format'] == "plain":
-                hash_to_crack = hash_info[hashcode]['example_hash']
-            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
-                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
-            else:
+            if "N/A" in hash_info[hashcode]['example_hash_format']:
                 continue
+            elif "binary file only" in hash_info[hashcode]['example_hash_format']:
+                hash_to_crack = hextobase64(hash_info[hashcode]['example_hash'])
+            else:
+                hash_to_crack = hash_info[hashcode]['example_hash']
             create_job_comb_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -134,12 +133,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (mask attack) ===========")
         for hashcode in hash_info:
-            if hash_info[hashcode]['example_hash_format'] == "plain":
-                hash_to_crack = hash_info[hashcode]['example_hash']
-            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
-                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
-            else:
+            if "N/A" in hash_info[hashcode]['example_hash_format']:
                 continue
+            elif "binary file only" in hash_info[hashcode]['example_hash_format']:
+                hash_to_crack = hextobase64(hash_info[hashcode]['example_hash'])
+            else:
+                hash_to_crack = hash_info[hashcode]['example_hash']
             create_job_mask_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -147,12 +146,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (hybrid wordlist + mask attack) ===========")
         for hashcode in hash_info:
-            if hash_info[hashcode]['example_hash_format'] == "plain":
-                hash_to_crack = hash_info[hashcode]['example_hash']
-            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
-                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
-            else:
+            if "N/A" in hash_info[hashcode]['example_hash_format']:
                 continue
+            elif "binary file only" in hash_info[hashcode]['example_hash_format']:
+                hash_to_crack = hextobase64(hash_info[hashcode]['example_hash'])
+            else:
+                hash_to_crack = hash_info[hashcode]['example_hash']
             create_job_hybrid_wm_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -160,12 +159,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (hybrid mask + wordlist attack) ===========")
         for hashcode in hash_info:
-            if hash_info[hashcode]['example_hash_format'] == "plain":
-                hash_to_crack = hash_info[hashcode]['example_hash']
-            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
-                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
-            else:
+            if "N/A" in hash_info[hashcode]['example_hash_format']:
                 continue
+            elif "binary file only" in hash_info[hashcode]['example_hash_format']:
+                hash_to_crack = hextobase64(hash_info[hashcode]['example_hash'])
+            else:
+                hash_to_crack = hash_info[hashcode]['example_hash']
             create_job_hybrid_mw_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -173,12 +172,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (prince attack) ===========")
         for hashcode in hash_info:
-            if hash_info[hashcode]['example_hash_format'] == "plain":
-                hash_to_crack = hash_info[hashcode]['example_hash']
-            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
-                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
-            else:
+            if "N/A" in hash_info[hashcode]['example_hash_format']:
                 continue
+            elif "binary file only" in hash_info[hashcode]['example_hash_format']:
+                hash_to_crack = hextobase64(hash_info[hashcode]['example_hash'])
+            else:
+                hash_to_crack = hash_info[hashcode]['example_hash']
             create_job_prince_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
@@ -186,12 +185,12 @@ def main():
         if arguments.debug:
             print("=========== Benchmarking (pcfg attack) ===========")
         for hashcode in hash_info:
-            if hash_info[hashcode]['example_hash_format'] == "plain":
-                hash_to_crack = hash_info[hashcode]['example_hash']
-            elif hash_info[hashcode]['example_hash_format'].startswith("hex-encoded"):
-                hash_to_crack = base64encode(hash_info[hashcode]['example_hash'])
-            else:
+            if "N/A" in hash_info[hashcode]['example_hash_format']:
                 continue
+            elif "binary file only" in hash_info[hashcode]['example_hash_format']:
+                hash_to_crack = hextobase64(hash_info[hashcode]['example_hash'])
+            else:
+                hash_to_crack = hash_info[hashcode]['example_hash']
             create_job_pcfg_attack(s, arguments, hashcode, hash_to_crack, host_id)
             time.sleep(arguments.delay)
 
