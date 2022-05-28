@@ -4,6 +4,49 @@ Note: A detailed documentation and other information can be found at [https://fi
 
 This README describes how to install and run Fitcrack distributed password cracking system.
 
+
+## Step-by-step: Install on Ubuntu 22.04 LTS
+
+Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
+
+### Install prerequisities
+```
+apt install -y m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
+```
+
+### Setup the MySQL Database
+```
+systemctl start mysql
+mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'YOURROOTPASSWORD';"
+mysql -u root -p
+mysql> create database fitcrack;
+mysql> CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+mysql> GRANT ALL ON fitcrack.* TO 'fitcrack'@'localhost';
+mysql> SET GLOBAL log_bin_trust_function_creators = 1;
+mysql> exit
+```
+
+### Setup the Apache web server
+```
+a2enmod cgi       # enable mod CGI
+a2enmod rewrite   # enable mod rewrite
+a2enmod wsgi      # enable mod wsgi
+systemctl restart apache2
+```
+
+### Setup BOINC server user
+```
+useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
+passwd boincadm   # choose some password to login later
+```
+
+### Install Fitcrack
+```
+./install_fitcrack.sh
+```
+
+
+
 ## Step-by-step: Install on Ubuntu 20.04 LTS
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
@@ -89,7 +132,7 @@ Sometimes you need to configure specific behavior for individual hosts.
 Fitcrack allows you to define additional **host-specific hashcat arguments**.
 This gives you options to select what GPUs to use for cracking,
 configure the workload profile for fine-tuning of the performance, etc.
-Simply create a file `/etc/fitcrack.conf` (Linux hosts) or 
+Simply create a file `/etc/fitcrack.conf` (Linux hosts) or
 `C:\ProgramData\BOINC\fitcrack.conf` (Windows hosts).
 If the file exists and is readable for the BOINC client user, the
 **Runner** subsystem will append the contents to **hashcat's arguments**.
@@ -100,4 +143,3 @@ $ echo '-w 4 -d 1,2 --force' > /etc/fitcrack.conf
 ```
 Hashcat will use OpenCL devices 1 and 2. The workload profile will be set to level 4 (Nightmare).
 The cracking session will be forced and all warnings ignored.
-
