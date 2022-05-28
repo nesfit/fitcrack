@@ -12,6 +12,8 @@ usermod -a -G $BOINC_GROUP $APACHE_USER
 # Make project and create database #
 ####################################
 
+SERVER_HOSTNAME=$(hostname)
+
 # Make project
 echo "Making BOINC project."
 ./boinc/tools/make_project \
@@ -19,6 +21,7 @@ echo "Making BOINC project."
  --url_base $BOINC_URL \
  --srcdir boinc \
  --user_name $BOINC_USER \
+ --project_host $SERVER_HOSTNAME \
  --project_root "$BOINC_HOME/projects/$BOINC_PROJECT" \
  --db_host $DB_HOST \
  --db_name $DB_NAME \
