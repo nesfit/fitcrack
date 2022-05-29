@@ -14,6 +14,10 @@ usermod -a -G $BOINC_GROUP $APACHE_USER
 
 SERVER_HOSTNAME=$(hostname)
 
+# Replace "localhost" with "127.0.0.1"
+# (as BOINC clients cannot resolve localhost)
+BOINC_URL=${BOINC_URL/localhost/127\.0\.0\.1}
+
 # Make project
 echo "Making BOINC project."
 ./boinc/tools/make_project \
