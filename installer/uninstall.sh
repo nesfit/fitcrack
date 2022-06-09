@@ -48,7 +48,7 @@ if [ -d "$BOINC_PROJECT_DIR" ]; then
       debian|ubuntu)
         update-rc.d fitcrack remove
       ;;
-      centos|redhat)
+      centos|redhat|rocky)
         chkconfig --level 2345 fitcrack off
         chkconfig --del fitcrack
       ;;
