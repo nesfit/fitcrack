@@ -40,7 +40,7 @@ if [ -z ${OPS_LOGIN+x} ]; then
 fi
 
 if [ -z ${OPS_PW+x} ]; then
-  read -e -p "Enter user name for accessing ${BOINC_URL}/${BOINC_PROJECT}_ops (default: mypassword)" OPS_PW
+  read -e -p "Enter password for accessing ${BOINC_URL}/${BOINC_PROJECT}_ops (default: mypassword)" OPS_PW
   OPS_PW=${OPS_PW:-mypassword}
 fi
 
