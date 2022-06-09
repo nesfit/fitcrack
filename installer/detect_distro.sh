@@ -43,7 +43,7 @@ case $ID in
         DEFAULT_APACHE_DOCUMENT_ROOT="/var/www/html"
         DEFAULT_APACHE_SERVICE="apache2"
         ;;
-    centos|redhat)
+    centos|redhat|rocky)
         DEFAULT_APACHE_USER="apache"
         DEFAULT_APACHE_CONFIG_DIR="/etc/httpd"
         DEFAULT_APACHE_CONFIG_FILE="/etc/httpd/conf/httpd.conf"

@@ -135,7 +135,7 @@ if [ $SERVICE_INSTALL = "y" ]; then
     debian|ubuntu)
       update-rc.d fitcrack defaults
     ;;
-    centos|redhat)
+    centos|redhat|rocky)
       chkconfig --add fitcrack
       chkconfig --level 2345 fitcrack on
     ;;
