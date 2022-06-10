@@ -225,7 +225,7 @@ export default {
         {title: 'Part of batch', icon: 'mdi-tray-full', value: d.batch.name},
         {title: 'Comment', icon: 'mdi-format-quote-close', value: d.comment},
         {title: 'Keyspace', icon: 'mdi-key', value: d.keyspace, format: fmt},
-        {title: 'Date Added', icon: 'mdi-calendar-import', value: d.time, format: v => this.$moment(v).calendar()},
+        {title: 'Date Added', icon: 'mdi-calendar-import', value: d.time, format: v => this.$moment.utc(v).local().calendar()},
         {title: 'Workunit Sum Time', icon: 'mdi-sigma', value: d.workunit_sum_time_str},
         {title: 'Cracking Time', icon: 'mdi-timer', value: this.crackingTime},
         {title: 'Estimated Cracking Time', icon: 'mdi-bell-ring-outline', value: d.estimated_cracking_time_str},
@@ -257,7 +257,7 @@ export default {
     startTime () {
       const d = this.data
       if (d.time_start) {
-        return this.$moment(d.time_start).format('DD.MM.YYYY HH:mm')
+        return this.$moment.utc(d.time_start).local().format('DD.MM.YYYY HH:mm')
       } else {
         return 'Not started yet'
       }
@@ -265,7 +265,7 @@ export default {
     endTime () {
       const d = this.data
       if (d.time_end) {
-        return this.$moment(d.time_end).format('DD.MM.YYYY HH:mm')
+        return this.$moment.utc(d.time_end).local().format('DD.MM.YYYY HH:mm')
       } else {
         return 'Not planned'
       }

@@ -16,7 +16,7 @@
 
 <script>
 import Timeseries from './types/timeseries'
-import { prepareLines } from './helpers'
+import { prepareLines, localizeTime } from './helpers'
 import autoload from './autoupdateMixin'
 import watcher from './boundWatcherMixin'
 
@@ -65,7 +65,7 @@ export default {
     },
     fromTime () {
       if (!this.id && !this.from) {
-        return this.$moment().subtract(24, 'hours').format('YYYY-M-DTH:mm:ss')
+        return this.$moment.utc().subtract(24, 'hours').format('YYYY-M-DTH:mm:ss')
       } else {
         return this.from
       }
@@ -86,7 +86,7 @@ export default {
         }
       }).then(r => {
         this.chartdata = {
-          datasets: prepareLines(r.data.datasets)
+          datasets: localizeTime(prepareLines(r.data.datasets))
         }
         this.loading = false
         this.loaded = true

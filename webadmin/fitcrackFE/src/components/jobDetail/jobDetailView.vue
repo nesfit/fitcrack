@@ -80,7 +80,6 @@
                           :href="$serverAddr + '/job/' + data.id + '/exportCrackedHashes'"
                           target="_blank"
                           download
-                          v-on="on"
                         >
                           <v-btn
                            color="success"

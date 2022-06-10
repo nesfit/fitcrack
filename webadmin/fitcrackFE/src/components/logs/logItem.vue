@@ -14,7 +14,7 @@
       :class="{new: isNew}"
       class="newOverlay px-2"
     >
-      <span class="time pr-2">{{ $moment(time).format('D.M.YYYY H:mm:ss') }}: </span>
+      <span class="time pr-2">{{ $moment.utc(time).local().format('D.M.YYYY H:mm:ss') }}: </span>
       <v-col><slot /></v-col>
       <v-btn
         v-if="hostID"

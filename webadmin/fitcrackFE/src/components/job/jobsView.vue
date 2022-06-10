@@ -371,7 +371,7 @@
       </template>
       <!-- Date added cell -->
       <template v-slot:item.time="{ item }">
-        {{ $moment(item.time).format('D.M.YYYY H:mm:ss') }}
+        {{ $moment.utc(item.time).local().format('D.M.YYYY H:mm:ss') }}
       </template>
       <!-- Action buttons cell -->
       <template v-slot:item.actions="{ item }">

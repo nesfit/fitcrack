@@ -25,7 +25,7 @@
         {{ fmt(dictionary.keyspace) }}
       </template>
       <template v-slot:item.dictionary.time="{ item: { dictionary } }">
-        {{ $moment(dictionary.time).format('DD.MM.YYYY HH:mm') }}
+        {{ $moment.utc(dictionary.time).local().format('DD.MM.YYYY HH:mm') }}
       </template>
     </v-data-table>
     <template v-if="data.rulesFile.id !== null">

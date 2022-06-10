@@ -74,7 +74,7 @@
               <v-list-item-title>
                 {{ device.name }}
               </v-list-item-title>
-              <v-list-item-subtitle v-if="$moment(device.device_info[0].time).isBefore($moment().subtract(10, 'minutes'))">
+              <v-list-item-subtitle v-if="$moment.utc(device.device_info[0].time).isBefore($moment.utc().subtract(10, 'minutes'))">
                 Inactive – no current data.
               </v-list-item-subtitle>
               <v-list-item-subtitle v-else>
@@ -153,7 +153,7 @@
           </template>
           <!-- Date added cell -->
           <template v-slot:item.time="{ item }">
-            {{ $moment(item.time).format('D.M.YYYY H:mm:ss') }}
+            {{ $moment.utc(item.time).local().format('D.M.YYYY H:mm:ss') }}
           </template>
           <!-- Action buttons cell -->
           <template v-slot:item.actions="{ item }">
@@ -240,7 +240,7 @@
             {{ fmt(item.hc_keyspace) }}
           </template>
           <template v-slot:item.time="{ item }">
-            {{ $moment(item.time).format('D.M.YYYY H:mm:ss') }}
+            {{ $moment.utc(item.time).local().format('D.M.YYYY H:mm:ss') }}
           </template>
           <template v-slot:item.retry="{ item }">
             {{ yesNo(item.retry) }}

@@ -36,7 +36,7 @@
           {{ fmt(item.keyspace) }}
         </template>
         <template v-slot:item.time_added="{ item }">
-          {{ $moment(item.time_added).format('DD.MM.YYYY HH:mm') }}
+          {{ $moment.utc(item.time_added).local().format('DD.MM.YYYY HH:mm') }}
         </template>
         <template v-slot:item.actions="{ item }">
           <v-tooltip top>

@@ -19,7 +19,7 @@
           {{ title }}
         </v-list-item-title>
         <v-list-item-subtitle class="text-end nogrow">
-          {{ $moment(time).format('DD. MM. YYYY HH:mm') }}
+          {{ $moment.utc(time).local().format('DD. MM. YYYY HH:mm') }}
         </v-list-item-subtitle>
       </div>
       <div class="body-2">

@@ -25,7 +25,7 @@
             <v-icon>
               mdi-ray-start
             </v-icon>
-            Start
+            Start{{ edit.startNow ? '' : ' (UTC)' }}
           </div>
           <v-spacer />
           <v-checkbox
@@ -49,7 +49,7 @@
             <v-icon>
               mdi-ray-end
             </v-icon>
-            End
+            End{{ edit.endNever ? '' : ' (UTC)' }}
           </div>
           <v-spacer />
           <v-checkbox
@@ -223,11 +223,11 @@ export default {
         comment: this.data.comment,
         seconds_per_job: this.data.seconds_per_job,
         time_start: this.data.time_start === null ?
-        this.$moment().toISOString(true).slice(0, 16) :
-        this.$moment(this.data.time_start).toISOString(true).slice(0, 16),
+        this.$moment.utc().toISOString(true).slice(0, 16) :
+        this.$moment.utc(this.data.time_start).toISOString(true).slice(0, 16),
         time_end: this.data.time_end === null ?
-          this.$moment().toISOString(true).slice(0, 16) :
-          this.$moment(this.data.time_end).toISOString(true).slice(0, 16),
+          this.$moment.utc().toISOString(true).slice(0, 16) :
+          this.$moment.utc(this.data.time_end).toISOString(true).slice(0, 16),
         startNow: (this.data.time_start === null),
         endNever: (this.data.time_end === null),
         check_duplicates: this.data.check_duplicates,

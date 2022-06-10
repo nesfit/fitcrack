@@ -105,7 +105,7 @@
         <span v-else>–</span>
       </template>
       <template v-slot:item.time="{ item }">
-        {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+        {{ $moment.utc(item.time).local().format('DD.MM.YYYY HH:mm') }}
       </template>
       <template v-slot:item.start_index_real="{ item }">
         {{ fmt(item.start_index_real) }}

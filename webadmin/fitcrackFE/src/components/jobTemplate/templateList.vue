@@ -17,7 +17,7 @@
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Templates per page'}"
       >
         <template v-slot:item.created="{ item }">
-          {{ $moment(item.created).format('DD.MM.YYYY HH:mm') }}
+          {{ $moment.utc(item.created).local().format('DD.MM.YYYY HH:mm') }}
         </template>
         <template v-slot:item.actions="{ item }">
           <v-tooltip top>

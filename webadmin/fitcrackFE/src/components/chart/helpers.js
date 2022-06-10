@@ -1,4 +1,5 @@
 import pattern from 'patternomaly'
+import moment from 'moment'
 
 const gridColor = '#9997'
 export { gridColor }
@@ -45,11 +46,22 @@ export function prepareLines (data) {
   })
 }
 
+export function localizeTime (data) {
+  return data.map(set => {
+    let localized = {}
+    for (const [time, value] of Object.entries(set.data)) {
+      localized[moment.utc(time).local()] = value
+    }
+    set.data = localized
+    return set
+  })
+}
+
 export function plotUsage (usageData, metric) {
   return take(usageData, 180)
     .reduce((data, point) => ({
       ...data,
-      [point.time]: point[metric]
+      [moment.utc(point.time).local()]: point[metric]
     }), {})
 }
 

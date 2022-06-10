@@ -27,10 +27,10 @@
           </v-icon>
         </v-sheet>
         <div class="subtitle-2 mt-2">
-          {{ $moment(time).format('DD.MM.YYYY') }}
+          {{ $moment.utc(time).local().format('DD.MM.YYYY') }}
         </div>
         <div>
-          {{ $moment(time).format('HH:mm') }}
+          {{ $moment.utc(time).local().format('HH:mm') }}
         </div>
       </div>
     </div>
@@ -60,10 +60,10 @@
           >
             <template v-slot:item.time="{ item }">
               <strong>
-                {{ $moment(item.time).format('DD.MM.YYYY') }}
+                {{ $moment.utc(item.time).local().format('DD.MM.YYYY') }}
               </strong>
               <span>
-                {{ $moment(item.time).format('HH:mm') }}
+                {{ $moment.utc(item.time).local().format('HH:mm') }}
               </span>
             </template>
             <template v-slot:item.status="{ item }">

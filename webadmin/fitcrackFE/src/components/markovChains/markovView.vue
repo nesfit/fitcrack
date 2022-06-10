@@ -25,7 +25,7 @@
         :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Hcstats per page'}"
       >
         <template v-slot:item.time="{ item }">
-          {{ $moment(item.time).format('DD.MM.YYYY HH:mm') }}
+          {{ $moment.utc(item.time).local().format('DD.MM.YYYY HH:mm') }}
         </template>
         <template v-slot:item.actions="{ item }">
           <v-tooltip top>

@@ -437,7 +437,7 @@
               </v-row>
               <v-row>
                 <v-col>
-                  <div class="title mb-2">Planned start</div>
+                  <div class="title mb-2">Planned start (UTC)</div>
                   <dt-picker
                     v-model="startDate"
                     outlined
@@ -468,7 +468,7 @@
                   />
                 </v-col>
                 <v-col>
-                  <div class="title mb-2">Planned end</div>
+                  <div class="title mb-2">Planned end (UTC)</div>
                   <dt-picker
                     v-model="endDate"
                     outlined
@@ -637,8 +637,8 @@
     mounted: function () {
       this.loadSettings()
       this.getHashTypes()
-      this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm')
-      this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm')
+      this.startDate = this.$moment.utc().format('YYYY-MM-DDTHH:mm')
+      this.endDate = this.$moment.utc().format('YYYY-MM-DDTHH:mm')
       if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
     },
@@ -867,7 +867,7 @@
         this.validateHashes()
       },
       generateJobName () {
-        this.name = "job-" + this.$moment().format('DD-MM-YYYY-HH-mm')
+        this.name = "job-" + this.$moment.utc().format('DD-MM-YYYY-HH-mm')
       }
     }
   }

@@ -53,7 +53,7 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title class="text-right">
-                  {{ $moment(info.time).format('DD.MM.YYYY HH:mm') }}
+                  {{ $moment.utc(info.time).local().format('DD.MM.YYYY HH:mm') }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>

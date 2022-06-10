@@ -45,12 +45,12 @@
           <dt-picker
             v-model="chartsFrom"
             class="mr-4"
-            label="From"
+            label="From (UTC)"
             @input="loadData"
           />
           <dt-picker
             v-model="chartsTo"
-            label="To"
+            label="To (UTC)"
             @input="loadData"
           />
         </div>
@@ -151,8 +151,8 @@ export default {
       //
       fullDate: false,
       hoursBefore: '3',
-      chartsFrom: this.$moment().subtract(1, 'hours').format('YYYY-MM-DDTHH:mm'),
-      chartsTo: this.$moment().format('YYYY-MM-DDTHH:mm'),
+      chartsFrom: this.$moment.utc().subtract(1, 'hours').format('YYYY-MM-DDTHH:mm'),
+      chartsTo: this.$moment.utc().format('YYYY-MM-DDTHH:mm'),
       //
       services: [],
       usageData: []
@@ -180,17 +180,17 @@ export default {
       let from_date, to_date = ''
       if (this.fullDate) {
         if (this.chartsFrom.length === 16) {
-          from_date = this.$moment(this.chartsFrom, 'YYYY-MM-DDTHH:mm').format('YYYY-M-D H:mm:ss')
+          from_date = this.$moment.utc(this.chartsFrom, 'YYYY-MM-DDTHH:mm').format('YYYY-M-D H:mm:ss')
         } else {
           return
         }
         if (this.chartsTo.length === 16) {
-          to_date = this.$moment(this.chartsTo, 'YYYY-MM-DDTHH:mm').format('YYYY-M-D H:mm:ss')
+          to_date = this.$moment.utc(this.chartsTo, 'YYYY-MM-DDTHH:mm').format('YYYY-M-D H:mm:ss')
         } else {
           return
         }
       } else {
-        from_date = this.$moment().subtract(this.hoursBefore, 'hours').format('YYYY-M-D H:mm:ss')
+        from_date = this.$moment.utc().subtract(this.hoursBefore, 'hours').format('YYYY-M-D H:mm:ss')
       }
 
       this.usageData = await this.axios

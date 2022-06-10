@@ -90,7 +90,7 @@ export default {
     disabled: Boolean,
     value: {
       type: String,
-      default: () => this.$moment().format('YYYY-MM-DDTHH:mm')
+      default: () => this.$moment.utc().format('YYYY-MM-DDTHH:mm')
     }
   },
   data () {

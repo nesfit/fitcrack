@@ -69,7 +69,7 @@
         </div>
       </template>
       <template v-slot:item.added="{ item }">
-        {{ $moment(item.added).format('D.M.YYYY H:mm:ss') }}
+        {{ $moment.utc(item.added).local().format('D.M.YYYY H:mm:ss') }}
       </template>
       <template v-slot:item.job="{ item }">
       <router-link

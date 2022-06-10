@@ -30,7 +30,7 @@
           </router-link>
         </template>
         <template v-slot:item.time="{ item }">
-          {{ $moment(item.time ).format('DD.MM.YYYY HH:mm') }}
+          {{ $moment.utc(item.time).local().format('DD.MM.YYYY HH:mm') }}
         </template>
         <template v-slot:item.keyspace="{ item }">
           {{ fmt(item.keyspace) }}

@@ -88,7 +88,14 @@ export default {
           x: {
             type: 'time',
             time: {
-              stepSize: 5
+              stepSize: 5,
+              tooltipFormat: 'YYYY-MM-DD HH:mm',
+              displayFormats: {
+                  millisecond: 'HH:mm:ss.SSS',
+                  second: 'HH:mm:ss',
+                  minute: 'HH:mm',
+                  hour: 'HH'
+              }
             },
             grid: {
               display: false
