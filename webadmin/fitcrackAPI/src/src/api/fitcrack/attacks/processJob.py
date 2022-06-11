@@ -150,9 +150,9 @@ def process_job_3(job, hashcatKeyspace=True):
             hc_keyspace_for_mask = 0
             if hashcatKeyspace:
 
-                tmp = HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' -a 3 ' + mask + ' --markov-threshold ' +  str(job['attack_settings']['markov_treshold'])
+                tmp = HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' -a 3 "' + mask + '" --markov-threshold ' +  str(job['attack_settings']['markov_treshold'])
                 hc_keyspace_for_mask = shellExec(
-                    HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' --keyspace -a 3 ' + mask + ' --markov-threshold ' +  str(job['attack_settings']['markov_treshold']),
+                    HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' --keyspace -a 3 "' + mask + '" --markov-threshold ' +  str(job['attack_settings']['markov_treshold']),
                     cwd=HASHCAT_DIR, abortOnError=True)
                 if hc_keyspace_for_mask == '':
                     abort(500, 'Server can not compute keyspace for mask ' + mask)
@@ -179,7 +179,7 @@ def process_job_3(job, hashcatKeyspace=True):
             hc_keyspace_for_mask = 0
             if hashcatKeyspace:
                 hc_keyspace_for_mask = shellExec(
-                    HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' --keyspace -a 3 ' + mask + ' ' + hashcatArgs,
+                    HASHCAT_PATH + ' -m ' + job['hash_settings']['hash_type'] + ' --keyspace -a 3 "' + mask + '" ' + hashcatArgs,
                     cwd=HASHCAT_DIR, abortOnError=True)
                 if hc_keyspace_for_mask == '':
                     abort(500, 'Server can not compute keyspace for mask ' + mask)
