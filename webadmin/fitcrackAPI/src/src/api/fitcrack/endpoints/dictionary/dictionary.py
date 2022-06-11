@@ -167,7 +167,13 @@ class dictionaryAdd(Resource):
                 move(dict_path + '_sorted', dict_path)
 
             pwd_dist = shellExec(PWD_DIST_PATH + " " + dict_path)
-            hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + dict_path, cwd=HASHCAT_DIR))
+            hc_keyspace = 0
+            for len_dist in pwd_dist.split(';'):
+                # password len : number of occurrences
+                password_occurrences = len_dist.split(':')
+                if len(password_occurrences) == 2:
+                    hc_keyspace += int(password_occurrences[1])
+
             dictionary = FcDictionary(name=uploadedFile['filename'], path=uploadedFile['path'], password_distribution=pwd_dist, keyspace=hc_keyspace)
             try:
                 db.session.add(dictionary)
