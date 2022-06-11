@@ -369,7 +369,7 @@ class OperationWithJob(Resource):
         if action == 'start':
             start_job(job, db)
         elif action == 'stop':
-            stop_job(job, db)
+            stop_job(job)
         elif action == 'restart':
             job.status = status_to_code['running']
             job.indexes_verified = 0
