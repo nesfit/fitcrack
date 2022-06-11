@@ -216,7 +216,13 @@ class dictionary(Resource):
             else:
                 os.symlink(file['path'], newPath)
             pwd_dist = shellExec(PWD_DIST_PATH + " " + newPath)
-            hc_keyspace = int(shellExec(HASHCAT_PATH + ' --keyspace -a 0 ' + newPath, cwd=HASHCAT_DIR))
+            hc_keyspace = 0
+            for len_dist in pwd_dist.split(';'):
+                # password len : number of occurrences
+                password_occurrences = len_dist.split(':')
+                if len(password_occurrences) == 2:
+                    hc_keyspace += int(password_occurrences[1])
+
             dictionary = FcDictionary(name=file['name'], path=newName, password_distribution=pwd_dist, keyspace=hc_keyspace)
             try:
                 db.session.add(dictionary)

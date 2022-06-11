@@ -5,7 +5,7 @@
 
 <template>
   <fc-tile
-    :title="data ? data.path || 'Server browser' : 'Connecting...'"
+    :title="data ? 'Import from ' + data.path || 'Server browser' : 'Connecting...'"
     icon="mdi-server-network"
     class="mx-auto dictContentContainer"
   >
@@ -87,8 +87,20 @@
         color="primary"
         @click="upload"
       >
-        Select
+        Add
       </v-btn>
+      <v-divider />
+      <v-progress-linear
+        v-model="progress"
+        :query="true"
+        :active="adding"
+        color="primary"
+      />
+      <v-card-text v-if="adding"
+        class="my-0 py-0"
+      >
+      It may take a few minutes to complete this action. Please check back later.
+      </v-card-text>
     </div>
   </fc-tile>
 </template>
@@ -107,13 +119,17 @@
       return {
         data: null,
         selectedFiles:{},
-        adding: false
+        adding: false,
+        progress: 0
       }
     },
     mounted: function () {
       this.loadDirectory('/')
     },
     methods: {
+      uploadChange(progressEvent) {
+        this.progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+      },
       loadDirectory: function (path) {
         // this.data = null
         this.axios.get(this.$serverAddr + '/directory', {
@@ -136,6 +152,7 @@
         }
       },
       upload: function () {
+        this.progress = 0
         this.adding = true
         var files = Object.keys(this.selectedFiles).map(function(key) {
           return {
@@ -143,10 +160,14 @@
             "path": this.selectedFiles[key]["path"]
           };
         }.bind(this));
+
+        var config = {
+          onUploadProgress: this.uploadChange
+        }
         this.axios.post(this.$serverAddr + '/dictionary/fromFile', {
           files,
           sort: this.sort
-        }).then((response) => {
+        }, config).then((response) => {
           this.adding = false
           this.$emit('filesuploaded', true)
         }).catch((error) => {
