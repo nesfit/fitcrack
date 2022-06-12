@@ -29,7 +29,7 @@ ProcessBase::ProcessBase(const std::string& exec_name, const std::vector<std::st
 
 std::string ProcessBase::quoteArgIfNecessary(const std::string &arg)
 {
-  if (arg.find(" ") != std::string::npos)
+  if (arg.find_first_of(" ?") != std::string::npos)
   {
     return getQuoteChar()+arg+getQuoteChar();
   }
