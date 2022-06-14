@@ -76,6 +76,12 @@
         />
       </v-col>
     </v-row>
+
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
+    />
   </div>
 </template>
 
@@ -90,7 +96,7 @@
     components: {
       'dict-selector': dictSelector
     },
-    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'ruleLeft', 'rightDicts', 'ruleRight'])),
+    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'ruleLeft', 'rightDicts', 'ruleRight', 'optimized'])),
     methods: {
       checkValid: function () {
         if (this.leftDicts.length > 0 && this.rightDicts.length > 0) {

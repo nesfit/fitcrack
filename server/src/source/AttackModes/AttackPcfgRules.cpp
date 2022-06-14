@@ -131,7 +131,9 @@ bool CAttackPcfgRules::makeWorkunit()
     }
 
     f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
-                             m_job->getName(), m_job->getHashType(), 0, m_job->getHWTempAbort());
+                             m_job->getName(), m_job->getHashType(), 0,
+                             m_job->getHWTempAbort(),
+                             m_job->getOptimizedFlag());
 
     /** Output hc_keyspace */
     auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(newKeyspace));

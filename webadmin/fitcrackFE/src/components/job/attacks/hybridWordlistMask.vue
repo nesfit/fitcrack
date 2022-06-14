@@ -47,6 +47,12 @@
         />
       </v-col>
     </v-row>
+
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
+    />
   </div>
 </template>
 
@@ -72,7 +78,7 @@
         ]
       }
     },
-    computed: mapTwoWayState('jobForm', twoWayMap(['ruleLeft', 'leftDicts', 'ruleRight', 'hybridMask'])),
+    computed: mapTwoWayState('jobForm', twoWayMap(['ruleLeft', 'leftDicts', 'ruleRight', 'hybridMask', 'optimized'])),
     methods: {
       checkValid: function () {
         if (this.hybridMask !== '' && this.leftDicts.length > 0) {

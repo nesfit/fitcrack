@@ -51,6 +51,7 @@ export const empty = {
   maxElemInChain: 8,
   generateRandomRules: 0,
   // other
+  optimized: true,
   startNow: true,
   endNever: true,
   timeForJob: undefined
@@ -90,6 +91,8 @@ export default {
         'min_elem_in_chain': parseInt(state.minElemInChain),
         'max_elem_in_chain': parseInt(state.maxElemInChain),
         'generate_random_rules': parseInt(state.generateRandomRules),
+         // other
+        'optimized': state.optimized,
       }
     },
     jobSettings (state, { attackSettings }) {

@@ -161,6 +161,7 @@ def create_job(data):
         min_elem_in_chain=job['attack_settings'].get('min_elem_in_chain', 0),
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
+        optimized=job['attack_settings'].get('optimized', 1),
         deleted=False
         )
 

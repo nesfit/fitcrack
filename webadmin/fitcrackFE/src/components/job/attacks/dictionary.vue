@@ -22,6 +22,12 @@
       v-model="rules"
       @input="checkValid"
     />
+
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
+    />
   </div>
 </template>
 
@@ -38,7 +44,7 @@
       'dict-selector': dictSelector,
       'rules-selector': ruleSelector
     },
-    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules'])),
+    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'optimized'])),
     methods: {
       checkValid: function () {
         if (this.leftDicts.length > 0) {

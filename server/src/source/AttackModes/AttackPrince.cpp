@@ -68,7 +68,8 @@ bool CAttackPrince::makeWorkunit()
     /** Output original config from DB */
     configFile << generateBasicConfig(
         m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getName(),
-        m_job->getHashType(), m_job->getRandomRulesCount(), m_job->getHWTempAbort());
+        m_job->getHashType(), m_job->getRandomRulesCount(),
+        m_job->getHWTempAbort(), m_job->getOptimizedFlag());
 
     /** Output mode */
     uint64_t startIndex = m_workunit->getStartIndex();

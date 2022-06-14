@@ -24,6 +24,10 @@ void AttackCrackingBase::addSpecificArguments() {
   findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "-g");
   findAndAddOptional(ConfigTask::HWMON_TEMP_ABORT, "--hwmon-temp-abort");
 
+  std::string value;
+  if (config_.find(ConfigTask::OPTIMIZED, value) && value == "1")
+    addArgument("--optimized-kernel-enable");
+
   addArgument("--status-timer="+RunnerUtils::toString(HashcatConstant::ProgressPeriod));
 
   addArgument("--outfile");

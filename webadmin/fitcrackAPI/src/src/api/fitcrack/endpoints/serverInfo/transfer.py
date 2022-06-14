@@ -17,7 +17,7 @@ JOB_EXPORTABLE_COLUMNS = (
   'charset1', 'charset2', 'charset3', 'charset4', 'rule_left', 'rule_right', 
   'markov_threshold', 'case_permute', 'check_duplicates', 
   'min_password_len', 'max_password_len', 'min_elem_in_chain', 
-  'max_elem_in_chain', 'generate_random_rules', 'deleted', 'masks'
+  'max_elem_in_chain', 'generate_random_rules', 'optimized', 'deleted', 'masks'
 )
 # relationship fields that get stored as dependencies
 JOB_EXPORTABLE_DEPENDENCIES = {

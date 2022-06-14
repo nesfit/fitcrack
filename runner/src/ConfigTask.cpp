@@ -19,6 +19,7 @@ const char *ConfigTask::MIN_ELEM_IN_CHAIN = "min_elem_in_chain";
 const char *ConfigTask::MAX_ELEM_IN_CHAIN = "max_elem_in_chain";
 const char *ConfigTask::GENERATE_RANDOM_RULES = "generate_random_rules";
 const char *ConfigTask::HWMON_TEMP_ABORT = "hwmon_temp_abort";
+const char *ConfigTask::OPTIMIZED = "optimized";
 
 /* Private */
 
@@ -72,6 +73,7 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::SKIP_FROM_START);
   supported_.push_back(ConfigTask::GENERATE_RANDOM_RULES);
   supported_.push_back(ConfigTask::HWMON_TEMP_ABORT);
+  supported_.push_back(ConfigTask::OPTIMIZED);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

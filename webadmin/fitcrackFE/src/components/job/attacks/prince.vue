@@ -13,8 +13,14 @@
       select-all
       @input="checkValid"
     />
-    <v-divider />
 
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
+    />
+  
+    <v-divider />
     <v-checkbox
        v-model="checkDuplicates"
        label="Check for password duplicates"
@@ -161,7 +167,7 @@
     },
     computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'checkDuplicates',
     'casePermute', 'minPasswordLen', 'maxPasswordLen', 'minElemInChain', 'maxElemInChain', 
-    'keyspaceLimit', 'generateRandomRules'])),
+    'keyspaceLimit', 'generateRandomRules', 'optimized'])),
     methods: {
       checkValid: function () {
         if (this.minPasswordLen <= 0) {

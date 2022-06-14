@@ -315,6 +315,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `min_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '1',
   `max_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '8',
   `generate_random_rules` int(10) unsigned NOT NULL DEFAULT '0',
+  `optimized` tinyint(1) NOT NULL DEFAULT '1',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
   `batch_id` int(11),

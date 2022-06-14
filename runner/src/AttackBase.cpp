@@ -36,9 +36,6 @@ void AttackBase::initializeArguments() {
 
   /** Name of the executable is set by class Process */
   findAndAddRequired("hash_type", "-m");
-
-  addArgument("--optimized-kernel-enable");
-  //    addArgument("--force");
 }
 
 /* Protected */

@@ -135,6 +135,7 @@ class CJob {
         uint32_t m_minElemInChain;
         uint32_t m_maxElemInChain;
         uint32_t m_generateRandomRules;
+        bool m_optimized;
         bool m_killFlag;
 
         /**
@@ -189,6 +190,7 @@ class CJob {
         uint32_t getMinElemInChain() const;
         uint32_t getMaxElemInChain() const;
         uint32_t getRandomRulesCount() const;
+        bool getOptimizedFlag() const;
         bool getKillFlag() const;
 
         void setGrammar(const std::string & grammar);

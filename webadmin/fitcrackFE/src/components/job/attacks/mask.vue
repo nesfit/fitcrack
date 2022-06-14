@@ -158,6 +158,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
+    />
   </div>
 </template>
 
@@ -187,7 +193,7 @@
       }
     },
     computed: {
-      ...mapTwoWayState('jobForm', twoWayMap(['masks', 'submode', 'markovThresh', 'markov', 'charset']))
+      ...mapTwoWayState('jobForm', twoWayMap(['masks', 'submode', 'markovThresh', 'markov', 'charset', 'optimized']))
     },
     methods: {
       ...mapMutations('jobForm', ['addMask', 'deleteMask', 'updateMask', 'mergeMasks']),

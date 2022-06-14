@@ -11,6 +11,14 @@
     <pcfg-selector
       v-model="pcfg"
     />
+
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
+    />
+
+    <v-divider />
     <v-card-title>
       <span>Edit keyspace limit</span>
     </v-card-title>
@@ -60,7 +68,7 @@
         }
       }
     },
-    computed: mapTwoWayState('jobForm', twoWayMap(['rules', 'pcfg', 'keyspaceLimit'])),
+    computed: mapTwoWayState('jobForm', twoWayMap(['rules', 'pcfg', 'keyspaceLimit', 'optimized'])),
     methods: {
       checkValid: function () {
         if(this.pcfg.length > 0 && this.keyspaceLimit > this.pcfg[0].keyspace) {

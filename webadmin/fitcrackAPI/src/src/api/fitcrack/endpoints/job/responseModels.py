@@ -176,7 +176,8 @@ job_big_model = api.model('Job', {
     'max_password_len': fields.Integer(),
     'min_elem_in_chain': fields.Integer(),
     'max_elem_in_chain': fields.Integer(),
-    'generate_random_rules': fields.Integer()
+    'generate_random_rules': fields.Integer(),
+    'optimized': fields.Boolean(),
 })
 
 job_nano_model = api.model('Job nano', {
