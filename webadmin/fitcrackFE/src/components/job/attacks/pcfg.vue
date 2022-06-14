@@ -13,12 +13,6 @@
     />
 
     <v-divider />
-    <v-checkbox
-       v-model="optimized"
-       label="Use optimized computing kernels (limits password length)"
-    />
-
-    <v-divider />
     <v-card-title>
       <span>Edit keyspace limit</span>
     </v-card-title>
@@ -38,6 +32,12 @@
     </v-card-title>
     <rules-selector
       v-model="rules"
+    />
+
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
     />
   </div>
 </template>

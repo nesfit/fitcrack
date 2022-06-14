@@ -13,12 +13,6 @@
       select-all
       @input="checkValid"
     />
-
-    <v-divider />
-    <v-checkbox
-       v-model="optimized"
-       label="Use optimized computing kernels (limits password length)"
-    />
   
     <v-divider />
     <v-checkbox
@@ -141,6 +135,12 @@
       suffix="rules"
       min="0"
       @input="checkValid"
+    />
+
+    <v-divider />
+    <v-checkbox
+       v-model="optimized"
+       label="Use optimized computing kernels (limits password length)"
     />
 
   </div>
