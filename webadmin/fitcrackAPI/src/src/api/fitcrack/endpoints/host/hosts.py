@@ -11,8 +11,10 @@ from flask_restx import Resource
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.host.argumentsParser import jobHost_parser
 from src.api.fitcrack.endpoints.host.responseModels import page_of_hosts_model, boincHostDetail_model, boincHostBenchmarks_model
+from src.api.fitcrack.responseModels import simpleResponse
+from src.api.fitcrack.endpoints.job.functions import stop_job
 from src.database import db
-from src.database.models import Host, FcHostActivity, FcHostStatus, FcBenchmark
+from src.database.models import Host, FcHost, FcHostActivity, FcHostStatus, FcBenchmark, FcJob
 
 from sqlalchemy import exc
 
@@ -124,6 +126,33 @@ class BenchmarksByID(Resource):
                     db.session.commit()
                 except exc.SQLAlchemyError:
                     pass
+
+
+@ns.route('/<id>/unassignAllJobs')
+class dictionaryDownload(Resource):
+    @api.marshal_with(simpleResponse)
+    def put(self, id):
+        """
+        Unassign all jobs.
+        """
+
+        hostActivities = FcHostActivity.query.filter(FcHostActivity.boinc_host_id == id).all()
+        for hostAct in hostActivities:
+            db.session.delete(hostAct)
+
+        jobsWithHost = FcHost.query.filter(FcHost.boinc_host_id == id).all()
+        for jobHost in jobsWithHost:
+            job = FcJob.query.filter(FcJob.id == jobHost.job_id).one()
+            if len(job.hosts) == 0:
+                stop_job(job)
+            db.session.delete(jobHost)
+
+        db.session.commit()
+
+        return {
+            'message': 'All jobs unassigned.',
+            'status': True
+        }
 
 @ns.route('/info')
 class hostsInfo(Resource):

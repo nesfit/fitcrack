@@ -57,22 +57,37 @@
           mdi-power
         </v-icon>
       </template>
-      <template v-slot:item.deleted="{ item }">
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn
-              icon
-              class="mx-0"
-              v-on="on"
-              @click="hideHost(item.id)"
-            >
-              <v-icon>
-                {{ item.deleted ? 'mdi-eye' : 'mdi-eye-off' }}
-              </v-icon>
-            </v-btn>
-          </template>
+      <template v-slot:item.actions="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                v-on="on"
+                @click="unassignAllJobs(item.id)"
+              >
+                <v-icon>
+                  {{ 'mdi-lan-disconnect' }}
+                </v-icon>
+              </v-btn>
+            </template>
+          <span>Unassign from all jobs</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                class="mx-0"
+                v-on="on"
+                @click="hideHost(item.id)"
+              >
+                <v-icon>
+                  {{ item.deleted ? 'mdi-eye' : 'mdi-eye-off' }}
+                </v-icon>
+              </v-btn>
+            </template>
           <span>{{ item.deleted ? 'Show' : 'Hide' }}</span>
-        </v-tooltip>
+          </v-tooltip>
       </template>
     </v-data-table>
   </div>
@@ -101,7 +116,7 @@
           {text: 'Processor', value: 'p_model', align: 'end', width: '200', sortable: false},
           {text: 'Active jobs', value: 'jobs', align: 'center', sortable: false},
           {text: 'Online', value: 'last_active', align: 'center', sortable: false},
-          {text: 'Show or hide', value: 'deleted', sortable: false, align: 'center'}
+          {text: 'Actions', value: 'actions', align: 'center', sortable: false}
         ],
         hosts_statuses: [],
         hosts:
@@ -156,6 +171,12 @@
         this.loading = true
         this.axios.delete(this.$serverAddr + '/hosts/' + id)
           .then((response) => {
+            this.loadHosts()
+          })
+      },
+      unassignAllJobs: function (id) {
+        this.axios.put(this.$serverAddr + '/hosts/' + id + "/unassignAllJobs")
+        .then((response) => {
             this.loadHosts()
           })
       },
