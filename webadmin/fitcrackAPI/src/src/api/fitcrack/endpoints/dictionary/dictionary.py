@@ -16,7 +16,7 @@ from flask import request, redirect, send_file
 from flask_restx import Resource, abort
 from sqlalchemy import exc
 
-from settings import DICTIONARY_DIR, HASHCAT_PATH, HASHCAT_DIR, PWD_DIST_PATH
+from settings import DICTIONARY_DIR, HASHCAT_PATH, HASHCAT_DIR, PWD_DIST_PATH, SERVER_BROWSER_ROOT
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.dictionary.argumentsParser import dictionary_parser, dictionaryFromFile_parser
 from src.api.fitcrack.endpoints.dictionary.functions import readingFromFolderPostProcces
@@ -207,14 +207,20 @@ class dictionary(Resource):
         files = args.get('files')
 
         for file in files:
+            file_path = file['path']
+            real_path = os.path.realpath(file_path)
+            if not os.path.realpath(file_path).startswith(SERVER_BROWSER_ROOT):
+                error = 'Path %s (real path: %s) is not accessible' % (file_path, real_path)
+                abort(500, error)
+
             if not allowed_file(file['name'], ALLOWED_EXTENSIONS):
                 abort(500, 'Wrong file format ' + file['name'])
             newName = Path(file['name']).stem + '_' + str(int(time.time())) + Path(file['name']).suffix
             newPath = os.path.join(DICTIONARY_DIR, newName)
             if sort:
-                sorted_cp(file['path'], newPath)
+                sorted_cp(file_path, newPath)
             else:
-                os.symlink(file['path'], newPath)
+                os.symlink(file_path, newPath)
             pwd_dist = shellExec(PWD_DIST_PATH + " " + newPath)
             hc_keyspace = 0
             for len_dist in pwd_dist.split(';'):
