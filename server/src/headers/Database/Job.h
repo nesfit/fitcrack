@@ -109,6 +109,7 @@ class CJob {
         std::string m_attack;
         uint32_t    m_attackMode;
         uint32_t    m_attackSubmode;
+        uint32_t    m_distributionMode;
         uint32_t    m_hashType;
         uint32_t    m_status;
         uint64_t    m_keyspace;
@@ -165,6 +166,7 @@ class CJob {
         const std::string &getAttack() const;
         uint32_t getAttackMode() const;
         uint32_t getAttackSubmode() const;
+        uint32_t getDistributionMode() const;
         uint32_t getHashType() const;
         uint32_t getStatus() const;
         uint64_t getKeyspace() const;

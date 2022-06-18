@@ -20,7 +20,7 @@ const char *ConfigTask::MAX_ELEM_IN_CHAIN = "max_elem_in_chain";
 const char *ConfigTask::GENERATE_RANDOM_RULES = "generate_random_rules";
 const char *ConfigTask::HWMON_TEMP_ABORT = "hwmon_temp_abort";
 const char *ConfigTask::OPTIMIZED = "optimized";
-
+const char *ConfigTask::DISTRIBUTION_MODE = "distribution_mode";
 /* Private */
 
 void ConfigTask::convertLineToOption(std::string& line) {
@@ -74,6 +74,7 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::GENERATE_RANDOM_RULES);
   supported_.push_back(ConfigTask::HWMON_TEMP_ABORT);
   supported_.push_back(ConfigTask::OPTIMIZED);
+  supported_.push_back(ConfigTask::DISTRIBUTION_MODE);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

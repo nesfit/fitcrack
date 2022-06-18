@@ -19,8 +19,12 @@ CAttackDict::CAttackDict(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader
 bool CAttackDict::makeWorkunit()
 {
     /** Create the workunit instance first */
-    if (!m_workunit && !generateWorkunit())
-        return false;
+    std::string mergedDictsPath =
+        Config::dictDir + ".dict_" + std::to_string(m_job->getId()) + ".txt";
+    if (!generateWorkunit()) {
+      remove(mergedDictsPath.c_str());
+      return false;
+    }
 
     DB_WORKUNIT wu;
     char name1[Config::SQL_BUF_SIZE],name2[Config::SQL_BUF_SIZE],name3[Config::SQL_BUF_SIZE], path[Config::SQL_BUF_SIZE];
@@ -30,7 +34,13 @@ bool CAttackDict::makeWorkunit()
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
-    std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
+
+    if (m_job->getDistributionMode() == 0)
+      std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict",
+                    Config::appName, Config::startTime, Config::seqNo++);
+    else if (m_job->getDistributionMode() == 1)
+      std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "",
+                    Config::appName, m_job->getId());
 
     /** Create the config file */
     retval = config.download_path(name1, path);
@@ -42,9 +52,9 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    std::ofstream f;
-    f.open(path);
-    if (!f.is_open())
+    std::ofstream configFile;
+    configFile.open(path);
+    if (!configFile.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open config BOINC input file! Setting job to malformed.\n");
@@ -52,11 +62,20 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
-                             m_job->getName(), m_job->getHashType(), 0,
-                             m_job->getHWTempAbort(),
-                             m_job->getOptimizedFlag());
-    f.close();
+    configFile << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
+                             m_job->getDistributionMode(), m_job->getName(),
+                             m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag());
+
+    if (m_job->getDistributionMode() == 1) {
+      uint64_t startIndex = m_workunit->getStartIndex();
+      std::string skipFromStart = std::to_string(startIndex);
+      configFile << "|||skip_from_start|BigUInt|" << skipFromStart.size() << "|"
+                 << skipFromStart << "|||\n";
+      std::string dictHcKeyspace = std::to_string(m_workunit->getHcKeyspace());
+      configFile << "|||dict_hc_keyspace|BigUInt|" << dictHcKeyspace.size()
+                 << "|" << dictHcKeyspace << "|||\n";
+    }
+    configFile.close();
 
     /** Create data file */
     retval = config.download_path(name2, path);
@@ -68,8 +87,9 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    f.open(path);
-    if (!f.is_open())
+    std::ofstream hashesFile;
+    hashesFile.open(path);
+    if (!hashesFile.is_open())
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "Failed to open data BOINC input file! Setting job to malformed.\n");
@@ -77,8 +97,8 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    f << m_job->getHashes();
-    f.close();
+    hashesFile << m_job->getHashes();
+    hashesFile.close();
 
     /** Create dictionary file. */
     retval = config.download_path(name3, path);
@@ -90,51 +110,127 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-
-    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-            "Creating dictionary fragment\n");
-
-    /** Load current workunit dictionary */
-    PtrDictionary workunitDict = GetWorkunitDict();
-
     try
     {
-        auto inputDict = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
+      if (m_job->getDistributionMode() == 0) {
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                              m_host->getBoincHostId(),
+                              "Creating dictionary fragment\n");
+
+        /** Load current workunit dictionary */
+        PtrDictionary workunitDict = GetWorkunitDict();
+
+        auto inputDict =
+            makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
 
         /** Add 'keyspace' passwords to dict file */
 
         uint64_t workunitKeyspace = m_workunit->getHcKeyspace();
 
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adding %" PRIu64 " passwords to host dictionary file\n", workunitKeyspace);
-        auto writtenPasswords = inputDict->WritePasswordsTo(workunitKeyspace, path);
-        if(writtenPasswords == 0 && workunitKeyspace > 0)
-        {
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+        Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "Adding %" PRIu64 " passwords to host dictionary file\n",
+            workunitKeyspace);
+        auto writtenPasswords =
+            inputDict->WritePasswordsTo(workunitKeyspace, path);
+        if (writtenPasswords == 0 && workunitKeyspace > 0) {
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                                m_host->getBoincHostId(),
                                 "'start_index' parameter is too far away\n");
-            if (!m_workunit->isDuplicated())
-            {
-                workunitDict->updateIndex(workunitDict->getHcKeyspace());
-                m_job->updateIndex(m_job->getCurrentIndex() - m_workunit->getHcKeyspace());
-            }
-            return true;
-        }
-        else if(writtenPasswords < workunitKeyspace)
-        {
-            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                    "Ate all passwords, new workunit keyspace: %" PRIu64 "\nSetting job to Finishing\n",
-                                writtenPasswords);
+          if (!m_workunit->isDuplicated()) {
+            workunitDict->updateIndex(workunitDict->getHcKeyspace());
+            m_job->updateIndex(m_job->getCurrentIndex() -
+                               m_workunit->getHcKeyspace());
+          }
+          return true;
+        } else if (writtenPasswords < workunitKeyspace) {
+          Tools::printDebugHost(
+              Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Ate all passwords, new workunit keyspace: %" PRIu64
+              "\nSetting job to Finishing\n",
+              writtenPasswords);
 
-            if (!m_workunit->isDuplicated())
-            {
-                m_job->updateIndex(m_job->getCurrentIndex() - m_workunit->getHcKeyspace() + writtenPasswords);
-                workunitDict->updateIndex(workunitDict->getHcKeyspace());
+          if (!m_workunit->isDuplicated()) {
+            m_job->updateIndex(m_job->getCurrentIndex() -
+                               m_workunit->getHcKeyspace() + writtenPasswords);
+            workunitDict->updateIndex(workunitDict->getHcKeyspace());
+          }
+
+          m_workunit->setHcKeyspace(writtenPasswords);
+        }
+      } else if (m_job->getDistributionMode() == 1) {
+        uint64_t startIndex = m_workunit->getStartIndex();
+
+        /** Merge dictionaries to one. */
+        if (startIndex == 0) {
+          std::ofstream mergedDictsFile;
+          mergedDictsFile.open(mergedDictsPath);
+          if (!mergedDictsFile.is_open()) {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                                  m_host->getBoincHostId(),
+                                  "Failed to open merged dictionary! "
+                                  "Setting job to malformed.\n");
+          }
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                                m_host->getBoincHostId(),
+                                "Merging dictionaries\n");
+          std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
+          for (PtrDictionary &dict : dictVec) {
+
+            std::ifstream dictFile;
+            std::string dictPath = Config::dictDir + dict->getDictFileName();
+            dictFile.open(dictPath);
+            if (!dictFile.is_open()) {
+              Tools::printDebugHost(
+                  Config::DebugType::Error, m_job->getId(),
+                  m_host->getBoincHostId(),
+                  "Cannot find dictionary file! Setting job to malformed.\n");
+              m_sqlLoader->updateRunningJobStatus(
+                  m_job->getId(), Config::JobState::JobMalformed);
+              return false;
             }
 
-            m_workunit->setHcKeyspace(writtenPasswords);
+            mergedDictsFile << dictFile.rdbuf();
+          }
+
+          mergedDictsFile.close();
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                                m_host->getBoincHostId(),
+                                "Dictionaries merged.\n");
         }
+
+        if (!std::ifstream(path)) {
+          std::ofstream dictFile;
+          dictFile.open(path);
+          if (!dictFile.is_open()) {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                                  m_host->getBoincHostId(),
+                                  "Failed to open dict1 BOINC input file! "
+                                  "Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                                Config::JobState::JobMalformed);
+            return false;
+          }
+
+          std::ifstream mergedDictsFile;
+          mergedDictsFile.open(mergedDictsPath);
+          if (!mergedDictsFile.is_open()) {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                                  m_host->getBoincHostId(),
+                                  "Failed to open merged dictionary! "
+                                  "Setting job to malformed.\n");
+          }
+
+          dictFile << mergedDictsFile.rdbuf();
+          dictFile.close();
+          mergedDictsFile.close();
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                                m_host->getBoincHostId(),
+                                "Workunit dictionary prepared.\n");
+        }
+      }
     }
-    catch(const InputDict::Exception &e)
+    catch(const std::exception &e)
     {
         Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
                 "A dictionary operation failed. Setting job to malformed. Message: %s\n", e.what());
@@ -159,7 +255,7 @@ bool CAttackDict::makeWorkunit()
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
-            Config::inTemplatePathDict,
+            m_job->getDistributionMode() == 0 ? Config::inTemplatePathDict : Config::inTemplatePathDictAlt,
             path,
             config.project_path(path),
             infiles,
@@ -190,6 +286,11 @@ bool CAttackDict::generateWorkunit()
 {
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "Generating dictionary workunit ...\n");
+    uint64_t currentIndex = m_job->getCurrentIndex();
+    uint64_t jobHcKeyspace = m_job->getHcKeyspace();
+    /** Check if the job isn't finished */
+    if (currentIndex >= jobHcKeyspace)
+      return false;
 
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess();
@@ -201,41 +302,58 @@ bool CAttackDict::generateWorkunit()
         passCount = getMinPassCount();
     }
 
-    /** Load job dictionaries */
-    std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
-    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-            "Dictionaries left for this job: %" PRIu64 "\n", dictVec.size());
+    if (m_job->getDistributionMode() == 0) {
+      /** Load job dictionaries */
+      std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
+      Tools::printDebugHost(
+          Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+          "Dictionaries left for this job: %" PRIu64 "\n", dictVec.size());
 
-    /** Find the following dictionary */
-    PtrDictionary currentDict = FindCurrentDict(dictVec);
+      /** Find the following dictionary */
+      PtrDictionary currentDict = FindCurrentDict(dictVec);
 
-    if (!currentDict)
-    {
+      if (!currentDict) {
         /** No dictionaries found, no workunit could be generated */
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "No dictionaries found for this job\n");
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                              m_host->getBoincHostId(),
+                              "No dictionaries found for this job\n");
         return false;
-    }
+      }
 
-    uint64_t dictIndex = currentDict->getCurrentIndex();
-    uint64_t dictHcKeyspace = currentDict->getHcKeyspace();
-    if (dictIndex + passCount > dictHcKeyspace)
-    {
+      uint64_t dictIndex = currentDict->getCurrentIndex();
+      uint64_t dictHcKeyspace = currentDict->getHcKeyspace();
+      if (dictIndex + passCount > dictHcKeyspace) {
         /** Host is too powerful for this mask, it will finish it */
         passCount = dictHcKeyspace - dictIndex;
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n", passCount);
+        Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n",
+            passCount);
+      }
+
+      /** Create the workunit */
+      m_workunit = CWorkunit::create(
+          m_job->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex,
+          0, passCount, 0, currentDict->getId(), false, 0, false);
+      if (!m_workunit)
+        return false;
+      /** Update the job/dictionary index */
+      m_job->updateIndex(currentIndex + passCount);
+      currentDict->updateIndex(dictIndex + passCount);
+    } else if (m_job->getDistributionMode() == 1) {
+      /** Adjust password count */
+      if (currentIndex + passCount > jobHcKeyspace)
+        passCount = jobHcKeyspace - currentIndex;
+
+      /** Create the workunit */
+      m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
+                                     m_host->getBoincHostId(), currentIndex, 0,
+                                     passCount, 0, 0, false, 0, false);
+      if (!m_workunit)
+        return false;
+      /** Update the job index */
+      m_job->updateIndex(currentIndex + passCount);
     }
-
-    /** Create the workunit */
-    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex, 0, passCount, 0,
-                         currentDict->getId(), false, 0, false);
-
-    /** Update the job/dictionary index */
-    uint64_t currentIndex = m_job->getCurrentIndex();
-
-    m_job->updateIndex(currentIndex + passCount);
-    currentDict->updateIndex(dictIndex + passCount);
 
     return true;
 }

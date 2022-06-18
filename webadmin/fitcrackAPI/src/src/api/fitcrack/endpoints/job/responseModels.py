@@ -129,6 +129,7 @@ job_big_model = api.model('Job', {
     'permissions': fields.Nested(job_permissions),
     'attack_mode': fields.String(required=True),
     'attack_submode': fields.Integer(),
+    'distribution_mode': fields.Integer(),
     'attack': fields.String(required=True),
     'status': fields.String(required=False),
     'status_text': fields.String(required=False),

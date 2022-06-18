@@ -284,6 +284,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `attack` varchar(40) COLLATE utf8_bin NOT NULL,
   `attack_mode` tinyint(3) unsigned NOT NULL,
   `attack_submode` tinyint(3) NOT NULL DEFAULT '0',
+  `distribution_mode` tinyint(3) NOT NULL DEFAULT '0',
   `hash_type` int(10) unsigned NOT NULL,
   `status` smallint(1) unsigned NOT NULL DEFAULT '0',
   `keyspace` bigint(20) unsigned NOT NULL,

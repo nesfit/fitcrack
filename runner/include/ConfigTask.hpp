@@ -143,6 +143,7 @@ class ConfigTask {
         static const char *GENERATE_RANDOM_RULES;
         static const char *HWMON_TEMP_ABORT;
         static const char *OPTIMIZED;
+        static const char *DISTRIBUTION_MODE;
 };
 
 #endif // CONFIGTASK_HPP

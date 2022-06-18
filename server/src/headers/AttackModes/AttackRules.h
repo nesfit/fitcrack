@@ -37,6 +37,10 @@ class CAttackRules : public AttackMode {
 
         virtual bool requiresDicts() const override {return true;}
 
+        virtual bool hasStickyLeftDict() const override {
+          return m_job->getDistributionMode() == 1;
+        }
+
     private:
         /**
          * @brief Function to generate new CWorkunit for certain host for given time

@@ -34,13 +34,14 @@ void AttackMode::setDefaultWorkunitParams(DB_WORKUNIT * wu)
 }
 
 
-std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, std::string name, unsigned hashType, unsigned generateRandomRules,
+std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, unsigned distributionMode, std::string name, unsigned hashType, unsigned generateRandomRules,
                                             unsigned hwTempAbort, bool optimized, std::string ruleLeft, std::string ruleRight, std::string charset1, std::string charset2,
                                             std::string charset3, std::string charset4)
 {
     std::string result = "|||mode|String|1|" + std::string(1, getModeLetter()) + "|||\n";
     result += "|||attack_mode|UInt|" + std::to_string(std::to_string(attackMode).length()) + "|" + std::to_string(attackMode) + "|||\n";
     result += "|||attack_submode|UInt|" + std::to_string(std::to_string(attackSubmode).length()) + "|" + std::to_string(attackSubmode) + "|||\n";
+    result += "|||distribution_mode|UInt|" + std::to_string(std::to_string(distributionMode).length()) + "|" + std::to_string(distributionMode) + "|||\n";
     result += "|||name|String|" + std::to_string(name.length()) + "|" + name + "|||\n";
     result += "|||hash_type|UInt|" + std::to_string(std::to_string(hashType).length()) + "|" + std::to_string(hashType) + "|||\n";
 

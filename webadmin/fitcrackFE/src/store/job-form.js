@@ -38,6 +38,7 @@ export const empty = {
   hybridMask: '',
   charset: [],
   submode: 0,
+  distributionMode: 0,
   markov: [], // init!
   markovThresh: NaN,
   pcfg: [],
@@ -77,6 +78,7 @@ export default {
         'rule_right': state.ruleRight,
         'masks': state.masks,
         'attack_submode': state.submode,
+        'distribution_mode': parseInt(state.distributionMode),
         'markov_treshold': state.submode == 0 ? null : parseInt(state.markovThresh),
         'markov': state.submode == 0 ? null : state.markov[0],
         'charset': state.charset,

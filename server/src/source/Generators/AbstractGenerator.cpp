@@ -86,6 +86,11 @@ std::vector<std::string> CAbstractGenerator::getStickyFiles(PtrJob &job) {
           if (job->getAttackSubmode() == 1)
             stickyFiles.push_back(std::string(Config::appName) + "_rules_" +
                                   std::to_string(job->getId()));
+
+          if (job->getDistributionMode() == 1)
+            stickyFiles.push_back(std::string(Config::appName) + "_dict_" +
+                                  std::to_string(job->getId()));
+
           break;
         case Config::AttackMode::AttackPrince:
           stickyFiles.push_back(std::string(Config::appName) + "_dict_" +

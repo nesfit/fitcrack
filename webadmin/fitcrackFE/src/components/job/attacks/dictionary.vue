@@ -16,6 +16,23 @@
 
     <v-divider />
     <v-card-title>
+      <span>Fragmentation of dictionaries</span>
+    </v-card-title>
+    <v-radio-group
+      v-model="distributionMode"
+    >
+      <v-radio
+        label="On server"
+        :value="0"
+      ></v-radio>
+      <v-radio
+        label="On hosts"
+        :value="1"
+      ></v-radio>
+    </v-radio-group>
+
+    <v-divider />
+    <v-card-title>
       <span>Select rule file</span>
     </v-card-title>
     <rules-selector
@@ -44,7 +61,7 @@
       'dict-selector': dictSelector,
       'rules-selector': ruleSelector
     },
-    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'optimized'])),
+    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'optimized', 'distributionMode'])),
     methods: {
       checkValid: function () {
         if (this.leftDicts.length > 0) {

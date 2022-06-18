@@ -67,7 +67,7 @@ bool CAttackPrince::makeWorkunit()
 
     /** Output original config from DB */
     configFile << generateBasicConfig(
-        m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getName(),
+        m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getDistributionMode(), m_job->getName(),
         m_job->getHashType(), m_job->getRandomRulesCount(),
         m_job->getHWTempAbort(), m_job->getOptimizedFlag());
 
@@ -291,11 +291,14 @@ bool CAttackPrince::generateWorkunit() {
   Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
                         m_host->getBoincHostId(),
                         "Generating prince workunit ...\n");
+  uint64_t currentIndex = m_job->getCurrentIndex();
+  uint64_t jobHcKeyspace = m_job->getHcKeyspace();
+  /** Check if the job isn't finished */
+  if (currentIndex >= jobHcKeyspace)
+    return false;
 
   /** Compute password count */
   uint64_t passwordsRange = getPasswordCountToProcess();
-  uint64_t currentIndex = m_job->getCurrentIndex();
-  uint64_t jobHcKeyspace = m_job->getHcKeyspace();
   if (passwordsRange < getMinPassCount()) {
     Tools::printDebugHost(
         Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
@@ -312,9 +315,7 @@ bool CAttackPrince::generateWorkunit() {
   Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
                         m_host->getBoincHostId(),
                         "Passwords range: %" PRIu64 "\n", passwordsRange);
-  //check if the job isn't finished
-  if (currentIndex >= jobHcKeyspace)
-    return false;
+
   /** Adjust password range */
   if (currentIndex + passwordsRange > jobHcKeyspace)
     passwordsRange = jobHcKeyspace - currentIndex;

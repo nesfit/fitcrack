@@ -200,6 +200,7 @@ class FcJob(Base):
     attack = Column(String(20, 'utf8_bin'), nullable=False)
     attack_mode = Column(Integer, nullable=False)
     attack_submode = Column(Integer, nullable=False, server_default=text("'0'"))
+    distribution_mode = Column(Integer, nullable=False, server_default=text("'0'"))
     hash_type = Column(Integer, nullable=False)
     status = Column(SmallInteger, nullable=False, server_default=text("'0'"))
     keyspace = Column(BigInteger, nullable=False)

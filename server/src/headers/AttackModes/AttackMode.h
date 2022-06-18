@@ -82,6 +82,7 @@ protected:
          * @param wuMode Mode of the WU (b/n/a)
          * @param attackMode Attack number
          * @param attackSubmode Attack submode
+         * * @param distributionMode Distribution mode
          * @param name Name of the Job
          * @param hashType Hashcat hash type
          * @param ruleLeft Left rule if present
@@ -93,12 +94,13 @@ protected:
          * @return Config string with newline at the end
          */
         virtual std::string generateBasicConfig(
-            unsigned attackMode, unsigned attackSubmode, std::string name,
-            unsigned hashType, unsigned generateRandomRules = 0,
-            unsigned hwTempAbort = 90, bool optimized = true,
-            std::string ruleLeft = "", std::string ruleRight = "",
-            std::string charset1 = "", std::string charset2 = "",
-            std::string charset3 = "", std::string charset4 = "");
+            unsigned attackMode, unsigned attackSubmode,
+            unsigned distributionMode, std::string name, unsigned hashType,
+            unsigned generateRandomRules = 0, unsigned hwTempAbort = 90,
+            bool optimized = true, std::string ruleLeft = "",
+            std::string ruleRight = "", std::string charset1 = "",
+            std::string charset2 = "", std::string charset3 = "",
+            std::string charset4 = "");
 
         /**
          * @brief Get the Mode Letter. This is 'n' for normal attack modes.

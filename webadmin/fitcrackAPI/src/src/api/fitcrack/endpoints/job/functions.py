@@ -131,6 +131,7 @@ def create_job(data):
         attack=job['attack_name'],
         attack_mode=job['attack_settings']['attack_mode'],
         attack_submode=job['attack_settings']['attack_submode'],
+        distribution_mode=job['attack_settings']['distribution_mode'],
         hash_type=job['hash_settings']['hash_type'],
         status='0',
         keyspace=job['keyspace'],

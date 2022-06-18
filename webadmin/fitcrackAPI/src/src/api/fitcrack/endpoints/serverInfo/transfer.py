@@ -12,7 +12,7 @@ from src.database.models import FcRule, FcHcstat, FcDictionary, FcJobDictionary,
 
 # scalar or relationship fields that get copied over
 JOB_EXPORTABLE_COLUMNS = (
-  'attack', 'attack_mode', 'attack_submode', 'hash_type', 'hashes',
+  'attack', 'attack_mode', 'attack_submode', 'distribution_mode', 'hash_type', 'hashes',
   'keyspace', 'hc_keyspace', 'name', 'comment', 'seconds_per_workunit', 
   'charset1', 'charset2', 'charset3', 'charset4', 'rule_left', 'rule_right', 
   'markov_threshold', 'case_permute', 'check_duplicates', 
