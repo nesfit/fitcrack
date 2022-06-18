@@ -20,6 +20,30 @@ from src.database import db
 """Functions which are used in multiple files"""
 
 
+def shell_exec(args, cwd=None):
+    """
+    Execute the external command
+    """
+
+    try:
+        print(' '.join(args), file=sys.stderr)
+        process = subprocess.Popen(args, shell=False,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   cwd=cwd)
+
+        # wait for the process to terminate
+        output, _ = process.communicate()
+        return_code = process.returncode
+    except subprocess.CalledProcessError as err:
+        print(err, file=sys.stderr)
+        return None, return_code
+    else:
+        output = output.decode('utf-8', errors='ignore')
+        return output, return_code
+
+
+# shellExec is not very secure with user supplied input, use 'shell_exec'.
 def shellExec(cmd, abortOnError=True, cwd=None, getOnlyReturnCode=False, getReturnCode=False):
     """
     Execute the external command

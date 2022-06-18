@@ -22,7 +22,7 @@ from src.api.fitcrack.endpoints.dictionary.argumentsParser import dictionary_par
 from src.api.fitcrack.endpoints.dictionary.functions import readingFromFolderPostProcces
 from src.api.fitcrack.endpoints.dictionary.responseModels import dictionaries_model, dictData_model, \
     dictionary_model
-from src.api.fitcrack.functions import shellExec, fileUpload, allowed_file, getFilesFromFolder, sorted_cp
+from src.api.fitcrack.functions import shell_exec, fileUpload, allowed_file, getFilesFromFolder, sorted_cp
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcDictionary
@@ -166,7 +166,10 @@ class dictionaryAdd(Resource):
                 os.remove(dict_path)
                 move(dict_path + '_sorted', dict_path)
 
-            pwd_dist = shellExec(PWD_DIST_PATH + " " + dict_path)
+            pwd_dist, ret_code = shell_exec([PWD_DIST_PATH, dict_path])
+            if ret_code != 0:
+                abort(500, 'Unable to compute password distribution for ' + dict_path)
+
             hc_keyspace = 0
             for len_dist in pwd_dist.split(';'):
                 # password len : number of occurrences
@@ -221,7 +224,10 @@ class dictionary(Resource):
                 sorted_cp(file_path, newPath)
             else:
                 os.symlink(file_path, newPath)
-            pwd_dist = shellExec(PWD_DIST_PATH + " " + newPath)
+            pwd_dist, ret_code = shell_exec([PWD_DIST_PATH, newPath])
+            if ret_code != 0:
+                abort(500, 'Unable to compute password distribution for ' + file_path)
+
             hc_keyspace = 0
             for len_dist in pwd_dist.split(';'):
                 # password len : number of occurrences
