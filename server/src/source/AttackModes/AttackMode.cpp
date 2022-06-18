@@ -76,7 +76,7 @@ std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attack
                 std::to_string(std::to_string(hwTempAbort).length()) + "|" +
                 std::to_string(hwTempAbort) + "|||\n";
 
-    result += "|||optimized|UInt|1|" << std::to_string(optimized) << "|||\n";
+    result += "|||optimized|UInt|1|" + std::to_string(optimized) + "|||\n";
 
     Tools::printDebug("%s", result.c_str());
     return result;
