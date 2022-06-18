@@ -123,7 +123,7 @@ def allowed_file(filename, extensions):
 def fileUpload(file, dir, extensions, content=None, suffix=None, withTimestamp=False):
     if file.filename == '':
         abort(500, 'No selected file')
-    if file and allowed_file(file.filename, extensions):
+    if allowed_file(file.filename, extensions):
 
         filename = secure_filename(file.filename)
         originalFilename = file.filename
@@ -156,7 +156,8 @@ def fileUpload(file, dir, extensions, content=None, suffix=None, withTimestamp=F
             'path': filename
         }
     else:
-        abort(500,'Can not upload file ' + file.filename)
+        error = 'Can\'t upload file %s. This file extension is not allowed.' % (file.filename)
+        abort(500, error)
     return None
 
 
