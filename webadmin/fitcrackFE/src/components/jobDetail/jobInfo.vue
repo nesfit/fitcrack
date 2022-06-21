@@ -247,11 +247,13 @@ export default {
         })
     },
     crackingTime () {
-      const d = this.data
-      if (d.total_time) {
-        return this.$moment.duration(d.total_time, 'seconds').format()
-      } else {
+      const { time_start: start, time_end: end } = this.data
+      if (!start) {
         return 'Not started yet'
+      } else if (start && !end) {
+        return this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(start))).format()
+      } else {
+        return this.$moment.duration(this.$moment.utc(end).diff(this.$moment.utc(start))).format()
       }
     },
     startTime () {
