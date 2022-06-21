@@ -338,7 +338,7 @@
           <v-btn
             color="primary"
             text
-            :disabled="!validNewUserForm || newUsername == '' || newEmail == '' || newPassword == '' || newUserRoleID == ''"
+            :disabled="!validNewUserForm || !newUsername || !newEmail || !newPassword || !newUserRoleID"
             @click.stop="addUser"
           >
             Add user
