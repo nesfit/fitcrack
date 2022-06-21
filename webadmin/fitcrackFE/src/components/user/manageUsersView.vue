@@ -291,6 +291,9 @@
           <h2>Add new user</h2>
         </v-card-title>
         <v-card-text>
+          <p>
+            All fields are mandatory.
+          </p>
           <v-form
             ref="form"
             v-model="validNewUserForm"
