@@ -281,7 +281,7 @@ class FcJob(Base):
         if not self.time_start:
             return 0
         else:
-            now = datetime.datetime.now()
+            now = datetime.datetime.utcnow()
             if now < self.time_start:
                 # Planned job
                 return 0
