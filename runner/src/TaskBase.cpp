@@ -100,19 +100,31 @@ void TaskBase::reportProgress() {
 
     const std::string &trickle_message = trickle_xml.getXml();
 
+    int ret;
+    int retries = 3;
+    do {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored                                                 \
     "-Wwrite-strings" // disable G++ warning about deprecated cast
-    boinc_send_trickle_up(
-        const_cast<char *>(BoincConstants::TrickleDeamonName.c_str()),
-        const_cast<char *>(
-            trickle_message.c_str())); // progress to boinc project server
+      ret = boinc_send_trickle_up(
+          const_cast<char *>(BoincConstants::TrickleDeamonName.c_str()),
+          const_cast<char *>(
+              trickle_message.c_str())); // progress to boinc project server
+      if (ret == 0)
+        break;
 #pragma GCC diagnostic pop
-    Logging::debugPrint(Logging::Detail::DevelDebug,
-                        " trickle daemon name :" +
-                            BoincConstants::TrickleDeamonName);
-    Logging::debugPrint(Logging::Detail::ObjectContentRevision,
-                        " generated trickle message :" + trickle_message);
+    } while (--retries);
+
+    if (ret == 0) {
+      Logging::debugPrint(Logging::Detail::DevelDebug,
+                          " trickle daemon name :" +
+                              BoincConstants::TrickleDeamonName);
+      Logging::debugPrint(Logging::Detail::ObjectContentRevision,
+                          " generated trickle message :" + trickle_message);
+    } else {
+      Logging::debugPrint(Logging::Detail::ObjectContentRevision,
+                          " failed to send trickle message :" + trickle_message);
+    }
     boinc_fraction_done(fraction_done); // progress to BOINC manager
   }
   std::cout << "Progress : " << RunnerUtils::toString(computed_hashes_) << "/"
