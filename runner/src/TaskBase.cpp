@@ -124,6 +124,9 @@ void TaskBase::reportProgress() {
     } else {
       Logging::debugPrint(Logging::Detail::ObjectContentRevision,
                           " failed to send trickle message :" + trickle_message);
+      std::string boinc_error = boincerror(ret);
+      Logging::debugPrint(Logging::Detail::ObjectContentRevision,
+                          " boinc error :" + boinc_error);
     }
     boinc_fraction_done(fraction_done); // progress to BOINC manager
   }
