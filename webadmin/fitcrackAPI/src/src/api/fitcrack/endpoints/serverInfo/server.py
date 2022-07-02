@@ -5,6 +5,7 @@
 
 import logging
 from time import sleep
+import datetime
 
 from flask_restx import Resource
 from src.api.apiConfig import api
@@ -12,7 +13,7 @@ from src.api.fitcrack.responseModels import simpleResponse
 from src.api.fitcrack.endpoints.serverInfo.responseModels import serverinfo, usageinfoList, usageinfo, dependency_report
 from src.api.fitcrack.endpoints.serverInfo.functions import getCpuMemData
 from src.api.fitcrack.endpoints.serverInfo.transfer import pack, unpack, dependency_check, ImportDependencyMissing
-from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options, dependency_list, job_graph_arguments
+from src.api.fitcrack.endpoints.serverInfo.argumentsParser import operation, serverUsage_argument, export_options, dependency_list, job_graph_arguments, delete_usage_data
 from src.database import db
 from src.database.models import FcServerUsage
 from settings import PROJECT_DIR, PROJECT_USER, PROJECT_NAME, BOINC_SERVER_URI
@@ -85,9 +86,9 @@ class actualUsageData(Resource):
 
         return FcServerUsage.query.order_by(FcServerUsage.time.desc()).limit(1).one_or_none()
 
-
-@ns.route('/saveData')
-class saveData(Resource):
+@ns.route('/usageData')
+class usageData(Resource):
+    # public endpoint, no auth needed
     is_public = True
 
     @api.expect(serverUsage_argument)
@@ -109,6 +110,21 @@ class saveData(Resource):
 
         return {
             'message': 'Usage data saved',
+            'status': True
+        }
+
+    @api.expect(delete_usage_data)
+    @api.marshal_with(simpleResponse)
+    def delete(self):
+        args = delete_usage_data.parse_args(request)
+        days = args['days']
+
+        limit = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+        FcServerUsage.query.filter(FcServerUsage.time < limit).delete()
+        db.session.commit()
+
+        return {
+            'message': 'Usage data deleted.',
             'status': True
         }
 

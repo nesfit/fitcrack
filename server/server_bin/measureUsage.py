@@ -4,41 +4,11 @@ import psutil
 import time
 import urllib3.request
 import datetime
-import mysql.connector
-
-DB_HOST = 'localhost'
-DB_NAME = 'fitcrack'
-DB_USER = 'fitcrack'
-DB_PW = 'mypassword'
 
 server = "http://localhost:5000"
 http = urllib3.PoolManager()
 
-MINUTES_IN_MONTH = 60 * 24 * 30
-
-def connect_db():
-    """Accesses the Fitcrack DB.
-
-    :return: MySQL object
-    """
-    try:
-        fitcrack_db = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            passwd=DB_PW,
-            database=DB_NAME
-        )
-    except mysql.connector.Error as err:
-        print(datetime.datetime.utcnow(),
-              '[ERROR]: Could not connect to Fitcrack DB:', err)
-        exit(1)
-
-    return fitcrack_db
-
-
 def main():
-    fitcrack_db = connect_db()
-    cursor = fitcrack_db.cursor()
     minutes = 0
 
     while True:
@@ -61,42 +31,50 @@ def main():
         hdd_read = (psutil.disk_io_counters(nowrap=True).read_bytes - hdd_read) / 60
         hdd_write = (psutil.disk_io_counters(
                 nowrap=True).write_bytes - hdd_write) / 60
-        recv = (psutil.net_io_counters(nowrap=True).bytes_recv - recv) / 60
-        sent = (psutil.net_io_counters(nowrap=True).bytes_sent - sent) / 60
+        net_recv = (psutil.net_io_counters(nowrap=True).bytes_recv - recv) / 60
+        net_sent = (psutil.net_io_counters(nowrap=True).bytes_sent - sent) / 60
 
         hdd_read *= 8
         hdd_write *= 8
-        recv *= 8
-        sent *= 8
+        net_recv *= 8
+        net_sent *= 8
 
         hdd_read /= 1000
         hdd_write /= 1000
-        recv /= 1000
-        sent /= 1000
+        net_recv /= 1000
+        net_sent /= 1000
 
         print("CPU: " + str(cpu))
         print("MEM: " + str(mem))
 
-        print("NET_D: " + str(recv))
-        print("NET_U: " + str(sent))
+        print("NET_D: " + str(net_recv))
+        print("NET_U: " + str(net_sent))
 
         print("HDD_R: " + str(hdd_read))
         print("HDD_W: " + str(hdd_write))
 
-        url = server + "/serverInfo/saveData" + "?cpu=" + str(cpu) + "&ram=" + str(mem) + "&net_recv=" + str(
-                recv) + "&net_sent=" + str(sent) + "&hdd_read=" + str(hdd_read) + "&hdd_write=" + str(hdd_write)
+        usage_data = {}
+        usage_data['cpu'] = str(cpu)
+        usage_data['ram'] = str(mem)
+        usage_data['net_recv'] = str(net_recv)
+        usage_data['net_sent'] = str(net_sent)
+        usage_data['hdd_read'] = str(hdd_read)
+        usage_data['hdd_write'] = str(hdd_write)
+
         try:
-            http.request('POST', url)
+            http.request('POST', server + "/serverInfo/usageData", fields=usage_data)
         except Exception as e:
             print(datetime.datetime.utcnow(),
                     '[WARN]: Unknown exception occured in sending usage data:', e)
 
-        if minutes == MINUTES_IN_MONTH:
-            cursor.execute(
-                    "DELETE FROM fc_server_usage WHERE time < (NOW() - INTERVAL 30 DAY)")
-            cursor.execute(
-                    "DELETE FROM fc_device_info WHERE time < (NOW() - INTERVAL 30 DAY)")
-            fitcrack_db.commit()
+        if minutes == 7 * 24 * 60: # 7 days
+            try:
+                http.request('DELETE', server +
+                             "/serverInfo/usageData", fields={'days': 7})
+                print("deleted")
+            except Exception as e:
+                print(datetime.datetime.utcnow(),
+                    '[WARN]: Unknown exception occured in deleting old usage data:', e)
             minutes = 0
 
 
