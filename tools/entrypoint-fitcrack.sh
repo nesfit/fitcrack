@@ -47,6 +47,7 @@ else # Create Fitcrack project
   mysql -e "CREATE USER '$DB_USER'@'$DB_HOST' IDENTIFIED WITH mysql_native_password BY '$DB_PW'";
   mysql -e "GRANT ALL ON $DB_NAME.* TO '$DB_USER'@'$DB_HOST'";
   mysql -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+  mysql -e "SET GLOBAL time_zone = '+00:00';"
   mysql -e "FLUSH PRIVILEGES";
 
   # Fix MySQL socket permissions
