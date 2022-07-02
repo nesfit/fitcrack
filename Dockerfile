@@ -26,7 +26,7 @@ RUN apt install -y iputils-ping
 RUN apt install -y net-tools && apt install -y telnet
 
 # Configure timezone
-ENV TZ Europe/Prague
+ENV TZ UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt install -yq sudo
