@@ -16,7 +16,6 @@
     />
 
     <v-container>
-      <v-row justify="center">
         <fc-tile
           title="Rule file"
           :loading="data==null"
@@ -82,7 +81,6 @@
             />
           </div>
         </fc-tile>
-      </v-row>
     </v-container>
   </div>
 </template>

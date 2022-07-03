@@ -16,7 +16,6 @@
     />
 
     <v-container>
-      <v-row justify="center">
         <fc-tile
           title="Dictionary"
           :loading="info==null"
@@ -71,7 +70,6 @@
             />
           </div>
         </fc-tile>
-      </v-row>
     </v-container>
   </div>
 </template>
@@ -107,7 +105,7 @@
 
 <style scoped>
   .dictContentContainer {
-    max-width: 500px;
+    max-width: 800px;
   }
   .dictContent {
     max-height: 600px;

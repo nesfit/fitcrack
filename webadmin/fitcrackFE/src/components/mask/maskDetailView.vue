@@ -16,7 +16,6 @@
     />
 
     <v-container>
-      <v-row justify="center">
         <fc-tile
           title="Mask set"
           :loading="data==null"
@@ -90,7 +89,6 @@
             >{{ data.data }}</code>
           </div>
         </fc-tile>
-      </v-row>
     </v-container>
   </div>
 </template>
