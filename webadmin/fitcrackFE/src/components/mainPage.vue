@@ -6,6 +6,7 @@
 <template>
   <div class="height100">
     <v-navigation-drawer
+      id="navigation-drawer"
       v-model="drawer"
       persistent
       class="navigationDrawer"
@@ -31,6 +32,7 @@
 
       <div class="dash-link">
         <v-btn
+          id="dash-link"
           to="/"
           text
         >
@@ -50,15 +52,15 @@
         grow
         class="notrans"
       >
-        <v-tab>
+        <v-tab id="nav-jobs-tab">
           Jobs
           <v-icon>mdi-briefcase-outline</v-icon>
         </v-tab>
-        <v-tab>
+        <v-tab id="nav-library-tab">
           Library
           <v-icon>mdi-folder-outline</v-icon>
         </v-tab>
-        <v-tab>
+        <v-tab id="nav-system-tab">
           System
           <v-icon>mdi-settings-outline</v-icon>
         </v-tab>
@@ -70,6 +72,7 @@
       >
         <v-tab-item eager>
           <v-list
+            id="nav-jobs-list"
             expand
             nav
             dense
@@ -112,7 +115,7 @@
 
             <v-divider class="mb-1" />
 
-            <bins />
+            <bins id="job-bin-list" />
 
             <v-divider class="my-1" />
 
@@ -131,6 +134,7 @@
         </v-tab-item>
         <v-tab-item>
           <v-list
+            id="nav-library-list"
             expand
             nav
             dense
@@ -210,6 +214,7 @@
         </v-tab-item>
         <v-tab-item>
           <v-list
+            id="nav-system-list"
             expand
             nav
             dense
@@ -297,7 +302,7 @@
       :color="daemonWarning ? 'error' : ''"
       :dark="daemonWarning"
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon id="nav-toggle" @click.stop="drawer = !drawer" />
       <v-toolbar-title>{{ $store.state.project }}</v-toolbar-title>
       <v-spacer />
       <v-row
@@ -342,6 +347,7 @@
         offset-y="18"
       >
         <v-btn
+          id="notifications-button"
           large
           rounded
           icon
@@ -359,6 +365,7 @@
       >
         <template #activator="{ on }">
           <v-btn
+            id="user-button"
             large
             rounded
             text
@@ -378,7 +385,7 @@
             </v-avatar>
           </v-btn>
         </template>
-        <v-card min-width="250">
+        <v-card id="user-flyout" min-width="250">
           <v-card-text class="text--primary d-flex align-center">
             <div>
               <div class="subtitle-2">
@@ -457,6 +464,7 @@
     </v-main>
     <!-- NOTIFICATION DRAWER -->
     <v-navigation-drawer
+      id="notifications-drawer"
       v-model="rightDrawer"
       class="pa-0"
       temporary
@@ -508,7 +516,7 @@
             <ol>
               <li>Access your server's shell (ex. via ssh)</li>
               <li>
-                Run <code>/home/<em>&lt;BOINC user&gt;</em>/projects/{{ $store.state.project }}/bin/start</code>
+                Run <code>/home/<em>&lt;BOINC user&gt;</em>/projects/<em>&lt;project name&gt;</em>/bin/start</code>
                 as BOINC. BOINC user is <code>boincadm</code> by default.
               </li>
             </ol>

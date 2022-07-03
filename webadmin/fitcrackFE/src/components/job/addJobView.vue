@@ -106,12 +106,14 @@
     <div>
       <v-col>
         <v-stepper
+          id="job-stepper"
           v-model="step"
           vertical
           non-linear
           class="mb-4"
         >
           <v-stepper-step
+            id="job-step-1"
             editable
             step="1"
           >
@@ -126,17 +128,18 @@
                   color="primary"
                   class="mr-2"
                 >
-                  <v-btn value="multipleHashes">
+                  <v-btn id="job-input-mode-manual" value="multipleHashes">
                     Manual entry
                   </v-btn>
-                  <v-btn value="hashFile">
+                  <v-btn id="job-input-mode-hashlist" value="hashFile">
                     From hash file
                   </v-btn>
-                  <v-btn value="extractFromFile">
+                  <v-btn id="job-input-mode-extract" value="extractFromFile">
                     Extract from file
                   </v-btn>
                 </v-btn-toggle>
                 <v-autocomplete
+                  id="hash-type-select"
                   v-model="hashType"
                   editable
                   validate-on-blur
@@ -237,6 +240,7 @@
                     You can select only one binary hash.
                   </v-alert>
                   <fc-textarea
+                    id="hashes-input"
                     v-if="inputMethod !== null"
                     ref="textarea"
                     v-model="hashList"
@@ -342,6 +346,7 @@
           </v-stepper-content>
 
           <v-stepper-step
+            id="job-step-2"
             editable
             step="2"
           >
@@ -361,6 +366,7 @@
                   #default="{ active, toggle }"
                 >
                   <v-btn
+                    :id="`attack-mode-${type.handler}`"
                     class="mode-btn"
                     text
                     small
@@ -377,7 +383,7 @@
                 </v-item>
               </v-item-group>
 
-              <v-component :is="attackSettingsTab" :keyspace="keyspace" />
+              <v-component :id="attackSettingsTab" :is="attackSettingsTab" :keyspace="keyspace" />
 
               <v-row>
                 <v-spacer />
@@ -392,6 +398,7 @@
             </v-container>
           </v-stepper-content>
           <v-stepper-step
+            id="job-step-3"
             editable
             step="3"
           >
@@ -419,6 +426,7 @@
             </v-row>
           </v-stepper-content>
           <v-stepper-step
+            id="job-step-4"
             editable
             step="4"
           >
@@ -428,6 +436,7 @@
             <v-container>
               <v-row>
                 <v-textarea
+                  id="comment-input"
                   v-model="comment"
                   label="Comment"
                   outlined

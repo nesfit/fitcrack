@@ -26,9 +26,9 @@
           v-show="$vuetify.breakpoint.lgAndUp"
           class="text--secondary"
         >
-          <span v-show="status || attackType">that</span>
+          <span v-show="status || attackType">that </span>
           <span v-show="status">are {{ status }}</span>
-          <span v-show="status && attackType">and</span>
+          <span v-show="status && attackType"> and </span>
           <span v-show="attackType">use {{ attackType }} attack</span>
         </span>
       </h2>
@@ -148,6 +148,7 @@
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
+                id="batch-creator-open"
                 text
                 class="mr-2"
                 color="success"
@@ -164,6 +165,7 @@
             <span>Only <strong class="info--text">ready</strong> jobs can be added</span>
           </v-tooltip>
           <v-btn
+            id="host-mapper-open"
             text
             class="mr-2"
             color="warning"
@@ -200,7 +202,7 @@
             @click="multiStart"
           >
             <v-icon left>
-              mdi-start
+              mdi-play
             </v-icon>
             Start
           </v-btn>
@@ -252,6 +254,7 @@
     </div>
 
     <v-data-table
+      id="jobs-table"
       v-show="!binEmpty"
       ref="table"
       v-model="selectedJobs"

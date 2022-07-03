@@ -7,6 +7,7 @@
   <div class="mask-container">
     <transition name="toolbar-fade">
       <v-sheet
+        :id="id ? `${id}-chips-editor` : undefined"
         v-show="focused"
         class="charset-toolbar pa-1"
         :elevation="8"
@@ -33,6 +34,7 @@
     </transition>
     <div class="mask-input">
       <v-text-field
+        :id="id ? `${id}-mask-input` : undefined"
         ref="field"
         label="Enter mask"
         filled
@@ -46,6 +48,7 @@
         @blur="focused = false"
       />
       <v-btn
+        :id="id ? `${id}-mask-remove` : undefined"
         v-show="!nonRemovable"
         class="ml-2 remove-button"
         icon
@@ -61,6 +64,10 @@
   export default {
     name: "MaskSingle",
     props: {
+      id: {
+        type: String,
+        default: ''
+      },
       value: {
         type: String,
         default: ''

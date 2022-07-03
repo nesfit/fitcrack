@@ -33,6 +33,7 @@
       </v-btn>
       <v-spacer />
       <v-btn
+        id="add-mask-button"
         v-show="masks.length < 50"
         color="success"
         @click="addMask()"
@@ -50,6 +51,7 @@
     >
       <mask-single
         v-for="(mask, i) in masks"
+        :id="`mask-${i}`"
         :key="i"
         :non-removable="masks.length == 1"
         :custom-charsets="charset"

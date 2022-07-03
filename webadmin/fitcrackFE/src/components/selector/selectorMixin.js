@@ -16,12 +16,21 @@ export default {
       items: [],
       loading: false,
       search: '',
-      selected: []
+      selected: [],
+      footerProps: {
+        itemsPerPageOptions: [3, 5, 10, 20, -1]
+      }
     }
   },
   mounted() {
     this.getData()
     if (this.value) this.selected = this.value
+  },
+  computed: {
+    itemsPerPage() {
+      // return value of perpage in localStorage or default value
+      return parseInt(localStorage.getItem('defaultItemsPerPage') || 10)
+    }
   },
   methods: {
     getData() {

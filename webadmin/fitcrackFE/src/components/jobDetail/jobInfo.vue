@@ -93,6 +93,7 @@
           <v-spacer />
           <!-- edit button -->
           <v-btn
+            id="job-editor-open"
             v-if="data.permissions.edit || $userCan('EDIT_ALL_JOBS')"
             key="edit-enter"
             text
@@ -106,6 +107,7 @@
         </template>
         <template v-else>
           <v-btn
+            id="job-permissions-open"
             v-if="data.permissions.owner"
             key="edit-perms"
             text

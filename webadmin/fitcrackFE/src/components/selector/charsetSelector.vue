@@ -8,6 +8,8 @@
     :value="selected"
     :headers="headers"
     :items="items"
+    :items-per-page="itemsPerPage"
+    :footer-props="footerProps"
     :search="search"
     item-key="id"
     show-select

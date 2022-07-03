@@ -35,6 +35,7 @@
         <v-spacer />
         <b class="mr-4">{{ hosts.length }} selected</b>
         <v-btn 
+          id="host-mapper-assign"
           :loading="saving"
           color="success"
           @click="save"

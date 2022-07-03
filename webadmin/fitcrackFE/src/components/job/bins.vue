@@ -11,6 +11,7 @@
       <v-spacer />
       <template v-if="$userCan('EDIT_ALL_JOBS')">
         <v-btn
+          id="job-bin-add-button"
           v-if="!adding"
           ref="addBtn"
           key="addBtn"

@@ -8,6 +8,8 @@
     v-model="selected"
     :headers="headers"
     :items="items"
+    :items-per-page="itemsPerPage"
+    :footer-props="footerProps"
     :loading="loading"
     item-key="id"
     show-select
