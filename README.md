@@ -1,136 +1,78 @@
 # Fitcrack (Distributed password cracking system)
 
-Note: A detailed documentation and other information can be found at [https://fitcrack.fit.vutbr.cz](https://fitcrack.fit.vutbr.cz)
+Fitcrack is a [BOINC](https://boinc.berkeley.edu)-based [hashcat](https://hashcat.net/)-powered distributed password cracking system.
+It recovers passwords that protect various encrypted media like documents, archives, or disk volumes, breaks
+various application passwords, as well as raw or salted cryptographic hashes.
+You can use our system to crack more than [350 different algorithms](https://hashcat.net/hashcat/#features-algos) supported by hashcat.
+Fitcrack allows you to distribute your tasks over dozens of different GPU-equipped computing nodes with Linux or Windows OS.
+For controlling your cracking network and management of jobs, you can use our friendly
+[WebAdmin](https://nesfit.github.io/fitcrack/#/) interface, or communicate directly with our REST API.
 
-This README describes how to install and run Fitcrack distributed password cracking system.
+A detailed documentation and other information can be found at [https://fitcrack.fit.vutbr.cz](https://fitcrack.fit.vutbr.cz).
 
-
-## Step-by-step: Install on Ubuntu 22.04 LTS
-
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
-
-### Install prerequisities
-```
-apt install -y m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
-```
-
-### Setup the MySQL Database
-```
-systemctl start mysql
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'YOURROOTPASSWORD';"
-mysql -u root -p
-mysql> create database fitcrack;
-mysql> CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
-mysql> GRANT ALL ON fitcrack.* TO 'fitcrack'@'localhost';
-mysql> SET GLOBAL log_bin_trust_function_creators = 1;
-mysql> SET GLOBAL time_zone = '+00:00';
-mysql> exit
-```
-
-### Setup the Apache web server
-```
-a2enmod cgi       # enable mod CGI
-a2enmod rewrite   # enable mod rewrite
-a2enmod wsgi      # enable mod wsgi
-systemctl restart apache2
-```
-
-### Setup BOINC server user
-```
-useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
-passwd boincadm   # choose some password to login later
-```
-
-### Install Fitcrack
-```
-./install_fitcrack.sh
-```
+**Table of Contents**
+* [Installation](#inst)
+* [Fitcrack WebAdmin user guide](https://nesfit.github.io/fitcrack/#/)
+* [Operating the server](#oper)
+* [Advanced: Host-specific configuration](#hostconf)
+* [Debugging](#debugging)
 
 
+<a name="inst"></a>
+## Installation
+Since Fitcrack 2.4.0, [Docker](README-Docker.md) is the recommended method
+for deployment. Everything is shipped in a single container. It also has a native
+support for SSL/TLS which is now super-easy to configure.
+Nevertheless, you can still use the installer or manual install if you want.
 
-## Step-by-step: Install on Ubuntu 20.04 LTS
+See instructions the desired type of deployment:
+* [Installation using Docker](INSTALL-Docker.md) (recommended, easy)
+* [Installation using Installer](INSTALL-Installer.md) (working alternative)
+* [Manual installation](INSTALL-Manual.md) (for advanced users/modders)
 
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
-
-### Install prerequisities
-```
-apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
-
-mysql_secure_installation # Set MySQL root password
-
-a2enmod cgi       # enable mod CGI
-a2enmod rewrite   # enable mod rewrite
-a2enmod wsgi      # enable mod wsgi
-systemctl restart apache2
-```
-### Setup user and Database
-```
-useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
-mysql -u root -p
-mysql> create database fitcrack;
-mysql> CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
-mysql> GRANT ALL ON fitcrack.* TO 'fitcrack'@'localhost';
-mysql> SET GLOBAL log_bin_trust_function_creators = 1;
-mysql> SET GLOBAL time_zone = '+00:00';
-mysql> exit
-```
-
-### Install Fitcrack
-```
-./install_fitcrack.sh
-```
-
-And proceed according to your preferences...
-
-![Installer](img/insta.png)
-
-You can read about the "expose to internet" option [here](#about-webadmin-security).
 
 <a name="oper"></a>
 ## Operating the server
 
+### WebAdmin
 The **default** login credentials to the WebAdmin are:
 * login: ``fitcrack``
 * password: ``FITCRACK``
 
-### About WebAdmin security
-When WebAdmin authenticates with the backend, cross-origin cookies are used. As browsers tightened their security policies, this method now **requires the connection to be encrypted (HTTPS)**.
+In the Docker-based version, those defaults can be changed by modifying the
+`WEBADMIN_LOGIN` and `WEBADMIN_PW` variables in your `.env` file.
 
-To get around this when you just want to test out fitcrack, we introduced an alternative (localstorage workaround) authentication method using [JWT](https://jwt.io). This enables auth over HTTP, but it **is not secure** and should **never ever** be used for installations accessible over the internet.
-
-When you set the installation as exposed to the internet during installation, the JWT login flow will be disabled. Which one is used is completely transparent to the user, just remeber that you'll need HTTPS to use WebAdmin then.
-
-
-To change this decision later, modify [this line](webadmin/fitcrackAPI/src/settings.py#L46) in `settings.py`.
+To learn how to use WebAdmin, check our [Fitcrack WebAdmin user guide](https://nesfit.github.io/fitcrack/#/).
 
 ### Server daemons
+Fitcrack provides an init script can automatically starts all the server
+daemons, and can be also used for stopping or restarting them.
+In the Docker-based version, the script is automatically set up inside the
+Fitcrack server container. With installer-based deployement, you will be asked
+whether you wish to add Fitcrack as a system service.
 
-At the end of the installation, the installer asks you if you wish to start
-the server daemons. If you decide not to, you can do that manually as described below:
-
-## Running the server
-
-Login to the server as BOINC user (e.g. `boincadm`) and enter the project directory:
+To control the server daemons, inside your Docker container
+(or on the machine where you installed Fitcrack), type:
 ```
-boincadm@myserver:~$ cd projects/fitcrack
-```
-
-### Get server status
-```
-boincadm@myserver:~/projects/fitcrack$ ./bin/status
+service fitcrack [start|stop|status|restart]
 ```
 
-### Start Fitcrack server
+For non-Docker systemd-based deployments, you can also use:
 ```
-boincadm@myserver:~/projects/fitcrack$ ./bin/start
-```
-
-### Stop Fitcrack server
-```
-boincadm@myserver:~/projects/fitcrack$ ./bin/stop
+systemctl [start|stop|status|restart] fitcrack
 ```
 
-#### Advanced: Host specific configuration
+It is also possible to operate the server daemons manually
+by logging as the BOINC user (e.g. `boincadm`), descending into the
+project directory (e.g. `/home/boincadm/project/fitcrack`) and running
+one of the following:
+* `./bin/start`
+* `./bin/stop`
+* `./bin/status`
+* `./bin/restart`
+
+<a name="hostconf"></a>
+### Advanced: Host specific configuration
 Sometimes you need to configure specific behavior for individual hosts.
 Fitcrack allows you to define additional **host-specific hashcat arguments**.
 This gives you options to select what GPUs to use for cracking,
@@ -140,9 +82,15 @@ Simply create a file `/etc/fitcrack.conf` (Linux hosts) or
 If the file exists and is readable for the BOINC client user, the
 **Runner** subsystem will append the contents to **hashcat's arguments**.
 
-##### Example
+#### Example
 ```
 $ echo '-w 4 -d 1,2 --force' > /etc/fitcrack.conf
 ```
 Hashcat will use OpenCL devices 1 and 2. The workload profile will be set to level 4 (Nightmare).
 The cracking session will be forced and all warnings ignored.
+
+
+<a name="debugging"></a>
+### Debugging
+For debugging **Docker-based** Fitcrack deployments, see [this page](INSTALL-Docker.md#debugging).
+For deployments with **Installer** (or manual installations), see [this page](INSTALL-Installer.md#debugging).

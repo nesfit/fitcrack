@@ -6,8 +6,8 @@ should work the same way for the standalone tool and all example commands are
 in Linux bash.
 
 ### Middleware
-As already said **Runner** is hashcat <=> boinc-client middleware. Simply all it does is: 
-1. convertion of `config` in TLV format to hashcat parameters, 
+As already said **Runner** is hashcat <=> boinc-client middleware. Simply all it does is:
+1. convertion of `config` in TLV format to hashcat parameters,
 2. launching and monitoring progress of **hashcat**,
 3. gathering of hashcat results and communicating them to server.
 
@@ -42,30 +42,30 @@ Examples are provided in directory *./testground*
 **Runner** also supports the host based specification of **Hashcat** parameters
 it is supposed to be used for the specification of workload(`-w`), which OpenCL
 devices to use(`-d`), whether should **Hashcat** ignore errors(`--force`) and
-such thing which aren't general by their nature. 
+such thing which aren't general by their nature.
 
-File with these configs should be placed at `/etc/<BOINC_project_name>.conf` on 
-Linux and under `C:\ProgramData\BOINC\<BOINC_project_name>.conf`. If you would 
-like to run **Runner** as standalone then create config inside the same 
+File with these configs should be placed at `/etc/<BOINC_project_name>.conf` on
+Linux and under `C:\ProgramData\BOINC\<BOINC_project_name>.conf`. If you would
+like to run **Runner** as standalone then create config inside the same
 directory but name it`standalone.conf`.
 
 Format is just a part of hashcat command.
 
 ##### Example
 ```
-$ cat /etc/fitcrack.conf 
+$ cat /etc/fitcrack.conf
 -w 1 -d 1 --force
 ```
 It specifies to use workload 1, device with id 1 and by-pass all possible OpenCL
 errors or driver incompatibilities.
 
-#### Attack types supported by Runner 
+#### Attack types supported by Runner
 * 0 - Straight (Dictionary attack)
 * 1 - Combination (Combinator attack - two dictionaries)
 * 3 - Brute-force (Mask attack)
 
-##### Attack subtypes 
-* attack\_mode = 0 (Straight) 
+##### Attack subtypes
+* attack\_mode = 0 (Straight)
    * 0 - Basic dictionary attack (name of the dictionary is in th field **dict1**)
    * 1 - Dictionary attack with rules (name of the file with rules is **rules**)
 * attack\_mode = 1 (Combination)  
@@ -97,7 +97,7 @@ errors or driver incompatibilities.
 |mode                   |String       | Type of the task benchmark, normal(cracking), benchmark-all (b, n, a)	    | --benchmark     	   |
 |markov_threshold	|UInt	      | Threshold value for markov chains					    |			   |
 
-##### Example of TLV config 
+##### Example of TLV config
 ```
 |||attack|String|4|dict|||
 |||attack_mode|UInt|1|0|||
@@ -110,7 +110,7 @@ errors or driver incompatibilities.
 More TLV sample can be found in the directory *./sample*.
 
 It is also possible to have external password generator which output can be
-redirected to **Runner**'s stdin. **Runner** then redirects its stdin to be 
+redirected to **Runner**'s stdin. **Runner** then redirects its stdin to be
 **Hascat**'s stdin without even touching the data provided.
 
 ## Compilation
@@ -127,11 +127,11 @@ and **libzip** and **zlib** static libraries. Runner is aimed to be compiled by
 g++4.8 same as with MinGW64-g++4.8. If you would want to use some higher version
 you will probably need to recompile those static libraries by yourself.
 
-Linux compilation: 
+Linux compilation:
 
 `$ make linux`
 
-Windows compilation: 
+Windows compilation:
 
 `$ make windows`
 
@@ -148,13 +148,12 @@ Ubuntu 14.04 default MinGW g++ which is also 4.8 and are targeted for Linux
 ##### Execution example
 `$ ./runner64.bin`
 
-##### Example of minimal amount of file need for cracking task
+##### Example of minimal amount of files need for cracking task
 ```
 $ ls
     config
     data
-    hashcat64.bin
-    hashcatkernel1_7.zip
-    runner64.bin
+    hashcat1.bin
+    hashcat_files1.zip
+    runner1.bin
 ```
-
