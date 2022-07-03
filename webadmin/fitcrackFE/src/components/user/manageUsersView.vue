@@ -188,7 +188,7 @@
           <v-btn
             color="primary"
             text
-            :disabled="newRoleName==''"
+            :disabled="!newRoleName"
             @click.stop="addRole"
           >
             Add
@@ -219,7 +219,7 @@
         </v-card-title>
         <v-card-text>
           <p>
-            All fields are optional. Empty will be left unchanged.
+            All fields are optional. Empty fields will be left unchanged.
           </p>
           <v-form
             ref="form"
