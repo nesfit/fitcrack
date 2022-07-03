@@ -89,8 +89,6 @@ RUN service apache2 restart
 COPY . /srv/fitcrack/
 WORKDIR /srv/fitcrack
 
-#COPY ./backend_utils/* /srv/fitcrack/
-
 # Copy server files to BOINC server Root
 RUN cp -f server/src/headers/*.h              boinc/sched/
 RUN cp -f server/src/headers/AttackModes/*.h  boinc/sched/
@@ -115,8 +113,6 @@ RUN make -j$COMPILER_THREADS
 
 # Prepare project creation script
 WORKDIR /srv/fitcrack/
-RUN `cat ./installer/services.sh ./installer/install_project.sh > createproject.sh`
-RUN chmod +x createproject.sh
 
 # Build runner
 WORKDIR /srv/fitcrack/runner
