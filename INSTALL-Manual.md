@@ -32,7 +32,7 @@ A Fitcrack server installation consists of:
   * The `FitcrackAPI` can also be used by external apps. For this purpose, we provide a neat documentation in Swagger, which you can find directly at: `http://<YOUR.SERVER.HOSTNAME>:5000`
   * See [webadmin/README.md](webadmin/README.md) to learn how to build and install the Fitcrack WebAdmin.
 
-![Fitcrack-architecture](https://fitcrack.fit.vutbr.cz/wp-content/uploads/2019/04/fitcrack2-768x532.png)
+![Fitcrack-architecture](img/fitcrack2-768x532.png)
 
 
 ## Modding / tinkering
