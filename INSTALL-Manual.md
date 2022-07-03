@@ -38,7 +38,7 @@ A Fitcrack server installation consists of:
 ## Modding / tinkering
 
 Fitcrack was created as an open-source research project and is distributed as free software.
-This means, you can do your custom modifications, forks, and extensions - See [LINCENSE](LICENSE).
+This means, you can do your custom modifications, forks, and extensions - See [LICENSE](LICENSE).
 
 A detailed specification of the architecture is also available in the following **technical report**: [The Architecture of Fitcrack Distributed Password Cracking System, version 2](https://fitcrack.fit.vutbr.cz/files/doc/TR_Fitcrack_architecture.pdf).
 Yet, for modding of the sources, also read the comments as the Techreport is not updated so frequently.
