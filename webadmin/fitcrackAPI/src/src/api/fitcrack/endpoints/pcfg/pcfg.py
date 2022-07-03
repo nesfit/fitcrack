@@ -141,7 +141,6 @@ class pcfgFileRead(Resource):
 
 @ns.route('/add')
 class pcfgAdd(Resource):
-    is_public = True
 
     @api.marshal_with(simpleResponse)
     def post(self):

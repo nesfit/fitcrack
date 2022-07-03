@@ -141,7 +141,6 @@ class dictionaryData(Resource):
 
 @ns.route('/add')
 class dictionaryAdd(Resource):
-    is_public = True
 
     @api.marshal_with(simpleResponse)
     def post(self):

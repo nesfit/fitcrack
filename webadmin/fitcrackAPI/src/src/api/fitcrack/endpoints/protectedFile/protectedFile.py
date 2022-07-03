@@ -37,7 +37,6 @@ class filesCollection(Resource):
 
 @ns.route('/add')
 class filesAdd(Resource):
-    is_public = True
 
     @api.marshal_with(excryptedFileUploaded_model)
     def post(self):

@@ -40,7 +40,6 @@ class markovCollection(Resource):
 
 @ns.route('/add')
 class markovAdd(Resource):
-    is_public = True
 
     @api.marshal_with(simpleResponse)
     def post(self):

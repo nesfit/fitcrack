@@ -222,9 +222,6 @@ class roleNew(Resource):
 @ns.route('/password/change_my_password')
 class change_my_password(Resource):
 
-    is_public = True
-
-
     #@api.expect(user_change_password_arguments)
     #@api.marshal_with(fc_user_model)
     @api.marshal_with(userSuccessResponse_model)
@@ -234,7 +231,7 @@ class change_my_password(Resource):
         """
         args = user_change_password_arguments.parse_args(request)
         if not (current_user.check_password(args['old_password'])):
-            abort(400, 'Password incorrect')
+            abort(400, 'Incorrect old password')
 
         else:
             current_user.set_password(args['new_password'])

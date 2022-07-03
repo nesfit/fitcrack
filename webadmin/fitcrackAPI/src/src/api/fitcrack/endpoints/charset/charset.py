@@ -40,7 +40,6 @@ class charsetCollection(Resource):
 
 @ns.route('/add')
 class charsetAdd(Resource):
-    is_public = True
 
     @api.marshal_with(simpleResponse)
     def post(self):

@@ -88,7 +88,7 @@ class actualUsageData(Resource):
 
 @ns.route('/usageData')
 class usageData(Resource):
-    # public endpoint, no auth needed
+    # public endpoint, no auth needed, used by measureUsage deamon
     is_public = True
 
     @api.expect(serverUsage_argument)
