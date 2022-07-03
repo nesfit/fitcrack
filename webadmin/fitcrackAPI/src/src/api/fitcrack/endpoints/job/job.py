@@ -212,10 +212,17 @@ class multiJobsHost(Resource):
 
         newIds = args['newHost_ids']
         if not newIds:
-             return {
-                'status': True,
-                'message': 'Hosts unassigned.'
-            }
+            try:
+                db.session.commit()
+                return {
+                    'status': True,
+                    'message': 'Hosts unassigned.'
+                }
+            except:
+                return {
+                    'status': False,
+                    'message': 'Something went wrong.'
+                }
 
         for jobId in ids:
             for hostId in newIds:
