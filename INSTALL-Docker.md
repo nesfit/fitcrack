@@ -1,8 +1,6 @@
 # Deploying Fitcrack server using Docker
 
-This document describes how to install Fitcrack server using installer.
-It contains cookbooks for various popular Linux distros + general installation
-instructions.
+This document describes how to install Fitcrack server using Docker.
 
 ### Requirements
 Install **Docker Engine 20.10x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
@@ -25,6 +23,9 @@ Create a new **.env** config file from the example attached:
 ```
 cp env.example .env
 ```
+
+![Fitcrack-architecture](img/dockerenv.png)
+
 Edit the newly-created **.env** file and configure:
 - `FITCRACK_SERVER_HOST` to the domain name or IP of your host machine
 - In most cases, it is fine to default ports: `80` for the WebAdmin frontend and the BOINC server, and `5000`for the WebAdmin backend. But you can change them if you want.
@@ -38,6 +39,8 @@ Once the `fitcrack_server` image is prepared and `.env` file configured, you can
 ```
 docker-compose up
 ```
+
+![Fitcrack-architecture](img/dockerstart.png)
 
 This is fine for debugging. For serious use, you may want the container to run on background.
 This can be dome by starting the container in the detached mode:
