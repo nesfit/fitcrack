@@ -235,7 +235,7 @@ that you want to remove.
 
 
 <a name="debugging"></a>
-## Removing an existing installation
+## Debugging
 Many of reported issues were caused by improper network configuration.
 To debug connectivity issues, check the configuration of your Apache
 web server. Look if the server is listening on the correct ports:
