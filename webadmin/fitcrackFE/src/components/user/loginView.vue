@@ -58,6 +58,7 @@
               class="d-block mx-auto mb-4"
               type="submit"
               color="primary"
+              :disabled="!username || !password"
               @click.prevent="submit"
             >
               sign in
