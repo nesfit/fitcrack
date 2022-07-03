@@ -14,6 +14,7 @@ A detailed documentation and other information can be found at [https://fitcrack
 * [Installation](#inst)
 * [Fitcrack WebAdmin user guide](https://nesfit.github.io/fitcrack/#/)
 * [Operating the server](#oper)
+* [How to connect new hosts](https://nesfit.github.io/fitcrack/#/guide/hosts)
 * [Advanced: Host-specific configuration](#hostconf)
 * [Debugging](#debugging)
 
