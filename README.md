@@ -20,7 +20,7 @@ A detailed documentation and other information can be found at [https://fitcrack
 
 <a name="inst"></a>
 ## Installation
-Since Fitcrack 2.4.0, [Docker](README-Docker.md) is the recommended method
+Since Fitcrack 2.4.0, [Docker](INSTALL-Docker.md) is the recommended method
 for deployment. Everything is shipped in a single container. It also has a native
 support for SSL/TLS which is now super-easy to configure.
 Nevertheless, you can still use the installer or manual install if you want.
