@@ -3,7 +3,7 @@ Users and Permissions
 
 There are several permissions your users can be granted via roles. You can add users and roles via the _Manage users_ page.
 
-![User management page](../_media/img/user-management.jpg)
+![User management page](../_media/img/perms/list.png)
 
 The permissions are briefly described below.
 
@@ -22,4 +22,4 @@ Each job (and batch, as well) has its owner. This is the user that created the j
 
 To do this, open the job's detail view, enter edit mode and select _Permissions_ in the action bar. The Permissions Manager dialog will appear. Here, use the _Add User_ button to pick a user to grant permissions to, and then enable or disable the permissions as you wish. Your changes are saved automatically.
 
-![Job permissions manager](../_media/img/perms-manager.jpg)
+![Job permissions manager](../_media/img/perms/job.png)

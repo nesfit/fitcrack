@@ -11,7 +11,7 @@ Make a selection while listing jobs from any view and select _Batch Run_ from th
 
 > Note that only jobs that are ready (not have been run yet) will be added to the queue
 
-![Batch preparation](../../_media/img/create-queue.jpg)
+![Batch preparation](../../_media/img/mng-jobs/batch.png)
 
 The selected ready jobs will be shown color coded with a preview of their password amount (and thus probable cracking times distribution) as a graph at the bottom __(1)__. You can reorder them by dragging or use a predefined sorting from the dropdown __(2)__. When ready, provide a name and select _Create Batch_ at the bottom. You will be taken to the bacth detail view.
 

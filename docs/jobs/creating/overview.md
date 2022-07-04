@@ -28,7 +28,7 @@ Let's take a look at each of the steps of the main form.
 Adding Input Hashes
 -------------------
 
-![Input settings step](../../_media/img/add-job-input.jpg)
+![Input settings step](../../_media/img/add-job/input.png)
 
 In this first step, you input the hashes you want to try to crack. There are three ways to do so:
 
@@ -40,7 +40,7 @@ The [next section](/jobs/creating/input.md) takes an in-depth look at each of th
 
 After setting the hash type, each hash is validated. __Green checkmarks__ indicate the hash is valid for this type (algorithm). Hashes that have already been entered into the system and are stored in the cache will have a __yellow exclamation mark__. This is purely informational. Invalid hashes, on the other hand, should not be used in the configuration. If one or more hashes are invalid, the input field is marked __red__ and you won't be able to create the job.
 
-![Invalid input settings](../../_media/img/add-job-input-invalid.jpg)
+![Invalid input settings](../../_media/img/add-job/hashes.png)
 
 Note that you can override this using the _Ignore invalid hashes_ checkbox that will appear. However, if you do this, there is no guarantee the job will work.
 
@@ -48,7 +48,7 @@ Note that you can override this using the _Ignore invalid hashes_ checkbox that 
 Configuring Attacks
 -------------------
 
-![Attack modes](../../_media/img/add-job-attacks.jpg)
+![Attack modes](../../_media/img/add-job/attack-settings.png)
 
 In this step, you choose an attack mode and configure it to fit the job. There are a few different attack modes to choose from, each with its own specific setup. You can find all of them, along with a detailed description and examples, in the [Attack modes](/jobs/creating/attacks.md) section.
 
@@ -58,7 +58,7 @@ Once you've set up the attack using valid combination of options, you should be 
 Assigning Hosts
 ---------------
 
-![Hosts table](../../_media/img/add-job-hosts.jpg)
+![Hosts table](../../_media/img/add-job/host-assignment.png)
 
 In this step, you tap into the real potential of the Fitcrack system. The job we've been configuring until now will be distributed between compute nodes, called hosts, based on their measured computing power. You can select which of the hosts currently connected to the system will be participating in the cracking.
 
@@ -70,7 +70,7 @@ The table lists all available hosts. By default, all hosts are selected. To sele
 Tuning the Details
 ------------------
 
-![Additional settings](../../_media/img/add-job-additional.jpg)
+![Additional settings](../../_media/img/add-job/misc-settings.png)
 
 This is the last step and it's very much optional. Here you can add a comment __(1)__ to the job, which will be visible in the detailed job view. You can also set a time and date for the job to start __(2)__ or leave the checkbox labeled _Immediately_ checked to let the job start when you, well, start it. Simmilarily, you can set a time and date for the job to end __(4)__ or not set any limitation.
 

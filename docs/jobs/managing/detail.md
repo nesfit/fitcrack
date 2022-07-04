@@ -7,19 +7,19 @@ The job detail view is where you find everything there is to know about a specif
 Main Info Panel
 ---------------
 
-![Job detail panel](../../_media/img/job-detail-main.jpg)
+![Job detail panel](../../_media/img/mng-jobs/detail.png)
 
-The main panel shows most of the information on the job setup, current state, progress and more. It is also where you'll find the main controls __(2)__ for starting, stopping and other operations for the job.
+The main panel shows most of the information on the job setup, current state, progress and more. It is also where you'll find the main controls for starting, stopping and other operations for the job.
 
 > For more on these controls, see [Controlling Jobs](/jobs/managing/actions.md).
 
-The top area where the name is glows different colors depending on the current state of the job, so that you can tell what's happening at a glance. Here you can also open the edit dialog __(1)__, which allows you to change the job's name, description (comment) and reschedule its start and end times.
+The top area where the name is has different colors depending on the current state of the job, so that you can tell what's happening at a glance. Here you can also open the edit dialog, which allows you to change the job's name, description (comment) and reschedule its start and end times.
 
 
 Attack Info and Hashes
 ----------------------
 
-The Details panel varies based on the attack mode used. It shows you how the attack was set up, for example what dictionaries are being used for a dictionary attack. It also shows the hashes being cracked. When a password is found, you'll see it next to its hash. A history of the job status is shown in a timeline along the top, with the option to _purge_ the job and return it to a fresh state.
+The Details panel varies based on the attack mode used. It shows you how the attack was set up, for example what dictionaries are being used for a dictionary attack. It also shows the hashes being cracked. When a password is found, you'll see it next to its hash. A history of the job status is shown in a timeline along the top, with the option to _purge_ the job (see [this](system/settings.md) as well) and return it to a fresh state.
 
 
 Hosts and Their Contribution

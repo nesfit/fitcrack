@@ -22,6 +22,7 @@
   - [Cracking Assets](library/assets.md)
 
 - System Management
+  - [System Settings](system/settings.md)
   - [Users and Permissions](system/users.md)
   - [Host Management](system/hosts.md)
   - [Server Monitoring](system/server.md)

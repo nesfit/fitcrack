@@ -21,11 +21,11 @@ In a desktop environment, you can use the BOINC GUI. The screenshots below are a
 
 2. Enter the URL of the server where your Fitcrack installation is running, with `/fitcrack` at the end 
 
-![Adding a project in BOINC](../_media/img/boinc-url.png)
+![Adding a project in BOINC](../_media/img/boinc/url.png)
 
 3. Create a new user (or use existing project credentials in later connections)
 
-![Registering a user in BOINC](../_media/img/boinc-user.png)
+![Registering a user in BOINC](../_media/img/boinc/user.png)
 
 4. Finish adding the project, your host will soon appear in Webadmin
 

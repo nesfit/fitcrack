@@ -1,10 +1,10 @@
 # Fitcrack Webadmin User's Guide
 
-Welcome to the Fitcrack User's Guide. A comprehensive documentation of the Webadmin app used to control the password cracking system developed at BUT FIT.
+Welcome to the Fitcrack User's Guide. A comprehensive documentation of the Webadmin app used to control the password cracking system developed at BUT FIT. To get started, select a topic in the sidebar or [continue with Quick Start](guide/start.md).
 
-![App preview](./_media/img/frontpage.png)
+<!-- ![App preview](./_media/img/overview/dashboard.png) -->
 
-## Fitcrack — Distributed password cracking system
+## What is Fitcrack?
 
 **Fitcrack** is a distributed password cracking system. It can be used for recovering passwords securing various types of encrypted media like documents, archives, or disk volumes, as well as for breaking raw cryptographic hashes.
 
