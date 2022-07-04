@@ -67,8 +67,11 @@ export default {
       if (!this.id && !this.from) {
         return this.$moment.utc().subtract(24, 'hours').format('YYYY-M-DTH:mm:ss')
       } else {
-        return this.from
+        return this.$moment(this.from).utc().format('YYYY-M-DTH:mm:ss')
       }
+    },
+    toTime () {
+      return this.to ? this.$moment(this.to).utc().format('YYYY-M-DTH:mm:ss') : undefined
     }
   },
   methods: {
@@ -82,7 +85,7 @@ export default {
       this.axios.get(target, {
         params: {
           from: this.fromTime,
-          to: this.to
+          to: this.toTime
         }
       }).then(r => {
         this.chartdata = {

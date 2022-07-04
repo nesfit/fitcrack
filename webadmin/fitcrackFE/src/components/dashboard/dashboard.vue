@@ -67,11 +67,11 @@
         <dt-picker
           v-model="chartsFrom"
           class="mr-4"
-          label="From (UTC)"
+          label="From"
         />
         <dt-picker
           v-model="chartsTo"
-          label="To (UTC)"
+          label="To"
         />
       </div>
     </v-sheet>
@@ -101,8 +101,8 @@
     },
     data () {
       return {
-        chartsFrom: this.$moment.utc().subtract(24, 'hours').format('YYYY-MM-DDTHH:mm'),
-        chartsTo: this.$moment.utc().format('YYYY-MM-DDTHH:mm'),
+        chartsFrom: this.$moment().subtract(24, 'hours').format('YYYY-MM-DDTHH:mm'),
+        chartsTo: this.$moment().format('YYYY-MM-DDTHH:mm'),
         hostsInfo: null,
         jobsInfo: [],
         serverInfo: [],

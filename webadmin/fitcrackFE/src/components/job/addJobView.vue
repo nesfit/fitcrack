@@ -446,7 +446,7 @@
               </v-row>
               <v-row>
                 <v-col>
-                  <div class="title mb-2">Planned start (UTC)</div>
+                  <div class="title mb-2">Planned start</div>
                   <dt-picker
                     v-model="startDate"
                     outlined
@@ -477,7 +477,7 @@
                   />
                 </v-col>
                 <v-col>
-                  <div class="title mb-2">Planned end (UTC)</div>
+                  <div class="title mb-2">Planned end</div>
                   <dt-picker
                     v-model="endDate"
                     outlined
@@ -646,8 +646,8 @@
     mounted: function () {
       this.loadSettings()
       this.getHashTypes()
-      this.startDate = this.$moment.utc().format('YYYY-MM-DDTHH:mm')
-      this.endDate = this.$moment.utc().format('YYYY-MM-DDTHH:mm')
+      this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm')
+      this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm')
       if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
     },
@@ -861,7 +861,19 @@
         }
 
         this.loading = true
-        this.axios.post(this.$serverAddr + '/job', this.jobSettings).then((response) => {
+        console.log(this.jobSettings.endNever)
+        const finalStartTime = this.startNow ? 
+          this.jobSettings['time_start'] : 
+          this.$moment(this.jobSettings['time_start']).utc().toISOString(true).slice(0, 16)
+        const finalEndTime = this.endNever ? 
+          this.jobSettings['time_end'] : 
+          this.$moment(this.jobSettings['time_end']).utc().toISOString(true).slice(0, 16)
+        const finalSettings = {
+          ...this.jobSettings,
+          'time_start': finalStartTime,
+          'time_end': finalEndTime
+        }
+        this.axios.post(this.$serverAddr + '/job', finalSettings).then((response) => {
           this.$router.push({name: 'jobDetail', params: {id: response.data.job_id}})
           this.applyTemplate() // Clear all
         }).catch((error) => {

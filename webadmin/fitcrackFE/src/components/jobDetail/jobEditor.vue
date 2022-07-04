@@ -25,7 +25,7 @@
             <v-icon>
               mdi-ray-start
             </v-icon>
-            Start{{ edit.startNow ? '' : ' (UTC)' }}
+            Start
           </div>
           <v-spacer />
           <v-checkbox
@@ -49,7 +49,7 @@
             <v-icon>
               mdi-ray-end
             </v-icon>
-            End{{ edit.endNever ? '' : ' (UTC)' }}
+            End
           </div>
           <v-spacer />
           <v-checkbox
@@ -223,11 +223,11 @@ export default {
         comment: this.data.comment,
         seconds_per_job: this.data.seconds_per_job,
         time_start: this.data.time_start === null ?
-        this.$moment.utc().toISOString(true).slice(0, 16) :
-        this.$moment.utc(this.data.time_start).toISOString(true).slice(0, 16),
+        this.$moment().format('YYYY-MM-DDTHH:mm') :
+        this.$moment.utc(this.data.time_start).local().format('YYYY-MM-DDTHH:mm'),
         time_end: this.data.time_end === null ?
-          this.$moment.utc().toISOString(true).slice(0, 16) :
-          this.$moment.utc(this.data.time_end).toISOString(true).slice(0, 16),
+          this.$moment().format('YYYY-MM-DDTHH:mm') :
+          this.$moment.utc(this.data.time_end).local().format('YYYY-MM-DDTHH:mm'),
         startNow: (this.data.time_start === null),
         endNever: (this.data.time_end === null),
         check_duplicates: this.data.check_duplicates,
@@ -242,12 +242,17 @@ export default {
   },
   methods: {
     save () {
+      
       if (this.edit.startNow) {
         this.edit.time_start = ''
+      } else {
+        this.edit.time_start = this.$moment(this.edit.time_start).utc().toISOString(true).slice(0, 16)
       }
 
       if (this.edit.endNever) {
         this.edit.time_end = ''
+      } else {
+        this.edit.time_end = this.$moment(this.edit.time_end).utc().toISOString(true).slice(0, 16)
       }
 
       this.axios.put(this.$serverAddr + '/job/' + this.data.id , this.edit
