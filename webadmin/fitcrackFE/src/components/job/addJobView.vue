@@ -75,17 +75,6 @@
           hint="Give this job a descriptive name"
           persistent-hint
         />
-        <v-btn
-          v-if="dev"
-          text
-          color="success"
-          @click="generateJobName"
-        >
-          <v-icon left>
-            mdi-auto-fix
-          </v-icon>
-          Generate
-        </v-btn>
       </v-col>
       <v-col>
         <v-autocomplete
@@ -650,6 +639,9 @@
       this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm')
       if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
+      if (this.name === '') {
+        this.generateJobName()
+      }
     },
     methods: {
       ...mapMutations('jobForm', ['applyTemplate']),
@@ -888,7 +880,7 @@
         this.validateHashes()
       },
       generateJobName () {
-        this.name = "job-" + this.$moment.utc().format('DD-MM-YYYY-HH-mm')
+        this.name = this.$store.state.project + ' Job – ' + this.$moment().format('DD.MM.YYYY HH:mm')
       }
     }
   }
