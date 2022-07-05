@@ -54,6 +54,11 @@ useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
 passwd boincadm   # choose some password to login later
 ```
 
+### Add Apache user to the boincadm group
+```
+usermod -a -G boincadm www-data
+```
+
 ### Install Fitcrack
 ```
 ./install_fitcrack.sh
@@ -93,6 +98,11 @@ mysql> SET GLOBAL time_zone = '+00:00';
 mysql> exit
 ```
 
+### Add Apache user to the boincadm group
+```
+usermod -a -G boincadm www-data
+```
+
 ### Install Fitcrack
 ```
 ./install_fitcrack.sh
@@ -121,6 +131,11 @@ useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
 mysql -u root -p
 mysql> create database fitcrack;
 mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+```
+
+### Add Apache user to the boincadm group
+```
+usermod -a -G boincadm www-data
 ```
 
 ### Install Fitcrack
@@ -189,6 +204,11 @@ useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
 mysql -u root -p
 mysql> create database fitcrack;
 mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+```
+
+### Add Apache user to the boincadm group
+```
+usermod -a -G boincadm apache
 ```
 
 ### Install Fitcrack
