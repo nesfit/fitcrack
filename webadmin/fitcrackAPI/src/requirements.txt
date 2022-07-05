@@ -6,9 +6,8 @@ flask-migrate
 flask_script
 pymysql
 mysql-connector-python
-psutil
+psutil==5.9.1
 msgpack
 pyjwt
 Werkzeug==2.0.3
 Flask==2.0.2
-
