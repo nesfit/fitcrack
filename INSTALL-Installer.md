@@ -57,6 +57,7 @@ passwd boincadm   # choose some password to login later
 ### Add Apache user to the boincadm group
 ```
 usermod -a -G boincadm www-data
+reboot
 ```
 
 ### Install Fitcrack
@@ -101,6 +102,7 @@ mysql> exit
 ### Add Apache user to the boincadm group
 ```
 usermod -a -G boincadm www-data
+reboot
 ```
 
 ### Install Fitcrack
@@ -136,6 +138,7 @@ mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED B
 ### Add Apache user to the boincadm group
 ```
 usermod -a -G boincadm www-data
+reboot
 ```
 
 ### Install Fitcrack
@@ -209,6 +212,7 @@ mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED B
 ### Add Apache user to the boincadm group
 ```
 usermod -a -G boincadm apache
+reboot
 ```
 
 ### Install Fitcrack
