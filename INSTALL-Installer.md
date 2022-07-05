@@ -11,7 +11,7 @@ Table of Contents:
 * [Step-by-step guide for Ubuntu 22.04 LTS](#instubu22)
 * [Step-by-step guide for Ubuntu 20.04 LTS](#instubu20)
 * [Step-by-step guide for Debian 9 / Ubuntu 18.04 LTS](#instdeb9)
-* [Step-by-step guide for CentOS / RHEL 8](#instcentos)
+* [Step-by-step guide for CentOS / RHEL 8](#instcentos8)
 * [General installation instructions (for Other Linux distros)](#instgen)
 * [Debugging your Fitcrack server installation](#debugging)
 * [Removing an existing installation](#removal)
@@ -137,11 +137,29 @@ Open a **root** terminal, go to the directory with Fitcrack sources and proceed 
 ### SELINUX
 The following tutorial assumes **SELINUX** in permissive or disabled mode.
 If you wish to use SELINUX enforcing mode on Fitcrack server machine, you have to configure policies to allow apache access to project directory and others.
-
+```
+sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
+reboot
+```
 
 ### Install prerequisities
 ```
-yum install -y m4 gcc gcc-c++ make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python3-devel python3 python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel
+yum install -y dnf-plugins-core
+```
+
+On CentOS 8, type:
+```
+yum config-manager --set-enabled powertools
+```
+
+On RHEL 8, type:
+```
+subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+```
+
+Then:
+```
+yum install -y m4 gcc gcc-c++ glibc-static libstdc++-static make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python3-devel python3 python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel
 
 pip3 install mysqlclient
 
