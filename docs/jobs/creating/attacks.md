@@ -15,7 +15,7 @@ Dictionary Attack
 
 A dictionary attack will try every possible password from given password dictionaries. You can select one or more dictionaries you want to use using the table __(1)__. For each dictionary available, you can see the keyspace signifying the number of passwords which will be used. If you choose multiple dictionaries, the total keyspace of the job is a sum of keyspaces of all selected dictionaries.
 
-You can choose whether to perform dictionary fragmentation on the server on leave it to the host machines __(2)__.
+You can choose whether to perform dictionary fragmentation on the server or leave it to the host machines __(2)__.
 
 It is also possible to select a file with password-mangling rules from the bottom table __(3)__. The number of rules in each file is shown in the _count_ column. The rules enhance the repertoire of passwords, but they also increase the total keyspace of the job. This is because Fitcrack applies every rule from the rule file to each dictionary password. The total keyspace is calculated as the sum of dictionary keyspaces multiplied by the number of rules in the rule file.
 
