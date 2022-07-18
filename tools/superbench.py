@@ -83,7 +83,7 @@ def main():
     parser.add_argument("--host-name", action="store")
     parser.add_argument("--delay", action="store", type=int, default=60)
     parser.add_argument("--debug", action="store_true", default=False)
-    parser.add_argument("--attack-modes", action="store")
+    parser.add_argument("--attack-modes", action="store", default='0136789')
 
     arguments = parser.parse_args()
 
