@@ -42,6 +42,7 @@ else # Create Fitcrack project
   echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
   # Configure MySQL server
+  usermod -d /var/lib/mysql/ mysql
   service mysql start
   mysql -e "CREATE DATABASE $DB_NAME";
   mysql -e "CREATE USER '$DB_USER'@'$DB_HOST' IDENTIFIED WITH mysql_native_password BY '$DB_PW'";
