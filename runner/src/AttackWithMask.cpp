@@ -44,7 +44,12 @@ void AttackWithMask::addMask() {
       logStr<<"After conversion: "<<mask.c_str();
       Logging::debugPrint(Logging::Detail::Important, logStr.str().c_str());
     }
-    addArgument(mask);
+
+    std::fstream mask_file;
+    File::openWriteStream(mask_file, HashcatConstant::MaskFileName, std::ios_base::trunc);
+    mask_file.write(mask.data(), mask.length());
+    mask_file.close();
+    addArgument(HashcatConstant::MaskFileName);
   }
   else
   {
@@ -59,6 +64,7 @@ void AttackWithMask::createMaskAndCharsets() {
     std::ostringstream charsetNameStr;
     charsetNameStr<<"charset"<<i;
     std::string charsetName = charsetNameStr.str();
+    //TODO: maybe store to file than arg?
     findAndAddOptional(charsetName, "--custom-"+charsetName);
   }
 
