@@ -10,6 +10,7 @@ instructions.
 Table of Contents:
 * [Step-by-step guide for Ubuntu 22.04 LTS](#instubu22)
 * [Step-by-step guide for Debian 11](#instdeb11)
+* [Step-by-step guide for CentOS Stream 9](#instcentos9)
 * [Step-by-step guide for Ubuntu 20.04 LTS](#instubu20)
 * [Step-by-step guide for Debian 9 / Ubuntu 18.04 LTS](#instdeb9)
 * [Step-by-step guide for CentOS / RHEL 8](#instcentos8)
@@ -79,7 +80,7 @@ And proceed according to your preferences...
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
-### Install and configure MySQL server
+### Install and configure the MySQL server
 
 Download the newest **mysql-apt-config** from https://dev.mysql.com/downloads/repo/apt/ and type:
 ```
@@ -139,6 +140,80 @@ reboot
 ```
 ./install_fitcrack.sh
 ```
+
+
+<a name="instcentos9"></a>
+## Step-by-step: Install on CentOS Stream 9
+
+Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
+
+### SELINUX
+The following tutorial assumes **SELINUX** in permissive or disabled mode.
+If you wish to use SELINUX enforcing mode on Fitcrack server machine, you have to configure policies to allow apache access to project directory and others.
+```
+sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
+reboot
+```
+
+### Install prerequisities
+Prepare the CodeReady Linux Builder:
+```
+dnf install -y dnf-plugins-core
+dnf config-manager --set-enabled crb
+```
+
+Then install the following:
+```
+dnf install -y m4 gcc gcc-c++ glibc-static libstdc++-static make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python3-devel python3 python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel initscripts
+```
+
+Install mySQL client for Python 3:
+```
+pip3 install mysqlclient
+```
+
+### Configure exceptions for firewalld:
+```
+firewall-cmd --zone=public --add-service=http --permanent
+firewall-cmd --zone=public --add-service=https --permanent
+firewall-cmd --zone=public --add-port=5000/tcp --permanent
+firewall-cmd --reload
+```
+
+### Configure services
+```
+systemctl start httpd.service
+systemctl enable httpd.service
+systemctl start mariadb
+mysql_secure_installation # Set MariaDB root password
+systemctl enable mariadb.service
+```
+
+### Setup user and Database
+```
+useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
+mysql -u root -p
+mysql> create database fitcrack;
+mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+```
+
+### Add Apache user to the boincadm group
+```
+usermod -a -G boincadm apache
+reboot
+```
+
+### Install Fitcrack
+```
+./install_fitcrack.sh
+```
+
+### Enable Fitcrack service
+If you installed Fitcrack as a system service you may enable it:
+```
+/usr/lib/systemd/systemd-sysv-install enable fitcrack
+```
+This will make Fitcrack start automatically on future boots.
 
 
 <a name="instubu20"></a>
@@ -296,6 +371,7 @@ If you installed Fitcrack as a system service you may enable it:
 /usr/lib/systemd/systemd-sysv-install enable fitcrack
 ```
 This will make Fitcrack start automatically on future boots.
+
 
 <a name="instgen"></a>
 ## General installation instructions (Linux-wide)
