@@ -9,6 +9,7 @@ instructions.
 
 Table of Contents:
 * [Step-by-step guide for Ubuntu 22.04 LTS](#instubu22)
+* [Step-by-step guide for Debian 11](#instdeb11)
 * [Step-by-step guide for Ubuntu 20.04 LTS](#instubu20)
 * [Step-by-step guide for Debian 9 / Ubuntu 18.04 LTS](#instdeb9)
 * [Step-by-step guide for CentOS / RHEL 8](#instcentos8)
@@ -28,6 +29,8 @@ apt install -y m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-p
 ```
 
 ### Setup the MySQL Database
+Set-up the mySQL root user password and
+create a database and user for Fitcrack. For example:
 ```
 systemctl start mysql
 mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'YOURROOTPASSWORD';"
@@ -69,6 +72,73 @@ And proceed according to your preferences...
 
 ![Installer](img/insta.png)
 
+
+
+<a name="instdeb11"></a>
+## Step-by-step: Install on Debian 11
+
+Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
+
+### Install and configure MySQL server
+
+Download the newest **mysql-apt-config** from https://dev.mysql.com/downloads/repo/apt/ and type:
+```
+apt install ./mysql-apt-config_*_all.deb
+dpkg-reconfigure mysql-apt-config
+```
+
+Proceed with default settings:
+* MySQL Server & Cluster: **mysql-8**
+* MySQL Tools & Connectors: **Enabled**
+* MySQL Preview Packages: **Disabled**
+
+Finally, install the mySQL server:
+```
+apt install mysql-server
+```
+You will be prompted to choose the MySQL root user password
+
+### Install other prerequisities
+```
+apt install -y m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-common libmysqlclient-dev zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
+```
+
+### Setup the MySQL Database
+Type `mysql -u root -p` and login with your MySQL root user password.
+Then create a database and user for Fitcrack. For example:
+```
+mysql> create database fitcrack;
+mysql> CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+mysql> GRANT ALL ON fitcrack.* TO 'fitcrack'@'localhost';
+mysql> SET GLOBAL log_bin_trust_function_creators = 1;
+mysql> SET GLOBAL time_zone = '+00:00';
+mysql> exit
+```
+
+### Setup the Apache web server
+```
+a2enmod cgi       # enable mod CGI
+a2enmod rewrite   # enable mod rewrite
+a2enmod wsgi      # enable mod wsgi
+systemctl restart apache2
+```
+
+### Setup BOINC server user
+```
+useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
+passwd boincadm   # choose some password to login later
+```
+
+### Add Apache user to the boincadm group
+```
+usermod -a -G boincadm www-data
+reboot
+```
+
+### Install Fitcrack
+```
+./install_fitcrack.sh
+```
 
 
 <a name="instubu20"></a>
