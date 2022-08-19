@@ -28,7 +28,7 @@
  #define DIR_CREATE_FLAGS 
  #define IFDIR_FLAG _S_IFDIR
 
-#elif defined (__linux__)
+#else
 
  #define DIR_CREATE_FLAGS , S_IRWXG | S_IRWXU | S_IROTH | S_IXOTH
  #define IFDIR_FLAG S_IFDIR 

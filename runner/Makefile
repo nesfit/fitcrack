@@ -13,22 +13,27 @@ $(shell echo 'void ehframe_dummy (void) { }' > $(BINDIR)/ehframe_dummy.C)
 
 CXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -O3 -g3 -std=c++11
 CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'
-LDXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lboinc_api -lboinc -lzip -lz
+LDXXFLAGS=-lboinc_api -lboinc -lzip -lz
 
 SRCS=$(shell find $(SRCDIR) -name *.cpp)
 OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))
 
 linux: TARGET=runner.bin
 linux: CXX=g++
-linux: LDXXFLAGS+=-L'./lib/x86_64_linux'
+linux: LDXXFLAGS+=-Wl,--whole-archive -lpthread -Wl,--no-whole-archive --static -L'./lib/x86_64_linux'
 #this is necessary because of https://bugzilla.redhat.com/show_bug.cgi?id=199788#c2 (15 yrs old and still not fixed -.-')
 linux: LDXXFLAGS+=-lc $(BINDIR)/ehframe_dummy.C
 linux: $(OBJDIR) $(BINDIR) runner
 
 windows: TARGET=runner.exe
 windows: CXX=x86_64-w64-mingw32-g++
-windows: LDXXFLAGS+=-L'./lib/windows_x86_64/'
+windows: LDXXFLAGS+=-lpthread --static -L'./lib/windows_x86_64/'
 windows: $(OBJDIR) $(BINDIR) runner
+
+mac: TARGET=runner.app
+mac: CXX=clang++
+mac: LDXXFLAGS+=-lpthread -L'./lib/darwin_arm64/'
+mac: $(OBJDIR) $(BINDIR) runner
 
 $(OBJDIR): 
 	mkdir -p $@

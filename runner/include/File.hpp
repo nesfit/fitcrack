@@ -112,12 +112,9 @@ class File : public FilesysBase {
 	 */
 	std::string resolveSoftlink();
 
-#ifdef __linux__
 	/**
 	 * @brief   Set file to be executable (chmod +x \<file\>)
 	 */
 	void setExecutableMode();
-#endif // __linux__
-
 };
 #endif // FILE_HPP

@@ -30,8 +30,8 @@ int main(int argc, char **argv) {
     }
 
     unsigned long long extraction_start = RunnerUtils::timeInMs();
-    FileZip hashcatkernels(file);
-    hashcatkernels.extract();
+    //FileZip hashcatkernels(file);
+    //hashcatkernels.extract();
     unsigned long long extraction_end = RunnerUtils::timeInMs();
 
     Logging::debugPrint(Logging::Detail::DevelDebug, " whole EXTRACTION took: " + RunnerUtils::toString(extraction_end - extraction_start) + "ms");

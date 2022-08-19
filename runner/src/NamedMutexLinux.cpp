@@ -1,4 +1,4 @@
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 
 #include "NamedMutex.hpp"
 
@@ -24,7 +24,7 @@ public:
 	 * @param name The global name of the mutex
 	 */
 	NamedMutexHandle(const std::string &name) {
-          std::string runner_mutex = "/tmp/FitcrackRunnerMutex_" + name;
+          runner_mutex = "/tmp/FitcrackRunnerMutex_" + name;
           handle =
               open(runner_mutex.c_str(), O_CREAT | O_RDONLY | O_CLOEXEC,
                    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
@@ -60,9 +60,12 @@ public:
 	~NamedMutexHandle()
 	{
 		close(handle);
+		unlink(runner_mutex.c_str());
 	}
 	//!The file descriptor
 	int handle;
+	//!Path to named mutex
+	std::string runner_mutex;
 };
 
 NamedMutex::NamedMutex(const std::string &name):

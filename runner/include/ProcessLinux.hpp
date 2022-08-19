@@ -3,7 +3,7 @@
  * Licence: MIT, see LICENSE
  */
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 
 #ifndef PROCESSLINUX_HPP
 #define PROCESSLINUX_HPP
@@ -13,6 +13,7 @@
 #include "ProcessBase.hpp"
 
 #include <unistd.h>
+#include <signal.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>

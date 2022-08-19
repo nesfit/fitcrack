@@ -150,10 +150,10 @@ std::fstream& File::readLine(std::fstream& input_stream, std::string& line) {
   return input_stream;
 }
 
-#ifdef __linux__
 void File::setExecutableMode() {
+#if defined(__linux__) || defined(__APPLE__)
   if (chmod(getRelativePath().c_str(), 0755) == -1) {
     RunnerUtils::runtimeException("chmod() failed for file: " + name_);
   }
+#endif
 }
-#endif // __linux__
