@@ -11,28 +11,23 @@ GIT_REV=$(shell git rev-parse HEAD 2> /dev/null)
 
 $(shell echo 'void ehframe_dummy (void) { }' > $(BINDIR)/ehframe_dummy.C)
 
-CXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -pedantic -lboinc_api -lboinc -lzip -lz -static-libgcc -static-libstdc++ 
-CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'  
-## Release
-LDXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -O3 -g3 -std=c++11 #-D_GLIBCXX_USE_CXX11_ABI=0
-## Debug
-# LDXXFLAGS=-Wall -Wextra -Wno-c++11-compat -g -std=c++98 #-D_GLIBCXX_USE_CXX11_ABI=0
+CXXFLAGS=-DGIT_REV="\"$(GIT_REV)\"" -Werror -Wall -Wextra -O3 -g3 -std=c++11
+CXXPATHS=-I'./include/' -I'./include/boinc/' -I'./include/libzip/'
+LDXXFLAGS=--static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lboinc_api -lboinc -lzip -lz
 
 SRCS=$(shell find $(SRCDIR) -name *.cpp)
 OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))
 
 linux: TARGET=runner.bin
 linux: CXX=g++
-linux: CXXPATHS+=-L'./lib/x86_64_linux'
+linux: LDXXFLAGS+=-L'./lib/x86_64_linux'
 #this is necessary because of https://bugzilla.redhat.com/show_bug.cgi?id=199788#c2 (15 yrs old and still not fixed -.-')
-linux: CXXFLAGS+= -lc $(BINDIR)/ehframe_dummy.C
-linux: ARCH=-m64
+linux: LDXXFLAGS+=-lc $(BINDIR)/ehframe_dummy.C
 linux: $(OBJDIR) $(BINDIR) runner
 
 windows: TARGET=runner.exe
 windows: CXX=x86_64-w64-mingw32-g++
-windows: ARCH=
-windows: CXXPATHS+=-L'./lib/windows_x86_64/'
+windows: LDXXFLAGS+=-L'./lib/windows_x86_64/'
 windows: $(OBJDIR) $(BINDIR) runner
 
 $(OBJDIR): 
@@ -42,11 +37,11 @@ $(BINDIR):
 	mkdir -p $@
 
 $(OBJDIR)%.o: $(SRCDIR)%.cpp  
-	$(CXX) $(CXXPATHS) $(LDXXFLAGS) -c $< -o $@  
+	$(CXX) $(CXXPATHS) $(CXXFLAGS) -c $< -o $@  
 
 .PHONY: runner
 runner: $(OBJS)  
-	$(CXX) -o $(BINDIR)$(TARGET) $(ARCH) $(OBJS) $(CXXPATHS) $(LDXXFLAGS) $(CXXFLAGS)  
+	$(CXX) -o $(BINDIR)$(TARGET) $(OBJS) $(CXXPATHS) $(LDXXFLAGS) $(CXXFLAGS)  
 	cp $(BINDIR)$(TARGET) $(TESTDIR)$(TARGET)
 
 .PHONY: doc
