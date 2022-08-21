@@ -4,7 +4,7 @@ Fitcrack is a [BOINC](https://boinc.berkeley.edu)-based [hashcat](https://hashca
 It recovers passwords that protect various encrypted media like documents, archives, or disk volumes, breaks
 various application passwords, as well as raw or salted cryptographic hashes.
 You can use our system to crack more than [350 different algorithms](https://hashcat.net/hashcat/#features-algos) supported by hashcat.
-Fitcrack allows you to distribute your tasks over dozens of different GPU-equipped computing nodes with Linux or Windows OS.
+Fitcrack allows you to distribute your tasks over dozens of different GPU-equipped computing nodes with Linux, Windows OS or macOS.
 For controlling your cracking network and management of jobs, you can use our friendly
 [WebAdmin](https://nesfit.github.io/fitcrack/#/) interface, or communicate directly with our REST API.
 
@@ -78,7 +78,7 @@ Sometimes you need to configure specific behavior for individual hosts.
 Fitcrack allows you to define additional **host-specific hashcat arguments**.
 This gives you options to select what GPUs to use for cracking,
 configure the workload profile for fine-tuning of the performance, etc.
-Simply create a file `/etc/fitcrack.conf` (Linux hosts) or
+Simply create a file `/etc/fitcrack.conf` (Linux/macOS hosts) or
 `C:\ProgramData\BOINC\fitcrack.conf` (Windows hosts).
 If the file exists and is readable for the BOINC client user, the
 **Runner** subsystem will append the contents to **hashcat's arguments**.
