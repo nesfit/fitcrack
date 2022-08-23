@@ -113,7 +113,8 @@
       'fc-tile': tile
     },
     props: {
-      sort: Boolean
+      sort: Boolean,
+      hex_wordlist: Boolean
     },
     data: function () {
       return {
@@ -166,7 +167,8 @@
         }
         this.axios.post(this.$serverAddr + '/dictionary/fromFile', {
           files,
-          sort: this.sort
+          sort: this.sort,
+          hex_wordlist: this.hex_wordlist
         }, config).then((response) => {
           this.adding = false
           this.$emit('filesuploaded', true)

@@ -75,6 +75,12 @@
           hint="Sort by password length"
           persistent-hint
         />
+        <v-checkbox
+          v-model="hexWordlist"
+          label="HEX wordlist"
+          hint="Assume words in wordlist are given in hex "
+          persistent-hint
+        />
         <v-spacer />
         <v-btn
           color="primary"
@@ -99,6 +105,7 @@
     >
       <server-browser
         :sort="sortUploaded"
+        :sort="sortUploaded"
         @filesuploaded="browser = false;loadDictionaries()"
       />
     </v-dialog>
@@ -114,7 +121,7 @@
         <v-card-text>
           <file-uploader
             :url="this.$serverAddr + '/dictionary/add'"
-            :args="{sort: sortUploaded}"
+            :args="{sort: sortUploaded, hex_wordlist: hexWordlist}"
             @uploadComplete="uploader = false;loadDictionaries()"
           />
         </v-card-text>
