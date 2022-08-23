@@ -28,7 +28,7 @@ void AttackCrackingBase::addSpecificArguments() {
   if (config_.find(ConfigTask::OPTIMIZED, value) && value == "1")
     addArgument("--optimized-kernel-enable");
 
-  if (config_.find(ConfigTask::HEX_WORDLIST, value) && value == "1")
+  if (config_.find(ConfigTask::HEX_DICT, value) && value == "1")
     addArgument("--hex-wordlist");
 
   addArgument("--status-timer="+RunnerUtils::toString(HashcatConstant::ProgressPeriod));

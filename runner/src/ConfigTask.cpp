@@ -21,7 +21,7 @@ const char *ConfigTask::GENERATE_RANDOM_RULES = "generate_random_rules";
 const char *ConfigTask::HWMON_TEMP_ABORT = "hwmon_temp_abort";
 const char *ConfigTask::OPTIMIZED = "optimized";
 const char *ConfigTask::DISTRIBUTION_MODE = "distribution_mode";
-const char *ConfigTask::HEX_WORDLIST = "hex_wordlist";
+const char *ConfigTask::HEX_DICT = "hex_dict";
 /* Private */
 
 void ConfigTask::convertLineToOption(std::string& line) {
@@ -76,7 +76,7 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::HWMON_TEMP_ABORT);
   supported_.push_back(ConfigTask::OPTIMIZED);
   supported_.push_back(ConfigTask::DISTRIBUTION_MODE);
-  supported_.push_back(ConfigTask::HEX_WORDLIST);
+  supported_.push_back(ConfigTask::HEX_DICT);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

@@ -76,9 +76,9 @@
           persistent-hint
         />
         <v-checkbox
-          v-model="hexWordlist"
-          label="HEX wordlist"
-          hint="Assume words in wordlist are given in hex "
+          v-model="hexDict"
+          label="HEX dictionary"
+          hint="Assume words in the dictionary are given in hex"
           persistent-hint
         />
         <v-spacer />
@@ -105,7 +105,7 @@
     >
       <server-browser
         :sort="sortUploaded"
-        :sort="sortUploaded"
+        :hex_dict="hexDict"
         @filesuploaded="browser = false;loadDictionaries()"
       />
     </v-dialog>
@@ -121,7 +121,7 @@
         <v-card-text>
           <file-uploader
             :url="this.$serverAddr + '/dictionary/add'"
-            :args="{sort: sortUploaded, hex_wordlist: hexWordlist}"
+            :args="{sort: sortUploaded, hex_dict: hexDict}"
             @uploadComplete="uploader = false;loadDictionaries()"
           />
         </v-card-text>

@@ -82,7 +82,6 @@ bool CAttackRules::makeWorkunit() {
       configFile << "|||dict_hc_keyspace|BigUInt|" << dictHcKeyspace.size()
                  << "|" << dictHcKeyspace << "|||\n";
     }
-    configFile.close();
 
     /** Create data file */
     retval = config.download_path(name2, path);
@@ -126,6 +125,8 @@ bool CAttackRules::makeWorkunit() {
 
         /** Load current workunit dictionary */
         PtrDictionary workunitDict = GetWorkunitDict();
+
+        configFile << "|||hex_dict|UInt|1|" << std::to_string(workunitDict->isHexDict()) << "|||\n";
 
         auto inputDict =
             makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
@@ -244,6 +245,8 @@ bool CAttackRules::makeWorkunit() {
         m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
         return false;
     }
+
+    configFile.close();
 
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(), "Done.\n");
 

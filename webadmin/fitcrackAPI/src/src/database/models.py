@@ -122,6 +122,7 @@ class FcDictionary(Base):
     password_distribution = Column(Text(collation='utf8_bin'), nullable=False)
     keyspace = Column(BigInteger, nullable=False)
     time = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    hex_dict = Column(Integer, nullable=False, server_default=text("'0'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
 
 

@@ -68,6 +68,7 @@ class CDictionary {
         std::string m_dictFileName;
         std::string m_passwordDistribution;
         bool        m_isLeft;
+        bool        m_hexDict;
 
     public:
 
@@ -82,6 +83,7 @@ class CDictionary {
         uint64_t getHcKeyspace() const;
         const std::string & getDictFileName() const;
         const std::string & getPasswordDistribution() const;
+        bool isHexDict() const;
         bool isLeft() const;
 };
 

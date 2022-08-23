@@ -22,6 +22,7 @@ CDictionary::CDictionary(DbMap &dictMap, CSqlLoader *sqlLoader)
         this->m_hcKeyspace = std::stoull(dictMap["keyspace"]);
         this->m_dictFileName = dictMap["path"];
         this->m_passwordDistribution = dictMap["password_distribution"];
+        this->m_hexDict = (bool)(std::stoi(dictMap["hex_dict"]));
         this->m_isLeft = (bool)(std::stoi(dictMap["is_left"]));
     }
     catch(std::logic_error & error)
@@ -102,4 +103,9 @@ const std::string &CDictionary::getPasswordDistribution() const
 bool CDictionary::isLeft() const
 {
     return m_isLeft;
+}
+
+bool CDictionary::isHexDict() const
+{
+    return m_hexDict;
 }

@@ -11,7 +11,7 @@
 #include <cmath>    /**< std::round */
 #include <sstream>
 #include <iomanip>
-
+#include <algorithm>
 #include "InputDict.h"
 
 
@@ -245,7 +245,6 @@ bool CAttackHybridDictMask::makeWorkunit()
 		}
 
 		f << m_job->getHashes();
-		f.close();
 
 		/** Create dict file */
 		retval = config.download_path(name3, path);
@@ -268,7 +267,12 @@ bool CAttackHybridDictMask::makeWorkunit()
 				auto dictFile = makeInputDict(dict, 0, true);
 				dictFile->CopyTo(path);
 			}
+
+			bool hexDicts = std::all_of(dictVec.begin(), dictVec.end(), [](auto dict){ return dict->isHexDict(); });
+    		f << "|||hex_dict|UInt|1|" << std::to_string(hexDicts) << "|||\n";
 		}
+
+		f.close();
 	}
 	catch(const InputDict::Exception &e)
 	{

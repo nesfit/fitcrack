@@ -144,7 +144,7 @@ class ConfigTask {
         static const char *HWMON_TEMP_ABORT;
         static const char *OPTIMIZED;
         static const char *DISTRIBUTION_MODE;
-        static const char *HEX_WORDLIST;
+        static const char *HEX_DICT;
 };
 
 #endif // CONFIGTASK_HPP

@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS `fc_dictionary` (
   `password_distribution` text COLLATE utf8_bin NOT NULL,
   `keyspace` bigint(20) unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `hex_dict` tinyint(1) NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;

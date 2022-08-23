@@ -59,12 +59,15 @@ bool CAttackHybridMaskDict::makeWorkunit()
 	}
 
         f << generateBasicConfig(
-            m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getDistributionMode(), m_job->getName(),
+            m_job->getAttackMode(), m_job->getAttackSubmode(),
+            m_job->getDistributionMode(), m_job->getName(),
             m_job->getHashType(), 0, m_job->getHWTempAbort(),
             m_job->getOptimizedFlag(), "", m_job->getRuleRight());
 
         /** Load current workunit dictionary */
 	PtrDictionary workunitDict = GetWorkunitDict();
+
+	f << "|||hex_dict|UInt|1|" << std::to_string(workunitDict->isHexDict()) << "|||\n";
 
 	// Debug
 	Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),

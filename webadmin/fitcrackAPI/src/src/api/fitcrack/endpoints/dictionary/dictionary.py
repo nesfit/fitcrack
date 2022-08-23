@@ -152,6 +152,7 @@ class dictionaryAdd(Resource):
             abort(500, 'No file part')
             return redirect(request.url)
         file = request.files['file']
+        hex_dict = request.form.get('hex_dict') == 'true'
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
@@ -176,7 +177,7 @@ class dictionaryAdd(Resource):
                 if len(password_occurrences) == 2:
                     hc_keyspace += int(password_occurrences[1])
 
-            dictionary = FcDictionary(name=uploadedFile['filename'], path=uploadedFile['path'], password_distribution=pwd_dist, keyspace=hc_keyspace)
+            dictionary = FcDictionary(name=uploadedFile['filename'], path=uploadedFile['path'], password_distribution=pwd_dist, keyspace=hc_keyspace, hex_dict=hex_dict)
             try:
                 db.session.add(dictionary)
                 db.session.commit()
@@ -206,6 +207,7 @@ class dictionary(Resource):
 
         args = dictionaryFromFile_parser.parse_args(request)
         sort = args.get('sort')
+        hex_dict = args.get('hex_dict')
         files = args.get('files')
 
         for file in files:
@@ -234,7 +236,7 @@ class dictionary(Resource):
                 if len(password_occurrences) == 2:
                     hc_keyspace += int(password_occurrences[1])
 
-            dictionary = FcDictionary(name=file['name'], path=newName, password_distribution=pwd_dist, keyspace=hc_keyspace)
+            dictionary = FcDictionary(name=file['name'], path=newName, password_distribution=pwd_dist, keyspace=hc_keyspace, hex_dict=hex_dict)
             try:
                 db.session.add(dictionary)
                 db.session.commit()
