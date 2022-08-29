@@ -15,7 +15,7 @@ make -j
 fi
 
 chmod +x hashcat
-./hashcat --hash-info --machine-readable --quiet > tmp.json
+./hashcat.bin --hash-info --machine-readable --quiet > tmp.json
 python3 -m json.tool tmp.json hash_info.json
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
