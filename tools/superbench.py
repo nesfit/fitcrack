@@ -8,10 +8,10 @@ def hextobase64(hash_in_hex):
     b64 = base64.b64encode(bytes.fromhex(hash_in_hex)).decode()
     return "BASE64:" + b64
 
-def kill_job(session, args, id):
+def stop_job(session, args, id):
     resp = session.get(args.api_url + '/job/' + str(id))
     if int(resp.json()['status']) >= 10: # still running or finishing
-        resp = session.get(args.api_url + '/job/' + str(id) + '/action?operation=kill')
+        resp = session.get(args.api_url + '/job/' + str(id) + '/action?operation=stop')
         assert resp.json()['status'] == True
 
 def create_and_start_job(session, args, job_name, attack_job_template):
@@ -27,7 +27,7 @@ def create_and_start_job(session, args, job_name, attack_job_template):
         print("Job", job_name, "created and running.")
 
     t = threading.Timer(
-        4 * 60, kill_job, args=[session, args, job_id])
+        4 * 60, stop_job, args=[session, args, job_id])
     t.start()
 
 def create_job_dict_attack(session, args, hashtype, hash, host):
