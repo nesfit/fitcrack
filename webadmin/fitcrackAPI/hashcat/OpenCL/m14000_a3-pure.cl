@@ -1734,6 +1734,8 @@ KERNEL_FQ void m14000_tm (KERN_ATTR_TM)
 {
   const u64 gid = get_global_id (0);
 
+  // if (gid >= GID_CNT) return;
+
   const u32 block = gid / 32;
   const u32 slice = gid % 32;
 
@@ -1762,6 +1764,8 @@ KERNEL_FQ void m14000_mxx (KERN_ATTR_BITSLICE ())
 
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);
+
+  if (gid >= GID_CNT) return;
 
   /**
    * salt
@@ -2171,8 +2175,8 @@ KERNEL_FQ void m14000_mxx (KERN_ATTR_BITSLICE ())
       #endif
       for (int i = 0; i < 32; i++)
       {
-        out0[i] = out[ 0 + i];
-        out1[i] = out[32 + i];
+        out0[i] = out[ 0 + 31 - i];
+        out1[i] = out[32 + 31 - i];
       }
 
       transpose32c (out0);
@@ -2183,8 +2187,8 @@ KERNEL_FQ void m14000_mxx (KERN_ATTR_BITSLICE ())
       #endif
       for (int slice = 0; slice < 32; slice++)
       {
-        const u32 r0 = out0[slice];
-        const u32 r1 = out1[slice];
+        const u32 r0 = out0[31 - slice];
+        const u32 r1 = out1[31 - slice];
         const u32 r2 = 0;
         const u32 r3 = 0;
 
@@ -2204,6 +2208,8 @@ KERNEL_FQ void m14000_sxx (KERN_ATTR_BITSLICE ())
 
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);
+
+  if (gid >= GID_CNT) return;
 
   /**
    * salt
