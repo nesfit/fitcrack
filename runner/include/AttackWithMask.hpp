@@ -19,7 +19,7 @@ protected:
 	 * @brief   Adds mask to the file which is then passed to hashcat
 	 * @param   mask_file [in] File to write to as a stream
 	 */
-	void addMask();
+	void addMask(const std::vector<std::string> &customCharsets);
 
 	/**
 	 * @brief   Creates mask file which is than passed to hashcat. It allows

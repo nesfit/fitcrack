@@ -9,7 +9,7 @@
 
 /* Private */
 
-void AttackWithMask::addMask() {
+void AttackWithMask::addMask(const std::vector<std::string> &customCharsets) {
   std::string mask;
 
   if (config_.find("mask", mask)) {
@@ -47,7 +47,11 @@ void AttackWithMask::addMask() {
 
     std::fstream mask_file;
     File::openWriteStream(mask_file, HashcatConstant::MaskFileName, std::ios_base::trunc);
-    mask_file.write(mask.data(), mask.length());
+
+    for (std::string customCharset : customCharsets)
+      mask_file << customCharset << ",";
+
+    mask_file << mask;
     mask_file.close();
     addArgument(HashcatConstant::MaskFileName);
   }
@@ -59,16 +63,19 @@ void AttackWithMask::addMask() {
 
 void AttackWithMask::createMaskAndCharsets() {
 
-  for(size_t i = 0; i < 4; ++i)
-  {
+  std::vector<std::string> customCharsets;
+  for (size_t i = 0; i < 4; ++i) {
     std::ostringstream charsetNameStr;
-    charsetNameStr<<"charset"<<i;
+    charsetNameStr << "charset" << i;
     std::string charsetName = charsetNameStr.str();
-    //TODO: maybe store to file than arg?
-    findAndAddOptional(charsetName, "--custom-"+charsetName);
+
+    std::string customCharset;
+
+    if (config_.find(charsetName, customCharset))
+      customCharsets.push_back(customCharset);
   }
 
-  addMask();
+  addMask(customCharsets);
   addArgument("--hex-charset");
 }
 

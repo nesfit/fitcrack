@@ -64,6 +64,10 @@ bool CAttackHybridDictMask::makeWorkunit()
 	f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getDistributionMode(),
 		m_job->getName(), m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag(), m_job->getRuleLeft());
 
+	auto dictVec = m_job->getDictionaries();
+	bool hexDicts = std::all_of(dictVec.begin(), dictVec.end(), [](auto dict){ return dict->isHexDict(); });
+	f << "|||hex_dict|UInt|1|" << std::to_string(hexDicts) << "|||\n";
+
 	/** Load the workunit mask to object */
 	PtrMask workunitMask = GetWorkunitMask();
 
@@ -245,6 +249,7 @@ bool CAttackHybridDictMask::makeWorkunit()
 		}
 
 		f << m_job->getHashes();
+		f.close();
 
 		/** Create dict file */
 		retval = config.download_path(name3, path);
@@ -258,7 +263,6 @@ bool CAttackHybridDictMask::makeWorkunit()
 
 		if(!std::ifstream(path))
 		{
-			auto dictVec = m_job->getDictionaries();
 			for (auto & dict : dictVec)
 			{
 				if (!dict->isLeft())
@@ -267,12 +271,7 @@ bool CAttackHybridDictMask::makeWorkunit()
 				auto dictFile = makeInputDict(dict, 0, true);
 				dictFile->CopyTo(path);
 			}
-
-			bool hexDicts = std::all_of(dictVec.begin(), dictVec.end(), [](auto dict){ return dict->isHexDict(); });
-    		f << "|||hex_dict|UInt|1|" << std::to_string(hexDicts) << "|||\n";
 		}
-
-		f.close();
 	}
 	catch(const InputDict::Exception &e)
 	{
