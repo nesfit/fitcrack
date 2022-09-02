@@ -12650,7 +12650,6 @@
         "potfile_enabled": true,
         "custom_plugin": false,
         "plaintext_encoding": [
-            "ASCII",
             "HEX"
         ]
     },
