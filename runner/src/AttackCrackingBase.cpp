@@ -19,9 +19,9 @@ void AttackCrackingBase::addSpecificArguments() {
 
   addRequiredFile("data");
 
-  findAndAddOptional(ConfigTask::START_INDEX, "-s");
-  findAndAddOptional(ConfigTask::HC_KEYSPACE, "-l");
-  findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "-g");
+  findAndAddOptional(ConfigTask::START_INDEX, "--skip");
+  findAndAddOptional(ConfigTask::HC_KEYSPACE, "--limit");
+  findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "--generate-rules");
   findAndAddOptional(ConfigTask::HWMON_TEMP_ABORT, "--hwmon-temp-abort");
 
   std::string value;
@@ -38,6 +38,7 @@ void AttackCrackingBase::addSpecificArguments() {
 
   addArgument("--outfile-format=" + HashcatConstant::OutputFormat);
   addArgument("--quiet");
+  addArgument("--status");
   addArgument("--status-json");
   addArgument("--restore-disable");
   addArgument("--potfile-disable");
