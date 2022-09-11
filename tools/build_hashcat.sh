@@ -19,12 +19,12 @@ chmod +x hashcat
 python3 -m json.tool tmp.json hash_info.json
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-zip -r hashcat_files_linux.zip OpenCL modules/*.so hashcat.hcstat2 hashcat.hctune hash_info.json
-zip -r hashcat_files_windows.zip OpenCL modules/*.dll hashcat.hcstat2 hashcat.hctune hash_info.json
+zip -r hashcat_files_linux.zip OpenCL tunings modules/*.so hashcat.hcstat2 hash_info.json
+zip -r hashcat_files_windows.zip OpenCL tunings modules/*.dll hashcat.hcstat2 hash_info.json
 mv hashcat_files_linux.zip ../
 mv hashcat_files_windows.zip ../
 else
-zip -r hashcat_files_mac.zip OpenCL modules hashcat.hcstat2 hashcat.hctune hash_info.json
+zip -r hashcat_files_mac.zip OpenCL tunings modules hashcat.hcstat2 hash_info.json
 mv hashcat_files_mac.zip ../
 fi
 
