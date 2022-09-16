@@ -17,9 +17,10 @@ uint64_t InputDict::WritePasswordsTo(uint64_t passCount, const std::string &dst)
 	}
 	std::string line;
 	uint64_t writtenCount;
-	for(writtenCount = 0; writtenCount < passCount && std::getline(m_file, line) && out; ++writtenCount, ++m_curIndex)
+	for(writtenCount = 0; writtenCount < passCount && std::getline(m_file, line); ++writtenCount, ++m_curIndex)
 	{
-		out<<line<<'\n';
+		line += '\n';
+		out.write(line.c_str(), line.length());
 	}
 	if(!m_file && !m_file.eof())
 	{
