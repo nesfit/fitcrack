@@ -160,6 +160,11 @@ void CSqlLoader::updateDictionaryIndex(uint64_t dictId, uint64_t newIndex)
                                  CDictionary::getTableName().c_str(), newIndex, dictId));
 }
 
+void CSqlLoader::updateDictionaryPos(uint64_t dictId, uint64_t newPos)
+{
+    return updateSql(formatQuery("UPDATE `%s` SET current_pos = %" PRIu64 " WHERE id = %" PRIu64 " ;",
+                                 CDictionary::getTableName().c_str(), newPos, dictId));
+}
 
 void CSqlLoader::updateJobIndex(uint64_t jobId, uint64_t newIndex)
 {

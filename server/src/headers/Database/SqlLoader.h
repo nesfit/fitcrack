@@ -127,6 +127,13 @@ class CSqlLoader {
         void updateDictionaryIndex(uint64_t dictId, uint64_t newIndex);
 
         /**
+         * @brief Updates current_pos (file pos) of fc_job_dictionary entry
+         * @param dictId [in] ID of job_dictionary entry
+         * @param newPos [in] New position in dictionary file
+         */
+        void updateDictionaryPos(uint64_t dictId, uint64_t newPos);
+
+        /**
          * @brief Updates current_index of fc_job entry
          * @param jobId [in] ID of the job entry
          * @param newIndex [in] New index value

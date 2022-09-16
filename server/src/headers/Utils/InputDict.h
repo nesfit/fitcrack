@@ -19,6 +19,8 @@ public:
 	 */
 	virtual uint64_t WritePasswordsTo(uint64_t passCount, const std::string &dst);
 	virtual void CopyTo(const std::string &dst);
+	virtual std::ifstream::pos_type GetCurrentDictPos();
+	virtual void SetCurrentDictPos(std::ifstream::pos_type pos);
 	class Exception: public std::runtime_error
 	{
 		using std::runtime_error::runtime_error;
@@ -30,7 +32,6 @@ private:
 	PtrDictionary m_dbDict;
 	std::ifstream m_file;
 	uint64_t m_startIndex;
-	std::ifstream::pos_type m_startPos;
 	uint64_t m_curIndex;
 };
 
@@ -40,6 +41,7 @@ public:
 	using InputDict::InputDict;
 	virtual uint64_t WritePasswordsTo(uint64_t passCount, const std::string &dst) override {std::ofstream{dst}; return passCount;}
 	virtual void CopyTo(const std::string &dst) override {std::ofstream{dst};}
+	virtual void SetCurrentDictPos(std::ifstream::pos_type pos) { (void)pos; }
 };
 
 #endif //SERVER_INPUT_DICT_H

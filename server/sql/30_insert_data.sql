@@ -6625,14 +6625,14 @@ INSERT INTO `fc_job` (`id`, `attack`, `attack_mode`, `attack_submode`, `distribu
 -- Insert default job dictionaries
 --
 
-INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index`, `is_left`) VALUES
-(1,	2,	3,	0,	1),
-(2,	2,	2,	0,	1),
-(3,	2,	8,	0,	1),
-(4,	3,	1,	0,	1),
-(5,	5,	2,	0,	1),
-(6,	5,	6,	0,	0),
-(7,	7,	2,	0,	1);
+INSERT INTO `fc_job_dictionary` (`id`, `job_id`, `dictionary_id`, `current_index`, `current_pos`, `is_left`) VALUES
+(1,	2,	3,	0,	0,	1),
+(2,	2,	2,	0,	0,	1),
+(3,	2,	8,	0,	0,	1),
+(4,	3,	1,	0,	0,	1),
+(5,	5,	2,	0,	0,	1),
+(6,	5,	6,	0,	0,	0),
+(7,	7,	2,	0,	0,	1);
 
 
 --

@@ -186,6 +186,7 @@ class FcJobDictionary(Base):
     job_id = Column(BigInteger, ForeignKey('fc_job.id'), nullable=False)
     dictionary_id = Column(BigInteger, ForeignKey('fc_dictionary.id'), nullable=False)
     current_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    current_pos = Column(BigInteger, nullable=False, server_default=text("'0'"))
     is_left = Column(Integer, nullable=False, server_default=text("'1'"))
     dictionary = relationship("FcDictionary")
 

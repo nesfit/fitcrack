@@ -51,6 +51,12 @@ class CDictionary {
          */
         virtual void updateIndex(uint64_t newIndex);
 
+        /**
+         * @brief Updates file position of this dictionary object and database entry
+         * @param newIndex [in] New dictionary current index
+         */
+        virtual void updatePos(uint64_t newPos);
+
 
     private:
 
@@ -64,6 +70,7 @@ class CDictionary {
         uint64_t    m_jobId;
         uint64_t    m_dictionaryId;
         uint64_t    m_currentIndex;
+        uint64_t    m_currentPos;
         uint64_t    m_hcKeyspace;
         std::string m_dictFileName;
         std::string m_passwordDistribution;
@@ -80,6 +87,7 @@ class CDictionary {
         uint64_t getJobId() const;
         uint64_t getDictionaryId() const;
         uint64_t getCurrentIndex() const;
+        uint64_t getCurrentPos() const;
         uint64_t getHcKeyspace() const;
         const std::string & getDictFileName() const;
         const std::string & getPasswordDistribution() const;

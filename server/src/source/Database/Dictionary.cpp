@@ -19,6 +19,7 @@ CDictionary::CDictionary(DbMap &dictMap, CSqlLoader *sqlLoader)
         this->m_jobId = std::stoull(dictMap["job_id"]);
         this->m_dictionaryId = std::stoull(dictMap["dictionary_id"]);
         this->m_currentIndex = std::stoull(dictMap["current_index"]);
+        this->m_currentPos = std::stoull(dictMap["current_pos"]);
         this->m_hcKeyspace = std::stoull(dictMap["keyspace"]);
         this->m_dictFileName = dictMap["path"];
         this->m_passwordDistribution = dictMap["password_distribution"];
@@ -54,6 +55,15 @@ void CDictionary::updateIndex(uint64_t newIndex)
     this->m_sqlLoader->updateDictionaryIndex(this->m_id, newIndex);
 }
 
+void CDictionary::updatePos(uint64_t newPos)
+{
+    /** Local update */
+    this->m_currentPos = newPos;
+
+    /** Database update */
+    this->m_sqlLoader->updateDictionaryPos(this->m_id, newPos);
+}
+
 
 /**
  * @section Table attributes getters
@@ -82,6 +92,10 @@ uint64_t CDictionary::getCurrentIndex() const
     return m_currentIndex;
 }
 
+uint64_t CDictionary::getCurrentPos() const
+{
+    return m_currentPos;
+}
 
 uint64_t CDictionary::getHcKeyspace() const
 {

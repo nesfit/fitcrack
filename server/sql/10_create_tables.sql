@@ -352,6 +352,7 @@ CREATE TABLE IF NOT EXISTS `fc_job_dictionary` (
   `job_id` bigint(20) unsigned NOT NULL,
   `dictionary_id` bigint(20) unsigned NOT NULL,
   `current_index` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `current_pos` bigint(20) unsigned NOT NULL DEFAULT '0',
   `is_left` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;

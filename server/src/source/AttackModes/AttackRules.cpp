@@ -131,6 +131,10 @@ bool CAttackRules::makeWorkunit() {
         auto inputDict =
             makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
 
+        /** Seek to the right position (faster then skipping line by line) */
+        auto filePosInDict = workunitDict->getCurrentPos();
+        inputDict->SetCurrentDictPos(filePosInDict);
+
         /** Add 'keyspace' passwords to dict file */
 
         uint64_t workunitKeyspace = m_workunit->getHcKeyspace();
@@ -166,6 +170,8 @@ bool CAttackRules::makeWorkunit() {
 
           m_workunit->setHcKeyspace(writtenPasswords);
         }
+
+        workunitDict->updatePos(inputDict->GetCurrentDictPos());
       } else if (m_job->getDistributionMode() == 1) {
         uint64_t startIndex = m_workunit->getStartIndex();
 

@@ -3,7 +3,6 @@
 InputDict::InputDict(PtrDictionary dbDict, uint64_t startIndex):
 	m_dbDict(std::move(dbDict)),
 	m_startIndex(startIndex),
-	m_startPos(0),
 	m_curIndex(0)
 {}
 
@@ -55,15 +54,6 @@ void InputDict::EnsureDictPosition()
 {
 	//open and move to correct position
 	EnsureDictIsOpen();
-	if(m_startPos > 0)
-	{
-		//position is known, seek to it
-		if(!m_file.seekg(m_startPos))
-		{
-			throw Exception("Seeking failed in dictionary");
-		}
-		return;
-	}
 	if(m_curIndex > m_startIndex)
 	{
 		//reset position
@@ -76,8 +66,7 @@ void InputDict::EnsureDictPosition()
 	//ignore startIndex passwords
 	for(m_curIndex = 0; m_curIndex < m_startIndex && std::getline(m_file, line); ++m_curIndex)
 		;
-	//save position for later, may come in handy
-	m_startPos = m_file.tellg();
+
 	if(!m_file && !m_file.eof())
 	{
 		throw Exception("Getting to the desired position in a dictionary failed");
@@ -90,6 +79,14 @@ void InputDict::EnsureDictIsOpen()
 	{
 		return DoOpenDict();
 	}
+}
+
+std::ifstream::pos_type InputDict::GetCurrentDictPos() {
+    return m_file.tellg();
+}
+
+void InputDict::SetCurrentDictPos(std::ifstream::pos_type pos) {
+    m_file.seekg(pos);
 }
 
 void InputDict::DoOpenDict()
