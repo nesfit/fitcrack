@@ -54,6 +54,11 @@ void InputDict::EnsureDictPosition()
 {
 	//open and move to correct position
 	EnsureDictIsOpen();
+
+	//check if set manually using SetCurrentDictPos
+	if (GetCurrentDictPos() > 0)
+		return;
+
 	if(m_curIndex > m_startIndex)
 	{
 		//reset position
