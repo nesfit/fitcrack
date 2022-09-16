@@ -350,7 +350,16 @@ class FcJob(Base):
             hostsPower[host.boinc_host_id] = host.power
 
         hostBenchmarks = FcBenchmark.query.filter(FcBenchmark.hash_type == self.hash_type). \
+            filter(FcBenchmark.attack_mode == self.attack_mode). \
             filter(FcBenchmark.boinc_host_id.in_(boinc_host_ids)).all()
+
+        if not hostBenchmarks:
+            # We were unable to find benchmark data for (host, job_hash_type, job_attack_mode).
+            # Instead of no data, try to use less precise data for (host, job_hash_type, X)
+            # where X is any attack mode
+            hostBenchmarks = FcBenchmark.query.filter(FcBenchmark.hash_type == self.hash_type). \
+                filter(FcBenchmark.boinc_host_id.in_(boinc_host_ids)).all()
+
         total_power = 0
         for benchmark in hostBenchmarks:
             if hostsPower.get(benchmark.boinc_host_id, 0) == 0:
