@@ -192,13 +192,7 @@ def create_job(data):
 
     for hashObj in data['hash_settings']['hash_list']:
         hash = FcHash(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
-        try:
-            db.session.add(hash)
-            db.session.commit()
-        except exc.SQLAlchemyError as err:
-            print(err,  file=sys.stderr)
-            abort(400, 'Unable to save hash to database.')
-
+        db.session.add(hash)
 
     perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)
     db.session.add(perms)
