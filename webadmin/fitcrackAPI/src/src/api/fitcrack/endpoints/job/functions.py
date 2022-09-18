@@ -89,23 +89,27 @@ def create_job(data):
         abort(500, 'Hash list can not be empty.')
 
     settings = FcSetting.query.first()
-    for idx, hashObj in enumerate(data['hash_settings']['hash_list']):
-        if hashObj['hash'].startswith('BASE64:'):
-            decoded = base64.decodebytes(hashObj['hash'][7:].encode())
+    if settings.verify_hash_format:
+        hashes = '\n'.join([hashObj['hash'] for hashObj in data['hash_settings']['hash_list']])
+        if hashes.startswith('BASE64:'):
+            decoded = base64.decodebytes(hashes[7:].encode())
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(decoded)
                 fp.seek(0)
-                if settings.verify_hash_format:
-                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'], binaryHash=hashObj['hash'])
-            data['hash_settings']['hash_list'][idx]['hash']= decoded
+                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'], binaryHash=hashes)
+        else:
+            with tempfile.NamedTemporaryFile() as fp:
+                fp.write(hashes.encode())
+                fp.seek(0)
+                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
+
+    for hashObj in data['hash_settings']['hash_list']:
+        if hashObj['hash'].startswith('BASE64:'):
+            decoded = base64.decodebytes(hashObj['hash'][7:].encode())
+            hashObj['hash'] = decoded
 
         else:
-            if settings.verify_hash_format:
-                with tempfile.NamedTemporaryFile() as fp:
-                    fp.write(hashObj['hash'].encode())
-                    fp.seek(0)
-                    verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
-            data['hash_settings']['hash_list'][idx]['hash']= hashObj['hash'].encode()
+            hashObj['hash'] = hashObj['hash'].encode()
 
     hybrid_mask_dict = False
     #Hybrid attack mask-wordlist
