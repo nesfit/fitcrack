@@ -268,7 +268,7 @@ bool CAttackHybridDictMask::makeWorkunit()
 				if (!dict->isLeft())
 					continue;
 
-				auto dictFile = makeInputDict(dict, 0, true);
+				auto dictFile = makeInputDict(dict, true);
 				dictFile->CopyTo(path);
 			}
 		}

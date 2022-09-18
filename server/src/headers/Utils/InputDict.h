@@ -6,7 +6,7 @@
 class InputDict
 {
 public:
-	InputDict(PtrDictionary dbDict, uint64_t startIndex);
+	InputDict(const std::string path);
 	virtual ~InputDict() = default;
 	/**
 	 * @brief Writes @p passCount passwords to file at @p dst
@@ -26,13 +26,7 @@ public:
 		using std::runtime_error::runtime_error;
 	};
 private:
-	void EnsureDictPosition();
-	void EnsureDictIsOpen();
-	void DoOpenDict();
-	PtrDictionary m_dbDict;
 	std::ifstream m_file;
-	uint64_t m_startIndex;
-	uint64_t m_curIndex;
 };
 
 class InputDictBenchmark: public InputDict

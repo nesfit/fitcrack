@@ -39,7 +39,7 @@ class CAttackBench : public BaseAttack {
 
         virtual std::string makeLimitingConfigLine(const std::string &, const std::string &, const std::string &) override {return "";}
 
-        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, uint64_t startIndex, bool isSticky) override;
+        virtual std::unique_ptr<InputDict> makeInputDict(PtrDictionary dict, bool isSticky) override;
 
         virtual std::unique_ptr<MaskSplitter> makeMaskSplitter(std::vector<std::string> customCharsets) override;
 
@@ -114,14 +114,14 @@ std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, u
 }
 
 template <typename BaseAttack>
-std::unique_ptr<InputDict> CAttackBench<BaseAttack>::makeInputDict(PtrDictionary dict, uint64_t startIndex, bool isSticky)
-{
-    //do NOT screw up sticky files
-    if(isSticky)
-    {
-        return BaseAttack::makeInputDict(dict, startIndex, isSticky);
+std::unique_ptr<InputDict>
+CAttackBench<BaseAttack>::makeInputDict(PtrDictionary dict, bool isSticky) {
+    // do NOT screw up sticky files
+    if (isSticky) {
+      return BaseAttack::makeInputDict(dict, isSticky);
     }
-    return std::unique_ptr<InputDict>(new InputDictBenchmark(dict, startIndex));
+    std::string path = Config::dictDir + dict->getDictFileName();
+    return std::unique_ptr<InputDict>(new InputDictBenchmark(path));
 }
 
 template <typename BaseAttack>

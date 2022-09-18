@@ -128,8 +128,7 @@ bool CAttackRules::makeWorkunit() {
 
         configFile << "|||hex_dict|UInt|1|" << std::to_string(workunitDict->isHexDict()) << "|||\n";
 
-        auto inputDict =
-            makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
+        auto inputDict = makeInputDict(workunitDict, false);
 
         /** Seek to the right position (faster then skipping line by line) */
         auto filePosInDict = workunitDict->getCurrentPos();

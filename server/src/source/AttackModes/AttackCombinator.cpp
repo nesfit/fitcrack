@@ -91,7 +91,11 @@ bool CAttackCombinator::makeWorkunit()
     try
     {
 
-        auto dict2_file = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
+        auto dict2_file = makeInputDict(workunitDict, false);
+
+        /** Seek to the right position (faster then skipping line by line) */
+        auto filePosInDict = workunitDict->getCurrentPos();
+        dict2_file->SetCurrentDictPos(filePosInDict);
 
         /** Check combinator workunit type */
         /** Dictionary is already fragmented, continue fragmenting */
@@ -106,7 +110,8 @@ bool CAttackCombinator::makeWorkunit()
 
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                     "Adding a single password to host dict2 file\n");
-            if(!dict2_file->WritePasswordsTo(1, outputDictPath))
+            auto addedPasswords = dict2_file->WritePasswordsTo(1, outputDictPath);
+            if (addedPasswords == 0)
             {
                 Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                         "Source dict has no more passwords, skipping workunit\n");
@@ -117,6 +122,8 @@ bool CAttackCombinator::makeWorkunit()
                 }
                 return true;
             }
+
+            workunitDict->updatePos(dict2_file->GetCurrentDictPos());
 
             /** Append skip and limit to config */
             Tools::printDebug("Adding additional info to CONFIG:\n");
@@ -215,7 +222,7 @@ bool CAttackCombinator::makeWorkunit()
 
             /** Add 'keyspace' passwords to dict2 file */
             auto addedPasswords = dict2_file->WritePasswordsTo(secDictKeyspace, outputDictPath);
-            if(addedPasswords != secDictKeyspace)
+            if (addedPasswords != secDictKeyspace)
             {
                 Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                         "Ate all passwords from current dictionary\n");
@@ -227,6 +234,8 @@ bool CAttackCombinator::makeWorkunit()
                     m_job->updateIndex(m_job->getCurrentIndex() + addedPasswords);
                 }
             }
+
+            workunitDict->updatePos(dict2_file->GetCurrentDictPos());
         }
         /** Host doesn't have enough power, start fragmenting */
         else
@@ -241,7 +250,8 @@ bool CAttackCombinator::makeWorkunit()
 
             Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                     "Adding a single password to host dict2 file\n");
-            if(!dict2_file->WritePasswordsTo(1, outputDictPath))
+            auto addedPasswords = dict2_file->WritePasswordsTo(1, outputDictPath);
+            if (addedPasswords == 0)
             {
                 Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                         "Source dict has no more passwords, skipping workunit\n");
@@ -252,6 +262,8 @@ bool CAttackCombinator::makeWorkunit()
                 }
                 return true;
             }
+
+            workunitDict->updatePos(dict2_file->GetCurrentDictPos());
 
             /** Append skip and limit to config */
             Tools::printDebug("Adding additional info to CONFIG:\n");
@@ -316,7 +328,7 @@ bool CAttackCombinator::makeWorkunit()
                 if (!dict->isLeft())
                     continue;
 
-                auto dictFile = makeInputDict(dict, 0, true);
+                auto dictFile = makeInputDict(dict, true);
                 dictFile->CopyTo(path);
             }
         }

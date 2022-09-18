@@ -89,9 +89,10 @@ std::string AttackMode::makeConfigLine(const std::string &option, const std::str
     return stream.str();
 }
 
-std::unique_ptr<InputDict> AttackMode::makeInputDict(PtrDictionary dict, uint64_t startIndex, bool)
+std::unique_ptr<InputDict> AttackMode::makeInputDict(PtrDictionary dict, bool)
 {
-    return std::unique_ptr<InputDict>(new InputDict(dict, startIndex));
+    std::string path = Config::dictDir + dict->getDictFileName();
+    return std::unique_ptr<InputDict>(new InputDict(path));
 }
 
 std::unique_ptr<MaskSplitter> AttackMode::makeMaskSplitter(std::vector<std::string> customCharsets)

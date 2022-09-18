@@ -92,7 +92,11 @@ bool CAttackHybridMaskDict::makeWorkunit()
 	try
 	{
 
-		auto dict2_file = makeInputDict(workunitDict, m_workunit->getStartIndex(), false);
+		auto dict2_file = makeInputDict(workunitDict, false);
+
+		/** Seek to the right position (faster then skipping line by line) */
+		auto filePosInDict = workunitDict->getCurrentPos();
+		dict2_file->SetCurrentDictPos(filePosInDict);
 
 		auto workunitMask = GetWorkunitMask();
 
@@ -117,7 +121,8 @@ bool CAttackHybridMaskDict::makeWorkunit()
 
 			Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
 					"Adding a single password to host dict2 file");
-			if(!dict2_file->WritePasswordsTo(1, outputDictPath))
+			auto addedPasswords = dict2_file->WritePasswordsTo(1, outputDictPath);
+			if (addedPasswords == 0)
 			{
 				Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
 						"Source dict has no more passwords, skipping workunit\n");
@@ -128,6 +133,8 @@ bool CAttackHybridMaskDict::makeWorkunit()
 				}
 				return true;
 			}
+
+			workunitDict->updatePos(dict2_file->GetCurrentDictPos());
 
 			/** Append skip and limit to config */
 			Tools::printDebug("Adding additional info to CONFIG:\n");
@@ -209,7 +216,7 @@ bool CAttackHybridMaskDict::makeWorkunit()
 
 			/** Add 'keyspace' passwords to dict2 file */
 			auto addedPasswords = dict2_file->WritePasswordsTo(secDictKeyspace, outputDictPath);
-			if(addedPasswords != secDictKeyspace)
+			if (addedPasswords != secDictKeyspace)
 			{
 				Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
 						"Ate all passwords from current dictionary\n");
@@ -221,6 +228,8 @@ bool CAttackHybridMaskDict::makeWorkunit()
 					m_job->updateIndex(prevJobIndex + addedPasswords);
 				}
 			}
+
+			workunitDict->updatePos(dict2_file->GetCurrentDictPos());
 		}
 		/** Host doesn't have enough power, start fragmenting */
 		else
@@ -235,7 +244,8 @@ bool CAttackHybridMaskDict::makeWorkunit()
 
 			Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
 					"Adding a single password to host dict2 file\n");
-			if(!dict2_file->WritePasswordsTo(1, outputDictPath))
+			auto addedPasswords = dict2_file->WritePasswordsTo(1, outputDictPath);
+			if (addedPasswords == 0)
 			{
 				Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
 						"Source dict has no more passwords, skipping workunit\n");
@@ -246,6 +256,8 @@ bool CAttackHybridMaskDict::makeWorkunit()
 				}
 				return true;
 			}
+
+			workunitDict->updatePos(dict2_file->GetCurrentDictPos());
 
 			/** Append skip and limit to config */
 			Tools::printDebug("Adding additional info to CONFIG:\n");
