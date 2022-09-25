@@ -19,12 +19,15 @@ void AttackCrackingBase::addSpecificArguments() {
 
   addRequiredFile("data");
 
-  findAndAddOptional(ConfigTask::START_INDEX, "--skip");
-  findAndAddOptional(ConfigTask::HC_KEYSPACE, "--limit");
+  std::string value;
+  if (config_.find(ConfigTask::START_INDEX, value) && value != "0")
+    addArgument("--skip=" + value);
+  if (config_.find(ConfigTask::HC_KEYSPACE, value) && value != "0")
+    addArgument("--limit=" + value);
+
   findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "--generate-rules");
   findAndAddOptional(ConfigTask::HWMON_TEMP_ABORT, "--hwmon-temp-abort");
 
-  std::string value;
   if (config_.find(ConfigTask::OPTIMIZED, value) && value == "1")
     addArgument("--optimized-kernel-enable");
 

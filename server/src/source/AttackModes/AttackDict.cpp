@@ -69,10 +69,10 @@ bool CAttackDict::makeWorkunit()
     if (m_job->getDistributionMode() == 1) {
       uint64_t startIndex = m_workunit->getStartIndex();
       std::string skipFromStart = std::to_string(startIndex);
-      configFile << "|||skip_from_start|BigUInt|" << skipFromStart.size() << "|"
+      configFile << "|||start_index|BigUInt|" << skipFromStart.size() << "|"
                  << skipFromStart << "|||\n";
       std::string dictHcKeyspace = std::to_string(m_workunit->getHcKeyspace());
-      configFile << "|||dict_hc_keyspace|BigUInt|" << dictHcKeyspace.size()
+      configFile << "|||hc_keyspace|BigUInt|" << dictHcKeyspace.size()
                  << "|" << dictHcKeyspace << "|||\n";
     }
 
