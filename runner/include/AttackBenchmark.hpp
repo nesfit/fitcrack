@@ -26,7 +26,7 @@ protected:
 		*/
 	void addSpecificArguments();
 
-	virtual void addRequiredFile(const std::string &file_name);
+	virtual std::string addRequiredFile(const std::string &file_name);
 	//no limits for benchmark
 	virtual void addGeneratorLimitingArgument(const std::string&) {}
 	virtual void addGeneratorLimitingRequiredFile(const std::string&) {}
@@ -108,7 +108,7 @@ inline std::istream &operator>>(std::istream &in, PasswordLenCount &data)
 static const unsigned bufSize = 16384;
 
 template <typename BaseAttack>
-void AttackBenchmark<BaseAttack>::addRequiredFile(const std::string &file_name)
+std::string AttackBenchmark<BaseAttack>::addRequiredFile(const std::string &file_name)
 {
 	std::string shape;
 	if((file_name == "dict1" || file_name == "dict2") && this->config_.find("benchmark_"+file_name, shape))

@@ -48,7 +48,7 @@ void AttackCrackingBase::addSpecificArguments() {
   addArgument("--logfile-disable");
 }
 
-void AttackCrackingBase::addRequiredFile(const std::string& file_name) {
+std::string AttackCrackingBase::addRequiredFile(const std::string& file_name) {
 
   Logging::debugPrint(Logging::Detail::CustomOutput, " : file_name : " + file_name);
 
@@ -57,7 +57,10 @@ void AttackCrackingBase::addRequiredFile(const std::string& file_name) {
     RunnerUtils::runtimeException("Missing hashcat required file " + file_name);
   }
 
-  addArgument(file.getRelativePath());
+  std::string fileRelativePath = file.getRelativePath();
+  addArgument(fileRelativePath);
+
+  return fileRelativePath;
 }
 
 void AttackCrackingBase::addOptionalFile(const std::string& file_name, const std::string& argument) {

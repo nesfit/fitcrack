@@ -4,6 +4,7 @@
 */
 
 #include "AttackDictionary.hpp"
+#include "Dictstat.hpp"
 
 AttackDictionary::AttackDictionary(const ConfigTask& config, Directory& directory) : AttackCrackingBase(config, directory) {
   
@@ -25,5 +26,14 @@ void AttackDictionary::addSpecificArguments() {
     RunnerUtils::runtimeException("Unsupported attack_submode = " + attack_submode_ + " attack_mode = " + attack_mode_ + " has no such attack_submode");
   }
 
-  addRequiredFile("dict1");
+  std::string relativePath = addRequiredFile("dict1");
+
+  std::string dict1Keyspace;
+  if (config_.find(ConfigTask::DICT1_KEYSPACE, dict1Keyspace)) {
+    // Build hashcat.dictstat2 so hashcat does not have to recompute
+    // number of passwords in this dictionary - could be a bottleneck for huge
+    // dictionaries.
+    DictStatBuilder dsBuilder;
+    dsBuilder.addStatForDict(relativePath.c_str(), stoull(dict1Keyspace));
+  }
 }

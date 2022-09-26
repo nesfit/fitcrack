@@ -13127,6 +13127,34 @@
             "HEX"
         ]
     },
+    "29800": {
+        "name": "Bisq .wallet (scrypt)",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": true,
+        "password_len_min": 8,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$bisq$3*32768*8*6*31d838af87f99cb8*5cfb7bf3228d9e865881156e17b1866589ffa6b757011e25d1319083595236d2",
+        "example_pass": "hashcat1",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": false,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
     "30000": {
         "name": "Python Werkzeug MD5 (HMAC-MD5 (key = $salt))",
         "category": "Framework",

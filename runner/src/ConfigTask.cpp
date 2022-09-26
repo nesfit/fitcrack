@@ -22,6 +22,7 @@ const char *ConfigTask::HWMON_TEMP_ABORT = "hwmon_temp_abort";
 const char *ConfigTask::OPTIMIZED = "optimized";
 const char *ConfigTask::DISTRIBUTION_MODE = "distribution_mode";
 const char *ConfigTask::HEX_DICT = "hex_dict";
+const char *ConfigTask::DICT1_KEYSPACE = "dict1_keyspace";
 /* Private */
 
 void ConfigTask::convertLineToOption(std::string& line) {
@@ -77,6 +78,7 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::OPTIMIZED);
   supported_.push_back(ConfigTask::DISTRIBUTION_MODE);
   supported_.push_back(ConfigTask::HEX_DICT);
+  supported_.push_back(ConfigTask::DICT1_KEYSPACE);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

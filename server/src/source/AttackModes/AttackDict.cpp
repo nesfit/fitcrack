@@ -71,9 +71,13 @@ bool CAttackDict::makeWorkunit()
       std::string skipFromStart = std::to_string(startIndex);
       configFile << "|||start_index|BigUInt|" << skipFromStart.size() << "|"
                  << skipFromStart << "|||\n";
-      std::string dictHcKeyspace = std::to_string(m_workunit->getHcKeyspace());
-      configFile << "|||hc_keyspace|BigUInt|" << dictHcKeyspace.size()
-                 << "|" << dictHcKeyspace << "|||\n";
+      std::string limit = std::to_string(m_workunit->getHcKeyspace());
+      configFile << "|||hc_keyspace|BigUInt|" << limit.size() << "|" << limit
+                 << "|||\n";
+
+      std::string dict1Keyspace = std::to_string(m_job->getHcKeyspace());
+      configFile << "|||dict1_keyspace|BigUInt|" << dict1Keyspace.size()
+                 << "|" << dict1Keyspace << "|||\n";
     }
 
     /** Create data file */
