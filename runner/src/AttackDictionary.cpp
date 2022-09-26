@@ -34,6 +34,11 @@ void AttackDictionary::addSpecificArguments() {
     // number of passwords in this dictionary - could be a bottleneck for huge
     // dictionaries.
     DictStatBuilder dsBuilder;
-    dsBuilder.addStatForDict(relativePath.c_str(), stoull(dict1Keyspace));
+    bool dict1StatAdded =
+        dsBuilder.addStatForDict(relativePath.c_str(), stoull(dict1Keyspace));
+    if (dict1StatAdded) {
+      Logging::debugPrint(Logging::Detail::GeneralInfo,
+                          "dictstat2 created for " + relativePath);
+    }
   }
 }

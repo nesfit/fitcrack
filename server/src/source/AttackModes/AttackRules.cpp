@@ -73,7 +73,12 @@ bool CAttackRules::makeWorkunit() {
                              m_job->getDistributionMode(), m_job->getName(),
                              m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag());
 
-    if (m_job->getDistributionMode() == 1) {
+    if (m_job->getDistributionMode() == 0) {
+      // Number of passwords in the sent dictionary (the dictionary fragment).
+      std::string dict1Keyspace = std::to_string(m_workunit->getHcKeyspace());
+      configFile << "|||dict1_keyspace|BigUInt|" << dict1Keyspace.size()
+                 << "|" << dict1Keyspace << "|||\n";
+    } else if (m_job->getDistributionMode() == 1) {
       uint64_t startIndex = m_workunit->getStartIndex();
       std::string skipFromStart = std::to_string(startIndex);
       configFile << "|||start_index|BigUInt|" << skipFromStart.size() << "|"
@@ -81,7 +86,7 @@ bool CAttackRules::makeWorkunit() {
       std::string limit = std::to_string(m_workunit->getHcKeyspace());
       configFile << "|||hc_keyspace|BigUInt|" << limit.size() << "|" << limit
                  << "|||\n";
-
+      // Number of passwords in the sent dictionary (the whole dictionary).
       std::string dict1Keyspace = std::to_string(m_job->getHcKeyspace());
       configFile << "|||dict1_keyspace|BigUInt|" << dict1Keyspace.size()
                  << "|" << dict1Keyspace << "|||\n";
