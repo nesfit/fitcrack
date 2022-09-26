@@ -59,7 +59,7 @@ jobs:
       if: env.RN_CHANGES > 0
       working-directory: runner
       run: |
-        bash update_client_libs.sh
+        bash update_client_bins.sh
         make clean
     # Commit & push back
     - name: Commit files
