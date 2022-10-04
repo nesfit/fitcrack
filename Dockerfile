@@ -117,8 +117,8 @@ WORKDIR /srv/fitcrack/
 # Build runner
 WORKDIR /srv/fitcrack/runner
 RUN apt-get install -y g++-mingw-w64-x86-64
-RUN chmod +x ./update_client_libs.sh
-RUN bash ./update_client_libs.sh
+RUN chmod +x ./update_client_bins.sh
+RUN bash ./update_client_bins.sh
 
 WORKDIR /srv/fitcrack/
 
