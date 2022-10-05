@@ -93,6 +93,11 @@ def main():
     arguments = parser.parse_args()
 
     s = requests.Session()
+    retries = requests.adapters.Retry(total=10, backoff_factor=1)
+    adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+    s.mount('http://', adapter)
+    s.mount('https://', adapter)
+
     auth = s.post(arguments.api_url + '/user/login', json={'username': arguments.user, 'password': arguments.password})
     assert auth.status_code == 200
     
