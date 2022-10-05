@@ -1,4 +1,4 @@
-import json, requests, argparse, time, threading, base64
+import json, requests, argparse, time, threading, base64, datetime
 
 HASH_INFO_PATH = '../webadmin/fitcrackAPI/hashcat/hash_info.json'
 
@@ -24,7 +24,7 @@ def create_and_start_job(session, args, job_name, attack_job_template):
     resp = session.get(args.api_url + '/job/' + str(job_id) + '/action?operation=start')
     assert resp.json()['status'] == True
     if args.debug:
-        print("Job", job_name, "created and running.")
+        print(datetime.datetime.now(), "Job", job_name, "created and running.")
 
     t = threading.Timer(
         4 * 60, stop_job, args=[session, args, job_id])
