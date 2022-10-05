@@ -16,10 +16,15 @@ def stop_job(session, args, id):
 
 def create_and_start_job(session, args, job_name, attack_job_template):
     job_json_data = json.loads(attack_job_template)
-    resp = session.post(args.api_url + '/job', json=job_json_data)
-    if resp.status_code != 200:
-        print(resp.json())
-        return
+    try:
+        resp = session.post(args.api_url + '/job', json=job_json_data)
+        if resp.status_code != 200:
+            print(resp.json())
+            return
+    except Exception as e:
+        print(datetime.datetime.now(), "Unable to create", job_name)
+        raise e
+
     job_id = resp.json()['job_id']
     resp = session.get(args.api_url + '/job/' + str(job_id) + '/action?operation=start')
     assert resp.json()['status'] == True
