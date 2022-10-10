@@ -1,5 +1,5 @@
 flask-restx
-Flask-SQLAlchemy
+Flask-SQLAlchemy==2.5.0
 flask-cors
 flask-login
 flask-migrate
