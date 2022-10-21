@@ -39,7 +39,7 @@ else # Create Fitcrack project
   chmod 775 /var/log/fitcrack
 
   # Setup Apache hostname
-  echo "ServerName localhost" >> /etc/apache2/apache2.conf
+  echo "ServerName localhost" >> $APACHE_CONFIG_FILE
 
   # Configure MySQL server
   usermod -d /var/lib/mysql/ mysql
@@ -110,21 +110,6 @@ else # Create Fitcrack project
   sudo -u $BOINC_USER ./bin/update_versions -y
   cd $MYDIR
 
-  #######################################
-  # Include BOINC HTML in Apache config #
-  #######################################
-
-  # Check if BOINC is included in Apache config
-  cat $APACHE_CONFIG_FILE | grep $PROJECT_HTTPD_CONF >/dev/null 2>/dev/null
-
-  if [[ $? != 0 ]]; then
-    echo "Adding $PROJECT_HTTPD_CONF Include to $APACHE_CONFIG_FILE ..."
-    echo "IncludeOptional $PROJECT_HTTPD_CONF" >> $APACHE_CONFIG_FILE
-    echo "Added."
-  else
-    echo "Reference to $PROJECT_HTTPD_CONF already included in $PROJECT_HTTPD_CONF."
-  fi
-
   # Restart Apache service
   service $APACHE_SERVICE restart
 
@@ -162,18 +147,6 @@ else # Create Fitcrack project
 
   # Add runlevel symlinks
   update-rc.d fitcrack defaults
-
-  # Different port for BOINC Server?
-  if [ $BOINC_PORT != "80" ] && [ $BOINC_PORT != "443" ]; then
-    echo "Listen $BOINC_PORT" >> $PROJECT_HTTPD_CONF
-  fi
-
-  # SSL for BOINC server?
-  if [ $SSL_WEBADMIN = "y" ]; then
-    echo "  SSLEngine on" >> $PROJECT_HTTPD_CONF
-    echo "  SSLCertificateFile /srv/certificates/$SSL_CERTIFICATE_FILE" >> $PROJECT_HTTPD_CONF
-    echo "  SSLCertificateKeyFile /srv/certificates/$SSL_CERTIFICATE_KEYFILE" >> $PROJECT_HTTPD_CONF
-  fi
 
   # Setup the default webadmin user
   chmod +x ./tools/setup_webadmin_user.py
@@ -242,6 +215,7 @@ else # Create Fitcrack project
   service apache2 stop
 
 
+
   ##############################################
   # Configure webadmin backend
 
@@ -268,10 +242,9 @@ else # Create Fitcrack project
   sed -i "s|sys.path.insert(0.*|sys.path.insert(0,\"$APACHE_DOCUMENT_ROOT/fitcrackAPI/src/\")|g" $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/wsgi.py
 
   # Configure Apache WSGI
-  BE_CONFIG_FILE=$APACHE_CONFIG_DIR/sites-available/fitcrackAPI.conf
+  BE_CONFIG_FILE=$APACHE_CONFIG_DIR/sites-available/00-fitcrackAPI.conf
   echo "# Fitcrack WebAdmin back-end config" > $BE_CONFIG_FILE
-  echo "Listen 5000" >> $BE_CONFIG_FILE
-  echo "<VirtualHost *:5000>" >> $BE_CONFIG_FILE
+  echo "<VirtualHost *:$BACKEND_PORT>" >> $BE_CONFIG_FILE
   echo "  WSGIDaemonProcess fitcrack user=$APACHE_USER group=$APACHE_USER threads=5" >> $BE_CONFIG_FILE
   echo "  WSGIScriptAlias / $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/wsgi.py" >> $BE_CONFIG_FILE
   echo "  <Directory $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/>" >> $BE_CONFIG_FILE
@@ -290,9 +263,12 @@ else # Create Fitcrack project
   echo "</VirtualHost>" >> $BE_CONFIG_FILE
 
   echo "Creating a symlink: $APACHE_CONFIG_DIR/sites-enabled/fitcrackAPI.conf"
-  ln -sf $APACHE_CONFIG_DIR/sites-available/fitcrackAPI.conf $APACHE_CONFIG_DIR/sites-enabled/fitcrackAPI.conf
+  ln -sf $BE_CONFIG_FILE $APACHE_CONFIG_DIR/sites-enabled/00-fitcrackAPI.conf
   echo "Backend-end Apache configuration done"
 
+
+  ##############################################
+  # Configure webadmin frontend
 
   # Copy frontend files
   echo "Installing Fitcrack WebAdmin front-end..."
@@ -311,9 +287,10 @@ else # Create Fitcrack project
   rm $APACHE_CONFIG_DIR/sites-enabled/000-default.conf
 
   # Create frontend Apache config
-  FE_CONFIG_FILE=$APACHE_CONFIG_DIR/sites-available/fitcrackFE.conf
+  FE_CONFIG_FILE=$APACHE_CONFIG_DIR/sites-available/01-fitcrackFE.conf
   echo "# Fitcrack WebAdmin front-end config" > $FE_CONFIG_FILE
-  echo "<VirtualHost *:80>" >> $FE_CONFIG_FILE
+  echo "<VirtualHost *:$FRONTEND_PORT>" >> $FE_CONFIG_FILE
+  #echo "ServerName localhost" >> $FE_CONFIG_FILE
   echo "  DocumentRoot $APACHE_DOCUMENT_ROOT/fitcrackFE" >> $FE_CONFIG_FILE
   echo "  <Directory $APACHE_DOCUMENT_ROOT/fitcrackFE/>" >> $FE_CONFIG_FILE
   echo "    RewriteEngine On" >> $FE_CONFIG_FILE
@@ -323,6 +300,12 @@ else # Create Fitcrack project
   echo "    RewriteCond %{REQUEST_FILENAME} !-d" >> $FE_CONFIG_FILE
   echo "    RewriteRule . /index.html [L]" >> $FE_CONFIG_FILE
   echo "  </Directory>" >> $FE_CONFIG_FILE
+
+  # In case BOINC uses the same port, include it here
+  if [ $FRONTEND_PORT == $BOINC_PORT ]; then
+    echo "  IncludeOptional $PROJECT_HTTPD_CONF" >> $FE_CONFIG_FILE
+  fi
+
   if [ $SSL_WEBADMIN = "y" ]; then
     echo "  SSLEngine on" >> $FE_CONFIG_FILE
     echo "  SSLCertificateFile /srv/certificates/$SSL_CERTIFICATE_FILE" >> $FE_CONFIG_FILE
@@ -331,8 +314,54 @@ else # Create Fitcrack project
   echo "</VirtualHost>" >> $FE_CONFIG_FILE
 
   echo "Creating a symlink: $APACHE_CONFIG_DIR/sites-enabled/fitcrackFE.conf"
-  ln -sf $APACHE_CONFIG_DIR/sites-available/fitcrackFE.conf $APACHE_CONFIG_DIR/sites-enabled/fitcrackFE.conf
+  ln -sf $FE_CONFIG_FILE $APACHE_CONFIG_DIR/sites-enabled/01-fitcrackFE.conf
   echo "Front-end Apache configuration done"
+
+
+  ##############################################
+  # Configure BOINC sheduler and HTTP(S)
+
+  # Create frontend Apache config
+  # In case BOINC uses the same port, include it here
+  if [ $FRONTEND_PORT != $BOINC_PORT ]; then
+    BOINC_APACHE_CONFIG=$APACHE_CONFIG_DIR/sites-available/02-fitcrackBOINC.conf
+    echo "# Fitcrack BOINC Apache config" > $BOINC_APACHE_CONFIG
+    echo "<VirtualHost *:$BOINC_PORT>" >> $BOINC_APACHE_CONFIG
+    echo "  IncludeOptional $PROJECT_HTTPD_CONF" >> $BOINC_APACHE_CONFIG
+
+    if [ $SSL_BOINC = "y" ]; then
+      echo "  SSLEngine on" >> $BOINC_APACHE_CONFIG
+      echo "  SSLCertificateFile /srv/certificates/$SSL_CERTIFICATE_FILE" >> $BOINC_APACHE_CONFIG
+      echo "  SSLCertificateKeyFile /srv/certificates/$SSL_CERTIFICATE_KEYFILE" >> $BOINC_APACHE_CONFIG
+    fi
+    echo "</VirtualHost>" >> $BOINC_APACHE_CONFIG
+
+
+    echo "Creating a symlink: $APACHE_CONFIG_DIR/sites-enabled/fitcrackBOINC.conf"
+    ln -sf $BOINC_APACHE_CONFIG $APACHE_CONFIG_DIR/sites-enabled/02-fitcrackBOINC.conf
+  fi
+  echo "BOINC Apache configuration done"
+
+
+  ##############################################
+  # Finalize Apache configuration
+
+  # Reconfigure apache ports
+  echo "Configuring ports..."
+  echo "BOINC port: $BOINC_PORT"
+  echo "WebAdmin backend port: $BACKEND_PORT"
+  echo "WebAdmin frontend port: $FRONTEND_PORT"
+
+  echo "Listen $BOINC_PORT" > $APACHE_CONFIG_DIR/ports.conf
+  cat $APACHE_CONFIG_DIR/ports.conf | grep "Listen $BACKEND_PORT" >/dev/null
+  if [[ $? != 0 ]]; then
+    echo "Listen $BACKEND_PORT" >> $APACHE_CONFIG_DIR/ports.conf
+  fi
+  cat $APACHE_CONFIG_DIR/ports.conf | grep "Listen $FRONTEND_PORT" >/dev/null
+  if [[ $? != 0 ]]; then
+    echo "Listen $FRONTEND_PORT" >> $APACHE_CONFIG_DIR/ports.conf
+  fi
+  echo "Done"
 
   if [ $DYNAMIC_BACKEND_URL = "y" ]; then
     sed -i "s@serverAddress.*@serverAddress = \"$WEBADMIN_PROTO://\"+window.location.hostname+\":${BACKEND_PORT}\"@g" /var/www/html/fitcrackFE/static/configuration.js
