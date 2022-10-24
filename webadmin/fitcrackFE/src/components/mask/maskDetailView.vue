@@ -49,24 +49,6 @@
           <v-row class="mx-2 mb-2">
             <v-col>
               <v-btn
-                v-if="!edit"
-                color="primary"
-                @click="edit=true"
-              >
-                Edit <v-icon right>
-                  mdi-pencil
-                </v-icon>
-              </v-btn>
-              <v-btn
-                v-else
-                color="primary"
-                @click="saveMask"
-              >
-                Save <v-icon right>
-                  mdi-nuke
-                </v-icon>
-              </v-btn>
-              <v-btn
                 color="primary"
                 :href="$serverAddr + '/masks/' + data.id + '/download'"
                 target="_blank"
@@ -84,8 +66,6 @@
           >
             <code
               class="code elevation-0"
-              :contenteditable="edit"
-              @input="update"
             >{{ data.data }}</code>
           </div>
         </fc-tile>
@@ -103,7 +83,6 @@
     data: function () {
       return {
         data: null,
-        edit: false,
         newData: ''
       }
     },
@@ -115,21 +94,6 @@
         this.axios.get(this.$serverAddr + '/masks/' + this.$route.params.id).then((response) => {
           this.data = response.data
         });
-      },
-      update:function(event){
-        console.log('text updated')
-        this.newData = event.target.innerText
-      },
-      saveMask: function () {
-        if (this.newData === '')
-          return
-
-        this.axios.post(this.$serverAddr + '/masks/' + this.data.id + '/update', {
-          "newMaskSet": this.newData
-        }).then((response) => {
-          console.log(response.data)
-          this.edit=false
-        })
       }
     }
   }
