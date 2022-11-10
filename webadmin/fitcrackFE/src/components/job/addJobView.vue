@@ -394,25 +394,27 @@
             Host assignment
           </v-stepper-step>
           <v-stepper-content step="3">
-            <v-subheader>Select which hosts to distribute workunits to</v-subheader>
-            <div class="scroller">
-              <host-selector
-                v-model="hosts"
-                select-all
-                auto-refresh
-              />
-            </div>
-            <v-subheader><b>({{ hosts.length }} selected)</b></v-subheader>
-            <v-row>
-              <v-spacer />
-              <v-btn
-                class="mr-6 mt-4"
-                color="primary"
-                @click="step = 4"
-              >
-                Next
-              </v-btn>
-            </v-row>
+            <v-container>
+              <v-subheader>Select which hosts to distribute workunits to</v-subheader>
+              <div class="scroller">
+                <host-selector
+                  v-model="hosts"
+                  select-all
+                  auto-refresh
+                />
+              </div>
+              <v-subheader><b>({{ hosts.length }} selected)</b></v-subheader>
+              <v-row>
+                <v-spacer />
+                <v-btn
+                  class="mr-6 mt-4"
+                  color="primary"
+                  @click="step = 4"
+                >
+                  Next
+                </v-btn>
+              </v-row>
+            </v-container>
           </v-stepper-content>
           <v-stepper-step
             id="job-step-4"
