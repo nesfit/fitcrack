@@ -1,4 +1,0 @@
-#! /bin/csh
-
-set ARG = "db_count $1"
-looper "$ARG" $2

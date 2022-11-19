@@ -1,0 +1,4 @@
+[submodule "boinc"]
+	path = boinc
+	url = https://github.com/BOINC/boinc
+	ignore = dirty

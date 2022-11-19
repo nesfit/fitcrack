@@ -1,0 +1,268 @@
+diff -ruN boinc_org/html/project.sample/project.inc boinc/html/project.sample/project.inc
+--- boinc_org/html/project.sample/project.inc	2022-11-19 00:14:19.825528941 +0100
++++ boinc/html/project.sample/project.inc	2022-11-19 00:23:40.304317833 +0100
+@@ -12,8 +12,8 @@
+ 
+ //-------------- Project name and owner
+ 
+-define("PROJECT", "REPLACE WITH PROJECT NAME");
+-define("COPYRIGHT_HOLDER", "REPLACE WITH COPYRIGHT HOLDER");
++define("PROJECT", "Fitcrack");
++define("COPYRIGHT_HOLDER", "Fitcrack team");
+ 
+ //-------------- URLs and directories
+ 
+diff -ruN boinc_org/py/Boinc/database.py boinc/py/Boinc/database.py
+--- boinc_org/py/Boinc/database.py	2022-11-19 00:14:20.045529464 +0100
++++ boinc/py/Boinc/database.py	2022-11-19 00:23:16.808191126 +0100
+@@ -283,9 +283,10 @@
+     connect(config, nodb=True)
+     dbcon = get_dbconnection()
+     cursor = dbcon.cursor()
+-    if drop_first:
+-        cursor.execute("drop database if exists %s"%config.db_name)
+-    cursor.execute("create database %s"%config.db_name)
++    # Commented (Radek), since we expect an empty database
++    # if drop_first:
++    #     cursor.execute("drop database if exists %s"%config.db_name)
++    # cursor.execute("create database %s"%config.db_name)
+     cursor.execute("use %s"%config.db_name)
+     for file in ['schema.sql', 'constraints.sql', 'content.sql']:
+         _execute_sql_script(cursor, os.path.join(srcdir, 'db', file))
+diff -ruN boinc_org/py/Boinc/setup_project.py boinc/py/Boinc/setup_project.py
+--- boinc_org/py/Boinc/setup_project.py	2022-11-19 00:14:20.045529464 +0100
++++ boinc/py/Boinc/setup_project.py	2022-11-19 00:24:27.756566567 +0100
+@@ -520,6 +520,15 @@
+             config.min_sendwork_interval = 6
+         self.scheduler_url = os.path.join(cgi_url     , 'cgi')
+ 
++        # FITCRACK-specific config options
++        config.enable_assignment = 1
++        config.next_rpc_delay = 10
++        config.maintenance_delay = 60
++        config.max_wus_in_progress = 1
++        config.max_ncpus = 1
++        config.prefer_primary_platform = 1
++        config.min_sendwork_interval = 6
++
+     def dest(self, *dirs):
+         location = self.project_dir
+         for x in dirs:
+diff -ruN boinc_org/sched/handle_request.cpp boinc/sched/handle_request.cpp
+--- boinc_org/sched/handle_request.cpp	2022-11-19 00:14:19.877529065 +0100
++++ boinc/sched/handle_request.cpp	2022-11-19 00:26:13.273089005 +0100
+@@ -1139,6 +1139,15 @@
+     log_messages.set_indent_level(2);
+ }
+ 
++static void notify_status() {
++    char buf[256];
++    snprintf(buf, 256, "UPDATE fc_host_status SET last_seen = UTC_TIMESTAMP() WHERE boinc_host_id = %lu ;", g_reply->host.id);
++
++    int retval = boinc_db.do_query(buf);
++    if (retval)
++        log_messages.printf(MSG_DEBUG, "Failed to update host status!\n");
++}
++
+ bool bad_install_type() {
+     if (config.no_vista_sandbox) {
+         if (!strcmp(g_request->host.os_name, "Microsoft Windows Vista")) {
+@@ -1264,6 +1273,7 @@
+     g_reply->nucleus_only = false;
+ 
+     log_request();
++    notify_status();
+ 
+ #if 0
+     // if you need to debug a problem w/ a particular host or user,
+diff -ruN boinc_org/sched/Makefile.am boinc/sched/Makefile.am
+--- boinc_org/sched/Makefile.am	2022-11-19 00:14:19.877529065 +0100
++++ boinc/sched/Makefile.am	2022-11-19 00:25:23.252846268 +0100
+@@ -124,7 +124,11 @@
+     trickle_credit \
+     trickle_deadline \
+     trickle_echo \
+-    update_stats
++    update_stats \
++    assimilator \
++    work_generator \
++    bitwise_validator \
++    trickler
+ 
+ schedcgi_PROGRAMS= \
+     cgi \
+@@ -307,6 +311,82 @@
+ sched_driver_SOURCES = sched_driver.cpp
+ sched_driver_LDADD = $(SERVERLIBS)
+ 
++# find . -name '*.h'
++# find . -name '*.cpp'
++fitcrack_sources = \
++    AttackBenchAll.h \
++    AttackBench.h \
++    AttackCombinator.h \
++    AttackDict.h \
++    AttackHybridDictMask.h \
++    AttackHybridMaskDict.h \
++    AttackMarkov.h \
++    AttackMask.h \
++    AttackMode.h \
++    AttackRules.h \
++    AttackPrince.h \
++    AttackPcfg.h \
++    AttackPcfgClient.h \
++    AttackPcfgRules.h \
++    Base64.h \
++    BenchmarkClasses.h \
++    Config.h \
++    Dictionary.h \
++    Host.h \
++    InputDict.h \
++    MaskSplitter.h \
++    Workunit.h \
++    Mask.h \
++    Job.h \
++    SqlLoader.h \
++    AbstractGenerator.h \
++    SimpleGenerator.h \
++    AttackBenchAll.cpp \
++    AttackCombinator.cpp \
++    AttackDict.cpp \
++    AttackHybridDictMask.cpp \
++    AttackHybridMaskDict.cpp \
++    AttackMarkov.cpp \
++    AttackMask.cpp \
++    AttackMode.cpp \
++    AttackRules.cpp \
++    AttackPrince.cpp \
++    AttackPcfg.cpp \
++    AttackPcfgClient.cpp \
++    AttackPcfgRules.cpp \
++    BenchmarkClasses.cpp \
++    Config.cpp \
++    Dictionary.cpp \
++    Host.cpp \
++    InputDict.cpp \
++    MaskSplitter.cpp \
++    Workunit.cpp \
++    Mask.cpp \
++    Job.cpp \
++    SqlLoader.cpp \
++    AbstractGenerator.cpp \
++    SimpleGenerator.cpp \
++    protocol.grpc.pb.h \
++    protocol.grpc.pb.cc \
++    protocol.pb.h \
++    protocol.pb.cc
++
++assimilator_SOURCES = $(ASSIMILATOR_SOURCES) \
++	$(fitcrack_sources) \
++	work_assimilator.cpp
++assimilator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
++
++work_generator_SOURCES = $(fitcrack_sources) \
++	work_generator.cpp
++work_generator_LDADD = $(SERVERLIBS) -L../../server/lib -lprotobuf -lgrpc++ -lgrpc -lgrpc++_reflection -lz
++
++bitwise_validator_SOURCES = $(VALIDATOR_SOURCES) \
++	sample_bitwise_validator.cpp
++bitwise_validator_LDADD = $(SERVERLIBS)
++
++trickler_SOURCES = trickler.cpp trickle_handler.cpp
++trickler_LDADD = $(SERVERLIBS)
++
+ if ENABLE_FCGI
+ 
+ schedcgi_PROGRAMS += fcgi fcgi_file_upload_handler
+diff -ruN boinc_org/tools/make_project boinc/tools/make_project
+--- boinc_org/tools/make_project	2022-11-19 00:14:20.057529493 +0100
++++ boinc/tools/make_project	2022-11-19 00:22:32.383944637 +0100
+@@ -1,5 +1,8 @@
+ #!/usr/bin/env python
+ 
++# MAKE PROJECT for Fitcrack - fitcrack.cz
++# 2021 - modified by Fitcrack team
++
+ # Creates a new BOINC project.
+ 
+ from __future__ import print_function
+@@ -238,10 +241,13 @@
+ project.sched_install('feeder')
+ project.sched_install('transitioner')
+ project.sched_install('file_deleter')
+-if options.test_app:
+-    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_work_generator -d 3 --app example_app'
+-    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_bitwise_validator -d 3 --app example_app'
+-    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_assimilator -d 3 --app example_app'
++
++project.config.daemons.make_node_and_append("daemon").cmd = 'work_generator -d 3 --app fitcrack'
++project.config.daemons.make_node_and_append("daemon").cmd = 'bitwise_validator -d 3 --app fitcrack'
++project.config.daemons.make_node_and_append("daemon").cmd = 'assimilator -d 3 --app fitcrack'
++project.config.daemons.make_node_and_append("daemon").cmd = 'trickler --variety fitcrack'
++project.config.daemons.make_node_and_append("daemon").cmd = 'measureUsage.py'
++project.config.daemons.make_node_and_append("daemon").cmd = 'pcfg_monitor.py'
+ 
+ # set up default tasks
+ 
+@@ -326,22 +332,12 @@
+ 
+ print ('''Done installing default daemons.''')
+ 
+-# copy the test app if needed
+-if options.test_app:
+-    app_dir = proot+'/apps/example_app/'
+-    os.mkdir(app_dir)
+-    os.system('cp -r ../samples/example_app/bin/* ' + app_dir);
+-    shutil.copy('example_app_in', proot+'/templates/')
+-    shutil.copy('example_app_out', proot+'/templates/')
+-    shutil.copy('../tools/create_work_example', proot+'/bin/')
+-
+-    #add app to project.xml
+-    pf = projectxml.ProjectFile(os.path.join(proot,'project.xml')).read()
+-    a = pf.elements.make_node_and_append('app')
+-    a.name = 'example_app'
+-    a.user_friendly_name = 'Example Application'
+-    pf.write()
+-
++# Add Fitcrack app
++pf = projectxml.ProjectFile(os.path.join(proot,'project.xml')).read()
++a = pf.elements.make_node_and_append('app')
++a.name = 'fitcrack'
++a.user_friendly_name = 'Fitcrack'
++pf.write()
+ 
+ httpd_conf_template_filename = os.path.join(
+     options.project_root,
+diff -ruN boinc_org/tools/project.xml boinc/tools/project.xml
+--- boinc_org/tools/project.xml	2022-11-19 00:14:20.057529493 +0100
++++ boinc/tools/project.xml	2022-11-19 00:16:39.929860132 +0100
+@@ -28,6 +28,10 @@
+         <user_friendly_name>Intel 64-bit Mac OS 10.5 or later</user_friendly_name>
+     </platform>
+     <platform>
++        <name>arm64-apple-darwin</name>
++        <user_friendly_name>Mac OS running on ARM</user_friendly_name>
++    </platform>
++    <platform>
+         <name>sparc-sun-solaris2.7</name>
+         <user_friendly_name>Solaris 2.7 running on a SPARC-compatible CPU</user_friendly_name>
+     </platform>
+diff -ruN boinc_org/tools/update_versions boinc/tools/update_versions
+--- boinc_org/tools/update_versions	2022-11-19 00:14:20.057529493 +0100
++++ boinc/tools/update_versions	2022-11-19 01:20:18.482266394 +0100
+@@ -224,14 +224,8 @@
+ 
+     IF YOUR PROJECT IS PUBLICLY ACCESSIBLE, THIS IS A SECURITY VULNERABILITY.
+     PLEASE STOP YOUR PROJECT IMMEDIATELY AND READ:
+-    https://boinc.berkeley.edu/trac/wiki/CodeSigning
++    https://boinc.berkeley.edu/trac/wiki/CodeSigning";
+ 
+-    Continue (y/n)? ";
+-
+-    $x = trim(fgets(STDIN));
+-    if ($x != "y") {
+-        exit;
+-    }
+     $sig_gen_confirmed = true;
+ }
+ 

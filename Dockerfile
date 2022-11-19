@@ -105,6 +105,9 @@ RUN cp -f server/src/headers/protocol/*.h     boinc/sched/
 RUN cp -rf server/src/include/*               boinc/sched/
 RUN rm -f tmp/built 2>/dev/null
 
+# Apply fitcrack specific changes to boinc
+RUN patch -p0 < installer/fitcrack_changes_in_boinc.patch
+
 # Build Fitcrack server
 WORKDIR /srv/fitcrack/boinc
 RUN chmod +x _autosetup && ./_autosetup

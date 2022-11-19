@@ -107,7 +107,7 @@ else # Create Fitcrack project
   MYDIR=$(pwd)
   cd $BOINC_PROJECT_DIR
   sudo -u $BOINC_USER ./bin/xadd
-  sudo -u $BOINC_USER ./bin/update_versions -y
+  sudo -u $BOINC_USER ./bin/update_versions --noconfirm
   cd $MYDIR
 
   # Restart Apache service

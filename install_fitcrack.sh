@@ -98,6 +98,13 @@ echo "=============================================================="
 ########################################
 # Configure and build server
 ########################################
+
+# Apply fitcrack specific changes to boinc
+if [ ! -f "tmp/fc_boinc_patched" ]; then
+  patch -p0 < installer/fitcrack_changes_in_boinc.patch > /dev/null
+  touch tmp/fc_boinc_patched
+fi
+
 if [ -f "tmp/built" ]; then
   read -e -p "1) Server seems to be built already. Rebuild? [y/N] (default: N): " BUILD_SERVER
   BUILD_SERVER=${BUILD_SERVER:-N}

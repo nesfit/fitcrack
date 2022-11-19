@@ -1,6 +1,0 @@
-#! /bin/csh 
-
-while (1) 
-    $1
-    sleep $2;
-end
