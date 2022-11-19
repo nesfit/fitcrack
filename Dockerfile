@@ -89,6 +89,9 @@ RUN service apache2 restart
 COPY . /srv/fitcrack/
 WORKDIR /srv/fitcrack
 
+# Apply fitcrack specific changes to boinc
+RUN patch -p0 < installer/fitcrack_changes_in_boinc.patch
+
 # Copy server files to BOINC server Root
 RUN cp -f server/src/headers/*.h              boinc/sched/
 RUN cp -f server/src/headers/AttackModes/*.h  boinc/sched/
@@ -104,9 +107,6 @@ RUN cp -f server/src/headers/protocol/*.cc    boinc/sched/
 RUN cp -f server/src/headers/protocol/*.h     boinc/sched/
 RUN cp -rf server/src/include/*               boinc/sched/
 RUN rm -f tmp/built 2>/dev/null
-
-# Apply fitcrack specific changes to boinc
-RUN patch -p0 < installer/fitcrack_changes_in_boinc.patch
 
 # Build Fitcrack server
 WORKDIR /srv/fitcrack/boinc
