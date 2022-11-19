@@ -12,16 +12,16 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-
 
 **NOTE:** Stick with the recommended versions if possible. Older versions may not work. Newer releases were not tested.
 
-### Building Fitcrack image
-In case you are not using a pre-built **fitcrack_server** image, build your own with:
-```
-docker-compose build
-```
-
 ### Preparing the .env configuration file
 Create a new **.env** config file from the example attached:
 ```
 cp env.example .env
+```
+
+### Building Fitcrack image
+In case you are not using a pre-built **fitcrack_server** image, build your own with:
+```
+docker-compose build
 ```
 
 ![Fitcrack-architecture](img/dockerenv.png)
