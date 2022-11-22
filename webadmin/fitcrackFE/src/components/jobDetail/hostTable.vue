@@ -21,7 +21,7 @@
           :to="{ name: 'hostDetail', params: { id: item.id}}"
           class="middle"
         >
-          {{ item.domain_name + ' (' + fixUserNameEncoding(item.user.name) + ')' }}
+          {{ item.domain_name + ' (' + item.user.name + ')' }}
         </router-link>
       </div>
     </template>
@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import fixUserNameEncoding from '@/assets/scripts/unswedishify'
 import { getColors } from '@/components/chart/helpers.js'
 
 export default {
@@ -76,8 +75,6 @@ export default {
     }
   },
   methods: {
-    fixUserNameEncoding,
-    //
     parseTimeDelta (delta) {
       if (delta !== null && delta !== undefined) {
         return this.$moment.utc(delta).fromNow()

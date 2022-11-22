@@ -78,7 +78,7 @@
               <span v-on="on">{{ item.host.domain_name }}</span>
             </router-link>
           </template>
-          <span>User: {{ fixUserNameEncoding(item.host.user.name) }}</span>
+          <span>User: {{ item.host.user.name }}</span>
         </v-tooltip>
         </div>
       </template>
@@ -146,7 +146,6 @@
 
 <script>
 import { getColors } from '@/components/chart/helpers.js'
-import fixUserNameEncoding from '@/assets/scripts/unswedishify'
 import fmt from '@/assets/scripts/numberFormat'
 import fcTextarea from '@/components/textarea/fc_textarea.vue'
 
@@ -249,7 +248,6 @@ export default {
     }
   },
   methods: {
-    fixUserNameEncoding,
     fmt
   }
 }
