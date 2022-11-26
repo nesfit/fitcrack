@@ -18,6 +18,10 @@ A detailed documentation and other information can be found at [https://fitcrack
 * [Advanced: Host-specific configuration](#hostconf)
 * [Debugging](#debugging)
 
+<a name="clone"></a>
+### Clone Fitcrack repository with submodules
+Run ``git clone --recursive https://github.com/nesfit/fitcrack``
+
 
 <a name="inst"></a>
 ## Installation
