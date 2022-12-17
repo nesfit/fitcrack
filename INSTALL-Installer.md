@@ -39,8 +39,9 @@ mysql -u root -p
 mysql> create database fitcrack;
 mysql> CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
 mysql> GRANT ALL ON fitcrack.* TO 'fitcrack'@'localhost';
-mysql> SET GLOBAL log_bin_trust_function_creators = 1;
-mysql> SET GLOBAL time_zone = '+00:00';
+mysql> FLUSH PRIVILEGES;
+mysql> SET PERSIST log_bin_trust_function_creators = 1;
+mysql> SET PERSIST time_zone = '+00:00';
 mysql> exit
 ```
 
