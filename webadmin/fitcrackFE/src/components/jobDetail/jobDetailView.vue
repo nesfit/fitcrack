@@ -209,6 +209,7 @@ import maskDetail from '@/components/jobDetail/attacks/mask.vue'
 import dictionaryDetail from '@/components/jobDetail/attacks/dictionary.vue'
 import princeDetail from '@/components/jobDetail/attacks/prince.vue'
 import pcfgDetail from '@/components/jobDetail/attacks/pcfg.vue'
+import associationDetail from '@/components/jobDetail/attacks/association.vue'
 // Scripts
 import { jobIcon, attackIcon } from '@/assets/scripts/iconMaps'
 //
@@ -231,7 +232,8 @@ export default {
     maskDetail,
     dictionaryDetail,
     princeDetail,
-    pcfgDetail
+    pcfgDetail,
+    associationDetail
   },
   data () {
     return {
@@ -262,6 +264,8 @@ export default {
           return 'princeDetail'
         case 'combinator':
           return 'combinatorDetail'
+        case 'association':
+          return 'associationDetail'
         default:
           return 'hybridDetail'
       }

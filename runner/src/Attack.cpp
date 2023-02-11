@@ -14,33 +14,28 @@
 #include "AttackMask.hpp"
 #include "AttackPCFG.hpp"
 #include "AttackPrince.hpp"
+#include "AttackAssociation.hpp"
 
-AttackType AttackModeToType(char attack_mode)
+AttackType AttackModeToType(std::string attack_mode)
 {
-  switch (attack_mode) {
-  case '0':
+  // opted for readablility but tree would be faster
+  if(attack_mode == "0")
     return AT_Dictionary;
-    break;
-  case '1':
+  if(attack_mode == "1")
     return AT_Combinator;
-    break;
-  case '3':
+  if(attack_mode == "3")
     return AT_Mask;
-    break;
-  case '6':
+  if(attack_mode == "6")
     return AT_HybridDictMask;
-    break;
-  case '7':
+  if(attack_mode == "7")
     return AT_HybridMaskDict;
-    break;
-  case '8':
+  if(attack_mode == "8")
     return AT_Prince;
-  case '9':
+  if(attack_mode == "9")
     return AT_PCFG;
-    break;
-  default:
-    return AT_Unknown;
-  }
+  if(attack_mode == "10")
+    return AT_Association;
+  return AT_Unknown;
 }
 
 AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory) {
@@ -69,11 +64,14 @@ AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory) 
   case AT_PCFG:
     attack = new AttackPCFG(task_config, directory);
     break;
+  case AT_Association:
+    attack = new AttackAssociation(task_config, directory);
+    break;
   case AT_Benchmark:
   {
     std::string attack_mode;
     task_config.find("attack_mode", attack_mode);
-    switch(AttackModeToType(attack_mode[0]))
+    switch(AttackModeToType(attack_mode))
     {
     case AT_Dictionary:
       attack = new AttackBenchmark<AttackDictionary>(task_config, directory);
@@ -96,6 +94,9 @@ AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory) 
     case AT_PCFG:
       attack = new AttackBenchmark<AttackPCFG>(task_config, directory);
       break;
+    case AT_Association:
+      attack = new AttackBenchmark<AttackAssociation>(task_config, directory);
+      break;
     default:
       RunnerUtils::runtimeException("invalid attack mode for benchmark");
       return nullptr;
@@ -116,7 +117,7 @@ enum AttackType Attack::detectAttackType(const ConfigTask &task_config) {
   task_config.find("mode", mode);
   task_config.find("attack_mode", attack_mode);
   if (mode == "n") {
-    return AttackModeToType(attack_mode[0]);
+    return AttackModeToType(attack_mode);
   } else if (mode == "a" || mode == "b") {
     return AT_Benchmark;
   }

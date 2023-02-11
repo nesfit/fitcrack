@@ -158,6 +158,8 @@ export default {
 
           // All ok!
           return true
+        case 'association':
+          return state.leftDicts.reduce((total, current)=>total+current.keyspace, 0) == state.validatedHashes.length
         default:
           return true
       }
@@ -240,5 +242,6 @@ export const attacks = [
   {handler: 'hybridWordlistMask', name: 'Hybrid Wordlist + Mask', id: 6, serverName: 'Hybrid wordlist+mask'},
   {handler: 'hybridMaskWordlist', name: 'Hybrid Mask + Wordlist', id: 7, serverName: 'Hybrid mask+wordlist'},
   {handler: 'princeAttack', name: 'PRINCE', id: 8, serverName: 'prince'},
-  {handler: 'pcfgAttack', name: 'PCFG', id: 9, serverName: 'pcfg'}
+  {handler: 'pcfgAttack', name: 'PCFG', id: 9, serverName: 'pcfg'},
+  {handler: 'association', name: 'Association', id: 10, serverName: 'assoc'},
 ]

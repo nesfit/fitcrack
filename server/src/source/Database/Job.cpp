@@ -184,6 +184,19 @@ void CJob::loadDictionaries()
 
 bool CJob::loadHashes()
 {
+    if (m_all_hashes.empty()){
+        std::vector<std::string> allHashVec = m_sqlLoader->loadJobAllHashes(this->m_id);
+
+        auto it1 = std::begin(allHashVec);
+        m_all_hashes.append(*it1);
+        ++it1;
+        for (auto end = std::end(allHashVec); it1 != end; ++it1)
+        {
+            m_all_hashes.append("\n");
+            m_all_hashes.append(*it1);
+        }
+    }
+
     m_hashes.clear();
     std::vector<std::string> hashVec = m_sqlLoader->loadJobHashes(this->m_id);
 
@@ -407,6 +420,11 @@ void CJob::addDictionary(Config::Ptr<CDictionary> dictionary)
 std::string CJob::getHashes() const
 {
     return m_hashes;
+}
+
+std::string CJob::getAllHashes() const
+{
+    return m_all_hashes;
 }
 
 
