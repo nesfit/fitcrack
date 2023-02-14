@@ -21,6 +21,7 @@
 #include <AttackPcfg.h>
 #include <AttackPcfgRules.h>
 #include <AttackPrince.h>
+#include <AttackAssoc.h>
 #include <AttackBenchAll.h>
 
 
@@ -139,6 +140,10 @@ AttackMode *CreateAttack(PtrJob &job, PtrHost &host, uint64_t duration, CSqlLoad
 
         case Config::AttackMode::AttackHybridMaskDict:
             return AttackTypeMaker<CAttackHybridMaskDict>::CreateAttack(job, host, duration, sqlLoader);
+
+        case Config::AttackMode::AttackAssoc:
+            return AttackTypeMaker<CAttackAssoc>::CreateAttack(job, host, duration, sqlLoader);
+            break;
 
         default:
             Tools::printDebugHost(Config::DebugType::Error, job->getId(), host->getId(),

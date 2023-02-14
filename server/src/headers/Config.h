@@ -125,7 +125,8 @@ namespace Config {
         AttackHybridDictMask = 6,
         AttackHybridMaskDict = 7,
         AttackPrince = 8,
-        AttackPcfg = 9
+        AttackPcfg = 9,
+        AttackAssoc = 10
     };
 
     /** Types of debug output */
