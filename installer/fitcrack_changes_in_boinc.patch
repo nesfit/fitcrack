@@ -112,6 +112,7 @@ diff -ruN boinc_org/sched/Makefile.am boinc/sched/Makefile.am
 +    AttackPcfg.h \
 +    AttackPcfgClient.h \
 +    AttackPcfgRules.h \
++    AttackAssoc.h \
 +    Base64.h \
 +    BenchmarkClasses.h \
 +    Config.h \
@@ -138,6 +139,7 @@ diff -ruN boinc_org/sched/Makefile.am boinc/sched/Makefile.am
 +    AttackPcfg.cpp \
 +    AttackPcfgClient.cpp \
 +    AttackPcfgRules.cpp \
++    AttackAssoc.cpp \
 +    BenchmarkClasses.cpp \
 +    Config.cpp \
 +    Dictionary.cpp \
