@@ -110,6 +110,9 @@ class mask(Resource):
         mask = FcMasksSet.query.filter(FcMasksSet.id == id).one()
         mask.deleted = True
         db.session.commit()
+        path = os.path.join(MASKS_DIR, mask.path)
+        if os.path.exists(path):
+            os.remove(path)
         return {
             'status': True,
             'message': 'Mask file sucesfully deleted.'

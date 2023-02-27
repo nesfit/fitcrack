@@ -94,6 +94,9 @@ class markov(Resource):
         markov = FcHcstat.query.filter(FcHcstat.id == id).one()
         markov.deleted = True
         db.session.commit()
+        path = os.path.join(HCSTATS_DIR, markov.path)
+        if os.path.exists(path):
+            os.remove(path)
         return {
             'status': True,
             'message': 'Markov files successfully deleted.'
