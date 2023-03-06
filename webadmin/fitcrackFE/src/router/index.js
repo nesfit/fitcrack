@@ -28,6 +28,7 @@ const myAccount = () => import('@/components/myAccount/myAccountView.vue')
 const hostDetail = () => import('@/components/host/hostDetailView.vue')
 const rules = () => import('@/components/rule/rulesView.vue')
 const ruleDetail = () => import('@/components/rule/ruleDetailView.vue')
+const ruleEdit = () => import('@/components/rule/ruleEdit.vue')
 const masks = () => import('@/components/mask/masksView.vue')
 const charsets = () => import('@/components/charset/charsetsView.vue')
 const charsetDetail = () => import('@/components/charset/charsetDetailView.vue')
@@ -209,7 +210,12 @@ const appRoutes = [
       title: 'Rules',
       icon: 'mdi-gavel',
       navtab: 1
-    }
+    },
+  },
+  {
+    path: '/rules/ruleEdit',
+    name: 'ruleEdit',
+    component: ruleEdit,
   },
   {
     path: '/rules/:id',

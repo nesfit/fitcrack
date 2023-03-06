@@ -13,7 +13,9 @@ from flask import request, redirect, send_file
 from flask_restx import Resource, abort
 from sqlalchemy import exc
 
-from settings import RULE_DIR
+import ctypes
+import json
+from settings import RULE_DIR, RULE_APPLICATOR_PATH
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
 from src.api.fitcrack.endpoints.rule.argumentsParser import updateRule_parser, rule_parser
@@ -28,6 +30,11 @@ ns = api.namespace('rule', description='Endpoints for work with rule files.')
 
 ALLOWED_EXTENSIONS = set(['txt', 'rule'])
 
+# Define the C function
+apply_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).apply_rule_cpu
+apply_rule.restype = ctypes.c_int
+apply_rule.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+RETCODE_COMMENT = -3
 
 @ns.route('')
 class ruleCollection(Resource):
@@ -161,3 +168,40 @@ class downloadRule(Resource):
         rule = FcRule.query.filter(FcRule.id == id).first()
         path = os.path.join(RULE_DIR, rule.path)
         return send_file(path, attachment_filename=rule.path, as_attachment=True)
+    
+    
+@ns.route('/rule/preview')
+class passwordsPreview(Resource):
+    def post(self):
+        request_data = request.get_json()
+        dictionary = request_data['dictionaryContent']
+        rules = request_data['ruleContent']
+        preview = []
+        
+        for password in dictionary:
+            password = password.strip()
+            for rule in rules: 
+                rule = rule.strip()
+                                
+                # Apply the rule to the password using the C function
+                in_len = len(password.encode('utf-8'))
+                final_password = ctypes.create_string_buffer(64)
+                #Returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
+                ret_code = apply_rule(rule.encode('utf-8'), len(rule), password.encode('utf-8'), in_len, final_password)
+                
+                if(ret_code == -1):
+                    final_password = ""
+                    #if the line in a rule is a comment, specify return code to -3
+                    if(len(rule) > 0 and rule[0] == '#'):
+                        ret_code = RETCODE_COMMENT
+                else:
+                    final_password = final_password.value.decode()
+                
+                #Add element to a preview list
+                element = {
+                    "finalPassword" : final_password,
+                    "retCode" : ret_code
+                }                         
+                preview.append(element)
+                
+        return { 'passwordsPreview' : preview }, 200  

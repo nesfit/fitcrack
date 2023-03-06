@@ -13,6 +13,7 @@ HASHCAT_DIR = ROOT_DIR + '/../hashcat/'
 HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_HASH_INFO_PATH = HASHCAT_DIR + HASHCAT_HASH_INFO_JSON
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
+RULE_APPLICATOR_PATH = "/srv/myData/cpu_rules.so"
 PWD_DIST_PATH =  ROOT_DIR + '/../pwd_dist/pwd_dist.bin'
 PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princeprocessor/pp64.bin'
 EXE_OR_BIN = 'bin'
@@ -40,7 +41,7 @@ XTOHASHCAT_PATH = ROOT_DIR + '/../xtohashcat/'
 
 # Fitcrack Settings
 SECONDS_PER_JOB = 3600
-PROJECT_USER = 'root'
+PROJECT_USER = 'boincadm'
 PROJECT_NAME = 'fitcrack'
 PROJECT_DIR = '/home/' + PROJECT_USER + '/projects/' + PROJECT_NAME
 
@@ -59,8 +60,8 @@ RESTX_ERROR_404_HELP = False
 
 # SQLAlchemy settings
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/fitcrack'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://fitcrack:mysqlPASSWORD@localhost/fitcrack'
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-BOINC_SERVER_URI = 'http://localhost'
+BOINC_SERVER_URI = 'http://127.0.0.1:80'
