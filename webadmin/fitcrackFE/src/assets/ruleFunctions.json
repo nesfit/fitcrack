@@ -1,0 +1,432 @@
+{
+    "functions" : [ 
+        {
+            "name": "Nothing",
+            "sign": ":",
+            "description": "Do nothing (passthrough)",
+            "example": ":",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0rd"
+        },
+        {
+            "name": "Lowercase",
+            "sign": "l",
+            "description": "Lowercase all letters",
+            "example": "l",
+            "input": "p@ssW0rd",
+            "output": "p@ssw0rd"
+        },
+        {
+            "name": "Uppercase",
+            "sign": "u",
+            "description": "Uppercase all letters",
+            "example": "u",
+            "input": "p@ssW0rd",
+            "output": "P@SSW0RD"
+        },
+        {
+            "name": "Capitalize",
+            "sign": "c",
+            "description": "Capitalize the first letter and lower the rest",
+            "example": "c",
+            "input": "p@ssW0rd",
+            "output": "P@ssw0rd"
+        },
+        {
+            "name": "Invert Capitalize",
+            "sign": "C",
+            "description": "Lowercase first found character, uppercase the rest",
+            "example": "C",
+            "input": "p@ssW0rd",
+            "output": "p@SSW0RD"
+        },
+        {
+            "name": "Toggle Case",
+            "sign": "t",
+            "description": "Toggle the case of all characters in word.",
+            "example": "t",
+            "input": "p@ssW0rd",
+            "output": "P@SSw0RD"
+        },
+        {
+            "name": "Toggle @",
+            "sign": "TN",
+            "description": "Toggle the case of characters at position N",
+            "example": "T3",
+            "input": "p@ssW0rd",
+            "output": "p@sSW0rd"
+        },
+        {
+            "name": "Reverse",
+            "sign": "r",
+            "description": "Reverse the entire word",
+            "example": "r",
+            "input": "p@ssW0rd",
+            "output": "dr0Wss@p"
+        },
+        {
+            "name": "Duplicate",
+            "sign": "d",
+            "description": "Duplicate entire word",
+            "example": "d",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0rdp@ssW0rd"
+        },
+        {
+            "name": "Duplicate N",
+            "sign": "pN",
+            "description": "Append duplicated word N times",
+            "example": "p2",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0rdp@ssW0rdp@ssW0rd"
+        },
+        {
+            "name": "Reflect",
+            "sign": "f",
+            "description": "Duplicate word reversed",
+            "example": "f",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0rddr0Wss@p"
+        },
+        {
+            "name": "Rotate Left",
+            "sign": "{",
+            "description": "Rotate the word left.",
+            "example": "{",
+            "input": "p@ssW0rd",
+            "output": "@ssW0rdp"
+        },
+        {
+            "name": "Rotate Right",
+            "sign": "}",
+            "description": "Rotate the word right",
+            "example": "}",
+            "input": "p@ssW0rd",
+            "output": "dp@ssW0r"
+        },
+        {
+            "name": "Append Character",
+            "sign": "$X",
+            "description": "Append character X to end",
+            "example": "$1$2",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0rd12"
+        },
+        {
+            "name": "Prepend Character",
+            "sign": "^X",
+            "description": "Prepend character X to front",
+            "example": "^2^1",
+            "input": "p@ssW0rd",
+            "output": "12p@ssW0rd"
+        },
+        {
+            "name": "Truncate left",
+            "sign": "[",
+            "description": "Delete first character",
+            "example": "[",
+            "input": "p@ssW0rd",
+            "output": "@ssW0rd"
+        },
+        {
+            "name": "Truncate right",
+            "sign": "]",
+            "description": "Delete last character",
+            "example": "]",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0r"
+        },
+        {
+            "name": "Delete @ N",
+            "sign": "DN",
+            "description": "Delete character at position N",
+            "example": "D3",
+            "input": "p@ssW0rd",
+            "output": "p@sW0rd"
+        },
+        {
+            "name": "Extract range",
+            "sign": "xNM",
+            "description": "Extract M characters, starting at position N",
+            "example": "x04",
+            "input": "p@ssW0rd",
+            "output": "p@ss"
+        },
+        {
+            "name": "Omit range",
+            "sign": "ONM",
+            "description": "Delete M characters, starting at position N",
+            "example": "O12",
+            "input": "p@ssW0rd",
+            "output": "psW0rd"
+        },
+        {
+            "name": "Insert @ N",
+            "sign": "iNX",
+            "description": "Insert character X at position N",
+            "example": "i4!",
+            "input": "p@ssW0rd",
+            "output": "p@ss!W0rd"
+        },
+        {
+            "name": "Overwrite @ N",
+            "sign": "oNX",
+            "description": "Overwrite character at position N with X",
+            "example": "o3$",
+            "input": "p@ssW0rd",
+            "output": "p@s$W0rd"
+        },
+        {
+            "name": "Truncate @ N",
+            "sign": "'N",
+            "description": "Truncate word at position N",
+            "example": "'6",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0"
+        },
+        {
+            "name": "Replace",
+            "sign": "sXY",
+            "description": "Replace all instances of X with Y",
+            "example": "ss$",
+            "input": "p@ssW0rd",
+            "output": "p@$$W0rd"
+        },
+        {
+            "name": "Purge",
+            "sign": "@X",
+            "description": "Purge all instances of X",
+            "example": "@s",
+            "input": "p@ssW0rd",
+            "output": "p@W0rd"
+        },
+        {
+            "name": "Duplicate first N",
+            "sign": "zN",
+            "description": "Duplicate first character N times",
+            "example": "z2",
+            "input": "p@ssW0rd",
+            "output": "ppp@ssW0rd"
+        },
+        {
+            "name": "Duplicate last N",
+            "sign": "ZN",
+            "description": "Duplicate last character N times",
+            "example": "Z2",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0rddd"
+        },
+        {
+            "name": "Duplicate all",
+            "sign": "q",
+            "description": "Duplicate every character",
+            "example": "q",
+            "input": "p@ssW0rd",
+            "output": "pp@@ssssWW00rrdd"
+        },
+        {
+            "name": "Extract memory",
+            "sign": "XNMI",
+            "description": "Insert substring of length M starting from position N of word saved to memory at position I",
+            "example": "lMX428",
+            "input": "p@ssW0rd",
+            "output": "p@ssw0rdw0"
+        },
+        {
+            "name": "Append memory",
+            "sign": "4",
+            "description": "Append the word saved to memory to current word",
+            "example": "uMl4",
+            "input": "p@ssW0rd",
+            "output": "p@ssw0rdP@SSW0RD"
+        },
+        {
+            "name": "Prepend memory",
+            "sign": "6",
+            "description": "Prepend the word saved to memory to current word",
+            "example": "rMr6",
+            "input": "p@ssW0rd",
+            "output": "dr0Wss@pp@ssW0rd"
+        },
+        {
+            "name": "Memorize",
+            "sign": "M",
+            "description": "Memorize current word",
+            "example": "lMuX084",
+            "input": "p@ssW0rd",
+            "output": "P@SSp@ssw0rdW0RD"
+        },
+        {
+            "name": "Reject less",
+            "sign": "<N",
+            "description": "Reject plains if their length is greater than N",
+            "example": "<G"
+        },
+        {
+            "name": "Reject greater",
+            "sign": ">N",
+            "description": "Reject plains if their length is less than N",
+            "example": ">8"
+        },
+        {
+            "name": "Reject equal",
+            "sign": "_N",
+            "description": "Reject plains of length not equal to N",
+            "example": "_7"
+        },
+        {
+            "name": "Reject contain",
+            "sign": "!X",
+            "description": "Reject plains which contain char X",
+            "example": "!z"
+        },
+        {
+            "name": "Reject not contain",
+            "sign": "/X",
+            "description": "Reject plains which do not contain char X",
+            "example": "/e"
+        },
+        {
+            "name": "Reject equal first",
+            "sign": "(X",
+            "description": "Reject plains which do not start with X",
+            "example": "(h"
+        },
+        {
+            "name": "Reject equal last",
+            "sign": ")X",
+            "description": "Reject plains which do not end with X",
+            "example": ")t"
+        },
+        {
+            "name": "Reject equal at",
+            "sign": "=NX",
+            "description": "Reject plains which do not have char X at position N",
+            "example": "=1a"
+        },
+        {
+            "name": "Reject contains",
+            "sign": "%NX",
+            "description": "Reject plains which contain char X less than N times",
+            "example": "%2a"
+        },
+        {
+            "name": "Reject contains",
+            "sign": "Q",
+            "description": "Reject plains where the memory saved matches current word",
+            "example": "rMrQ"
+        },
+        {
+            "name": "Swap front",
+            "sign": "k",
+            "description": "Swap first two characters",
+            "example": "k",
+            "input": "p@ssW0rd",
+            "output": "@pssW0rd"
+        },
+        {
+            "name": "Swap back",
+            "sign": "K",
+            "description": "Swap last two characters",
+            "example": "K",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0dr"
+        },
+        {
+            "name": "Swap @ N",
+            "sign": "*NM",
+            "description": "Swap character at position N with character at position M",
+            "example": "*34",
+            "input": "p@ssW0rd",
+            "output": "p@sWs0rd"
+        },
+        {
+            "name": "Bitwise shift left",
+            "sign": "LN",
+            "description": "Bitwise shift left character @ N",
+            "example": "L2",
+            "input": "p@ssW0rd",
+            "output": "p@\u00e6sW0rd"
+        },
+        {
+            "name": "Bitwise shift right",
+            "sign": "RN",
+            "description": "Bitwise shift right character @ N",
+            "example": "R2",
+            "input": "p@ssW0rd",
+            "output": "p@9sW0rd"
+        },
+        {
+            "name": "Ascii increment",
+            "sign": "+N",
+            "description": "Increment character @ N by 1 ascii value",
+            "example": "+2",
+            "input": "p@ssW0rd",
+            "output": "p@tsW0rd"
+        },
+        {
+            "name": "Ascii decrement",
+            "sign": "-N",
+            "description": "Decrement character @ N by 1 ascii value",
+            "example": "-1",
+            "input": "p@ssW0rd",
+            "output": "p?ssW0rd"
+        },
+        {
+            "name": "Replace N + 1",
+            "sign": ".N",
+            "description": "Replace character @ N with value at @ N plus 1",
+            "example": ".1",
+            "input": "p@ssW0rd",
+            "output": "psssW0rd"
+        },
+        {
+            "name": "Replace N - 1",
+            "sign": ",N",
+            "description": "Replace character @ N with value at @ N minus 1",
+            "example": ",1",
+            "input": "p@ssW0rd",
+            "output": "ppssW0rd"
+        },
+        {
+            "name": "Duplicate block front",
+            "sign": "yN",
+            "description": "Duplicate first N characters",
+            "example": "y2",
+            "input": "p@ssW0rd",
+            "output": "p@p@ssW0rd"
+        },
+        {
+            "name": "Duplicate block back",
+            "sign": "YN",
+            "description": "Duplicate last N characters",
+            "example": "Y2",
+            "input": "p@ssW0rd",
+            "output": "p@ssW0rdrd"
+        },
+        {
+            "name": "Title",
+            "sign": "E",
+            "description": "Lower case the whole line, then upper case the first letter and every letter after a space",
+            "example": "E",
+            "input": "p@ssW0rd w0rld",
+            "output": "P@ssw0rd W0rld"
+        },
+        {
+            "name": "Title w/separator",
+            "sign": "eX",
+            "description": "Lower case the whole line, then upper case the first letter and every letter after a custom separator character",
+            "example": "e-",
+            "input": "p@ssW0rd-w0rld",
+            "output": "P@ssw0rd-W0rld"
+        },
+        {
+            "name": "Title w/Nth separator",
+            "sign": "3NX",
+            "description": "Upper case the letter after the Nth instance of a char",
+            "example": "30-",
+            "input": "pass-word",
+            "output": "pass-Word"
+        }
+    ]
+}

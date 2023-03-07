@@ -19,7 +19,7 @@ from settings import RULE_DIR, RULE_APPLICATOR_PATH
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
 from src.api.fitcrack.endpoints.rule.argumentsParser import updateRule_parser, rule_parser
-from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_model, ruleData_model
+from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_model, ruleData_model, previewPasswords_model, randomRule_model
 from src.api.fitcrack.functions import fileUpload
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
@@ -29,12 +29,20 @@ log = logging.getLogger(__name__)
 ns = api.namespace('rule', description='Endpoints for work with rule files.')
 
 ALLOWED_EXTENSIONS = set(['txt', 'rule'])
+RETCODE_COMMENT = -3
 
-# Define the C function
+# Define the C function for applying rules
 apply_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).apply_rule_cpu
 apply_rule.restype = ctypes.c_int
 apply_rule.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-RETCODE_COMMENT = -3
+
+# Define the C function for generating random rule
+gen_random_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).generate_random_rule
+gen_random_rule.restype = ctypes.c_int
+gen_random_rule.argtypes = [ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
+
+
+
 
 @ns.route('')
 class ruleCollection(Resource):
@@ -170,12 +178,36 @@ class downloadRule(Resource):
         return send_file(path, attachment_filename=rule.path, as_attachment=True)
     
     
-@ns.route('/rule/preview')
-class passwordsPreview(Resource):
+@ns.route('/randomRule')
+class generateRandomRule(Resource):
+    @api.marshal_with(randomRule_model)
     def post(self):
+        """
+        Returns generated random rule.
+        """
         request_data = request.get_json()
-        dictionary = request_data['dictionaryContent']
-        rules = request_data['ruleContent']
+        min_function_num = request_data['minFunctionsNum']
+        max_function_num = request_data['maxFunctionsNum']
+        random_rule_buf = ctypes.create_string_buffer(256)
+        
+        ret_code = gen_random_rule(random_rule_buf, min_function_num, max_function_num)
+        
+        return { "randomRule": random_rule_buf.value.decode() }
+        
+        
+        
+    
+    
+@ns.route('/preview')
+class passwordsPreview(Resource):
+    @api.marshal_with(previewPasswords_model)
+    def post(self):
+        """
+        Returns passwords after rules application.
+        """
+        request_data = request.get_json()
+        dictionary = request_data['passwordsList']
+        rules = request_data['rulesList']
         preview = []
         
         for password in dictionary:
@@ -184,10 +216,10 @@ class passwordsPreview(Resource):
                 rule = rule.strip()
                                 
                 # Apply the rule to the password using the C function
-                in_len = len(password.encode('utf-8'))
+                in_len = len(password.encode('latin-1'))
                 final_password = ctypes.create_string_buffer(64)
                 #Returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
-                ret_code = apply_rule(rule.encode('utf-8'), len(rule), password.encode('utf-8'), in_len, final_password)
+                ret_code = apply_rule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), in_len, final_password)
                 
                 if(ret_code == -1):
                     final_password = ""
@@ -195,7 +227,7 @@ class passwordsPreview(Resource):
                     if(len(rule) > 0 and rule[0] == '#'):
                         ret_code = RETCODE_COMMENT
                 else:
-                    final_password = final_password.value.decode()
+                    final_password = final_password.value.decode('latin-1')
                 
                 #Add element to a preview list
                 element = {

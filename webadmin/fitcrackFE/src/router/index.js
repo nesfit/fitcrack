@@ -213,7 +213,12 @@ const appRoutes = [
     },
   },
   {
-    path: '/rules/ruleEdit',
+    path: '/rules/edit/new',
+    name: 'ruleEdit',
+    component: ruleEdit,
+  },
+  {
+    path: '/rules/edit/:id',
     name: 'ruleEdit',
     component: ruleEdit,
   },
