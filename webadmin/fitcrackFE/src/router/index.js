@@ -28,7 +28,7 @@ const myAccount = () => import('@/components/myAccount/myAccountView.vue')
 const hostDetail = () => import('@/components/host/hostDetailView.vue')
 const rules = () => import('@/components/rule/rulesView.vue')
 const ruleDetail = () => import('@/components/rule/ruleDetailView.vue')
-const ruleEdit = () => import('@/components/rule/ruleEdit.vue')
+const ruleFileEdit = () => import('@/components/rule/ruleFileEdit.vue')
 const masks = () => import('@/components/mask/masksView.vue')
 const charsets = () => import('@/components/charset/charsetsView.vue')
 const charsetDetail = () => import('@/components/charset/charsetDetailView.vue')
@@ -214,13 +214,13 @@ const appRoutes = [
   },
   {
     path: '/rules/edit/new',
-    name: 'ruleEdit',
-    component: ruleEdit,
+    name: 'ruleFileEdit',
+    component: ruleFileEdit,
   },
   {
     path: '/rules/edit/:id',
-    name: 'ruleEdit',
-    component: ruleEdit,
+    name: 'ruleFileEdit',
+    component: ruleFileEdit,
   },
   {
     path: '/rules/:id',
