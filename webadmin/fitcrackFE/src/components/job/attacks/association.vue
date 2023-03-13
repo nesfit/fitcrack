@@ -61,11 +61,12 @@
         'dict-selector': dictSelector,
         'rules-selector': ruleSelector
       },
-      computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'optimized', 'distributionMode'])),
+      computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'validatedHashes', 'rules', 'optimized', 'distributionMode'])),
       methods: {
         checkValid: function () {
-          if (this.leftDicts.length > 0 &&
-              this.leftDicts.length == this.hashList.length) {
+          if (this.leftDicts.length > 0
+              // && this.leftDicts.reduce((total, current)=>total+current.keyspace, 0) == this.validatedHashes.length
+              ) {
             return true
           }
           return false

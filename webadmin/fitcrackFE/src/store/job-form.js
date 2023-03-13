@@ -159,7 +159,7 @@ export default {
           // All ok!
           return true
         case 'association':
-          return state.leftDicts.length == state.hashList.length
+          return state.leftDicts.reduce((total, current)=>total+current.keyspace, 0) == state.validatedHashes.length
         default:
           return true
       }
