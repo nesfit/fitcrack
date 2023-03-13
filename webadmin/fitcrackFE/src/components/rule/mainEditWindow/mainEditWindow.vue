@@ -11,7 +11,7 @@
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col>
-                    <v-btn color="grey lighten-1">Show rule functions</v-btn>
+                    <ruleFunctions></ruleFunctions>
                 </v-col>
 
             </v-row>
@@ -46,17 +46,6 @@
                 </v-col>
                 <v-spacer></v-spacer>
 
-                <!--<v-col>
-                    <v-btn class="px-2" color="orange lighten-3" depressed>
-                        <v-icon>
-                            mdi-cogs
-                        </v-icon>    
-                        
-                        Generate rules from dictionary
-                    </v-btn>
-
-                </v-col>
-                -->
                 <v-col>
                     <v-btn class="px-2" color="red accent-2" depressed @click="resetRules">
                         <v-icon>
@@ -66,17 +55,13 @@
                 </v-col>
             </v-row>
             <v-row>
-                <!--
-                <input type="file" label="Load Dictionary" @change="onRuleFileChange($event)">
-                <v-textarea label="Rule File Content" v-model="rulesContent"></v-textarea>                    
-                -->
-                <ruleFileContent v-bind:rules="rulesList" v-on:rules-updated="updateRules"></ruleFileContent>
+                <ruleFileContent v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"></ruleFileContent>
             </v-row>
             <v-row>
                 <v-col align="right">
-                    Rule count: {{ruleCount}}
+                    Rule count: {{ ruleCount }}
                 </v-col>
-                
+
             </v-row>
 
             <v-row>
@@ -95,10 +80,11 @@
 
 <script>
 import ruleFileContent from '@/components/rule/mainEditWindow/ruleFileContent.vue';
+import ruleFunctions from '@/components/rule/mainEditWindow/popups/ruleFunctions.vue';
 export default {
+    props: ["rulesList"],
     data() {
         return {
-            rulesList: [""],
             minFunctionsNum: 6,
             maxFunctionsNum: 8,
             randomRuleString: ""
@@ -112,6 +98,7 @@ export default {
                 this.rulesContent = event.target.result;
                 this.rulesList = this.rulesList.concat(event.target.result.split("\n"));
                 this.rulesList.pop();
+                this.$emit("rules-updated", this.rulesList)
             };
             reader.readAsText(file);
         },
@@ -127,24 +114,27 @@ export default {
                 this.randomRuleString = error.message;
             });
         },
-        addEmptyRule(){
+        addEmptyRule() {
             this.rulesList.push("")
         },
-        updateRules(updatedRulesList){
+        updateRules(updatedRulesList) {
             this.rulesList = updatedRulesList;
-            console.log(this.rulesList)
+            console.log("updatedParent")
+            this.$emit("rules-updated", this.rulesList)
         },
-        resetRules(){
+        resetRules() {
             this.rulesList = []
+            this.updateRules(this.rulesList)
         }
     },
-    computed:{
-        ruleCount(){
+    computed: {
+        ruleCount() {
             return this.rulesList.length;
         }
     },
     components: {
-        ruleFileContent
+        ruleFileContent,
+        ruleFunctions
     },
 
 
@@ -176,8 +166,7 @@ export default {
     margin-top: 10px;
 }
 
-.border-down{
+.border-down {
     border-bottom: 1px solid darkgray;
 }
-
 </style>

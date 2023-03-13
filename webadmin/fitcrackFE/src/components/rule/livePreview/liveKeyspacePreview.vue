@@ -1,36 +1,45 @@
 <template>
-    <v-col cols="12" md="3" class="bordered">
+    <v-col cols="5" md="3" class="bordered">
         <v-container>
             <v-row justify="center" class="border-down boxTitle text-h5 py-2">
                 Live keyspace preview
             </v-row>
             <v-row>
-                <v-col cols="2">
-                    <v-list>
-                        <v-list-item v-for="(line, index) in lines" :key="index">
-                            <v-list-item-content class="line-number">{{ index + 1 }}</v-list-item-content>
-                        </v-list-item>
-                    </v-list>
-                </v-col>
-                <v-col cols="10">
-                    <v-textarea v-model="text" @input="updateLines" :rows="rows" :style="{ height: `${height}px` }"
-                        hide-details></v-textarea>
+                <v-col class="font-weight-medium">
+                    Type words or select a dictionary:
                 </v-col>
             </v-row>
-
-
             <v-row>
+                <v-col class="py-0">
+                    <input type="file" ref="appendDictionary" style="display: none"
+                        @change="onDictionaryFileChange($event)">
+                    <v-btn class="px-2" color="orange lighten-3" depressed @click="$refs.appendDictionary.click()">
+                        <v-icon left>
+                            mdi-file
+                        </v-icon>
+                        Append dictionary
+                    </v-btn>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col class="pb-0">
+                    <v-textarea solo label="Dictionary Content" v-model="dictionaryContent"></v-textarea>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="12" class="text-center pt-0 pb-8">
+                    <v-btn class="orange darken-3" @click="generatePreview">Generate Preview</v-btn>
+                </v-col>
 
             </v-row>
-
             <v-row>
-                <v-col>
-                    <input type="file" label="Load Dictionary" @change="onDictionaryFileChange($event)">
-                    <v-textarea label="Dictionary Content" v-model="dictionaryContent"></v-textarea>
+                <v-col class="font-weight-medium">
+                    Final keyspace:
                 </v-col>
-                <v-col>
-                    <v-btn @click="generatePreview">Generate Preview</v-btn>
-                    <v-textarea label="Preview Passwords" v-model="previewPasswordsString"></v-textarea>
+            </v-row>
+            <v-row>
+                <v-col class="pt-0">
+                    <v-textarea readonly solo label="Preview Passwords" v-model="this.previewPasswordsString"></v-textarea>
                 </v-col>
 
             </v-row>
@@ -40,23 +49,12 @@
 
 
 <script>
-import fcTextarea from '@/components/textarea/fc_textarea.vue'
-
 
 export default {
+    props: ["passwordsList", "previewPasswordsString"],
     data() {
         return {
             dictionaryContent: null,
-            passwordsList: null,
-            applicatorResult: null,
-            previewPasswords: [],
-            previewPasswordsString: "",
-
-            text: "",
-            lines: [],
-            rows: 3, // initial number of rows
-            lineHeight: 20, // adjust to match your font size and line height
-            height: 0,
         }
     },
     methods: {
@@ -71,40 +69,13 @@ export default {
             reader.readAsText(file);
         },
         generatePreview() {
-            const data = {
-                rulesList: this.rulesList,
-                passwordsList: this.passwordsList
-            };
-            this.axios.post(this.$serverAddr + "/rule/preview", data).then((response) => {
-                this.applicatorResult = response.data.passwordsPreview;
-                this.filterPreviewPasswords();
-            }).catch((error) => {
-                this.previewPasswords = error.message;
-            });
-        },
-        filterPreviewPasswords() {
-            this.previewPasswords = [];
-            this.applicatorResult.forEach(element => {
-                if (element.retCode >= 0) {
-                    this.previewPasswords.push(element.finalPassword);
-                }
-            });
-            this.previewPasswordsString = this.previewPasswords.join("\n");
-            console.log(this.previewPasswords);
-        },
-        updateLines() {
-            // split text into lines and update the line numbers
-            this.lines = this.text.split("\n");
-            this.rows = this.lines.length;
-            this.height = this.rows * this.lineHeight;
-        },
-    },
-    components: {
-        fcTextarea
+            this.$emit("generate-preview", this.passwordsList)
+        }
     }
 };
 
 </script>
+
 
 <style>
 .line-number {

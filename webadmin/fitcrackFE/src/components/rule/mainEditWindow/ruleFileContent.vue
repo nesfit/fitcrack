@@ -32,60 +32,7 @@
                     </tbody>
 
                 </template>
-
-                <!--
-                <tr v-for="(rule, index) in rules" :key="index">
-                    <td>
-                        {{ index + 1 }}
-                    </td>
-                    <td>
-                        <v-text-field placeholder="Enter rule" hide-details outlined dense v-model="rules[index]"
-                            @input="updateRules"></v-text-field>
-                    </td>
-
-                </tr>
-                -->
-
-                <!--
-
-                <template #item="{ item, index }">
-                    <tr>
-                        <td>
-                            {{ index + 1}}
-                        </td>
-                        <td>
-                            <v-text-field placeholder="Enter rule" hide-details outlined dense v-model="item.item"
-                                @input="updateRules"></v-text-field>
-                        </td>
-                        <td>
-                            <v-btn icon class="px-0" color="black" @click="deleteRule(index)">
-                                <v-icon color="error">
-                                    mdi-delete-outline
-                                </v-icon>
-                            </v-btn>
-                        </td>
-                    </tr>
-                </template>                    
-                -->
-
-
-
             </v-data-table>
-            <!--
-            <v-list>
-                <v-list-item v-for="(rule, index) in rules" :key="index">
-                    <div class="mr-3">{{ index + 1 }}</div>
-
-                    <v-text-field placeholder="Enter rule" hide-details outlined dense v-model="rules[index]"
-                        @input="updateRules"></v-text-field>
-                    <v-btn icon class="px-0" color="black" @click="deleteRule(index)">
-                        <v-icon color="error">
-                            mdi-delete-outline
-                        </v-icon>
-                    </v-btn>
-                </v-list-item>
-            </v-list>
-        -->
         </v-card>
     </v-container>
 </template>
@@ -93,7 +40,7 @@
 <script>
 
 export default {
-    props: ["rules"],
+    props: ["rulesList"],
     data() {
         return {
             search: "",
@@ -105,17 +52,17 @@ export default {
     },
     methods: {
         updateRules(rule, index) {
-            this.rules[index] = rule;
-            this.$emit("rules-updated", this.rules);
+            this.rulesList[index] = rule;
+            this.$emit("rules-updated", this.rulesList);
         },
         deleteRule(index) {
-            this.rules.splice(index, 1);
-            this.$emit("rules-updated", this.rules)
+            this.rulesList.splice(index, 1);
+            this.$emit("rules-updated", this.rulesList)
         }
     },
     computed: {
         ruleObjects() {
-            return this.rules.map((rule, index) => ({ rule, index }));
+            return this.rulesList.map((rule, index) => ({ rule, index }));
         },
     }
 }
