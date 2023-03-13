@@ -8,6 +8,9 @@
 
 #include <AttackAssoc.h>
 
+#include <algorithm>
+#include <cmath>    /**< std::round */
+
 
 CAttackAssoc::CAttackAssoc(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
     :   AttackMode(std::move(job), host, seconds, sqlLoader)
@@ -27,8 +30,10 @@ bool CAttackAssoc::makeWorkunit()
     }
 
     DB_WORKUNIT wu;
-    char name1[Config::SQL_BUF_SIZE],name2[Config::SQL_BUF_SIZE],name3[Config::SQL_BUF_SIZE], path[Config::SQL_BUF_SIZE];
-    const char* infiles[3];
+    char name1[Config::SQL_BUF_SIZE], name2[Config::SQL_BUF_SIZE], name3[Config::SQL_BUF_SIZE],
+            name4[Config::SQL_BUF_SIZE], path[Config::SQL_BUF_SIZE];
+
+    const char *infiles[4];
     int retval;
 
     /** Make a unique name for the workunit and its input file */
@@ -42,7 +47,10 @@ bool CAttackAssoc::makeWorkunit()
       std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "",
                     Config::appName, m_job->getId());
 
-    /** Create the config file */
+    /** Same name of rules file - for sticky flag to work */
+    std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId());
+
+    /** Append mode to config */
     retval = config.download_path(name1, path);
     if (retval)
     {
@@ -108,7 +116,7 @@ bool CAttackAssoc::makeWorkunit()
     hashesFile << m_job->getHashes();
     hashesFile.close();
 
-    /** Create dictionary file. */
+    /** Create dict1 file */
     retval = config.download_path(name3, path);
     if (retval)
     {
@@ -257,6 +265,51 @@ bool CAttackAssoc::makeWorkunit()
 
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(), "Done.\n");
 
+    /** Create rules file */
+    retval = config.download_path(name4, path);
+    if (retval)
+    {
+        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                "Failed to receive BOINC filename - rules. Setting job to malformed.\n");
+        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+        return false;
+    }
+
+    std::ofstream rulesFile;    
+    if(!std::ifstream(path))
+    {
+        rulesFile.open(path);
+        if (!rulesFile.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to open rules BOINC input file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
+
+        if(m_job->getRules().empty())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Rules is not set in database! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
+
+        std::ifstream rules;
+        rules.open((Config::rulesDir + m_job->getRules()).c_str());
+        if (!rules.is_open())
+        {
+            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                    "Failed to open rules file! Setting job to malformed.\n");
+            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+            return false;
+        }
+
+        rulesFile << rules.rdbuf();
+        rulesFile.close();
+    }
+
+
     /** Fill in the workunit parameters */
     wu.clear();
     wu.appid = Config::app->id;
@@ -265,6 +318,7 @@ bool CAttackAssoc::makeWorkunit()
     infiles[0] = name1;
     infiles[1] = name2;
     infiles[2] = name3;
+    infiles[3] = name4;
 
     setDefaultWorkunitParams(&wu);
 
@@ -272,11 +326,11 @@ bool CAttackAssoc::makeWorkunit()
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
-            m_job->getDistributionMode() == 0 ? Config::inTemplatePathDict : Config::inTemplatePathDictAlt,
+            m_job->getDistributionMode() == 0 ? Config::inTemplatePathAssoc : Config::inTemplatePathAssoc,
             path,
             config.project_path(path),
             infiles,
-            3,
+            4,
             config
     );
 

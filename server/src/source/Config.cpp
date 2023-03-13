@@ -56,6 +56,7 @@ namespace Config {
     std::string inTemplateFilePrinceRules =    "prince_rules_in";
     std::string inTemplateFilePcfg =           "pcfg_in";
     std::string inTemplateFilePcfgRules =      "pcfg_rules_in";
+    std::string inTemplateFileAssoc =          "assoc_in";
     std::string outTemplateFile =              "app_out";
 
     /** Some default values */
@@ -73,6 +74,7 @@ namespace Config {
     char * inTemplatePathHybridMaskDict = nullptr;
     char * inTemplatePathRule = nullptr;
     char * inTemplatePathRuleAlt = nullptr;
+    char * inTemplatePathAssoc = nullptr;
     DB_APP * app = nullptr;
     int startTime = 0;
     int seqNo = 0;
