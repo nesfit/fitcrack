@@ -168,6 +168,8 @@ class dictionaryAdd(Resource):
 
             pwd_dist, ret_code = shell_exec([PWD_DIST_PATH, dict_path])
             if ret_code != 0:
+                if os.path.isfile(dict_path):
+                    os.remove(dict_path)
                 abort(500, 'Unable to compute password distribution for ' + dict_path)
 
             hc_keyspace = 0
