@@ -190,6 +190,7 @@ class generateRandomRule(Resource):
         max_function_num = request_data['maxFunctionsNum']
         random_rule_buf = ctypes.create_string_buffer(256)
         
+        # generate random rule using the C function
         ret_code = gen_random_rule(random_rule_buf, min_function_num, max_function_num)
         
         return { "randomRule": random_rule_buf.value.decode() }

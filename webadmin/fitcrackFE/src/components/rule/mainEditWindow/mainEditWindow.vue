@@ -2,7 +2,7 @@
     <v-col cols="12" md="8" class="bordered">
         <v-container>
             <v-row justify="center" class="border-down text-h5 py-2 rounded">
-                Create rule file / Edit rule file
+                Create rule file
             </v-row>
             <v-row>
                 <v-col cols="6">
