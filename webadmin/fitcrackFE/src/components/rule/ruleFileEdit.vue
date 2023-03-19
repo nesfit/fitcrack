@@ -33,11 +33,6 @@ export default {
   methods: {
     updateRules(updatedRulesList) {
       this.rulesList = updatedRulesList;
-      //console.log("updated ruleslist in grandparent:", this.rulesList)
-    },
-    updatePasswords(updatedPasswordsList) {
-      //console.log("updated passwords in parent")
-      this.passwordsList = updatedPasswordsList;
     },
     generatePreview(updatedPasswordsList) {
       this.passwordsList = updatedPasswordsList;

@@ -11,7 +11,10 @@
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col>
-                    <ruleFunctions></ruleFunctions>
+                    <v-btn color="grey lighten-1" @click="showFunctionsPopup = true">
+                        Show rule functions
+                    </v-btn>
+                    <ruleFunctions v-bind:showFunctionsPopup="showFunctionsPopup" v-on:update-functions-popup-state="updateFunctionsPopupState" :readonly="true"></ruleFunctions>
                 </v-col>
 
             </v-row>
@@ -82,12 +85,16 @@
 import ruleFileContent from '@/components/rule/mainEditWindow/ruleFileContent.vue';
 import ruleFunctions from '@/components/rule/mainEditWindow/popups/ruleFunctions.vue';
 export default {
-    props: ["rulesList"],
+    props:{
+        rulesList: Array
+    },
     data() {
         return {
             minFunctionsNum: 6,
             maxFunctionsNum: 8,
-            randomRuleString: ""
+            randomRuleString: "",
+            showFunctionsPopup: false,
+            rulesListData: this.rulesList
         };
     },
     methods: {
@@ -96,9 +103,10 @@ export default {
             const reader = new FileReader();
             reader.onload = (event) => {
                 this.rulesContent = event.target.result;
-                this.rulesList = this.rulesList.concat(event.target.result.split("\n"));
-                this.rulesList.pop();
-                this.$emit("rules-updated", this.rulesList)
+                this. rulesListData = this.rulesList.concat(event.target.result.split("\n"));
+                //this.rulesList = this.rulesList.concat(event.target.result.split("\n"));
+                this.rulesListData.pop();
+                this.$emit("rules-updated", this.rulesListData)
             };
             reader.readAsText(file);
         },
@@ -109,22 +117,28 @@ export default {
             };
             this.axios.post(this.$serverAddr + "/rule/randomRule", data).then((response) => {
                 this.randomRuleString = response.data.randomRule;
-                this.rulesList.push(this.randomRuleString);
+                this.rulesListData = this.rulesList; //copy the props
+                this.rulesListData.push(this.randomRuleString);
+                this.$emit("rules-updated", this.rulesListData)
             }).catch((error) => {
                 this.randomRuleString = error.message;
             });
         },
         addEmptyRule() {
-            this.rulesList.push("")
+            this.rulesListData = this.rulesList;
+            this.rulesListData.push("")
+            this.$emit("rules-updated", this.rulesListData)
         },
         updateRules(updatedRulesList) {
             this.rulesList = updatedRulesList;
-            console.log("updatedParent")
             this.$emit("rules-updated", this.rulesList)
         },
         resetRules() {
-            this.rulesList = []
             this.updateRules(this.rulesList)
+            this.$emit("rules-updated", [""])
+        },
+        updateFunctionsPopupState(updatedState){
+            this.showFunctionsPopup = updatedState;
         }
     },
     computed: {
@@ -136,21 +150,9 @@ export default {
         ruleFileContent,
         ruleFunctions
     },
-
-
-
 };
 
 </script>
-
-
-
-
-
-
-
-
-
 
 
 

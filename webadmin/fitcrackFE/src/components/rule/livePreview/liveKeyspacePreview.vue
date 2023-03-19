@@ -51,10 +51,14 @@
 <script>
 
 export default {
-    props: ["passwordsList", "previewPasswordsString"],
+    props: {
+        passwordsList: Array,
+        previewPasswordsString: String
+    },
     data() {
         return {
             dictionaryContent: null,
+            passwordsListData: this.passwordsList
         }
     },
     methods: {
@@ -63,13 +67,13 @@ export default {
             const reader = new FileReader();
             reader.onload = (event) => {
                 this.dictionaryContent = event.target.result;
-                this.passwordsList = event.target.result.split("\n");
-                this.passwordsList.pop();
+                this.passwordsListData = event.target.result.split("\n");
+                this.passwordsListData.pop();
             };
             reader.readAsText(file);
         },
         generatePreview() {
-            this.$emit("generate-preview", this.passwordsList)
+            this.$emit("generate-preview", this.passwordsListData)
         }
     }
 };

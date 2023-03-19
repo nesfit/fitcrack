@@ -9,8 +9,7 @@
 
             </v-card-title>
             <v-divider></v-divider>
-            <v-data-table class="hovnomoje" :headers="headers" :items="ruleObjects" hide-default-header
-                :search="search"
+            <v-data-table class="hovnomoje" :headers="headers" :items="ruleObjects" hide-default-header :search="search"
                 :footer-props="{ itemsPerPageOptions: [5, 7, 15, 20], itemsPerPageText: 'Rules per page' }">
                 <template v-slot:body="{ items }">
                     <tbody class="telicko">
@@ -19,19 +18,6 @@
                                 {{ item.index + 1 }}
                             </td>
                             <td class="my-0 ruleInputLine">
-                                <v-sheet :elevation="10" class="quickFunctionsMenuPopup" v-show="item.popupVisible"
-                                    :id="`ruleLinePopup-${item.index}`">
-                                    <v-chip>
-                                        <v-btn>
-                                            ahokj
-                                        </v-btn>
-                                    </v-chip>
-                                    <v-chip>
-                                        <v-btn>
-                                            ahokj
-                                        </v-btn>
-                                    </v-chip>
-                                </v-sheet>
                                 <v-text-field :id="`ruleLineField-${item.index}`" @focus="showPopup(item.index)"
                                     @blur="hidePopup(item.index)" placeholder="Enter rule" hide-details outlined dense
                                     v-model="item.rule" @input="updateRules(item.rule, item.index)">
@@ -44,13 +30,15 @@
                                     </v-icon>
                                 </v-btn>
                             </td>
+                            
+                            <div v-show="item.popupVisible">
+                                <quickFunctionsMenu></quickFunctionsMenu>
+                            </div>
                         </tr>
                     </tbody>
 
                 </template>
             </v-data-table>
-
-
         </v-card>
     </v-container>
 </template>
@@ -59,7 +47,9 @@
 import quickFunctionsMenu from '@/components/rule/mainEditWindow/popups/quickFunctionsMenu.vue';
 
 export default {
-    props: ["rulesList"],
+    props:{
+        rulesList: Array
+    },
     data() {
         return {
             search: "",
@@ -68,16 +58,19 @@ export default {
                 { text: "ID", value: "id" },
             ],
             quickFunctionsMenuVisible: false,
+            rulesListData : this.rulesList
         }
     },
     methods: {
         updateRules(rule, index) {
-            this.rulesList[index] = rule;
-            this.$emit("rules-updated", this.rulesList);
+            this.rulesListData = this.rulesList
+            this.rulesListData[index] = rule;
+            this.$emit("rules-updated", this.rulesListData);
         },
         deleteRule(index) {
-            this.rulesList.splice(index, 1);
-            this.$emit("rules-updated", this.rulesList)
+            this.rulesListData = this.rulesList
+            this.rulesListData.splice(index, 1);
+            this.$emit("rules-updated", this.rulesListData)
         },
         showPopup(index) {
             console.log("clicked")
@@ -114,12 +107,7 @@ export default {
     position: relative;
 }
 
-.quickFunctionsMenuPopup {
-    position: absolute;
-    bottom: 100%;
-    max-width: 100%;
-    border-radius: 1.3em;
-    padding: 0;
+.telicko {
+    margin: 10px !important;
 }
-
 </style>
