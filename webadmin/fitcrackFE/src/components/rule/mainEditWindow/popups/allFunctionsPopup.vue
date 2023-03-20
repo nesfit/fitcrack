@@ -4,10 +4,10 @@
 -->
 
 <template>
-    <v-dialog v-model="showPopup" max-width="1200">
+    <v-dialog v-model="allFunctionsPopup.visible" max-width="1200">
         <v-card>
             <v-card-title justify-center class="headline orange lighten-3">
-                <div v-if="readonly">
+                <div v-if="allFunctionsPopup.onlyShow">
                     Rule functions
                 </div>
                 <div v-else>
@@ -37,8 +37,7 @@
 import functionsJson from "@/assets/ruleFunctions.json"
 export default {
     props: {
-        readonly: Boolean,
-        showFunctionsPopup: Boolean
+        allFunctionsPopup: Object
     },
     data() {
         return {
@@ -57,12 +56,7 @@ export default {
     },
     methods:{
         hideFunctionsPopup(){
-            this.$emit("update-functions-popup-state", false)
-        }
-    },
-    computed:{
-        showPopup(){
-            return this.showFunctionsPopup;
+            this.$emit("hide-all-functions-popup", false)
         }
     }
 }

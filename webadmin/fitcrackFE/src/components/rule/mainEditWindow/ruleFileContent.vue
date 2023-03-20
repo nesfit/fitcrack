@@ -22,6 +22,9 @@
                                     @blur="hidePopup(item.index)" placeholder="Enter rule" hide-details outlined dense
                                     v-model="item.rule" @input="updateRules(item.rule, item.index)">
                                 </v-text-field>
+                                <div class="quickFunctionsMenuPopup" v-show="item.popupVisible">
+                                    <quickFunctionsMenu v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
+                                </div>
                             </td>
                             <td class="other">
                                 <v-btn icon class="px-0" color="black" @click="deleteRule(item.index)">
@@ -30,10 +33,6 @@
                                     </v-icon>
                                 </v-btn>
                             </td>
-                            
-                            <div v-show="item.popupVisible">
-                                <quickFunctionsMenu></quickFunctionsMenu>
-                            </div>
                         </tr>
                     </tbody>
 
@@ -47,7 +46,7 @@
 import quickFunctionsMenu from '@/components/rule/mainEditWindow/popups/quickFunctionsMenu.vue';
 
 export default {
-    props:{
+    props: {
         rulesList: Array
     },
     data() {
@@ -58,12 +57,12 @@ export default {
                 { text: "ID", value: "id" },
             ],
             quickFunctionsMenuVisible: false,
-            rulesListData : this.rulesList
+            rulesListData: this.rulesList
         }
     },
     methods: {
         updateRules(rule, index) {
-            this.rulesListData = this.rulesList
+            this.rulesListData = this.rulesList;
             this.rulesListData[index] = rule;
             this.$emit("rules-updated", this.rulesListData);
         },
@@ -79,6 +78,12 @@ export default {
         hidePopup(index) {
             this.ruleObjects[index].popupVisible = false;
         },
+        showInsertPopup(insertData){
+            this.$emit("show-insert-popup", insertData)
+        },
+        showAllFunctionsPopup(popupData){
+            this.$emit("show-all-functions-popup", popupData)
+        }
 
     },
     computed: {
@@ -107,7 +112,10 @@ export default {
     position: relative;
 }
 
-.telicko {
-    margin: 10px !important;
+.quickFunctionsMenuPopup {
+    position: absolute;
+    bottom: 100%;
+    max-width: 120%;
+    padding: 0;
 }
 </style>

@@ -5,8 +5,14 @@
 
 <template>
   <v-container>
+    <!--Show popups when clicked-->
+    <functionInsertPopup v-bind:functionsInsertPopup="functionsInsertPopup" v-on:hide-insert-popup="hideInsertPopup">
+    </functionInsertPopup>
+    <allFunctionsPopup v-bind:allFunctionsPopup="allFunctionsPopup"
+      v-on:hide-all-functions-popup="hideAllFunctionsPopup"></allFunctionsPopup>
     <v-row justify="center">
-      <mainEditWindow v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"></mainEditWindow>
+      <mainEditWindow v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"
+        v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
       <liveKeyspacePreview v-bind:passwordsList="passwordsList" v-bind:previewPasswordsString="previewPasswordsString"
         v-on:generate-preview="generatePreview">
       </liveKeyspacePreview>
@@ -18,6 +24,9 @@
 <script>
 import mainEditWindow from "@/components/rule/mainEditWindow/mainEditWindow.vue";
 import liveKeyspacePreview from "@/components/rule/livePreview/liveKeyspacePreview.vue"
+import functionInsertPopup from "@/components/rule/mainEditWindow/popups/functionInsertPopup.vue"
+import allFunctionsPopup from '@/components/rule/mainEditWindow/popups/allFunctionsPopup.vue';
+
 
 export default {
 
@@ -28,6 +37,14 @@ export default {
       applicatorResult: "",
       previewPasswords: [],
       previewPasswordsString: "",
+      functionsInsertPopup: {
+        visible: false,
+        functionIndex: 0
+      },
+      allFunctionsPopup: {
+        visible: false,
+        onlyShow: true
+      }
     };
   },
   methods: {
@@ -56,8 +73,20 @@ export default {
       });
       this.previewPasswordsString = this.previewPasswords.join("\n");
     },
+    showInsertPopup(insertData) {
+      this.functionsInsertPopup = insertData;
+    },
+    hideInsertPopup(visibility) {
+      this.functionsInsertPopup.visible = visibility;
+    },
+    showAllFunctionsPopup(popupData){
+      this.allFunctionsPopup = popupData;
+    },
+    hideAllFunctionsPopup(visibility){
+      this.allFunctionsPopup.visible = visibility;
+    }
   },
-  components: { mainEditWindow, liveKeyspacePreview }
+  components: { mainEditWindow, liveKeyspacePreview, functionInsertPopup, allFunctionsPopup }
 };
 </script>
 

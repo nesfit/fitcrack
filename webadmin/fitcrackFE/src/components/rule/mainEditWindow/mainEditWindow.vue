@@ -11,12 +11,10 @@
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col>
-                    <v-btn color="grey lighten-1" @click="showFunctionsPopup = true">
+                    <v-btn color="grey lighten-1" @click="showAllFunctionsPopup({visible: true, onlyShow: true})">
                         Show rule functions
                     </v-btn>
-                    <ruleFunctions v-bind:showFunctionsPopup="showFunctionsPopup" v-on:update-functions-popup-state="updateFunctionsPopupState" :readonly="true"></ruleFunctions>
                 </v-col>
-
             </v-row>
 
             <v-row justify-start align-start>
@@ -58,7 +56,8 @@
                 </v-col>
             </v-row>
             <v-row>
-                <ruleFileContent v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"></ruleFileContent>
+                <ruleFileContent v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"
+                    v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></ruleFileContent>
             </v-row>
             <v-row>
                 <v-col align="right">
@@ -83,9 +82,8 @@
 
 <script>
 import ruleFileContent from '@/components/rule/mainEditWindow/ruleFileContent.vue';
-import ruleFunctions from '@/components/rule/mainEditWindow/popups/ruleFunctions.vue';
 export default {
-    props:{
+    props: {
         rulesList: Array
     },
     data() {
@@ -93,7 +91,6 @@ export default {
             minFunctionsNum: 6,
             maxFunctionsNum: 8,
             randomRuleString: "",
-            showFunctionsPopup: false,
             rulesListData: this.rulesList
         };
     },
@@ -103,7 +100,7 @@ export default {
             const reader = new FileReader();
             reader.onload = (event) => {
                 this.rulesContent = event.target.result;
-                this. rulesListData = this.rulesList.concat(event.target.result.split("\n"));
+                this.rulesListData = this.rulesList.concat(event.target.result.split("\n"));
                 //this.rulesList = this.rulesList.concat(event.target.result.split("\n"));
                 this.rulesListData.pop();
                 this.$emit("rules-updated", this.rulesListData)
@@ -137,8 +134,14 @@ export default {
             this.updateRules(this.rulesList)
             this.$emit("rules-updated", [""])
         },
-        updateFunctionsPopupState(updatedState){
+        updateFunctionsPopupState(updatedState) {
             this.showFunctionsPopup = updatedState;
+        },
+        showInsertPopup(insertData) {
+            this.$emit("show-insert-popup", insertData)
+        },
+        showAllFunctionsPopup(popupData){
+            this.$emit("show-all-functions-popup", popupData)
         }
     },
     computed: {
@@ -148,7 +151,6 @@ export default {
     },
     components: {
         ruleFileContent,
-        ruleFunctions
     },
 };
 
