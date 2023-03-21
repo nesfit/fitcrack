@@ -24,7 +24,7 @@
             <v-text-field class="ma-2" outlined dense v-model="search" append-icon="mdi-magnify" label="Search" single-line
                 hide-details></v-text-field>
             <v-divider></v-divider>
-            <v-data-table :headers="headers" :items="ruleFunctions.functions" :search="search"
+            <v-data-table :headers="headers" :items="ruleFunctions" @click:row="showInsertPopup" :search="search"
                 :footer-props="{ itemsPerPageOptions: [5, 10, 15], itemsPerPageText: 'Functions per page' }">
             </v-data-table>
         </v-card>
@@ -54,9 +54,20 @@ export default {
             ruleFunctions: functionsJson
         }
     },
-    methods:{
-        hideFunctionsPopup(){
+    methods: {
+        hideFunctionsPopup() {
             this.$emit("hide-all-functions-popup", false)
+        },
+        showInsertPopup(row) {
+            if (!this.allFunctionsPopup.onlyShow) {
+                const functionIndex = this.ruleFunctions.findIndex((obj) => obj === row);
+                const data = {
+                    visible: true,
+                    functionIndex: functionIndex
+                }
+                this.$emit("hide-all-functions-popup", false)
+                this.$emit("show-insert-popup", data)
+            }
         }
     }
 }

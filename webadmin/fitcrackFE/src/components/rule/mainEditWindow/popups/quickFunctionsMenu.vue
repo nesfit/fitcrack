@@ -9,10 +9,10 @@
         <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(3)">
             Capitalize
         </v-chip>
-        <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(15)">
+        <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(13)">
             Append
         </v-chip>
-        <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(16)">
+        <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(19)">
             Prepend
         </v-chip>
         <v-chip label class="ma-1" color="primary" @mousedown="showAllFunctionsPopup(false)">
@@ -25,19 +25,20 @@
 
 <script>
 export default {
+    props:{
+        ruleIndex: Number
+    },
     data() {
         return {
-            showFunctionsPopup: false
+            
         }
     },
     methods: {
-        updateFunctionsPopupState(updatedState) {
-            this.showFunctionsPopup = updatedState;
-        },
         showInsertPopup(functionIndex){
             const data = {
                 visible: true,
-                functionIndex: functionIndex
+                functionIndex: functionIndex,
+                ruleIndex: this.ruleIndex
             }
             this.$emit("show-insert-popup", data)
         },

@@ -23,7 +23,7 @@
                                     v-model="item.rule" @input="updateRules(item.rule, item.index)">
                                 </v-text-field>
                                 <div class="quickFunctionsMenuPopup" v-show="item.popupVisible">
-                                    <quickFunctionsMenu v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
+                                    <quickFunctionsMenu v-bind:ruleIndex="item.index" v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
                                 </div>
                             </td>
                             <td class="other">
@@ -72,7 +72,6 @@ export default {
             this.$emit("rules-updated", this.rulesListData)
         },
         showPopup(index) {
-            console.log("clicked")
             this.ruleObjects[index].popupVisible = true;
         },
         hidePopup(index) {
