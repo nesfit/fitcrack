@@ -12,7 +12,7 @@
     <allFunctionsPopup v-bind:allFunctionsPopup="allFunctionsPopup" v-on:hide-all-functions-popup="hideAllFunctionsPopup"
       v-on:show-insert-popup="showInsertPopup"></allFunctionsPopup>
     <v-row justify="center">
-      <mainEditWindow v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"
+      <mainEditWindow v-bind:rulesList="rulesList" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo" v-on:rules-updated="updateRules"
         v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
       <liveKeyspacePreview v-bind:passwordsList="passwordsList" v-bind:previewPasswordsString="previewPasswordsString"
         v-on:generate-preview="generatePreview">
@@ -31,7 +31,6 @@ import allFunctionsPopup from '@/components/rule/mainEditWindow/popups/allFuncti
 
 
 export default {
-
   data() {
     return {
       rulesList: [""],
@@ -47,7 +46,9 @@ export default {
       allFunctionsPopup: {
         visible: false,
         onlyShow: true
-      }
+      },
+      editingFile: false,
+      ruleFileInfo: {}
     };
   },
   methods: {
@@ -58,7 +59,6 @@ export default {
       console.log(this.functionsInsertPopup)
       //update the rule, where rule function was inserted
       Vue.set(this.rulesList, this.functionsInsertPopup.ruleIndex, this.rulesList[this.functionsInsertPopup.ruleIndex].trimEnd().concat(changedRule));
-
     },
     generatePreview(updatedPasswordsList) {
       this.passwordsList = updatedPasswordsList;
@@ -93,9 +93,24 @@ export default {
     },
     hideAllFunctionsPopup(visibility) {
       this.allFunctionsPopup.visible = visibility;
+    },
+    loadRuleFile() {
+      this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id + '/download').then((response) => {
+        this.rulesList = response.data.split("\n")
+      });
+      this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
+        console.log(response.data)
+        this.ruleFileInfo = response.data;
+      });
     }
   },
-  components: { mainEditWindow, liveKeyspacePreview, functionInsertPopup, allFunctionsPopup }
+  created() {
+    if (this.$route.params.id) { //when there is id parameter in route url
+      this.editingFile = true;
+      this.loadRuleFile();
+    }
+  },
+  components: { mainEditWindow, liveKeyspacePreview, functionInsertPopup, allFunctionsPopup },
 };
 </script>
 

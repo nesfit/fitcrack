@@ -5,25 +5,12 @@
 
 <template>
   <v-container class="max700">
-    <fc-tile
-      title="Rules"
-      class="ma-2"
-      :icon="$route.meta.icon"
-    >
-      <v-alert
-        tile
-        text
-        type="warning"
-        class="mb-0"
-      >
+    <fc-tile title="Rules" class="ma-2" :icon="$route.meta.icon">
+      <v-alert tile text type="warning" class="mb-0">
         Rule files must have a .txt or .rule extension.
       </v-alert>
-      <v-data-table
-        :headers="headers"
-        :items="rules.items"
-        :loading="loading"
-        :footer-props="{itemsPerPageOptions: [10,25,50], itemsPerPageText: 'Rules per page'}"
-      >
+      <v-data-table :headers="headers" :items="rules.items" :loading="loading"
+        :footer-props="{ itemsPerPageOptions: [10, 25, 50], itemsPerPageText: 'Rules per page' }">
         <template v-slot:item.name="{ item }">
           <router-link :to="`rules/${item.id}`">
             {{ item.name }}
@@ -38,12 +25,17 @@
         <template v-slot:item.actions="{ item }">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <a
-                :href="$serverAddr + '/rule/' + item.id + '/download'"
-                target="_blank"
-                download
-                v-on="on"
-              >
+              <router-link :to="`/rules/edit/` + item.id">
+                <v-btn icon v-on="on">
+                  <v-icon color="primary">mdi-file-edit-outline</v-icon>
+                </v-btn>
+              </router-link>
+            </template>
+            <span>Edit file</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <a :href="$serverAddr + '/rule/' + item.id + '/download'" target="_blank" download v-on="on">
                 <v-btn icon>
                   <v-icon>mdi-file-download-outline</v-icon>
                 </v-btn>
@@ -53,11 +45,7 @@
           </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                @click="deleteRule(item)"
-                v-on="on"
-              >
+              <v-btn icon @click="deleteRule(item)" v-on="on">
                 <v-icon color="error">
                   mdi-delete-outline
                 </v-icon>
@@ -68,93 +56,115 @@
         </template>
       </v-data-table>
       <v-divider />
-      <file-uploader
-        :url="this.$serverAddr + '/rule'"
-        @uploadComplete="loadRules"
-      />
+      <v-row class="mt-0">
+        <v-col class="d-flex align-center justify-center">
+          <router-link :to="`/rules/edit/new`">
+            <v-btn color="primary" class="black--text">
+              Create new file
+            </v-btn>
+          </router-link>
+
+        </v-col>
+        <v-col>
+          <v-card>
+            <v-card-title>
+              Upload existing rule file
+            </v-card-title>
+            <v-divider></v-divider>
+            <file-uploader :url="this.$serverAddr + '/rule'" @uploadComplete="loadRules" />
+          </v-card>
+
+
+        </v-col>
+
+      </v-row>
+
     </fc-tile>
   </v-container>
 </template>
 
 <script>
-  import fmt from '@/assets/scripts/numberFormat'
-  import tile from '@/components/tile/fc_tile.vue'
-  import FileUploader from "@/components/fileUploader/fileUploader.vue";
-  export default {
-    name: "RulesView",
-    components: {
-      FileUploader,
-      'fc-tile': tile,
+import fmt from '@/assets/scripts/numberFormat'
+import tile from '@/components/tile/fc_tile.vue'
+import FileUploader from "@/components/fileUploader/fileUploader.vue";
+export default {
+  name: "RulesView",
+  components: {
+    FileUploader,
+    'fc-tile': tile,
+  },
+  data: function () {
+    return {
+      loading: false,
+      rules: [],
+      headers: [
+        {
+          text: 'Name',
+          align: 'start',
+          value: 'name'
+        },
+        { text: 'Count', value: 'count', align: 'end' },
+        { text: 'Added', value: 'time', align: 'end' },
+        { text: 'Actions', value: 'actions', align: 'end', sortable: false }
+      ]
+    }
+  },
+  mounted: function () {
+    this.loadRules()
+  },
+  methods: {
+    fmt,
+    loadRules: function () {
+      this.loading = true;
+      this.axios.get(this.$serverAddr + '/rule', {}).then((response) => {
+        this.rules = response.data;
+        this.loading = false
+      })
     },
-    data: function () {
-      return {
-        loading: false,
-        rules: [],
-        headers: [
-          {
-            text: 'Name',
-            align: 'start',
-            value: 'name'
-          },
-          {text: 'Count', value: 'count', align: 'end'},
-          {text: 'Added', value: 'time', align: 'end'},
-          {text: 'Actions', value: 'actions', align: 'end', sortable: false}
-        ]
-      }
-    },
-    mounted: function () {
-      this.loadRules()
-    },
-    methods: {
-      fmt,
-      loadRules: function () {
+    deleteRule: function (item) {
+      this.$root.$confirm('Delete', `This will remove ${item.name} from your rules. Are you sure?`).then((confirm) => {
         this.loading = true;
-        this.axios.get(this.$serverAddr + '/rule', {}).then((response) => {
-          this.rules = response.data;
-          this.loading = false
+        this.axios.delete(this.$serverAddr + '/rule/' + item.id).then((response) => {
+          this.loadRules()
         })
-      },
-      deleteRule: function (item) {
-        this.$root.$confirm('Delete', `This will remove ${item.name} from your rules. Are you sure?`).then((confirm) => {
-          this.loading = true;
-          this.axios.delete(this.$serverAddr + '/rule/' + item.id).then((response) => {
-            this.loadRules()
-          })
-        })
-      }
+      })
     }
   }
+}
 </script>
 
 <style scoped>
-  .noEvent {
-    pointer-events: none;
-    display: inline-block;
-  }
+.noEvent {
+  pointer-events: none;
+  display: inline-block;
+}
 
-  .dz-message {
-    cursor: pointer;
-    text-align: center;
-  }
+.dz-message {
+  cursor: pointer;
+  text-align: center;
+}
 
-  .max700 {
-    max-width: 700px;
-  }
+.max700 {
+  max-width: 700px;
+}
 
+.v-card__title {
+  background-color: #FFF3EC;
+}
 </style>
 
 
 <style>
-  .selectedDict {
-    background: rgba(37, 157, 173, 0.85) !important;
-    color: white;
-  }
+.selectedDict {
+  background: rgba(37, 157, 173, 0.85) !important;
+  color: white;
+}
 
-  .selectedDict a {
-    color: white;
-  }
+.selectedDict a {
+  color: white;
+}
 
-  .clickable {
-    cursor: pointer;
-  }
+.clickable {
+  cursor: pointer;
+}
 </style>

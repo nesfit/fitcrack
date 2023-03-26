@@ -2,16 +2,22 @@
     <v-col cols="12" md="8" class="bordered">
         <v-container>
             <v-row justify="center" class="border-down text-h5 py-2 rounded">
-                Create rule file
+                <div v-if="!editingFile">
+                    Create rule file
+                </div>
+                <div v-else>
+                    Edit rule file
+                </div>
+
             </v-row>
             <v-row>
                 <v-col cols="6">
-                    <v-text-field label="Rule file name" required outlined autofocus
+                    <v-text-field v-model="ruleFileInfo.name" label="Rule file name" required outlined autofocus
                         hint="Give this rule file a name (.txt or .rule extension)" persistent-hint></v-text-field>
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col>
-                    <v-btn color="grey lighten-1" @click="showAllFunctionsPopup({visible: true, onlyShow: true})">
+                    <v-btn color="grey lighten-1" @click="showAllFunctionsPopup({ visible: true, onlyShow: true })">
                         Show rule functions
                     </v-btn>
                 </v-col>
@@ -57,7 +63,8 @@
             </v-row>
             <v-row>
                 <ruleFileContent v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"
-                    v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></ruleFileContent>
+                    v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup">
+                </ruleFileContent>
             </v-row>
             <v-row>
                 <v-col align="right">
@@ -68,7 +75,7 @@
 
             <v-row>
                 <v-col class="text-right">
-                    <v-btn color="grey lighten-1" depressed>
+                    <v-btn color="grey lighten-1" depressed @click="saveFile()">
                         <v-icon>
                             mdi-content-save
                         </v-icon>
@@ -84,14 +91,17 @@
 import ruleFileContent from '@/components/rule/mainEditWindow/ruleFileContent.vue';
 export default {
     props: {
-        rulesList: Array
+        rulesList: Array,
+        editingFile: Boolean,
+        ruleFileInfo: Object
     },
     data() {
         return {
             minFunctionsNum: 6,
             maxFunctionsNum: 8,
             randomRuleString: "",
-            rulesListData: this.rulesList
+            rulesListData: this.rulesList,
+            ruleFile: null
         };
     },
     methods: {
@@ -140,8 +150,40 @@ export default {
         showInsertPopup(insertData) {
             this.$emit("show-insert-popup", insertData)
         },
-        showAllFunctionsPopup(popupData){
+        showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
+        },
+        /**
+         * Function which converts rules into a file
+         */
+        convertRulesToFile() {
+            const rulesString = this.rulesList.join('\n');
+            const blob = new Blob([rulesString], { type: 'text/plain' });
+            const file = new File([blob], this.ruleFileInfo.name, { type: 'text/plain' });
+            this.ruleFile = file;
+        },
+        saveFile() {
+            if (!this.editingFile) {
+                this.convertRulesToFile();
+                const formData = new FormData();
+                formData.append('file', this.ruleFile);
+                var config = {
+                    withCredentials: true,
+                    headers: {
+                        'Content-type': 'multipart/form-data'
+                    },
+                }
+                //upload the file to server
+                this.axios.post(this.$serverAddr + "/rule", formData, config).then(response => {
+                    this.file = null
+                    this.resetRules();
+                }).catch(error => {
+                    console.log(error)
+                });
+            }
+            else {
+                null
+            }
         }
     },
     computed: {
