@@ -8,10 +8,12 @@ import logging
 import os
 import re
 from itertools import islice
+from pathlib import Path
 
 from flask import request, redirect, send_file
 from flask_restx import Resource, abort
 from sqlalchemy import exc
+from werkzeug.utils import secure_filename
 
 import ctypes
 import json
@@ -20,7 +22,7 @@ from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
 from src.api.fitcrack.endpoints.rule.argumentsParser import updateRule_parser, rule_parser
 from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_model, ruleData_model, previewPasswords_model, randomRule_model
-from src.api.fitcrack.functions import fileUpload
+from src.api.fitcrack.functions import fileUpload, allowed_file
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcRule
@@ -42,6 +44,16 @@ gen_random_rule.restype = ctypes.c_int
 gen_random_rule.argtypes = [ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
 
 
+def countRules(filePath):
+    '''
+    Function which counts rules
+    '''
+    ruleCount = 0
+    with open(os.path.join(RULE_DIR, filePath), encoding='latin-1') as file:
+        for line in file:
+            if re.match('^\s*(\#.*)?$', line) == None:
+                rule_count += 1
+    return ruleCount
 
 
 @ns.route('')
@@ -64,12 +76,8 @@ class ruleCollection(Resource):
 
         uploadedFile = fileUpload(file, RULE_DIR, ALLOWED_EXTENSIONS, suffix='.rule')
         if uploadedFile:
-            rule_count = 0
-            with open(os.path.join(RULE_DIR, uploadedFile['path']), encoding='latin-1') as file:
-                for line in file:
-                    if re.match('^\s*(\#.*)?$', line) == None:
-                        rule_count += 1
-            rule = FcRule(name=uploadedFile['filename'], path=uploadedFile['path'], count=rule_count)
+            ruleCount = countRules(uploadedFile['path']) #count the number of rules
+            rule = FcRule(name=uploadedFile['filename'], path=uploadedFile['path'], count=ruleCount)
             try:
                 db.session.add(rule)
                 db.session.commit()
@@ -120,7 +128,67 @@ class rule(Resource):
             'status': True,
             'message': 'Rule file sucesfully deleted.'
         }, 200
-
+        
+    def put(self, id):
+        """
+        Updates the rule file
+        """
+        newFile = request.files['file']
+        ruleFileRecord = FcRule.query.filter(FcRule.id == id).first()
+        ruleFilePath = Path(RULE_DIR) / ruleFileRecord.path
+        nameChanged = False
+        
+        if(newFile.filename != ruleFileRecord.name): #if the name of file changed
+            if allowed_file(newFile.filename, ALLOWED_EXTENSIONS):
+                fileName = secure_filename(newFile.filename)
+                filePart = Path(fileName).stem
+                
+                #create a new path, rule file has always .rule suffix on the server
+                fileName = filePart + ".rule"
+                newRuleFilePath = Path(RULE_DIR) / fileName
+                
+                if Path(ruleFilePath).exists():
+                    abort(500, "File with name " + fileName + " already exists.\nPath: " + ruleFilePath)
+                    
+            else:
+                error = "Can't update file " + ruleFileRecord.name + ". The file extension is not allowed."
+                abort(500, error)
+            os.rename(ruleFilePath, newRuleFilePath)
+            nameChanged = True
+        # change in database
+        ruleCount = countRules(ruleFileRecord.path)
+        ruleFileRecord.count = ruleCount
+        ruleFileRecord.name = newFile.filename
+        ruleFileRecord.path = fileName
+        try:
+            db.session.commit()
+        except exc.IntegrityError as e: #TODO should name be unique? add to models.py
+            db.session().rollback()
+            abort(500, 'Rule with name ' + newFile.filename + ' already exists.')
+            
+            
+        
+        # update the content of rule file
+        with open(ruleFilePath, "wb") as origFile:
+            origFile.write(newFile.read())
+        
+        # return success    
+        if(nameChanged):
+            returnMessage = "Renamed rule file to " + newFile.filename + " and successfully updated."
+        else:
+            returnMessage = "Rule file " + ruleFileRecord.name + " successfully updated."
+        return {
+            'status': True,
+            'message': returnMessage
+        }, 200
+        
+        
+        
+        
+        
+        
+        
+        
 @ns.route('/<id>/data')
 class ruleData(Resource):
     @api.expect(rule_parser)

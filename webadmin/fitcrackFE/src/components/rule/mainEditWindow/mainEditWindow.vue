@@ -79,7 +79,14 @@
                         <v-icon>
                             mdi-content-save
                         </v-icon>
-                        Save file</v-btn>
+                        <div v-if="!editingFile">
+                            Save file
+                        </div>
+                        <div v-else>
+                            Update file
+                        </div>
+
+                    </v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -163,27 +170,33 @@ export default {
             this.ruleFile = file;
         },
         saveFile() {
+            this.convertRulesToFile();
+            const formData = new FormData();
+            formData.append('file', this.ruleFile);
+            var config = {
+                withCredentials: true,
+                headers: {
+                    'Content-type': 'multipart/form-data'
+                },
+            }
             if (!this.editingFile) {
-                this.convertRulesToFile();
-                const formData = new FormData();
-                formData.append('file', this.ruleFile);
-                var config = {
-                    withCredentials: true,
-                    headers: {
-                        'Content-type': 'multipart/form-data'
-                    },
-                }
                 //upload the file to server
-                this.axios.post(this.$serverAddr + "/rule", formData, config).then(response => {
+                this.axios.post(this.$serverAddr + "/rule", formData, config).then((response) => {
                     this.file = null
                     this.resetRules();
+                    this.$router.push({ name: 'rules' });
                 }).catch(error => {
                     console.log(error)
                 });
             }
             else {
-                null
+                this.axios.put(this.$serverAddr + "/rule/" + this.$route.params.id, formData, config).then((response) => {
+                    this.$router.push({ name: 'rules' });
+                }).catch(error => {
+                    console.log(error)
+                });
             }
+
         }
     },
     computed: {
