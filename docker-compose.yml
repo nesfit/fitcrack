@@ -15,6 +15,8 @@ services:
           - ${BACKEND_PORT}:${BACKEND_PORT}         # Mapping of WebAdmin backend
           - ${FRONTEND_PORT}:${FRONTEND_PORT}       # Mapping of WebAdmin frontend
           #- ${BOINC_PORT}:${BOINC_PORT} # BOINC port (uncomment if different from webadmin)
+      stdin_open: true
+      tty: true
       environment:
         - USER=root                      # root should be used for installation
 
@@ -73,7 +75,7 @@ services:
         - "boincadm:/home/boincadm"                        # BOINC server user home directory
         - "apache:/etc/apache2"                            # Apache config directory
         - "apache-conf:/etc/init.d"                        # Directory with service init scripts
-        - "webadmin-be:/var/www/html/fitcrackAPI"          # Fitcrack backend installation
+        - "./webadmin/fitcrackAPI:/var/www/html/fitcrackAPI"          # Fitcrack backend installation
         - "webadmin-fe:/var/www/html/fitcrackFE"           # Fitcrack frontend installation
         - "./fitcrack-data/logs:/var/log/fitcrack"         # Log directory (host-mapped!)
         - "./fitcrack-data/certificates:/srv/certificates" # Certificate directory (host-mapped!)
