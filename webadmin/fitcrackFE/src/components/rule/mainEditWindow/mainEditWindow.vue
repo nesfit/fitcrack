@@ -191,6 +191,8 @@ export default {
             }
             else {
                 this.axios.put(this.$serverAddr + "/rule/" + this.$route.params.id, formData, config).then((response) => {
+                    this.file = null
+                    this.resetRules();
                     this.$router.push({ name: 'rules' });
                 }).catch(error => {
                     console.log(error)

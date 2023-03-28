@@ -33,7 +33,11 @@
                     </v-col>
                 </v-row>
                 <v-divider class="my-2 grey darken-1"></v-divider>
-
+                <v-row>
+                    <v-snackbar v-model="textFieldError" color="error">
+                        Invalid operands
+                    </v-snackbar>
+                </v-row>
                 <v-row v-if="ruleFunction.operands.length">
                     <v-col cols="9">
                         <p class="font-weight-medium my-0">
@@ -48,8 +52,9 @@
                                     </p>
                                 </v-col>
                                 <v-col>
-                                    <v-text-field v-model="functionOperands[index]" dense required outlined autofocus
-                                        hide-details class="py-0"></v-text-field>
+                                    <v-text-field v-model="functionOperands[index]" type="text" maxlength="1" dense required
+                                        :style="{ width: '5ch'}" outlined class="text-center py-0"
+                                        hide-details></v-text-field>
                                 </v-col>
                             </v-row>
                         </div>
@@ -78,7 +83,8 @@ export default {
     data() {
         return {
             ruleFunctions: functionsJson,
-            functionOperands: []
+            functionOperands: [],
+            textFieldError: false
         }
     },
     props: {
@@ -89,11 +95,27 @@ export default {
             this.$emit("hide-insert-popup", false);
         },
         insertFunction() {
+            if (!this.validateOperands()) {
+                return
+            }
+
             this.hidePopup();
             const operandsCount = this.ruleFunction.operands.length;
             const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) //get the function sign, remove the abstract operands
             const finalFunction = " " + functionSign + this.functionOperands.join(""); //
+            this.functionOperands = []
             this.$emit("update-rule", finalFunction);
+        },
+        validateOperands() {
+            this.textFieldError = false;
+            for (let index = 0; index < this.functionOperands.length; index++) {
+                const pattern = (this.ruleFunction.operands[index].type === 'int') ? /^[0-9]{1}$/ : /^[^\s]{1}$/;
+                if (!pattern.test(this.functionOperands[index])) {
+                    this.textFieldError = true;
+                    return false;
+                }
+            }
+            return true;
         }
     },
     computed: {
