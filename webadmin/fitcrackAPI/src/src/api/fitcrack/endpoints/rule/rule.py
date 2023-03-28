@@ -52,7 +52,7 @@ def countRules(filePath):
     with open(os.path.join(RULE_DIR, filePath), encoding='latin-1') as file:
         for line in file:
             if re.match('^\s*(\#.*)?$', line) == None:
-                rule_count += 1
+                ruleCount += 1
     return ruleCount
 
 
@@ -129,54 +129,58 @@ class rule(Resource):
             'message': 'Rule file sucesfully deleted.'
         }, 200
         
+    @api.marshal_with(simpleResponse)
     def put(self, id):
         """
         Updates the rule file
         """
         newFile = request.files['file']
-        ruleFileRecord = FcRule.query.filter(FcRule.id == id).first()
-        ruleFilePath = Path(RULE_DIR) / ruleFileRecord.path
+        fileRecord = FcRule.query.filter(FcRule.id == id).first() #the record of rule file in database
+        oldFilePath = Path(RULE_DIR) / fileRecord.path
+        newFilePath = oldFilePath
         nameChanged = False
         
-        if(newFile.filename != ruleFileRecord.name): #if the name of file changed
+        if newFile.filename != fileRecord.name: #if the name of file changed
+            # check if the file extension is allowed (.txt or .rule)
             if allowed_file(newFile.filename, ALLOWED_EXTENSIONS):
-                fileName = secure_filename(newFile.filename)
-                filePart = Path(fileName).stem
+                databaseFileName = secure_filename(newFile.filename)
+                filePart = Path(databaseFileName).stem
+                # create a new path, rule file has always ".rule" suffix on the server
+                serverFileName = filePart + ".rule"
+                newFilePath = Path(RULE_DIR) / serverFileName
                 
-                #create a new path, rule file has always .rule suffix on the server
-                fileName = filePart + ".rule"
-                newRuleFilePath = Path(RULE_DIR) / fileName
-                
-                if Path(ruleFilePath).exists():
-                    abort(500, "File with name " + fileName + " already exists.\nPath: " + ruleFilePath)
-                    
+                # check if new filePath doesn't already exist
+                if Path(newFilePath).exists():
+                    abort(500, "File with name " + serverFileName + " already exists on server. Path: " + str(newFilePath))
             else:
-                error = "Can't update file " + ruleFileRecord.name + ". The file extension is not allowed."
-                abort(500, error)
-            os.rename(ruleFilePath, newRuleFilePath)
+                abort(500, "Can't update file " + fileRecord.name + ". The file extension is not allowed.")
+                
+            os.rename(oldFilePath, newFilePath)
+            fileRecord.name = databaseFileName
+            fileRecord.path = serverFileName
             nameChanged = True
-        # change in database
-        ruleCount = countRules(ruleFileRecord.path)
-        ruleFileRecord.count = ruleCount
-        ruleFileRecord.name = newFile.filename
-        ruleFileRecord.path = fileName
+        
+        # update the content of rule file
+        with open(newFilePath, "wb") as origFile:
+            origFile.write(newFile.read())
+        
+        # change record in database
+        fileRecord.count = countRules(fileRecord.path)
+        db.session.commit()
+        
+        ''' TODO if there should be unique name in database, then I need to update content of file afterwards
         try:
             db.session.commit()
         except exc.IntegrityError as e: #TODO should name be unique? add to models.py
             db.session().rollback()
-            abort(500, 'Rule with name ' + newFile.filename + ' already exists.')
-            
-            
-        
-        # update the content of rule file
-        with open(ruleFilePath, "wb") as origFile:
-            origFile.write(newFile.read())
+            abort(500, 'Rule with name ' + databaseFileName + ' already exists.')
+        '''
         
         # return success    
         if(nameChanged):
-            returnMessage = "Renamed rule file to " + newFile.filename + " and successfully updated."
+            returnMessage = "Renamed rule file to " + fileRecord.name + " and successfully updated."
         else:
-            returnMessage = "Rule file " + ruleFileRecord.name + " successfully updated."
+            returnMessage = "Rule file " + fileRecord.name + " successfully updated."
         return {
             'status': True,
             'message': returnMessage
