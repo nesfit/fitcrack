@@ -258,6 +258,7 @@
           <v-btn
             color="primary"
             outlined
+            @click="generateMasks()"
           >
             Generate masks
           </v-btn>
@@ -338,6 +339,19 @@
           this.dictionaries = response.data;
           this.loading = false
         })
+      },
+      generateMasks: function () {
+        //this.axios.post(this.$serverAddr + '/maskGenerator/generate', {} )
+        this.axios.post(this.$serverAddr + '/maskGenerator/generate', {
+          firstName: 'Fred',
+          lastName: 'Flintstone'
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       }
     }
   }
