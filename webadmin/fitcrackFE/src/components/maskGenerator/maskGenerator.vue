@@ -216,7 +216,24 @@
       <v-card-title class="pb-0 mb-2">
         <span>Wordlists</span>
       </v-card-title>
-      <file-uploader class="bottom-space"/>
+      <v-data-table
+        :headers="headers"
+        :items="dictionaries.items"
+        :loading="loading"
+        :footer-props="{itemsPerPageOptions: [5,10,25], itemsPerPageText: 'Dictionaries per page'}"
+      >
+        <template v-slot:item.name="{ item }">
+          <router-link :to="`dictionaries/${item.id}`">
+            {{ item.name }}
+          </router-link>
+        </template>
+        <template v-slot:item.time="{ item }">
+          {{ $moment.utc(item.time).local().format('DD.MM.YYYY HH:mm') }}
+        </template>
+        <template v-slot:item.keyspace="{ item }">
+          {{ fmt(item.keyspace) }}
+        </template>
+      </v-data-table>
       <v-row>
         <v-col cols="6">
         <b>Minimum number of occurrences:</b>
@@ -253,11 +270,12 @@
   let incId = 0
   let excId = 0
 
+  import fmt from '@/assets/scripts/numberFormat'
   import tile from '@/components/tile/fc_tile.vue'
-  import FileUploader from "@/components/fileUploader/fileUploader.vue";
   export default {
-    data () {
+    data: function () {
       return {
+        loading: false,
         pattern: '',
         minLower: 0,
         minUpper: 0,
@@ -275,15 +293,28 @@
         minOcc: 0,
         sortingMode: 'Optimal',
         incPatterns: [],
-        excPatterns: []
+        excPatterns: [],
+        headers: [
+          {
+            text: 'Name',
+            align: 'start',
+            value: 'name'
+          },
+          {text: 'Keyspace', value: 'keyspace', align: 'end'},
+          {text: 'Time', value: 'time', align: 'end'}
+        ],
+        dictionaries: []
       }
+    },
+    mounted: function () {
+      this.loadDictionaries()
     },
     name: "MaskGenerator",
     components: {
-      FileUploader,
       'fc-tile': tile,
     },
     methods: {
+      fmt,
       updatePattern: function (text) {
         this.pattern += text
       },
@@ -300,6 +331,13 @@
       },
       removeExcPattern: function (excPattern) {
         this.excPatterns = this.excPatterns.filter((b) => b !== excPattern)
+      },
+      loadDictionaries: function () {
+        this.loading = true;
+        this.axios.get(this.$serverAddr + '/dictionary', {}).then((response) => {
+          this.dictionaries = response.data;
+          this.loading = false
+        })
       }
     }
   }
