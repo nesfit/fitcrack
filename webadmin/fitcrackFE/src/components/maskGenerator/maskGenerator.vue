@@ -1,0 +1,330 @@
+<template>
+  <v-container class="max600">
+    <fc-tile
+      title="Mask generator"
+      class="ma-2"
+      :icon="$route.meta.icon"
+    >
+      <v-row>
+        <v-col cols="4">
+          <v-card-title class="pb-0 mb-2">
+            <span>Patterns</span>
+          </v-card-title>
+        </v-col>
+        <v-col cols="8">
+          <div class="align-right">
+            <v-btn class="text-lowercase"
+              color="primary"
+              outlined
+              @click="updatePattern('?l')"
+            >
+              ?l
+            </v-btn>
+            <v-btn class="text-lowercase"
+              color="primary"
+              outlined
+              @click="updatePattern('?u')"
+            >
+              ?u
+            </v-btn>
+            <v-btn class="text-lowercase"
+              color="primary"
+              outlined
+              @click="updatePattern('?d')"
+            >
+              ?d
+            </v-btn>
+            <v-btn class="text-lowercase"
+              color="primary"
+              outlined
+              @click="updatePattern('?s')"
+            >
+              ?s
+            </v-btn>
+            <v-btn class="text-lowercase"
+              color="primary"
+              outlined
+              @click="updatePattern('?a')"
+            >
+              ?a
+            </v-btn>
+          </div>
+        </v-col>
+      </v-row>
+      <v-text-field
+        label="Enter mask pattern"
+        filled
+        outlined
+        dense
+        single-line
+        v-model="pattern"
+      />
+      <v-row>
+        <v-col align="left">
+          <v-btn
+            color="primary"
+            outlined
+            @click="includePattern()"
+          >
+            Include pattern
+            <v-icon right>
+              mdi-plus-circle
+            </v-icon>
+          </v-btn>
+        </v-col>
+        <v-col align="right">
+          <v-btn
+            color="primary"
+            outlined
+            @click="excludePattern()"
+          >
+            Exclude pattern
+            <v-icon right>
+              mdi-minus-circle
+            </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col align="right">
+          <ul style="list-style-type:none;">
+            <li v-for="incPattern in incPatterns" :key="incPattern.id">
+              {{ incPattern.text }}
+              <button @click="removeIncPattern(incPattern)">
+                <v-icon right>
+                  mdi-close-outline
+                </v-icon>
+              </button>
+            </li>
+          </ul>
+        </v-col>
+        <v-col align="right">
+          <ul style="list-style-type:none;">
+            <li v-for="excPattern in excPatterns" :key="excPattern.id">
+              {{ excPattern.text }}
+              <button @click="removeExcPattern(excPattern)">
+                <v-icon right>
+                  mdi-close-outline
+                </v-icon>
+              </button>
+            </li>
+          </ul>
+        </v-col>
+      </v-row>
+      <v-card-title class="pb-0 mb-2">
+        <span>Criteria</span>
+      </v-card-title>
+      <v-row max-height="50px">
+        <v-col cols="2">
+        </v-col>
+        <v-col cols="2" align="right">
+          <b>Min</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <b>Max</b>
+        </v-col>
+        <v-col cols="2">
+        </v-col>
+        <v-col cols="2" align="right">
+          <b>Min</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <b>Max</b>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="2">
+          <b>Lowercase</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="minLower" type="number" size="4">
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="maxLower" type="number" size="4">
+        </v-col>
+        <v-col cols="2">
+          <b>Digits</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="minDigits" type="number" size="4">
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="maxDigits" type="number" size="4">
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="2">
+          <b>Uppercase</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="minUpper" type="number" size="4">
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="maxUpper" type="number" size="4">
+        </v-col>
+        <v-col cols="2">
+          <b>Special</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="minSpecial" type="number" size="4">
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="maxSpecial" type="number" size="4">
+        </v-col>
+      </v-row>
+      <v-row class="bottom-space">
+        <v-col cols="2">
+          <b>Length</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="minLength" type="number" size="4">
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="maxLength" type="number" size="4">
+        </v-col>
+        <v-col cols="6"/>
+      </v-row>
+      <v-card-title class="pb-0 mb-2 bottom-space">
+        <span>Cracking task options</span>
+      </v-card-title>
+      <v-row class="top-space">
+        <v-col cols="2">
+          <b>Time:</b>
+        </v-col>
+        <v-col cols="1">
+          <input v-model="timeHours" type="number" size="4">
+        </v-col>
+        <v-col cols="1">
+          <b>h</b>
+        </v-col>
+        <v-col cols="1">
+          <input v-model="timeMins" type="number" size="4">
+        </v-col>
+        <v-col cols="1">
+          <b>m</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <b>Speed:</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="speed" type="number" size="8">
+        </v-col>
+        <v-col cols="2" align="left">
+          <b>keys/s</b>
+        </v-col>
+      </v-row>
+      <v-card-title class="pb-0 mb-2">
+        <span>Wordlists</span>
+      </v-card-title>
+      <file-uploader class="bottom-space"/>
+      <v-row>
+        <v-col cols="6">
+        <b>Minimum number of occurrences:</b>
+        </v-col>
+        <v-col cols="6" align="left">
+          <input v-model="minOcc" type="number" size="4">
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="3" align-self="center">
+          <b>Sorting mode:</b>
+        </v-col>
+        <v-col cols="4">
+          <v-select
+            v-model="sortingMode"
+            :items="['Optimal', 'Occurrence', 'Complexity']"
+          ></v-select>
+      </v-col>
+        <v-col cols="5"/>
+      </v-row>
+      <div class="align-right">
+          <v-btn
+            color="primary"
+            outlined
+          >
+            Generate masks
+          </v-btn>
+        </div>
+    </fc-tile>
+  </v-container>
+</template>
+
+<script>
+  let incId = 0
+  let excId = 0
+
+  import tile from '@/components/tile/fc_tile.vue'
+  import FileUploader from "@/components/fileUploader/fileUploader.vue";
+  export default {
+    data () {
+      return {
+        pattern: '',
+        minLower: 0,
+        minUpper: 0,
+        maxLower: 0,
+        maxUpper: 0,
+        minDigits: 0,
+        maxDigits: 0,
+        minSpecial: 0,
+        maxSpecial: 0,
+        maxLength: 0,
+        minLength: 0,
+        timeHours: 0,
+        timeMins: 0,
+        speed: 0,
+        minOcc: 0,
+        sortingMode: 'Optimal',
+        incPatterns: [],
+        excPatterns: []
+      }
+    },
+    name: "MaskGenerator",
+    components: {
+      FileUploader,
+      'fc-tile': tile,
+    },
+    methods: {
+      updatePattern: function (text) {
+        this.pattern += text
+      },
+      includePattern: function () {
+        this.incPatterns.push({ id: incId++, text: this.pattern })
+        this.pattern = ''
+      },
+      excludePattern: function () {
+        this.excPatterns.push({ id: excId++, text: this.pattern })
+        this.pattern = ''
+      },
+      removeIncPattern: function (incPattern) {
+        this.incPatterns = this.incPatterns.filter((b) => b !== incPattern)
+      },
+      removeExcPattern: function (excPattern) {
+        this.excPatterns = this.excPatterns.filter((b) => b !== excPattern)
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+  .max600 {
+      max-width: 600px;
+    }
+
+</style>
+
+<style>
+
+  .bottom-space {
+      margin-bottom: 4mm;
+    }
+
+  .top-space {
+      margin-top: 4mm;
+    }
+
+  .align-right {
+      text-align: right;
+    }
+
+</style>

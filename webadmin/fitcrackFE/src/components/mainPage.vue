@@ -193,6 +193,15 @@
               </v-list-item-content>
             </v-list-item>
 
+            <v-list-item :to="{ name: 'maskGenerator'}">
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('maskGenerator') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Mask generator</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
             <v-list-item :to="{ name: 'markovChains'}">
               <v-list-item-action>
                 <v-icon>{{ routeIcon('markovChains') }}</v-icon>

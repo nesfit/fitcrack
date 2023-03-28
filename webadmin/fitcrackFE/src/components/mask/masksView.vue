@@ -65,6 +65,24 @@
         </template>
       </v-data-table>
       <v-divider />
+      <template>
+        <div class="align-right">
+          <a
+            :href="'/maskGenerator'"
+          >
+          <v-btn
+            color="primary"
+            outlined
+          >
+            Create mask file
+            <v-icon right>
+              mdi-plus-circle
+            </v-icon>
+          </v-btn>
+          </a>
+        </div>
+      </template>
+      <v-divider />
       <file-uploader
         :url="this.$serverAddr + '/masks/add'"
         @uploadComplete="loadMasks"
@@ -150,5 +168,12 @@
 
   .clickable {
     cursor: pointer;
+  }
+
+  .align-right {
+    margin-top: 2mm;
+    margin-bottom: 2mm;
+    text-align: right;
+    border: 0;
   }
 </style>

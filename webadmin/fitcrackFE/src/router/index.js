@@ -29,6 +29,7 @@ const hostDetail = () => import('@/components/host/hostDetailView.vue')
 const rules = () => import('@/components/rule/rulesView.vue')
 const ruleDetail = () => import('@/components/rule/ruleDetailView.vue')
 const masks = () => import('@/components/mask/masksView.vue')
+const maskGenerator = () => import('@/components/maskGenerator/maskGenerator.vue')
 const charsets = () => import('@/components/charset/charsetsView.vue')
 const charsetDetail = () => import('@/components/charset/charsetDetailView.vue')
 const markovChains = () => import('@/components/markovChains/markovView.vue')
@@ -237,6 +238,16 @@ const appRoutes = [
     component: masks,
     meta: {
       title: 'Masks',
+      icon: 'mdi-guy-fawkes-mask',
+      navtab: 1
+    }
+  },
+  {
+    path: '/maskGenerator',
+    name: 'maskGenerator',
+    component: maskGenerator,
+    meta: {
+      title: 'Mask generator',
       icon: 'mdi-guy-fawkes-mask',
       navtab: 1
     }
