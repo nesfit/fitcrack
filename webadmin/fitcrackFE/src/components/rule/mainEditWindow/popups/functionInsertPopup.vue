@@ -34,9 +34,6 @@
                 </v-row>
                 <v-divider class="my-2 grey darken-1"></v-divider>
                 <v-row>
-                    <v-snackbar v-model="textFieldError" color="error">
-                        Invalid operands
-                    </v-snackbar>
                 </v-row>
                 <v-row v-if="ruleFunction.operands.length">
                     <v-col cols="9">
@@ -45,7 +42,7 @@
                         </p>
 
                         <div class="operandsWrapper">
-                            <v-row v-for="(operand, index) in ruleFunction.operands">
+                            <v-row v-for="(operand, index) in ruleFunction.operands" :key="index">
                                 <v-col md="auto">
                                     <p class="py-0">
                                         {{ operand.specification }} :
@@ -53,7 +50,7 @@
                                 </v-col>
                                 <v-col>
                                     <v-text-field v-model="functionOperands[index]" type="text" maxlength="1" dense required
-                                        :style="{ width: '5ch'}" outlined class="text-center py-0"
+                                        :style="{ width: '5ch' }" outlined class="text-center py-0 operandField"
                                         hide-details></v-text-field>
                                 </v-col>
                             </v-row>
@@ -96,22 +93,19 @@ export default {
         },
         insertFunction() {
             if (!this.validateOperands()) {
+                this.$error("Invalid operands")
                 return
             }
-
-            this.hidePopup();
             const operandsCount = this.ruleFunction.operands.length;
             const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) //get the function sign, remove the abstract operands
             const finalFunction = " " + functionSign + this.functionOperands.join(""); //
-            this.functionOperands = []
+            this.hidePopup();
             this.$emit("update-rule", finalFunction);
         },
         validateOperands() {
-            this.textFieldError = false;
             for (let index = 0; index < this.functionOperands.length; index++) {
                 const pattern = (this.ruleFunction.operands[index].type === 'int') ? /^[0-9]{1}$/ : /^[^\s]{1}$/;
                 if (!pattern.test(this.functionOperands[index])) {
-                    this.textFieldError = true;
                     return false;
                 }
             }
@@ -121,6 +115,15 @@ export default {
     computed: {
         ruleFunction() {
             return this.ruleFunctions[this.functionsInsertPopup.functionIndex]
+        }
+    },
+    watch: {
+        /**Function which initializes the operands array to empty strings when popup is shown, because of validation */
+        functionsInsertPopup(newObject) {
+            if (newObject.visible === true) {
+                const numOfOperands = this.ruleFunction.operands.length;
+                this.functionOperands = Array(numOfOperands).fill("");
+            }
         }
     }
 };
