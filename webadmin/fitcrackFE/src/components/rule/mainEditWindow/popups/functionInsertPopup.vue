@@ -33,6 +33,9 @@
                     </v-col>
                 </v-row>
                 <v-divider class="my-2 grey darken-1"></v-divider>
+                <v-alert v-if="textFieldError" type="error" tile>
+                    Invalid operands!
+                </v-alert>
                 <v-row>
                 </v-row>
                 <v-row v-if="ruleFunction.operands.length">
@@ -92,10 +95,10 @@ export default {
             this.$emit("hide-insert-popup", false);
         },
         insertFunction() {
-            if (!this.validateOperands()) {
-                this.$error("Invalid operands")
-                return
+            if (this.textFieldError = this.validateOperands()) {
+                return;
             }
+
             const operandsCount = this.ruleFunction.operands.length;
             const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) //get the function sign, remove the abstract operands
             const finalFunction = " " + functionSign + this.functionOperands.join(""); //
@@ -106,10 +109,10 @@ export default {
             for (let index = 0; index < this.functionOperands.length; index++) {
                 const pattern = (this.ruleFunction.operands[index].type === 'int') ? /^[0-9]{1}$/ : /^[^\s]{1}$/;
                 if (!pattern.test(this.functionOperands[index])) {
-                    return false;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
     },
     computed: {
@@ -121,6 +124,7 @@ export default {
         /**Function which initializes the operands array to empty strings when popup is shown, because of validation */
         functionsInsertPopup(newObject) {
             if (newObject.visible === true) {
+                this.textFieldError = false;
                 const numOfOperands = this.ruleFunction.operands.length;
                 this.functionOperands = Array(numOfOperands).fill("");
             }
