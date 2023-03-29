@@ -17,7 +17,10 @@ from src.database import db
 from src.database.models import FcDictionary
 
 def check_mask_syntax(mask):
-    if not re.fullmatch("^(\?[ludhHsab]|[ -~])+$", mask):
+    #Allowed are either variables (? followed by an allowed character)
+    #or static letters (any printable ASCII character or space except ?).
+    #https://hashcat.net/wiki/doku.php?id=mask_attack for complete reference.
+    if not re.fullmatch("^(\?[ludhHsab?1234]|[ ->@-~])+$", mask):
         abort(400, 'Wrong mask ' + mask)
 
 
