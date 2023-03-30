@@ -23,7 +23,11 @@ from src.database.models import FcMasksSet
 log = logging.getLogger(__name__)
 ns = api.namespace('maskGenerator', description='Endpoints for work with mask generator.')
 
-@ns.route('/generate')
+@ns.route('')
 class generateMasks(Resource):
-    def post(self):
-        return("Hello")
+    @api.marshal_with(simpleResponse)
+    def get(self):
+        return {
+            'message': 'Hello',
+            'status': True
+        }

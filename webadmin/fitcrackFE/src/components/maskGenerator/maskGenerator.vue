@@ -341,8 +341,9 @@
         })
       },
       generateMasks: function () {
-        //this.axios.post(this.$serverAddr + '/maskGenerator/generate', {} )
-        this.axios.post(this.$serverAddr + '/maskGenerator/generate', {
+        //this.axios.get(this.$serverAddr + '/dictionary', {}).then(response => {this.pattern="hello"})
+      this.axios.get(this.$serverAddr + '/maskGenerator', {} )
+        /*this.axios.post(this.$serverAddr + '/maskGenerator/generate', {
           firstName: 'Fred',
           lastName: 'Flintstone'
         })
@@ -351,7 +352,7 @@
         })
         .catch(function (error) {
           console.log(error);
-        });
+        });*/
       }
     }
   }

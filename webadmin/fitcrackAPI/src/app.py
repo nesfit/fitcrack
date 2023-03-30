@@ -37,6 +37,7 @@ from src.api.fitcrack.endpoints.logs.logs import ns as logs_ns
 from src.api.fitcrack.endpoints.status.status import ns as status_ns
 from src.api.fitcrack.endpoints.pcfg.pcfg import ns as pcfg_ns
 from src.api.fitcrack.endpoints.settings.settings import ns as settings_ns
+from src.api.fitcrack.endpoints.maskGenerator.maskGenerator import ns as maskGenerator_namespace
 
 from src.database import db
 
@@ -76,6 +77,7 @@ def initialize_app(flask_app):
     api.add_namespace(pcfg_namespace)
     api.add_namespace(markov_namespace)
     api.add_namespace(masks_namespace)
+    api.add_namespace(maskGenerator_namespace)
     api.add_namespace(rule_namespace)
     api.add_namespace(charset_namespace)
     api.add_namespace(protected_files_ns)
