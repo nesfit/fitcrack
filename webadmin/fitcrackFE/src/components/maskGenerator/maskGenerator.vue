@@ -112,6 +112,53 @@
         </v-col>
       </v-row>
       <v-card-title class="pb-0 mb-2">
+        <span>Custom character sets</span>
+      </v-card-title>
+      <v-row>
+        <v-col cols="6" align="left">
+          <v-text-field
+            label="Character set 1"
+            filled
+            outlined
+            dense
+            single-line
+            v-model="charset1"
+          />
+        </v-col>
+        <v-col cols="6" align="left">
+          <v-text-field
+            label="Character set 2"
+            filled
+            outlined
+            dense
+            single-line
+            v-model="charset2"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="6" align="left">
+          <v-text-field
+            label="Character set 3"
+            filled
+            outlined
+            dense
+            single-line
+            v-model="charset3"
+          />
+        </v-col>
+        <v-col cols="6" align="left">
+          <v-text-field
+            label="Character set 4"
+            filled
+            outlined
+            dense
+            single-line
+            v-model="charset4"
+          />
+        </v-col>
+      </v-row>
+      <v-card-title class="pb-0 mb-2">
         <span>Criteria</span>
       </v-card-title>
       <v-row max-height="50px">
@@ -293,6 +340,10 @@
         speed: 0,
         minOcc: 0,
         sortingMode: 'Optimal',
+        charset1: '',
+        charset2: '',
+        charset3: '',
+        charset4: '',
         incPatterns: [],
         excPatterns: [],
         headers: [
@@ -341,11 +392,35 @@
         })
       },
       generateMasks: function () {
-        //this.axios.get(this.$serverAddr + '/dictionary', {}).then(response => {this.pattern="hello"})
-        //this.axios.get(this.$serverAddr + '/maskGenerator', {} )
-        this.axios.get(this.$serverAddr + '/maskGenerator', {
+        var patexc = []
+        this.excPatterns.forEach(function(pattern){
+          patexc.push(pattern['text'])
+        })
+        var patinc = []
+        this.incPatterns.forEach(function(pattern){
+          patinc.push(pattern['text'])
+        })
+        this.axios.post(this.$serverAddr + '/maskGenerator', {
           minLength: this.minLength,
-          maxLength: this.maxLength
+          maxLength: this.maxLength,
+          minLower: this.minLower,
+          minUpper: this.minUpper,
+          maxLower: this.maxLower,
+          maxUpper: this.maxUpper,
+          minDigits: this.minDigits,
+          maxDigits: this.maxDigits,
+          minSpecial: this.minSpecial,
+          maxSpecial: this.maxSpecial,
+          time: this.timeHours * 3600 + this.timeMins * 60,
+          speed: this.speed,
+          minOcc: this.minOcc,
+          sortingMode: this.sortingMode,
+          charset1: this.charset1,
+          charset2: this.charset2,
+          charset3: this.charset3,
+          charset4: this.charset4,
+          incPatterns: patinc,
+          excPatterns: patexc
         })
         .then(function (response) {
           console.log(response);

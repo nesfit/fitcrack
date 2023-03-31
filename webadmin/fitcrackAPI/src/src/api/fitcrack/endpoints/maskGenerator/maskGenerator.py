@@ -36,6 +36,6 @@ class generateMasks(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         return {
-            'message': 'Hello from POST',
+            'message': request.json.get('sortingMode'),
             'status': True
         }
