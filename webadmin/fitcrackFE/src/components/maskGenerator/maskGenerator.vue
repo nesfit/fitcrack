@@ -342,17 +342,17 @@
       },
       generateMasks: function () {
         //this.axios.get(this.$serverAddr + '/dictionary', {}).then(response => {this.pattern="hello"})
-      this.axios.get(this.$serverAddr + '/maskGenerator', {} )
-        /*this.axios.post(this.$serverAddr + '/maskGenerator/generate', {
-          firstName: 'Fred',
-          lastName: 'Flintstone'
+        //this.axios.get(this.$serverAddr + '/maskGenerator', {} )
+        this.axios.get(this.$serverAddr + '/maskGenerator', {
+          minLength: this.minLength,
+          maxLength: this.maxLength
         })
         .then(function (response) {
           console.log(response);
         })
         .catch(function (error) {
           console.log(error);
-        });*/
+        });
       }
     }
   }

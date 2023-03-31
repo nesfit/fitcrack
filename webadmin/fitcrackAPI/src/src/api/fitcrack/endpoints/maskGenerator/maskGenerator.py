@@ -25,9 +25,17 @@ ns = api.namespace('maskGenerator', description='Endpoints for work with mask ge
 
 @ns.route('')
 class generateMasks(Resource):
+
     @api.marshal_with(simpleResponse)
     def get(self):
         return {
-            'message': 'Hello',
+            'message': 'Hello from GET',
+            'status': True
+        }
+
+    @api.marshal_with(simpleResponse)
+    def post(self):
+        return {
+            'message': 'Hello from POST',
             'status': True
         }
