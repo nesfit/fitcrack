@@ -12,7 +12,7 @@
     <allFunctionsPopup v-bind:allFunctionsPopup="allFunctionsPopup" v-on:hide-all-functions-popup="hideAllFunctionsPopup"
       v-on:show-insert-popup="showInsertPopup"></allFunctionsPopup>
     <v-row justify="center">
-      <mainEditWindow v-bind:rulesList="rulesList" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo" v-on:rules-updated="updateRules"
+      <mainEditWindow v-bind:rulesList="rulesList" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo" v-on:update-rules="updateRules"
         v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
       <liveKeyspacePreview v-bind:passwordsList="passwordsList" v-bind:previewPasswordsString="previewPasswordsString"
         v-on:generate-preview="generatePreview">

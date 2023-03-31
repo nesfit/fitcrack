@@ -41,7 +41,6 @@ export default {
     },
     data() {
         return {
-
             search: "",
             headers: [
                 { text: "Name", value: "name" },

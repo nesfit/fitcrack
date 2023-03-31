@@ -43,13 +43,17 @@
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col>
-                    <input type="file" ref="appendRuleFile" style="display: none" @change="onRuleFileChange($event)">
+                    <!--
+                        <input type="file" ref="appendRuleFile" style="display: none" @change="onRuleFileChange($event)">
                     <v-btn class="px-2" color="orange lighten-3" depressed @click="$refs.appendRuleFile.click()">
+                    -->
+                    <v-btn class="px-2" color="orange lighten-3" depressed @click="appendRuleFilePopup = true">
                         <v-icon left>
                             mdi-file
                         </v-icon>
                         Append rule file
                     </v-btn>
+                    <appendRulePopup v-model="appendRuleFilePopup" v-bind:rulesList="rulesList" v-on:update-rules="updateRules"></appendRulePopup>
                 </v-col>
                 <v-spacer></v-spacer>
 
@@ -62,7 +66,7 @@
                 </v-col>
             </v-row>
             <v-row>
-                <ruleFileContent v-bind:rulesList="rulesList" v-on:rules-updated="updateRules"
+                <ruleFileContent v-bind:rulesList="rulesList" v-on:update-rules="updateRules"
                     v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup">
                 </ruleFileContent>
             </v-row>
@@ -96,6 +100,7 @@
 
 <script>
 import ruleFileContent from '@/components/rule/mainEditWindow/ruleFileContent.vue';
+import appendRulePopup from '@/components/rule/mainEditWindow/popups/appendRulePopup.vue';
 export default {
     props: {
         rulesList: Array,
@@ -107,6 +112,7 @@ export default {
             minFunctionsNum: 6,
             maxFunctionsNum: 8,
             randomRuleString: "",
+            appendRuleFilePopup: false,
             rulesListData: this.rulesList,
             ruleFile: null
         };
@@ -120,7 +126,7 @@ export default {
                 this.rulesListData = this.rulesList.concat(event.target.result.split("\n"));
                 //this.rulesList = this.rulesList.concat(event.target.result.split("\n"));
                 this.rulesListData.pop();
-                this.$emit("rules-updated", this.rulesListData)
+                this.$emit("update-rules", this.rulesListData)
             };
             reader.readAsText(file);
         },
@@ -133,7 +139,7 @@ export default {
                 this.randomRuleString = response.data.randomRule;
                 this.rulesListData = this.rulesList; //copy the props
                 this.rulesListData.push(this.randomRuleString);
-                this.$emit("rules-updated", this.rulesListData)
+                this.$emit("update-rules", this.rulesListData)
             }).catch((error) => {
                 this.randomRuleString = error.message;
             });
@@ -141,15 +147,14 @@ export default {
         addEmptyRule() {
             this.rulesListData = this.rulesList;
             this.rulesListData.push("")
-            this.$emit("rules-updated", this.rulesListData)
+            this.$emit("update-rules", this.rulesListData)
         },
         updateRules(updatedRulesList) {
-            this.rulesList = updatedRulesList;
-            this.$emit("rules-updated", this.rulesList)
+            this.$emit("update-rules", updatedRulesList)
         },
         resetRules() {
-            this.updateRules(this.rulesList)
-            this.$emit("rules-updated", [""])
+            this.updateRules(this.rulesList) //todo
+            this.$emit("update-rules", [""])
         },
         updateFunctionsPopupState(updatedState) {
             this.showFunctionsPopup = updatedState;
@@ -208,6 +213,7 @@ export default {
     },
     components: {
         ruleFileContent,
+        appendRulePopup
     },
 };
 

@@ -64,12 +64,12 @@ export default {
         updateRules(rule, index) {
             this.rulesListData = this.rulesList;
             this.rulesListData[index] = rule;
-            this.$emit("rules-updated", this.rulesListData);
+            this.$emit("update-rules", this.rulesListData);
         },
         deleteRule(index) {
             this.rulesListData = this.rulesList
             this.rulesListData.splice(index, 1);
-            this.$emit("rules-updated", this.rulesListData)
+            this.$emit("update-rules", this.rulesListData)
         },
         showPopup(index) {
             this.ruleObjects[index].popupVisible = true;
