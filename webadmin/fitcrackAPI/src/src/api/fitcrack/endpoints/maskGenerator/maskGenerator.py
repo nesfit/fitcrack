@@ -12,7 +12,6 @@ from sqlalchemy import exc
 
 from settings import MASKS_DIR, ROOT_DIR
 from src.api.apiConfig import api
-from webadmin.fitcrackAPI.src.src.api.fitcrack.endpoints.maskGenerator import MaskGenerator
 from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
 from src.api.fitcrack.endpoints.masks.argumentsParser import updateMask_parser
 from src.api.fitcrack.endpoints.masks.responseModels import maskSet_model
@@ -36,9 +35,7 @@ class generateMasks(Resource):
 
     @api.marshal_with(simpleResponse)
     def post(self):
-        maskGen = MaskGenerator.MaskGenerator()
-        message = maskGen.generateMaskFile(request.json, '.')
         return {
-            'message': message,
+            'message': request.json.get("minLength"),
             'status': True
         }
