@@ -1,4 +1,5 @@
 import string
+import itertools
 
 def check_compatibility(mask, mask_pattern):
     '''Compare mask with a given mask pattern.'''
@@ -49,7 +50,47 @@ class PasswordGenerator():
 
     def generate(self, arg_options):
         '''Generate all compatible iterations of password masks.'''
-        pass
+        if arg_options.charset1:
+            self.charset.append("?1")
+        if arg_options.charset2:
+            self.charset.append("?2")
+        if arg_options.charset3:
+            self.charset.append("?3")
+        if arg_options.charset4:
+            self.charset.append("?4")
+
+        for iteration in range(arg_options.minlength, 9 if arg_options.maxlength > 9 else arg_options.maxlength + 1):
+            for mask in itertools.product(self.charset, repeat=iteration):
+                joined_mask = ''.join(mask)
+
+                if joined_mask == '':
+                    continue
+
+                if not check_charsets(joined_mask, arg_options):
+                    continue
+
+                if arg_options.patinc:
+                    comp_count = 0
+                    for mask_pattern in arg_options.patinc:
+                        if check_compatibility(joined_mask, mask_pattern):
+                            comp_count += 1
+                    if comp_count == 0:
+                        continue
+
+                if arg_options.patexc:
+                    comp_count = 0
+                    for mask_pattern in arg_options.patexc:
+                        if check_compatibility(joined_mask, mask_pattern):
+                            comp_count += 1
+                    if comp_count != 0:
+                        continue
+
+                if joined_mask in self.masks:
+                    self.masks[joined_mask] += 1
+                else:
+                    self.masks[joined_mask] = 1
+
+        return self.masks
 
 class MaskSorter:
     '''
@@ -64,15 +105,74 @@ class MaskSorter:
 
     def add_complexity(self, arg_options):
         '''Iterate through input masks and evaluate its complexity'''
-        pass
+        for mask, occurrence in self.input_masks.items():
+            complexity = 1
+            for charset in mask.split('?'):
+                if charset == '1':
+                    complexity *= len(arg_options.charset1)
+                elif charset == '2':
+                    complexity *= len(arg_options.charset2)
+                elif charset == '3':
+                    complexity *= len(arg_options.charset3)
+                elif charset == '4':
+                    complexity *= len(arg_options.charset4)
+                elif charset == 'd':
+                    complexity *= len(string.digits)
+                elif charset == 'l':
+                    complexity *= len(string.ascii_lowercase)
+                elif charset == 'u':
+                    complexity *= len(string.ascii_uppercase)
+                elif charset == 's':
+                    complexity *= 33
+                elif charset == 'b':
+                    complexity *= 256
+
+            self.mask_complexity.update({mask:{"Occurrence":occurrence,
+                                        "Complexity":complexity, "Optimal":complexity//occurrence}})
     
     def sort_masks(self, input_options):
         '''Create sorted dictionary'''
-        pass
+        
+        capacity = None
+        if input_options.time != 0:
+            capacity = input_options.time * input_options.speed
+
+        self.add_complexity(input_options)
+        
+        if self.sorting_mode == "Occurrence":
+            sorted_masks = dict(sorted(self.mask_complexity.items(),
+                                 key=lambda x:x[1][self.sorting_mode], reverse=True))
+        elif self.sorting_mode == "Complexity":
+            sorted_masks = dict(sorted(self.mask_complexity.items(),
+                                 key=lambda x:x[1][self.sorting_mode]))
+        elif self.sorting_mode == "Optimal":
+            sorted_masks = dict(sorted(self.mask_complexity.items(),
+                                 key=lambda x:x[1][self.sorting_mode]))
+            
+        for mask in sorted_masks:
+            if capacity is not None:
+                if capacity - self.mask_complexity[mask]["Complexity"] < 0:
+                    break
+                else:
+                    capacity -= self.mask_complexity[mask]["Complexity"]
+
+            self.sorted_masks.append(mask)
     
-    def save_masks_to_file(self, arg_options):
+    def save_masks_to_file(self, arg_options, wordlistsPath):
         '''Save sorted masks to an output file'''
-        pass
+        #self.sorted_masks = self.input_masks
+        file = open(wordlistsPath + "/test.hcmask", "w", encoding="utf-8")
+        for mask in self.sorted_masks:
+            if "1" in mask:
+                file.write(arg_options.charset1+",")
+            if "2" in mask:
+                file.write(arg_options.charset2+",")
+            if "3" in mask:
+                file.write(arg_options.charset3+",")
+            if "4" in mask:
+                file.write(arg_options.charset4+",")
+            file.write(mask+"\n")
+        file.close()
 
 class Options():
     def __init__(self, options) -> None:
@@ -94,6 +194,8 @@ class Options():
         self.charset4 = options.get('charset4')
         self.wordlists = options.get('wordlists')
         self.sorting = options.get('sortingMode')
+        self.speed = int(options.get('speed'))
+        self.time = int(options.get('time'))
 
 class MaskGenerator():
 
@@ -104,13 +206,13 @@ class MaskGenerator():
         
         options = Options(arg_options)
         
-        if options.patinc is not None:
+        if options.patinc:
             for pattern in options.patinc:
                 if not (check_charsets(pattern, options) and check_custom_charsets(pattern, options) and
                         options.minlength <= len(pattern.replace('?', '')) <= options.maxlength):
                     return "Arguments incompatible with pattern: " + str(pattern)
 
-        if options.patexc is not None:
+        if options.patexc:
             for pattern in options.patexc:
                 if not (check_charsets(pattern, options) and check_custom_charsets(pattern, options) and
                         options.minlength <= len(pattern.replace('?', '')) <= options.maxlength):
@@ -124,11 +226,10 @@ class MaskGenerator():
             generator = PasswordGenerator()
             masks = generator.generate(options)
 
-        masks = []
         sorter = MaskSorter(options.sorting, masks)
         sorter.sort_masks(options)
 
-        sorter.save_masks_to_file(wordlistsPath)
+        sorter.save_masks_to_file(options, wordlistsPath)
 
         return self.message
     

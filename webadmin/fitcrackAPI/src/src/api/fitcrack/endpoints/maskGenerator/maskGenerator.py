@@ -37,7 +37,7 @@ class generateMasks(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         maskGenerator = MaskGenerator()
-        message = maskGenerator.generateMaskFile(request.json, '.')
+        message = maskGenerator.generateMaskFile(request.json, MASKS_DIR)
         return {
             'message': message,
             'status': True
