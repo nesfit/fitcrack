@@ -355,7 +355,8 @@
           {text: 'Keyspace', value: 'keyspace', align: 'end'},
           {text: 'Time', value: 'time', align: 'end'}
         ],
-        dictionaries: []
+        dictionaries: [],
+        selectedDictionaries: []
       }
     },
     mounted: function () {
@@ -401,16 +402,16 @@
           patinc.push(pattern['text'])
         })
         this.axios.post(this.$serverAddr + '/maskGenerator', {
-          minLength: this.minLength,
-          maxLength: this.maxLength,
-          minLower: this.minLower,
-          minUpper: this.minUpper,
-          maxLower: this.maxLower,
-          maxUpper: this.maxUpper,
-          minDigits: this.minDigits,
-          maxDigits: this.maxDigits,
-          minSpecial: this.minSpecial,
-          maxSpecial: this.maxSpecial,
+          minlength: this.minLength,
+          maxlength: this.maxLength,
+          minlower: this.minLower,
+          minupper: this.minUpper,
+          maxlower: this.maxLower,
+          maxupper: this.maxUpper,
+          mindigit: this.minDigits,
+          maxdigit: this.maxDigits,
+          minspecial: this.minSpecial,
+          maxspecial: this.maxSpecial,
           time: this.timeHours * 3600 + this.timeMins * 60,
           speed: this.speed,
           minOcc: this.minOcc,
@@ -419,8 +420,9 @@
           charset2: this.charset2,
           charset3: this.charset3,
           charset4: this.charset4,
-          incPatterns: patinc,
-          excPatterns: patexc
+          patinc: patinc,
+          patexc: patexc,
+          wordlists: this.selectedDictionaries
         })
         .then(function (response) {
           console.log(response);
