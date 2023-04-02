@@ -38,9 +38,75 @@ class PasswordAnalyzer:
     def __init__(self):
         self.masks = {}
 
-    def analyze(self, arg_options):
+    def analyze(self, arg_options, wordlistsPath):
         '''Iterate through passwords in wordlists and analyze passwords compatible with policy.'''
-        pass
+        for filename in arg_options.wordlists:
+            try:
+                with open(wordlistsPath + "/" + filename, 'r', encoding="latin-1") as file:
+                    for password in file:
+
+                        password = password.rstrip('\r\n')
+
+                        if password == "":
+                            continue
+
+                        mask = ""
+
+                        for letter in password:
+                            if arg_options.charset1 and letter in arg_options.charset1:
+                                mask += "?1"
+                            elif arg_options.charset2 and letter in arg_options.charset2:
+                                mask += "?2"
+                            elif arg_options.charset3 and letter in arg_options.charset3:
+                                mask += "?3"
+                            elif arg_options.charset4 and letter in arg_options.charset4:
+                                mask += "?4"
+                            elif letter in string.ascii_lowercase:
+                                mask += "?l"
+                            elif letter in string.ascii_uppercase:
+                                mask += "?u"
+                            elif letter in string.digits:
+                                mask += "?d"
+                            elif letter in string.printable:
+                                mask += "?s"
+                            else:
+                                mask += "?b"
+
+                        if not (check_charsets(mask, arg_options) and
+                                arg_options.minlength <= len(password) <= arg_options.maxlength):
+                            continue
+
+                        if arg_options.patinc:
+                            comp_count = 0
+                            for mask_pattern in arg_options.patinc:
+                                if check_compatibility(mask, mask_pattern):
+                                    comp_count += 1
+                            if comp_count == 0:
+                                continue
+
+                        if arg_options.patexc:
+                            comp_count = 0
+                            for mask_pattern in arg_options.patexc:
+                                if check_compatibility(mask, mask_pattern):
+                                    comp_count += 1
+                            if comp_count != 0:
+                                continue
+
+                        if mask in self.masks:
+                            self.masks[mask] += 1
+                        else:
+                            self.masks[mask] = 1
+
+            except OSError:
+                pass
+
+        filtered_masks = {}
+        for mask, occurrence in self.masks.items():
+            pass
+            if occurrence >= arg_options.minocc:
+                filtered_masks.update({mask:occurrence})
+
+        return filtered_masks
 
 class PasswordGenerator():
     '''Generates masks based on given password policies.'''
@@ -158,10 +224,9 @@ class MaskSorter:
 
             self.sorted_masks.append(mask)
     
-    def save_masks_to_file(self, arg_options, wordlistsPath):
+    def save_masks_to_file(self, arg_options, masksPath):
         '''Save sorted masks to an output file'''
-        #self.sorted_masks = self.input_masks
-        file = open(wordlistsPath + "/test.hcmask", "w", encoding="utf-8")
+        file = open(masksPath + "/test.hcmask", "w", encoding="utf-8")
         for mask in self.sorted_masks:
             if "1" in mask:
                 file.write(arg_options.charset1+",")
@@ -196,13 +261,14 @@ class Options():
         self.sorting = options.get('sortingMode')
         self.speed = int(options.get('speed'))
         self.time = int(options.get('time'))
+        self.minocc = int(options.get('minocc'))
 
 class MaskGenerator():
 
     def __init__(self) -> None:
         self.message = "all good"
 
-    def generateMaskFile(self, arg_options, wordlistsPath):
+    def generateMaskFile(self, arg_options, masksPath, wordlistsPath):
         
         options = Options(arg_options)
         
@@ -220,7 +286,7 @@ class MaskGenerator():
                 
         if options.wordlists:
             analyzer = PasswordAnalyzer()
-            masks = analyzer.analyze(options)
+            masks = analyzer.analyze(options, wordlistsPath)
 
         else:
             generator = PasswordGenerator()
@@ -229,7 +295,7 @@ class MaskGenerator():
         sorter = MaskSorter(options.sorting, masks)
         sorter.sort_masks(options)
 
-        sorter.save_masks_to_file(options, wordlistsPath)
+        sorter.save_masks_to_file(options, masksPath)
 
         return self.message
     

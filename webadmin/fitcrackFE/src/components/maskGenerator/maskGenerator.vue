@@ -280,6 +280,17 @@
         <template v-slot:item.keyspace="{ item }">
           {{ fmt(item.keyspace) }}
         </template>
+        <template v-slot:item.analyze="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+                <v-btn icon
+                @click="addDictionary(item.name)">
+                  <v-icon>{{ selectedDictionaries.includes(item.name) ? 'mdi-minus-circle' : 'mdi-plus-circle' }}</v-icon>
+                </v-btn>
+            </template>
+            <span>Analyze</span>
+          </v-tooltip>
+        </template>
       </v-data-table>
       <v-row>
         <v-col cols="6">
@@ -337,7 +348,7 @@
         minLength: 0,
         timeHours: 0,
         timeMins: 0,
-        speed: 0,
+        speed: 10000,
         minOcc: 0,
         sortingMode: 'Optimal',
         charset1: '',
@@ -353,7 +364,8 @@
             value: 'name'
           },
           {text: 'Keyspace', value: 'keyspace', align: 'end'},
-          {text: 'Time', value: 'time', align: 'end'}
+          {text: 'Time', value: 'time', align: 'end'},
+          {text: 'Analyze', value: 'analyze', align: 'end', sortable: false}
         ],
         dictionaries: [],
         selectedDictionaries: []
@@ -385,6 +397,14 @@
       removeExcPattern: function (excPattern) {
         this.excPatterns = this.excPatterns.filter((b) => b !== excPattern)
       },
+      addDictionary: function (dictName) {
+        if (this.selectedDictionaries.includes(dictName)) {
+          this.selectedDictionaries.splice(this.selectedDictionaries.indexOf(dictName), 1)
+        }
+        else {
+          this.selectedDictionaries.push(dictName)
+        }
+      },
       loadDictionaries: function () {
         this.loading = true;
         this.axios.get(this.$serverAddr + '/dictionary', {}).then((response) => {
@@ -414,7 +434,7 @@
           maxspecial: this.maxSpecial,
           time: this.timeHours * 3600 + this.timeMins * 60,
           speed: this.speed,
-          minOcc: this.minOcc,
+          minocc: this.minOcc,
           sortingMode: this.sortingMode,
           charset1: this.charset1,
           charset2: this.charset2,

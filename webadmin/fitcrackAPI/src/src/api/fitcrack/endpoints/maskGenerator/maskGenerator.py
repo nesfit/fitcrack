@@ -10,7 +10,7 @@ from flask import request, redirect, send_file
 from flask_restx import Resource, abort
 from sqlalchemy import exc
 
-from settings import MASKS_DIR, ROOT_DIR
+from settings import DICTIONARY_DIR, MASKS_DIR, ROOT_DIR
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.maskGenerator.MaskGenerator import MaskGenerator
 from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
@@ -37,7 +37,7 @@ class generateMasks(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
         maskGenerator = MaskGenerator()
-        message = maskGenerator.generateMaskFile(request.json, MASKS_DIR)
+        message = maskGenerator.generateMaskFile(request.json, MASKS_DIR, DICTIONARY_DIR)
         return {
             'message': message,
             'status': True
