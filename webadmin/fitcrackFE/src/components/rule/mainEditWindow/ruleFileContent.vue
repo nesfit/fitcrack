@@ -19,11 +19,13 @@
                             </td>
                             <td class="my-0 ruleInputLine">
                                 <v-text-field :id="`ruleLineField-${item.index}`" @focus="showPopup(item.index)"
-                                    @blur="hidePopup(item.index)" placeholder="Enter rule" hide-details outlined dense
-                                    v-model="item.rule" @input="updateRules(item.rule, item.index)">
+                                    @blur="hidePopup(item.index)" placeholder="Enter rule" autocomplete="off" hide-details
+                                    outlined dense v-model="item.rule" @input="updateRules(item.rule, item.index)">
                                 </v-text-field>
                                 <div class="quickFunctionsMenuPopup" v-show="item.popupVisible">
-                                    <quickFunctionsMenu v-bind:ruleIndex="item.index" v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
+                                    <quickFunctionsMenu v-bind:ruleIndex="item.index"
+                                        v-on:show-insert-popup="showInsertPopup"
+                                        v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
                                 </div>
                             </td>
                             <td class="other">
@@ -77,10 +79,10 @@ export default {
         hidePopup(index) {
             this.ruleObjects[index].popupVisible = false;
         },
-        showInsertPopup(insertData){
+        showInsertPopup(insertData) {
             this.$emit("show-insert-popup", insertData)
         },
-        showAllFunctionsPopup(popupData){
+        showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
         }
 

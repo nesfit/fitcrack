@@ -12,8 +12,9 @@
     <allFunctionsPopup v-bind:allFunctionsPopup="allFunctionsPopup" v-on:hide-all-functions-popup="hideAllFunctionsPopup"
       v-on:show-insert-popup="showInsertPopup"></allFunctionsPopup>
     <v-row justify="center">
-      <mainEditWindow v-bind:rulesList="rulesList" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo" v-on:update-rules="updateRules"
-        v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
+      <mainEditWindow v-bind:rulesList="rulesList" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo"
+        v-on:update-rules="updateRules" v-on:show-insert-popup="showInsertPopup"
+        v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
       <liveKeyspacePreview v-bind:passwordsList="passwordsList" v-bind:previewPasswordsString="previewPasswordsString"
         v-on:generate-preview="generatePreview">
       </liveKeyspacePreview>
@@ -24,6 +25,7 @@
   
 <script>
 import Vue from 'vue';
+import functionsJson from "@/assets/ruleFunctions.json"
 import mainEditWindow from "@/components/rule/mainEditWindow/mainEditWindow.vue";
 import liveKeyspacePreview from "@/components/rule/livePreview/liveKeyspacePreview.vue"
 import functionInsertPopup from "@/components/rule/mainEditWindow/popups/functionInsertPopup.vue"
@@ -33,6 +35,7 @@ import allFunctionsPopup from '@/components/rule/mainEditWindow/popups/allFuncti
 export default {
   data() {
     return {
+      ruleFunctions: functionsJson,
       rulesList: [""],
       passwordsList: [""],
       applicatorResult: "",
@@ -45,7 +48,8 @@ export default {
       },
       allFunctionsPopup: {
         visible: false,
-        onlyShow: true
+        onlyShow: true,
+        ruleIndex: 0
       },
       editingFile: false,
       ruleFileInfo: {}
@@ -55,10 +59,9 @@ export default {
     updateRules(updatedRulesList) {
       this.rulesList = updatedRulesList;
     },
-    updateRule(changedRule) {
-      console.log(this.functionsInsertPopup)
+    updateRule(functionToAdd) {
       //update the rule, where rule function was inserted
-      Vue.set(this.rulesList, this.functionsInsertPopup.ruleIndex, this.rulesList[this.functionsInsertPopup.ruleIndex].trimEnd().concat(changedRule));
+      Vue.set(this.rulesList, this.functionsInsertPopup.ruleIndex, this.rulesList[this.functionsInsertPopup.ruleIndex].trimEnd().concat(functionToAdd));
     },
     generatePreview(updatedPasswordsList) {
       this.passwordsList = updatedPasswordsList;
@@ -83,9 +86,21 @@ export default {
       this.previewPasswordsString = this.previewPasswords.join("\n");
     },
     showInsertPopup(insertData) {
+      //this.functionsInsertPopup = Object.assign({}, this.functionInsertPopup, insertData) //change the popup data
       this.functionsInsertPopup = insertData;
+      if (this.ruleFunctions[insertData.functionIndex].operands.length == 0) { //if the inserted function has no operands, insert the function immediatelly
+        Vue.set(this.functionsInsertPopup, 'visible', false);
+        const ruleFunction = " " + this.ruleFunctions[insertData.functionIndex].sign;
+        this.updateRule(ruleFunction)
+      }
+      else { //otherwise show the insert popup
+        Vue.set(this.functionsInsertPopup, 'visible', true);
+      }
+      console.log(this.functionsInsertPopup)
+
     },
     hideInsertPopup(visibility) {
+      console.log(this.functionsInsertPopup)
       this.functionsInsertPopup.visible = visibility;
     },
     showAllFunctionsPopup(popupData) {
@@ -99,7 +114,6 @@ export default {
         this.rulesList = response.data.split("\n")
       });
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
-        console.log(response.data)
         this.ruleFileInfo = response.data;
       });
     }

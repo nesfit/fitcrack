@@ -33,17 +33,16 @@
                     </v-col>
                 </v-row>
                 <v-divider class="my-2 grey darken-1"></v-divider>
-                <v-alert v-if="textFieldError" type="error" tile>
+                <v-alert v-if="!textFieldValid" type="error" tile>
                     Invalid operands!
                 </v-alert>
                 <v-row>
                 </v-row>
-                <v-row v-if="ruleFunction.operands.length">
+                <v-row>
                     <v-col cols="9">
                         <p class="font-weight-medium my-0">
                             Operands:
                         </p>
-
                         <div class="operandsWrapper">
                             <v-row v-for="(operand, index) in ruleFunction.operands" :key="index">
                                 <v-col md="auto">
@@ -84,7 +83,7 @@ export default {
         return {
             ruleFunctions: functionsJson,
             functionOperands: [],
-            textFieldError: false
+            textFieldValid: true
         }
     },
     props: {
@@ -95,10 +94,9 @@ export default {
             this.$emit("hide-insert-popup", false);
         },
         insertFunction() {
-            if (this.textFieldError = this.validateOperands()) {
+            if (!(this.textFieldValid = this.validateOperands())) {
                 return;
             }
-
             const operandsCount = this.ruleFunction.operands.length;
             const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) //get the function sign, remove the abstract operands
             const finalFunction = " " + functionSign + this.functionOperands.join(""); //
@@ -109,10 +107,10 @@ export default {
             for (let index = 0; index < this.functionOperands.length; index++) {
                 const pattern = (this.ruleFunction.operands[index].type === 'int') ? /^[0-9]{1}$/ : /^[^\s]{1}$/;
                 if (!pattern.test(this.functionOperands[index])) {
-                    return true;
+                    return false;
                 }
             }
-            return false;
+            return true;
         }
     },
     computed: {
@@ -124,7 +122,7 @@ export default {
         /**Function which initializes the operands array to empty strings when popup is shown, because of validation */
         functionsInsertPopup(newObject) {
             if (newObject.visible === true) {
-                this.textFieldError = false;
+                this.textFieldValid = true;
                 const numOfOperands = this.ruleFunction.operands.length;
                 this.functionOperands = Array(numOfOperands).fill("");
             }

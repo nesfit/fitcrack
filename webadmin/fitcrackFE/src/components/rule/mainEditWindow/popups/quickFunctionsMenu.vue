@@ -36,7 +36,6 @@ export default {
     methods: {
         showInsertPopup(functionIndex){
             const data = {
-                visible: true,
                 functionIndex: functionIndex,
                 ruleIndex: this.ruleIndex
             }
@@ -45,7 +44,8 @@ export default {
         showAllFunctionsPopup(onlyShow){
             const data = {
                 visible: true,
-                onlyShow: onlyShow
+                onlyShow: onlyShow,
+                ruleIndex: this.ruleIndex
             }
             this.$emit("show-all-functions-popup", data)
         }

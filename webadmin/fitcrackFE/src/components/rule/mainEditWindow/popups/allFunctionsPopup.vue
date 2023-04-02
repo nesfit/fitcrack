@@ -61,8 +61,8 @@ export default {
             if (!this.allFunctionsPopup.onlyShow) {
                 const functionIndex = this.ruleFunctions.findIndex((obj) => obj === row);
                 const data = {
-                    visible: true,
-                    functionIndex: functionIndex
+                    functionIndex: functionIndex,
+                    ruleIndex: this.allFunctionsPopup.ruleIndex
                 }
                 this.$emit("hide-all-functions-popup", false)
                 this.$emit("show-insert-popup", data)
