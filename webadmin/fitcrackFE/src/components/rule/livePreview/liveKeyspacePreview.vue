@@ -11,19 +11,23 @@
             </v-row>
             <v-row>
                 <v-col class="py-0">
-                    <input type="file" ref="appendDictionary" style="display: none"
+                    <!--
+                        <input type="file" ref="appendDictionary" style="display: none"
                         @change="onDictionaryFileChange($event)">
-                    <v-btn class="px-2" color="orange lighten-3" depressed @click="$refs.appendDictionary.click()">
+                    -->
+                    
+                    <v-btn class="px-2" color="orange lighten-3" depressed @click="appendDictPopup = true">
                         <v-icon left>
                             mdi-file
                         </v-icon>
                         Append dictionary
                     </v-btn>
+                    <appendDictPopup v-model="appendDictPopup" v-bind:passwordsContent="passwordsContent" v-on:update-passwords="updatePasswords"></appendDictPopup>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col class="pb-0">
-                    <v-textarea solo label="Dictionary Content" v-model="passwordsContent"></v-textarea>
+                    <v-textarea solo class="textArea" label="Dictionary Content" v-model="passwordsContent"></v-textarea>
                 </v-col>
             </v-row>
             <v-row>
@@ -39,7 +43,8 @@
             </v-row>
             <v-row>
                 <v-col class="pt-0">
-                    <v-textarea readonly solo label="Preview Passwords" v-model="this.previewPasswordsString"></v-textarea>
+                    <v-textarea class="textArea" readonly solo label="Preview Passwords"
+                        v-model="this.previewPasswordsString"></v-textarea>
                 </v-col>
 
             </v-row>
@@ -49,7 +54,7 @@
 
 
 <script>
-
+import appendDictPopup from '@/components/rule/mainEditWindow/popups/appendDictPopup.vue';
 export default {
     props: {
         previewPasswordsString: String
@@ -57,25 +62,19 @@ export default {
     data() {
         return {
             passwordsContent: "",
+            appendDictPopup: false
         }
     },
     methods: {
-        onDictionaryFileChange(event) {
-            if(event.target.files[0]) {
-                const file = event.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    this.passwordsContent = this.passwordsContent.concat(event.target.result);
-                    //this.passwordsListData = event.target.result.split("\n");
-                    //this.passwordsListData.pop();
-                };
-                reader.readAsText(file);
-            }
-
+        updatePasswords(updatedPasswordsContent){
+            this.passwordsContent = updatedPasswordsContent;
         },
         generatePreview() {
             this.$emit("generate-preview", this.passwordsContent)
         }
+    },
+    components:{
+        appendDictPopup
     }
 };
 
@@ -90,5 +89,10 @@ export default {
     font-family: monospace;
     font-size: 14px;
     line-height: 1.2;
+}
+
+.v-textarea textarea {
+    white-space: nowrap;
+    overflow-x: auto;
 }
 </style>

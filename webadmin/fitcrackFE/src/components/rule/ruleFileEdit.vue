@@ -85,6 +85,7 @@ export default {
         }
       });
       this.previewPasswordsString = this.previewPasswords.join("\n");
+      console.log(this.previewPasswordsString)
     },
     showInsertPopup(insertData) {
       //this.functionsInsertPopup = Object.assign({}, this.functionInsertPopup, insertData) //change the popup data
