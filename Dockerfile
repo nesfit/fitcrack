@@ -153,7 +153,7 @@ RUN mkdir /srv/db_init
 EXPOSE 80
 EXPOSE 5000
 
-HEALTHCHECK --interval=5s --timeout=20s CMD curl --fail http://localhost:5000# || exit 1
+HEALTHCHECK --interval=5s --timeout=20s CMD ps -ef | grep apache2 | grep -v grep || exit 1
 
 # Entrypoint
 RUN ["chmod", "+x", "/srv/fitcrack/entrypoint-fitcrack.sh"]

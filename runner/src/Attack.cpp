@@ -95,7 +95,7 @@ AttackBase *Attack::create(const ConfigTask &task_config, Directory &directory) 
       attack = new AttackBenchmark<AttackPCFG>(task_config, directory);
       break;
     case AT_Association:
-      attack = new AttackBenchmark<AttackDictionary>(task_config, directory); // TODO: create own benchmark
+      attack = new AttackBenchmark<AttackAssociation>(task_config, directory); // TODO: create own benchmark
       break;
     default:
       RunnerUtils::runtimeException("invalid attack mode for benchmark");

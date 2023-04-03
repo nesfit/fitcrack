@@ -39,6 +39,14 @@ class CAttackAssoc : public AttackMode {
           return m_job->getDistributionMode() == 1;
         }
 
+        /**
+         * @brief enum for distribution mode options readability
+        */
+        enum DistributionMode {
+          FragmentOnHosts = 1 << 0, ///< whether to fragment on server to multiple dicts or send whole dictionary to everyone and just give indexes
+          FragmentByRules  = 1 << 1 ///< whether to fragment rules (without dictionaries) or dictionaries (without rules)
+        };
+
     private:
         /**
          * @brief Function to generate new CWorkunit for certain host for given time

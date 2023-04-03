@@ -16,18 +16,22 @@
   
       <v-divider />
       <v-card-title>
-        <span>Fragmentation of dictionaries</span>
+        <span>Distribution mode</span>
       </v-card-title>
       <v-radio-group
         v-model="distributionMode"
       >
         <v-radio
-          label="On server"
+          label="Fragment dictionaries on server"
           :value="0"
         ></v-radio>
         <v-radio
-          label="On hosts"
+          label="Fragment dictionaries on hosts"
           :value="1"
+        ></v-radio>
+        <v-radio
+          label="Fragment rules on server"
+          :value="2"
         ></v-radio>
       </v-radio-group>
   

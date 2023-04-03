@@ -76,7 +76,9 @@ namespace Config {
     extern std::string inTemplateFilePrinceRules;
     extern std::string inTemplateFilePcfg;
     extern std::string inTemplateFilePcfgRules;
-    extern std::string inTemplateFileAssoc;
+    extern std::string inTemplateFileAssocDictSplit;
+    extern std::string inTemplateFileAssocDictAlt;
+    extern std::string inTemplateFileAssocRuleSplit;
     extern std::string outTemplateFile;
 
     /** Other parameters filled by BOINC arg parsing */
@@ -94,7 +96,9 @@ namespace Config {
     extern char * inTemplatePathPrinceRules;
     extern char * inTemplatePathPcfg;
     extern char * inTemplatePathPcfgRules;
-    extern char * inTemplatePathAssoc;
+    extern char * inTemplatePathAssocDictSplit;
+    extern char * inTemplatePathAssocDictAlt;
+    extern char * inTemplatePathAssocRuleSplit;
     extern DB_APP * app;
     extern int startTime;
     extern int seqNo;
