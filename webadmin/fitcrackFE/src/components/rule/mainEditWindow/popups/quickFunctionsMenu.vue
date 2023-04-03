@@ -1,9 +1,9 @@
 <template>
-    <v-sheet rounded :elevation="20" >
+    <v-sheet rounded :elevation="20">
         <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(1)">
             Lowercase
         </v-chip>
-        <v-chip label class="ma-1" color="primary"  @mousedown="showInsertPopup(2)">
+        <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(2)">
             Uppercase
         </v-chip>
         <v-chip label class="ma-1" color="primary" @mousedown="showInsertPopup(3)">
@@ -25,23 +25,23 @@
 
 <script>
 export default {
-    props:{
+    props: {
         ruleIndex: Number
     },
     data() {
         return {
-            
+
         }
     },
     methods: {
-        showInsertPopup(functionIndex){
+        showInsertPopup(functionIndex) {
             const data = {
                 functionIndex: functionIndex,
                 ruleIndex: this.ruleIndex
             }
             this.$emit("show-insert-popup", data)
         },
-        showAllFunctionsPopup(onlyShow){
+        showAllFunctionsPopup(onlyShow) {
             const data = {
                 visible: true,
                 onlyShow: onlyShow,
@@ -53,6 +53,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

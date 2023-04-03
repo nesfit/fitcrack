@@ -6,7 +6,7 @@
             </v-row>
             <v-row>
                 <v-col class="font-weight-medium">
-                    Type words or select a dictionary:
+                    Type passwords or append a dictionary:
                 </v-col>
             </v-row>
             <v-row>
