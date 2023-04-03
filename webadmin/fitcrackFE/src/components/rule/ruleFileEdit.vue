@@ -15,8 +15,7 @@
       <mainEditWindow v-bind:rulesList="rulesList" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo"
         v-on:update-rules="updateRules" v-on:show-insert-popup="showInsertPopup"
         v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
-      <liveKeyspacePreview v-bind:passwordsList="passwordsList" v-bind:previewPasswordsString="previewPasswordsString"
-        v-on:generate-preview="generatePreview">
+      <liveKeyspacePreview v-bind:previewPasswordsString="previewPasswordsString" v-on:generate-preview="generatePreview">
       </liveKeyspacePreview>
     </v-row>
   </v-container>
@@ -35,7 +34,9 @@ import allFunctionsPopup from '@/components/rule/mainEditWindow/popups/allFuncti
 export default {
   data() {
     return {
+      showConfirmation: false,
       ruleFunctions: functionsJson,
+      backupRulesList: [""],
       rulesList: [""],
       passwordsList: [""],
       applicatorResult: "",
@@ -63,8 +64,8 @@ export default {
       //update the rule, where rule function was inserted
       Vue.set(this.rulesList, this.functionsInsertPopup.ruleIndex, this.rulesList[this.functionsInsertPopup.ruleIndex].trimEnd().concat(functionToAdd));
     },
-    generatePreview(updatedPasswordsList) {
-      this.passwordsList = updatedPasswordsList;
+    generatePreview(passwordsContent) {
+      this.passwordsList = passwordsContent.split("\n");
       const data = {
         rulesList: this.rulesList,
         passwordsList: this.passwordsList
@@ -112,16 +113,55 @@ export default {
     loadRuleFile() {
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id + '/download').then((response) => {
         this.rulesList = response.data.split("\n")
+        this.backupRulesList = this.rulesList.slice()
       });
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
         this.ruleFileInfo = response.data;
       });
+    },
+    /**
+     * Function which checks if the rules has been changed compared to beginning
+     */
+    rulesChanged() {
+      return this.backupRulesList.toString() !== this.rulesList.toString(); 
+    },
+    /**
+     * Function which shows confirmation window when reload or go back button is clicked
+     */
+    navigateFromPage(event) {
+      if (this.rulesChanged() && !this.showConfirmation) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
     }
   },
   created() {
     if (this.$route.params.id) { //when there is id parameter in route url
       this.editingFile = true;
       this.loadRuleFile();
+    }
+  },
+  beforeMount() {
+    window.addEventListener('beforeunload', this.navigateFromPage);
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.navigateFromPage);
+  },
+  /**
+   * Function which shows confirm message when route is changed
+   */
+  beforeRouteLeave(to, from, next) {
+    if (this.rulesChanged()) {
+      if (confirm("Changes you made may not be saved.")) {
+        this.showConfirmation = true;
+        next();
+      }
+      else {
+        next(false);
+      }
+    }
+    else {
+      next();
     }
   },
   components: { mainEditWindow, liveKeyspacePreview, functionInsertPopup, allFunctionsPopup },

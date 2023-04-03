@@ -23,7 +23,7 @@
             </v-row>
             <v-row>
                 <v-col class="pb-0">
-                    <v-textarea solo label="Dictionary Content" v-model="dictionaryContent"></v-textarea>
+                    <v-textarea solo label="Dictionary Content" v-model="passwordsContent"></v-textarea>
                 </v-col>
             </v-row>
             <v-row>
@@ -52,28 +52,29 @@
 
 export default {
     props: {
-        passwordsList: Array,
         previewPasswordsString: String
     },
     data() {
         return {
-            dictionaryContent: null,
-            passwordsListData: this.passwordsList
+            passwordsContent: "",
         }
     },
     methods: {
         onDictionaryFileChange(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                this.dictionaryContent = event.target.result;
-                this.passwordsListData = event.target.result.split("\n");
-                this.passwordsListData.pop();
-            };
-            reader.readAsText(file);
+            if(event.target.files[0]) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    this.passwordsContent = this.passwordsContent.concat(event.target.result);
+                    //this.passwordsListData = event.target.result.split("\n");
+                    //this.passwordsListData.pop();
+                };
+                reader.readAsText(file);
+            }
+
         },
         generatePreview() {
-            this.$emit("generate-preview", this.passwordsListData)
+            this.$emit("generate-preview", this.passwordsContent)
         }
     }
 };
