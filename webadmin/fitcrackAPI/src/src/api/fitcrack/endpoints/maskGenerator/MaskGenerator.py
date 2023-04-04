@@ -226,7 +226,10 @@ class MaskSorter:
     
     def save_masks_to_file(self, arg_options, masksPath):
         '''Save sorted masks to an output file'''
-        file = open(masksPath + "/test.hcmask", "w", encoding="utf-8")
+        if arg_options.filename == '':
+            file = open(masksPath + "/test.hcmask", "w", encoding="utf-8")
+        else:
+            file = open(masksPath + "/" + arg_options.filename + ".hcmask", "w", encoding="utf-8")
         for mask in self.sorted_masks:
             if "1" in mask:
                 file.write(arg_options.charset1+",")
@@ -262,6 +265,7 @@ class Options():
         self.speed = int(options.get('speed'))
         self.time = int(options.get('time'))
         self.minocc = int(options.get('minocc'))
+        self.filename = options.get('filename')
 
 class MaskGenerator():
 

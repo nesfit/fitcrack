@@ -13,7 +13,7 @@
         </v-col>
         <v-col cols="8" align="right">
           <v-btn class="text-lowercase"
-            v-if="charset1 != ''"
+            :disabled="charset1 == ''"
             color="primary"
             outlined
             @click="updatePattern('?1')"
@@ -21,7 +21,7 @@
             ?1
           </v-btn>
           <v-btn class="text-lowercase"
-            v-if="charset2 != ''"
+          :disabled="charset2 == ''"
             color="primary"
             outlined
             @click="updatePattern('?2')"
@@ -29,7 +29,7 @@
             ?2
           </v-btn>
           <v-btn class="text-lowercase"
-            v-if="charset3 != ''"
+          :disabled="charset3 == ''"
             color="primary"
             outlined
             @click="updatePattern('?3')"
@@ -37,7 +37,7 @@
             ?3
           </v-btn>
           <v-btn class="text-lowercase"
-            v-if="charset4 != ''"
+          :disabled="charset4 == ''"
             color="primary"
             outlined
             @click="updatePattern('?4')"
@@ -328,9 +328,9 @@
           </v-tooltip>
         </template>
       </v-data-table>
-      <v-row>
+      <v-row class="top-space">
         <v-col cols="6">
-        <b>Minimum number of occurrences:</b>
+          <b>Minimum number of occurrences:</b>
         </v-col>
         <v-col cols="6" align="left">
           <input v-model="minOcc" type="number" min="1" size="4">
@@ -345,10 +345,20 @@
             v-model="sortingMode"
             :items="['Optimal', 'Occurrence', 'Complexity']"
           ></v-select>
-      </v-col>
-        <v-col cols="5"/>
+        </v-col>
       </v-row>
-      <div class="align-right">
+      <v-row>
+        <v-col cols="6" align="left">
+          <v-text-field
+            label="Mask file name"
+            filled
+            outlined
+            dense
+            single-line
+            v-model="filename"
+          />
+        </v-col>
+        <v-col cols="6" align="right">      
           <v-btn
             color="primary"
             outlined
@@ -356,7 +366,8 @@
           >
             Generate masks
           </v-btn>
-        </div>
+        </v-col>
+      </v-row>
     </fc-tile>
   </v-container>
 </template>
@@ -404,7 +415,8 @@
           {text: 'Analyze', value: 'analyze', align: 'end', sortable: false}
         ],
         dictionaries: [],
-        selectedDictionaries: []
+        selectedDictionaries: [],
+        filename: ''
       }
     },
     mounted: function () {
@@ -478,7 +490,8 @@
           charset4: this.charset4,
           patinc: patinc,
           patexc: patexc,
-          wordlists: this.selectedDictionaries
+          wordlists: this.selectedDictionaries,
+          filename: this.filename
         })
         .then(function (response) {
           console.log(response);
