@@ -364,7 +364,7 @@
             outlined
             @click="generateMasks()"
           >
-            Generate masks
+            {{ showItemState }}
           </v-btn>
         </v-col>
       </v-row>
@@ -382,6 +382,7 @@
     data: function () {
       return {
         loading: false,
+        awaitingResponse: false,
         pattern: '',
         minLower: 0,
         minUpper: 0,
@@ -426,6 +427,12 @@
     components: {
       'fc-tile': tile,
     },
+    computed: {
+      showItemState () {
+        if (!this.awaitingResponse) return "Generate masks"
+        else return "Generating..."
+      }
+    },
     methods: {
       fmt,
       updatePattern: function (text) {
@@ -469,6 +476,7 @@
         this.incPatterns.forEach(function(pattern){
           patinc.push(pattern['text'])
         })
+        this.awaitingResponse = true;
         this.axios.post(this.$serverAddr + '/maskGenerator', {
           minlength: this.minLength,
           maxlength: this.maxLength,
@@ -493,8 +501,9 @@
           wordlists: this.selectedDictionaries,
           filename: this.filename
         })
-        .then(function (response) {
+        .then(response => {
           console.log(response);
+          this.awaitingResponse = false;
         })
         .catch(function (error) {
           console.log(error);
