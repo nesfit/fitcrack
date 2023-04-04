@@ -281,7 +281,7 @@
           <b>h</b>
         </v-col>
         <v-col cols="1">
-          <input v-model="timeMins" type="number" min="0" size="4">
+          <input v-model="timeMins" type="number" min="0" size="4" max="59">
         </v-col>
         <v-col cols="1">
           <b>m</b>
@@ -290,7 +290,7 @@
           <b>Speed:</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="speed" type="number" min="0" size="8">
+          <input v-model="speed" type="number" min="0" size="8" step="10000">
         </v-col>
         <v-col cols="2" align="left">
           <b>keys/s</b>
@@ -396,7 +396,7 @@
         minLength: 0,
         timeHours: 0,
         timeMins: 0,
-        speed: 10000,
+        speed: 100000,
         minOcc: 1,
         sortingMode: 'Optimal',
         charset1: '',
