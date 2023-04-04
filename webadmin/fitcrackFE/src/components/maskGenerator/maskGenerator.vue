@@ -5,14 +5,50 @@
       class="ma-2"
       :icon="$route.meta.icon"
     >
-      <v-row>
+      <v-row style="margin-bottom: -10mm;">
         <v-col cols="4">
           <v-card-title class="pb-0 mb-2">
             <span>Patterns</span>
           </v-card-title>
         </v-col>
-        <v-col cols="8">
-          <div class="align-right">
+        <v-col cols="8" align="right">
+          <v-btn class="text-lowercase"
+            v-if="charset1 != ''"
+            color="primary"
+            outlined
+            @click="updatePattern('?1')"
+          >
+            ?1
+          </v-btn>
+          <v-btn class="text-lowercase"
+            v-if="charset2 != ''"
+            color="primary"
+            outlined
+            @click="updatePattern('?2')"
+          >
+            ?2
+          </v-btn>
+          <v-btn class="text-lowercase"
+            v-if="charset3 != ''"
+            color="primary"
+            outlined
+            @click="updatePattern('?3')"
+          >
+            ?3
+          </v-btn>
+          <v-btn class="text-lowercase"
+            v-if="charset4 != ''"
+            color="primary"
+            outlined
+            @click="updatePattern('?4')"
+          >
+            ?4
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col align="right">
+          <div class="bottom-space">
             <v-btn class="text-lowercase"
               color="primary"
               outlined
@@ -184,19 +220,19 @@
           <b>Lowercase</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minLower" type="number" size="4">
+          <input v-model="minLower" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxLower" type="number" size="4">
+          <input v-model="maxLower" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="2">
           <b>Digits</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minDigits" type="number" size="4">
+          <input v-model="minDigits" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxDigits" type="number" size="4">
+          <input v-model="maxDigits" type="number" min="0" max="99" size="4">
         </v-col>
       </v-row>
       <v-row>
@@ -204,19 +240,19 @@
           <b>Uppercase</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minUpper" type="number" size="4">
+          <input v-model="minUpper" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxUpper" type="number" size="4">
+          <input v-model="maxUpper" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="2">
           <b>Special</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minSpecial" type="number" size="4">
+          <input v-model="minSpecial" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxSpecial" type="number" size="4">
+          <input v-model="maxSpecial" type="number" min="0" max="99" size="4">
         </v-col>
       </v-row>
       <v-row class="bottom-space">
@@ -224,10 +260,10 @@
           <b>Length</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minLength" type="number" size="4">
+          <input v-model="minLength" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxLength" type="number" size="4">
+          <input v-model="maxLength" type="number" min="0" max="99" size="4">
         </v-col>
         <v-col cols="6"/>
       </v-row>
@@ -239,13 +275,13 @@
           <b>Time:</b>
         </v-col>
         <v-col cols="1">
-          <input v-model="timeHours" type="number" size="4">
+          <input v-model="timeHours" type="number" min="0" size="4">
         </v-col>
         <v-col cols="1">
           <b>h</b>
         </v-col>
         <v-col cols="1">
-          <input v-model="timeMins" type="number" size="4">
+          <input v-model="timeMins" type="number" min="0" size="4">
         </v-col>
         <v-col cols="1">
           <b>m</b>
@@ -254,7 +290,7 @@
           <b>Speed:</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="speed" type="number" size="8">
+          <input v-model="speed" type="number" min="0" size="8">
         </v-col>
         <v-col cols="2" align="left">
           <b>keys/s</b>
@@ -297,7 +333,7 @@
         <b>Minimum number of occurrences:</b>
         </v-col>
         <v-col cols="6" align="left">
-          <input v-model="minOcc" type="number" size="4">
+          <input v-model="minOcc" type="number" min="1" size="4">
         </v-col>
       </v-row>
       <v-row>
@@ -349,7 +385,7 @@
         timeHours: 0,
         timeMins: 0,
         speed: 10000,
-        minOcc: 0,
+        minOcc: 1,
         sortingMode: 'Optimal',
         charset1: '',
         charset2: '',
