@@ -253,13 +253,12 @@ class downloadRule(Resource):
 @ns.route('/randomRule')
 class generateRandomRule(Resource):
     @api.marshal_with(randomRule_model)
-    def post(self):
+    def get(self):
         """
         Returns generated random rule.
         """
-        request_data = request.get_json()
-        min_function_num = request_data['minFunctionsNum']
-        max_function_num = request_data['maxFunctionsNum']
+        min_function_num = 3
+        max_function_num = 8
         random_rule_buf = ctypes.create_string_buffer(256)
         
         # generate random rule using the C function
@@ -282,6 +281,7 @@ class passwordsPreview(Resource):
         dictionary = request_data['passwordsList']
         rules = request_data['rulesList']
         preview = []
+        final_password = ctypes.create_string_buffer(64)
         
         for password in dictionary:
             password = password.strip()
@@ -290,7 +290,6 @@ class passwordsPreview(Resource):
                                 
                 # Apply the rule to the password using the C function
                 in_len = len(password.encode('latin-1'))
-                final_password = ctypes.create_string_buffer(64)
                 #Returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
                 ret_code = apply_rule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), in_len, final_password)
                 

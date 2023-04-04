@@ -103,8 +103,6 @@ export default {
     },
     data() {
         return {
-            minFunctionsNum: 6,
-            maxFunctionsNum: 8,
             randomRuleString: "",
             appendRuleFilePopup: false,
             rulesListData: this.rulesList,
@@ -125,11 +123,7 @@ export default {
             reader.readAsText(file);
         },
         generateRandomRule() {
-            const data = {
-                minFunctionsNum: this.minFunctionsNum,
-                maxFunctionsNum: this.maxFunctionsNum
-            };
-            this.axios.post(this.$serverAddr + "/rule/randomRule", data).then((response) => {
+            this.axios.get(this.$serverAddr + "/rule/randomRule").then((response) => {
                 this.randomRuleString = response.data.randomRule;
                 this.rulesListData = this.rulesList; //copy the props
                 this.rulesListData.push(this.randomRuleString);
