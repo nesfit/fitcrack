@@ -72,14 +72,14 @@
             </v-row>
             <v-row>
                 <v-col align="right">
-                    Rule count: {{ ruleCount }}
+                    Lines count: {{ ruleCount }}
                 </v-col>
 
             </v-row>
 
             <v-row>
                 <v-col class="text-right">
-                    <v-btn color="grey lighten-1" depressed @click="saveFile()">
+                    <v-btn color="grey lighten-1" @click="saveFile()">
                         <v-icon>
                             mdi-content-save
                         </v-icon>

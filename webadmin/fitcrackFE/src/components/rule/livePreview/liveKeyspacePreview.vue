@@ -15,14 +15,15 @@
                         <input type="file" ref="appendDictionary" style="display: none"
                         @change="onDictionaryFileChange($event)">
                     -->
-                    
-                    <v-btn class="px-2" color="orange lighten-3" depressed @click="appendDictPopup = true">
+
+                    <v-btn class="px-2" color="orange lighten-3" small depressed @click="appendDictPopup = true">
                         <v-icon left>
                             mdi-file
                         </v-icon>
                         Append dictionary
                     </v-btn>
-                    <appendDictPopup v-model="appendDictPopup" v-bind:passwordsContent="passwordsContent" v-on:update-passwords="updatePasswords"></appendDictPopup>
+                    <appendDictPopup v-model="appendDictPopup" v-bind:passwordsContent="passwordsContent"
+                        v-on:update-passwords="updatePasswords"></appendDictPopup>
                 </v-col>
             </v-row>
             <v-row>
@@ -42,11 +43,15 @@
                 </v-col>
             </v-row>
             <v-row>
-                <v-col class="pt-0">
-                    <v-textarea class="textArea" readonly solo label="Preview Passwords"
+                <v-col class="py-0">
+                    <v-textarea class="textArea" readonly solo label="Passwords preview"
                         v-model="this.previewPasswordsString"></v-textarea>
                 </v-col>
-
+            </v-row>
+            <v-row>
+                <v-col class="text-center pt-0">
+                    <v-btn height="40" multi-line text-wrap color=" grey lighten-1" small @click="downloadFinalPasswords()">Download <br>mangled passwords</v-btn>
+                </v-col>
             </v-row>
         </v-container>
     </v-col>
@@ -61,19 +66,28 @@ export default {
     },
     data() {
         return {
-            passwordsContent: "",
+            passwordsContent: "p@ssW0rd",
             appendDictPopup: false
         }
     },
     methods: {
-        updatePasswords(updatedPasswordsContent){
+        updatePasswords(updatedPasswordsContent) {
             this.passwordsContent = updatedPasswordsContent;
         },
         generatePreview() {
             this.$emit("generate-preview", this.passwordsContent)
+        },
+        downloadFinalPasswords(){
+            const blob = new Blob([this.previewPasswordsString], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "finalPasswords.txt"
+            link.click();
+            URL.revokeObjectURL(url)
         }
     },
-    components:{
+    components: {
         appendDictPopup
     }
 };
@@ -92,7 +106,7 @@ export default {
 }
 
 .v-textarea textarea {
-    white-space: nowrap;
+    white-space: pre;
     overflow-x: auto;
 }
 </style>
