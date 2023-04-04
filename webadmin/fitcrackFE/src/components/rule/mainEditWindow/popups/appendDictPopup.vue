@@ -58,7 +58,7 @@ export default {
     },
     data() {
         return {
-            passwordsContentCopy: this.passwordsContent,
+            passwordsContentCopy: "",
             tab: null,
             systemFileSelected: false,
             serverFileSelected: []
@@ -69,7 +69,7 @@ export default {
             if (event) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    this.passwordsContentCopy = this.passwordsContentCopy.concat(reader.result);
+                    this.passwordsContentCopy = this.passwordsContent.concat(reader.result);
                 };
                 reader.readAsText(event)
                 this.systemFileSelected = true;
@@ -86,7 +86,7 @@ export default {
         },
         appendServerDict() {
             this.axios.get(this.$serverAddr + "/dictionary/" + this.serverFileSelected[0].id + "/download").then((response) => {
-                this.passwordsContentCopy = this.passwordsContentCopy.concat(response.data)
+                this.passwordsContentCopy = this.passwordsContent.concat(response.data)
                 this.$emit("update-passwords", this.passwordsContentCopy)
                 this.serverFileSelected = []
                 this.popupVisible = false;

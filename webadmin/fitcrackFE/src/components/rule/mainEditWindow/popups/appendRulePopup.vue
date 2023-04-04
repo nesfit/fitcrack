@@ -32,7 +32,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card text class="text-center py-2">
-                        <rulesSelector v-model="serverFileSelected"> </rulesSelector>
+                        <rulesSelector v-model="serverFileSelected"></rulesSelector>
                         <v-btn color="primary" outlined :disabled="serverFileSelected.length == 0"
                             @click="appendServerRules">
                             Append
@@ -60,7 +60,7 @@ export default {
     },
     data() {
         return {
-            rulesListData: this.rulesList,
+            rulesListData: [],
             tab: null,
             systemFileSelected: false,
             serverFileSelected: []
@@ -89,7 +89,7 @@ export default {
         },
         appendServerRules() {
             this.axios.get(this.$serverAddr + "/rule/" + this.serverFileSelected[0].id + "/download").then((response) => {
-                this.rulesListData = this.rulesListData.concat(response.data.split("\n"))
+                this.rulesListData = this.rulesList.concat(response.data.split("\n"))
                 this.rulesListData.pop();
                 console.log(this.rulesListData)
                 this.$emit("update-rules", this.rulesListData)

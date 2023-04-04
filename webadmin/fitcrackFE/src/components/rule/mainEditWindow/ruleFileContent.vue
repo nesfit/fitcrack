@@ -11,7 +11,7 @@
             <v-divider></v-divider>
             <v-data-table :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="ruleObjects"
                 hide-default-header :search="search"
-                :footer-props="{ itemsPerPageOptions: [5, 10, 15, 20, 100], itemsPerPageText: 'Rules per page' }">
+                :footer-props="{ itemsPerPageOptions: [5, 10, 15, 20, 100, 200], itemsPerPageText: 'Rules per page', showFirstLastPage: true }">
                 <template v-slot:body="{ items }">
                     <tbody class="telicko">
                         <tr v-for="item in items" :key="item.index">
@@ -58,7 +58,8 @@ export default {
                 itemsPerPage: 5,
                 page: 1
             },
-            prevRuleObjectsLength: 0, // for checking if line was deleted 
+            prevRuleObjectsLength: 0, // for checking if line was deleted
+            goOnLastPage: false,
             headers: [
                 { text: "Rule name", value: "rule", align: "right" },
                 { text: "ID", value: "id" },
@@ -104,11 +105,13 @@ export default {
          * Return number of current page when deleting rules, otherwise number of last page 
          */
         lastOrCurrentPage() {
-            if (this.ruleObjects.length >= this.prevRuleObjectsLength) {
+            if (this.ruleObjects.length > this.prevRuleObjectsLength || this.goOnLastPage) {
+                console.log("returning lastpage")
                 this.prevRuleObjectsLength = this.ruleObjects.length;
                 return Math.ceil(this.ruleObjects.length / this.options.itemsPerPage);
             }
             else {
+                console.log("returning current")
                 this.prevRuleObjectsLength = this.ruleObjects.length;
                 return this.options.page;
             }
@@ -118,7 +121,9 @@ export default {
         // When itemsPerPage value is changed, go onto the last page
         'options.itemsPerPage': function (newVal, oldVal) {
             if (newVal !== oldVal) {
+                this.goOnLastPage = true;
                 this.options.page = this.lastOrCurrentPage;
+                this.goOnLastPage = false;
             }
         }
     },
