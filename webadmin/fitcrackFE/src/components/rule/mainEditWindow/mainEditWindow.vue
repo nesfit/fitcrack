@@ -83,13 +83,7 @@
                         <v-icon>
                             mdi-content-save
                         </v-icon>
-                        <div v-if="!editingFile">
-                            Save file
-                        </div>
-                        <div v-else>
-                            Update file
-                        </div>
-
+                        {{ !editingFile ? "Save file" : "Update File" }}
                     </v-btn>
                 </v-col>
             </v-row>
@@ -188,8 +182,7 @@ export default {
                 //upload the file to server
                 this.axios.post(this.$serverAddr + "/rule", formData, config).then((response) => {
                     this.file = null
-                    this.resetRules();
-                    this.$router.push({ name: 'rules' });
+                    this.$router.push({ name: 'rules', params: {skipConfirmWindow: true}});
                 }).catch(error => {
                     console.log(error)
                 });
@@ -197,8 +190,7 @@ export default {
             else {
                 this.axios.put(this.$serverAddr + "/rule/" + this.$route.params.id, formData, config).then((response) => {
                     this.file = null
-                    this.resetRules();
-                    this.$router.push({ name: 'rules' });
+                    this.$router.push({ name: 'rules', params: {skipConfirmWindow: true}});
                 }).catch(error => {
                     console.log(error)
                 });

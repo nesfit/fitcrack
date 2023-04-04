@@ -106,12 +106,10 @@ export default {
          */
         lastOrCurrentPage() {
             if (this.ruleObjects.length > this.prevRuleObjectsLength || this.goOnLastPage) {
-                console.log("returning lastpage")
                 this.prevRuleObjectsLength = this.ruleObjects.length;
                 return Math.ceil(this.ruleObjects.length / this.options.itemsPerPage);
             }
             else {
-                console.log("returning current")
                 this.prevRuleObjectsLength = this.ruleObjects.length;
                 return this.options.page;
             }

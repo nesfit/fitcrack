@@ -124,6 +124,9 @@ export default {
      * Function which checks if the rules has been changed compared to beginning
      */
     rulesChanged() {
+      console.log("Baqckup:", this.backupRulesList.toString())
+      console.log("CUrrent:", this.rulesList.toString())
+
       return this.backupRulesList.toString() !== this.rulesList.toString(); 
     },
     /**
@@ -152,7 +155,7 @@ export default {
    * Function which shows confirm message when route is changed
    */
   beforeRouteLeave(to, from, next) {
-    if (this.rulesChanged()) {
+    if (this.rulesChanged() && !to.params.skipConfirmWindow) {
       if (confirm("Changes you made may not be saved.")) {
         this.showConfirmation = true;
         next();
