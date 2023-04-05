@@ -15,7 +15,7 @@
       <mainEditWindow v-bind:rulesList="rulesList" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo"
         v-on:update-rules="updateRules" v-on:show-insert-popup="showInsertPopup"
         v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
-      <liveKeyspacePreview v-bind:previewPasswordsString="previewPasswordsString" v-on:generate-preview="generatePreview">
+      <liveKeyspacePreview v-bind:previewPasswords="previewPasswords" v-on:generate-preview="generatePreview">
       </liveKeyspacePreview>
     </v-row>
   </v-container>
@@ -40,8 +40,11 @@ export default {
       rulesList: [""],
       passwordsList: [""],
       applicatorResult: "",
-      previewPasswords: [],
-      previewPasswordsString: "",
+      previewPasswordsList: [],
+      previewPasswords: {
+        string: "",
+        loading: false
+      },
       functionsInsertPopup: {
         visible: false,
         functionIndex: 0,
@@ -64,28 +67,37 @@ export default {
       //update the rule, where rule function was inserted
       Vue.set(this.rulesList, this.functionsInsertPopup.ruleIndex, this.rulesList[this.functionsInsertPopup.ruleIndex].trimEnd().concat(functionToAdd));
     },
+    /**
+     * Function which generates password preview, gets mangled passwords
+     */
     generatePreview(passwordsContent) {
+      this.previewPasswords.loading = true; //Show loading button
+
       this.passwordsList = passwordsContent.split("\n");
       const data = {
         rulesList: this.rulesList,
         passwordsList: this.passwordsList
       };
+      // Get the result
       this.axios.post(this.$serverAddr + "/rule/preview", data).then((response) => {
         this.applicatorResult = response.data.passwordsPreview;
+        console.log(this.rulesList)
         this.filterPreviewPasswords();
       }).catch((error) => {
-        this.previewPasswords = error.message;
-      });
+        this.previewPasswords.string = error.message;
+      }).finally(() => {
+        this.previewPasswords.loading = false; //the loading is done
+      })
     },
     filterPreviewPasswords() {
-      this.previewPasswords = [];
+      this.previewPasswordsList = [];
       this.applicatorResult.forEach(element => {
         if (element.retCode >= 0) {
-          this.previewPasswords.push(element.finalPassword);
+          this.previewPasswordsList.push(element.finalPassword);
         }
       });
-      this.previewPasswordsString = this.previewPasswords.join("\n");
-      console.log(this.previewPasswordsString)
+      this.previewPasswords.string = this.previewPasswordsList.join("\n");
+      console.log(this.previewPasswords.string)
     },
     showInsertPopup(insertData) {
       //this.functionsInsertPopup = Object.assign({}, this.functionInsertPopup, insertData) //change the popup data
@@ -115,6 +127,7 @@ export default {
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id + '/download').then((response) => {
         this.rulesList = response.data.split("\n")
         this.backupRulesList = this.rulesList.slice()
+        this.generatePreview("p@ssW0rd"); //generate the initial mangled passwords
       });
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
         this.ruleFileInfo = response.data;

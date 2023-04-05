@@ -28,7 +28,9 @@ previewPasswords_model = api.model('Changed passwords preview', {
         'finalPassword': fields.String(required=True, description='Password after rule mangling'),
         'retCode': fields.Integer(required=True, 
             description='Return code of password mangling function (Length of password if OK, -3 if comment, -2 if empty rule or password, -1 if syntax error)')
-        })), required=True)
+        })), required=True),
+    'status': fields.Boolean(description="True if success, False if failed."),
+    'message': fields.String(description="Some details...")
 })
 
 randomRule_model = api.model('Random rule', {

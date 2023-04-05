@@ -275,37 +275,48 @@ class passwordsPreview(Resource):
     @api.marshal_with(previewPasswords_model)
     def post(self):
         """
-        Returns passwords after rules application.
+        Returns passwords after rules mangling.
         """
         request_data = request.get_json()
         dictionary = request_data['passwordsList']
         rules = request_data['rulesList']
         preview = []
-        final_password = ctypes.create_string_buffer(64)
+        final_password_buf = ctypes.create_string_buffer(64)
         
+        counter = 0
         for password in dictionary:
             password = password.strip()
             for rule in rules: 
+                counter += 1
                 rule = rule.strip()
                                 
                 # Apply the rule to the password using the C function
                 in_len = len(password.encode('latin-1'))
+                
                 #Returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
-                ret_code = apply_rule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), in_len, final_password)
+                ret_code = apply_rule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), in_len, final_password_buf)
                 
                 if(ret_code == -1):
-                    final_password = ""
+                    final_password_str = ""
                     #if the line in a rule is a comment, specify return code to -3
                     if(len(rule) > 0 and rule[0] == '#'):
                         ret_code = RETCODE_COMMENT
                 else:
-                    final_password = final_password.value.decode('latin-1')
+                    final_password_str = final_password_buf.value.decode('latin-1')
                 
                 #Add element to a preview list
                 element = {
-                    "finalPassword" : final_password,
+                    "finalPassword" : final_password_str,
                     "retCode" : ret_code
                 }                         
-                preview.append(element)
+                preview.append(element) 
                 
-        return { 'passwordsPreview' : preview }, 200  
+        #Return success
+        return { 
+            'passwordsPreview' : preview,
+            'status': True,
+            'message': "Passwords were successfully mangled."
+        }, 200
+                
+                
+        

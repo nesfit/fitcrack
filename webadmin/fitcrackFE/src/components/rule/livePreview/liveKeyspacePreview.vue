@@ -33,7 +33,9 @@
             </v-row>
             <v-row>
                 <v-col cols="12" class="text-center pt-0 pb-8">
-                    <v-btn class="orange darken-3" @click="generatePreview">Generate Preview</v-btn>
+                    <v-btn class="orange darken-3" :loading="previewPasswords.loading" :disabled="previewPasswords.loading" @click="generatePreview">
+                        <span v-if="!previewPasswords.loading">Generate Preview</span>
+                    </v-btn>
                 </v-col>
 
             </v-row>
@@ -45,12 +47,13 @@
             <v-row>
                 <v-col class="py-0">
                     <v-textarea class="textArea" readonly solo label="Passwords preview"
-                        v-model="this.previewPasswordsString"></v-textarea>
+                        v-model="this.previewPasswords.string"></v-textarea>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col class="text-center pt-0">
-                    <v-btn height="40" multi-line text-wrap color=" grey lighten-1" small @click="downloadFinalPasswords()">Download <br>mangled passwords</v-btn>
+                    <v-btn height="40" multi-line text-wrap color=" grey lighten-1" small
+                        @click="downloadFinalPasswords()">Download <br>mangled passwords</v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -62,7 +65,7 @@
 import appendDictPopup from '@/components/rule/mainEditWindow/popups/appendDictPopup.vue';
 export default {
     props: {
-        previewPasswordsString: String
+        previewPasswords: Object
     },
     data() {
         return {
@@ -75,10 +78,10 @@ export default {
             this.passwordsContent = updatedPasswordsContent;
         },
         generatePreview() {
-            this.$emit("generate-preview", this.passwordsContent)
+            this.$emit("generate-preview", this.passwordsContent);
         },
-        downloadFinalPasswords(){
-            const blob = new Blob([this.previewPasswordsString], { type: 'text/plain' });
+        downloadFinalPasswords() {
+            const blob = new Blob([this.previewPasswords.string], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
