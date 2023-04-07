@@ -197,6 +197,9 @@ class pcfgMakeFromDictionary(Resource):
         if not dict:
             abort(500, 'Can not find selected dictionary.')
 
+        if os.path.exists(PCFG_DIR + '/' + extractNameFromZipfile(dict.name)):
+            abort(500, 'PCFG with the same as dictionary already exists.')
+
         makePcfgFolder(dict.name)
         moveGrammarToPcfgDir(dict.name)
 
