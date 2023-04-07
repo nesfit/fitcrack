@@ -122,8 +122,8 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col align="right">
-          <ul style="list-style-type:none;">
+        <v-col align="left" cols="5">
+          <ul style="list-style-type:disc;">
             <li v-for="incPattern in incPatterns" :key="incPattern.id">
               {{ incPattern.text }}
               <button @click="removeIncPattern(incPattern)">
@@ -134,8 +134,9 @@
             </li>
           </ul>
         </v-col>
-        <v-col align="right">
-          <ul style="list-style-type:none;">
+        <v-col cols="2"></v-col>
+        <v-col align="left" cols="5">
+          <ul style="list-style-type:disc;">
             <li v-for="excPattern in excPatterns" :key="excPattern.id">
               {{ excPattern.text }}
               <button @click="removeExcPattern(excPattern)">
