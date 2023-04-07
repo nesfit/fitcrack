@@ -36,8 +36,28 @@ class generateMasks(Resource):
 
     @api.marshal_with(simpleResponse)
     def post(self):
+
+        filename = request.json.get('filename')
+
+        if filename == '':
+            abort(500, 'Filename cannot be empty.')
+
+        if os.path.isfile(MASKS_DIR + "/" + filename + ".hcmask"):
+            abort(500, 'File with this name already exists.')
+
         maskGenerator = MaskGenerator()
         message = maskGenerator.generateMaskFile(request.json, MASKS_DIR, DICTIONARY_DIR)
+
+
+        filename = 'test.hcmask' if request.json.get('filename') == '' else request.json.get('filename') + '.hcmask'
+        maskSet = FcMasksSet(name=filename, path=filename)
+        try:
+            db.session.add(maskSet)
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session().rollback()
+            abort(500, 'Masks set with name ' + filename + ' already exists.')
+
         return {
             'message': message,
             'status': True

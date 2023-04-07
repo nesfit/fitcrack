@@ -519,8 +519,9 @@
           console.log(response);
           this.awaitingResponse = false;
         })
-        .catch(function (error) {
+        .catch(error => {
           console.log(error);
+          this.awaitingResponse = false;
         });
       }
     }
