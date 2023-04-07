@@ -270,7 +270,7 @@ class Options():
 class MaskGenerator():
 
     def __init__(self) -> None:
-        self.message = "all good"
+        self.message = "Successfully created mask file."
 
     def generateMaskFile(self, arg_options, masksPath, wordlistsPath):
         
@@ -278,15 +278,21 @@ class MaskGenerator():
         
         if options.patinc:
             for pattern in options.patinc:
-                if not (check_charsets(pattern, options) and check_custom_charsets(pattern, options) and
-                        options.minlength <= len(pattern.replace('?', '')) <= options.maxlength):
-                    return "Arguments incompatible with pattern: " + str(pattern)
+                if not check_charsets(pattern, options):
+                    return "Criteria incompatible with pattern: " + str(pattern)
+                if not check_custom_charsets(pattern, options):
+                    return "Undefined charset used in pattern: " + str(pattern)
+                if not options.minlength <= len(pattern.replace('?', '')) <= options.maxlength:
+                    return "Pattern " + pattern + " incompatible with length criteria."
 
         if options.patexc:
             for pattern in options.patexc:
-                if not (check_charsets(pattern, options) and check_custom_charsets(pattern, options) and
-                        options.minlength <= len(pattern.replace('?', '')) <= options.maxlength):
-                    return "Arguments incompatible with pattern: " + str(pattern)
+                if not check_charsets(pattern, options):
+                    return "Criteria incompatible with pattern: " + str(pattern)
+                if not check_custom_charsets(pattern, options):
+                    return "Undefined charset used in pattern: " + str(pattern)
+                if not options.minlength <= len(pattern.replace('?', '')) <= options.maxlength:
+                    return "Pattern " + pattern + " incompatible with length criteria."
                 
         if options.wordlists:
             analyzer = PasswordAnalyzer()

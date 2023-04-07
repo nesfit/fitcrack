@@ -48,17 +48,19 @@ class generateMasks(Resource):
         maskGenerator = MaskGenerator()
         message = maskGenerator.generateMaskFile(request.json, MASKS_DIR, DICTIONARY_DIR)
 
+        if message == "Successfully created mask file.":
+            filename = 'test.hcmask' if request.json.get('filename') == '' else request.json.get('filename') + '.hcmask'
+            maskSet = FcMasksSet(name=filename, path=filename)
+            try:
+                db.session.add(maskSet)
+                db.session.commit()
+            except exc.IntegrityError as e:
+                db.session().rollback()
+                abort(500, 'Masks set with name ' + filename + ' already exists.')
 
-        filename = 'test.hcmask' if request.json.get('filename') == '' else request.json.get('filename') + '.hcmask'
-        maskSet = FcMasksSet(name=filename, path=filename)
-        try:
-            db.session.add(maskSet)
-            db.session.commit()
-        except exc.IntegrityError as e:
-            db.session().rollback()
-            abort(500, 'Masks set with name ' + filename + ' already exists.')
-
-        return {
-            'message': message,
-            'status': True
-        }
+            return {
+                'message': message,
+                'status': True
+            }
+        else:
+            abort(500, 'Error generating masks: ' + message)
