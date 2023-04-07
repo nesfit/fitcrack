@@ -220,19 +220,19 @@
           <b>Lowercase</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minLower" type="number" min="0" max="99" size="4">
+          <input v-model="minLower" type="number" min="0" max="99" size="4" @input="checkMinInc()">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxLower" type="number" min="0" max="99" size="4">
+          <input v-model="maxLower" type="number" min="0" max="99" size="4" @input="checkMaxDec()">
         </v-col>
         <v-col cols="2">
           <b>Digits</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minDigits" type="number" min="0" max="99" size="4">
+          <input v-model="minDigits" type="number" min="0" max="99" size="4" @input="checkMinInc()">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxDigits" type="number" min="0" max="99" size="4">
+          <input v-model="maxDigits" type="number" min="0" max="99" size="4" @input="checkMaxDec()">
         </v-col>
       </v-row>
       <v-row>
@@ -240,19 +240,19 @@
           <b>Uppercase</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minUpper" type="number" min="0" max="99" size="4">
+          <input v-model="minUpper" type="number" min="0" max="99" size="4" @input="checkMinInc()">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxUpper" type="number" min="0" max="99" size="4">
+          <input v-model="maxUpper" type="number" min="0" max="99" size="4" @input="checkMaxDec()">
         </v-col>
         <v-col cols="2">
           <b>Special</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minSpecial" type="number" min="0" max="99" size="4">
+          <input v-model="minSpecial" type="number" min="0" max="99" size="4" @input="checkMinInc()">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxSpecial" type="number" min="0" max="99" size="4">
+          <input v-model="maxSpecial" type="number" min="0" max="99" size="4" @input="checkMaxDec()">
         </v-col>
       </v-row>
       <v-row class="bottom-space">
@@ -260,10 +260,10 @@
           <b>Length</b>
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="minLength" type="number" min="0" max="99" size="4">
+          <input v-model="minLength" type="number" min="0" max="99" size="4" @input="checkMinInc()">
         </v-col>
         <v-col cols="2" align="right">
-          <input v-model="maxLength" type="number" min="0" max="99" size="4">
+          <input v-model="maxLength" type="number" min="0" max="99" size="4" @input="checkMaxDec()">
         </v-col>
         <v-col cols="6"/>
       </v-row>
@@ -466,6 +466,20 @@
           this.dictionaries = response.data;
           this.loading = false
         })
+      },
+      checkMinInc: function () {
+        if (this.minLower > this.maxLower) this.maxLower = this.minLower;
+        if (this.minUpper > this.maxUpper) this.maxUpper = this.minUpper;
+        if (this.minSpecial > this.maxSpecial) this.maxSpecial = this.minSpecial;
+        if (this.minDigits > this.maxDigits) this.maxDigits = this.minDigits;
+        if (this.minLength > this.maxLength) this.maxLength = this.minLength;
+      },
+      checkMaxDec: function () {
+        if (this.minLower > this.maxLower) this.minLower = this.maxLower;
+        if (this.minUpper > this.maxUpper) this.minUpper = this.maxUpper;
+        if (this.minSpecial > this.maxSpecial) this.minSpecial = this.maxSpecial;
+        if (this.minDigits > this.maxDigits) this.minDigits = this.maxDigits;
+        if (this.minLength > this.maxLength) this.minLength = this.maxLength;
       },
       generateMasks: function () {
         var patexc = []

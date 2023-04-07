@@ -125,7 +125,7 @@ class PasswordGenerator():
         if arg_options.charset4:
             self.charset.append("?4")
 
-        for iteration in range(arg_options.minlength, 9 if arg_options.maxlength > 9 else arg_options.maxlength + 1):
+        for iteration in range(arg_options.minlength, 10 if arg_options.maxlength > 10 else arg_options.maxlength + 1):
             for mask in itertools.product(self.charset, repeat=iteration):
                 joined_mask = ''.join(mask)
 
