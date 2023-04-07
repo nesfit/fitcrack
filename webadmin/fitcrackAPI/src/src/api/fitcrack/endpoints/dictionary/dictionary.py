@@ -162,9 +162,16 @@ class dictionaryAdd(Resource):
         if uploadedFile:
             dict_path = os.path.join(DICTIONARY_DIR, uploadedFile['path'])
             if request.form.get('sort') == 'true':
-                sorted_cp(dict_path, dict_path + '_sorted')
-                os.remove(dict_path)
-                move(dict_path + '_sorted', dict_path)
+                try:
+                    sorted_cp(dict_path, dict_path + '_sorted')
+                    os.remove(dict_path)
+                    move(dict_path + '_sorted', dict_path)
+                except:
+                    if os.path.isfile(dict_path):
+                        os.remove(dict_path)
+                    if os.path.isfile(dict_path + '_sorted'):
+                        os.remove(dict_path +  '_sorted')
+                    abort(500, 'Unable to sort dictionary.')
 
             pwd_dist, ret_code = shell_exec([PWD_DIST_PATH, dict_path])
             if ret_code != 0:
