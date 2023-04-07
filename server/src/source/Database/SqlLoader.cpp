@@ -374,7 +374,7 @@ Config::Ptr<CJob> CSqlLoader::loadJob(uint64_t jobId)
 std::string CSqlLoader::loadGrammarName(uint64_t grammarId)
 {
     std::string result;
-    updateSql(formatQuery("SELECT name FROM `%s` WHERE `id` = %" PRIu64 " LIMIT 1 ;",
+    updateSql(formatQuery("SELECT path FROM `%s` WHERE `id` = %" PRIu64 " LIMIT 1 ;",
                           Config::tableNamePcfgGrammar.c_str(), grammarId));
 
     MYSQL_RES* sqlResult;
