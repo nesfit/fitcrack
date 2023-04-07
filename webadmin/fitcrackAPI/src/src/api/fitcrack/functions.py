@@ -226,7 +226,7 @@ def directory_tree (path):
 def sorted_cp (src, dst):
     "Sort source text file by line length and output to destination"
     lengths = []
-    with open(src, 'r') as i, open(dst, 'w') as o:
+    with open(src, 'r', encoding="ascii", errors="surrogateescape") as i, open(dst, 'w', encoding="ascii", errors="surrogateescape") as o:
         while True:
             off = i.tell()
             l = i.readline()

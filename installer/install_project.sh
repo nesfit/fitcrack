@@ -104,7 +104,7 @@ echo "Fitcrack tables created."
 echo "Creating Fitcrack database triggers..."
 mysql -h $DB_HOST -u $DB_USER -D"$DB_NAME" < server/sql/20_create_triggers.sql
 if [[ $? != 0 ]]; then
-  echo "Error: Unable to create Fitcrack DB tables"
+  echo "Error: Unable to create Fitcrack DB triggers"
   exit
 fi
 echo "Fitcrack database triggers created."
@@ -112,7 +112,7 @@ echo "Fitcrack database triggers created."
 echo "Inserting initial data..."
 mysql -h $DB_HOST -u $DB_USER -D"$DB_NAME" < server/sql/30_insert_data.sql
 if [[ $? != 0 ]]; then
-  echo "Error: Unable to create Fitcrack DB tables"
+  echo "Error: Unable to fill Fitcrack DB with initial data"
   exit
 fi
 echo "Initial data inserted."

@@ -66,6 +66,38 @@
 
     <v-row>
       <v-col>
+        <v-alert
+          v-if="!helpAlreadyDismissed"
+          text
+          type="success"
+          icon="mdi-help-box"
+          dismissible
+        >
+          If you need help with creating a job, you can <a target="_blank" :href="$docsLink + '/#/jobs/creating/overview'">read the user manual here</a>.
+          <template #close="{ toggle }">
+            <v-btn
+              text
+              small
+              @click="dismissHelp(toggle)"
+            >
+              Don't show anymore
+              <v-icon right>mdi-close</v-icon>
+            </v-btn>
+          </template>
+        </v-alert>
+        <v-alert
+          v-if="helpDismissedMessage"
+          text
+          type="info"
+          dismissible
+        >
+          Sure. If you need help at any time in the future, use the link in the top right corner.
+        </v-alert>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
         <v-text-field
           v-model="name"
           outlined
@@ -578,6 +610,7 @@
     data: function () {
       return {
         loading: false,
+        helpDismissedMessage: false,
         hashTypes: [],
         showEstimatedTime: false,
         estimatedTime: null,
@@ -608,6 +641,9 @@
       },
       dev () {
         return localStorage.getItem('testmode') == 'true'
+      },
+      helpAlreadyDismissed () {
+        return localStorage.getItem('dismissedHelp') == 'true'
       }
     },
     watch: {
@@ -654,6 +690,11 @@
           const settings = await this.axios.get(this.$serverAddr + '/settings').then(r => r.data)
           this.timeForJob = settings.default_seconds_per_workunit
         }
+      },
+      dismissHelp (toggleFunction) {
+        localStorage.setItem('dismissedHelp', true)
+        toggleFunction()
+        this.helpDismissedMessage = true
       },
       fetchTemplates () {
         this.axios.get(this.$serverAddr + '/template')

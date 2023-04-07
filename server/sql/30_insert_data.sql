@@ -6597,9 +6597,9 @@ INSERT INTO `fc_masks_set` (`id`, `name`, `path`, `time`, `deleted`) VALUES
 --
 
 INSERT INTO `fc_pcfg_grammar` (`id`, `name`, `path`, `keyspace`, `time_added`, `deleted`) VALUES
-(1, 'john', 'john.zip', 1321431161, '2019-08-30 12:14:53', 0),
-(2, 'facebook-pastebay', 'facebook-pastebay.zip', 999, '2019-08-30 12:15:08', 0),
-(3, 'twitter-banned', 'twitter-banned.zip', 1096, '2019-08-30 12:17:48', 0);
+(1, 'john', 'john', 1321431161, '2019-08-30 12:14:53', 0),
+(2, 'facebook-pastebay', 'facebook-pastebay', 999, '2019-08-30 12:15:08', 0),
+(3, 'twitter-banned', 'twitter-banned', 1096, '2019-08-30 12:17:48', 0);
 
 --
 -- Create default job bins

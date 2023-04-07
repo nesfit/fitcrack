@@ -86,7 +86,7 @@
         rawValue: '',
         focused: false,
         maskRules: [
-          v => /^(\?[ludhHsab\?]|[ -~])*$/.test(v) || 'Invalid mask',
+          v => /^(\?[ludhHsab]|[^\?])+$/.test(v) || 'Invalid mask',
           v => {
             let nextCharSymbol = false
             for (let c of v) {

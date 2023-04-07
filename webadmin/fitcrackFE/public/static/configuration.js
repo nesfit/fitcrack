@@ -4,8 +4,12 @@
 */
 
 window.serverAddress = "http://localhost:5000"
-window.projectName = "Fitcrack"
+window.projectName = "Fitcrack" // Set the name to show in titlebars etc.
 
+window.optimizedKernelsOnly = false // Set to true to disable unoptimized kernels (safer, but slower)
+window.docsLink = "https://nesfit.github.io/fitcrack" // link to docs for help button
+
+// Set up color schemes for light and dark appearances
 window.theme = {
   light: {
     primary: '#F17734',

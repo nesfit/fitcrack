@@ -4,10 +4,11 @@ flask-cors
 flask-login
 flask-migrate
 flask_script
-pymysql
+pymysql==0.9.3
 mysql-connector-python
 psutil==5.9.1
-msgpack
+msgpack==1.0.4
 pyjwt
 Werkzeug==2.0.3
 Flask==2.0.2
+sqlalchemy==1.4.46

@@ -3,7 +3,7 @@
 This document describes how to install Fitcrack server using Docker.
 
 ### Requirements
-Install **Docker Engine 20.10x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+Install **Docker Engine 20.10.x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
 Install **docker-compose 1.29.x**. You can use the following command:
 ```
