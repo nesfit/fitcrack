@@ -348,7 +348,7 @@
           ></v-select>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row class="bottom-space">
         <v-col cols="6" align="left">
           <v-text-field
             label="Mask file name"
@@ -359,7 +359,52 @@
             v-model="filename"
           />
         </v-col>
-        <v-col cols="6" align="right">      
+        <v-col cols="6" align="right">
+          <v-btn
+              color="primary"
+              outlined
+              @click="showOrdering()"
+            >
+            {{ orderingVisible ? "Close charset priorities" : "Change charset priorities" }}
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-data-table
+        class="bottom-space"
+        v-if="orderingVisible"
+        :headers="charsetOrderHeaders"
+        :items="charsetOrderList"
+        :loading=false
+        :sort-by="['order']"
+        :hide-default-footer="true"
+      >
+        <template v-slot:item.order="{ item }">
+          {{ item.order }}
+        </template>
+        <template v-slot:item.name="{ item }">
+          {{ item.name }}
+        </template>
+        <template v-slot:item.placeholder="{ item }">
+          {{ item.placeholder }}
+        </template>
+        <template v-slot:item.move="{ item }">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+                <v-btn icon
+                @click="moveCharsetUp(item.name)">
+                  <v-icon>mdi-arrow-up</v-icon>
+                </v-btn>
+                <v-btn icon
+                @click="moveCharsetDown(item.name)">
+                  <v-icon>mdi-arrow-down</v-icon>
+                </v-btn>
+            </template>
+            <span>Analyze</span>
+          </v-tooltip>
+        </template>
+      </v-data-table>
+      <v-row>
+        <v-col align="right">      
           <v-btn
             color="primary"
             outlined
@@ -382,6 +427,7 @@
   export default {
     data: function () {
       return {
+        orderingVisible: false,
         loading: false,
         awaitingResponse: false,
         pattern: '',
@@ -416,6 +462,27 @@
           {text: 'Time', value: 'time', align: 'end'},
           {text: 'Analyze', value: 'analyze', align: 'end', sortable: false}
         ],
+        charsetOrderHeaders: [
+          {
+            text: 'Order',
+            align: 'start',
+            value: 'order',
+            sortable: false
+          },
+          {text: 'Name', value: 'name', align: 'end', sortable: false},
+          {text: 'Placeholder', value: 'placeholder', align: 'end', sortable: false},
+          {text: 'Move', value: 'move', align: 'end', sortable: false}
+        ],
+        charsetOrderList: [ {order: 1, name: 'Custom character set 1', placeholder: '?1'},
+                            {order: 2, name: 'Custom character set 2', placeholder: '?2'},
+                            {order: 3, name: 'Custom character set 3', placeholder: '?3'},
+                            {order: 4, name: 'Custom character set 4', placeholder: '?4'},
+                            {order: 5, name: 'Lowercase letters', placeholder: '?l'},
+                            {order: 6, name: 'Uppercase letters', placeholder: '?u'},
+                            {order: 7, name: 'Digits', placeholder: '?d'},
+                            {order: 8, name: 'Special characters', placeholder: '?s'},
+                            {order: 9, name: 'Lowercase hexadecimal', placeholder: '?h'},
+                            {order: 10, name: 'Uppercase hexadecimal', placeholder: '?H'},],
         dictionaries: [],
         selectedDictionaries: [],
         filename: ''
@@ -439,6 +506,9 @@
       updatePattern: function (text) {
         this.pattern += text
       },
+      showOrdering: function () {
+        this.orderingVisible = !this.orderingVisible
+      },
       includePattern: function () {
         this.incPatterns.push({ id: incId++, text: this.pattern })
         this.pattern = ''
@@ -452,6 +522,22 @@
       },
       removeExcPattern: function (excPattern) {
         this.excPatterns = this.excPatterns.filter((b) => b !== excPattern)
+      },
+      moveCharsetUp: function (charsetName) {
+        let charset = this.charsetOrderList.find(charset => charset.name == charsetName)
+        if (charset.order != 1) {
+          let charset2 = this.charsetOrderList.find(charset2 => charset2.order == charset.order - 1)
+          charset.order = charset.order - 1
+          charset2.order = charset2.order + 1
+        }
+      },
+      moveCharsetDown: function (charsetName) {
+        let charset = this.charsetOrderList.find(charset => charset.name == charsetName)
+        if (charset.order != 10) {
+          let charset2 = this.charsetOrderList.find(charset2 => charset2.order == charset.order + 1)
+          charset.order = charset.order + 1
+          charset2.order = charset2.order - 1
+        }
       },
       addDictionary: function (dictName) {
         if (this.selectedDictionaries.includes(dictName)) {
