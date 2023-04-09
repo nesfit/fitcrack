@@ -7,7 +7,7 @@ def check_compatibility(mask, mask_pattern):
         return False
     for i, letter in enumerate(mask):
         if mask_pattern[i] == 'a':
-            if mask_pattern[i] == 'b':
+            if mask_pattern[i] == 'b' or mask_pattern[i] == 'h' or mask_pattern[i] == 'H':
                 return False
         elif (mask_pattern[i] != 'b' and mask_pattern[i] != letter):
             return False
@@ -53,7 +53,7 @@ class PasswordAnalyzer:
                         mask = ""
 
                         for letter in password:
-                            
+
                             maskLength = len(mask)
 
                             for charset in arg_options.charsetOrderList:
@@ -143,6 +143,10 @@ class PasswordGenerator():
             self.charset.append("?3")
         if arg_options.charset4:
             self.charset.append("?4")
+
+        if arg_options.useHex:
+            self.charset.append("?h")
+            self.charset.append("?H")
 
         for iteration in range(arg_options.minlength, 10 if arg_options.maxlength > 10 else arg_options.maxlength + 1):
             for mask in itertools.product(self.charset, repeat=iteration):
@@ -288,6 +292,7 @@ class Options():
         self.minocc = int(options.get('minocc'))
         self.filename = options.get('filename')
         self.charsetOrderList = sorted(list(options.get('charsetOrderList')), key=lambda x: x['order'])
+        self.useHex = options.get('useHex')
 
 class MaskGenerator():
 

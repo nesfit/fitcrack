@@ -84,6 +84,22 @@
             >
               ?a
             </v-btn>
+            <v-btn class="text-lowercase"
+              :disabled="!useHex"
+              color="primary"
+              outlined
+              @click="updatePattern('?h')"
+            >
+              ?h
+            </v-btn>
+            <v-btn class="text-lowercase"
+              :disabled="!useHex"
+              color="primary"
+              outlined
+              @click="updatePattern('?H')"
+            >
+              ?H
+            </v-btn>
           </div>
         </v-col>
       </v-row>
@@ -268,6 +284,32 @@
         </v-col>
         <v-col cols="6"/>
       </v-row>
+      <v-row v-if="useHex">
+        <v-col cols="2">
+          <b>Lower HEX</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="minLowerHex" type="number" min="0" max="99" size="4" @input="checkMinInc()">
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="maxLowerHex" type="number" min="0" max="99" size="4" @input="checkMaxDec()">
+        </v-col>
+        <v-col cols="2">
+          <b>Upper HEX</b>
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="minUpperHex" type="number" min="0" max="99" size="4" @input="checkMinInc()">
+        </v-col>
+        <v-col cols="2" align="right">
+          <input v-model="maxUpperHex" type="number" min="0" max="99" size="4" @input="checkMaxDec()">
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col align="right">
+          <input type="checkbox" id="hexCheckbox" v-model="useHex" />
+          <label for="hexCheckbox">Use hexadecimal</label>
+        </v-col>
+      </v-row>
       <v-card-title class="pb-0 mb-2 bottom-space">
         <span>Cracking task options</span>
       </v-card-title>
@@ -429,6 +471,7 @@
       return {
         orderingVisible: false,
         loading: false,
+        useHex: false,
         awaitingResponse: false,
         pattern: '',
         minLower: 0,
@@ -441,6 +484,10 @@
         maxSpecial: 0,
         maxLength: 0,
         minLength: 0,
+        minLowerHex: 0,
+        minUpperHex: 0,
+        maxLowerHex: 0,
+        maxUpperHex: 0,
         timeHours: 0,
         timeMins: 0,
         speed: 100000,
@@ -560,6 +607,8 @@
         if (this.minSpecial > this.maxSpecial) this.maxSpecial = this.minSpecial;
         if (this.minDigits > this.maxDigits) this.maxDigits = this.minDigits;
         if (this.minLength > this.maxLength) this.maxLength = this.minLength;
+        if (this.minLowerHex > this.maxLowerHex) this.maxLowerHex = this.minLowerHex;
+        if (this.minUpperHex > this.maxUpperHex) this.maxUpperHex = this.minUpperHex;
       },
       checkMaxDec: function () {
         if (this.minLower > this.maxLower) this.minLower = this.maxLower;
@@ -567,6 +616,8 @@
         if (this.minSpecial > this.maxSpecial) this.minSpecial = this.maxSpecial;
         if (this.minDigits > this.maxDigits) this.minDigits = this.maxDigits;
         if (this.minLength > this.maxLength) this.minLength = this.maxLength;
+        if (this.minLowerHex > this.maxLowerHex) this.minLowerHex = this.maxLowerHex;
+        if (this.minUpperHex > this.maxUpperHex) this.minUpperHex = this.maxUpperHex;
       },
       generateMasks: function () {
         var patexc = []
@@ -589,6 +640,10 @@
           maxdigit: this.maxDigits,
           minspecial: this.minSpecial,
           maxspecial: this.maxSpecial,
+          minlowerhex: this.minLowerHex,
+          maxlowerhex: this.maxLowerHex,
+          minupperhex: this.minUpperHex,
+          maxupperhex: this.maxUpperHex,
           time: this.timeHours * 3600 + this.timeMins * 60,
           speed: this.speed,
           minocc: this.minOcc,
@@ -601,7 +656,8 @@
           patexc: patexc,
           wordlists: this.selectedDictionaries,
           filename: this.filename,
-          charsetOrderList: this.charsetOrderList
+          charsetOrderList: this.charsetOrderList,
+          useHex: this.useHex
         })
         .then(response => {
           console.log(response);
