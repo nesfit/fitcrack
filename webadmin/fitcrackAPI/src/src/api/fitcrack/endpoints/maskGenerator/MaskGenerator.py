@@ -9,7 +9,7 @@ def check_compatibility(mask, mask_pattern):
         if mask_pattern[i] == 'a':
             if mask_pattern[i] == 'b' or mask_pattern[i] == 'h' or mask_pattern[i] == 'H':
                 return False
-        elif (mask_pattern[i] != 'b' and mask_pattern[i] != letter):
+        elif mask_pattern[i] != 'b' and mask_pattern[i] != letter:
             return False
     return True
 
@@ -18,7 +18,9 @@ def check_charsets(mask, arg_options):
     if (arg_options.minlower <= mask.count("l") <= arg_options.maxlower and
         arg_options.minupper <= mask.count("u") <= arg_options.maxupper and
         arg_options.mindigit <= mask.count("d") <= arg_options.maxdigit and
-        arg_options.minspecial <= mask.count("s") <= arg_options.maxspecial):
+        arg_options.minspecial <= mask.count("s") <= arg_options.maxspecial and
+        arg_options.minlowerhex <= mask.count("h") <= arg_options.maxlowerhex and
+        arg_options.minupperhex <= mask.count("H") <= arg_options.maxupperhex):
         return True
     else:
         return False
@@ -121,7 +123,6 @@ class PasswordAnalyzer:
 
         filtered_masks = {}
         for mask, occurrence in self.masks.items():
-            pass
             if occurrence >= arg_options.minocc:
                 filtered_masks.update({mask:occurrence})
 
@@ -251,10 +252,8 @@ class MaskSorter:
     
     def save_masks_to_file(self, arg_options, masksPath):
         '''Save sorted masks to an output file'''
-        if arg_options.filename == '':
-            file = open(masksPath + "/test.hcmask", "w", encoding="utf-8")
-        else:
-            file = open(masksPath + "/" + arg_options.filename + ".hcmask", "w", encoding="utf-8")
+        file = open(masksPath + "/" + arg_options.filename + ".hcmask", "w", encoding="utf-8")
+
         for mask in self.sorted_masks:
             if "1" in mask:
                 file.write(arg_options.charset1+",")
@@ -265,6 +264,7 @@ class MaskSorter:
             if "4" in mask:
                 file.write(arg_options.charset4+",")
             file.write(mask+"\n")
+            
         file.close()
 
 class Options():
@@ -279,6 +279,10 @@ class Options():
         self.maxspecial = int(options.get('maxspecial'))
         self.minlength = int(options.get('minlength'))
         self.maxlength = int(options.get('maxlength'))
+        self.minlowerhex = int(options.get('minlowerhex'))
+        self.maxlowerhex = int(options.get('maxlowerhex'))
+        self.minupperhex = int(options.get('minupperhex'))
+        self.maxupperhex = int(options.get('maxupperhex'))
         self.patinc = options.get('patinc')
         self.patexc = options.get('patexc')
         self.charset1 = options.get('charset1')
