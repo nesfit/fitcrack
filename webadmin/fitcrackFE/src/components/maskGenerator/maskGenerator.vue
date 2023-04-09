@@ -600,7 +600,8 @@
           patinc: patinc,
           patexc: patexc,
           wordlists: this.selectedDictionaries,
-          filename: this.filename
+          filename: this.filename,
+          charsetOrderList: this.charsetOrderList
         })
         .then(response => {
           console.log(response);

@@ -53,23 +53,42 @@ class PasswordAnalyzer:
                         mask = ""
 
                         for letter in password:
-                            if arg_options.charset1 and letter in arg_options.charset1:
-                                mask += "?1"
-                            elif arg_options.charset2 and letter in arg_options.charset2:
-                                mask += "?2"
-                            elif arg_options.charset3 and letter in arg_options.charset3:
-                                mask += "?3"
-                            elif arg_options.charset4 and letter in arg_options.charset4:
-                                mask += "?4"
-                            elif letter in string.ascii_lowercase:
-                                mask += "?l"
-                            elif letter in string.ascii_uppercase:
-                                mask += "?u"
-                            elif letter in string.digits:
-                                mask += "?d"
-                            elif letter in string.printable:
-                                mask += "?s"
-                            else:
+                            
+                            maskLength = len(mask)
+
+                            for charset in arg_options.charsetOrderList:
+                                if charset['placeholder'] == '?1' and arg_options.charset1 and letter in arg_options.charset1:
+                                    mask += "?1"
+                                    break
+                                elif charset['placeholder'] == '?2' and arg_options.charset2 and letter in arg_options.charset2:
+                                    mask += "?2"
+                                    break
+                                elif charset['placeholder'] == '?3' and arg_options.charset3 and letter in arg_options.charset3:
+                                    mask += "?3"
+                                    break
+                                elif charset['placeholder'] == '?4' and arg_options.charset4 and letter in arg_options.charset4:
+                                    mask += "?4"
+                                    break
+                                elif charset['placeholder'] == '?l' and letter in string.ascii_lowercase:
+                                    mask += "?l"
+                                    break
+                                elif charset['placeholder'] == '?u' and letter in string.ascii_uppercase:
+                                    mask += "?u"
+                                    break
+                                elif charset['placeholder'] == '?d' and letter in string.digits:
+                                    mask += "?d"
+                                    break
+                                elif charset['placeholder'] == '?s' and letter in string.printable:
+                                    mask += "?s"
+                                    break
+                                elif charset['placeholder'] == '?h' and letter in 'abcdef0123456789':
+                                    mask += "?h"
+                                    break
+                                elif charset['placeholder'] == '?H' and letter in 'ABCDEF0123456789':
+                                    mask += "?H"
+                                    break
+
+                            if len(mask) == maskLength:    
                                 mask += "?b"
 
                         if not (check_charsets(mask, arg_options) and
@@ -190,6 +209,8 @@ class MaskSorter:
                     complexity *= len(string.ascii_uppercase)
                 elif charset == 's':
                     complexity *= 33
+                elif charset == 'h' or charset == 'H':
+                    complexity *= 16
                 elif charset == 'b':
                     complexity *= 256
 
@@ -266,6 +287,7 @@ class Options():
         self.time = int(options.get('time'))
         self.minocc = int(options.get('minocc'))
         self.filename = options.get('filename')
+        self.charsetOrderList = sorted(list(options.get('charsetOrderList')), key=lambda x: x['order'])
 
 class MaskGenerator():
 
