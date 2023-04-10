@@ -12,7 +12,7 @@ from sqlalchemy import exc
 
 from settings import DICTIONARY_DIR, MASKS_DIR, ROOT_DIR
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.maskGenerator.MaskGenerator import MaskGenerator
+from src.api.fitcrack.endpoints.maskGenerator.src.MaskGenerator import MaskGenerator
 from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
 from src.api.fitcrack.endpoints.masks.argumentsParser import updateMask_parser
 from src.api.fitcrack.endpoints.masks.responseModels import maskSet_model
