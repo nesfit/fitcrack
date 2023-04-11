@@ -2,7 +2,7 @@
     <v-col cols="5" md="3" class="bordered">
         <v-container>
             <v-row justify="center" class="border-down boxTitle text-h5 py-2">
-                Live keyspace preview
+                Live mangled passwords preview
             </v-row>
             <v-row>
                 <v-col class="font-weight-medium">
@@ -11,37 +11,47 @@
             </v-row>
             <v-row>
                 <v-col class="py-0">
-                    <!--
-                        <input type="file" ref="appendDictionary" style="display: none"
-                        @change="onDictionaryFileChange($event)">
-                    -->
-
                     <v-btn class="px-2" color="orange lighten-3" small depressed @click="appendDictPopup = true">
                         <v-icon left>
                             mdi-file
                         </v-icon>
                         Append dictionary
                     </v-btn>
-                    <appendDictPopup v-model="appendDictPopup" v-bind:passwordsContent="passwordsContent"
+                    <appendDictPopup v-model="appendDictPopup" v-bind:allPasswordsString="allPasswordsString"
                         v-on:update-passwords="updatePasswords"></appendDictPopup>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col class="pb-0">
-                    <v-textarea solo class="textArea" label="Dictionary Content" v-model="passwordsContent"></v-textarea>
+                    <v-textarea solo class="textArea" label="Dictionary Content" :value="allPasswordsString"
+                        @input="updatePasswords"></v-textarea>
                 </v-col>
             </v-row>
+            <v-row>
+
+                <v-alert tile color="orange" text class="mb-0">
+                    Maximum number of mangled passwords is 50000. For change go to
+                    <router-link :to="{ name: 'settings' }">
+                        <b>advanced settings</b>.
+                    </router-link>
+                </v-alert>
+
+            </v-row>
+            <!--
+
             <v-row>
                 <v-col cols="12" class="text-center pt-0 pb-8">
                     <v-btn class="orange darken-3" :loading="previewPasswords.loading" :disabled="previewPasswords.loading" @click="generatePreview">
                         <span v-if="!previewPasswords.loading">Generate Preview</span>
                     </v-btn>
                 </v-col>
-
             </v-row>
+
+            -->
+
             <v-row>
                 <v-col class="font-weight-medium">
-                    Final keyspace:
+                    Mangled passwords:
                 </v-col>
             </v-row>
             <v-row>
@@ -52,7 +62,7 @@
             </v-row>
             <v-row>
                 <v-col class="text-center pt-0">
-                    <v-btn height="40" multi-line text-wrap color=" grey lighten-1" small
+                    <v-btn height="40" multi-line text-wrap class="orange darken-3" small
                         @click="downloadFinalPasswords()">Download <br>mangled passwords</v-btn>
                 </v-col>
             </v-row>
@@ -65,20 +75,17 @@
 import appendDictPopup from '@/components/rule/mainEditWindow/popups/appendDictPopup.vue';
 export default {
     props: {
-        previewPasswords: Object
+        previewPasswords: Object,
+        allPasswordsString: String
     },
     data() {
         return {
-            passwordsContent: "p@ssW0rd",
             appendDictPopup: false
         }
     },
     methods: {
-        updatePasswords(updatedPasswordsContent) {
-            this.passwordsContent = updatedPasswordsContent;
-        },
-        generatePreview() {
-            this.$emit("generate-preview", this.passwordsContent);
+        updatePasswords(updatedAllPasswordsString) {
+            this.$emit("update-passwords", updatedAllPasswordsString);
         },
         downloadFinalPasswords() {
             const blob = new Blob([this.previewPasswords.string], { type: 'text/plain' });

@@ -24,7 +24,7 @@
                             @change="onRuleFileChange" />
                         <v-btn color="primary" outlined :disabled="systemFileSelected === false" @click="appendRules">
                             Append
-                        <v-icon right>
+                            <v-icon right>
                                 mdi-plus
                             </v-icon>
                         </v-btn>
@@ -56,11 +56,11 @@ import rulesSelector from '@/components/selector/rulesSelector.vue'
 export default {
     props: {
         value: Boolean,
-        rulesList: Array
+        rules: Array
     },
     data() {
         return {
-            rulesListData: [],
+            updatedRules: [],
             tab: null,
             systemFileSelected: false,
             serverFileSelected: []
@@ -71,8 +71,10 @@ export default {
             if (event) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    this.rulesListData = this.rulesList.concat(reader.result.split("\n"));
-                    this.rulesListData.pop();
+                    const lines = reader.result.split("\n");
+                    const newRules = lines.map(line => ({ value: line, error: false }))
+                    this.updatedRules = this.rules.concat(newRules);
+                    this.updatedRules.pop();
                 };
                 reader.readAsText(event)
                 this.systemFileSelected = true;
@@ -83,16 +85,17 @@ export default {
 
         },
         appendRules() {
-            this.$emit("update-rules", this.rulesListData)
+            this.$emit("update-rules", this.updatedRules)
             this.systemFileSelected = false;
             this.popupVisible = false;
         },
         appendServerRules() {
             this.axios.get(this.$serverAddr + "/rule/" + this.serverFileSelected[0].id + "/download").then((response) => {
-                this.rulesListData = this.rulesList.concat(response.data.split("\n"))
-                this.rulesListData.pop();
-                console.log(this.rulesListData)
-                this.$emit("update-rules", this.rulesListData)
+                const lines = response.data.split("\n");
+                const newRules = lines.map(line => ({ value: line, error: false }))
+                this.updatedRules = this.rules.concat(newRules);
+                this.updatedRules.pop();
+                this.$emit("update-rules", this.updatedRules)
                 this.serverFileSelected = []
                 this.popupVisible = false;
             });

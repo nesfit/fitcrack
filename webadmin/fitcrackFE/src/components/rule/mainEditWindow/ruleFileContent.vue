@@ -9,19 +9,20 @@
 
             </v-card-title>
             <v-divider></v-divider>
-            <v-data-table :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="ruleObjects"
+            <v-data-table :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="computedRules"
                 hide-default-header :search="search"
                 :footer-props="{ itemsPerPageOptions: [5, 10, 15, 20, 100, 200], itemsPerPageText: 'Rules per page', showFirstLastPage: true }">
                 <template v-slot:body="{ items }">
                     <tbody class="telicko">
                         <tr v-for="item in items" :key="item.index">
-                            <td class="other">
+                            <td>
                                 {{ item.index + 1 }}
                             </td>
                             <td class="my-0 ruleInputLine">
-                                <v-text-field :id="`ruleLineField-${item.index}`" @focus="showPopup(item.index)"
-                                    @blur="hidePopup(item.index)" placeholder="Enter rule" autocomplete="off" hide-details
-                                    outlined dense v-model="item.rule" @input="updateRules(item.rule, item.index)">
+                                <v-text-field @focus="showPopup(item.index)" @blur="hidePopup(item.index)"
+                                    :ref="'rule-' + item.index" placeholder="Enter rule" autocomplete="off" hide-details
+                                    outlined dense v-model="item.rule.value"
+                                    @input="updateRules(item.rule.value, item.index)">
                                 </v-text-field>
                                 <div class="quickFunctionsMenuPopup" v-show="item.popupVisible">
                                     <quickFunctionsMenu v-bind:ruleIndex="item.index"
@@ -29,7 +30,12 @@
                                         v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
                                 </div>
                             </td>
-                            <td class="other">
+                            <td>
+                                <v-btn v-if="item.rule.error" icon class="disableClickEffect">
+                                    <v-icon color="primary">mdi-alert</v-icon>
+                                </v-btn>
+                            </td>
+                            <td>
                                 <v-btn icon class="px-0" color="black" @click="deleteRule(item.index)">
                                     <v-icon color="error">
                                         mdi-delete-outline
@@ -49,7 +55,7 @@ import quickFunctionsMenu from '@/components/rule/mainEditWindow/popups/quickFun
 
 export default {
     props: {
-        rulesList: Array
+        rules: Array
     },
     data() {
         return {
@@ -58,32 +64,33 @@ export default {
                 itemsPerPage: 5,
                 page: 1
             },
-            prevRuleObjectsLength: 0, // for checking if line was deleted
+            prevcomputedRulesLength: 0, // for checking if line was deleted
             goOnLastPage: false,
             headers: [
                 { text: "Rule name", value: "rule", align: "right" },
                 { text: "ID", value: "id" },
             ],
             quickFunctionsMenuVisible: false,
-            rulesListData: this.rulesList
         }
     },
     methods: {
-        updateRules(rule, index) {
-            this.rulesListData = this.rulesList;
-            this.rulesListData[index] = rule;
-            this.$emit("update-rules", this.rulesListData);
+        updateRules(newRuleValue, index) {
+            let updatedRules = this.rules;
+            console.log(updatedRules)
+            updatedRules[index].value = newRuleValue;
+            console.log(updatedRules)
+            this.$emit("update-rules", updatedRules);
         },
         deleteRule(index) {
-            this.rulesListData = this.rulesList
-            this.rulesListData.splice(index, 1);
-            this.$emit("update-rules", this.rulesListData)
+            let updatedRules = this.rules;
+            updatedRules.splice(index, 1);
+            this.$emit("update-rules", updatedRules)
         },
         showPopup(index) {
-            this.ruleObjects[index].popupVisible = true;
+            this.computedRules[index].popupVisible = true;
         },
         hidePopup(index) {
-            this.ruleObjects[index].popupVisible = false;
+            this.computedRules[index].popupVisible = false;
         },
         showInsertPopup(insertData) {
             this.$emit("show-insert-popup", insertData)
@@ -94,8 +101,8 @@ export default {
 
     },
     computed: {
-        ruleObjects() {
-            return this.rulesList.map((rule, index) => ({
+        computedRules() {
+            return this.rules.map((rule, index) => ({
                 rule,
                 index,
                 popupVisible: false
@@ -105,12 +112,12 @@ export default {
          * Return number of current page when deleting rules, otherwise number of last page 
          */
         lastOrCurrentPage() {
-            if (this.ruleObjects.length > this.prevRuleObjectsLength || this.goOnLastPage) {
-                this.prevRuleObjectsLength = this.ruleObjects.length;
-                return Math.ceil(this.ruleObjects.length / this.options.itemsPerPage);
+            if (this.computedRules.length > this.prevcomputedRulesLength || this.goOnLastPage) {
+                this.prevcomputedRulesLength = this.computedRules.length;
+                return Math.ceil(this.computedRules.length / this.options.itemsPerPage);
             }
             else {
-                this.prevRuleObjectsLength = this.ruleObjects.length;
+                this.prevcomputedRulesLength = this.computedRules.length;
                 return this.options.page;
             }
         }
@@ -134,12 +141,18 @@ export default {
 
 
 <style>
-.other {
-    width: 5%;
+tr {
+    padding: 5px;
 }
 
-.ruleInputLine {
+.v-data-table>.v-data-table__wrapper>table>tbody>tr>td {
+    padding: 0px 0px 0px 5px;
+}
+
+.v-data-table>.v-data-table__wrapper>table>tbody>tr>td.ruleInputLine {
     position: relative;
+    width: 100%;
+    padding-left: 10px;
 }
 
 .quickFunctionsMenuPopup {
@@ -147,5 +160,9 @@ export default {
     bottom: 100%;
     max-width: 120%;
     padding: 0;
+}
+
+.disableClickEffect {
+    pointer-events: none
 }
 </style>

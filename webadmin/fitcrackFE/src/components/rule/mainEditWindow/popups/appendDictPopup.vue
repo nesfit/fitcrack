@@ -54,11 +54,11 @@ import dictSelector from '@/components/selector/dictionarySelector.vue'
 export default {
     props: {
         value: Boolean,
-        passwordsContent: String
+        allPasswordsString: String
     },
     data() {
         return {
-            passwordsContentCopy: "",
+            updatedAllPasswordsString: "",
             tab: null,
             systemFileSelected: false,
             serverFileSelected: []
@@ -69,7 +69,7 @@ export default {
             if (event) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    this.passwordsContentCopy = this.passwordsContent.concat(reader.result);
+                    this.updatedAllPasswordsString = this.allPasswordsString.concat(reader.result);
                 };
                 reader.readAsText(event)
                 this.systemFileSelected = true;
@@ -80,14 +80,14 @@ export default {
 
         },
         appendSystemDict() {
-            this.$emit("update-passwords", this.passwordsContentCopy)
+            this.$emit("update-passwords", this.updatedAllPasswordsString)
             this.systemFileSelected = false;
             this.popupVisible = false;
         },
         appendServerDict() {
             this.axios.get(this.$serverAddr + "/dictionary/" + this.serverFileSelected[0].id + "/download").then((response) => {
-                this.passwordsContentCopy = this.passwordsContent.concat(response.data)
-                this.$emit("update-passwords", this.passwordsContentCopy)
+                this.updatedAllPasswordsString = this.allPasswordsString.concat(response.data)
+                this.$emit("update-passwords", this.updatedAllPasswordsString)
                 this.serverFileSelected = []
                 this.popupVisible = false;
             });

@@ -279,7 +279,7 @@ class passwordsPreview(Resource):
         """
         request_data = request.get_json()
         dictionary = request_data['passwordsList']
-        rules = request_data['rulesList']
+        rules = request_data['rules']
         preview = []
         final_password_buf = ctypes.create_string_buffer(64)
         
