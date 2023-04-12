@@ -25,7 +25,7 @@ from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_mod
 from src.api.fitcrack.functions import fileUpload, allowed_file
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcRule
+from src.database.models import FcRule, FcJob
 
 log = logging.getLogger(__name__)
 ns = api.namespace('rule', description='Endpoints for work with rule files.')
@@ -140,6 +140,11 @@ class rule(Resource):
         newFilePath = oldFilePath
         nameChanged = False
         
+        # Check if rule file is not mapped to a job, if so, update is not enabled
+        jobWithRule = FcJob.query.filter(FcJob.rules == fileRecord.name).first()
+        if jobWithRule is not None:
+            abort(500, "Can not update the rule file. The rule file is mapped to a job.")
+            
         if newFile.filename != fileRecord.name: #if the name of file changed
             # check if the file extension is allowed (.txt or .rule)
             if allowed_file(newFile.filename, ALLOWED_EXTENSIONS):
