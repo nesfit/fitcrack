@@ -139,7 +139,7 @@ def fileUpload(file, dir, extensions, content=None, suffix=None, withTimestamp=F
         path = os.path.join(dir, filename)
 
         if os.path.exists(path):
-            abort(500, 'File with name ' + filename + ' already exists.\nPath: ' + path)
+            abort(500, 'File with name ' + filename + ' was used before. Choose a different name.')
 
         file.save(path)
         file.close()
