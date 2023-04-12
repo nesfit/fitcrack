@@ -217,13 +217,13 @@
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">RAR</a> and </span>
                       </template>
-                      <span>Hash types: 12500, 13000</span>
+                      <span>Hash types: 12500, 13000, 23700, 23800</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">ZIP</a>.</span>
                       </template>
-                      <span>Hash types: 13600</span>
+                      <span>Hash types: 13600, 17200, 17210, 17225, 13001, 23002, 23003</span>
                     </v-tooltip>
                   </v-alert>
                   <file-uploader
