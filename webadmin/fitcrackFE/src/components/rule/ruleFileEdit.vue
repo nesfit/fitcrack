@@ -25,6 +25,7 @@
   
 <script>
 import Vue from 'vue';
+import { debounce } from 'lodash';
 import functionsJson from "@/assets/ruleFunctions.json"
 import mainEditWindow from "@/components/rule/mainEditWindow/mainEditWindow.vue";
 import liveKeyspacePreview from "@/components/rule/livePreview/liveKeyspacePreview.vue"
@@ -61,9 +62,12 @@ export default {
     };
   },
   methods: {
-    updateRules(updatedRules) {
+    updateRules(updatedRules, emptyRuleAdded) {
       this.rules = updatedRules;
-      this.generatePreview();
+      // generate preview always except when empty rule was added
+      if (!emptyRuleAdded) {
+        this.generatePreview();
+      }
     },
     updateRule(functionToAdd) {
       //update the rule, where rule function was inserted
@@ -84,7 +88,6 @@ export default {
      * Function which generates password preview, gets mangled passwords
      */
     generatePreview() {
-      this.previewPasswords.string = ""
       this.previewPasswords.loading = true; //Show loading button
       this.passwordsList = this.allPasswordsString.split("\n"); //create an array of passwords
       const data = {
@@ -184,16 +187,20 @@ export default {
       }
     }
   },
-  created() {
+  mounted() {
     if (this.$route.params.id) { //when there is id parameter in route url
       this.loadRuleFile();
     }
+    this.generatePreview = debounce(this.generatePreview, 2000); // call generatePreview only 2 seconds after rule change (because of application performance, prevents too many requests)
   },
   beforeMount() {
     window.addEventListener('beforeunload', this.navigateFromPage);
   },
   beforeDestroy() {
     window.removeEventListener('beforeunload', this.navigateFromPage);
+  },
+  destroyed(){
+    this.generatePreview.cancel()
   },
   /**
    * Function which shows confirm message when route is changed

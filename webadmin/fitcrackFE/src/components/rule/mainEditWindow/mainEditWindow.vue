@@ -116,7 +116,7 @@ export default {
         addEmptyRule() {
             let updatedRules = this.rules;
             updatedRules.push({value: "", error: false})
-            this.$emit("update-rules", updatedRules)
+            this.$emit("update-rules", updatedRules, true)
         },
         updateRules(updatedRules) {
             this.$emit("update-rules", updatedRules)

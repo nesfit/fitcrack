@@ -37,22 +37,13 @@
                 </v-alert>
 
             </v-row>
-            <!--
-
-            <v-row>
-                <v-col cols="12" class="text-center pt-0 pb-8">
-                    <v-btn class="orange darken-3" :loading="previewPasswords.loading" :disabled="previewPasswords.loading" @click="generatePreview">
-                        <span v-if="!previewPasswords.loading">Generate Preview</span>
-                    </v-btn>
-                </v-col>
-            </v-row>
-
-            -->
-
             <v-row>
                 <v-col class="font-weight-medium">
                     Mangled passwords:
                 </v-col>
+            </v-row>
+            <v-row class="my-1">
+                <v-progress-linear v-visible="previewPasswords.loading" indeterminate color="orange"></v-progress-linear>
             </v-row>
             <v-row>
                 <v-col class="py-0">
@@ -62,10 +53,9 @@
             </v-row>
             <v-row>
                 <v-col class="text-center pt-0">
-                    <v-btn height="40" multi-line text-wrap class="orange darken-3" :loading="previewPasswords.loading" :disabled="previewPasswords.loading" small
-                        @click="downloadFinalPasswords()">
-                        <span v-if="!previewPasswords.loading">Download <br>mangled passwords</span>
-                        
+                    <v-btn height="40" multi-line text-wrap class="orange darken-3" :disabled="previewPasswords.loading"
+                        small @click="downloadFinalPasswords()">
+                        Download <br>mangled passwords
                     </v-btn>
                 </v-col>
             </v-row>
@@ -104,9 +94,9 @@ export default {
     components: {
         appendDictPopup
     },
-    mounted(){
+    mounted() {
         // get the maximum number of mangled passwords from database
-        this.axios.get(this.$serverAddr + '/settings').then((response)=>{
+        this.axios.get(this.$serverAddr + '/settings').then((response) => {
             this.max_mangled_passwords = response.data.max_mangled_passwords;
         });
     }
