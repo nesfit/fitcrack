@@ -76,7 +76,7 @@
 
             <v-row>
                 <v-col class="text-right">
-                    <v-btn color="grey lighten-1" @click="saveFile()">
+                    <v-btn class="orange darken-3" @click="saveFile()">
                         <v-icon>
                             mdi-content-save
                         </v-icon>

@@ -30,7 +30,7 @@
             <v-row>
 
                 <v-alert tile color="orange" text class="mb-0">
-                    Maximum number of mangled passwords is 50000. For change go to
+                    Maximum number of mangled passwords is set to {{ max_mangled_passwords }}. For change go to
                     <router-link :to="{ name: 'settings' }">
                         <b>advanced settings</b>.
                     </router-link>
@@ -62,8 +62,11 @@
             </v-row>
             <v-row>
                 <v-col class="text-center pt-0">
-                    <v-btn height="40" multi-line text-wrap class="orange darken-3" small
-                        @click="downloadFinalPasswords()">Download <br>mangled passwords</v-btn>
+                    <v-btn height="40" multi-line text-wrap class="orange darken-3" :loading="previewPasswords.loading" :disabled="previewPasswords.loading" small
+                        @click="downloadFinalPasswords()">
+                        <span v-if="!previewPasswords.loading">Download <br>mangled passwords</span>
+                        
+                    </v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -80,7 +83,8 @@ export default {
     },
     data() {
         return {
-            appendDictPopup: false
+            appendDictPopup: false,
+            max_mangled_passwords: 5000
         }
     },
     methods: {
@@ -99,6 +103,12 @@ export default {
     },
     components: {
         appendDictPopup
+    },
+    mounted(){
+        // get the maximum number of mangled passwords from database
+        this.axios.get(this.$serverAddr + '/settings').then((response)=>{
+            this.max_mangled_passwords = response.data.max_mangled_passwords;
+        });
     }
 };
 

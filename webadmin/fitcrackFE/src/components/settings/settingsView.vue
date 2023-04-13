@@ -206,6 +206,18 @@
               persistent-hint
               class="mb-4"
             />
+            <v-divider class="mb-2"></v-divider>
+            <span class="text-subtitle-1">Rules settings</span>
+            <v-text-field
+              v-model="settings.max_mangled_passwords"
+              :loading="loading"
+              outlined
+              type="number"
+              label="Maximum number of mangled passwords"
+              hint="Changing the default value (5000) to a higher number can lead to delays and performance issues when mangling passwords and checking rules. The number can not go beyond 1000000."
+              persistent-hint
+              class="my-2"
+            />
           </v-card-text>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -304,6 +316,10 @@
           }
           if (this.settings.workunit_timeout_factor < 5) { // see minTimeoutFactor in generator's Config.h
             this.$error('Workunit timeout factor cannot be smaller than 5.')
+            return
+          }
+          if(this.settings.max_mangled_passwords > 1000000){ // check the maximum number of mangled passwords
+            this.$error('Maximum number of mangled passwords can not be more than 1000000.')
             return
           }
           this.saving = true

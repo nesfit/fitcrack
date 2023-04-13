@@ -25,7 +25,7 @@ from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_mod
 from src.api.fitcrack.functions import fileUpload, allowed_file
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
-from src.database.models import FcRule, FcJob
+from src.database.models import FcRule, FcJob, FcSetting
 
 log = logging.getLogger(__name__)
 ns = api.namespace('rule', description='Endpoints for work with rule files.')
@@ -285,14 +285,18 @@ class passwordsPreview(Resource):
         request_data = request.get_json()
         dictionary = request_data['passwordsList']
         rules = request_data['rules']
+        max_mangled_passwords = FcSetting.query.first().max_mangled_passwords
         preview = []
         final_password_buf = ctypes.create_string_buffer(64)
         
         counter = 0
         for password in dictionary:
+            if counter >= max_mangled_passwords: # check maximum number of mangled passwords
+                break
             password = password.strip()
             for rule in rules: 
-                counter += 1
+                if counter >= max_mangled_passwords: # check maximum number of mangled passwords
+                    break
                 rule = rule.strip()
                                 
                 # Apply the rule to the password using the C function
@@ -314,14 +318,11 @@ class passwordsPreview(Resource):
                     "finalPassword" : final_password_str,
                     "retCode" : ret_code
                 }                         
-                preview.append(element) 
+                preview.append(element)
+                counter += 1
                 
         #Return success
-        return { 
-            'passwordsPreview' : preview,
-            'status': True,
-            'message': "Passwords were successfully mangled."
-        }, 200
+        return { 'passwordsPreview' : preview }, 200
                 
                 
         

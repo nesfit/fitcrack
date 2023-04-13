@@ -84,6 +84,7 @@ export default {
      * Function which generates password preview, gets mangled passwords
      */
     generatePreview() {
+      this.previewPasswords.string = ""
       this.previewPasswords.loading = true; //Show loading button
       this.passwordsList = this.allPasswordsString.split("\n"); //create an array of passwords
       const data = {
@@ -97,6 +98,7 @@ export default {
         console.log(response.data.passwordsPreview)
         this.filterPreviewPasswords();
       }).catch((error) => {
+        //TODO this.$error
         this.previewPasswords.string = "Could not mangle the passwords."
       }).finally(() => {
         this.previewPasswords.loading = false; //the loading is done
@@ -108,25 +110,6 @@ export default {
     filterPreviewPasswords() {
       let previewPasswordsList = []; // list for storing only mangled passwords with no error
       let ruleIndex = 0;
-
-      /*
-      for(let index in this.applicatorResult){
-        console.log("inside")
-        if (ruleIndex <= this.rules.length) {
-          if (this.applicatorResult[index].retCode == -1) {
-            this.rules[ruleIndex].error = true;
-          }
-          else {
-            this.rules[ruleIndex].error = false;
-          }
-        }
-        if (this.applicatorResult[index].retCode >= 0) {
-          previewPasswordsList.push(this.applicatorResult[index].finalPassword);
-        }
-        ruleIndex += 1;
-      }
-      */
-
 
       this.applicatorResult.forEach((element) => {
         if (ruleIndex < this.rules.length) {
