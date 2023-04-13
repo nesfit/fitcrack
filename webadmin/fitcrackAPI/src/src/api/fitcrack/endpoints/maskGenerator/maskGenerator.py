@@ -28,13 +28,6 @@ ns = api.namespace('maskGenerator', description='Endpoints for work with mask ge
 class generateMasks(Resource):
 
     @api.marshal_with(simpleResponse)
-    def get(self):
-        return {
-            'message': 'Hello from GET',
-            'status': True
-        }
-
-    @api.marshal_with(simpleResponse)
     def post(self):
 
         filename = request.json.get('filename')

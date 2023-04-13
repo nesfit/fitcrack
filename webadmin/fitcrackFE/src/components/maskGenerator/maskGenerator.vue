@@ -152,7 +152,7 @@
         <v-col align="left" cols="5">
           <ul style="list-style-type:disc;">
             <li v-for="incPattern in incPatterns" :key="incPattern.id">
-              {{ incPattern.text }}
+              <b style="font-size: 1.1em;">{{ incPattern.text }}</b>
               <button @click="removeIncPattern(incPattern)">
                 <v-icon right>
                   mdi-close-outline
@@ -165,7 +165,7 @@
         <v-col align="left" cols="5">
           <ul style="list-style-type:disc;">
             <li v-for="excPattern in excPatterns" :key="excPattern.id">
-              {{ excPattern.text }}
+              <b style="font-size: 1.1em;">{{ excPattern.text }}</b>
               <button @click="removeExcPattern(excPattern)">
                 <v-icon right>
                   mdi-close-outline
@@ -317,8 +317,8 @@
       </v-row>
       <v-row>
         <v-col align="right">
+          <label for="hexCheckbox"><b>Use hexadecimal </b></label>
           <input type="checkbox" id="hexCheckbox" v-model="useHex" />
-          <label for="hexCheckbox">Use hexadecimal</label>
         </v-col>
       </v-row>
       <v-card-title class="pb-0 mb-2 bottom-space">
@@ -401,7 +401,7 @@
           ></v-select>
         </v-col>
       </v-row>
-      <v-row class="bottom-space">
+      <v-row>
         <v-col cols="6" align="left">
           <v-text-field
             label="Mask file name"
@@ -418,7 +418,7 @@
               outlined
               @click="showOrdering()"
             >
-            Change charset priorities"
+            Change charset priorities
           </v-btn>
         </v-col>
       </v-row>
@@ -441,7 +441,7 @@
     >
       <v-card>
         <v-card-title>
-          Change order
+          Change character set priorities
         </v-card-title>
         <v-card-text>
           <v-data-table
@@ -483,7 +483,7 @@
               outlined
               @click="showOrdering()"
             >
-            Close charset priorities"
+            Close charset priorities
           </v-btn>
         </v-card-text>
       </v-card>

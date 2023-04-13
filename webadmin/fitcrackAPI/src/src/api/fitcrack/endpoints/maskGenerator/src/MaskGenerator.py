@@ -4,6 +4,7 @@ from src.api.fitcrack.endpoints.maskGenerator.src.IterationGenerator import Iter
 from src.api.fitcrack.endpoints.maskGenerator.src.MaskSorter import MaskSorter
 
 class Options():
+    '''Parse arguments from request.'''
     def __init__(self, options) -> None:
         self.minlower = int(options.get('minlower'))
         self.maxlower = int(options.get('maxlower'))
@@ -40,7 +41,7 @@ class MaskGenerator():
         self.message = "Success"
 
     def generateMaskFile(self, arg_options, masksPath, wordlistsPath):
-        
+        '''Check patterns and dictionaries, and either call analyzer or generator to get masks.'''
         options = Options(arg_options)
         
         if options.patinc:
