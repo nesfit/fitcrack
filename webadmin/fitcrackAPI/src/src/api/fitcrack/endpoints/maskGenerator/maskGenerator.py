@@ -48,7 +48,7 @@ class generateMasks(Resource):
         maskGenerator = MaskGenerator()
         message = maskGenerator.generateMaskFile(request.json, MASKS_DIR, DICTIONARY_DIR)
 
-        if message == "Successfully created mask file.":
+        if message == "Success":
             filename = 'test.hcmask' if request.json.get('filename') == '' else request.json.get('filename') + '.hcmask'
             maskSet = FcMasksSet(name=filename, path=filename)
             try:
@@ -59,7 +59,7 @@ class generateMasks(Resource):
                 abort(500, 'Masks set with name ' + filename + ' already exists.')
 
             return {
-                'message': message,
+                'message': "Successfully created mask file " + filename,
                 'status': True
             }
         else:

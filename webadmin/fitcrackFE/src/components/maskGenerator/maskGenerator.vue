@@ -1,5 +1,5 @@
 <template>
-  <v-container class="max600">
+  <v-container class="title-length">
     <fc-tile
       title="Mask generator"
       class="ma-2"
@@ -103,13 +103,24 @@
           </div>
         </v-col>
       </v-row>
+      <v-alert
+        v-if="patternInvalid"
+        tile
+        text
+        type="error"
+        class="mb-0"
+      >
+        Pattern cannot be empty.
+      </v-alert>
       <v-text-field
         label="Enter mask pattern"
         filled
         outlined
+        clearable
         dense
         single-line
         v-model="pattern"
+        :readonly="true"
       />
       <v-row>
         <v-col align="left">
@@ -407,44 +418,10 @@
               outlined
               @click="showOrdering()"
             >
-            {{ orderingVisible ? "Close charset priorities" : "Change charset priorities" }}
+            Change charset priorities"
           </v-btn>
         </v-col>
       </v-row>
-      <v-data-table
-        class="bottom-space"
-        v-if="orderingVisible"
-        :headers="charsetOrderHeaders"
-        :items="charsetOrderList"
-        :loading=false
-        :sort-by="['order']"
-        :hide-default-footer="true"
-      >
-        <template v-slot:item.order="{ item }">
-          {{ item.order }}
-        </template>
-        <template v-slot:item.name="{ item }">
-          {{ item.name }}
-        </template>
-        <template v-slot:item.placeholder="{ item }">
-          {{ item.placeholder }}
-        </template>
-        <template v-slot:item.move="{ item }">
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-                <v-btn icon
-                @click="moveCharsetUp(item.name)">
-                  <v-icon>mdi-arrow-up</v-icon>
-                </v-btn>
-                <v-btn icon
-                @click="moveCharsetDown(item.name)">
-                  <v-icon>mdi-arrow-down</v-icon>
-                </v-btn>
-            </template>
-            <span>Analyze</span>
-          </v-tooltip>
-        </template>
-      </v-data-table>
       <v-row>
         <v-col align="right">      
           <v-btn
@@ -457,6 +434,61 @@
         </v-col>
       </v-row>
     </fc-tile>
+
+    <v-dialog
+      v-model="orderingVisible"
+      max-width="700"
+    >
+      <v-card>
+        <v-card-title>
+          Change order
+        </v-card-title>
+        <v-card-text>
+          <v-data-table
+            class="bottom-space"
+            v-if="orderingVisible"
+            :headers="charsetOrderHeaders"
+            :items="charsetOrderList"
+            :loading=false
+            :sort-by="['order']"
+            :hide-default-footer="true"
+          >
+            <template v-slot:item.order="{ item }">
+              {{ item.order }}
+            </template>
+            <template v-slot:item.name="{ item }">
+              {{ item.name }}
+            </template>
+            <template v-slot:item.placeholder="{ item }">
+              {{ item.placeholder }}
+            </template>
+            <template v-slot:item.move="{ item }">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                    <v-btn icon
+                    @click="moveCharsetUp(item.name)">
+                      <v-icon>mdi-arrow-up</v-icon>
+                    </v-btn>
+                    <v-btn icon
+                    @click="moveCharsetDown(item.name)">
+                      <v-icon>mdi-arrow-down</v-icon>
+                    </v-btn>
+                </template>
+                <span>Analyze</span>
+              </v-tooltip>
+            </template>
+          </v-data-table>
+          <v-btn
+              color="primary"
+              outlined
+              @click="showOrdering()"
+            >
+            Close charset priorities"
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
   </v-container>
 </template>
 
@@ -469,6 +501,7 @@
   export default {
     data: function () {
       return {
+        patternInvalid: false,
         orderingVisible: false,
         loading: false,
         useHex: false,
@@ -482,7 +515,7 @@
         maxDigits: 0,
         minSpecial: 0,
         maxSpecial: 0,
-        maxLength: 0,
+        maxLength: 10,
         minLength: 0,
         minLowerHex: 0,
         minUpperHex: 0,
@@ -551,18 +584,30 @@
     methods: {
       fmt,
       updatePattern: function (text) {
+        if (this.pattern == null)
+          this.pattern = ''
         this.pattern += text
       },
       showOrdering: function () {
         this.orderingVisible = !this.orderingVisible
       },
       includePattern: function () {
-        this.incPatterns.push({ id: incId++, text: this.pattern })
-        this.pattern = ''
+        if (this.pattern == '' || this.pattern == null)
+          this.patternInvalid = true
+        else {
+          this.incPatterns.push({ id: incId++, text: this.pattern })
+          this.pattern = ''
+          this.patternInvalid = false
+        }
       },
       excludePattern: function () {
-        this.excPatterns.push({ id: excId++, text: this.pattern })
-        this.pattern = ''
+        if (this.pattern == '' || this.pattern == null)
+          this.patternInvalid = true
+        else {
+          this.excPatterns.push({ id: excId++, text: this.pattern })
+          this.pattern = ''
+          this.patternInvalid = false
+        }
       },
       removeIncPattern: function (incPattern) {
         this.incPatterns = this.incPatterns.filter((b) => b !== incPattern)
@@ -674,8 +719,8 @@
 
 <style scoped>
 
-  .max600 {
-      max-width: 600px;
+  .title-length {
+      max-width: 700px;
     }
 
 </style>

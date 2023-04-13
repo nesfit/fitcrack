@@ -26,16 +26,16 @@ class PasswordAnalyzer:
                             maskLength = len(mask)
 
                             for charset in arg_options.charsetOrderList:
-                                if charset['placeholder'] == '?1' and arg_options.charset1 and letter in arg_options.charset1:
+                                if charset['placeholder'] == '?1' and letter in arg_options.charset1:
                                     mask += "?1"
                                     break
-                                elif charset['placeholder'] == '?2' and arg_options.charset2 and letter in arg_options.charset2:
+                                elif charset['placeholder'] == '?2' and letter in arg_options.charset2:
                                     mask += "?2"
                                     break
-                                elif charset['placeholder'] == '?3' and arg_options.charset3 and letter in arg_options.charset3:
+                                elif charset['placeholder'] == '?3' and letter in arg_options.charset3:
                                     mask += "?3"
                                     break
-                                elif charset['placeholder'] == '?4' and arg_options.charset4 and letter in arg_options.charset4:
+                                elif charset['placeholder'] == '?4' and letter in arg_options.charset4:
                                     mask += "?4"
                                     break
                                 elif charset['placeholder'] == '?l' and letter in string.ascii_lowercase:

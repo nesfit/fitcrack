@@ -1,6 +1,3 @@
-import string
-import itertools
-
 from src.api.fitcrack.endpoints.maskGenerator.src.functions import *
 from src.api.fitcrack.endpoints.maskGenerator.src.PasswordAnalyzer import PasswordAnalyzer
 from src.api.fitcrack.endpoints.maskGenerator.src.IterationGenerator import IterationGenerator
@@ -40,7 +37,7 @@ class Options():
 class MaskGenerator():
 
     def __init__(self) -> None:
-        self.message = "Successfully created mask file."
+        self.message = "Success"
 
     def generateMaskFile(self, arg_options, masksPath, wordlistsPath):
         

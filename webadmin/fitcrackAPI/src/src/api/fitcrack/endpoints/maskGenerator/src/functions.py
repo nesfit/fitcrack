@@ -1,9 +1,3 @@
-import string
-import itertools
-
-def hello() :
-    return "Hello"
-
 def check_compatibility(mask, mask_pattern):
     '''Compare mask with a given mask pattern.'''
     if len(mask) != len(mask_pattern):
