@@ -214,7 +214,7 @@ const appRoutes = [
   },
   {
     path: '/rules/edit/new',
-    name: 'ruleFileEdit',
+    name: 'ruleFileCreate',
     component: ruleFileEdit,
   },
   {

@@ -37,7 +37,7 @@ export default {
     return {
       showConfirmation: false,
       ruleFunctions: functionsJson,
-      backupRules: [],
+      backupRules: [{ value: "", error: false }],
       rules: [{ value: "", error: false }],
       allPasswordsString: "p@ssW0rd",
       passwordsList: [],
@@ -152,15 +152,21 @@ export default {
       this.allFunctionsPopup.visible = visibility;
     },
     loadRuleFile() {
+      // get the content of the rule file
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id + '/download').then((response) => {
+        this.editingFile = true; // mark that file is edited, not created
+        // get the information about rule file
+        this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
+          this.ruleFileInfo = response.data;
+        })
         const lines = response.data.split("\n")
         this.rules = lines.map(line => ({ value: line, error: false }))
         this.backupRules = this.rules.slice()
         this.generatePreview(); //generate the initial mangled passwords
-      });
-      this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
-        this.ruleFileInfo = response.data;
-      });
+      }).catch((error) => { // handle specifying wrong rule file ID in URL
+        this.$error('Rule file with such ID does not exist.')
+        this.$router.push({ name: 'ruleFileCreate' });
+      })
     },
     /**
      * Function which checks if the rules have been changed compared to beginning
@@ -180,7 +186,6 @@ export default {
   },
   created() {
     if (this.$route.params.id) { //when there is id parameter in route url
-      this.editingFile = true;
       this.loadRuleFile();
     }
   },
