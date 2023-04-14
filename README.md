@@ -31,7 +31,8 @@ support for SSL/TLS which is now super-easy to configure.
 Nevertheless, you can still use the installer or manual install if you want.
 
 See instructions the desired type of deployment:
-* [Installation using Docker](INSTALL-Docker.md) (recommended, easy)
+* [Installation using a pre-built image from Docker Hub](INSTALL-Docker.md) (recommended, easy)
+* [Installation using a custom Docker build](INSTALL-Docker-Custom.md) (make your own build of Fitcrack)
 * [Installation using Installer](INSTALL-Installer.md) (working alternative)
 * [Manual installation](INSTALL-Manual.md) (for advanced users/modders)
 
