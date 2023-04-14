@@ -100,3 +100,6 @@ The cracking session will be forced and all warnings ignored.
 ### Debugging
 For debugging **Docker-based** Fitcrack deployments, see [this page](INSTALL-Docker.md#debugging).
 For deployments with **Installer** (or manual installations), see [this page](INSTALL-Installer.md#debugging).
+
+### Changelog
+Visit [CHANGELOG](CHANGELOG.md) to see changes between different versions of Fitcrack
