@@ -1,4 +1,4 @@
-# Deploying Fitcrack server using a pre-built image from Docker hub
+# Deploying Fitcrack using a pre-built image from Docker Hub
 
 This document describes how to install Fitcrack server using a pre-built Docker image.
 

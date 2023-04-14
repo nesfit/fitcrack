@@ -1,4 +1,4 @@
-# Deploying Fitcrack server using a Docker build
+# Deploying Fitcrack using a custom Docker build
 
 This document describes how to prepare and run a custom Docker build of Fitcrack server.
 
