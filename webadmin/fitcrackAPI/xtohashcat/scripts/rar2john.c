@@ -40,8 +40,9 @@
  * If any of the files is uncompressed, this is preferred even if larger
  * Add METHOD to output
  *
- * Edited by David Bolvansky (david.bolvansky@gmail.com)
+ * Edited by David Bolvansky (david.bolvansky@gmail.com) and Radek Hranicky (hranicky@fit.vut.cz)
  * Changes: rar2john is now standalone utility, does not require john
+ * Last update: 2023-04-14
  */
 
 #include <stdint.h>
@@ -53,8 +54,106 @@
 #include <unistd.h>
 #include <inttypes.h>
 
+
+
 #include "rar2john.h"
 #include "base64_convert.h"
+
+
+/******************************************/
+/* here we try to 'find' a usable fseek64 */
+/******************************************/
+#if SIZEOF_LONG == 8
+#define jtr_fseek64 fseek
+
+#elif HAVE_FSEEK64 /* Various */
+// int fseek64 (FILE *stream, long long offset, int whence);
+#define jtr_fseek64 fseek64
+
+#elif HAVE_FSEEKO64 /* Various */
+// int fseeko64 (FILE *stream, long long offset, int whence);
+#define jtr_fseek64 fseeko64
+
+#elif defined (HAVE__FSEEKI64) || defined (_MSC_VER) /* Windows */
+// int _fseeki64(FILE *stream, __int64 offset, int origin);
+#define jtr_fseek64 _fseeki64
+
+#elif SIZEOF_OFF_T == 8 && HAVE_FSEEKO /* Other LLP64 */
+// int _fseeko(FILE *stream, __int64 offset, int origin);
+#define jtr_fseek64 fseeko
+
+#elif HAVE_LSEEK64 /* Linux 32-bit or X32 */
+// off64_t lseek64(int fd, off64_t offset, int whence);
+//   !!!WARNING, we may need to flush, if file open for reading
+//      for this to work right, especially in SEEK_END mode
+#define jtr_fseek64(s,o,w) lseek64(fileno(s),o,w);
+
+#elif SIZEOF_OFF_T == 8 && HAVE_LSEEK /* POSIX.1 */
+// off_t lseek(int fildes, off_t offset, int whence);
+//   !!!WARNING, we may need to flush, if file open for reading
+//      for this to work right, especially in SEEK_END mode
+#define jtr_fseek64(s,o,w) lseek(fileno(s),o,w)
+
+#else
+// at this point, we have NO easy workaround for a seek64 function.
+// we can code things for specific environments, OR simply fall
+// back to using fseek (and warn the user)
+#if defined (__CYGWIN32__) && !defined (__CYGWIN64__)
+   extern  int fseeko64 (FILE* stream, int64_t offset, int whence);
+  #define jtr_fseek64 fseeko64
+#elif defined (__CYGWIN64__)
+   extern  int fseeko (FILE* stream, int64_t offset, int whence);
+  #define jtr_fseek64 fseeko
+#else
+  #if defined(__GNUC__) && defined (AC_BUILT)
+    #warning Using 32-bit fseek(). Files larger than 2GB will be handled unreliably
+  #endif
+  #define jtr_fseek64 fseek
+#endif
+
+#endif /* fseek */
+
+
+/******************************************/
+/* here we try to 'find' a usable ftell64 */
+/******************************************/
+#if SIZEOF_LONG == 8
+#define jtr_ftell64 ftell
+
+#elif HAVE_FTELL64 /* Linux and others */
+// long long ftell64(FILE *stream)
+#define jtr_ftell64 ftell64
+
+#elif HAVE_FTELLO64 /* Solaris */
+// integer*8 function ftello64 (lunit) (Solaris)
+#define jtr_ftell64 ftello64
+
+#elif defined (HAVE__FTELLI64) || defined (_MSC_VER) /* Windows */
+// __int64 _ftelli64(FILE *stream);
+#define jtr_ftell64 _ftelli64
+
+#elif SIZEOF_OFF_T == 8 && HAVE_FTELLO /* Other LLP64 */
+// off_t ftello(FILE *stream);
+#define jtr_ftell64 ftello
+
+#else
+// at this point, we have NO easy workaround for a tell64 function.
+// we can code things for specific environments, OR simply fall
+// back to using ftell (and warn the user)
+#if defined (__CYGWIN32__) && !defined (__CYGWIN64__)
+   extern  int64_t ftello64 (FILE* stream);
+  #define jtr_ftell64 ftello64
+#elif defined (__CYGWIN64__)
+   extern  int64_t ftello (FILE* stream);
+  #define jtr_ftell64 ftello
+#else
+  #if defined(__GNUC__) && defined (AC_BUILT)
+    #warning Using 32-bit ftell(). Files larger than 2GB will be handled unreliably
+  #endif
+  #define jtr_ftell64 ftell
+#endif
+
+#endif /* ftell */
 
 typedef struct
 {
@@ -460,6 +559,14 @@ char *strnzcpy(char *dst, const char *src, int size)
 	return dst;
 }
 
+/* File magics */
+#define RAR_OLD_MAGIC      "\x52\x45\x7e\x5e"
+#define RAR3_MAGIC         "\x52\x61\x72\x21\x1a\x07\x00"
+#define RAR5_MAGIC         "\x52\x61\x72\x21\x1a\x07\x01\x00"
+#define RAR_OLD_MAGIC_SIZE (sizeof(RAR_OLD_MAGIC) - 1)
+#define RAR3_MAGIC_SIZE    (sizeof(RAR3_MAGIC) - 1)
+#define RAR5_MAGIC_SIZE    (sizeof(RAR5_MAGIC) - 1)
+
 static int verbose;
 static char *self_name;
 
@@ -573,7 +680,7 @@ static void DecodeFileName(unsigned char *Name, unsigned char *EncName,
 static void process_file(const char *archive_name)
 {
 	FILE *fp;
-	unsigned char marker_block[7];
+	unsigned char marker_block[RAR3_MAGIC_SIZE];
 	unsigned char archive_hdr_block[13];
 	unsigned char file_hdr_block[40];
 	int i, count, type;
@@ -604,35 +711,39 @@ static void process_file(const char *archive_name)
 		goto err;
 	}
 	/* marker block */
-	memset(marker_block, 0, 7);
-	if (fread(marker_block, 7, 1, fp) != 1) {
-		fprintf(stderr, "%s: Error: read failed: %s.\n",
-			archive_name, strerror(errno));
+	if (fread(marker_block, RAR3_MAGIC_SIZE, 1, fp) != 1) {
+		fprintf(stderr, "! %s: Not a RAR file\n", archive_name);
 		goto err;
 	}
 
-	if (memcmp(marker_block, "\x52\x61\x72\x21\x1a\x07\x00", 7)) {
-		/* handle SFX archives */
+	if (!memcmp(marker_block, RAR_OLD_MAGIC, RAR_OLD_MAGIC_SIZE)) {
+		fprintf(stderr, "! %s: Too old RAR file version (pre 1.50), not supported.\n", archive_name);
+		goto err;
+	}
+
+	if (memcmp(marker_block, RAR3_MAGIC, RAR3_MAGIC_SIZE)) {
+		/* Handle SFX archive, find "Rar!" signature */
 		if (memcmp(marker_block, "MZ", 2) == 0) {
 			/* jump to "Rar!" signature */
 			while (!feof(fp)) {
 				count = fread(buf, 1, CHUNK_SIZE, fp);
-				if ((pos =
-				     memmem(buf, count, "\x52\x61\x72\x21\x1a\x07\x00",7))) {
+				if (count < RAR3_MAGIC_SIZE)
+					break;
+				if ((pos = memmem(buf, count, RAR3_MAGIC, RAR3_MAGIC_SIZE))) {
 					diff = count - (pos - buf);
-					lseek64(fileno(fp), - diff, SEEK_CUR);
-					lseek64(fileno(fp), 7, SEEK_CUR);
+					jtr_fseek64(fp, - diff, SEEK_CUR);
+					jtr_fseek64(fp, RAR3_MAGIC_SIZE, SEEK_CUR);
 					found = 1;
 					break;
 				}
-				if (feof(fp)) //We shold examine the EOF before seek back
+				if (feof(fp)) /* We should examine the EOF before seek back */
 					break;
-				lseek64(fileno(fp), -6, SEEK_CUR);
+				jtr_fseek64(fp, 1 - RAR3_MAGIC_SIZE, SEEK_CUR);
 			}
 			if (!found) {
 				if (process_file5(archive_name))
 					return;
-				fprintf(stderr, "! %s: Not a RAR file\n", archive_name);
+				/* The "Not a RAR file" message already printed by process_file5() at this point */
 				goto err;
 			}
 		}
@@ -720,7 +831,7 @@ next_file_header:
 			fprintf(stderr, "! -hp mode entry found in %s\n", base_aname);
 		}
 		printf("%s:$RAR3$*%d*", base_aname, type);
-		lseek64(fileno(fp), -24, SEEK_END);
+		jtr_fseek64(fp, -24, SEEK_END);
 		if (fread(buf, 24, 1, fp) != 1) {
 			fprintf(stderr, "%s: Error: read failed: %s.\n",
 				archive_name, strerror(errno));
@@ -919,7 +1030,7 @@ next_file_header:
 		 */
 		if (file_hdr_head_flags & 0x10) {
 			fprintf(stderr, "! Solid, can't handle (currently)\n");
-			lseek64(fileno(fp), file_hdr_pack_size, SEEK_CUR);
+			jtr_fseek64(fp, file_hdr_pack_size, SEEK_CUR);
 			goto next_file_header;
 		}
 
@@ -927,7 +1038,7 @@ next_file_header:
 			if (verbose) {
 				fprintf(stderr, "! Is a directory, skipping\n");
 			}
-			lseek64(fileno(fp), file_hdr_pack_size, SEEK_CUR);
+			jtr_fseek64(fp, file_hdr_pack_size, SEEK_CUR);
 			goto next_file_header;
 		}
 		else if (verbose) {
@@ -937,9 +1048,15 @@ next_file_header:
 		/* Check if encryption is being used */
 		if (!(file_hdr_head_flags & 0x04)) {
 			fprintf(stderr, "! not encrypted, skipping\n");
-			lseek64(fileno(fp), file_hdr_pack_size, SEEK_CUR);
+			jtr_fseek64(fp, file_hdr_pack_size, SEEK_CUR);
+			goto next_file_header;
+		} else if (file_hdr_block[24] < 29) {
+			fprintf(stderr, "! %s: Too old RAR file version (v%u.%u encryption), not supported.\n",
+			        archive_name, file_hdr_block[24] / 10, file_hdr_block[24] % 10);
+			jtr_fseek64(fp, file_hdr_pack_size, SEEK_CUR);
 			goto next_file_header;
 		}
+
 
 		method = file_hdr_block[25];
 
@@ -959,7 +1076,7 @@ next_file_header:
 			if (verbose)
 				fprintf(stderr,
 				        "! We got a better candidate already, skipping\n");
-			lseek64(fileno(fp), file_hdr_pack_size, SEEK_CUR);
+			jtr_fseek64(fp, file_hdr_pack_size, SEEK_CUR);
 			goto next_file_header;
 		}
 
@@ -1121,7 +1238,8 @@ int read_vuint (FILE *fp, uint64_t *n, uint32_t *bytes_read) {
  * Process an 'extra' block of data. This is where rar5 stores the
  * encryption block.
  *************************************************************************/
-static int ProcessExtra50(FILE *fp, uint64_t extra_size, uint64_t HeadSize, uint32_t HeaderType, uint32_t CurBlockPos, const char *archive_name) {
+static int ProcessExtra50(FILE *fp, uint64_t extra_size, uint64_t HeadSize, uint32_t HeaderType, uint32_t CurBlockPos, const char *archive_name, int *found)
+{
 	uint64_t FieldSize, FieldType, EncVersion, Flags;
 	uint32_t bytes_read=0;
 	int bytes_left=(int)extra_size;
@@ -1155,6 +1273,7 @@ static int ProcessExtra50(FILE *fp, uint64_t extra_size, uint64_t HeadSize, uint
                 if (!read_buf(fp, rar5_salt, SIZE_SALT50, &bytes_read)) return 0;
                 if (!read_buf(fp, InitV, SIZE_INITV, &bytes_read)) return 0;
                 if (!read_buf(fp, PswCheck, SIZE_PSWCHECK, &bytes_read)) return 0;
+                (*found)++;
                 printf("%s:$rar5$%d$%s$%d$%s$%d$%s\n",
                     base_aname,
                     SIZE_SALT50, base64_convert_cp(rar5_salt,e_b64_raw,SIZE_SALT50,Hex1,e_b64_hex,sizeof(Hex1),0, 0),
@@ -1171,7 +1290,8 @@ static int ProcessExtra50(FILE *fp, uint64_t extra_size, uint64_t HeadSize, uint
  * Common file header processing for rar5
  *************************************************************************/
 
-static size_t read_rar5_header(FILE *fp, size_t CurBlockPos, uint8_t *HeaderType, const char *archive_name) {
+static size_t read_rar5_header(FILE *fp, size_t CurBlockPos, uint8_t *HeaderType, const char *archive_name, int *found)
+{
 	uint64_t block_size, flags, extra_size=0, data_size=0;
 	uint64_t crypt_version, enc_flags, HeadSize;
 	uint32_t head_crc, header_bytes_read = 0, sizeof_vint;
@@ -1187,6 +1307,7 @@ static size_t read_rar5_header(FILE *fp, size_t CurBlockPos, uint8_t *HeaderType
             fprintf(stderr, "Error, rar file %s too short, could not read IV from header\n", archive_name);
             return 0;
         }
+        (*found)++;
         printf("%s:$rar5$%d$%s$%d$%s$%d$%s\n",
             base_aname,
             SIZE_SALT50, base64_convert_cp(rar5_salt,e_b64_raw,SIZE_SALT50,Hex1,e_b64_hex,sizeof(Hex1),0, 0),
@@ -1259,9 +1380,9 @@ static size_t read_rar5_header(FILE *fp, size_t CurBlockPos, uint8_t *HeaderType
         if (!read_vuint(fp, &HostOS, &header_bytes_read)) return 0;
         if (!read_vuint(fp, &NameSize, &header_bytes_read)) return 0;
         // skip the field name.
-        lseek64(fileno(fp), NameSize, SEEK_CUR);
+        jtr_fseek64(fp, NameSize, SEEK_CUR);
         if (extra_size != 0)
-            ProcessExtra50(fp, extra_size, HeadSize, *HeaderType, CurBlockPos, archive_name);
+	        ProcessExtra50(fp, extra_size, HeadSize, *HeaderType, CurBlockPos, archive_name, found);
 
     } else if (header_type == HEAD_ENDARC) {
         return 0;
@@ -1271,53 +1392,66 @@ static size_t read_rar5_header(FILE *fp, size_t CurBlockPos, uint8_t *HeaderType
 
 /* handle rar5 files */
 static int process_file5(const char *archive_name) {
-	//fprintf(stderr, "! %s: Not a RAR 3.x file, try running rar5tojohn.py on me!\n", archive_name);
-	char Magic[8], buf[CHUNK_SIZE], *pos;
+	unsigned char Magic[RAR5_MAGIC_SIZE], buf[CHUNK_SIZE], *pos;
 	size_t count, NextBlockPos, CurBlockPos;
 	int diff, found = 0;
 	FILE *fp;
 
-	fp = fopen(archive_name, "rb");
-	if (!fp) { fprintf(stderr, "error opening file %s\n", archive_name); return 0; }
-	if (fread(Magic, 1, 8, fp) != 8) {
-        fclose(fp);
-        fprintf(stderr, "Error reading rar signature from file %s\n", archive_name);
-        return 0;
-    }
-	if (memcmp(Magic, "\x52\x61\x72\x21\x1a\x07\x01\x00", 8)) { /* handle SFX archives */
-		if (memcmp(Magic, "MZ", 2) == 0) {
-			/* jump to "Rar!" signature */
-			while (!feof(fp)) {
-				count = fread(buf, 1, CHUNK_SIZE, fp);
-				if ( (pos = (char*)memmem(buf, count, "\x52\x61\x72\x21\x1a\x07\x01\x00", 8))) {
-					diff = count - (pos - buf);
-					lseek64(fileno(fp), - diff, SEEK_CUR);
-					lseek64(fileno(fp), 8, SEEK_CUR);
-					found = 1;
-					break;
-				}
-				if (feof(fp)) //We shold examine the EOF before seek back
-					break;
-				lseek64(fileno(fp), -7, SEEK_CUR);
+	if (!(fp = fopen(archive_name, "rb"))) {
+		fprintf(stderr, "! %s: %s\n", archive_name, strerror(errno));
+		return 0;
+	}
+
+	if (fread(Magic, sizeof(Magic), 1, fp) != 1) {
+		fprintf(stderr, "! %s: Not a RAR file\n", archive_name);
+		goto err;
+	}
+
+	if (memcmp(Magic, "MZ", 2) == 0) {
+		/* Handle SFX archive, find "Rar!" signature */
+		while (!feof(fp)) {
+			count = fread(buf, 1, CHUNK_SIZE, fp);
+			if (count < RAR5_MAGIC_SIZE)
+				break;
+			if ((pos = memmem(buf, count, RAR5_MAGIC, RAR5_MAGIC_SIZE))) {
+				diff = count - (pos - buf);
+				jtr_fseek64(fp, - diff, SEEK_CUR);
+				jtr_fseek64(fp, RAR5_MAGIC_SIZE, SEEK_CUR);
+				found = 1;
+				break;
 			}
-            if (!found)
-                goto err;
+			if (feof(fp)) /* We should examine the EOF before seek back */
+				break;
+			jtr_fseek64(fp, 1 - RAR5_MAGIC_SIZE, SEEK_CUR);
 		}
 	}
+
+	if (memcmp(Magic, RAR5_MAGIC, RAR5_MAGIC_SIZE) && !found) {
+		fprintf(stderr, "! %s: Not a RAR file\n", archive_name);
+		goto err;
+	}
+
+	found = 0;
 	while (1) {
 		uint8_t HeaderType;
-		CurBlockPos = (size_t)ftello64(fp);
-		NextBlockPos = read_rar5_header(fp, CurBlockPos, &HeaderType, archive_name);
+
+		CurBlockPos = (size_t)jtr_ftell64(fp);
+		NextBlockPos = read_rar5_header(fp, CurBlockPos, &HeaderType, archive_name, &found);
 		if (!NextBlockPos)
 			break;
 		// fprintf(stderr, "NextBlockPos is %d Headertype=%d curblockpos=%d\n", NextBlockPos, HeaderType, CurBlockPos);
-		lseek64(fileno(fp), NextBlockPos, SEEK_SET);
+		jtr_fseek64(fp, NextBlockPos, SEEK_SET);
 	}
-    if (fp) fclose(fp);
-    return 1;
-err:;
+
 	if (fp) fclose(fp);
-    return 0;
+	if (!found)
+		fprintf(stderr, "! Did not find a valid encrypted candidate in %s\n", archive_name);
+
+	return 1;
+
+err:
+	if (fp) fclose(fp);
+	return 0;
 }
 
 
