@@ -217,13 +217,13 @@
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">RAR</a> and </span>
                       </template>
-                      <span>Hash types: 12500, 13000</span>
+                      <span>Hash types: 12500, 13000, 23700, 23800</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">ZIP</a>.</span>
                       </template>
-                      <span>Hash types: 13600</span>
+                      <span>Hash types: 13600, 17200, 17210, 17225, 13001, 23002, 23003</span>
                     </v-tooltip>
                   </v-alert>
                   <file-uploader
@@ -655,12 +655,10 @@
           }
           /* -1 means no hash entered */
           var hash_code = this.hashType == null ? -1 : this.hashType.code
-          this.axios.get(this.$serverAddr + '/job/crackingTime', {
-            params: {
-              'hash_type_code': hash_code,
-              'boinc_host_ids': boincIds.join(","),
-              'attack_settings': val.attack_settings
-            }
+          this.axios.post(this.$serverAddr + '/job/crackingTime', {   
+            'hash_type_code': hash_code,
+            'boinc_host_ids': boincIds.join(","),
+            'attack_settings': JSON.stringify(val.attack_settings)
           }).then((response) => {
             if (response['data']) {
               this.estimatedTime = response.data.display_time

@@ -597,7 +597,7 @@ class verifyHash(Resource):
 class getCrackingTime(Resource):
     @api.expect(crackingTime_argument)
     @api.marshal_with(crackingTime_model)
-    def get(self):
+    def post(self):
         """
         Calculates cracking time.
         """

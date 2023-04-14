@@ -288,7 +288,9 @@ def computeCrackingTime(data):
     total_power = 0
     keyspace = 0
     hosts_dict = []
+
     attackSettings = json.loads(data['attack_settings'])
+
     data['boinc_host_ids'] = [x.strip() for x in data['boinc_host_ids'].split(',')]
 
     # Check if we have valid hash type code and if we have any host
