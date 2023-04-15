@@ -23,10 +23,23 @@
             </v-row>
             <v-row>
                 <v-col class="pb-0">
-                    <v-textarea solo class="textArea" label="Dictionary Content" :value="allPasswordsString"
+                    <v-textarea solo hide-details class="textArea" label="Type or append passwords" :value="allPasswordsString"
                         @input="updatePasswords"></v-textarea>
                 </v-col>
             </v-row>
+            <v-row>
+                <v-col>
+                    <v-btn class="py-0" color="red accent-2" small depressed @click="updatePasswords('')">
+                        <v-icon>
+                            mdi-delete
+                        </v-icon>
+                        Reset passwords
+                    </v-btn>
+                </v-col>
+
+            </v-row>
+
+
             <v-row>
 
                 <v-alert tile color="orange" text class="mb-0">
