@@ -422,6 +422,15 @@
           </v-btn>
         </v-col>
       </v-row>
+      <v-alert
+        v-if="charset1 || charset2 || charset3 || charset4"
+        tile
+        text
+        type="warning"
+        class="mb-0"
+      >
+        You are using custom character sets. Make sure to select respective character sets during job creation.
+      </v-alert>
       <v-row>
         <v-col align="right">      
           <v-btn

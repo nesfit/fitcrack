@@ -39,8 +39,12 @@ class MaskGenerator():
 
     def __init__(self) -> None:
         self.message = "Success"
+        self.charsets = {}
 
-    def generateMaskFile(self, arg_options, masksPath, wordlistsPath):
+    def getCustomCharsetList(self):
+        return self.charsets
+
+    def generateMaskFile(self, arg_options, masksPath, wordlistsPath, charsetsPath):
         '''Check patterns and dictionaries, and either call analyzer or generator to get masks.'''
         options = Options(arg_options)
         
@@ -74,6 +78,25 @@ class MaskGenerator():
         sorter.sort_masks(options)
 
         sorter.save_masks_to_file(options, masksPath)
+
+        self.charsets = {}
+        if options.charset1:
+            self.charsets['charset1'] = options.charset1
+        if options.charset2:
+            self.charsets['charset2'] = options.charset2
+        if options.charset3:
+            self.charsets['charset3'] = options.charset3
+        if options.charset4:
+            self.charsets['charset4'] = options.charset4
+
+        for key in self.charsets:
+            try:
+                file = open(charsetsPath + "/" + options.filename + "_" + key + ".hcchr", "w", encoding="utf-8")
+                file.write(self.charsets[key])
+                file.close()
+            except:
+                return charsetsPath + "/" + options.filename + "_" + key + ".hcchr"
+                
 
         return self.message
     

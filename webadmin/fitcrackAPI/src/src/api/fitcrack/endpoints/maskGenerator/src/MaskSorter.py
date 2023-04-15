@@ -75,14 +75,6 @@ class MaskSorter:
         file = open(masksPath + "/" + arg_options.filename + ".hcmask", "w", encoding="utf-8")
 
         for mask in self.sorted_masks:
-            if "1" in mask:
-                file.write(arg_options.charset1+",")
-            if "2" in mask:
-                file.write(arg_options.charset2+",")
-            if "3" in mask:
-                file.write(arg_options.charset3+",")
-            if "4" in mask:
-                file.write(arg_options.charset4+",")
             file.write(mask+"\n")
             
         file.close()
