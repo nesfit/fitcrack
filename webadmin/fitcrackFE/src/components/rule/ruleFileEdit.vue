@@ -98,7 +98,6 @@ export default {
       // Get the result
       this.axios.post(this.$serverAddr + "/rule/preview", data).then((response) => {
         this.applicatorResult = response.data.passwordsPreview;
-        console.log(response.data.passwordsPreview)
         this.filterPreviewPasswords();
       }).catch((error) => {
         //TODO this.$error
@@ -141,11 +140,9 @@ export default {
       else { //otherwise show the insert popup
         Vue.set(this.functionsInsertPopup, 'visible', true);
       }
-      console.log(this.functionsInsertPopup)
 
     },
     hideInsertPopup(visibility) {
-      console.log(this.functionsInsertPopup)
       this.functionsInsertPopup.visible = visibility;
     },
     showAllFunctionsPopup(popupData) {
@@ -164,9 +161,10 @@ export default {
         })
         const lines = response.data.split("\n")
         this.rules = lines.map(line => ({ value: line, error: false }))
-        this.backupRules = this.rules.slice()
+        this.backupRules = JSON.parse(JSON.stringify(this.rules)); //keep a copy of initial rules
         this.generatePreview(); //generate the initial mangled passwords
-      }).catch((error) => { // handle specifying wrong rule file ID in URL
+      }).catch((error) => {
+        // handle specifying wrong rule file ID in URL
         this.$error('Rule file with such ID does not exist.')
         this.$router.push({ name: 'ruleFileCreate' });
       })

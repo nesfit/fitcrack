@@ -76,9 +76,7 @@ export default {
     methods: {
         updateRules(newRuleValue, index) {
             let updatedRules = this.rules;
-            console.log(updatedRules)
             updatedRules[index].value = newRuleValue;
-            console.log(updatedRules)
             this.$emit("update-rules", updatedRules);
         },
         deleteRule(index) {
