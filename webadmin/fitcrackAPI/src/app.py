@@ -111,7 +111,7 @@ def check_valid_login():
 
 
 def main():
-    app.run(host='0.0.0.0', port=5000, threaded=False)
+    app.run(host='0.0.0.0', port=5000, threaded=False, debug = True)
 
 
 initialize_app(app)
