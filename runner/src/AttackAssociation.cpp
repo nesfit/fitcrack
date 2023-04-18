@@ -6,9 +6,20 @@
 #include "AttackAssociation.hpp"
 #include "Dictstat.hpp"
 
+
 AttackAssociation::AttackAssociation(const ConfigTask& config, Directory& directory)
   : AttackCrackingBase(config, directory, "9") { // change attack mode for hashcat
-  
+  std::string mode;
+
+  config.find("mode", mode);
+
+  // This is abusing an undefined behavior in hascat (multiple definitions of attack mode argument)
+  // The last defined one will be considered the correct
+  if (mode == "b" || mode == "a"){
+    // Association mode doen't like 0 keyspace so testing is done on dictionary
+    addArgument("-a");
+    addArgument("0");
+  }
 }
 
 void AttackAssociation::addSpecificArguments() {

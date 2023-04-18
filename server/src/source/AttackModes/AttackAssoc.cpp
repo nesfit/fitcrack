@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <cmath>    /**< std::round */
 #include <sstream>
-#include <iostream>
+#include <fstream>
 
 
 CAttackAssoc::CAttackAssoc(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
@@ -23,8 +23,8 @@ CAttackAssoc::CAttackAssoc(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoad
 
 bool CAttackAssoc::makeWorkunit()
 {
-    std::ifstream logfile("/home/dukek/Dokumenty/skola/predmety/SEP/fitcrack/generator_log_file.txt");
-    std::cerr.rdbuf(logfile.rdbuf());
+    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                "making assoc workunit.\n");
     /** Create the workunit instance first */
     std::string mergedDictsPath =
         Config::dictDir + ".dict_" + std::to_string(m_job->getId()) + ".txt";
@@ -42,12 +42,17 @@ bool CAttackAssoc::makeWorkunit()
 
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
-    std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
 
-    if (m_job->getDistributionMode() == 0) {
+    if (m_job->getDistributionMode() == 0) { // distribute dictionaries
+      std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
       std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
       std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
-    } else if (m_job->getDistributionMode() == 1) {
+    } else if (m_job->getDistributionMode() == 1) { // use skip limit, send everything
+      std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_data_%" PRIu64 "", Config::appName, m_job->getId());// sticky
+      std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
+      std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
+    } else if (m_job->getDistributionMode() == 2){
+      std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_data_%" PRIu64 "", Config::appName, m_job->getId());// sticky
       std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "", Config::appName, m_job->getId());// sticky
       std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_%d_%d.rules", Config::appName, Config::startTime, Config::seqNo++);
     }
@@ -196,27 +201,37 @@ bool CAttackAssoc::makeWorkunit()
 
         workunitDict->updatePos(inputDict->GetCurrentDictPos());
 
-        /** Hash fragment (not optimal line skipping) */
-        std::stringstream hashes(m_job->getHashes());
-        std::string buffer;
-        for (uint64_t i = 0; i < m_workunit->getStartIndex(); i++){
-          std::getline(hashes, buffer);
-        }
-        for (uint64_t i = 0; i < writtenPasswords; i++){
-          if (!std::getline(hashes, buffer)){
-            Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
-                                  m_host->getBoincHostId(),
-                                  "Failed to read same number of hashes as hints! "
-                                  "Setting job to malformed.\n");
-            m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-            return false;
+
+        if (writtenPasswords == 0){
+          // hashes for benchmark
+          hashesFile << m_job->getHashes();
+        } else {
+          /** Hash fragment (not optimal line skipping) */
+          std::stringstream hashes(m_job->getHashes());
+          std::string buffer;
+          for (uint64_t i = 0; i < m_workunit->getStartIndex(); i++){
+            std::getline(hashes, buffer);
           }
-          hashesFile << buffer;
+          for (uint64_t i = 0; i < writtenPasswords; i++){
+            if (!std::getline(hashes, buffer)){
+              Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                                    m_host->getBoincHostId(),
+                                    "Failed to read same number of hashes as hints! "
+                                    "Setting job to malformed.\n");
+              m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+              return false;
+            }
+            hashesFile << buffer <<'\n';
+          }
         }
         hashesFile.close();
 
 
       } else /* if (m_job->getDistributionMode() & FragmentOnHosts)*/ {
+        Tools::printDebugHost(
+          Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+          "One complete dictionary\n");
+
         uint64_t startIndex = m_workunit->getStartIndex();
 
         hashesFile << m_job->getHashes();
@@ -316,16 +331,6 @@ bool CAttackAssoc::makeWorkunit()
         return false;
     }
 
-    std::ofstream rulesFile;
-    rulesFile.open(path);
-    if (!rulesFile.is_open())
-    {
-        Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
-                "Failed to open rules BOINC input file! Setting job to malformed.\n");
-        m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
-        return false;
-    }
-
     if(m_job->getRules().empty())
     {
         // TODO: remake mode to without rules
@@ -338,6 +343,19 @@ bool CAttackAssoc::makeWorkunit()
 
     if(m_job->getDistributionMode() & FragmentByRules)
     {
+      Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                      "Creating rules fragment file\n");
+
+      std::ofstream rulesFile;
+      rulesFile.open(path);
+      if (!rulesFile.is_open())
+      {
+          Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                  "Failed to open rules BOINC input file! Setting job to malformed.\n");
+          m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+          return false;
+      }
+
       /** Rule fragment (not optimal line skipping) */
       std::ifstream rules;
       rules.open((Config::rulesDir + m_job->getRules()).c_str());
@@ -350,21 +368,40 @@ bool CAttackAssoc::makeWorkunit()
       }
       
       u_int64_t keyspace = m_workunit->getHcKeyspace();
-      std::string buffer;
-      for (uint64_t i = 0; i < m_workunit->getStartIndex(); i++){
-        std::getline(rules, buffer);
-      }
-      Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                      "rule fragment\n");
-      for (uint64_t i = 0; i < keyspace && std::getline(rules, buffer); i++){
+      if (keyspace == 0) {
+        // for benchmark nonzero amount
+        rulesFile << rules.rdbuf();
+      } else {
+        // fragment rules
+        std::string buffer;
+        for (uint64_t i = 0; i < m_workunit->getStartIndex(); i++){
+          std::getline(rules, buffer);
+        }
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                      "rule one: %s\n", buffer);
-        rulesFile << buffer;
+                        "rule fragment\n");
+        for (uint64_t i = 0; i < keyspace && std::getline(rules, buffer); i++){
+          rulesFile << buffer << '\n';
+        }
       }
       rulesFile.close();
     } else {
+      Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                      "Checking existing sticky rules file\n");
       if(!std::ifstream(path)) // check file doesn't exist
       {
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                      "Creating sticky rules file\n");
+
+          std::ofstream rulesFile;
+          rulesFile.open(path);
+          if (!rulesFile.is_open())
+          {
+              Tools::printDebugHost(Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
+                      "Failed to open rules BOINC input file! Setting job to malformed.\n");
+              m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
+              return false;
+          }
+
           std::ifstream rules;
           rules.open((Config::rulesDir + m_job->getRules()).c_str());
           if (!rules.is_open())
@@ -379,9 +416,7 @@ bool CAttackAssoc::makeWorkunit()
 
           std::stringstream buffer;
           buffer << rules.rdbuf();
-          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                      "rules full: %s\n",buffer.str());
-          rulesFile << rules.rdbuf();
+          rulesFile << buffer.str();
           rulesFile.close();
       }
     }
@@ -402,8 +437,9 @@ bool CAttackAssoc::makeWorkunit()
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
-            m_job->getDistributionMode() & FragmentByRules ? Config::inTemplatePathAssocRuleSplit :
-            m_job->getDistributionMode() & FragmentOnHosts ? Config::inTemplatePathAssocDictAlt : Config::inTemplatePathAssocDictSplit,
+            Config::inTemplatePathAssocDictAlt, // FIXME: remove after debug (this one has no delete)
+            // m_job->getDistributionMode() & FragmentByRules ? Config::inTemplatePathAssocRuleSplit :
+            // m_job->getDistributionMode() & FragmentOnHosts ? Config::inTemplatePathAssocDictAlt : Config::inTemplatePathAssocDictSplit,
             path,
             config.project_path(path),
             infiles,
@@ -430,6 +466,10 @@ bool CAttackAssoc::makeWorkunit()
 }
 
 
+
+
+
+
 bool CAttackAssoc::generateWorkunit()
 {
     Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
@@ -442,20 +482,46 @@ bool CAttackAssoc::generateWorkunit()
 
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess(); // TODO: somehow calculate keyspace from rules
+    Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "get pass count to process: %" PRIu64 "\n",
+            passCount);
 
-    if (passCount < getMinPassCount())
+    Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "min pass count: %" PRIu64 "\n",
+            getMinPassCount());
+
+    if (passCount < getMinPassCount()) //FIXME: benchmark sets to 0, assoc requires some
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = getMinPassCount();
+        passCount = getMinPassCount(); //FIXME: benchmark sets to 0, assoc requires some
     }
 
-    if (m_job->getDistributionMode() & FragmentByRules) { // TODO: fragmentation by rules cutoff rules
+
+
+    //////////////////    By Rule    //////////////////
+    if (m_job->getDistributionMode() == 2) {
+      Tools::printDebugHost(
+          Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+          "Fragment rules\n");
       /** Adjust password count */
       if (currentIndex + passCount > jobHcKeyspace)
         passCount = jobHcKeyspace - currentIndex;
 
-    } else if(!(m_job->getDistributionMode() & FragmentOnHosts)) {
+      /** Create the workunit */
+      m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
+                                      m_host->getBoincHostId(), currentIndex, 0,
+                                      passCount, 0, 0, false, 0, false);
+      if (!m_workunit)
+        return false;
+      /** Update the job index */
+      m_job->updateIndex(currentIndex + passCount);
+
+
+    //////////////////    On Server    //////////////////
+    } else if (m_job->getDistributionMode() == 0) {
       /** Load job dictionaries */
       std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
       Tools::printDebugHost(
@@ -475,6 +541,10 @@ bool CAttackAssoc::generateWorkunit()
 
       uint64_t dictIndex = currentDict->getCurrentIndex();
       uint64_t dictHcKeyspace = currentDict->getHcKeyspace();
+      Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "dictionary keyspace: %" PRIu64 "\n",
+            dictHcKeyspace);
       if (dictIndex + passCount > dictHcKeyspace) {
         /** Host is too powerful for this mask, it will finish it */
         passCount = dictHcKeyspace - dictIndex;
@@ -484,23 +554,38 @@ bool CAttackAssoc::generateWorkunit()
             passCount);
       }
 
-      /** Update the dictionary index */
+      /** Create the workunit */
+      m_workunit = CWorkunit::create(
+          m_job->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex,
+          0, passCount, 0, currentDict->getId(), false, 0, false);
+      if (!m_workunit)
+        return false;
+      /** Update the job/dictionary index */
+      m_job->updateIndex(currentIndex + passCount);
       currentDict->updateIndex(dictIndex + passCount);
 
-    } else if (m_job->getDistributionMode() & FragmentOnHosts) {
+
+    //////////////////    On Hosts    //////////////////
+    } else if (m_job->getDistributionMode() == 1) {
+      Tools::printDebugHost(
+          Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+          "Dont fragment, skip and limit\n");
+
       /** Adjust password count */
       if (currentIndex + passCount > jobHcKeyspace)
         passCount = jobHcKeyspace - currentIndex;
+
+      /** Create the workunit */
+      m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
+                                      m_host->getBoincHostId(), currentIndex, 0,
+                                      passCount, 0, 0, false, 0, false);
+      if (!m_workunit)
+        return false;
+      /** Update the job index */
+      m_job->updateIndex(currentIndex + passCount);
     }
 
-    /** Create the workunit */
-    m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
-                                    m_host->getBoincHostId(), currentIndex, 0,
-                                    passCount, 0, 0, false, 0, false);
-    if (!m_workunit)
-      return false;
-    /** Update the job index */
-    m_job->updateIndex(currentIndex + passCount);
+    
 
     return true;
 }
