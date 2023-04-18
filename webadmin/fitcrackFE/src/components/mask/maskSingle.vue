@@ -110,7 +110,8 @@
               }
             }
             return true
-          }
+          },
+          v => /^(\?[ludhHsab1234?]|[^\?])+$/.test(v) || 'Invalid mask'
         ],
         represenArray: {
           'l': {
@@ -144,6 +145,10 @@
           'b': {
             'chars': '0x00 - 0xff',
             'represent': 'ASCII'
+          },
+          '?': {
+            'chars': '?',
+            'represent': '?'
           }
         }
       }
