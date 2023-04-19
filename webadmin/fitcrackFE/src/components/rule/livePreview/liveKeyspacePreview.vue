@@ -56,17 +56,17 @@
                 </v-col>
             </v-row>
             <v-row class="my-1">
-                <v-progress-linear v-visible="previewPasswords.loading" indeterminate color="orange"></v-progress-linear>
+                <v-progress-linear v-visible="mangledPasswords.loading" indeterminate color="orange"></v-progress-linear>
             </v-row>
             <v-row>
                 <v-col class="py-0">
-                    <v-textarea class="textArea" readonly solo label="Passwords preview"
-                        v-model="this.previewPasswords.string"></v-textarea>
+                    <v-textarea class="textArea" readonly solo label="Mangled passwords preview"
+                        v-model="this.mangledPasswords.value"></v-textarea>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col class="text-center pt-0">
-                    <v-btn height="40" multi-line text-wrap class="orange darken-3" :disabled="previewPasswords.loading"
+                    <v-btn height="40" multi-line text-wrap class="orange darken-3" :disabled="mangledPasswords.loading"
                         small @click="downloadFinalPasswords()">
                         Download <br>mangled passwords
                     </v-btn>
@@ -81,7 +81,7 @@
 import appendDictPopup from '@/components/rule/mainEditWindow/popups/appendDictPopup.vue';
 export default {
     props: {
-        previewPasswords: Object,
+        mangledPasswords: Object,
         allPasswordsString: String
     },
     data() {
@@ -95,13 +95,14 @@ export default {
             this.$emit("update-passwords", updatedAllPasswordsString);
         },
         downloadFinalPasswords() {
-            const blob = new Blob([this.previewPasswords.string], { type: 'text/plain' });
+            const blob = new Blob([this.mangledPasswords.value], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = "finalPasswords.txt"
+            link.download = "mangledPasswords.txt"
             link.click();
             URL.revokeObjectURL(url)
+            this.$success("Successfully downloaded mangled passwords")
         }
     },
     components: {

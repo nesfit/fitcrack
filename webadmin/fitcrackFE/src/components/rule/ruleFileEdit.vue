@@ -1,21 +1,23 @@
 <!--
-   * Author : see AUTHORS
+   * Author : Jiří Mládek
    * Licence: MIT, see LICENSE
 -->
 
 <template>
   <v-container>
-    <!--Show popups when clicked-->
+    <!-- Show popups when clicked -->
     <functionInsertPopup v-bind:functionsInsertPopup="functionsInsertPopup" v-on:hide-insert-popup="hideInsertPopup"
-      v-on:update-rule="updateRule">
+      v-on:add-function="addFunction">
     </functionInsertPopup>
     <allFunctionsPopup v-bind:allFunctionsPopup="allFunctionsPopup" v-on:hide-all-functions-popup="hideAllFunctionsPopup"
       v-on:show-insert-popup="showInsertPopup"></allFunctionsPopup>
+
+    <!-- Tool has 2 parts, main window for editing rules and preview of mangled passwords -->
     <v-row justify="center">
       <mainEditWindow v-bind:rules="rules" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo"
         v-on:update-rules="updateRules" v-on:show-insert-popup="showInsertPopup"
         v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
-      <liveKeyspacePreview v-bind:allPasswordsString="allPasswordsString" v-bind:previewPasswords="previewPasswords"
+      <liveKeyspacePreview v-bind:allPasswordsString="allPasswordsString" v-bind:mangledPasswords="mangledPasswords"
         v-on:update-passwords="updatePasswords">
       </liveKeyspacePreview>
     </v-row>
@@ -36,84 +38,103 @@ import allFunctionsPopup from '@/components/rule/mainEditWindow/popups/allFuncti
 export default {
   data() {
     return {
-      showConfirmation: false,
-      ruleFunctions: functionsJson,
-      backupRules: [{ value: "", error: false }],
-      rules: [{ value: "", error: false }],
-      allPasswordsString: "p@ssW0rd",
-      passwordsList: [],
-      applicatorResult: [],
-      previewPasswords: {
-        string: "",
-        loading: false
+      ruleFunctions: functionsJson, // array for storing rule functions objects
+      backupRules: [{ value: "", error: false }], // array of objects for storing initial state of rules
+      rules: [{ value: "", error: false }], // array of objects for storing rules
+      allPasswordsString: "p@ssW0rd\n", // string for storing all passwords concatenated
+      applicatorResult: [], // array for storing result from rules applicator (response from server)
+      mangledPasswords: { 
+        value: "", // string with all mangled passwords concatenated
+        loading: false // boolean to mark if mangled passwords are loading from server
       },
       functionsInsertPopup: {
-        visible: false,
-        functionIndex: 0,
-        ruleIndex: 0
+        visible: false, 
+        functionIndex: 0, // index of function in Json array
+        ruleIndex: 0 // index of rule, to which function will be inserted
       },
       allFunctionsPopup: {
         visible: false,
-        onlyShow: true,
-        ruleIndex: 0
+        onlyShow: true, // true if functions in popup are not clickable, false if functions can be selected
+        ruleIndex: 0 // index of rule, to which function will be inserted
       },
-      editingFile: false,
-      ruleFileInfo: {}
+      editingFile: false, // false if creating file, true if editing file
+      ruleFileInfo: {} // object for storing information about edited rule file
     };
   },
   methods: {
+    /**
+     * Method which updates rules received from child components
+     * @param {Array} updatedRules Updated array of rules
+     * @param {Boolean} emptyRuleAdded True if empty rule was added
+     */
     updateRules(updatedRules, emptyRuleAdded) {
       this.rules = updatedRules;
       // generate preview always except when empty rule was added
       if (!emptyRuleAdded) {
+        this.mangledPasswords.loading = true;
+        this.mangledPasswords.value = "";
         this.generatePreview();
       }
     },
-    updateRule(functionToAdd) {
+    /**
+     * Method which updates passwords received from child components
+     * @param {String} updatedAllPasswordsString Updated array of rules
+     */
+    updatePasswords(updatedAllPasswordsString) {
+      this.allPasswordsString = updatedAllPasswordsString;
+      this.mangledPasswords.loading = true;
+      this.mangledPasswords.value = "";
+      this.generatePreview(); 
+    },
+        /**
+     * Method which adds a rule function to an existing specific rule 
+     * @param {String} functionToAdd Rule function created from insert popup
+     */
+     addFunction(functionToAdd) {
       //update the rule, where rule function was inserted
       this.rules[this.functionsInsertPopup.ruleIndex].value = this.rules[this.functionsInsertPopup.ruleIndex].value.trimEnd().concat(functionToAdd);
-      //Vue.set(this.rules, this.functionsInsertPopup.ruleIndex, this.rules[this.functionsInsertPopup.ruleIndex].trimEnd().concat(functionToAdd)); TODO
-      //get cursor position
-      console.log(this.$refs)
+      //get cursor position TODO
       //const inputElement = this.$refs["rule-" + this.functionsInsertPopup.ruleIndex].$el.querySelector('input');
       //const cursorPosition = inputElement.selectionStart;
 
-      this.generatePreview();
-    },
-    updatePasswords(updatedAllPasswordsString) {
-      this.allPasswordsString = updatedAllPasswordsString;
-      this.generatePreview();
+
+
+
+      this.mangledPasswords.loading = true;
+      this.mangledPasswords.value = "";
+      this.generatePreview(); 
     },
     /**
-     * Function which generates password preview, gets mangled passwords
+     * Method which generates passwords preview, gets mangled passwords
      */
     generatePreview() {
-      this.previewPasswords.loading = true; //Show loading button
-      this.passwordsList = this.allPasswordsString.split("\n"); //create an array of passwords
+      this.mangledPasswords.loading = true; // Show loading button until generating is done
+      let passwordsList = this.allPasswordsString.split("\n"); // create an array of passwords
       const data = {
         rules: this.rules.map(rule => rule.value),
-        passwordsList: this.passwordsList
+        passwordsList: passwordsList
       };
-
-      // Get the result
+      // Get the result of rule applicator
       this.axios.post(this.$serverAddr + "/rule/preview", data).then((response) => {
         this.applicatorResult = response.data.passwordsPreview;
-        this.filterPreviewPasswords();
+        this.filterPasswordsPreview();
       }).catch((error) => {
-        //TODO this.$error
-        this.previewPasswords.string = "Could not mangle the passwords."
+        this.$error("Could not mangle the passwords.")
+        this.mangledPasswords.value = "";
       }).finally(() => {
-        this.previewPasswords.loading = false; //the loading is done
+        this.mangledPasswords.loading = false; // Loading is done
       })
     },
     /**
      * Create a string from all correctly mangled passwords and mark if rule is with error
      */
-    filterPreviewPasswords() {
-      let previewPasswordsList = []; // list for storing only mangled passwords with no error
+    filterPasswordsPreview() {
+      let mangledPasswordsList = []; // array for storing only mangled passwords with no error
       let ruleIndex = 0;
 
+      // go through each mangled password from rule applicator
       this.applicatorResult.forEach((element) => {
+        // mark if rule has an error
         if (ruleIndex < this.rules.length) {
           if (element.retCode == -1) {
             this.rules[ruleIndex].error = true;
@@ -123,34 +144,50 @@ export default {
           }
           ruleIndex += 1;
         }
+        // if there was no error while mangling, add password to array
         if (element.retCode >= 0) {
-          previewPasswordsList.push(element.finalPassword);
+          mangledPasswordsList.push(element.finalPassword);
         }
       });
-
-      this.previewPasswords.string = previewPasswordsList.join("\n");
+      this.mangledPasswords.value = mangledPasswordsList.join("\n"); // create a string from all correct mangled passwords
     },
-    showInsertPopup(insertData) {
-      this.functionsInsertPopup = insertData;
-      if (this.ruleFunctions[insertData.functionIndex].operands.length == 0) { //if the inserted function has no operands, insert the function immediatelly
-        Vue.set(this.functionsInsertPopup, 'visible', false);
-        const ruleFunction = " " + this.ruleFunctions[insertData.functionIndex].sign;
-        this.updateRule(ruleFunction)
+    /**
+     * Method which takes care of showing the Insert popup
+     * @param {Object} popupData data for Insert popup to be updated 
+     */
+    showInsertPopup(popupData) {
+      this.functionsInsertPopup = popupData;
+      if (this.ruleFunctions[popupData.functionIndex].operands.length == 0) { // if the inserted function has no operands, insert the function immediatelly
+        Vue.set(this.functionsInsertPopup, 'visible', false); // popup is not going to show up
+        const ruleFunction = " " + this.ruleFunctions[popupData.functionIndex].sign; //TODO
+        this.addFunction(ruleFunction)
       }
       else { //otherwise show the insert popup
         Vue.set(this.functionsInsertPopup, 'visible', true);
       }
-
     },
-    hideInsertPopup(visibility) {
-      this.functionsInsertPopup.visible = visibility;
+    /**
+     * Method which hides the Insert popup
+     */
+    hideInsertPopup() {
+      this.functionsInsertPopup.visible = false;
     },
+    /**
+     * Method which takes care of showing the All funtions popup
+     * @param {Object} popupData data for All functions popup to be updated 
+     */
     showAllFunctionsPopup(popupData) {
       this.allFunctionsPopup = popupData;
     },
-    hideAllFunctionsPopup(visibility) {
-      this.allFunctionsPopup.visible = visibility;
+    /**
+     * Method which hides the All functions popup
+     */
+    hideAllFunctionsPopup() {
+      this.allFunctionsPopup.visible = false;
     },
+    /**
+     * Method which loads the existing rule file from server (only when editing file)
+     */
     loadRuleFile() {
       // get the content of the rule file
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id + '/download').then((response) => {
@@ -158,66 +195,75 @@ export default {
         // get the information about rule file
         this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
           this.ruleFileInfo = response.data;
-        })
+        });
+        // store the rules 
         const lines = response.data.split("\n")
         this.rules = lines.map(line => ({ value: line, error: false }))
         this.backupRules = JSON.parse(JSON.stringify(this.rules)); //keep a copy of initial rules
         this.generatePreview(); //generate the initial mangled passwords
       }).catch((error) => {
-        // handle specifying wrong rule file ID in URL
+        // handle specifying wrong rule file ID in URL and redirect to creating file
         this.$error('Rule file with such ID does not exist.')
         this.$router.push({ name: 'ruleFileCreate' });
-      })
+      });
     },
     /**
-     * Function which checks if the rules have been changed compared to beginning
+     * Method which checks if the rules have been changed compared to beginning (for redirecting off page, so that changes were not lost)
      */
     rulesChanged() {
       return this.backupRules.map(rule => rule.value).toString() !== this.rules.map(rule => rule.value).toString();
     },
     /**
-     * Function which shows confirmation window when reload or go back button is clicked
+     * Method which shows confirmation window when reload button is clicked
      */
     navigateFromPage(event) {
-      if (this.rulesChanged() && !this.showConfirmation) {
+      if (this.rulesChanged()) {
         event.preventDefault();
         event.returnValue = '';
       }
     }
   },
   mounted() {
-    if (this.$route.params.id) { //when there is id parameter in route url
+    if (this.$route.params.id) { // when there is id parameter in route url, load the existing rule file
+      this.mangledPasswords.loading = true;
       this.loadRuleFile();
     }
-    this.generatePreview = debounce(this.generatePreview, 2000); // call generatePreview only 2 seconds after rule change (because of application performance, prevents too many requests)
+    /* call generatePreview 2 seconds after rule change or password change
+       because of application performance, prevents too many requests) */
+    this.generatePreview = debounce(this.generatePreview, 1500); 
   },
   beforeMount() {
-    window.addEventListener('beforeunload', this.navigateFromPage);
+    window.addEventListener('beforeunload', this.navigateFromPage); // event listener for navigating off page (reload button)
   },
   beforeDestroy() {
     window.removeEventListener('beforeunload', this.navigateFromPage);
   },
-  destroyed(){
-    this.generatePreview.cancel()
+  destroyed() { 
+    this.generatePreview.cancel() // cancel the debounce method
   },
   /**
-   * Function which shows confirm message when route is changed
+   * Method which shows confirm message when route is changed
    */
   beforeRouteLeave(to, from, next) {
+    // when rules were changed compared to initial and when confirm window should not be skipped, then show confirm message
     if (this.rulesChanged() && !to.params.skipConfirmWindow) {
       if (confirm("Changes you made may not be saved.")) {
-        this.showConfirmation = true;
-        next();
+        next(); // redirect
       }
       else {
         next(false);
       }
     }
     else {
-      next();
+      next(); // redirect
     }
   },
-  components: { mainEditWindow, liveKeyspacePreview, functionInsertPopup, allFunctionsPopup },
+  components: {
+    mainEditWindow,
+    liveKeyspacePreview,
+    functionInsertPopup,
+    allFunctionsPopup
+  },
 };
 </script>
 

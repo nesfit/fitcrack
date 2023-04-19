@@ -15,7 +15,7 @@
                 </div>
                 <v-spacer></v-spacer>
                 <v-card-actions>
-                    <v-btn class="close-btn" color="grey darken-4" fab x-small dark @click="hideFunctionsPopup()">
+                    <v-btn class="close-btn" color="grey darken-4" fab x-small dark @click="hidePopup()">
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </v-card-actions>
@@ -54,8 +54,8 @@ export default {
         }
     },
     methods: {
-        hideFunctionsPopup() {
-            this.$emit("hide-all-functions-popup", false)
+        hidePopup() {
+            this.$emit("hide-all-functions-popup")
         },
         showInsertPopup(row) {
             if (!this.allFunctionsPopup.onlyShow) {
@@ -64,7 +64,7 @@ export default {
                     functionIndex: functionIndex,
                     ruleIndex: this.allFunctionsPopup.ruleIndex
                 }
-                this.$emit("hide-all-functions-popup", false)
+                this.$emit("hide-all-functions-popup")
                 this.$emit("show-insert-popup", data)
             }
         }

@@ -207,7 +207,7 @@
               class="mb-4"
             />
             <v-divider class="mb-2"></v-divider>
-            <span class="text-subtitle-1">Rules settings</span>
+            <span class="text-subtitle-1 font-weight-medium">Rules editor settings (effects only Live preview of mangled passwords)</span>
             <v-text-field
               v-model="settings.max_mangled_passwords"
               :loading="loading"

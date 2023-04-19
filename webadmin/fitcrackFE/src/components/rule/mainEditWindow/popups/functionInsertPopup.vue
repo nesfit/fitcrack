@@ -14,7 +14,7 @@
             <v-container>
                 <v-row>
                     <v-col>
-                        <p class="font-weight-medium">
+                        <p class="font-weight-medium my-0">
                             Function:
                         </p>
                         <v-textarea dense readonly hide-details auto-grow v-model="ruleFunction.name" outlined rows="1"
@@ -91,7 +91,7 @@ export default {
     },
     methods: {
         hidePopup() {
-            this.$emit("hide-insert-popup", false);
+            this.$emit("hide-insert-popup");
         },
         insertFunction() {
             if (!(this.textFieldValid = this.validateOperands())) {
@@ -99,9 +99,9 @@ export default {
             }
             const operandsCount = this.ruleFunction.operands.length;
             const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) //get the function sign, remove the abstract operands
-            const finalFunction = functionSign + this.functionOperands.join("");
+            const finalFunction = " " + functionSign + this.functionOperands.join("");
             this.hidePopup();
-            this.$emit("update-rule", finalFunction);
+            this.$emit("add-function", finalFunction);
         },
         validateOperands() {
             for (let index = 0; index < this.functionOperands.length; index++) {

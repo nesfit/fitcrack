@@ -20,9 +20,9 @@
                             </td>
                             <td class="my-0 ruleInputLine">
                                 <v-text-field @focus="showPopup(item.index)" @blur="hidePopup(item.index)"
-                                    :ref="'rule-' + item.index" placeholder="Enter rule" autocomplete="off" hide-details
-                                    outlined dense v-model="item.rule.value"
-                                    @input="updateRules(item.rule.value, item.index)">
+                                    @keydown="getCursorPosition($event, item.index)" @click="getCursorPosition($event, item.index)" :ref="'rule-' + item.index"
+                                    placeholder="Enter rule" autocomplete="off" hide-details outlined dense
+                                    v-model="item.rule.value" @input="updateRules(item.rule.value, item.index)">
                                 </v-text-field>
                                 <div class="quickFunctionsMenuPopup" v-show="item.popupVisible">
                                     <quickFunctionsMenu v-bind:ruleIndex="item.index"
@@ -95,6 +95,13 @@ export default {
         },
         showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
+        },
+        getCursorPosition(event, ruleIndex) {
+            console.log(event)
+            const inputElement = this.$refs["rule-" + ruleIndex][0].$el.querySelector('input');
+            const cursorPosition = inputElement.selectionStart;
+            console.log(cursorPosition) //TODO
+
         }
 
     },
@@ -128,7 +135,8 @@ export default {
                 this.options.page = this.lastOrCurrentPage;
                 this.goOnLastPage = false;
             }
-        }
+        },
+
     },
     components: {
         quickFunctionsMenu
