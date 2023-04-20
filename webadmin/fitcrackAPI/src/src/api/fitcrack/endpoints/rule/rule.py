@@ -31,17 +31,6 @@ log = logging.getLogger(__name__)
 ns = api.namespace('rule', description='Endpoints for work with rule files.')
 
 ALLOWED_EXTENSIONS = set(['txt', 'rule'])
-RETCODE_COMMENT = -3
-
-# Define the C function for applying rules
-apply_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).apply_rule_cpu
-apply_rule.restype = ctypes.c_int
-apply_rule.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-
-# Define the C function for generating random rule
-gen_random_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).generate_random_rule
-gen_random_rule.restype = ctypes.c_int
-gen_random_rule.argtypes = [ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
 
 
 def countRules(filePath):
@@ -262,8 +251,13 @@ class generateRandomRule(Resource):
         """
         Returns generated random rule.
         """
-        min_function_num = 3
-        max_function_num = 8
+        # Define the C function for generating random rule
+        gen_random_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).generate_random_rule
+        gen_random_rule.restype = ctypes.c_int
+        gen_random_rule.argtypes = [ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
+        
+        min_function_num = 3 # minimum number of functions
+        max_function_num = 8 # maximum number of functions
         random_rule_buf = ctypes.create_string_buffer(256)
         
         # generate random rule using the C function
@@ -282,14 +276,23 @@ class passwordsPreview(Resource):
         """
         Returns passwords after rules mangling.
         """
+        # Define the C function for applying rules, specify data types
+        apply_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).apply_rule_cpu
+        apply_rule.restype = ctypes.c_int
+        apply_rule.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+        
+        # Get data from request
         request_data = request.get_json()
         dictionary = request_data['passwordsList']
         rules = request_data['rules']
-        max_mangled_passwords = FcSetting.query.first().max_mangled_passwords
+        
+        RETCODE_COMMENT = -3
+        max_mangled_passwords = FcSetting.query.first().max_mangled_passwords # get maximum number of mangled passwords from database
         preview = []
         final_password_buf = ctypes.create_string_buffer(64)
         
         counter = 0
+        # Apply each rule to each password
         for password in dictionary:
             if counter >= max_mangled_passwords: # check maximum number of mangled passwords
                 break
@@ -299,10 +302,8 @@ class passwordsPreview(Resource):
                     break
                 rule = rule.strip()
                                 
-                # Apply the rule to the password using the C function
+                # Apply the rule to the password using the C function, returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
                 in_len = len(password.encode('latin-1'))
-                
-                #Returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
                 ret_code = apply_rule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), in_len, final_password_buf)
                 
                 if(ret_code == -1):
@@ -315,7 +316,7 @@ class passwordsPreview(Resource):
                 
                 #Add element to a preview list
                 element = {
-                    "finalPassword" : final_password_str,
+                    "mangledPassword" : final_password_str,
                     "retCode" : ret_code
                 }                         
                 preview.append(element)

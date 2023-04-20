@@ -23,9 +23,9 @@ ruleData_model = api.inherit('Rules with data', {
     'status': fields.Boolean()
 })
 
-previewPasswords_model = api.model('Changed passwords preview', {
-    'passwordsPreview': fields.List(fields.Nested(api.model("Changed password preview", {
-        'finalPassword': fields.String(required=True, description='Password after rule mangling'),
+previewPasswords_model = api.model('Mangled passwords preview', {
+    'passwordsPreview': fields.List(fields.Nested(api.model("Mangled password preview", {
+        'mangledPassword': fields.String(required=True, description='Password after rule mangling'),
         'retCode': fields.Integer(required=True, 
             description='Return code of password mangling function (Length of password if OK, -3 if comment, -2 if empty rule or password, -1 if syntax error)')
         })), required=True)

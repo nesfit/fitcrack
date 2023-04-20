@@ -162,7 +162,7 @@ export default {
         }
         // if there was no error while mangling, add password to array
         if (element.retCode >= 0) {
-          mangledPasswordsList.push(element.finalPassword);
+          mangledPasswordsList.push(element.mangledPassword);
         }
       });
       this.mangledPasswords.value = mangledPasswordsList.join("\n"); // create a string from all correct mangled passwords

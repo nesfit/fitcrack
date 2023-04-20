@@ -67,7 +67,7 @@
             <v-row>
                 <v-col class="text-center pt-0">
                     <v-btn height="40" multi-line text-wrap class="orange darken-3" :disabled="mangledPasswords.loading"
-                        small @click="downloadFinalPasswords()">
+                        small @click="downloadMangledPasswords()">
                         Download <br>mangled passwords
                     </v-btn>
                 </v-col>
@@ -94,7 +94,7 @@ export default {
         updatePasswords(updatedAllPasswordsString) {
             this.$emit("update-passwords", updatedAllPasswordsString);
         },
-        downloadFinalPasswords() {
+        downloadMangledPasswords() {
             const blob = new Blob([this.mangledPasswords.value], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
