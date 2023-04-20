@@ -20,12 +20,12 @@
                             </td>
                             <td class="my-0 ruleInputLine">
                                 <v-text-field @focus="showPopup(item.index)" @blur="hidePopup(item.index)"
-                                    @keydown="getCursorPosition($event, item.index)" @click="getCursorPosition($event, item.index)" :ref="'rule-' + item.index"
-                                    placeholder="Enter rule" autocomplete="off" hide-details outlined dense
-                                    v-model="item.rule.value" @input="updateRules(item.rule.value, item.index)">
+                                    :ref="'rule-' + item.index" placeholder="Enter rule" autocomplete="off" hide-details
+                                    outlined dense v-model="item.rule.value"
+                                    @input="updateRules(item.rule.value, item.index)">
                                 </v-text-field>
-                                <div class="quickFunctionsMenuPopup" v-show="item.popupVisible">
-                                    <quickFunctionsMenu v-bind:ruleIndex="item.index"
+                                <div class="quickFunctionsMenuPopup" v-if="item.popupVisible">
+                                    <quickFunctionsMenu :ruleIndex="item.index" :ruleLineRef="$refs['rule-' + item.index]"
                                         v-on:show-insert-popup="showInsertPopup"
                                         v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
                                 </div>
@@ -59,6 +59,7 @@ export default {
     },
     data() {
         return {
+            rulesLinesRef: null,
             search: "",
             options: { //default table page settings
                 itemsPerPage: 5,
@@ -96,13 +97,17 @@ export default {
         showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
         },
+        /*
         getCursorPosition(event, ruleIndex) {
             console.log(event)
             const inputElement = this.$refs["rule-" + ruleIndex][0].$el.querySelector('input');
             const cursorPosition = inputElement.selectionStart;
             console.log(cursorPosition) //TODO
-
         }
+
+
+        @keydown="getCursorPosition($event, item.index)" @click="getCursorPosition($event, item.index)"
+        */
 
     },
     computed: {
@@ -137,6 +142,9 @@ export default {
             }
         },
 
+    },
+    mounted() {
+        this.rulesLinesRef = this.$refs;
     },
     components: {
         quickFunctionsMenu

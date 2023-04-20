@@ -99,7 +99,7 @@ export default {
             }
             const operandsCount = this.ruleFunction.operands.length;
             const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) //get the function sign, remove the abstract operands
-            const finalFunction = " " + functionSign + this.functionOperands.join("");
+            const finalFunction = functionSign + this.functionOperands.join("");
             this.hidePopup();
             this.$emit("add-function", finalFunction);
         },

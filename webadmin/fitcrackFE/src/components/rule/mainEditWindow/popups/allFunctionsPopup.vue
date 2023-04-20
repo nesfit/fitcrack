@@ -62,7 +62,8 @@ export default {
                 const functionIndex = this.ruleFunctions.findIndex((obj) => obj === row);
                 const data = {
                     functionIndex: functionIndex,
-                    ruleIndex: this.allFunctionsPopup.ruleIndex
+                    ruleIndex: this.allFunctionsPopup.ruleIndex,
+                    cursorPosition: this.allFunctionsPopup.cursorPosition
                 }
                 this.$emit("hide-all-functions-popup")
                 this.$emit("show-insert-popup", data)

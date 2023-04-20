@@ -26,18 +26,15 @@
 <script>
 export default {
     props: {
-        ruleIndex: Number
-    },
-    data() {
-        return {
-
-        }
+        ruleIndex: Number,
+        ruleLineRef: Array
     },
     methods: {
         showInsertPopup(functionIndex) {
             const data = {
                 functionIndex: functionIndex,
-                ruleIndex: this.ruleIndex
+                ruleIndex: this.ruleIndex,
+                cursorPosition: this.cursorPosition
             }
             this.$emit("show-insert-popup", data)
         },
@@ -45,9 +42,20 @@ export default {
             const data = {
                 visible: true,
                 onlyShow: onlyShow,
-                ruleIndex: this.ruleIndex
+                ruleIndex: this.ruleIndex,
+                cursorPosition: this.cursorPosition
             }
             this.$emit("show-all-functions-popup", data)
+        }
+    },
+    computed:{
+        /**
+         * Gets the position, where the function should be inserted
+         */
+        cursorPosition(){
+            const inputElement = this.ruleLineRef[0].$el.querySelector('input');
+            const position = inputElement.selectionStart;
+            return position;
         }
     }
 };

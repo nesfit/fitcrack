@@ -50,12 +50,14 @@ export default {
       functionsInsertPopup: {
         visible: false, 
         functionIndex: 0, // index of function in Json array
-        ruleIndex: 0 // index of rule, to which function will be inserted
+        ruleIndex: 0, // index of rule, to which function will be inserted
+        cursorPosition: 0 // cursor position in edited rule
       },
       allFunctionsPopup: {
         visible: false,
         onlyShow: true, // true if functions in popup are not clickable, false if functions can be selected
-        ruleIndex: 0 // index of rule, to which function will be inserted
+        ruleIndex: 0, // index of rule, to which function will be inserted
+        cursorPosition: 0 // cursor position in edited rule
       },
       editingFile: false, // false if creating file, true if editing file
       ruleFileInfo: {} // object for storing information about edited rule file
@@ -91,15 +93,29 @@ export default {
      * @param {String} functionToAdd Rule function created from insert popup
      */
      addFunction(functionToAdd) {
-      //update the rule, where rule function was inserted
-      this.rules[this.functionsInsertPopup.ruleIndex].value = this.rules[this.functionsInsertPopup.ruleIndex].value.trimEnd().concat(functionToAdd);
-      //get cursor position TODO
-      //const inputElement = this.$refs["rule-" + this.functionsInsertPopup.ruleIndex].$el.querySelector('input');
-      //const cursorPosition = inputElement.selectionStart;
+      //update the specific rule, add created function
+      const currentRule = this.rules[this.functionsInsertPopup.ruleIndex].value;
+      const cursorPosition = this.functionsInsertPopup.cursorPosition;
+      const firstPart = currentRule.slice(0, cursorPosition);
+      const secondPart = currentRule.slice(cursorPosition);
+      let finalRule = firstPart; 
 
+      // check if space should be added before the inserted function
+      if(cursorPosition !== 0){
+        if (firstPart.slice(-1) !== ' ') {
+          finalRule = finalRule.concat(" ");
+        }
+      }
+      finalRule = finalRule.concat(functionToAdd); // add inserted function to the final rule
 
+      // check if space should be added after the inserted function
+      if (secondPart.charAt(0) !== ' ' && secondPart.charAt(0) !== '') {
+        finalRule = finalRule.concat(" ");
+      }
+      finalRule = finalRule.concat(secondPart); // concatenate with the second part
+      this.rules[this.functionsInsertPopup.ruleIndex].value = finalRule;
 
-
+      //generate mangled passwords preview
       this.mangledPasswords.loading = true;
       this.mangledPasswords.value = "";
       this.generatePreview(); 
@@ -159,7 +175,7 @@ export default {
       this.functionsInsertPopup = popupData;
       if (this.ruleFunctions[popupData.functionIndex].operands.length == 0) { // if the inserted function has no operands, insert the function immediatelly
         Vue.set(this.functionsInsertPopup, 'visible', false); // popup is not going to show up
-        const ruleFunction = " " + this.ruleFunctions[popupData.functionIndex].sign; //TODO
+        const ruleFunction = this.ruleFunctions[popupData.functionIndex].sign;
         this.addFunction(ruleFunction)
       }
       else { //otherwise show the insert popup
