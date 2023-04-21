@@ -128,7 +128,7 @@ export default {
       let passwordsList = this.allPasswordsString.split("\n"); // create an array of passwords
       const data = {
         rules: this.rules.map(rule => rule.value),
-        passwordsList: passwordsList
+        passwords: passwordsList
       };
       // Get the result of rule applicator
       this.axios.post(this.$serverAddr + "/rule/preview", data).then((response) => {

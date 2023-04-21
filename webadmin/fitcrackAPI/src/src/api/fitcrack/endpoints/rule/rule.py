@@ -20,7 +20,7 @@ import json
 from settings import RULE_DIR, RULE_APPLICATOR_PATH
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
-from src.api.fitcrack.endpoints.rule.argumentsParser import updateRule_parser, rule_parser
+from src.api.fitcrack.endpoints.rule.argumentsParser import rule_parser, preview_request
 from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_model, ruleData_model, previewPasswords_model, randomRule_model
 from src.api.fitcrack.functions import fileUpload, allowed_file
 from src.api.fitcrack.responseModels import simpleResponse
@@ -119,15 +119,16 @@ class rule(Resource):
         }, 200
         
     @api.marshal_with(simpleResponse)
+    @api.response(500, 'Could not update the rule file')
     def put(self, id):
         """
         Updates the rule file
         """
         newFile = request.files['file']
-        fileRecord = FcRule.query.filter(FcRule.id == id).first() #the record of rule file in database
+        fileRecord = FcRule.query.filter(FcRule.id == id).first() # the record of rule file in database
         oldFilePath = Path(RULE_DIR) / fileRecord.path
         newFilePath = oldFilePath
-        nameChanged = False
+        nameChanged = False # boolean to mark if name of file was changed in the update request
         
         # Check if rule file is not mapped to a job, if so, update is not enabled
         jobWithRule = FcJob.query.filter(FcJob.rules == fileRecord.name).first()
@@ -148,7 +149,8 @@ class rule(Resource):
                     abort(500, "File with name " + serverFileName + " already exists on server. Path: " + str(newFilePath))
             else:
                 abort(500, "Can't update file " + fileRecord.name + ". The file extension is not allowed.")
-                
+            
+            # At this point, everything is OK, so rename the file on server and in database
             os.rename(oldFilePath, newFilePath)
             fileRecord.name = databaseFileName
             fileRecord.path = serverFileName
@@ -162,15 +164,7 @@ class rule(Resource):
         fileRecord.count = countRules(fileRecord.path)
         db.session.commit()
         
-        ''' TODO if there should be unique name in database, then I need to update content of file afterwards
-        try:
-            db.session.commit()
-        except exc.IntegrityError as e: #TODO should name be unique? add to models.py
-            db.session().rollback()
-            abort(500, 'Rule with name ' + databaseFileName + ' already exists.')
-        '''
-        
-        # return success    
+        # return success  
         if(nameChanged):
             returnMessage = "Renamed rule file to " + fileRecord.name + " and successfully updated."
         else:
@@ -252,18 +246,18 @@ class generateRandomRule(Resource):
         Returns generated random rule.
         """
         # Define the C function for generating random rule
-        gen_random_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).generate_random_rule
-        gen_random_rule.restype = ctypes.c_int
-        gen_random_rule.argtypes = [ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
+        genRandomRule = ctypes.CDLL(RULE_APPLICATOR_PATH).generate_random_rule
+        genRandomRule.restype = ctypes.c_int
+        genRandomRule.argtypes = [ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
         
-        min_function_num = 3 # minimum number of functions
-        max_function_num = 8 # maximum number of functions
-        random_rule_buf = ctypes.create_string_buffer(256)
+        minFunctionsNum = 3 # minimum number of functions
+        maxFunctionsNum = 8 # maximum number of functions
+        randomRuleBuf = ctypes.create_string_buffer(256)
         
         # generate random rule using the C function
-        ret_code = gen_random_rule(random_rule_buf, min_function_num, max_function_num)
+        retCode = genRandomRule(randomRuleBuf, minFunctionsNum, maxFunctionsNum)
         
-        return { "randomRule": random_rule_buf.value.decode() }
+        return { "randomRule": randomRuleBuf.value.decode() }
         
         
         
@@ -271,53 +265,54 @@ class generateRandomRule(Resource):
     
 @ns.route('/preview')
 class passwordsPreview(Resource):
+    @api.expect(preview_request)
     @api.marshal_with(previewPasswords_model)
     def post(self):
         """
         Returns passwords after rules mangling.
         """
         # Define the C function for applying rules, specify data types
-        apply_rule = ctypes.CDLL(RULE_APPLICATOR_PATH).apply_rule_cpu
-        apply_rule.restype = ctypes.c_int
-        apply_rule.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+        applyRule = ctypes.CDLL(RULE_APPLICATOR_PATH).apply_rule_cpu
+        applyRule.restype = ctypes.c_int
+        applyRule.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
         
         # Get data from request
-        request_data = request.get_json()
-        dictionary = request_data['passwordsList']
-        rules = request_data['rules']
+        requestData = request.get_json()
+        dictionary = requestData['passwords']
+        rules = requestData['rules']
         
         RETCODE_COMMENT = -3
-        max_mangled_passwords = FcSetting.query.first().max_mangled_passwords # get maximum number of mangled passwords from database
+        maxMangledPasswords = FcSetting.query.first().max_mangled_passwords # get maximum number of mangled passwords from database
         preview = []
-        final_password_buf = ctypes.create_string_buffer(64)
+        mangledPasswordBuf = ctypes.create_string_buffer(64)
         
         counter = 0
         # Apply each rule to each password
         for password in dictionary:
-            if counter >= max_mangled_passwords: # check maximum number of mangled passwords
+            if counter >= maxMangledPasswords: # check maximum number of mangled passwords
                 break
             password = password.strip()
             for rule in rules: 
-                if counter >= max_mangled_passwords: # check maximum number of mangled passwords
+                if counter >= maxMangledPasswords: # check maximum number of mangled passwords
                     break
                 rule = rule.strip()
                                 
                 # Apply the rule to the password using the C function, returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
-                in_len = len(password.encode('latin-1'))
-                ret_code = apply_rule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), in_len, final_password_buf)
+                passwordLength = len(password.encode('latin-1'))
+                retCode = applyRule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), passwordLength, mangledPasswordBuf)
                 
-                if(ret_code == -1):
-                    final_password_str = ""
+                if(retCode == -1):
+                    mangledPasswordStr = ""
                     #if the line in a rule is a comment, specify return code to -3
                     if(len(rule) > 0 and rule[0] == '#'):
-                        ret_code = RETCODE_COMMENT
+                        retCode = RETCODE_COMMENT
                 else:
-                    final_password_str = final_password_buf.value.decode('latin-1')
+                    mangledPasswordStr = mangledPasswordBuf.value.decode('latin-1')
                 
                 #Add element to a preview list
                 element = {
-                    "mangledPassword" : final_password_str,
-                    "retCode" : ret_code
+                    "mangledPassword" : mangledPasswordStr,
+                    "retCode" : retCode
                 }                         
                 preview.append(element)
                 counter += 1
