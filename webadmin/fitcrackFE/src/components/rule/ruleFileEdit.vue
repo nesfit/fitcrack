@@ -17,9 +17,9 @@
       <mainEditWindow v-bind:rules="rules" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo"
         v-on:update-rules="updateRules" v-on:show-insert-popup="showInsertPopup"
         v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
-      <liveKeyspacePreview v-bind:allPasswordsString="allPasswordsString" v-bind:mangledPasswords="mangledPasswords"
+      <livePreviewWindow v-bind:allPasswordsString="allPasswordsString" v-bind:mangledPasswords="mangledPasswords"
         v-on:update-passwords="updatePasswords">
-      </liveKeyspacePreview>
+      </livePreviewWindow>
     </v-row>
   </v-container>
 </template>
@@ -30,7 +30,7 @@ import Vue from 'vue';
 import { debounce } from 'lodash';
 import functionsJson from "@/assets/ruleFunctions.json"
 import mainEditWindow from "@/components/rule/mainEditWindow/mainEditWindow.vue";
-import liveKeyspacePreview from "@/components/rule/livePreview/liveKeyspacePreview.vue"
+import livePreviewWindow from "@/components/rule/livePreviewWindow/livePreviewWindow.vue"
 import functionInsertPopup from "@/components/rule/mainEditWindow/popups/functionInsertPopup.vue"
 import allFunctionsPopup from '@/components/rule/mainEditWindow/popups/allFunctionsPopup.vue';
 
@@ -276,7 +276,7 @@ export default {
   },
   components: {
     mainEditWindow,
-    liveKeyspacePreview,
+    livePreviewWindow,
     functionInsertPopup,
     allFunctionsPopup
   },
