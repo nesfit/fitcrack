@@ -21,7 +21,7 @@ from settings import RULE_DIR, RULE_APPLICATOR_PATH
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
 from src.api.fitcrack.endpoints.rule.argumentsParser import rule_parser, preview_request
-from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_model, ruleData_model, previewPasswords_model, randomRule_model
+from src.api.fitcrack.endpoints.rule.responseModels import rules_model, rule_model, ruleData_model, preview_response, randomRule_response
 from src.api.fitcrack.functions import fileUpload, allowed_file
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
@@ -240,7 +240,7 @@ class downloadRule(Resource):
     
 @ns.route('/randomRule')
 class generateRandomRule(Resource):
-    @api.marshal_with(randomRule_model)
+    @api.marshal_with(randomRule_response)
     def get(self):
         """
         Returns generated random rule.
@@ -266,7 +266,7 @@ class generateRandomRule(Resource):
 @ns.route('/preview')
 class passwordsPreview(Resource):
     @api.expect(preview_request)
-    @api.marshal_with(previewPasswords_model)
+    @api.marshal_with(preview_response)
     def post(self):
         """
         Returns passwords after rules mangling.

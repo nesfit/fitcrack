@@ -23,7 +23,7 @@ ruleData_model = api.inherit('Rules with data', {
     'status': fields.Boolean()
 })
 
-previewPasswords_model = api.model('Mangled passwords preview', {
+preview_response = api.model('Mangled passwords preview', {
     'passwordsPreview': fields.List(fields.Nested(api.model("Mangled password preview", {
         'mangledPassword': fields.String(required=True, description='Password after rule mangling'),
         'retCode': fields.Integer(required=True, 
@@ -31,6 +31,6 @@ previewPasswords_model = api.model('Mangled passwords preview', {
         })), required=True)
 })
 
-randomRule_model = api.model('Random rule', {
+randomRule_response = api.model('Random rule', {
     'randomRule' : fields.String(required=True, description='Generated random rule')
 })
