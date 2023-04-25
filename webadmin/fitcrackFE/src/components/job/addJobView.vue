@@ -653,8 +653,12 @@
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
           }
-          /* -1 means no hash entered */
+          // -1 means no hash entered
           var hash_code = this.hashType == null ? -1 : this.hashType.code
+          // Reset old values as they are no longer valid
+          this.estimatedTime = null
+          this.keyspace = null
+          // Compute new keyspace and new estimation of cracking time
           this.axios.post(this.$serverAddr + '/job/crackingTime', {   
             'hash_type_code': hash_code,
             'boinc_host_ids': boincIds.join(","),
