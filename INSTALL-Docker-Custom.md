@@ -1,6 +1,6 @@
-# Deploying Fitcrack using a pre-built image from Docker Hub
+# Deploying Fitcrack using a custom Docker build
 
-This document describes how to install Fitcrack server using a pre-built Docker image.
+This document describes how to prepare and run a custom Docker build of Fitcrack server.
 
 ### Requirements
 Install **Docker Engine 20.10.x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
@@ -12,8 +12,36 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-
 
 **NOTE:** Stick with the recommended versions if possible. Older versions may not work. Newer releases were not tested.
 
+### Checking if you have BOINC submodule
+Fitcrack relies on [BOINC](https://boinc.berkeley.edu), which is used as a submodule. Therefore, it is recommended to clone Fitcrack with the `--recursive` option:
+```
+git clone --recursive https://github.com/nesfit/fitcrack
+```
+If you did not (and the `boinc` directory is empty), you can fix this by typing
+```
+git submodule init
+git submodule update
+```
+
+### Building Fitcrack image
+Once you have everything prepared, you can start the build of your own **fitcrack_server** with:
+```
+docker-compose -f docker-compose-custom-build.yml build
+```
+Please note that this process will compile everything from source and it may take some time.
+
+Once done, you can type
+```
+docker image ls
+```
+to see whether you have your image ready. You should see something like this:
+```
+REPOSITORY        TAG       IMAGE ID       CREATED       SIZE
+fitcrack_server   latest    9742ce4d598a   3 hours ago   3.79GB
+```
+
 ### Preparing the .env configuration file
-Create a new **.env** config file from the example attached:
+Now it is time for the setup! Create a new **.env** config file from the example attached:
 ```
 cp env.example .env
 ```
@@ -27,12 +55,12 @@ Edit the newly-created **.env** file and configure:
 - The default WebAdmin login is `fitcrack`/`FITCRACK`. We **highly recommend** to change it by modifying the `WEBADMIN_LOGIN` and `WEBADMIN_PW` variables.
 - SSL is disabled by default. If you want to enable it, follow the instructions below.
 
+
 ### Starting the fitcrack_server container
-Once the `.env` file is configured, you can run the server container using:
+Once the `fitcrack_server` image is prepared and `.env` file configured, you can run the server container using:
 ```
 docker-compose up
 ```
-Note that if you are running Fitcrack for the first time, it may take several minutes to pull the image from the Docker Hub.
 
 ![Fitcrack-architecture](img/dockerstart.png)
 

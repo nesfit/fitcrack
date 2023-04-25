@@ -86,7 +86,6 @@
         rawValue: '',
         focused: false,
         maskRules: [
-          v => /^(\?[ludhHsab]|[^\?])+$/.test(v) || 'Invalid mask',
           v => {
             let nextCharSymbol = false
             for (let c of v) {
@@ -111,7 +110,8 @@
               }
             }
             return true
-          }
+          },
+          v => /^(\?[ludhHsab1234?]|[^\?])+$/.test(v) || 'Invalid mask'
         ],
         represenArray: {
           'l': {
@@ -145,6 +145,10 @@
           'b': {
             'chars': '0x00 - 0xff',
             'represent': 'ASCII'
+          },
+          '?': {
+            'chars': '?',
+            'represent': '?'
           }
         }
       }

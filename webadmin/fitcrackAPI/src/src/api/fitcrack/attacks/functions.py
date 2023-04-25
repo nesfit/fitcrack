@@ -17,7 +17,7 @@ from src.database import db
 from src.database.models import FcDictionary
 
 def check_mask_syntax(mask):
-    if not re.fullmatch("^(\?[ludhHsab]|[^\?])+$", mask):
+    if not re.fullmatch("^(\?[ludhHsab1234?]|[^\?])+$", mask):
         abort(400, 'Wrong mask ' + mask)
 
 
