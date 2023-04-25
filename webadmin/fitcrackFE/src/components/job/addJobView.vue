@@ -557,9 +557,9 @@
             @click="submit"
           >
             <v-icon left>
-              {{ hosts.length > 0 ? 'mdi-check' : 'mdi-content-save' }}
+              {{ canCreateJob() ? 'mdi-check' : 'mdi-content-save' }}
             </v-icon>
-            {{ hosts.length > 0 ? 'Create' : 'Save for later' }}
+            {{ canCreateJob() ? 'Create' : 'Save for later' }}
           </v-btn>
         </v-row>
       </v-col>
@@ -648,6 +648,9 @@
     },
     watch: {
       jobSettings (val) {
+        // Reset old values as they are no longer valid
+        this.estimatedTime = null
+        this.keyspace = null
         if (val.attack_settings != false && this.validAttackSpecificSettings) {
           var boincIds = []
           for (let i = 0; i < this.hosts.length; i++) {
@@ -655,9 +658,6 @@
           }
           // -1 means no hash entered
           var hash_code = this.hashType == null ? -1 : this.hashType.code
-          // Reset old values as they are no longer valid
-          this.estimatedTime = null
-          this.keyspace = null
           // Compute new keyspace and new estimation of cracking time
           this.axios.post(this.$serverAddr + '/job/crackingTime', {   
             'hash_type_code': hash_code,
@@ -926,6 +926,9 @@
       },
       generateJobName () {
         this.name = this.$store.state.project + ' Job – ' + this.$moment().format('DD.MM.YYYY HH:mm')
+      },
+      canCreateJob() {
+        return this.hosts.length > 0;
       }
     }
   }
