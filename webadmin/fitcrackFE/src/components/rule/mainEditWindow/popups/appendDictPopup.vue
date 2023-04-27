@@ -24,7 +24,7 @@
                             @change="onDictionaryChange" />
                         <v-btn color="primary" outlined :disabled="systemFileSelected === false" @click="appendSystemDict">
                             Append
-                        <v-icon right>
+                            <v-icon right>
                                 mdi-plus
                             </v-icon>
                         </v-btn>
@@ -53,23 +53,28 @@ import dictSelector from '@/components/selector/dictionarySelector.vue'
 
 export default {
     props: {
-        value: Boolean,
-        allPasswordsString: String
+        value: Boolean, // for visibility of popup
+        allPasswordsString: String // all passwords concatenated
     },
     data() {
         return {
-            updatedAllPasswordsString: "",
-            tab: null,
-            systemFileSelected: false,
-            serverFileSelected: []
+            updatedAllPasswordsString: "", // string for storing updated passwords after append
+            tab: null, // variable for v-tab choice
+            systemFileSelected: false, // boolean to indicate that file from filesystem was selected
+            serverFileSelected: [] // array to store selected file from server
         };
     },
     methods: {
+        /**
+         * Method which gets the content of selected dictionary from filesystem and concatenates it with existing passwords
+         * @param {*} event Selected file from filesystem 
+         */
         onDictionaryChange(event) {
+            // if file is selected
             if (event) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    this.updatedAllPasswordsString = this.allPasswordsString.concat(reader.result);
+                    this.updatedAllPasswordsString = this.allPasswordsString.concat(reader.result);  // concatenate passwords from new file with existing ones
                 };
                 reader.readAsText(event)
                 this.systemFileSelected = true;
@@ -77,23 +82,30 @@ export default {
             else {
                 this.systemFileSelected = false;
             }
-
         },
+        /**
+         * Method which appends the dictionary (from client filesystem) after clicking the button
+         */
         appendSystemDict() {
-            this.$emit("update-passwords", this.updatedAllPasswordsString)
+            this.$emit("update-passwords", this.updatedAllPasswordsString) //update passwords in parent
             this.systemFileSelected = false;
             this.popupVisible = false;
         },
+        /**
+         * Method which appends the content of selected dictionary (from server)
+         */
         appendServerDict() {
+            // get content of selected dictionary
             this.axios.get(this.$serverAddr + "/dictionary/" + this.serverFileSelected[0].id + "/download").then((response) => {
-                this.updatedAllPasswordsString = this.allPasswordsString.concat(response.data)
-                this.$emit("update-passwords", this.updatedAllPasswordsString)
+                this.updatedAllPasswordsString = this.allPasswordsString.concat(response.data) // concatenate passwords from new file with existing ones
+                this.$emit("update-passwords", this.updatedAllPasswordsString) // update passwords in parent
                 this.serverFileSelected = []
                 this.popupVisible = false;
             });
         }
     },
     computed: {
+        // getter and setter for visibility of popup
         popupVisible: {
             get() {
                 return this.value;

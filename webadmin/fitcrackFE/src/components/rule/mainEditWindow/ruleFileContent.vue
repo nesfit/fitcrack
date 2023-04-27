@@ -55,62 +55,76 @@ import quickFunctionsMenu from '@/components/rule/mainEditWindow/popups/quickFun
 
 export default {
     props: {
-        rules: Array
+        rules: Array // array of rules {value, error}
     },
     data() {
         return {
-            rulesLinesRef: null,
-            search: "",
-            options: { //default table page settings
+            search: "", // for storing current search 
+            options: { // default table page settings
                 itemsPerPage: 5,
                 page: 1
             },
             prevcomputedRulesLength: 0, // for checking if line was deleted
-            goOnLastPage: false,
-            headers: [
-                { text: "Rule name", value: "rule", align: "right" },
-                { text: "ID", value: "id" },
+            goOnLastPage: false, // boolean to control if last page of table should be shown
+            headers: [ // headers for the table, important for searching
+                { text: "Rule name", value: "rule.value", align: "right" }
             ],
-            quickFunctionsMenuVisible: false,
+            quickFunctionsMenuVisible: false, // boolean indicating if quick functions menu should be shown
         }
     },
     methods: {
+        /**
+         * Method which updates specific rule
+         * @param {String} newRuleValue Updated specific rule
+         * @param {Number} index Index of the updating rule
+         */
         updateRules(newRuleValue, index) {
             let updatedRules = this.rules;
             updatedRules[index].value = newRuleValue;
             this.$emit("update-rules", updatedRules);
         },
+        /**
+         * Method to delete specific rule from array
+         * @param {Number} index Index of rule to be deleted
+         */
         deleteRule(index) {
             let updatedRules = this.rules;
             updatedRules.splice(index, 1);
-            this.$emit("update-rules", updatedRules)
+            this.$emit("update-rules", updatedRules) // update in parent
         },
+        /**
+         * Method which shows quick functions popup for specific rule
+         * @param {Number} index Index of rule
+         */
         showPopup(index) {
             this.computedRules[index].popupVisible = true;
         },
+        /**
+         * Method which hides quick functions popup for specific rule
+         * @param {Number} index Index of rule
+         */
         hidePopup(index) {
             this.computedRules[index].popupVisible = false;
         },
-        showInsertPopup(insertData) {
-            this.$emit("show-insert-popup", insertData)
+        /**
+         * Method which propagates showing insert popup to parent
+         * @param {Object} popupData Data for Insert popup to be updated 
+         */        
+        showInsertPopup(popupData) {
+            this.$emit("show-insert-popup", popupData)
         },
+        /**
+         * Method which propagates showing all functions popup to parent
+         * @param {Object} popupData Data for all functions popup to be updated 
+         */        
         showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
-        },
-        /*
-        getCursorPosition(event, ruleIndex) {
-            console.log(event)
-            const inputElement = this.$refs["rule-" + ruleIndex][0].$el.querySelector('input');
-            const cursorPosition = inputElement.selectionStart;
-            console.log(cursorPosition) //TODO
         }
-
-
-        @keydown="getCursorPosition($event, item.index)" @click="getCursorPosition($event, item.index)"
-        */
-
     },
     computed: {
+        /**
+         * Give each rule an index and boolean which indicates if quick functions popup should be shown
+         */
         computedRules() {
             return this.rules.map((rule, index) => ({
                 rule,
@@ -133,7 +147,7 @@ export default {
         }
     },
     watch: {
-        // When itemsPerPage value is changed, go onto the last page
+        // when itemsPerPage value is changed, go onto the last page
         'options.itemsPerPage': function (newVal, oldVal) {
             if (newVal !== oldVal) {
                 this.goOnLastPage = true;
@@ -142,9 +156,6 @@ export default {
             }
         },
 
-    },
-    mounted() {
-        this.rulesLinesRef = this.$refs;
     },
     components: {
         quickFunctionsMenu

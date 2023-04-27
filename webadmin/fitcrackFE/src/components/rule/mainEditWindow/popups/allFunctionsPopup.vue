@@ -37,12 +37,12 @@
 import functionsJson from "@/assets/ruleFunctions.json"
 export default {
     props: {
-        allFunctionsPopup: Object
+        allFunctionsPopup: Object // data about All functions popup {visible, onlyShow, ruleIndex, cursorPosition}
     },
     data() {
         return {
-            search: "",
-            headers: [
+            search: "", // for storing current search 
+            headers: [ // headers for the table, also important for searching
                 { text: "Name", value: "name" },
                 { text: "Function", value: "sign", align: "center" },
                 { text: "Description", value: "description" },
@@ -50,16 +50,23 @@ export default {
                 { text: "Input", value: "input" },
                 { text: "Output", value: "output" }
             ],
-            ruleFunctions: functionsJson
+            ruleFunctions: functionsJson // information about functions from JSON file
         }
     },
     methods: {
+        // Method which hides the all functions popup (emits function in parent)
         hidePopup() {
             this.$emit("hide-all-functions-popup")
         },
+        /**
+         * Method which shows insert popup after clicking specific function
+         * @param {Object} row Clicked row in All functions popup
+         */
         showInsertPopup(row) {
+            // Rows are not clickable when only Showing functions
             if (!this.allFunctionsPopup.onlyShow) {
                 const functionIndex = this.ruleFunctions.findIndex((obj) => obj === row);
+                // assign which function should be inserted, to which rule and position of the cursor in a rule
                 const data = {
                     functionIndex: functionIndex,
                     ruleIndex: this.allFunctionsPopup.ruleIndex,

@@ -36,12 +36,8 @@
                         Reset passwords
                     </v-btn>
                 </v-col>
-
             </v-row>
-
-
             <v-row>
-
                 <v-alert tile color="orange" text class="mb-0">
                     Maximum number of mangled passwords is set to {{ max_mangled_passwords }}. For change go to
                     <router-link :to="{ name: 'settings' }">
@@ -79,40 +75,51 @@
 
 <script>
 import appendDictPopup from '@/components/rule/mainEditWindow/popups/appendDictPopup.vue';
+
 export default {
     props: {
-        mangledPasswords: Object,
-        allPasswordsString: String
+        mangledPasswords: { // object with concatenated mangled passwords and boolean indicating generating
+            type: Object,
+            default: () => ({value: "", loading: false})
+        },
+        allPasswordsString: String // string for storing all passwords concatenated
     },
     data() {
         return {
-            appendDictPopup: false,
-            max_mangled_passwords: 5000
+            appendDictPopup: false, // true if append dictionary popup should be shown, false if hidden
+            max_mangled_passwords: 5000 // TODO
         }
     },
     methods: {
+        /**
+         * Method which emits updating passwords in parent
+         * @param {String} updatedAllPasswordsString Updated passwords
+         */
         updatePasswords(updatedAllPasswordsString) {
             this.$emit("update-passwords", updatedAllPasswordsString);
         },
+        /**
+         * Method which downloads mangled passwords as a text file
+         */
         downloadMangledPasswords() {
-            const blob = new Blob([this.mangledPasswords.value], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
+            const blob = new Blob([this.mangledPasswords.value], { type: 'text/plain' }); // content of the file to be downloaded
+            const url = URL.createObjectURL(blob); 
+            const link = document.createElement('a'); // create a link for download
             link.href = url;
-            link.download = "mangledPasswords.txt"
+            link.download = "mangledPasswords.txt" // give file a name
             link.click();
             URL.revokeObjectURL(url)
-            this.$success("Successfully downloaded mangled passwords")
+            this.$success("Successfully downloaded mangled passwords") // show success message
         }
-    },
-    components: {
-        appendDictPopup
     },
     mounted() {
         // get the maximum number of mangled passwords from database
         this.axios.get(this.$serverAddr + '/settings').then((response) => {
             this.max_mangled_passwords = response.data.max_mangled_passwords;
         });
+    },
+    components: {
+        appendDictPopup
     }
 };
 

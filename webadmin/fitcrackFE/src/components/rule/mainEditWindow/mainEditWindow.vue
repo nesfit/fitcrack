@@ -92,58 +92,81 @@
 <script>
 import ruleFileContent from '@/components/rule/mainEditWindow/ruleFileContent.vue';
 import appendRulePopup from '@/components/rule/mainEditWindow/popups/appendRulePopup.vue';
+
 export default {
     props: {
-        rules: Array,
-        editingFile: Boolean,
-        ruleFileInfo: Object
+        rules: Array, // array of rules {value, error}
+        editingFile: Boolean, // boolean indicating if the rule file is being created or edited
+        ruleFileInfo: Object // information about rule file got from server
     },
     data() {
         return {
-            appendRuleFilePopup: false,
-            ruleFile: null
+            appendRuleFilePopup: false, // boolean indicating if append rule file popup should be shown
+            ruleFile: null // variable for storing the newly created rule file, will be sent on the server when saved
         };
     },
     methods: {
+        /**
+         * Method which gets generated random rule from server
+         */
         generateRandomRule() {
             this.axios.get(this.$serverAddr + "/rule/randomRule").then((response) => {
-                const randomRule = { value: response.data.randomRule, error: false };
-                let updatedRules = this.rules; //copy 
-                updatedRules.push(randomRule);
-                this.$emit("update-rules", updatedRules)
+                const randomRule = { value: response.data.randomRule, error: false }; // save the value of generated random rule
+                let updatedRules = this.rules;
+                updatedRules.push(randomRule); // add to existing rules
+                this.$emit("update-rules", updatedRules) // update in parent
             });
         },
+        /**
+         * Method which adds a new empty rule to existing ones 
+         */
         addEmptyRule() {
             let updatedRules = this.rules;
             updatedRules.push({value: "", error: false})
-            this.$emit("update-rules", updatedRules, true)
+            this.$emit("update-rules", updatedRules, true) // update in parent
         },
+        /**
+         * Method which emits updating rules in parent
+         * @param {Array} updatedRules Updated rules
+         */
         updateRules(updatedRules) {
             this.$emit("update-rules", updatedRules)
         },
+        /**
+         * Method which deletes all rules
+         */
         resetRules() {
             this.$emit("update-rules", [{value: "", error: false}])
         },
-        updateFunctionsPopupState(updatedState) {
-            this.showFunctionsPopup = updatedState;
+        /**
+         * Method which propagates showing insert popup to parent
+         * @param {Object} popupData Data for Insert popup to be updated 
+         */ 
+        showInsertPopup(popupData) {
+            this.$emit("show-insert-popup", popupData)
         },
-        showInsertPopup(insertData) {
-            this.$emit("show-insert-popup", insertData)
-        },
+        /**
+         * Method which propagates showing all functions popup to parent
+         * @param {Object} popupData Data for All functions popup to be updated 
+         */ 
         showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
         },
         /**
-         * Function which converts rules into a file
+         * Method which converts rules into a file
          */
         convertRulesToFile() {
-            //create a string from the rules values
+            // create a string from the rules values
             const rulesArray = this.rules.map(rule => rule.value);
             const rulesString = rulesArray.join('\n');
+            // create a file with rules content
             const blob = new Blob([rulesString], { type: 'text/plain' });
             const file = new File([blob], this.ruleFileInfo.name, { type: 'text/plain' });
             this.ruleFile = file;
         },
+        /**
+         * Method which saves the file (when creating -> creates as new, when editing -> updates current rule file)
+         */
         saveFile() {
             this.convertRulesToFile();
             const formData = new FormData();
@@ -154,8 +177,9 @@ export default {
                     'Content-type': 'multipart/form-data'
                 },
             }
+            // when creating rule file, send POST request
             if (!this.editingFile) {
-                //upload the file to server
+                // upload the file to server
                 this.axios.post(this.$serverAddr + "/rule", formData, config).then((response) => {
                     this.file = null
                     this.$router.push({ name: 'rules', params: { skipConfirmWindow: true } });
@@ -163,7 +187,9 @@ export default {
                     console.log(error)
                 });
             }
+            // when editing rule, send PUT request
             else {
+                // upload the updated file to server
                 this.axios.put(this.$serverAddr + "/rule/" + this.$route.params.id, formData, config).then((response) => {
                     this.file = null
                     this.$router.push({ name: 'rules', params: { skipConfirmWindow: true } });
@@ -175,6 +201,9 @@ export default {
         }
     },
     computed: {
+        /**
+         * Computed property which counts the current number of rules
+         */
         ruleCount() {
             return this.rules.length;
         }
