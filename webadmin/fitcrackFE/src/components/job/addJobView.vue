@@ -928,7 +928,7 @@
         this.name = this.$store.state.project + ' Job – ' + this.$moment().format('DD.MM.YYYY HH:mm')
       },
       canCreateJob() {
-        return this.hosts.length > 0;
+        return this.hosts.some((host) => host.last_active.online);
       }
     }
   }
