@@ -36,15 +36,16 @@ class CAttackAssoc : public AttackMode {
         virtual bool requiresDicts() const override {return true;}
 
         virtual bool hasStickyLeftDict() const override {
-          return m_job->getDistributionMode() == 1;
+          return m_job->getDistributionMode() == 1 || m_job->getDistributionMode() == 2;
         }
 
         /**
          * @brief enum for distribution mode options readability
         */
         enum DistributionMode {
-          FragmentOnHosts = 1 << 0, ///< whether to fragment on server to multiple dicts or send whole dictionary to everyone and just give indexes
-          FragmentByRules  = 1 << 1 ///< whether to fragment rules (without dictionaries) or dictionaries (without rules)
+          FragmentOnServer = 0,
+          FragmentOnHosts  = 1,
+          FragmentByRules  = 2
         };
 
     private:

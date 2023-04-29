@@ -43,17 +43,17 @@ bool CAttackAssoc::makeWorkunit()
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
 
-    if (m_job->getDistributionMode() == 0) { // distribute dictionaries
+    if (m_job->getDistributionMode() == FragmentOnServer) { // distribute dictionaries
       std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
       std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict", Config::appName, Config::startTime, Config::seqNo++);
       std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
-    } else if (m_job->getDistributionMode() == 1) { // use skip limit, send everything
-      std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_data_%" PRIu64 "", Config::appName, m_job->getId());// sticky
+    } else if (m_job->getDistributionMode() == FragmentOnHosts) { // use skip limit, send everything
+      std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_data_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
       std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
       std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
-    } else if (m_job->getDistributionMode() == 2){
-      std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_data_%" PRIu64 "", Config::appName, m_job->getId());// sticky
-      std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "", Config::appName, m_job->getId());// sticky
+    } else if (m_job->getDistributionMode() == FragmentByRules){
+      std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_data_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
+      std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "", Config::appName, m_job->getId()); // sticky
       std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_%d_%d.rules", Config::appName, Config::startTime, Config::seqNo++);
     }
     
@@ -82,12 +82,12 @@ bool CAttackAssoc::makeWorkunit()
                              m_job->getDistributionMode(), m_job->getName(),
                              m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag());
 
-    if (m_job->getDistributionMode() == 0) {
+    if (m_job->getDistributionMode() == FragmentOnServer) {
       // Number of passwords in the sent dictionary (the dictionary fragment).
       std::string dict1Keyspace = std::to_string(m_workunit->getHcKeyspace());
       configFile << "|||dict1_keyspace|BigUInt|" << dict1Keyspace.size()
                  << "|" << dict1Keyspace << "|||\n";
-    } else if (m_job->getDistributionMode() == 1) {
+    } else if (m_job->getDistributionMode() == FragmentOnHosts) {
       uint64_t startIndex = m_workunit->getStartIndex();
       std::string skipFromStart = std::to_string(startIndex);
       configFile << "|||start_index|BigUInt|" << skipFromStart.size() << "|"
@@ -95,6 +95,11 @@ bool CAttackAssoc::makeWorkunit()
       std::string limit = std::to_string(m_workunit->getHcKeyspace());
       configFile << "|||hc_keyspace|BigUInt|" << limit.size() << "|" << limit
                  << "|||\n";
+      // Number of passwords in the sent dictionary (the whole dictionary).
+      std::string dict1Keyspace = std::to_string(m_job->getHcKeyspace());
+      configFile << "|||dict1_keyspace|BigUInt|" << dict1Keyspace.size()
+                 << "|" << dict1Keyspace << "|||\n";
+    } else if (m_job->getDistributionMode() == FragmentByRules) {
       // Number of passwords in the sent dictionary (the whole dictionary).
       std::string dict1Keyspace = std::to_string(m_job->getHcKeyspace());
       configFile << "|||dict1_keyspace|BigUInt|" << dict1Keyspace.size()
@@ -133,7 +138,7 @@ bool CAttackAssoc::makeWorkunit()
 
     try
     {
-      if (!(m_job->getDistributionMode() & FragmentOnHosts) && !(m_job->getDistributionMode() & FragmentByRules)) {
+      if (m_job->getDistributionMode() == FragmentOnServer) {
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
                               m_host->getBoincHostId(),
                               "Creating dictionary and hashes fragment 1\n");
@@ -227,7 +232,7 @@ bool CAttackAssoc::makeWorkunit()
         hashesFile.close();
 
 
-      } else /* if (m_job->getDistributionMode() & FragmentOnHosts)*/ {
+      } else /* if (m_job->getDistributionMode() == FragmentOnHosts || == FragmentByRules)*/ {
         Tools::printDebugHost(
           Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
           "One complete dictionary\n");
@@ -341,7 +346,7 @@ bool CAttackAssoc::makeWorkunit()
     }
 
 
-    if(m_job->getDistributionMode() & FragmentByRules)
+    if(m_job->getDistributionMode() == FragmentByRules)
     {
       Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
                       "Creating rules fragment file\n");
@@ -437,9 +442,9 @@ bool CAttackAssoc::makeWorkunit()
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
-            Config::inTemplatePathAssocDictAlt, // FIXME: remove after debug (this one has no delete)
-            // m_job->getDistributionMode() & FragmentByRules ? Config::inTemplatePathAssocRuleSplit :
-            // m_job->getDistributionMode() & FragmentOnHosts ? Config::inTemplatePathAssocDictAlt : Config::inTemplatePathAssocDictSplit,
+            m_job->getDistributionMode() == 0 ? Config::inTemplatePathAssocDictSplit :
+            m_job->getDistributionMode() == 1 ? Config::inTemplatePathAssocDictAlt :
+            /*m_job->getDistributionMode()==2*/ Config::inTemplatePathAssocRuleSplit,
             path,
             config.project_path(path),
             infiles,
@@ -502,7 +507,7 @@ bool CAttackAssoc::generateWorkunit()
 
 
     //////////////////    By Rule    //////////////////
-    if (m_job->getDistributionMode() == 2) {
+    if (m_job->getDistributionMode() == FragmentByRules) {
       Tools::printDebugHost(
           Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
           "Fragment rules\n");
@@ -521,7 +526,7 @@ bool CAttackAssoc::generateWorkunit()
 
 
     //////////////////    On Server    //////////////////
-    } else if (m_job->getDistributionMode() == 0) {
+    } else if (m_job->getDistributionMode() == FragmentOnServer) {
       /** Load job dictionaries */
       std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
       Tools::printDebugHost(
@@ -566,7 +571,7 @@ bool CAttackAssoc::generateWorkunit()
 
 
     //////////////////    On Hosts    //////////////////
-    } else if (m_job->getDistributionMode() == 1) {
+    } else if (m_job->getDistributionMode() == FragmentOnHosts) {
       Tools::printDebugHost(
           Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
           "Dont fragment, skip and limit\n");
