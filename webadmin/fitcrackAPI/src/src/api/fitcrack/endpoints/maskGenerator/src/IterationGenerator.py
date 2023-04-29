@@ -30,7 +30,7 @@ class IterationGenerator():
                 if joined_mask == '':
                     continue
 
-                if not check_charsets(joined_mask, arg_options):
+                if not check_charsets(joined_mask, arg_options) or not check_custom_charsets(joined_mask, arg_options):
                     continue
 
                 if arg_options.patinc:

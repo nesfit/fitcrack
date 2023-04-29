@@ -1,5 +1,5 @@
 <template>
-  <v-container class="title-length">
+  <v-container class="title-width">
     <fc-tile
       title="Mask generator"
       class="ma-2"
@@ -178,7 +178,7 @@
       <v-card-title class="pb-0 mb-2">
         <span>Custom character sets</span>
       </v-card-title>
-      <v-row>
+      <v-row class="negative-bottom-space">
         <v-col cols="6" align="left">
           <v-text-field
             label="Character set 1"
@@ -201,6 +201,33 @@
         </v-col>
       </v-row>
       <v-row>
+        <v-col cols="1" v-if="charset1">
+          <b>Min</b>
+        </v-col>
+        <v-col cols="6" v-else></v-col>
+        <v-col cols="2" align="right" v-if="charset1">
+          <input v-model="mincharset1" type="number" min="0" max="99" size="4" @input="checkCustomInc()">
+        </v-col>
+        <v-col cols="1" v-if="charset1">
+          <b>Max</b>
+        </v-col>
+        <v-col cols="2" align="right" v-if="charset1">
+          <input v-model="maxcharset1" type="number" min="0" max="99" size="4" @input="checkCustomDec()">
+        </v-col>
+        <v-col cols="1" v-if="charset2">
+          <b>Min</b>
+        </v-col>
+        <v-col cols="2" align="right" v-if="charset2">
+          <input v-model="mincharset2" type="number" min="0" max="99" size="4" @input="checkCustomInc()">
+        </v-col>
+        <v-col cols="1" v-if="charset2">
+          <b>Max</b>
+        </v-col>
+        <v-col cols="2" align="right" v-if="charset2">
+          <input v-model="maxcharset2" type="number" min="0" max="99" size="4" @input="checkCustomDec()">
+        </v-col>
+      </v-row>
+      <v-row class="negative-bottom-space">
         <v-col cols="6" align="left">
           <v-text-field
             label="Character set 3"
@@ -220,6 +247,33 @@
             single-line
             v-model="charset4"
           />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="1" v-if="charset3">
+          <b>Min</b>
+        </v-col>
+        <v-col cols="6" v-else></v-col>
+        <v-col cols="2" align="right" v-if="charset3">
+          <input v-model="mincharset3" type="number" min="0" max="99" size="4" @input="checkCustomInc()">
+        </v-col>
+        <v-col cols="1" v-if="charset3">
+          <b>Max</b>
+        </v-col>
+        <v-col cols="2" align="right" v-if="charset3">
+          <input v-model="maxcharset3" type="number" min="0" max="99" size="4" @input="checkCustomDec()">
+        </v-col>
+        <v-col cols="1" v-if="charset4">
+          <b>Min</b>
+        </v-col>
+        <v-col cols="2" align="right" v-if="charset4">
+          <input v-model="mincharset4" type="number" min="0" max="99" size="4" @input="checkCustomInc()">
+        </v-col>
+        <v-col cols="1" v-if="charset4">
+          <b>Max</b>
+        </v-col>
+        <v-col cols="2" align="right" v-if="charset4">
+          <input v-model="maxcharset4" type="number" min="0" max="99" size="4" @input="checkCustomDec()">
         </v-col>
       </v-row>
       <v-card-title class="pb-0 mb-2">
@@ -351,7 +405,7 @@
         </v-col>
       </v-row>
       <v-card-title class="pb-0 mb-2">
-        <span>Wordlists</span>
+        <span>Dictionaries</span>
       </v-card-title>
       <v-data-table
         :headers="headers"
@@ -383,36 +437,7 @@
         </template>
       </v-data-table>
       <v-row class="top-space">
-        <v-col cols="6">
-          <b>Minimum number of occurrences:</b>
-        </v-col>
-        <v-col cols="6" align="left">
-          <input v-model="minOcc" type="number" min="1" size="4">
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="3" align-self="center">
-          <b>Sorting mode:</b>
-        </v-col>
-        <v-col cols="4">
-          <v-select
-            v-model="sortingMode"
-            :items="['Optimal', 'Occurrence', 'Complexity']"
-          ></v-select>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="6" align="left">
-          <v-text-field
-            label="Mask file name"
-            filled
-            outlined
-            dense
-            single-line
-            v-model="filename"
-          />
-        </v-col>
-        <v-col cols="6" align="right">
+        <v-col align="right">
           <v-btn
               color="primary"
               outlined
@@ -420,6 +445,23 @@
             >
             Change charset priorities
           </v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="4" align-self="center">
+          <b>Minimum occurrences:</b>
+        </v-col>
+        <v-col cols="2" align="left" align-self="center">
+          <input v-model="minOcc" type="number" min="1" size="4">
+        </v-col>
+        <v-col cols="2" align-self="center">
+          <b>Sorting mode:</b>
+        </v-col>
+        <v-col cols="4">
+          <v-select
+            v-model="sortingMode"
+            :items="['Optimal', 'Occurrence', 'Complexity']"
+          ></v-select>
         </v-col>
       </v-row>
       <v-alert
@@ -432,13 +474,24 @@
         You are using custom character sets. Make sure to select respective character sets during job creation.
       </v-alert>
       <v-row>
-        <v-col align="right">      
+        <v-col cols="6" align="left">
+          <v-text-field
+            label="Mask file name"
+            filled
+            outlined
+            dense
+            single-line
+            v-model="filename"
+          />
+        </v-col>
+        <v-col cols="6" align="right">      
           <v-btn
             color="primary"
             outlined
             @click="generateMasks()"
           >
             {{ showItemState }}
+            <v-progress-circular indeterminate color="primary" v-if="awaitingResponse"></v-progress-circular>
           </v-btn>
         </v-col>
       </v-row>
@@ -524,7 +577,7 @@
         maxDigits: 0,
         minSpecial: 0,
         maxSpecial: 0,
-        maxLength: 10,
+        maxLength: 0,
         minLength: 0,
         minLowerHex: 0,
         minUpperHex: 0,
@@ -534,6 +587,14 @@
         timeMins: 0,
         speed: 100000,
         minOcc: 1,
+        mincharset1: 0,
+        maxcharset1: 0,
+        mincharset2: 0,
+        maxcharset2: 0,
+        mincharset3: 0,
+        maxcharset3: 0,
+        mincharset4: 0,
+        maxcharset4: 0,
         sortingMode: 'Optimal',
         charset1: '',
         charset2: '',
@@ -587,7 +648,7 @@
     computed: {
       showItemState () {
         if (!this.awaitingResponse) return "Generate masks"
-        else return "Generating..."
+        else return "Generating...  "
       }
     },
     methods: {
@@ -673,6 +734,18 @@
         if (this.minLowerHex > this.maxLowerHex) this.minLowerHex = this.maxLowerHex;
         if (this.minUpperHex > this.maxUpperHex) this.minUpperHex = this.maxUpperHex;
       },
+      checkCustomInc: function () {
+        if (this.mincharset1 > this.maxcharset1) this.maxcharset1 = this.mincharset1;
+        if (this.mincharset2 > this.maxcharset2) this.maxcharset2 = this.mincharset2;
+        if (this.mincharset3 > this.maxcharset3) this.maxcharset3 = this.mincharset3;
+        if (this.mincharset4 > this.maxcharset4) this.maxcharset4 = this.mincharset4;
+      },
+      checkCustomDec: function () {
+        if (this.mincharset1 > this.maxcharset1) this.mincharset1 = this.maxcharset1;
+        if (this.mincharset2 > this.maxcharset2) this.mincharset2 = this.maxcharset2;
+        if (this.mincharset3 > this.maxcharset3) this.mincharset3 = this.maxcharset3;
+        if (this.mincharset4 > this.maxcharset4) this.mincharset4 = this.maxcharset4;
+      },
       generateMasks: function () {
         var patexc = []
         this.excPatterns.forEach(function(pattern){
@@ -698,6 +771,14 @@
           maxlowerhex: this.maxLowerHex,
           minupperhex: this.minUpperHex,
           maxupperhex: this.maxUpperHex,
+          mincharset1: this.mincharset1,
+          maxcharset1: this.maxcharset1,
+          mincharset2: this.mincharset2,
+          maxcharset2: this.maxcharset2,
+          mincharset3: this.mincharset3,
+          maxcharset3: this.maxcharset3,
+          mincharset4: this.mincharset4,
+          maxcharset4: this.maxcharset4,
           time: this.timeHours * 3600 + this.timeMins * 60,
           speed: this.speed,
           minocc: this.minOcc,
@@ -728,8 +809,8 @@
 
 <style scoped>
 
-  .title-length {
-      max-width: 700px;
+  .title-width {
+      max-width: 720px;
     }
 
 </style>
@@ -746,6 +827,10 @@
 
   .align-right {
       text-align: right;
+    }
+
+  .negative-bottom-space {
+      margin-bottom: -8mm;
     }
 
 </style>

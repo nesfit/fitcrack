@@ -60,7 +60,7 @@ class PasswordAnalyzer:
                             if len(mask) == maskLength:    
                                 mask += "?b"
 
-                        if not (check_charsets(mask, arg_options) and
+                        if not (check_charsets(mask, arg_options) and check_custom_charsets(mask, arg_options) and
                                 arg_options.minlength <= len(password) <= arg_options.maxlength):
                             continue
 

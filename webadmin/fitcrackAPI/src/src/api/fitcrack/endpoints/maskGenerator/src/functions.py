@@ -12,12 +12,12 @@ def check_compatibility(mask, mask_pattern):
 
 def check_charsets(mask, arg_options):
     '''Checks for required number of character sets within a mask.'''
-    if (arg_options.minlower <= mask.count("l") <= arg_options.maxlower and
-        arg_options.minupper <= mask.count("u") <= arg_options.maxupper and
-        arg_options.mindigit <= mask.count("d") <= arg_options.maxdigit and
-        arg_options.minspecial <= mask.count("s") <= arg_options.maxspecial and
-        arg_options.minlowerhex <= mask.count("h") <= arg_options.maxlowerhex and
-        arg_options.minupperhex <= mask.count("H") <= arg_options.maxupperhex):
+    if (arg_options.minlower <= mask.count("l") + mask.count("a") and mask.count("l") <= arg_options.maxlower and
+        arg_options.minupper <= mask.count("u") + mask.count("a") and mask.count("u") <= arg_options.maxupper and
+        arg_options.mindigit <= mask.count("d") + mask.count("a") and mask.count("d") <= arg_options.maxdigit and
+        arg_options.minspecial <= mask.count("s") + mask.count("a") and mask.count("s") <= arg_options.maxspecial and
+        arg_options.minlowerhex <= mask.count("h") + mask.count("a") and mask.count("h") <= arg_options.maxlowerhex and
+        arg_options.minupperhex <= mask.count("H") + mask.count("a") and mask.count("H") <= arg_options.maxupperhex):
         return True
     else:
         return False
@@ -28,6 +28,11 @@ def check_custom_charsets(mask, arg_options):
         not arg_options.charset2 and "2" in mask or
         not arg_options.charset3 and "3" in mask or
         not arg_options.charset4 and "4" in mask):
+        return False
+    elif ((arg_options.charset1 and not arg_options.mincharset1 <= mask.count("1") <= arg_options.maxcharset1) or
+          (arg_options.charset2 and not arg_options.mincharset2 <= mask.count("2") <= arg_options.maxcharset2) or
+          (arg_options.charset3 and not arg_options.mincharset3 <= mask.count("3") <= arg_options.maxcharset3) or
+          (arg_options.charset4 and not arg_options.mincharset4 <= mask.count("4") <= arg_options.maxcharset4)):
         return False
     else:
         return True
