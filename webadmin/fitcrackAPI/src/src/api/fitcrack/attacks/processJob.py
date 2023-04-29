@@ -118,6 +118,8 @@ def post_process_job_1(data, db_job):
 def process_job_3(job, hashcatKeyspace=True):
     if not job['attack_settings'].get('attack_submode'):
         job['attack_settings']['attack_submode'] = 0
+    # remove empty masks
+    job['attack_settings']['masks'] = [i for i in job['attack_settings']['masks'] if i]
     # check masks syntax
     for mask in job['attack_settings']['masks']:
         check_mask_syntax(mask)
