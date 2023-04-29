@@ -1,12 +1,12 @@
 <!--
-   * Author : see AUTHORS
+   * Author : Jiri Mladek
    * Licence: MIT, see LICENSE
 -->
 
 <template>
     <v-dialog v-model="popupVisible">
         <v-card>
-            <v-card-title class="headline orange lighten-3">
+            <v-card-title class="headline primary">
                 Append rule file
             </v-card-title>
             <v-tabs v-model="tab">
@@ -32,7 +32,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card text class="text-center py-2">
-                        <rulesSelector v-model="serverFileSelected"></rulesSelector>
+                        <rulesSelector class="px-2" v-model="serverFileSelected"></rulesSelector>
                         <v-btn color="primary" outlined :disabled="serverFileSelected.length == 0"
                             @click="appendServerRules">
                             Append

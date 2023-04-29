@@ -1,18 +1,13 @@
 <!--
-   * Author : see AUTHORS
+   * Author : Jiri Mladek
    * Licence: MIT, see LICENSE
 -->
 
 <template>
     <v-dialog v-model="allFunctionsPopup.visible" max-width="1200">
         <v-card>
-            <v-card-title justify-center class="headline orange lighten-3">
-                <div v-if="allFunctionsPopup.onlyShow">
-                    Rule functions
-                </div>
-                <div v-else>
-                    Choose a rule function
-                </div>
+            <v-card-title justify-center class="headline primary">
+                {{ allFunctionsPopup.onlyShow ? "Rule functions" : "Choose a rule function" }}
                 <v-spacer></v-spacer>
                 <v-card-actions>
                     <v-btn class="close-btn" color="grey darken-4" fab x-small dark @click="hidePopup()">
@@ -24,7 +19,8 @@
             <v-text-field class="ma-2" outlined dense v-model="search" append-icon="mdi-magnify" label="Search" single-line
                 hide-details></v-text-field>
             <v-divider></v-divider>
-            <v-data-table :headers="headers" :items="ruleFunctions" @click:row="showInsertPopup" :search="search"
+            <v-data-table class="px-2" :headers="headers" :items="ruleFunctions" @click:row="showInsertPopup"
+                :search="search"
                 :footer-props="{ itemsPerPageOptions: [5, 10, 15], itemsPerPageText: 'Functions per page' }">
             </v-data-table>
         </v-card>
@@ -46,7 +42,7 @@ export default {
                 { text: "Name", value: "name" },
                 { text: "Function", value: "sign", align: "center" },
                 { text: "Description", value: "description" },
-                { text: "Example", value: "example" },
+                { text: "Example", value: "example", align: "center" },
                 { text: "Input", value: "input" },
                 { text: "Output", value: "output" }
             ],
@@ -54,7 +50,9 @@ export default {
         }
     },
     methods: {
-        // Method which hides the all functions popup (emits function in parent)
+        /**
+         * Method which hides the all functions popup (emits function in parent)
+        */
         hidePopup() {
             this.$emit("hide-all-functions-popup")
         },

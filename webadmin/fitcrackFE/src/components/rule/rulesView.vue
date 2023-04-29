@@ -59,15 +59,18 @@
       <v-row class="mt-0">
         <v-col class="d-flex align-center justify-center">
           <router-link :to="`/rules/edit/new`">
-            <v-btn color="primary" class="black--text">
-              Create new file
+            <v-btn large color="primary">
+              <v-icon left>
+                mdi-file-plus
+              </v-icon>
+              Create new rule file
             </v-btn>
           </router-link>
 
         </v-col>
         <v-col>
           <v-card>
-            <v-card-title>
+            <v-card-title class="primary">
               Upload existing rule file
             </v-card-title>
             <v-divider></v-divider>
@@ -146,10 +149,6 @@ export default {
 
 .max700 {
   max-width: 700px;
-}
-
-.v-card__title {
-  background-color: #FFF3EC;
 }
 </style>
 

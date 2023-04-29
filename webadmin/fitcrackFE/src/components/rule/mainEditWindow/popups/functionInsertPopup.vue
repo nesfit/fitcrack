@@ -1,9 +1,13 @@
+<!--
+   * Author : Jiri Mladek
+   * Licence: MIT, see LICENSE
+-->
 
 <template>
     <v-dialog v-model="functionsInsertPopup.visible" max-width="1200">
         <v-card>
-            <v-card-title justify-center class="headline orange lighten-3">
-                Insert a function
+            <v-card-title justify-center class="headline primary">
+                {{ ruleFunction.name }}
                 <v-spacer></v-spacer>
                 <v-card-actions>
                     <v-btn class="close-btn" color="grey darken-4" fab x-small dark @click="hidePopup()">
@@ -14,62 +18,51 @@
             <v-container>
                 <v-row>
                     <v-col>
-                        <p class="font-weight-medium my-0">
-                            Function:
+                        <p class="font-weight-medium my-0 text-h6">
+                            {{ ruleFunction.description }}
                         </p>
-                        <v-textarea dense readonly hide-details auto-grow v-model="ruleFunction.name" outlined rows="1"
-                            row-height="15" background-color="orange lighten-3" color="black">
-                        </v-textarea>
-
-                    </v-col>
-                    <v-col>
-                        <p class="font-weight-medium my-0">
-                            Description:
-                        </p>
-                        <v-textarea dense readonly hide-details auto-grow v-model="ruleFunction.description" outlined
-                            rows="1" row-height="10">
-                        </v-textarea>
-
                     </v-col>
                 </v-row>
                 <v-divider class="my-2 grey darken-1"></v-divider>
-                <v-alert v-if="!textFieldValid" type="error" tile>
-                    Invalid operands!
-                </v-alert>
                 <v-row>
+                    <v-col cols="12">
+                        <v-sheet outlined color="grey lighten-1" rounded>
+                            <v-card>
+                                <v-container>
+                                    <v-row align="center" v-for="(operand, index) in ruleFunction.operands" :key="index">
+                                        <v-col cols="auto">
+                                            <p class="mb-0">
+                                                {{ operand.specification }} :
+                                            </p>
+                                        </v-col>
+                                        <v-col class="px-0">
+                                            <v-text-field v-model="functionOperands[index]" type="text" maxlength="1" dense
+                                                required :style="{ width: '5ch' }" outlined class="py-0 operandField"
+                                                hide-details></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                            </v-card>
+                        </v-sheet>
+                    </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="9">
-                        <p class="font-weight-medium my-0">
-                            Operands:
-                        </p>
-                        <div class="operandsWrapper">
-                            <v-row v-for="(operand, index) in ruleFunction.operands" :key="index">
-                                <v-col md="auto">
-                                    <p class="py-0">
-                                        {{ operand.specification }} :
-                                    </p>
-                                </v-col>
-                                <v-col>
-                                    <v-text-field v-model="functionOperands[index]" type="text" maxlength="1" dense required
-                                        :style="{ width: '5ch' }" outlined class="text-center py-0 operandField"
-                                        hide-details></v-text-field>
-                                </v-col>
-                            </v-row>
-                        </div>
+                    <v-col cols="12" v-show="!textFieldValid" class="py-0">
+                        <v-alert dense class="mb-0" type="error">
+                            Invalid operands!
+                        </v-alert>
                     </v-col>
-                    <v-col cols="3" class="d-flex justify-end align-end">
-                        <v-btn color="orange darken-3" depressed @click="insertFunction()">
+                </v-row>
+                <v-row>
+                    <v-col align="center">
+                        <v-btn color="primary black--text" @click="insertFunction()">
                             Insert
                         </v-btn>
                     </v-col>
+
                 </v-row>
-
-
             </v-container>
         </v-card>
-
-
     </v-dialog>
 </template>
 
@@ -81,32 +74,42 @@ import functionsJson from "@/assets/ruleFunctions.json"
 export default {
     data() {
         return {
-            ruleFunctions: functionsJson,
-            functionOperands: [],
-            textFieldValid: true
+            ruleFunctions: functionsJson, // data about each rule function
+            functionOperands: [], // array for storing operands for specific rule function
+            textFieldValid: true // boolean indicating if operands text fields are valid
         }
     },
     props: {
-        functionsInsertPopup: Object,
+        functionsInsertPopup: Object, // data about Function insert popup {visible, functionIndex, ruleIndex, cursorPosition}
     },
     methods: {
+        /**
+         * Method which hides the Insert popup (emits function in parent)
+        */
         hidePopup() {
             this.$emit("hide-insert-popup");
         },
+        /**
+         * Method which creates a function from function sign and operands
+         */
         insertFunction() {
+            // enable inserting only if all operands are valid
             if (!(this.textFieldValid = this.validateOperands())) {
                 return;
             }
             const operandsCount = this.ruleFunction.operands.length;
-            const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) //get the function sign, remove the abstract operands
+            const functionSign = this.ruleFunction.sign.slice(0, -operandsCount) // get the function sign, remove the abstract operands
             const finalFunction = functionSign + this.functionOperands.join("");
             this.hidePopup();
-            this.$emit("add-function", finalFunction);
+            this.$emit("add-function", finalFunction); // add function to specific rule in a parent
         },
+        /**
+         * Method which validates all operands of rule function based on data type (and corresponding regex)
+         */
         validateOperands() {
             for (let index = 0; index < this.functionOperands.length; index++) {
                 const pattern = (this.ruleFunction.operands[index].type === 'int') ? /^[0-9]{1}$/ : /^[^\s]{1}$/;
-                if (!pattern.test(this.functionOperands[index])) {
+                if (!pattern.test(this.functionOperands[index])) { // when any operand is not valid
                     return false;
                 }
             }
@@ -114,14 +117,20 @@ export default {
         }
     },
     computed: {
+        /**
+         * Computed property to get data of selected rule function
+         */
         ruleFunction() {
             return this.ruleFunctions[this.functionsInsertPopup.functionIndex]
         }
     },
     watch: {
-        /**Function which initializes the operands array to empty strings when popup is shown, because of validation */
-        functionsInsertPopup(newObject) {
-            if (newObject.visible === true) {
+        /**
+         * Initializes the operands array to empty strings when popup is shown, because of validation
+         * @param {Object} newData New data for Insert popup
+         */
+        functionsInsertPopup(newData) {
+            if (newData.visible === true) {
                 this.textFieldValid = true;
                 const numOfOperands = this.ruleFunction.operands.length;
                 this.functionOperands = Array(numOfOperands).fill("");
@@ -132,12 +141,7 @@ export default {
 </script>
 
 <style scoped>
-.operandsWrapper {
-    border: 1px solid rgb(100, 100, 100);
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    padding: 10px 5px;
+.operandField>>>input {
+    text-align: center
 }
 </style>

@@ -1,90 +1,92 @@
+<!--
+   * Author : Jiri Mladek
+   * Licence: MIT, see LICENSE
+-->
+
 <template>
     <v-col cols="12" md="8" class="bordered">
-        <v-container>
-            <v-row justify="center" class="border-down text-h5 py-2 rounded">
-                <div v-if="!editingFile">
-                    Create rule file
-                </div>
-                <div v-else>
-                    Edit rule file
-                </div>
+        <v-sheet outlined color="grey lighten-1" rounded>
+            <v-card>
+                <v-card-title>
+                    <v-row justify="center" class="border-down text-h5 font-weight-medium py-2 rounded">
+                        {{ editingFile ? "Edit rule file" : "Create rule file" }}
+                    </v-row>
+                </v-card-title>
+                <v-container>
+                    <v-row>
+                        <v-col sm="7" cols="12" class="pb-0">
+                            <v-text-field v-model="ruleFileInfo.name" label="Rule file name" required outlined autofocus
+                                hint="Give this rule file a name (.txt or .rule extension)" persistent-hint></v-text-field>
+                        </v-col>
+                        <v-spacer></v-spacer>
+                        <v-col>
+                            <v-btn color="custom_grey" @click="showAllFunctionsPopup({ visible: true, onlyShow: true })">
+                                Show rule functions
+                            </v-btn>
+                        </v-col>
+                    </v-row>
 
-            </v-row>
-            <v-row>
-                <v-col cols="6">
-                    <v-text-field v-model="ruleFileInfo.name" label="Rule file name" required outlined autofocus
-                        hint="Give this rule file a name (.txt or .rule extension)" persistent-hint></v-text-field>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col>
-                    <v-btn color="grey lighten-1" @click="showAllFunctionsPopup({ visible: true, onlyShow: true })">
-                        Show rule functions
-                    </v-btn>
-                </v-col>
-            </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-btn class="px-2 mr-3 mb-2" color="orange lighten-3 black--text"  @click="addEmptyRule">
+                                <v-icon left>
+                                    mdi-plus
+                                </v-icon>
+                                Add rule
+                            </v-btn>
 
-            <v-row justify-start align-start>
-                <v-col>
-                    <v-btn class="px-2" color="orange lighten-3" depressed @click="addEmptyRule">
-                        <v-icon left>
-                            mdi-plus
-                        </v-icon>
-                        Add rule
-                    </v-btn>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col>
-                    <v-btn class="px-2" color="orange lighten-3" depressed @click="generateRandomRule">
-                        <v-icon>
-                            mdi-plus-thick
-                        </v-icon>
-                        Add random rule
-                    </v-btn>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col>
-                    <v-btn class="px-2" color="orange lighten-3" depressed @click="appendRuleFilePopup = true">
-                        <v-icon left>
-                            mdi-file
-                        </v-icon>
-                        Append rule file
-                    </v-btn>
-                    <appendRulePopup v-model="appendRuleFilePopup" v-bind:rules="rules" v-on:update-rules="updateRules">
-                    </appendRulePopup>
-                </v-col>
-                <v-spacer></v-spacer>
+                            <v-btn class="px-2 mr-3 mb-2" color="orange lighten-3 black--text" @click="generateRandomRule">
+                                <v-icon>
+                                    mdi-plus
+                                </v-icon>
+                                Add random rule
+                            </v-btn>
 
-                <v-col>
-                    <v-btn class="px-2" color="red accent-2" depressed @click="resetRules">
-                        <v-icon>
-                            mdi-delete
-                        </v-icon>
-                        Reset rules</v-btn>
-                </v-col>
-            </v-row>
-            <v-row>
-                <ruleFileContent v-bind:rules="rules" v-on:update-rules="updateRules"
-                    v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup">
-                </ruleFileContent>
-            </v-row>
-            <v-row>
-                <v-col align="right">
-                    Lines count: {{ ruleCount }}
-                </v-col>
+                            <v-btn class="px-2 mr-3 mb-2 orange lighten-3 black--text " color="primary" 
+                                @click="appendRuleFilePopup = true">
+                                <v-icon left>
+                                    mdi-file
+                                </v-icon>
+                                Append rule file
+                            </v-btn>
+                            <appendRulePopup v-model="appendRuleFilePopup" v-bind:rules="rules"
+                                v-on:update-rules="updateRules">
+                            </appendRulePopup>
 
-            </v-row>
+                            <v-btn class="px-2 mr-3 mb-2" color="red accent-2 black--text"  @click="resetRules">
+                                <v-icon>
+                                    mdi-delete
+                                </v-icon>
+                                Reset rules</v-btn>
 
-            <v-row>
-                <v-col class="text-right">
-                    <v-btn class="orange darken-3" @click="saveFile()">
-                        <v-icon>
-                            mdi-content-save
-                        </v-icon>
-                        {{ !editingFile ? "Save file" : "Update File" }}
-                    </v-btn>
-                </v-col>
-            </v-row>
-        </v-container>
+                        </v-col>
+
+                    </v-row>
+                    <v-row class="mt-0">
+                        <ruleFileContent v-bind:rules="rules" v-on:update-rules="updateRules"
+                            v-on:show-insert-popup="showInsertPopup" v-on:show-all-functions-popup="showAllFunctionsPopup">
+                        </ruleFileContent>
+                    </v-row>
+                    <v-row>
+                        <v-col align="right">
+                            Lines count: {{ ruleCount }}
+                        </v-col>
+
+                    </v-row>
+
+                    <v-row>
+                        <v-col class="text-right">
+                            <v-btn color="primary black--text" @click="saveFile()">
+                                <v-icon>
+                                    mdi-content-save
+                                </v-icon>
+                                {{ !editingFile ? "Save file" : "Update File" }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-card>
+        </v-sheet>
     </v-col>
 </template>
 
@@ -122,7 +124,7 @@ export default {
          */
         addEmptyRule() {
             let updatedRules = this.rules;
-            updatedRules.push({value: "", error: false})
+            updatedRules.push({ value: "", error: false })
             this.$emit("update-rules", updatedRules, true) // update in parent
         },
         /**
@@ -136,19 +138,19 @@ export default {
          * Method which deletes all rules
          */
         resetRules() {
-            this.$emit("update-rules", [{value: "", error: false}])
+            this.$emit("update-rules", [{ value: "", error: false }])
         },
         /**
          * Method which propagates showing insert popup to parent
          * @param {Object} popupData Data for Insert popup to be updated 
-         */ 
+         */
         showInsertPopup(popupData) {
             this.$emit("show-insert-popup", popupData)
         },
         /**
          * Method which propagates showing all functions popup to parent
          * @param {Object} popupData Data for All functions popup to be updated 
-         */ 
+         */
         showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
         },
@@ -220,17 +222,7 @@ export default {
 
 
 <style>
-.bordered {
-    border: 2px solid darkgray;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    margin: 4px;
-    margin-top: 10px;
-}
-
 .border-down {
-    border-bottom: 1px solid darkgray;
+    border-bottom: 3px solid #BDBDBD;
 }
 </style>

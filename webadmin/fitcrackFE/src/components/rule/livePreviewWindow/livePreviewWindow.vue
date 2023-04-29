@@ -1,74 +1,94 @@
-<template>
-    <v-col cols="5" md="3" class="bordered">
-        <v-container>
-            <v-row justify="center" class="border-down boxTitle text-h5 py-2">
-                Live mangled passwords preview
-            </v-row>
-            <v-row>
-                <v-col class="font-weight-medium">
-                    Type passwords or append a dictionary:
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col class="py-0">
-                    <v-btn class="px-2" color="orange lighten-3" small depressed @click="appendDictPopup = true">
-                        <v-icon left>
-                            mdi-file
-                        </v-icon>
-                        Append dictionary
-                    </v-btn>
-                    <appendDictPopup v-model="appendDictPopup" v-bind:allPasswordsString="allPasswordsString"
-                        v-on:update-passwords="updatePasswords"></appendDictPopup>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col class="pb-0">
-                    <v-textarea solo hide-details class="textArea" label="Type or append passwords" :value="allPasswordsString"
-                        @input="updatePasswords"></v-textarea>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col>
-                    <v-btn class="py-0" color="red accent-2" small depressed @click="updatePasswords('')">
-                        <v-icon>
-                            mdi-delete
-                        </v-icon>
-                        Reset passwords
-                    </v-btn>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-alert tile color="orange" text class="mb-0">
-                    Maximum number of mangled passwords is set to {{ max_mangled_passwords }}. For change go to
-                    <router-link :to="{ name: 'settings' }">
-                        <b>advanced settings</b>.
-                    </router-link>
-                </v-alert>
+<!--
+   * Author : Jiri Mladek
+   * Licence: MIT, see LICENSE
+-->
 
-            </v-row>
-            <v-row>
-                <v-col class="font-weight-medium">
-                    Mangled passwords:
-                </v-col>
-            </v-row>
-            <v-row class="my-1">
-                <v-progress-linear v-visible="mangledPasswords.loading" indeterminate color="orange"></v-progress-linear>
-            </v-row>
-            <v-row>
-                <v-col class="py-0">
-                    <v-textarea class="textArea" readonly solo label="Mangled passwords preview"
-                        v-model="this.mangledPasswords.value"></v-textarea>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col class="text-center pt-0">
-                    <v-btn height="40" multi-line text-wrap class="orange darken-3" :disabled="mangledPasswords.loading"
-                        small @click="downloadMangledPasswords()">
-                        Download <br>mangled passwords
-                    </v-btn>
-                </v-col>
-            </v-row>
-        </v-container>
+<template>
+    <v-col cols="10" md="4">
+        <v-sheet outlined color="grey lighten-1" rounded>
+            <v-card>
+                <v-card-title>
+                    <v-row justify="center" class="text-center border-down boxTitle text-h5 font-weight-medium py-2">
+                        Live mangled passwords preview
+                    </v-row>
+                </v-card-title>
+                <v-container>
+
+                    <v-row>
+                        <v-col class="font-weight-medium">
+                            Type passwords or append a dictionary:
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="py-0">
+                            <v-btn class="px-2" color="orange lighten-3 black--text" small 
+                                @click="appendDictPopup = true">
+                                <v-icon left>
+                                    mdi-file
+                                </v-icon>
+                                Append dictionary
+                            </v-btn>
+                            <appendDictPopup v-model="appendDictPopup" v-bind:allPasswordsString="allPasswordsString"
+                                v-on:update-passwords="updatePasswords"></appendDictPopup>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="pb-0">
+                            <v-sheet outlined color="grey lighten-1" rounded>
+                                <v-textarea solo hide-details class="textArea" label="Type or append passwords"
+                                    :value="allPasswordsString" @input="updatePasswords"></v-textarea>
+                            </v-sheet>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-btn class="py-0" color="red accent-2 black--text" small 
+                                @click="updatePasswords('')">
+                                <v-icon>
+                                    mdi-delete
+                                </v-icon>
+                                Reset passwords
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-alert tile color="orange" text class="mb-0">
+                                Maximum number of mangled passwords is set to {{ max_mangled_passwords }}. For change go to
+                                <router-link :to="{ name: 'settings' }">
+                                    <b>advanced settings</b>.
+                                </router-link>
+                            </v-alert>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="font-weight-medium">
+                            Mangled passwords:
+                        </v-col>
+                    </v-row>
+                    <v-row class="my-1">
+                        <v-progress-linear v-visible="mangledPasswords.loading" indeterminate
+                            color="primary"></v-progress-linear>
+                    </v-row>
+                    <v-row>
+                        <v-col class="py-0">
+                            <v-sheet outlined color="grey lighten-1" rounded>
+                                <v-textarea class="textArea" hide-details readonly solo label="Mangled passwords preview"
+                                    v-model="this.mangledPasswords.value"></v-textarea>
+                            </v-sheet>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="text-center pt-5">
+                            <v-btn height="40" multi-line text-wrap class="primary black--text"
+                                :disabled="mangledPasswords.loading" small @click="downloadMangledPasswords()">
+                                Download <br>mangled passwords
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-card>
+        </v-sheet>
     </v-col>
 </template>
 
@@ -80,7 +100,7 @@ export default {
     props: {
         mangledPasswords: { // object with concatenated mangled passwords and boolean indicating generating
             type: Object,
-            default: () => ({value: "", loading: false})
+            default: () => ({ value: "", loading: false })
         },
         allPasswordsString: String // string for storing all passwords concatenated
     },
@@ -103,7 +123,7 @@ export default {
          */
         downloadMangledPasswords() {
             const blob = new Blob([this.mangledPasswords.value], { type: 'text/plain' }); // content of the file to be downloaded
-            const url = URL.createObjectURL(blob); 
+            const url = URL.createObjectURL(blob);
             const link = document.createElement('a'); // create a link for download
             link.href = url;
             link.download = "mangledPasswords.txt" // give file a name
@@ -139,5 +159,4 @@ export default {
 .v-textarea textarea {
     white-space: pre;
     overflow-x: auto;
-}
-</style>
+}</style>
