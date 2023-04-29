@@ -79,6 +79,8 @@ namespace Config {
     extern std::string inTemplateFileAssocDictSplit;
     extern std::string inTemplateFileAssocDictAlt;
     extern std::string inTemplateFileAssocRuleSplit;
+    extern std::string inTemplateFileAssocNoRule;
+    extern std::string inTemplateFileAssocNoRuleAlt;
     extern std::string outTemplateFile;
 
     /** Other parameters filled by BOINC arg parsing */
@@ -99,6 +101,8 @@ namespace Config {
     extern char * inTemplatePathAssocDictSplit;
     extern char * inTemplatePathAssocDictAlt;
     extern char * inTemplatePathAssocRuleSplit;
+    extern char * inTemplatePathAssocNoRule;
+    extern char * inTemplatePathAssocNoRuleAlt;
     extern DB_APP * app;
     extern int startTime;
     extern int seqNo;
@@ -123,7 +127,7 @@ namespace Config {
         JobFinishing  = 12    /**< Job is running, but all workunits has been generated, ending soon */
     };
 
-    /** Attack modes in haschat*/
+    /** Attack modes in runner (mostly hashcat)*/
     enum AttackMode {
         AttackDict = 0,
         AttackCombinator = 1,

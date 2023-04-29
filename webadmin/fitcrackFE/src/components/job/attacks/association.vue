@@ -20,6 +20,7 @@
       </v-card-title>
       <v-radio-group
         v-model="distributionMode"
+        @input="checkValid"
       >
         <v-radio
           label="Fragment dictionaries on server"
@@ -68,8 +69,10 @@
       computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'validatedHashes', 'rules', 'optimized', 'distributionMode'])),
       methods: {
         checkValid: function () {
+          console.log(rules);
           if (this.leftDicts.length > 0
               // && this.leftDicts.reduce((total, current)=>total+current.keyspace, 0) == this.validatedHashes.length
+              && !((!rules) && (distributionMode == 2)) // fragment by rules requires rules
               ) {
             return true
           }

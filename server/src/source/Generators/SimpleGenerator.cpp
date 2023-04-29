@@ -22,6 +22,7 @@
 #include <AttackPcfgRules.h>
 #include <AttackPrince.h>
 #include <AttackAssoc.h>
+#include <AttackAssocNoRule.h>
 #include <AttackBenchAll.h>
 
 
@@ -142,7 +143,10 @@ AttackMode *CreateAttack(PtrJob &job, PtrHost &host, uint64_t duration, CSqlLoad
             return AttackTypeMaker<CAttackHybridMaskDict>::CreateAttack(job, host, duration, sqlLoader);
 
         case Config::AttackMode::AttackAssoc:
-            return AttackTypeMaker<CAttackAssoc>::CreateAttack(job, host, duration, sqlLoader);
+            if (job->getAttackSubmode() == 0)
+                return AttackTypeMaker<CAttackAssocNoRule>::CreateAttack(job, host, duration, sqlLoader);
+            else
+                return AttackTypeMaker<CAttackAssoc>::CreateAttack(job, host, duration, sqlLoader);
             break;
 
         default:

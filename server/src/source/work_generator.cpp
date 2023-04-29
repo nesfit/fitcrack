@@ -234,6 +234,20 @@ void parseArguments(int argc, char * argv[])
         exit(1);
     }
 
+    std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileAssocNoRule.c_str());
+    if (read_file_malloc(config.project_path(buf), Config::inTemplatePathAssocNoRule))
+    {
+        log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
+        exit(1);
+    }
+
+    std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileAssocNoRuleAlt.c_str());
+    if (read_file_malloc(config.project_path(buf), Config::inTemplatePathAssocNoRuleAlt))
+    {
+        log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
+        exit(1);
+    }
+
     /** Set starting values */
     Config::startTime = time(0);
     Config::seqNo = 0;
