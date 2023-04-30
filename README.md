@@ -1,3 +1,8 @@
+# RELEASE 2.4.0 IS HERE!
+After two years and six months, a new stable release is finally here! See the [Changelog](CHANGELOG.md) for details.
+
+**The installation has never been easier:** Fitcrack is now available as a pre-built Docker image on Docker Hub. See [Docker install README](INSTALL-Docker.md) for details.
+
 # Fitcrack (Distributed password cracking system)
 
 Fitcrack is a [BOINC](https://boinc.berkeley.edu)-based [hashcat](https://hashcat.net/)-powered distributed password cracking system.
