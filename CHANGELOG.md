@@ -1,5 +1,5 @@
 # Fitcrack 2.4.0
-Released: 2023-04-??
+Released: 2023-04-30
 * Fitcrack can now be deployed using Docker (pre-built image or custom build)
 * Legacy installation ways still work and are better documented now
 * Upgraded BOINC to 7.27
@@ -36,6 +36,10 @@ Released: 2023-04-??
 * Fixed hash extraction for some types of RAR5
 * Fixed hash validation for 11300 - Bitcoin/Litecoin wallet.dat
 * Fixed broken WPA hash types
+* Fixed hash extraction for RAR4 
+* Fixed hash extraction for Office365
+* Fixed buggy keyspace limit when PRINCE attack is added too fast
+* Fixed urllib3 version for measureUsage
 * LUKS - fix for showing the password correctly
 * Fixed TrueCrypt VeraCrypt hash handling  (NVIDIA clients)
 * Hostname auto-detection in BOINC projects
