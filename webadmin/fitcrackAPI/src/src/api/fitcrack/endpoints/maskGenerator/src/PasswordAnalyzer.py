@@ -1,3 +1,8 @@
+'''
+About: Class responsible for analyzing passwords from dictionaries.
+Author: Samuel Hribik
+'''
+
 import string
 
 from src.api.fitcrack.endpoints.maskGenerator.src.functions import *
@@ -7,11 +12,11 @@ class PasswordAnalyzer:
     def __init__(self):
         self.masks = {}
 
-    def analyze(self, arg_options, wordlistsPath):
-        '''Iterate through passwords in wordlists and analyze passwords compatible with policy.'''
+    def analyze(self, arg_options, wordlists_path):
+        '''Iterate through passwords in dictionaries and analyze passwords compatible with policy.'''
         for filename in arg_options.wordlists:
             try:
-                with open(wordlistsPath + "/" + filename, 'r', encoding="latin-1") as file:
+                with open(wordlists_path + "/" + filename, 'r', encoding="latin-1") as file:
                     for password in file:
 
                         password = password.rstrip('\r\n')
@@ -23,7 +28,7 @@ class PasswordAnalyzer:
 
                         for letter in password:
 
-                            maskLength = len(mask)
+                            mask_length = len(mask)
 
                             for charset in arg_options.charsetOrderList:
                                 if charset['placeholder'] == '?1' and letter in arg_options.charset1:
@@ -57,7 +62,7 @@ class PasswordAnalyzer:
                                     mask += "?H"
                                     break
 
-                            if len(mask) == maskLength:    
+                            if len(mask) == mask_length:
                                 mask += "?b"
 
                         if not (check_charsets(mask, arg_options) and check_custom_charsets(mask, arg_options) and
@@ -86,7 +91,7 @@ class PasswordAnalyzer:
                             self.masks[mask] = 1
 
             except OSError:
-                pass
+                continue
 
         filtered_masks = {}
         for mask, occurrence in self.masks.items():

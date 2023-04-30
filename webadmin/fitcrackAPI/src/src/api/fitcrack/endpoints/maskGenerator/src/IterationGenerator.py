@@ -1,3 +1,8 @@
+'''
+About: Class responsible for generating possible mask iterations.
+Author: Samuel Hribik
+'''
+
 import itertools
 
 from src.api.fitcrack.endpoints.maskGenerator.src.functions import *
@@ -10,14 +15,10 @@ class IterationGenerator():
 
     def generate(self, arg_options):
         '''Generate all compatible iterations of password masks.'''
-        if arg_options.charset1:
-            self.charset.append("?1")
-        if arg_options.charset2:
-            self.charset.append("?2")
-        if arg_options.charset3:
-            self.charset.append("?3")
-        if arg_options.charset4:
-            self.charset.append("?4")
+        for i in range(1, 5):
+            charset_option = getattr(arg_options, f"charset{i}")
+            if charset_option:
+                self.charset.append(f"?{i}")
 
         if arg_options.useHex:
             self.charset.append("?h")

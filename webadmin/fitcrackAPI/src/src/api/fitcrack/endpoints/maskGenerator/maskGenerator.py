@@ -1,6 +1,6 @@
 '''
-   * Author : see AUTHORS
-   * Licence: MIT, see LICENSE
+About: Endpoint handling request for the mask generation process.
+Author: Samuel Hribik
 '''
 
 import logging
@@ -10,13 +10,9 @@ from flask import request, redirect, send_file
 from flask_restx import Resource, abort
 from sqlalchemy import exc
 
-from settings import CHARSET_DIR, DICTIONARY_DIR, MASKS_DIR, ROOT_DIR
+from settings import CHARSET_DIR, DICTIONARY_DIR, MASKS_DIR
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.maskGenerator.src.MaskGenerator import MaskGenerator
-from src.api.fitcrack.endpoints.markov.responseModels import hcStatsCollection_model
-from src.api.fitcrack.endpoints.masks.argumentsParser import updateMask_parser
-from src.api.fitcrack.endpoints.masks.responseModels import maskSet_model
-from src.api.fitcrack.functions import fileUpload
 from src.api.fitcrack.responseModels import simpleResponse
 from src.database import db
 from src.database.models import FcMasksSet
@@ -31,43 +27,43 @@ class generateMasks(Resource):
     @api.marshal_with(simpleResponse)
     def post(self):
 
-        maskFilename = request.json.get('filename')
+        mask_filename = request.json.get('filename')
 
-        if maskFilename == '':
+        if mask_filename == '':
             abort(500, 'Filename cannot be empty.')
 
-        if os.path.isfile(MASKS_DIR + "/" + maskFilename + ".hcmask"):
+        if os.path.isfile(MASKS_DIR + "/" + mask_filename + ".hcmask"):
             abort(500, 'File with this name already exists.')
 
-        maskGenerator = MaskGenerator()
-        message = maskGenerator.generateMaskFile(request.json, MASKS_DIR, DICTIONARY_DIR, CHARSET_DIR)
+        mask_generator = MaskGenerator()
+        message = mask_generator.generateMaskFile(request.json, MASKS_DIR, DICTIONARY_DIR, CHARSET_DIR)
 
         if message == "Success":
 
-            maskFilename = request.json.get('filename') + '.hcmask'
-            maskSet = FcMasksSet(name=maskFilename, path=maskFilename)
+            mask_filename = request.json.get('filename') + '.hcmask'
+            mask_set = FcMasksSet(name=mask_filename, path=mask_filename)
             try:
-                db.session.add(maskSet)
+                db.session.add(mask_set)
                 db.session.commit()
-            except exc.IntegrityError as e:
+            except exc.IntegrityError:
                 db.session().rollback()
-                abort(500, 'Masks set with name ' + maskFilename + ' already exists.')
+                abort(500, 'Masks set with name ' + mask_filename + ' already exists.')
 
-            charsets = maskGenerator.getCustomCharsetList()
+            charsets = mask_generator.getCustomCharsetList()
 
-            for key in charsets:
-                charsetFilename = request.json.get('filename') + "_" + key + ".hcchr"
-                size = os.path.getsize(os.path.join(CHARSET_DIR, charsetFilename))
-                charset = FcCharset(name=request.json.get('filename') + "_" + key, path=charsetFilename, keyspace=size)
+            for charset_number in charsets:
+                charset_filename = request.json.get('filename') + "_" + charset_number + ".hcchr"
+                size = os.path.getsize(os.path.join(CHARSET_DIR, charset_filename))
+                charset = FcCharset(name=request.json.get('filename') + "_" + charset_number, path=charset_filename, keyspace=size)
                 try:
                     db.session.add(charset)
                     db.session.commit()
-                except exc.IntegrityError as e:
+                except exc.IntegrityError:
                     db.session().rollback()
-                    abort(500, 'Charset with name ' + charsetFilename + ' already exists.')
+                    abort(500, 'Charset with name ' + charset_filename + ' already exists.')
 
             return {
-                'message': "Successfully created mask file " + maskFilename,
+                'message': "Successfully created mask file " + mask_filename,
                 'status': True
             }
         else:

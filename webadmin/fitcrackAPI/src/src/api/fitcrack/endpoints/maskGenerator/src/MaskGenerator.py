@@ -1,3 +1,10 @@
+'''
+About: Main MaskGenerator class handling parsing options,
+       checking patterns, instantiating other classes,
+       and saving generated masks and charsets in files.
+Author: Samuel Hribik
+'''
+
 from src.api.fitcrack.endpoints.maskGenerator.src.functions import *
 from src.api.fitcrack.endpoints.maskGenerator.src.PasswordAnalyzer import PasswordAnalyzer
 from src.api.fitcrack.endpoints.maskGenerator.src.IterationGenerator import IterationGenerator
@@ -44,15 +51,16 @@ class Options():
         self.useHex = options.get('useHex')
 
 class MaskGenerator():
-
+    '''Main class handling mask generaion process logic.'''
     def __init__(self) -> None:
         self.message = "Success"
-        self.charsets = {}
+        self.charsets = []
 
     def getCustomCharsetList(self):
+        '''Return list of used custom character sets.'''
         return self.charsets
 
-    def generateMaskFile(self, arg_options, masksPath, wordlistsPath, charsetsPath):
+    def generateMaskFile(self, arg_options, masks_path, wordlists_path, charsets_path):
         '''Check patterns and dictionaries, and either call analyzer or generator to get masks.'''
         options = Options(arg_options)
         
@@ -76,7 +84,7 @@ class MaskGenerator():
                 
         if options.wordlists:
             analyzer = PasswordAnalyzer()
-            masks = analyzer.analyze(options, wordlistsPath)
+            masks = analyzer.analyze(options, wordlists_path)
 
         else:
             generator = IterationGenerator()
@@ -85,26 +93,18 @@ class MaskGenerator():
         sorter = MaskSorter(options.sorting, masks)
         sorter.sort_masks(options)
 
-        sorter.save_masks_to_file(options, masksPath)
+        sorter.save_masks_to_file(options, masks_path)
 
-        self.charsets = {}
-        if options.charset1:
-            self.charsets['charset1'] = options.charset1
-        if options.charset2:
-            self.charsets['charset2'] = options.charset2
-        if options.charset3:
-            self.charsets['charset3'] = options.charset3
-        if options.charset4:
-            self.charsets['charset4'] = options.charset4
-
-        for key in self.charsets:
-            try:
-                file = open(charsetsPath + "/" + options.filename + "_" + key + ".hcchr", "w", encoding="utf-8")
-                file.write(self.charsets[key])
-                file.close()
-            except:
-                return charsetsPath + "/" + options.filename + "_" + key + ".hcchr"
-                
+        for i in range(1,5):
+            charset = getattr(options, f"charset{i}")
+            if charset:
+                try:
+                    self.charsets.append(f"charset{i}")
+                    file = open(charsets_path + "/" + options.filename + "_" + f"charset{i}" + ".hcchr", "w", encoding="utf-8")
+                    file.write(charset)
+                    file.close()
+                except OSError:
+                    return charsets_path + "/" + options.filename + "_" + f"charset{i}" + ".hcchr"
 
         return self.message
     

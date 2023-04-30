@@ -1,3 +1,9 @@
+'''
+About: Class responsible for sorting generated masks
+       using the selected sorting method.
+Author: Samuel Hribik
+'''
+
 import string
 
 from src.api.fitcrack.endpoints.maskGenerator.src.functions import *
@@ -5,7 +11,7 @@ from src.api.fitcrack.endpoints.maskGenerator.src.functions import *
 class MaskSorter:
     '''
     Depending on the given sorting mode, sorts masks by their complexity, occurrence,
-    or their respective ratio in an optimal sorting
+    or their respective ratio in an optimal sorting.
     '''
     def __init__(self, sorting_mode, input_masks):
         self.sorting_mode = sorting_mode
@@ -14,7 +20,7 @@ class MaskSorter:
         self.sorted_masks = []
 
     def add_complexity(self, arg_options):
-        '''Iterate through input masks and evaluate its complexity'''
+        '''Iterate through input masks and evaluate its complexity.'''
         for mask, occurrence in self.input_masks.items():
             complexity = 1
             for charset in mask.split('?'):
@@ -41,16 +47,16 @@ class MaskSorter:
 
             self.mask_complexity.update({mask:{"Occurrence":occurrence,
                                         "Complexity":complexity, "Optimal":complexity//occurrence}})
-    
+
     def sort_masks(self, input_options):
-        '''Create sorted dictionary'''
-        
+        '''Create sorted dictionary.'''
+
         capacity = None
         if input_options.time != 0:
             capacity = input_options.time * input_options.speed
 
         self.add_complexity(input_options)
-        
+
         if self.sorting_mode == "Occurrence":
             sorted_masks = dict(sorted(self.mask_complexity.items(),
                                  key=lambda x:x[1][self.sorting_mode], reverse=True))
@@ -60,7 +66,7 @@ class MaskSorter:
         elif self.sorting_mode == "Optimal":
             sorted_masks = dict(sorted(self.mask_complexity.items(),
                                  key=lambda x:x[1][self.sorting_mode]))
-            
+
         for mask in sorted_masks:
             if capacity is not None:
                 if capacity - self.mask_complexity[mask]["Complexity"] < 0:
@@ -69,12 +75,12 @@ class MaskSorter:
                     capacity -= self.mask_complexity[mask]["Complexity"]
 
             self.sorted_masks.append(mask)
-    
-    def save_masks_to_file(self, arg_options, masksPath):
-        '''Save sorted masks to an output file'''
-        file = open(masksPath + "/" + arg_options.filename + ".hcmask", "w", encoding="utf-8")
+
+    def save_masks_to_file(self, arg_options, masks_path):
+        '''Save sorted masks to an output file.'''
+        file = open(masks_path + "/" + arg_options.filename + ".hcmask", "w", encoding="utf-8")
 
         for mask in self.sorted_masks:
             file.write(mask+"\n")
-            
+
         file.close()
