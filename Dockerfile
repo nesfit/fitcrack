@@ -73,7 +73,7 @@ RUN apt install -yq php php-xml php-mysql php-cli php-gd
 
 # Python3 with MySQL connectors
 RUN apt install -yq python3 python3-pymysql python3-pip python3-mysqldb
-RUN pip3 install urllib3
+RUN pip3 install urllib3==1.26.15
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Apache with necessary mods
