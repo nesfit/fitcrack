@@ -6,54 +6,58 @@
 <template>
     <v-container>
         <v-sheet outlined color="grey lighten-1" rounded>
-        <v-card>
-            <v-card-title class="custom_grey">
-                Rules in a file:
-                <v-spacer></v-spacer>
-                <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
-                    hide-details></v-text-field>
+            <v-card>
+                <v-card-title class="custom_grey">
+                    Rules in a file:
+                    <v-spacer></v-spacer>
+                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                        hide-details></v-text-field>
 
-            </v-card-title>
-            <v-divider></v-divider>
-            <v-data-table :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="computedRules"
-                hide-default-header :search="search"
-                :footer-props="{ itemsPerPageOptions: [5, 10, 15, 20, 100, 200], itemsPerPageText: 'Rules per page', showFirstLastPage: true }">
-                <template v-slot:body="{ items }">
-                    <tbody>
-                        <tr v-for="item in items" :key="item.index" >
-                            <td>
-                                {{ item.index + 1 }}
-                            </td>
-                            <td class="my-0 ruleInputLine " >
-                                <v-text-field @focus="showPopup(item.index)" @blur="hidePopup(item.index)"
-                                    :ref="'rule-' + item.index" placeholder="Enter rule" autocomplete="off" hide-details
-                                    outlined dense v-model="item.rule.value"
-                                    @input="updateRules(item.rule.value, item.index)">
-                                </v-text-field>
-                                <div class="quickFunctionsMenuPopup " v-if="item.popupVisible" >
-                                    <quickFunctionsMenu :ruleIndex="item.index" :ruleLineRef="$refs['rule-' + item.index]"
-                                        v-on:show-insert-popup="showInsertPopup"
-                                        v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
-                                </div>
-                            </td>
-                            <td>
-                                <v-btn v-if="item.rule.error" icon class="disableClickEffect">
-                                    <v-icon color="primary">mdi-alert</v-icon>
-                                </v-btn>
-                            </td>
-                            <td>
-                                <v-btn icon class="px-0" color="black" @click="deleteRule(item.index)">
-                                    <v-icon color="error">
-                                        mdi-delete-outline
-                                    </v-icon>
-                                </v-btn>
-                            </td>
-                        </tr>
-                    </tbody>
-                </template>
-            </v-data-table>
-        </v-card>
-    </v-sheet>
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-data-table :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="computedRules"
+                    hide-default-header :search="search"
+                    :footer-props="{ itemsPerPageOptions: [5, 10, 15, 20, 100, 200], itemsPerPageText: 'Rules per page', showFirstLastPage: true }">
+                    <template v-slot:body="{ items }">
+                        <tbody>
+                            <tr v-for="item in items" :key="item.index">
+
+                                <td>
+                                    {{ item.index + 1 }}
+                                </td>
+                                <td class="my-0 ruleInputLine">
+                                    <transition name="toolbar-fade">
+                                        <div class="quickFunctionsMenuPopup mb-5" v-if="item.popupVisible">
+                                            <quickFunctionsMenu :ruleIndex="item.index"
+                                                :ruleLineRef="$refs['rule-' + item.index]"
+                                                v-on:show-insert-popup="showInsertPopup"
+                                                v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
+                                        </div>
+                                    </transition>
+                                    <v-text-field @focus="showPopup(item.index)" @blur="hidePopup(item.index)"
+                                        :ref="'rule-' + item.index" placeholder="Enter rule" autocomplete="off" hide-details
+                                        outlined dense v-model="item.rule.value"
+                                        @input="updateRules(item.rule.value, item.index)">
+                                    </v-text-field>
+                                </td>
+                                <td>
+                                    <v-btn v-if="item.rule.error" icon class="disableClickEffect">
+                                        <v-icon color="primary">mdi-alert</v-icon>
+                                    </v-btn>
+                                </td>
+                                <td>
+                                    <v-btn icon class="px-0" color="black" @click="deleteRule(item.index)">
+                                        <v-icon color="error">
+                                            mdi-delete-outline
+                                        </v-icon>
+                                    </v-btn>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </v-data-table>
+            </v-card>
+        </v-sheet>
     </v-container>
 </template>
   
@@ -116,14 +120,14 @@ export default {
         /**
          * Method which propagates showing insert popup to parent
          * @param {Object} popupData Data for Insert popup to be updated 
-         */        
+         */
         showInsertPopup(popupData) {
             this.$emit("show-insert-popup", popupData)
         },
         /**
          * Method which propagates showing all functions popup to parent
          * @param {Object} popupData Data for all functions popup to be updated 
-         */        
+         */
         showAllFunctionsPopup(popupData) {
             this.$emit("show-all-functions-popup", popupData)
         }
@@ -173,52 +177,42 @@ export default {
 
 
 <style>
+.quickFunctionsMenuPopup {
+    position: absolute;
+    bottom: 60%;
+    z-index: 9999;
+    max-width: 120%;
 
-.v-data-table>.v-data-table__wrapper>table>tbody>tr{
-    position: relative;
-    overflow-y: visible;
 }
 
-.v-data-table>.v-data-table__wrapper>table>tbody{
+.ruleInputLine {
+    width: 100%;
+    padding-left: 10px;
     position: relative;
-    overflow-y: visible;
-}
 
-.v-data-table>.v-data-table__wrapper>table{
-    position: relative;
-    overflow-y: visible;
-}
-
-.v-data-table>.v-data-table__wrapper{
-    position: relative;
-    overflow-y: visible;
-}
-
-.v-data-table{
-    position: relative;
-    overflow-y: visible;
 }
 
 .v-data-table>.v-data-table__wrapper>table>tbody>tr>td {
-    position: relative;
-    overflow-y: visible;
-    padding: 0px 0px 0px 5px;
+    padding: 0px 0px 0px 8px;
 }
 
-.v-data-table>.v-data-table__wrapper>table>tbody>tr>td.ruleInputLine {
-    position: relative;
-    width: 100%;
-    padding-left: 10px;
-}
-
-.quickFunctionsMenuPopup {
-    position: absolute;
-    bottom: 100%;
-    max-width: 120%;
-    padding: 0;
+.v-data-table>.v-data-table__wrapper {
+    overflow: visible;
 }
 
 .disableClickEffect {
     pointer-events: none
 }
-</style>
+
+.toolbar-fade-enter,.toolbar-fade-leave-to {
+    opacity: 0;
+    transform: translateY(1em);
+}
+
+.toolbar-fade-enter-active {
+    transition: .35s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.toolbar-fade-leave-active {
+    transition: .15s .1s ease-in;
+}</style>
