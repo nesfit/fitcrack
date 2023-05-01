@@ -297,9 +297,12 @@ class passwordsPreview(Resource):
                     break
                 rule = rule.strip()
                                 
+                passwordLength = len(password.encode('utf-8'))
+                if(passwordLength > 64): # skip password if it is too long, might crash the server
+                    continue
+                
                 # Apply the rule to the password using the C function, returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
-                passwordLength = len(password.encode('latin-1'))
-                retCode = applyRule(rule.encode('latin-1'), len(rule), password.encode('latin-1'), passwordLength, mangledPasswordBuf)
+                retCode = applyRule(rule.encode('latin-1'), len(rule), password.encode('utf-8'), passwordLength, mangledPasswordBuf)
                 
                 if(retCode == -1):
                     mangledPasswordStr = ""
