@@ -14,11 +14,11 @@
 
     <!-- Tool has 2 parts, main window for editing rules and preview of mangled passwords -->
     <v-row justify="center">
-      <mainEditWindow v-bind:rules="rules" v-bind:editingFile="editingFile" v-bind:ruleFileInfo="ruleFileInfo"
+      <mainEditWindow v-bind:rules="rules" v-bind:editingFile="editingFile" v-bind:rulesCount="rulesCount" v-bind:ruleFileInfo="ruleFileInfo"
         v-on:update-rules="updateRules" v-on:show-insert-popup="showInsertPopup"
         v-on:show-all-functions-popup="showAllFunctionsPopup"></mainEditWindow>
-      <livePreviewWindow v-bind:allPasswordsString="allPasswordsString" v-bind:mangledPasswords="mangledPasswords"
-        v-on:update-passwords="updatePasswords">
+      <livePreviewWindow v-bind:allPasswordsString="allPasswordsString" v-bind:passwordsCount="passwordsCount" v-bind:finalKeyspaceCount="finalKeyspaceCount"
+        v-bind:mangledPasswords="mangledPasswords" v-on:update-passwords="updatePasswords">
       </livePreviewWindow>
     </v-row>
   </v-container>
@@ -43,12 +43,12 @@ export default {
       rules: [{ value: "", error: false }], // array of objects for storing rules
       allPasswordsString: "p@ssW0rd\n", // string for storing all passwords concatenated
       applicatorResult: [], // array for storing result from rules applicator (response from server)
-      mangledPasswords: { 
+      mangledPasswords: {
         value: "", // string with all mangled passwords concatenated
         loading: false // boolean to mark if mangled passwords are loading from server
       },
       functionsInsertPopup: {
-        visible: false, 
+        visible: false,
         functionIndex: 0, // index of function in Json array
         ruleIndex: 0, // index of rule, to which function will be inserted
         cursorPosition: 0 // cursor position in edited rule
@@ -86,22 +86,22 @@ export default {
       this.allPasswordsString = updatedAllPasswordsString;
       this.mangledPasswords.loading = true;
       this.mangledPasswords.value = "";
-      this.generatePreview(); 
+      this.generatePreview();
     },
-        /**
-     * Method which adds a rule function to an existing specific rule 
-     * @param {String} functionToAdd Rule function created from insert popup
-     */
-     addFunction(functionToAdd) {
+    /**
+ * Method which adds a rule function to an existing specific rule 
+ * @param {String} functionToAdd Rule function created from insert popup
+ */
+    addFunction(functionToAdd) {
       //update the specific rule, add created function
       const currentRule = this.rules[this.functionsInsertPopup.ruleIndex].value;
       const cursorPosition = this.functionsInsertPopup.cursorPosition;
       const firstPart = currentRule.slice(0, cursorPosition);
       const secondPart = currentRule.slice(cursorPosition);
-      let finalRule = firstPart; 
+      let finalRule = firstPart;
 
       // check if space should be added before the inserted function
-      if(cursorPosition !== 0){
+      if (cursorPosition !== 0) {
         if (firstPart.slice(-1) !== ' ') {
           finalRule = finalRule.concat(" ");
         }
@@ -118,7 +118,7 @@ export default {
       //generate mangled passwords preview
       this.mangledPasswords.loading = true;
       this.mangledPasswords.value = "";
-      this.generatePreview(); 
+      this.generatePreview();
     },
     /**
      * Method which generates passwords preview, gets mangled passwords
@@ -239,6 +239,43 @@ export default {
       }
     }
   },
+  computed: {
+    /**
+     * Calculate the number of passwords (empty strings are not considered passwords)
+     */
+    passwordsCount() {
+      let count = 0;
+      let passwordsList = this.allPasswordsString.split("\n");
+      passwordsList.forEach(password => {
+        if (password.trim() !== "") {
+          count++;
+        }
+      })
+      return count;
+    },
+    /**
+     * Calculate the number of rules based on regex (don't count comments and empty rules)
+     */
+    rulesCount(){
+      const rules = this.rules.map(rule => rule.value);
+      const regex = /^\s*(#.*)?$/;
+      let count = 0;
+
+      rules.forEach(rule => {
+        if(rule.trim() !== ""){
+          count++;
+        }
+      })
+
+      return count;
+    },
+    /**
+     * Calculate the number of keyspace (rules * passwords)
+     */
+    finalKeyspaceCount(){
+      return this.rulesCount * this.passwordsCount;
+    }
+  },
   mounted() {
     if (this.$route.params.id) { // when there is id parameter in route url, load the existing rule file
       this.mangledPasswords.loading = true;
@@ -246,7 +283,7 @@ export default {
     }
     /* call generatePreview 2 seconds after rule change or password change
        because of application performance, prevents too many requests) */
-    this.generatePreview = debounce(this.generatePreview, 1500); 
+    this.generatePreview = debounce(this.generatePreview, 1500);
   },
   beforeMount() {
     window.addEventListener('beforeunload', this.navigateFromPage); // event listener for navigating off page (reload button)
@@ -254,7 +291,7 @@ export default {
   beforeDestroy() {
     window.removeEventListener('beforeunload', this.navigateFromPage);
   },
-  destroyed() { 
+  destroyed() {
     this.generatePreview.cancel() // cancel the debounce method
   },
   /**

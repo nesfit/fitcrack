@@ -6,7 +6,7 @@
 <template>
     <v-container>
         <v-sheet outlined color="grey lighten-1" rounded>
-        <v-card class="overflow-visible">
+        <v-card>
             <v-card-title class="custom_grey">
                 Rules in a file:
                 <v-spacer></v-spacer>
@@ -15,23 +15,23 @@
 
             </v-card-title>
             <v-divider></v-divider>
-            <v-data-table class="overflow-visible" :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="computedRules"
+            <v-data-table :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="computedRules"
                 hide-default-header :search="search"
                 :footer-props="{ itemsPerPageOptions: [5, 10, 15, 20, 100, 200], itemsPerPageText: 'Rules per page', showFirstLastPage: true }">
-                <template v-slot:body="{ items }" class="overflow-visible">
-                    <tbody class="overflow-visible">
-                        <tr v-for="item in items" :key="item.index" class="overflow-visible" >
-                            <td class="overflow-visible">
+                <template v-slot:body="{ items }">
+                    <tbody>
+                        <tr v-for="item in items" :key="item.index" >
+                            <td>
                                 {{ item.index + 1 }}
                             </td>
-                            <td class="my-0 ruleInputLine overflow-visible" >
-                                <v-text-field @focus="showPopup(item.index)" @blur="hidePopup(item.index)" class="overflow-visible"
+                            <td class="my-0 ruleInputLine " >
+                                <v-text-field @focus="showPopup(item.index)" @blur="hidePopup(item.index)"
                                     :ref="'rule-' + item.index" placeholder="Enter rule" autocomplete="off" hide-details
                                     outlined dense v-model="item.rule.value"
                                     @input="updateRules(item.rule.value, item.index)">
                                 </v-text-field>
-                                <div class="quickFunctionsMenuPopup overflow-visible" v-if="item.popupVisible" >
-                                    <quickFunctionsMenu class="overflow-visible" :ruleIndex="item.index" :ruleLineRef="$refs['rule-' + item.index]"
+                                <div class="quickFunctionsMenuPopup " v-if="item.popupVisible" >
+                                    <quickFunctionsMenu :ruleIndex="item.index" :ruleLineRef="$refs['rule-' + item.index]"
                                         v-on:show-insert-popup="showInsertPopup"
                                         v-on:show-all-functions-popup="showAllFunctionsPopup"></quickFunctionsMenu>
                                 </div>
@@ -173,11 +173,35 @@ export default {
 
 
 <style>
-tr {
-    padding: 5px;
+
+.v-data-table>.v-data-table__wrapper>table>tbody>tr{
+    position: relative;
+    overflow-y: visible;
+}
+
+.v-data-table>.v-data-table__wrapper>table>tbody{
+    position: relative;
+    overflow-y: visible;
+}
+
+.v-data-table>.v-data-table__wrapper>table{
+    position: relative;
+    overflow-y: visible;
+}
+
+.v-data-table>.v-data-table__wrapper{
+    position: relative;
+    overflow-y: visible;
+}
+
+.v-data-table{
+    position: relative;
+    overflow-y: visible;
 }
 
 .v-data-table>.v-data-table__wrapper>table>tbody>tr>td {
+    position: relative;
+    overflow-y: visible;
     padding: 0px 0px 0px 5px;
 }
 

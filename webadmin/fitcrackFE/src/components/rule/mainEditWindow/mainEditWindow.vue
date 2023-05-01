@@ -68,8 +68,8 @@
                         </ruleFileContent>
                     </v-row>
                     <v-row>
-                        <v-col align="right">
-                            Lines count: {{ ruleCount }}
+                        <v-col align="right" class="pr-4">
+                            Rules count: <b>{{ rulesCount }}</b>
                         </v-col>
 
                     </v-row>
@@ -98,7 +98,8 @@ import appendRulePopup from '@/components/rule/mainEditWindow/popups/appendRuleP
 export default {
     props: {
         rules: Array, // array of rules {value, error}
-        editingFile: Boolean, // boolean indicating if the rule file is being created or edited
+        rulesCount: Number,
+        editingFile: Boolean,
         ruleFileInfo: Object // information about rule file got from server
     },
     data() {
@@ -180,7 +181,7 @@ export default {
                 },
             }
             // when creating rule file, send POST request
-            if (!this.editingFile) {
+            if (!this.toolData.editingFile) {
                 // upload the file to server
                 this.axios.post(this.$serverAddr + "/rule", formData, config).then((response) => {
                     this.file = null
@@ -200,14 +201,6 @@ export default {
                 });
             }
 
-        }
-    },
-    computed: {
-        /**
-         * Computed property which counts the current number of rules
-         */
-        ruleCount() {
-            return this.rules.length;
         }
     },
     components: {

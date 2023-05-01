@@ -34,23 +34,35 @@
                     </v-row>
                     <v-row>
                         <v-col class="pb-0">
-                            <v-sheet outlined color="grey lighten-1" rounded>
-                                <v-textarea solo hide-details class="textArea" label="Type or append passwords"
-                                    :value="allPasswordsString" @input="updatePasswords"></v-textarea>
-                            </v-sheet>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-btn class="py-0" color="red accent-2 black--text" small 
+                            <v-btn  color="red accent-2 black--text" small 
                                 @click="updatePasswords('')">
-                                <v-icon>
+                                <v-icon left>
                                     mdi-delete
                                 </v-icon>
                                 Reset passwords
                             </v-btn>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col class="pb-0">
+                            <v-sheet outlined color="grey lighten-1" rounded>
+                                <v-textarea solo hide-details class="textArea" label="Type or append passwords"
+                                    :value="allPasswordsString" @input="updatePasswords"></v-textarea>
+                            </v-sheet>
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-col class="pb-0 pl-4">
+                            Passwords count: <b>{{ passwordsCount }}</b>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="pb-0 pl-4">
+                            Approximate final keyspace: <b>{{ finalKeyspaceCount }}</b>
+                        </v-col>
+                    </v-row>
+                
                     <v-row>
                         <v-col>
                             <v-alert tile color="orange" text class="mb-0">
@@ -102,12 +114,14 @@ export default {
             type: Object,
             default: () => ({ value: "", loading: false })
         },
-        allPasswordsString: String // string for storing all passwords concatenated
+        allPasswordsString: String, // string for storing all passwords concatenated
+        passwordsCount: Number,
+        finalKeyspaceCount: Number
     },
     data() {
         return {
             appendDictPopup: false, // true if append dictionary popup should be shown, false if hidden
-            max_mangled_passwords: 5000 // TODO
+            max_mangled_passwords: 5000, // TODO
         }
     },
     methods: {
