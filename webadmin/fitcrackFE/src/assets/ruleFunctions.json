@@ -400,7 +400,9 @@
                 "type": "int"
             }
         ],
-        "example": "<G"
+        "example": "<3",
+        "input": "p@ssW0rd",
+        "output": ""
     },
     {
         "name": "Reject greater",
@@ -412,19 +414,9 @@
                 "type": "int"
             }
         ],
-        "example": ">8"
-    },
-    {
-        "name": "Reject equal",
-        "sign": "_N",
-        "description": "Reject plains of length not equal to N",
-        "operands": [
-            {
-                "specification": "Length",
-                "type": "int"
-            }
-        ],
-        "example": "_7"
+        "example": ">7",
+        "input": "p@ssW0rd",
+        "output": "p@ssW0rd"
     },
     {
         "name": "Reject contain",
@@ -436,7 +428,9 @@
                 "type": "char"
             }
         ],
-        "example": "!z"
+        "example": "!y",
+        "input": "p@ssW0rd",
+        "output": "p@ssW0rd"
     },
     {
         "name": "Reject not contain",
@@ -448,7 +442,9 @@
                 "type": "char"
             }
         ],
-        "example": "/e"
+        "example": "/y",
+        "input": "p@ssW0rd",
+        "output": ""
     },
     {
         "name": "Reject equal first",
@@ -460,7 +456,9 @@
                 "type": "char"
             }
         ],
-        "example": "(h"
+        "example": "(p",
+        "input": "p@ssW0rd",
+        "output": "p@ssW0rd"
     },
     {
         "name": "Reject equal last",
@@ -472,7 +470,9 @@
                 "type": "char"
             }
         ],
-        "example": ")t"
+        "example": ")t",
+        "input": "p@ssW0rd",
+        "output": ""
     },
     {
         "name": "Reject equal at",
@@ -488,7 +488,9 @@
                 "type": "char"
             }
         ],
-        "example": "=1a"
+        "example": "=50",
+        "input": "p@ssW0rd",
+        "output": "p@ssW0rd"
     },
     {
         "name": "Reject contains",
@@ -504,14 +506,19 @@
                 "type": "char"
             }
         ],
-        "example": "%2a"
+        "example": "%2M",
+        "input": "p@ssW0rd",
+        "output": ""
+        
     },
     {
-        "name": "Reject contains",
+        "name": "Reject contains memory",
         "sign": "Q",
         "description": "Reject plains where the memory saved matches current word",
         "operands": [],
-        "example": "rMrQ"
+        "example": "rMrQ",
+        "input": "p@ssW0rd",
+        "output": "p@ssW0rd"
     },
     {
         "name": "Swap front",
