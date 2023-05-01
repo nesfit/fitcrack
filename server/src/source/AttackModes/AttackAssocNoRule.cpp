@@ -225,7 +225,7 @@ bool CAttackAssocNoRule::makeWorkunit()
         hashesFile.close();
 
 
-      } else /* if (m_job->getDistributionMode() == FragmentOnHosts || == FragmentByRules)*/ {
+      } else /* if (m_job->getDistributionMode() == FragmentOnHosts)*/ {
         Tools::printDebugHost(
           Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
           "One complete dictionary\n");
@@ -336,9 +336,9 @@ bool CAttackAssocNoRule::makeWorkunit()
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
-            m_job->getDistributionMode() == 0 ? Config::inTemplatePathAssocDictSplit :
-            m_job->getDistributionMode() == 1 ? Config::inTemplatePathAssocDictAlt :
-            /*m_job->getDistributionMode()==2*/ Config::inTemplatePathAssocRuleSplit,
+            m_job->getDistributionMode() == 0 ? Config::inTemplatePathAssocNoRule :
+            /*m_job->getDistributionMode()==1*/ Config::inTemplatePathAssocNoRuleAlt,
+            /*m_job->getDistributionMode()==2*/ // ERROR
             path,
             config.project_path(path),
             infiles,
