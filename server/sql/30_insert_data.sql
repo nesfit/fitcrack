@@ -3,7 +3,7 @@
 --
 
 INSERT INTO `fc_settings` (`default_seconds_per_workunit`, `workunit_timeout_factor`, `hwmon_temp_abort`, `bench_all`, `distribution_coefficient_alpha`, `t_pmin`, `ramp_up_workunits`, `ramp_down_coefficient`, `verify_hash_format`, `auto_add_hosts_to_running_jobs`, `max_mangled_passwords`) VALUES
-(3600, 48, 90, 0, 0.1, 20, 0, 0.25, 1, 0, 5000);
+(3600, 48, 90, 0, 0.1, 20, 0, 0.25, 1, 0, 50000);
 
 
 --
