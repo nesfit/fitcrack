@@ -39,16 +39,14 @@ export default {
          * Method which assigns required data of Insert popup when specific function in a Quick menu is clicked
          * @param {Number} functionIndex Index of the rule function
          */
-        async showInsertPopup(functionIndex) {
+        showInsertPopup(functionIndex) {
 
             const data = {
                 functionIndex: functionIndex,
                 ruleIndex: this.ruleIndex,
                 cursorPosition: this.cursorPosition
             }
-
-            await this.$emit("show-insert-popup", data) // propagate into parent
-            this.ruleLineRef.focus()
+            this.$emit("show-insert-popup", data) // propagate into parent
         },
         /**
          * Method which assigns required data of All functions popup when 'Add other function' button in a Quick menu is clicked
