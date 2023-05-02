@@ -59,15 +59,15 @@ class pcfg(Resource):
 
         pcfg = FcPcfg.query.filter(FcPcfg.id == id).first()
         if not pcfg:
-            abort(404, 'Can\'t find PCFG grammar')
+            abort(404, 'Can\'t find PCFG grammar record in DB')
         path = os.path.join(PCFG_DIR, pcfg.path)
         is_dir = os.path.isdir(path)
-        if not is_dir:
-            return send_file(path, attachment_filename=pcfg.path, as_attachment=True)
-        else:
+        if is_dir:
             makeshift_zip = '/tmp/pcfg/' + pcfg.path
             shutil.make_archive(makeshift_zip, 'zip', path)
             return send_file(makeshift_zip + '.zip', attachment_filename=pcfg.path + '.zip', as_attachment=True)
+        else:
+            abort(404, 'Can\'t find PCFG grammar directory')
 
     @api.marshal_with(simpleResponse)
     def delete(self, id):
@@ -162,7 +162,7 @@ class pcfgAdd(Resource):
             unzipGrammarToPcfgFolder(uploadedFile['filename'])
             pcfg_keyspace = calculateKeyspace(uploadedFile['filename'])
             pcfg = FcPcfg(
-                name=extractNameFromZipfile(uploadedFile['filename']), path=uploadedFile['path'], keyspace=int(pcfg_keyspace))
+                name=extractNameFromZipfile(uploadedFile['filename']), path=extractNameFromZipfile(uploadedFile['path']), keyspace=int(pcfg_keyspace))
 
             try:
                 db.session.add(pcfg)
@@ -196,6 +196,9 @@ class pcfgMakeFromDictionary(Resource):
         dict = FcDictionary.query.filter(FcDictionary.id == args['dictionary_id']).first()
         if not dict:
             abort(500, 'Can not find selected dictionary.')
+
+        if os.path.exists(PCFG_DIR + '/' + extractNameFromZipfile(dict.name)):
+            abort(500, 'PCFG with the same as dictionary already exists.')
 
         makePcfgFolder(dict.name)
         moveGrammarToPcfgDir(dict.name)

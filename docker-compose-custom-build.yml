@@ -1,0 +1,101 @@
+version: '3'
+services:
+    fitcrack_server:
+      # Perform a custom build of Fitcrack server from source
+      image: fitcrack_server
+      
+      hostname: fitcrack
+
+      # Configuration of the build context
+      build:
+        context: .
+        dockerfile: Dockerfile
+        args:
+           - COMPILER_THREADS=1  # Higher values may cause linker race conditions
+
+      command: ./entrypoint-fitcrack.sh
+      restart: always
+      ports:
+          - ${BACKEND_PORT}:${BACKEND_PORT}         # Mapping of WebAdmin backend
+          - ${FRONTEND_PORT}:${FRONTEND_PORT}       # Mapping of WebAdmin frontend
+          #- ${BOINC_PORT}:${BOINC_PORT} # BOINC port (uncomment if different from webadmin)
+      environment:
+        - USER=root                      # root should be used for installation
+
+        # MySQL database environment variables
+        - DB_HOST=${FITCRACK_DB_HOST}    # Database hostname
+        - DB_NAME=${FITCRACK_DB_NAME}    # Database name
+        - DB_USER=${FITCRACK_DB_USER}    # Database username
+        - DB_PW=${FITCRACK_DB_PW}        # Database password
+
+        # Fitcrack WebAdmin environment variables
+        - WEBADMIN_HOST=${WEBADMIN_HOST}    # WebAdmin hostname
+        - WEBADMIN_PROTO=${WEBADMIN_PROTO}  # WebAdmin protocol ('http' or 'https')
+        - BACKEND_PORT=${BACKEND_PORT}      # WebAdmin backend port
+        - FRONTEND_PORT=${FRONTEND_PORT}    # WebAdmin frontend port
+        - SSL_WEBADMIN=${SSL_WEBADMIN}      # SSL engine state for WebAdmin ('y' or 'n')
+        - WEBADMIN_USER=${WEBADMIN_LOGIN}   # Login for the default WebAdmin account
+        - WEBADMIN_EMAIL=${WEBADMIN_EMAIL}  # Email for the default WebAdmin account
+        - WEBADMIN_PW=${WEBADMIN_PW}        # Password for dthe efault WebAdmin account
+
+        - DYNAMIC_BACKEND_URL=${DYNAMIC_BACKEND_URL}
+
+        # BOINC server environment variables
+        - BOINC_HOST=${BOINC_HOST}          # BOINC server hostname
+        - BOINC_PROTO=${BOINC_PROTO}        # WebAdmin protocol ('http' or 'https')
+        - BOINC_PORT=${BOINC_PORT}          # BOINC public port - needed to set up URLs
+        - SSL_BOINC=${SSL_BOINC}            # SSL engine state for BOINC ('y' or 'n')
+        - BOINC_URL=${BOINC_PROTO}://${BOINC_HOST}:${BOINC_PORT}
+        - BOINC_USER=boincadm               # User that runs the BOINC server
+        - BOINC_GROUP=boincadm              # User group that runs the BOINC server
+        - BOINC_HOME=/home/boincadm         # Home directory of the BOINC server user
+        - BOINC_PROJECT=fitcrack            # Name of the BOINC project
+        - BOINC_PROJECT_DIR=/home/boincadm/projects/fitcrack
+        - OPS_LOGIN=${WEBADMIN_LOGIN}       # Login for http(s):/HOST/fitcrack_ops
+        - OPS_PW=${WEBADMIN_PW}             # Password for http(s):/HOST/fitcrack_ops
+        - SERVICE_INSTALL=y                 # Install Fitcrack as a service (needed)
+        - PROJECT_HTTPD_CONF=/home/boincadm/projects/fitcrack/fitcrack.httpd.conf
+
+        # SSL certificate file names (used if SSL_WEBADMIN='y' or SSL_BOINC='y')
+        - SSL_CERTIFICATE_FILE=${SSL_CERTIFICATE_FILE}
+        - SSL_CERTIFICATE_KEYFILE=${SSL_CERTIFICATE_KEYFILE}
+
+        # Apache web server environment variables
+        - APACHE_USER=www-data                            # Apache web server user
+        - APACHE_CONFIG_DIR=/etc/apache2                  # Apache configuration directory
+        - APACHE_CONFIG_FILE=/etc/apache2/apache2.conf    # Apache main config file
+        - APACHE_DOCUMENT_ROOT=/var/www/html              # Apache document root
+        - APACHE_SERVICE=apache2                          # Apach servic name
+        - PYTHONUNBUFFERED=1                              # Backend python buffering
+      volumes:
+        # Data that will be preserved when the Docker container is restarted
+        # When preserved, the entrypoint will attempt to load existing Fitcrack installation
+        # When deleted, the entrypoint installs a new Fitcrack project
+
+        - "mysql:/var/lib/mysql"                           # MySQL server data directory
+        - "collections:/usr/share/collections"             # Collections of dictionaries, masks, etc.
+        - "boincadm:/home/boincadm"                        # BOINC server user home directory
+        - "apache:/etc/apache2"                            # Apache config directory
+        - "apache-conf:/etc/init.d"                        # Directory with service init scripts
+        - "webadmin-be:/var/www/html/fitcrackAPI"          # Fitcrack backend installation
+        - "webadmin-fe:/var/www/html/fitcrackFE"           # Fitcrack frontend installation
+        - "./fitcrack-data/logs:/var/log/fitcrack"         # Log directory (host-mapped!)
+        - "./fitcrack-data/certificates:/srv/certificates" # Certificate directory (host-mapped!)
+
+        # NOTE: WebAdmin backend copy, frontend Node.JS build, and server + runner binaries are
+        #       built using Dockerfile when the image is created. The entrypoint started with
+        #       'docker-compose up' only installs the Fitcrack server from pre-built binaries.
+        #       Modifying the sources when a pre-built image is used will have no effect.
+        #       In case you modify the implementation, you need to rebuild the image first:
+        #       using 'docker-compose build' or 'docker-compose build --no-cache'.
+
+volumes:
+  mysql:
+  boincadm:
+  collections:
+  apache:
+  apache-conf:
+  webadmin-be:
+  webadmin-fe:
+  logs:
+  certificates:

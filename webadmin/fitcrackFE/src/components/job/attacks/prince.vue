@@ -139,8 +139,9 @@
 
     <v-divider />
     <v-checkbox
+      v-if="!$optimizedOnly"
        v-model="optimized"
-       label="Use optimized computing kernels (limits password length)"
+       label="Use optimized computing kernels (limits password length, disable for passwords over 256 chars long)"
     />
 
   </div>
@@ -162,7 +163,8 @@
     props: ['keyspace'],
     watch: {
       keyspace (val) {
-        this.keyspaceLimit = val
+        if (val)
+          this.keyspaceLimit = val
       }
     },
     computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'checkDuplicates',

@@ -1,3 +1,8 @@
+# RELEASE 2.4.0 IS HERE!
+After two years and six months, a new stable release is finally here! See the [Changelog](CHANGELOG.md) for details.
+
+**The installation has never been easier:** Fitcrack is now available as a pre-built Docker image on Docker Hub. See [Docker install README](INSTALL-Docker.md) for details.
+
 # Fitcrack (Distributed password cracking system)
 
 Fitcrack is a [BOINC](https://boinc.berkeley.edu)-based [hashcat](https://hashcat.net/)-powered distributed password cracking system.
@@ -9,6 +14,8 @@ For controlling your cracking network and management of jobs, you can use our fr
 [WebAdmin](https://nesfit.github.io/fitcrack/#/) interface, or communicate directly with our REST API.
 
 A detailed documentation and other information can be found at [https://fitcrack.fit.vutbr.cz](https://fitcrack.fit.vutbr.cz).
+
+Any issue or feature request? Join Fitcrack community [on Discord](https://discord.gg/DJjwetJ8Td).
 
 **Table of Contents**
 * [Installation](#inst)
@@ -31,7 +38,8 @@ support for SSL/TLS which is now super-easy to configure.
 Nevertheless, you can still use the installer or manual install if you want.
 
 See instructions the desired type of deployment:
-* [Installation using Docker](INSTALL-Docker.md) (recommended, easy)
+* [Installation using a pre-built image from Docker Hub](INSTALL-Docker.md) (recommended, easy)
+* [Installation using a custom Docker build](INSTALL-Docker-Custom.md) (make your own build of Fitcrack)
 * [Installation using Installer](INSTALL-Installer.md) (working alternative)
 * [Manual installation](INSTALL-Manual.md) (for advanced users/modders)
 
@@ -99,3 +107,6 @@ The cracking session will be forced and all warnings ignored.
 ### Debugging
 For debugging **Docker-based** Fitcrack deployments, see [this page](INSTALL-Docker.md#debugging).
 For deployments with **Installer** (or manual installations), see [this page](INSTALL-Installer.md#debugging).
+
+### Changelog
+Visit [CHANGELOG](CHANGELOG.md) to see changes between different versions of Fitcrack

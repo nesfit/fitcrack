@@ -52,6 +52,8 @@ const UserPlugin = {
     Vue.prototype.$needLogin = true
 
     Vue.prototype.$serverAddr = window.serverAddress
+    Vue.prototype.$docsLink = window.docsLink
+    Vue.prototype.$optimizedOnly = window.optimizedKernelsOnly
 
     Vue.prototype.$user = function () {
       return this.user
