@@ -181,7 +181,7 @@ export default {
                 },
             }
             // when creating rule file, send POST request
-            if (!this.toolData.editingFile) {
+            if (!this.editingFile) {
                 // upload the file to server
                 this.axios.post(this.$serverAddr + "/rule", formData, config).then((response) => {
                     this.file = null
