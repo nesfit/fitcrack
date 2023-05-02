@@ -114,8 +114,13 @@ class markovMakeFromDictionary(Resource):
         dict = FcDictionary.query.filter(FcDictionary.id == args['dictionary_id']).first()
         if not dict:
             abort(500, 'Can not find selected dictionary.')
+        
         filename = secure_filename(extractNameFromZipfile(dict.name))
         path = os.path.join(HCSTATS_DIR, filename) + '.hcstat2'
+
+        # Check whether the Markov with the same name already exists
+        if os.path.exists(path):
+            abort(500, 'HcStats with name ' + filename + ' already exists.')
 
         # make hcstat2 file
         shellExec(

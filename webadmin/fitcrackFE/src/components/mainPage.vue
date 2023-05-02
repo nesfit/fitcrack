@@ -452,6 +452,16 @@
           </v-card-actions>
         </v-card>
       </v-menu>
+      <v-btn
+        large
+        rounded
+        icon
+        color="accent"
+        :href="$docsLink"
+        target="_blank"
+      >
+        <v-icon>mdi-help-box</v-icon>
+      </v-btn>
     </v-app-bar>
     <!-- CONTENT -->
     <v-main class="height100 main">

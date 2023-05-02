@@ -94,7 +94,7 @@ export default {
         'max_elem_in_chain': parseInt(state.maxElemInChain),
         'generate_random_rules': parseInt(state.generateRandomRules),
          // other
-        'optimized': state.optimized,
+        'optimized': Vue.prototype.$optimizedOnly ? true : state.optimized,
       }
     },
     jobSettings (state, { attackSettings }) {

@@ -66,6 +66,38 @@
 
     <v-row>
       <v-col>
+        <v-alert
+          v-if="!helpAlreadyDismissed"
+          text
+          type="success"
+          icon="mdi-help-box"
+          dismissible
+        >
+          If you need help with creating a job, you can <a target="_blank" :href="$docsLink + '/#/jobs/creating/overview'">read the user manual here</a>.
+          <template #close="{ toggle }">
+            <v-btn
+              text
+              small
+              @click="dismissHelp(toggle)"
+            >
+              Don't show anymore
+              <v-icon right>mdi-close</v-icon>
+            </v-btn>
+          </template>
+        </v-alert>
+        <v-alert
+          v-if="helpDismissedMessage"
+          text
+          type="info"
+          dismissible
+        >
+          Sure. If you need help at any time in the future, use the link in the top right corner.
+        </v-alert>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
         <v-text-field
           v-model="name"
           outlined
@@ -185,13 +217,13 @@
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">RAR</a> and </span>
                       </template>
-                      <span>Hash types: 12500, 13000</span>
+                      <span>Hash types: 12500, 13000, 23700, 23800</span>
                     </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{ on }">
                         <span v-on="on"><a href="#" class="filetype-link">ZIP</a>.</span>
                       </template>
-                      <span>Hash types: 13600</span>
+                      <span>Hash types: 13600, 17200, 17210, 17225, 13001, 23002, 23003</span>
                     </v-tooltip>
                   </v-alert>
                   <file-uploader
@@ -525,9 +557,9 @@
             @click="submit"
           >
             <v-icon left>
-              {{ hosts.length > 0 ? 'mdi-check' : 'mdi-content-save' }}
+              {{ canCreateJob() ? 'mdi-check' : 'mdi-content-save' }}
             </v-icon>
-            {{ hosts.length > 0 ? 'Create' : 'Save for later' }}
+            {{ canCreateJob() ? 'Create' : 'Save for later' }}
           </v-btn>
         </v-row>
       </v-col>
@@ -580,6 +612,7 @@
     data: function () {
       return {
         loading: false,
+        helpDismissedMessage: false,
         hashTypes: [],
         showEstimatedTime: false,
         estimatedTime: null,
@@ -610,23 +643,28 @@
       },
       dev () {
         return localStorage.getItem('testmode') == 'true'
+      },
+      helpAlreadyDismissed () {
+        return localStorage.getItem('dismissedHelp') == 'true'
       }
     },
     watch: {
       jobSettings (val) {
+        // Reset old values as they are no longer valid
+        this.estimatedTime = null
+        this.keyspace = null
         if (val.attack_settings != false && this.validAttackSpecificSettings) {
           var boincIds = []
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
           }
-          /* -1 means no hash entered */
+          // -1 means no hash entered
           var hash_code = this.hashType == null ? -1 : this.hashType.code
-          this.axios.get(this.$serverAddr + '/job/crackingTime', {
-            params: {
-              'hash_type_code': hash_code,
-              'boinc_host_ids': boincIds.join(","),
-              'attack_settings': val.attack_settings
-            }
+          // Compute new keyspace and new estimation of cracking time
+          this.axios.post(this.$serverAddr + '/job/crackingTime', {   
+            'hash_type_code': hash_code,
+            'boinc_host_ids': boincIds.join(","),
+            'attack_settings': JSON.stringify(val.attack_settings)
           }).then((response) => {
             if (response['data']) {
               this.estimatedTime = response.data.display_time
@@ -656,6 +694,11 @@
           const settings = await this.axios.get(this.$serverAddr + '/settings').then(r => r.data)
           this.timeForJob = settings.default_seconds_per_workunit
         }
+      },
+      dismissHelp (toggleFunction) {
+        localStorage.setItem('dismissedHelp', true)
+        toggleFunction()
+        this.helpDismissedMessage = true
       },
       fetchTemplates () {
         this.axios.get(this.$serverAddr + '/template')
@@ -885,6 +928,9 @@
       },
       generateJobName () {
         this.name = this.$store.state.project + ' Job – ' + this.$moment().format('DD.MM.YYYY HH:mm')
+      },
+      canCreateJob() {
+        return this.hosts.some((host) => host.last_active.online);
       }
     }
   }

@@ -1,14 +1,9 @@
 version: '3'
 services:
     fitcrack_server:
-      image: fitcrack_server:latest
+      # Use for pre-built image from Docker Hub
+      image: hranicky/fitcrack_server:2.4.0
       hostname: fitcrack
-      build:
-        context: .
-        dockerfile: Dockerfile
-        args:
-           - COMPILER_THREADS=1  # Higher values may cause linker race conditions
-
       command: ./entrypoint-fitcrack.sh
       restart: always
       ports:
