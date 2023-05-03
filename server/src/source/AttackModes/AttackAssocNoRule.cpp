@@ -342,7 +342,7 @@ bool CAttackAssocNoRule::makeWorkunit()
             path,
             config.project_path(path),
             infiles,
-            4,
+            3,
             config
     );
 
