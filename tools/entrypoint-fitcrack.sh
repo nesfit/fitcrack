@@ -25,7 +25,7 @@ echo "╚═╝     ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚
 echo "           Distributed password cracking system             "
 echo "                  * powered by hashcat *                    "
 echo "                                                            "
-echo "       (C) 2017-2022 Fitcrack team - www.fitcrack.cz        "
+echo "       (C) 2017-2023 Fitcrack team - www.fitcrack.cz        "
 echo "============================================================"
 
 ##############################################
