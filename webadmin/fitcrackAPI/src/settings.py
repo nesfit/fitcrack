@@ -41,7 +41,7 @@ XTOHASHCAT_PATH = ROOT_DIR + '/../xtohashcat/'
 
 # Fitcrack Settings
 SECONDS_PER_JOB = 3600
-PROJECT_USER = 'boincadm'
+PROJECT_USER = 'root'
 PROJECT_NAME = 'fitcrack'
 PROJECT_DIR = '/home/' + PROJECT_USER + '/projects/' + PROJECT_NAME
 
@@ -60,8 +60,8 @@ RESTX_ERROR_404_HELP = False
 
 # SQLAlchemy settings
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://fitcrack:mysqlPASSWORD@localhost/fitcrack'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/fitcrack'
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-BOINC_SERVER_URI = 'http://127.0.0.1:80'
+BOINC_SERVER_URI = 'http://localhost'
