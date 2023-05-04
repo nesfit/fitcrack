@@ -208,6 +208,7 @@ export default {
       // get the content of the rule file
       this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id + '/download').then((response) => {
         this.editingFile = true; // mark that file is edited, not created
+        this.mangledPasswords.loading = true;
         // get the information about rule file
         this.axios.get(this.$serverAddr + '/rule/' + this.$route.params.id).then((response) => {
           this.ruleFileInfo = response.data;
@@ -278,7 +279,6 @@ export default {
   },
   mounted() {
     if (this.$route.params.id) { // when there is id parameter in route url, load the existing rule file
-      this.mangledPasswords.loading = true;
       this.loadRuleFile();
     }
     /* call generatePreview 2 seconds after rule change or password change
