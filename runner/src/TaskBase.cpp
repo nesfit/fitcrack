@@ -115,13 +115,7 @@ void TaskBase::reportProgress() {
 #pragma GCC diagnostic pop
     } while (--retries);
 
-    if (ret == 0) {
-      Logging::debugPrint(Logging::Detail::DevelDebug,
-                          " trickle daemon name :" +
-                              BoincConstants::TrickleDeamonName);
-      Logging::debugPrint(Logging::Detail::ObjectContentRevision,
-                          " generated trickle message :" + trickle_message);
-    } else {
+    if (ret != 0) {
       Logging::debugPrint(Logging::Detail::ObjectContentRevision,
                           " failed to send trickle message :" + trickle_message);
       std::string boinc_error = boincerror(ret);
