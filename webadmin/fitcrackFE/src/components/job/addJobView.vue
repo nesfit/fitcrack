@@ -655,12 +655,10 @@
           }
           /* -1 means no hash entered */
           var hash_code = this.hashType == null ? -1 : this.hashType.code
-          this.axios.get(this.$serverAddr + '/job/crackingTime', {
-            params: {
-              'hash_type_code': hash_code,
-              'boinc_host_ids': boincIds.join(","),
-              'attack_settings': val.attack_settings
-            }
+          this.axios.post(this.$serverAddr + '/job/crackingTime', {   
+            'hash_type_code': hash_code,
+            'boinc_host_ids': boincIds.join(","),
+            'attack_settings': JSON.stringify(val.attack_settings)
           }).then((response) => {
             if (response['data']) {
               this.estimatedTime = response.data.display_time
