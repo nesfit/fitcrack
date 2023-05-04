@@ -214,7 +214,7 @@
               outlined
               type="number"
               label="Maximum number of mangled passwords"
-              hint="Changing the default value (5000) to a higher number can lead to delays and performance issues when mangling passwords and checking rules. The number can not go beyond 1000000."
+              hint="Changing the default value (50000) to a higher number can lead to delays and performance issues when mangling passwords and checking rules. The number can not go beyond 1000000."
               persistent-hint
               class="my-2"
             />
