@@ -4,7 +4,7 @@ Author: Samuel Hribik
 '''
 
 def check_compatibility(mask, mask_pattern):
-    '''Compare mask with a given mask pattern.'''
+    '''Checks whether the mask is compatible with the given pattern.'''
     if len(mask) != len(mask_pattern):
         return False
     for i, letter in enumerate(mask):
@@ -28,7 +28,10 @@ def check_charsets(mask, arg_options):
 
 
 def check_custom_charsets(mask, arg_options):
-    '''Checks for undefined character sets within a mask.'''
+    '''
+    Checks for undefined character sets within a mask
+    and the number of characters from custom sets.
+    '''
     for i in range(1, 5):
         charset = getattr(arg_options, f"charset{i}")
         if charset:
