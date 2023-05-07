@@ -397,11 +397,11 @@
         <v-col cols="2" align="right">
           <b>Speed:</b>
         </v-col>
-        <v-col cols="2" align="right">
-          <input v-model="speed" type="number" min="0" size="8" step="10000">
+        <v-col cols="3" align="right">
+          <input v-model="speed" type="number" min="0" size="12" step="100">
         </v-col>
-        <v-col cols="2" align="left">
-          <b>keys/s</b>
+        <v-col cols="1" align="left">
+          <b>kH/s</b>
         </v-col>
       </v-row>
       <v-card-title class="pb-0 mb-2">
@@ -780,7 +780,7 @@
           mincharset4: this.mincharset4,
           maxcharset4: this.maxcharset4,
           time: this.timeHours * 3600 + this.timeMins * 60,
-          speed: this.speed,
+          speed: this.speed * 1000,
           minocc: this.minOcc,
           sortingMode: this.sortingMode,
           charset1: this.charset1,

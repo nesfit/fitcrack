@@ -21,7 +21,7 @@ def check_charsets(mask, arg_options):
         min_count = getattr(arg_options, f'min{charset_name}')
         max_count = getattr(arg_options, f'max{charset_name}')
         charset_count = mask.count(placeholder_char)
-        if not min_count <= charset_count + mask.count('a') and charset_count <= max_count:
+        if not (min_count <= charset_count + mask.count('a') and charset_count <= max_count):
             return False
         
     return True
