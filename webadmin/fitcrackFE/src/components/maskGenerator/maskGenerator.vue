@@ -1,3 +1,8 @@
+<!--
+   * About  : Graphical user interface for the mask generation process.
+   * Author : Samuel Hribik
+-->
+
 <template>
   <v-container class="title-width">
     <fc-tile

@@ -11,7 +11,7 @@ from src.api.fitcrack.endpoints.maskGenerator.src.IterationGenerator import Iter
 from src.api.fitcrack.endpoints.maskGenerator.src.MaskSorter import MaskSorter
 
 class Options():
-    '''Parse arguments from request.'''
+    '''Class containing the parsed arguments from request.'''
     def __init__(self, options) -> None:
         self.minlower = int(options.get('minlower'))
         self.maxlower = int(options.get('maxlower'))
@@ -63,7 +63,7 @@ class MaskGenerator():
     def generateMaskFile(self, arg_options, masks_path, wordlists_path, charsets_path):
         '''Check patterns and dictionaries, and either call analyzer or generator to get masks.'''
         options = Options(arg_options)
-        
+
         if options.patinc:
             for pattern in options.patinc:
                 if not check_charsets(pattern, options):
@@ -81,7 +81,7 @@ class MaskGenerator():
                     return "Undefined charset used in pattern: " + str(pattern)
                 if not options.minlength <= len(pattern.replace('?', '')) <= options.maxlength:
                     return "Pattern " + pattern + " incompatible with length criteria."
-                
+
         if options.wordlists:
             analyzer = PasswordAnalyzer()
             masks = analyzer.analyze(options, wordlists_path)

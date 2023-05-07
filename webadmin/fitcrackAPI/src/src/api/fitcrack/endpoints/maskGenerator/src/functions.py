@@ -23,7 +23,7 @@ def check_charsets(mask, arg_options):
         charset_count = mask.count(placeholder_char)
         if not (min_count <= charset_count + mask.count('a') and charset_count <= max_count):
             return False
-        
+
     return True
 
 
