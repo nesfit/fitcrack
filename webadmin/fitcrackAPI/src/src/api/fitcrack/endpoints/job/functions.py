@@ -57,7 +57,7 @@ def kill_job(job, db):
         masks = FcMask.query.filter(FcMask.job_id == id).all()
         for mask in masks:
             mask.current_index = 0
-    elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
+    elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)', 'association']]:
         dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
         for dictionary in dictionaries:
             dictionary.current_index = 0
