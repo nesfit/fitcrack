@@ -202,10 +202,10 @@ bool CAttackAssocNoRule::makeWorkunit()
 
         if (writtenPasswords == 0){
           // hashes for benchmark
-          hashesFile << m_job->getHashes();
+          hashesFile << m_job->getAllHashes();
         } else {
           /** Hash fragment (not optimal line skipping) */
-          std::stringstream hashes(m_job->getHashes());
+          std::stringstream hashes(m_job->getAllHashes());
           std::string buffer;
           for (uint64_t i = 0; i < m_workunit->getStartIndex(); i++){
             std::getline(hashes, buffer);
@@ -232,7 +232,7 @@ bool CAttackAssocNoRule::makeWorkunit()
 
         uint64_t startIndex = m_workunit->getStartIndex();
 
-        hashesFile << m_job->getHashes();
+        hashesFile << m_job->getAllHashes();
         hashesFile.close();
 
         /** Merge dictionaries to one. */

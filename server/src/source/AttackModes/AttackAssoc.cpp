@@ -209,15 +209,20 @@ bool CAttackAssoc::makeWorkunit()
 
         if (writtenPasswords == 0){
           // hashes for benchmark
-          hashesFile << m_job->getHashes();
+          hashesFile << m_job->getAllHashes();
         } else {
           /** Hash fragment (not optimal line skipping) */
-          std::stringstream hashes(m_job->getHashes());
+          std::stringstream hashes(m_job->getAllHashes());
           std::string buffer;
+          Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "Adding hashes to host data file starting from %" PRIu64 " index\n",
+            m_workunit->getStartIndex());
           for (uint64_t i = 0; i < m_workunit->getStartIndex(); i++){
             std::getline(hashes, buffer);
           }
-          for (uint64_t i = 0; i < writtenPasswords; i++){
+          uint64_t hashcount;
+          for (hashcount = 0; hashcount < writtenPasswords; hashcount++){
             if (!std::getline(hashes, buffer)){
               Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
                                     m_host->getBoincHostId(),
@@ -228,6 +233,10 @@ bool CAttackAssoc::makeWorkunit()
             }
             hashesFile << buffer <<'\n';
           }
+          Tools::printDebugHost(
+              Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Adding %" PRIu64 " hashes to host data file\n",
+              hashcount);
         }
         hashesFile.close();
 
@@ -239,7 +248,7 @@ bool CAttackAssoc::makeWorkunit()
 
         uint64_t startIndex = m_workunit->getStartIndex();
 
-        hashesFile << m_job->getHashes();
+        hashesFile << m_job->getAllHashes();
         hashesFile.close();
 
         /** Merge dictionaries to one. */
