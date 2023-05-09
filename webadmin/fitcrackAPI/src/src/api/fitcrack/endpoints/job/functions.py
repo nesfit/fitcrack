@@ -395,6 +395,17 @@ def computeCrackingTime(data):
 
         if int(keyspace) >= INT_MAX:
             keyspace = INT_MAX
+            
+    elif attackSettings['attack_mode'] == 10:
+        dictsKeyspace = 0
+        for dict in attackSettings['left_dictionaries']:
+            dictsKeyspace += dict['keyspace']
+        rulesKeyspace = 1
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = rules.count
+
+        keyspace = dictsKeyspace * rulesKeyspace
 
     display_time = None
     if (total_power > 0):

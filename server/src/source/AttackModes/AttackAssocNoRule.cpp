@@ -391,11 +391,11 @@ bool CAttackAssocNoRule::generateWorkunit()
             "min pass count: %" PRIu64 "\n",
             getMinPassCount());
 
-    if (passCount < getMinPassCount()) //FIXME: benchmark sets to 0, assoc requires some
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = getMinPassCount(); //FIXME: benchmark sets to 0, assoc requires some
+        passCount = getMinPassCount();
     }
 
 
@@ -405,6 +405,7 @@ bool CAttackAssocNoRule::generateWorkunit()
       Tools::printDebugHost(
           Config::DebugType::Error, m_job->getId(), m_host->getBoincHostId(),
           "Trying to fragment rules without rules\n");
+      m_sqlLoader->updateRunningJobStatus(m_job->getId(), Config::JobState::JobMalformed);
       return false;
 
 
@@ -464,9 +465,9 @@ bool CAttackAssocNoRule::generateWorkunit()
         passCount = jobHcKeyspace - currentIndex;
 
       /** Create the workunit */
-      m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
-                                      m_host->getBoincHostId(), currentIndex, 0,
-                                      passCount, 0, 0, false, 0, false);
+      m_workunit = CWorkunit::create(
+          m_job->getId(), m_host->getId(), m_host->getBoincHostId(), currentIndex,
+          0, passCount, 0, 0, false, 0, false);
       if (!m_workunit)
         return false;
       /** Update the job index */

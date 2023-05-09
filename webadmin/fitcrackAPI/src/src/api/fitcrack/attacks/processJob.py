@@ -440,6 +440,10 @@ def process_job_10(job):
         job['rules'] = rules.name
 
     job['keyspace'] = job['hc_keyspace'] * ruleFileMultiplier
+    
+    # in case of rule distribution hashcat keyspace is defined by rules
+    if job['attack_settings']['distribution_mode'] == 2:
+        job['hc_keyspace'] = ruleFileMultiplier
 
     return job
 

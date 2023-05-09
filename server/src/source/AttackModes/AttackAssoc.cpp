@@ -495,7 +495,7 @@ bool CAttackAssoc::generateWorkunit()
       return false;
 
     /** Compute password count */
-    uint64_t passCount = getPasswordCountToProcess(); // TODO: somehow calculate keyspace from rules
+    uint64_t passCount = getPasswordCountToProcess();
     Tools::printDebugHost(
             Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
             "get pass count to process: %" PRIu64 "\n",
@@ -506,11 +506,11 @@ bool CAttackAssoc::generateWorkunit()
             "min pass count: %" PRIu64 "\n",
             getMinPassCount());
 
-    if (passCount < getMinPassCount()) //FIXME: benchmark sets to 0, assoc requires some
+    if (passCount < getMinPassCount())
     {
         Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
                 "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = getMinPassCount(); //FIXME: benchmark sets to 0, assoc requires some
+        passCount = getMinPassCount();
     }
 
 
@@ -525,12 +525,16 @@ bool CAttackAssoc::generateWorkunit()
         passCount = jobHcKeyspace - currentIndex;
 
       /** Create the workunit */
-      m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
-                                      m_host->getBoincHostId(), currentIndex, 0,
-                                      passCount, 0, 0, false, 0, false);
+      m_workunit = CWorkunit::create(
+          m_job->getId(), m_host->getId(), m_host->getBoincHostId(), currentIndex,
+          0, passCount, 0, 0, false, 0, false);
       if (!m_workunit)
         return false;
       /** Update the job index */
+      Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "updated index: %" PRIu64 "\n",
+            currentIndex + passCount);
       m_job->updateIndex(currentIndex + passCount);
 
 
@@ -590,9 +594,9 @@ bool CAttackAssoc::generateWorkunit()
         passCount = jobHcKeyspace - currentIndex;
 
       /** Create the workunit */
-      m_workunit = CWorkunit::create(m_job->getId(), m_host->getId(),
-                                      m_host->getBoincHostId(), currentIndex, 0,
-                                      passCount, 0, 0, false, 0, false);
+      m_workunit = CWorkunit::create(
+          m_job->getId(), m_host->getId(), m_host->getBoincHostId(), currentIndex,
+          0, passCount, 0, 0, false, 0, false);
       if (!m_workunit)
         return false;
       /** Update the job index */
