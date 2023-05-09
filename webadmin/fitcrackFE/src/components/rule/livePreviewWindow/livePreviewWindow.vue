@@ -115,13 +115,13 @@ export default {
             default: () => ({ value: "", loading: false })
         },
         allPasswordsString: String, // string for storing all passwords concatenated
-        passwordsCount: Number,
-        finalKeyspaceCount: Number
+        passwordsCount: Number, // number of passwords specified
+        finalKeyspaceCount: Number // number of passwords, which will be generated
     },
     data() {
         return {
             appendDictPopup: false, // true if append dictionary popup should be shown, false if hidden
-            max_mangled_passwords: 5000, // TODO
+            max_mangled_passwords: 50000,
         }
     },
     methods: {

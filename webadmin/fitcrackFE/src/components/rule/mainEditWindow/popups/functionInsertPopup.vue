@@ -66,7 +66,6 @@
                             Insert
                         </v-btn>
                     </v-col>
-
                 </v-row>
             </v-container>
         </v-card>
@@ -84,7 +83,7 @@ export default {
             ruleFunctions: functionsJson, // data about each rule function
             functionOperands: [], // array for storing operands for specific rule function
             textFieldValid: true, // boolean indicating if operands text fields are valid
-            showHint: false
+            showHint: false // flag to indicate if hint about function should be shown
         }
     },
     props: {

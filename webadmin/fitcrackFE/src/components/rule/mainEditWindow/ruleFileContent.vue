@@ -12,7 +12,6 @@
                     <v-spacer></v-spacer>
                     <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
                         hide-details></v-text-field>
-
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-data-table :page="lastOrCurrentPage" :options.sync="options" :headers="headers" :items="computedRules"
@@ -21,7 +20,6 @@
                     <template v-slot:body="{ items }">
                         <tbody>
                             <tr v-for="item in items" :key="item.index">
-
                                 <td>
                                     {{ item.index + 1 }}
                                 </td>
@@ -204,7 +202,8 @@ export default {
     pointer-events: none
 }
 
-.toolbar-fade-enter,.toolbar-fade-leave-to {
+.toolbar-fade-enter,
+.toolbar-fade-leave-to {
     opacity: 0;
     transform: translateY(1em);
 }
@@ -215,4 +214,5 @@ export default {
 
 .toolbar-fade-leave-active {
     transition: .15s .1s ease-in;
-}</style>
+}
+</style>

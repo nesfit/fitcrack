@@ -40,7 +40,6 @@ export default {
          * @param {Number} functionIndex Index of the rule function
          */
         showInsertPopup(functionIndex) {
-
             const data = {
                 functionIndex: functionIndex,
                 ruleIndex: this.ruleIndex,

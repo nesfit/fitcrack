@@ -25,7 +25,6 @@
                             </v-btn>
                         </v-col>
                     </v-row>
-
                     <v-row>
                         <v-col>
                             <v-btn class="px-2 mr-3 mb-2" color="orange lighten-3 black--text"  @click="addEmptyRule">
@@ -58,9 +57,7 @@
                                     mdi-delete
                                 </v-icon>
                                 Reset rules</v-btn>
-
                         </v-col>
-
                     </v-row>
                     <v-row class="mt-0">
                         <ruleFileContent v-bind:rules="rules" v-on:update-rules="updateRules"
@@ -71,9 +68,7 @@
                         <v-col align="right" class="pr-4">
                             Rules count: <b>{{ rulesCount }}</b>
                         </v-col>
-
                     </v-row>
-
                     <v-row>
                         <v-col class="text-right">
                             <v-btn color="primary black--text" @click="saveFile()">
@@ -98,8 +93,8 @@ import appendRulePopup from '@/components/rule/mainEditWindow/popups/appendRuleP
 export default {
     props: {
         rules: Array, // array of rules {value, error}
-        rulesCount: Number,
-        editingFile: Boolean,
+        rulesCount: Number, // number of rules in a rule file
+        editingFile: Boolean, // flag to indicate if file is being created or edited
         ruleFileInfo: Object // information about rule file got from server
     },
     data() {
