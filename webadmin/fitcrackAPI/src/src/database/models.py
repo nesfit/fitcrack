@@ -689,6 +689,8 @@ class FcWorkunit(Base):
                 if rules != 0:
                     return self.start_index * rules
                 return self.start_index * rules if rules else self.start_index
+            elif self.job.attack_mode == 10 and self.job.distribution_mode == 2:
+                return self.start_index * len(self.job.hashes)
             else:
                 if self.job.rulesFile:
                     return self.start_index * self.job.rulesFile.count
