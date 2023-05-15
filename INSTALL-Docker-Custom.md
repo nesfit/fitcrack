@@ -59,7 +59,7 @@ Edit the newly-created **.env** file and configure:
 ### Starting the fitcrack_server container
 Once the `fitcrack_server` image is prepared and `.env` file configured, you can run the server container using:
 ```
-docker-compose up
+docker-compose -f docker-compose-custom-build.yml up
 ```
 
 ![Fitcrack-architecture](img/dockerstart.png)
@@ -67,7 +67,7 @@ docker-compose up
 This is fine for debugging. For serious use, you may want the container to run on background.
 This can be dome by starting the container in the detached mode:
 ```
-docker-compose up -d
+docker-compose -f docker-compose-custom-build.yml up -d
 ```
 
 For the very first run, the entrypoint will install the Fitcrack project which may take a couple of minutes.
