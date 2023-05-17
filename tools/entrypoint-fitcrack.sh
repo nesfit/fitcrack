@@ -32,6 +32,14 @@ echo "============================================================"
 # Check if project exists. If not, create it.
 if [ -d "$BOINC_PROJECT_DIR" ]; then
   echo "Project already exists."
+
+  usermod -d /var/lib/mysql/ mysql
+  # Fix MySQL socket permission
+  chmod 755 /var/run/mysql
+
+  service mysql start
+  service apache2 start
+  service fitcrack start
 else # Create Fitcrack project
 
   # Setup Fitcrack logging directory
@@ -210,7 +218,7 @@ else # Create Fitcrack project
 
   # Fix permission (if eneded)
   chown -R $BOINC_USER:$BOINC_GROUP /home/$BOINC_USER
-  chmod 775 /home/$BOINC_USER
+  chmod -R 775 /home/$BOINC_USER
   usermod -a -G $BOINC_GROUP $APACHE_USER # NOTE: Normally done at project creation - consider to do that somewhere else
   service apache2 stop
 
@@ -372,13 +380,10 @@ else # Create Fitcrack project
 
   # Restart Apache
   service apache2 restart
+  service fitcrack start
 fi
 
 #
 ##############################################
-
-service mysql start
-service apache2 start
-service fitcrack start
 
 sleep infinity
