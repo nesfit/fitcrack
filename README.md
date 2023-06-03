@@ -93,11 +93,12 @@ configure the workload profile for fine-tuning of the performance, etc.
 Simply create a file `/etc/fitcrack.conf` (Linux/macOS hosts) or
 `C:\ProgramData\BOINC\fitcrack.conf` (Windows hosts).
 If the file exists and is readable for the BOINC client user, the
-**Runner** subsystem will append the contents to **hashcat's arguments**.
+**Runner** subsystem will append the content of 'extra_hashcat_args' to
+**hashcat's arguments**.
 
 #### Example
 ```
-$ echo '-w 4 -d 1,2 --force' > /etc/fitcrack.conf
+$ echo 'extra_hashcat_args=-w 4 -d 1,2 --force' > /etc/fitcrack.conf
 ```
 Hashcat will use OpenCL devices 1 and 2. The workload profile will be set to level 4 (Nightmare).
 The cracking session will be forced and all warnings ignored.

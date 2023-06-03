@@ -14,11 +14,9 @@ void TaskComputeBase::getAllArguments() {
   
   external_generator_arguments_ = attack_->getExternalGeneratorArguments();
 
-  host_config_.read();
+  auto extraHashcatArgs = host_config_.getExtraHashcatArgs();
 
-  host_config_.print();
-
-  host_config_.parseArguments(hashcat_arguments_);
+  hashcat_arguments_.insert(hashcat_arguments_.end(), extraHashcatArgs.begin(), extraHashcatArgs.end());
 }
 
 /* Public */

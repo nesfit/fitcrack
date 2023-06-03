@@ -5,74 +5,45 @@
 
 #include "ConfigHost.hpp"
 
+#include "boinc/str_util.h"
+
 ConfigHost::ConfigHost(std::string config_path) {
-  setPath(config_path);
+  path_ = config_path;
+
+  load();
 }
 
-ConfigHost::ConfigHost(std::string& config_path) {
-  setPath(config_path);
-}
-
-std::string ConfigHost::getContent() const {
-  return content_;
-}
-
-std::string ConfigHost::getPath() const {
-  return path_;
-}
-
-void ConfigHost::parseArguments(std::vector<std::string>& arguments) {
-  std::size_t next, last = 0;
-  std::string delimeter = " ";
-  std::string *argument;
-
-  if (content_.empty()) {
-    Logging::debugPrint(Logging::Detail::Important, "File wasn't read therefore its content can't be parsed.");
-    return;
-  }
-
-  while (last != std::string::npos) {
-    next = content_.find(delimeter, last);
-    argument = new std::string();
-    *argument = content_.substr(last, next - last);
-
-    if (!argument->empty()) {
-      arguments.push_back(TOCSTRING(argument->c_str()));
-      Logging::debugPrint(Logging::Detail::ObjectManipulation, "Adding argument : '" + *argument + "'");
-    }
-
-    if (next != std::string::npos) {
-      last = next + 1;
-    } else {
-      last = next;
-    }
-  }
-}
-
-void ConfigHost::print() {
-  Logging::debugPrint(Logging::Detail::GeneralInfo, "Content of file: " + content_);
-}
-
-void ConfigHost::read() {
+void ConfigHost::load() {
   std::fstream file;
 
   if (File::exists(path_)) {
     File::openReadStream(file, path_);
 
-    File::readLine(file, content_);
-    /** Cover the case when there is just empty line in the host config */
-    if (content_ == "\n")
-    content_ = "";
-    file.close();
+    std::string line, key, value;
+    while (!File::readLine(file, line).eof()) {
+      size_t pos = line.find('=');
+      if (pos == std::string::npos) continue;
+
+      key = line.substr(0, pos);
+      value = line.substr(pos + 1);
+
+      strip_whitespace(key);
+      strip_whitespace(value);
+
+      configuration_[key] = value;
+    }
   } else {
 
-    Logging::debugPrint(Logging::Detail::Important, "File doesn't exist at " + path_);
-
+    Logging::debugPrint(Logging::Detail::Important,
+                        "Config file doesn't exist at " + path_);
   }
 }
 
-void ConfigHost::setPath(const std::string& config_path) {
-  path_ = config_path;
+std::vector<std::string> ConfigHost::getExtraHashcatArgs() {
+  auto config_item_it = configuration_.find("extra_hashcat_args");
+  if (config_item_it == configuration_.end())
+    return {};
 
-  Logging::debugPrint(Logging::Detail::ObjectManipulation, "Path set to " + path_);
+  std::string extraHashcatArgs = config_item_it->second;
+  return split(extraHashcatArgs, ' ');
 }
