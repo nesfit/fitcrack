@@ -42,6 +42,7 @@ namespace BoincConstants {
      * @param	workunit_name [in] Name of the BOINC workunit
      */
     void setProjectName(const std::string& workunit_name);
+    std::string getHostConfigPath();
 };
 
 /** Namespace representing ProjectConstants */

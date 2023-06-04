@@ -39,27 +39,15 @@ class TaskComputeBase: public TaskBase {
         void getAllArguments();
 
     public:
-
-
         /**
          * @brief   Constructor
-	 * @param   directory [in] Working directory object
-         * @param   task_config [in] Task configuration file object
-         * @param   host_config [in] Path to the host based configuration file
-         * @param   output_file [in] Name of the hashcat output file
-         * @param   workunit_name [in] Name of the BOINC project workunit
-         */
-        TaskComputeBase (Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name);
-
-        /**
-         * @brief   Constructor
-	 * @param   directory [in] Working directory object
+	     * @param   directory [in] Working directory object
          * @param   task_config [in] Task configuration file object
          * @param   host_config [in] Host configuration file object
          * @param   output_file [in] Name of the hashcat output file
          * @param   workunit_name [in] Name of the BOINC project workunit
          */
-        TaskComputeBase (Directory& directory, ConfigTask& task_config, ConfigHost& host_config, const std::string& output_file, const std::string& workunit_name);
+        TaskComputeBase (Directory& directory, ConfigTask task_config, ConfigHost host_config, const std::string& output_file, const std::string& workunit_name);
 
 	/**
 	 * @brief   Destructor freeint hashcat_arguments_ and attack_ and

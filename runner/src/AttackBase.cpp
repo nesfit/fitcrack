@@ -65,7 +65,7 @@ void AttackBase::findAndAddRequired(const std::string& key, const std::string& a
 
 /* Public */
 
-AttackBase::AttackBase(const ConfigTask& config) : output_file_(HashcatConstant::OutputFile), config_(config), success_exit_code_(HashcatConstant::Succeded) {
+AttackBase::AttackBase(const ConfigTask& config) : output_file_(HashcatConstant::OutputFile), host_config_(BoincConstants::getHostConfigPath()), config_(config), success_exit_code_(HashcatConstant::Succeded) {
   initializeArguments();
 }
 

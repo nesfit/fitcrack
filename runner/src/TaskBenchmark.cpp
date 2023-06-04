@@ -26,19 +26,8 @@ bool TaskBenchmark::parseHashcatBenchmark(std::string &output_line) {
 
 /* Public */
 
-TaskBenchmark::TaskBenchmark(Directory &directory, ConfigTask &task_config,
-                             const std::string &host_config,
-                             const std::string &output_file,
-                             const std::string &workunit_name)
-    : TaskComputeBase(directory, task_config, host_config, output_file,
-                      workunit_name),
-      salt_count_(1) {
-  mode_ = "b";
-  initializeTotalHashes();
-}
-
-TaskBenchmark::TaskBenchmark(Directory &directory, ConfigTask &task_config,
-                             ConfigHost &host_config,
+TaskBenchmark::TaskBenchmark(Directory &directory, ConfigTask task_config,
+                             ConfigHost host_config,
                              const std::string &output_file,
                              const std::string &workunit_name)
     : TaskComputeBase(directory, task_config, host_config, output_file,

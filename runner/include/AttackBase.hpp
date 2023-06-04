@@ -36,8 +36,9 @@ class AttackBase {
         std::string output_file_;		/**< Name/path to hashcat result file */
 
         std::vector<std::string> arguments_;		/**< Hashcat arguments based on the config */
+        ConfigHost host_config_;                /**< Representer of host configuration file */
 
-        const ConfigTask& config_;              /**< Representer of configuration file */
+        const ConfigTask& config_;              /**< Representer of task configuration file */
 
         const unsigned long long success_exit_code_; /**< Expected hashcat exit code on successful execution */
 

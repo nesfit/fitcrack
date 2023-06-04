@@ -22,12 +22,14 @@ TaskBase *Task::create(File &config_file, Directory &directory) {
   BoincConstants::setProjectName(workunit_name);
   setHostConfigPath();
 
+  ConfigHost host_config(HostConfigPath);
+
   if (mode == "a") {
-    return new TaskBenchmarkAll(directory, task_config, HostConfigPath, BoincConstants::ResultFileName, workunit_name);
+    return new TaskBenchmarkAll(directory, task_config, host_config, BoincConstants::ResultFileName, workunit_name);
   } else if (mode == "b") {
-    return new TaskBenchmark(directory, task_config, HostConfigPath, BoincConstants::ResultFileName, workunit_name);
+    return new TaskBenchmark(directory, task_config, host_config, BoincConstants::ResultFileName, workunit_name);
   } else if (mode == "n") {
-    return new TaskNormal(directory, task_config, HostConfigPath, BoincConstants::ResultFileName, workunit_name);
+    return new TaskNormal(directory, task_config, host_config, BoincConstants::ResultFileName, workunit_name);
   } else {
     RunnerUtils::runtimeException("Unsupported mode of the task");
   }
@@ -69,10 +71,6 @@ std::string Task::parseWorkunitName() {
 }
 
 void Task::setHostConfigPath() {
-  #ifdef __WIN32
-  HostConfigPath = "C:\\ProgramData\\BOINC\\" + BoincConstants::ProjectName + ".conf";
-  #elif defined (__linux__)
-  HostConfigPath = "/etc/" + BoincConstants::ProjectName + ".conf"; // WARNING: CANNOT write there just CAN read from there
-  #endif
+  HostConfigPath = BoincConstants::getHostConfigPath();
   Logging::debugPrint(Logging::Detail::ObjectManipulation, "HostConfigPath is " + HostConfigPath);
 }

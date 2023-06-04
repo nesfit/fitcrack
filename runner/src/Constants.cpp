@@ -26,3 +26,13 @@ void BoincConstants::setProjectName(const std::string& workunit_name) {
   }
   TrickleDeamonName = ProjectName;
 }
+
+std::string BoincConstants::getHostConfigPath() {
+  std::string HostConfigPath;
+  #ifdef __WIN32
+  HostConfigPath = "C:\\ProgramData\\BOINC\\" + BoincConstants::ProjectName + ".conf";
+  #elif defined(__linux__) || defined(__APPLE__)
+  HostConfigPath = "/etc/" + BoincConstants::ProjectName + ".conf"; // WARNING: CANNOT write there just CAN read from there
+  #endif
+  return HostConfigPath;
+}

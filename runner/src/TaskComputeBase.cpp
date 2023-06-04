@@ -22,23 +22,8 @@ void TaskComputeBase::getAllArguments() {
 /* Public */
 TaskComputeBase::TaskComputeBase(
   Directory& directory,
-  ConfigTask& task_config,
-  const std::string& host_config,
-  const std::string& output_file,
-  const std::string& workunit_name
-):
-  TaskBase(directory, task_config, host_config, output_file, workunit_name),
-  attack_(nullptr),
-  process_hashcat_(nullptr),
-  process_external_generator_(nullptr),
-  hashcat_mutex_(RunnerConstants::HashcatMutexName),
-  attack_type(Attack::detectAttackType(task_config_))
-{}
-
-TaskComputeBase::TaskComputeBase(
-  Directory& directory,
-  ConfigTask& task_config,
-  ConfigHost& host_config,
+  ConfigTask task_config,
+  ConfigHost host_config,
   const std::string& output_file,
   const std::string& workunit_name
 ):

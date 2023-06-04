@@ -8,8 +8,8 @@
 
 /* Public */
 TaskBenchmarkAll::TaskBenchmarkAll(Directory &directory,
-                                   ConfigTask &task_config,
-                                   const std::string &host_config,
+                                   ConfigTask task_config,
+                                   ConfigHost host_config,
                                    const std::string &output_file,
                                    const std::string &workunit_name)
     : TaskBase(directory, task_config, host_config, output_file, workunit_name),

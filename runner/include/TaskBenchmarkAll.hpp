@@ -29,7 +29,7 @@ public:
 		* @param   output_file [in] Name of the hashcat output file
 		* @param   workunit_name [in] Name of the BOINC project workunit
 		*/
-	TaskBenchmarkAll(Directory& directory, ConfigTask& task_config, const std::string& host_config, const std::string& output_file, const std::string& workunit_name);
+	TaskBenchmarkAll(Directory& directory, ConfigTask task_config, ConfigHost host_config, const std::string& output_file, const std::string& workunit_name);
 
 	~TaskBenchmarkAll();
 
