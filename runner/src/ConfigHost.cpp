@@ -47,3 +47,11 @@ std::vector<std::string> ConfigHost::getExtraHashcatArgs() {
   std::string extraHashcatArgs = config_item_it->second;
   return split(extraHashcatArgs, ' ');
 }
+
+std::string ConfigHost::getPrestoredDictsPath() {
+  auto config_item_it = configuration_.find("prestored_dicts_path");
+  if (config_item_it == configuration_.end())
+    return "";
+
+  return config_item_it->second;
+}

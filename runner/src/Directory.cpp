@@ -7,7 +7,7 @@
 /* Private */
 void Directory::init() {
   if (!relative_path_.empty() && !isDirectory(relative_path_))
-  RunnerUtils::runtimeException("stat() failed on " + relative_path_, errno);
+    RunnerUtils::runtimeException("stat() failed on " + relative_path_, errno);
   FilesysBase::init();
 }
 
@@ -70,8 +70,9 @@ bool Directory::find(const std::string& key, File& value) const {
     value = found_it->second;
 
     Logging::debugPrint(Logging::Detail::CustomOutput, " found file : " + value.getName() /* + "->" + value.getRelativePath()*/ );
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool Directory::findVersionedFile(const std::string& prefix, const std::string& extension, File& file) {
@@ -107,10 +108,11 @@ void Directory::scanForEntities() {
   struct dirent *entity;
   if ((directory = opendir (absolute_path_.c_str())) != NULL) {
     while ((entity = readdir (directory)) != NULL) {
-      if (isDirectory(entity->d_name)) {
-        directories_.insert(std::pair<std::string, Directory>(entity->d_name, Directory(relative_path_ + entity->d_name)));
-      } else if (isFile(entity->d_name)) {
-        files_.insert(std::pair<std::string, File>(entity->d_name, File(relative_path_ + entity->d_name)));
+      std::string path = relative_path_ + entity->d_name;
+      if (isDirectory(path)) {
+        directories_.insert(std::pair<std::string, Directory>(entity->d_name, Directory(path)));
+      } else if (isFile(path)) {
+        files_.insert(std::pair<std::string, File>(entity->d_name, File(path)));
       }
     }
     closedir (directory);

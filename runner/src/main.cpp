@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
     directory.scanForEntities();
 
-    const char *config = argc > 1 ?argv[1] : "config";
+    const char *config = argc > 1 ? argv[1] : "config";
     directory.find(config, file);
 
     std::unique_ptr<TaskBase> task(Task::create(file, directory));

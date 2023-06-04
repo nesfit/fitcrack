@@ -30,8 +30,30 @@
         :value="1"
       ></v-radio>
     </v-radio-group>
-
     <v-divider />
+
+    <div
+      v-if="distributionMode == 1"
+    >
+      <v-card-title>
+        <span>Deployment of dictionaries</span>
+      </v-card-title>
+      <v-radio-group
+        v-model="dictDeploymentMode"
+      >
+        <v-radio
+          label="Automatically send dictionaries to hosts"
+          :value="0"
+        ></v-radio>
+        <v-radio
+          v-if="leftDicts.length == 1"
+          label="Use prestored dictionaries on hosts"
+          :value="1"
+        ></v-radio>
+      </v-radio-group>
+      <v-divider />
+    </div>
+
     <v-card-title>
       <span>Select rule file</span>
     </v-card-title>
@@ -62,7 +84,7 @@
       'dict-selector': dictSelector,
       'rules-selector': ruleSelector
     },
-    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'optimized', 'distributionMode'])),
+    computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'optimized', 'distributionMode', 'dictDeploymentMode'])),
     methods: {
       checkValid: function () {
         if (this.leftDicts.length > 0) {

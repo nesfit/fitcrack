@@ -90,7 +90,9 @@ bool FilesysBase::isDirectory(const std::string& path) {
   if (stat(path.c_str(), &statbuf) != 0) {
     Logging::debugPrint(Logging::Detail::DevelDebug, path + " does not exist.");
     return false;
-  } else if (statbuf.st_mode & S_IFDIR) {
+  } 
+  
+  if (S_ISDIR(statbuf.st_mode)) {
     Logging::debugPrint(Logging::Detail::DevelDebug, path + " does exist.");
     return true;
   } else {
@@ -101,11 +103,12 @@ bool FilesysBase::isDirectory(const std::string& path) {
 
 bool FilesysBase::isFile(const std::string& path) {
   struct stat statbuf;
-
   if (stat(path.c_str(), &statbuf) != 0) {
     Logging::debugPrint(Logging::Detail::DevelDebug, path + " does not exist.");
     return false;
-  } else if (statbuf.st_mode & S_IFREG) {
+  } 
+  
+  if (S_ISREG(statbuf.st_mode)) {
     return true;
   } else {
     Logging::debugPrint(Logging::Detail::DevelDebug, path + " is not a file.");

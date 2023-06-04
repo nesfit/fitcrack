@@ -290,11 +290,11 @@ std::vector<Config::Ptr<CMask>> CSqlLoader::loadJobMasksWithNormalKeyspace(uint6
 std::vector<Config::Ptr<CDictionary>>
 CSqlLoader::loadJobDictionaries(uint64_t jobId) {
   return customLoad<CDictionary>(formatQuery(
-      "SELECT `%s`.*, `%s`.`path`, `%s`.`password_distribution`, `%s`.`hex_dict`, "
+      "SELECT `%s`.*, `%s`.`name`, `%s`.`path`, `%s`.`password_distribution`, `%s`.`hex_dict`, "
       "`%s`.`keyspace` FROM `%s` INNER JOIN `%s` ON `%s`.`dictionary_id` = "
       "`%s`.`id` WHERE `job_id` = %" PRIu64
       " AND `current_index` < `keyspace` ORDER BY `%s`.`id` ASC ;",
-      Config::tableNameJobDictionary.c_str(),
+      Config::tableNameJobDictionary.c_str(), Config::tableNameDictionary.c_str(),
       Config::tableNameDictionary.c_str(), Config::tableNameDictionary.c_str(),
       Config::tableNameDictionary.c_str(), Config::tableNameDictionary.c_str(),
       Config::tableNameJobDictionary.c_str(),

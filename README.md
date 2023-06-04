@@ -87,6 +87,7 @@ one of the following:
 <a name="hostconf"></a>
 ### Advanced: Host specific configuration
 Sometimes you need to configure specific behavior for individual hosts.
+
 Fitcrack allows you to define additional **host-specific hashcat arguments**.
 This gives you options to select what GPUs to use for cracking,
 configure the workload profile for fine-tuning of the performance, etc.
@@ -102,6 +103,25 @@ $ echo 'extra_hashcat_args=-w 4 -d 1,2 --force' > /etc/fitcrack.conf
 ```
 Hashcat will use OpenCL devices 1 and 2. The workload profile will be set to level 4 (Nightmare).
 The cracking session will be forced and all warnings ignored.
+
+----
+
+Fitcrack also allows you to use **prestored dictionaries on hosts**, so they do not have to be transfered
+from server to hosts.
+
+#### Example
+```
+$ echo 'prestored_dicts_path=/etc/fitcrack' > /etc/fitcrack.conf
+```
+
+Fitcrack client (Runner) will search for prestored dictionaries in /etc/fitcrack. So for example,
+if you use rockyou.txt for this job, copy rockyou.txt to /etc/fitcrack. Please also ensure that
+/etc/fitcrack is readable for BOINC. Run:
+
+```
+$ sudo chmod -R 755 /etc/fitcrack
+```
+
 
 
 <a name="debugging"></a>

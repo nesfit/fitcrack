@@ -27,7 +27,7 @@ if len(files) == 0:
 
 last_ver = 1
 try:
-    last_ver = int(sorted(files)[-1])
+    last_ver = int(sorted(files, key=int)[-1])
 except:
     print("Bad last version")
     exit(1)

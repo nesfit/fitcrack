@@ -180,7 +180,8 @@ bool CAttackRules::makeWorkunit() {
         }
 
         workunitDict->updatePos(inputDict->GetCurrentDictPos());
-      } else if (m_job->getDistributionMode() == 1) {
+      } else if (m_job->getDistributionMode() == 1 &&
+                 m_job->getDictDeploymentMode() == DictDeploymentMode::send) {
         uint64_t startIndex = m_workunit->getStartIndex();
 
         /** Merge dictionaries to one. */
@@ -220,7 +221,24 @@ bool CAttackRules::makeWorkunit() {
                                 m_host->getBoincHostId(),
                                 "Dictionaries merged.\n");
         }
+      }
 
+      if (m_job->getDictDeploymentMode() == DictDeploymentMode::use_prestored) {
+        std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
+        // TODO: unsupported for more dictionaries (not possible with merging,
+        // could be possible with other approach) Frontend ensures than this
+        // option cannot be enabled with more than 1 dictionary.
+        const std::string &dictName = dictVec[0]->getDictName();
+        configFile << "|||dict1_name|String|" << std::to_string(dictName.length())
+                   << "|" << dictName << "|||\n";
+
+        if (!std::ifstream(path)) {
+          // Just create empty file to make boinc happy.
+          std::ofstream dictFile;
+          dictFile.open(path);
+        }
+
+      } else if (m_job->getDictDeploymentMode() == DictDeploymentMode::send) {
         if (!std::ifstream(path)) {
           std::ofstream dictFile;
           dictFile.open(path);

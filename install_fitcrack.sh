@@ -39,6 +39,10 @@ if [[ $1 == "-s" ]]; then
         source installer/update_webadmin.sh
         exit
     elif [[ $2 == "-4" ]]; then
+        source installer/build_server.sh
+        source installer/install_libs.sh
+        exit
+    elif [[ $2 == "-u" ]]; then
         source installer/uninstall.sh
         cleanup_project
         cleanup_db

@@ -38,7 +38,8 @@ export const empty = {
   hybridMask: '',
   charset: [],
   submode: 0,
-  distributionMode: 0,
+  distributionMode: 0, // Default: create fragment on server
+  dictDeploymentMode: 0, // Default: Send dictionaries to hosts
   markov: [], // init!
   markovThresh: NaN,
   pcfg: [],
@@ -95,6 +96,7 @@ export default {
         'generate_random_rules': parseInt(state.generateRandomRules),
          // other
         'optimized': Vue.prototype.$optimizedOnly ? true : state.optimized,
+        'dict_deployment_mode': parseInt(state.dictDeploymentMode),
       }
     },
     jobSettings (state, { attackSettings }) {

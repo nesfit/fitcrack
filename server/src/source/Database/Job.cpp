@@ -48,6 +48,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
         this->m_generateRandomRules = std::stoul(jobMap["generate_random_rules"]);
         this->m_optimized = std::stoul(jobMap["optimized"]);
+        this->m_dictDeploymentMode = static_cast<DictDeploymentMode>(std::stoul(jobMap["dict_deployment_mode"]));
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         uint64_t minSeconds = m_sqlLoader->getAbsoluteMinimumWorkunitSeconds();
@@ -252,6 +253,11 @@ uint32_t CJob::getAttackSubmode() const
 uint32_t CJob::getDistributionMode() const
 {
     return m_distributionMode;
+}
+
+DictDeploymentMode CJob::getDictDeploymentMode() const
+{
+    return m_dictDeploymentMode;
 }
 
 uint32_t CJob::getHashType() const

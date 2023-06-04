@@ -1,0 +1,3 @@
+v2.4.0 -> ...
+
+* New option 'Use prestored dictionaries on hosts' when 'Fragmentation of dictionaries' is set to 'On hosts'. Check README for more details.

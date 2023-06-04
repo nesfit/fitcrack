@@ -18,6 +18,7 @@ class CMask;
 class CDictionary;
 using PtrJob = Config::Ptr<CJob>;
 
+enum DictDeploymentMode { send, use_prestored };
 
 class CJob {
     private:
@@ -137,6 +138,7 @@ class CJob {
         uint32_t m_maxElemInChain;
         uint32_t m_generateRandomRules;
         bool m_optimized;
+        DictDeploymentMode m_dictDeploymentMode;
         bool m_killFlag;
 
         /**
@@ -193,6 +195,7 @@ class CJob {
         uint32_t getMaxElemInChain() const;
         uint32_t getRandomRulesCount() const;
         bool getOptimizedFlag() const;
+        DictDeploymentMode getDictDeploymentMode() const;
         bool getKillFlag() const;
 
         void setGrammar(const std::string & grammar);
