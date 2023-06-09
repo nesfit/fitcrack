@@ -1,20 +1,13 @@
 /*
  * zip2john processes input ZIP files into a format suitable for use with JtR.
  *
- * This software is Copyright (c) 2011, Dhiru Kholia <dhiru.kholia at gmail.com>,
+ * This software is
+ * Copyright (c) 2011-2018 Dhiru Kholia <dhiru.kholia at gmail.com>,
+ * Copyright (c) 2011-2018 JimF, Copyright (c) 2020 Simon Rettberg,
+ * Copyright (c) 2013-2021 magnum,
  * and it is hereby released to the general public under the following terms:
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted.
- *
- * Updated in Aug 2011 by JimF.  Added PKZIP 'old' encryption.  The signature on the
- * pkzip will be $pkzip$ and does not look like the AES version written by Dhiru
- * Also fixed some porting issues, such as variables needing declared at top of blocks.
- *
- * Updated in 2020 by Simon Rettberg. Handle archives by scanning their central
- * directory first, which is more robust with archives that have been created using
- * streams. The old behavior of scanning for local headers from the start of the
- * file is still available through the -s option. Also fixed some minor issues and
- * refactored the code for slightly less redundant code beween AES and legacy.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted.
  *
  * References:
  *
@@ -38,13 +31,27 @@
  * For type = 0, for ZIP files encrypted using AES
  * filename:$zip$*type*hex(CRC)*encryption_strength*hex(salt)*hex(password_verfication_value):hex(authentication_code)
  *
- * For original pkzip encryption:  (JimF, with longer explaination of fields)
- * filename:$pkzip$C*B*[DT*MT{CL*UL*CR*OF*OX}*CT*DL*CS*DA]*$/pkzip$   (deprecated)
- * filename:$pkzip2$C*B*[DT*MT{CL*UL*CR*OF*OX}*CT*DL*CS*TC*DA]*$/pkzip2$   (new format, with 2 checksums)
+ * Original $pkzip$ only had CS, fixed to be part of CRC, which was found out sometimes inappropriate.
+ * filename:$pkzip$C*B*[DT*MT{CL*UL*CR*OF*OX}*CT*DL*CS*DA]*$/pkzip$
+ *   CS  2 bytes of checksum data.
+ *
+ * The newer $pkzip2$ addressed the problem by adding TC (as in timestamp), but still neither zip2john or
+ * the format really knew when to use which (resulting in suboptimal early rejection).
+ * filename:$pkzip2$C*B*[DT*MT{CL*UL*CR*OF*OX}*CT*DL*CS*TC*DA]*$/pkzip2$ (with 2 checksums: CS & TC)
+ *   CS  2 bytes of checksum data.
+ *   TC  2 bytes of checksum data (from timestamp)
+ *
+ * Current version (Feb 2021) reverted to original $pkzip$ but now with the one correct value put in CS: Sometimes
+ * it's taken from timestamp, sometimes part of the CRC.
+ * filename:$pkzip$C*B*[DT*MT{CL*UL*CR*OF*OX}*CT*DL*CS*DA]*$/pkzip$
+ *   CS  Depending on archive, 2 bytes of either checksum data or timestamp.
+ *
  * All numeric and 'binary data' fields are stored in hex.
  *
- * C   is the count of hashes present (the array of items, inside the []  C can be 1 to 3.).
- * B   is number of valid bytes in the checksum (1 or 2).  Unix zip is 2 bytes, all others are 1 (NOTE, some can be 0)
+ * C   is the count of hashes present (the array of items, inside the []  C can be 1 to 8.).
+ * B   is number of valid bytes in the CS.  For ZIP version [needed to extract] < 2.0, this is 2, otherwise it's 1.
+ *     The B value should actually be defined within the ARRAY below, not per archive. For now we set it to 1 if any
+ *     of the files limits it.
  * ARRAY of data starts here
  *   DT  is a "Data Type enum".  This will be 1 2 or 3.  1 is 'partial'. 2 and 3 are full file data (2 is inline, 3 is load from file).
  *   MT  Magic Type enum.  0 is no 'type'.  255 is 'text'. Other types (like MS Doc, GIF, etc), see source.
@@ -57,8 +64,8 @@
  *     END OF 'optional' fields.
  *   CT  Compression type  (0 or 8)  0 is stored, 8 is imploded.
  *   DL  Length of the DA data.
- *   CS  2 bytes of checksum data.
- *   TC  2 bytes of checksum data (from timestamp)
+ *   CS  2 bytes of checksum data, from CRC, *or* from either CRC or timestamp (see above).
+ *   TC  2 bytes of checksum data, from timestamp (only $pkzip2$, see above).
  *   DA  This is the 'data'.  It will be hex data if DT == 1 or 2. If DT == 3, then it is a filename (name of the .zip file).
  * END of array item.  There will be C (count) array items.
  * The format string will end with $/pkzip$
@@ -111,6 +118,8 @@
  * Changes: zip2john is now standalone utility, does not require john
  */
 
+// ------------------------------
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -121,6 +130,17 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <inttypes.h>
+
+#define xstrdup strdup
+#define mem_alloc malloc
+
+#define MEM_FREE(ptr) \
+{ \
+	if ((ptr)) { \
+		free((ptr)); \
+		(ptr) = NULL; \
+	} \
+}
 
 #define ARCH_INDEX(x)                       ((unsigned int)(unsigned char)(x))
 #define JOHNSWAP(x) __builtin_bswap32((x))
@@ -280,6 +300,14 @@ uint16_t fget16LE(FILE *fp)
 	return v;
 }
 
+#define MAX_PKZ_FILES 8
+
+// ------------------------------
+
+#define _STR_VALUE(arg) #arg
+#define STR_MACRO(n)    _STR_VALUE(n)
+#define MAX_FILES STR_MACRO(MAX_PKZ_FILES)
+
 #define MAX_BLOB_INLINE_SIZE 0x400000000ULL // 16 GB
 
 #define FLAG_ENCRYPTED            1
@@ -331,8 +359,7 @@ static int fexpect(FILE *stream, int c)
 	return d == c;
 }
 
-static int checksum_only = 0, use_magic = 0;
-static int force_2_byte_checksum = 0;
+static int checksum_only, use_magic;
 static char *ascii_fname, *only_fname;
 
 static char *MagicTypes[] = { "", "DOC", "XLS", "DOT", "XLT", "EXE", "DLL", "ZIP", "BMP", "DIB", "GIF", "PDF", "GZ", "TGZ", "BZ2", "TZ2", "FLV", "SWF", "MP3", "PST", NULL };
@@ -355,8 +382,7 @@ typedef struct _zip_ptr
 	uint64_t      offset, offex;
 	uint64_t      cmp_len, decomp_len;
 	uint32_t      crc;
-	char          chksum[5];
-	char          chksum2[5];
+	char          cs[5]; // High-order word of either crc or timestamp
 	int           zip64; // Has extended header with 64bit data
 	uint16_t      lastmod_date, lastmod_time;
 	uint16_t      extrafield_length;
@@ -372,15 +398,13 @@ typedef struct _zip_file
 {
 	FILE *fp;
 	const char *fname;
-	int unix_made; // not used, inverse of check_in_crc...
-	int check_in_crc; // ??? only used for debug output...
 	int check_bytes;  // number of valid bytes in checksum
 	int zip64; // Is ZIP64 format (has ZIP64 EOCD)
 } zip_file;
 
 // Wrapper struct so we don't have to pass three pointers all the time
 typedef struct _zip_context {
-	zip_ptr best_files[3];  // Three candidated for handling old encryption type archives
+	zip_ptr best_files[MAX_PKZ_FILES]; // Up to 8 candidates for handling old encryption type archives
 	zip_ptr curzip;         // Meta data of file in archive we're currently processing
 	zip_file archive;       // The zip file being processed
 	int num_candidates;     // Number of candidates in best_files array
@@ -869,7 +893,7 @@ static int load_local_header(zip_file *zfp, zip_ptr *p)
 	if (p->file_name != NULL) {
 		xfseek(fp, filename_length, SEEK_CUR);
 	} else {
-		p->file_name = malloc(filename_length + 1);
+		p->file_name = mem_alloc(filename_length + 1);
 		xfread(p->file_name, filename_length, 1, fp);
 		p->file_name[filename_length] = 0;
 	}
@@ -888,6 +912,7 @@ static int load_local_header(zip_file *zfp, zip_ptr *p)
 static int process_legacy(zip_file *zfp, zip_ptr *p)
 {
 	FILE *fp = zfp->fp;
+
 	fprintf(stderr, "ver %d.%d ", p->version / 10, p->version % 10);
 
 	if ( (p->flags & FLAG_ENCRYPTED) &&
@@ -908,48 +933,41 @@ static int process_legacy(zip_file *zfp, zip_ptr *p)
 			xfseek(fp, efh_datasize, SEEK_CUR);
 
 			extra_len_used += 4 + efh_datasize;
-			if (efh_id == 0x07c8 ||  // Info-ZIP Macintosh (old, J. Lee)
-				efh_id == 0x334d ||  // Info-ZIP Macintosh (new, D. Haase's 'Mac3' field)
-				efh_id == 0x4d49 ||  // Info-ZIP OpenVMS (obsolete)
-				efh_id == 0x5855 ||  // Info-ZIP UNIX (original; also OS/2, NT, etc.)
-				efh_id == 0x6375 ||  // Info-ZIP UTF-8 comment field
-				efh_id == 0x7075 ||  // Info-ZIP UTF-8 name field
-				efh_id == 0x7855 ||  // Info-ZIP UNIX (16-bit UID/GID info)
-				efh_id == 0x7875)    // Info-ZIP UNIX 3rd generation (generic UID/GID, ...)
-
-				// 7zip ALSO is 2 byte checksum, but I have no way to find them.  NOTE, it is 2 bytes of CRC, not timestamp like InfoZip.
-				// OLD winzip (I think 8.01 or before), is also supposed to be 2 byte.
-				// old v1 pkzip (the DOS builds) are 2 byte checksums.
-			{
-				zfp->unix_made = 1;
-				zfp->check_bytes = 2;
-				zfp->check_in_crc = 0;
-			}
 		}
+
+		if (p->version >= 20)
+			zfp->check_bytes = 1;
+		else if (zfp->check_bytes == 1)
+			fprintf(stderr, "** 2b ** ");
 
 		scan_for_data_descriptor(zfp, p);
 
-		if (force_2_byte_checksum)
-			zfp->check_bytes = 2;
-
-		fprintf(stderr,
-		        "%s/%s PKZIP%s Encr:%s%s cmplen=%"PRIu64", decmplen=%"PRIu64", crc=%X type=%"PRIu16"\n",
-		        jtr_basename(zfp->fname), p->file_name,
-		        zfp->zip64 ? "64" : "",
-		        zfp->check_bytes == 2 ? " 2b chk," : "",
-		        zfp->check_in_crc ? "" : " TS_chk,",
-		        p->cmp_len, p->decomp_len, p->crc, p->cmptype);
-
-		free(p->hash_data);
-		p->hash_data = malloc(p->cmp_len + 1);
-		if (fread(p->hash_data, 1, p->cmp_len, fp) != p->cmp_len) {
-			fprintf(stderr, "Error, fread could not read the data from the file: %s\n", zfp->fname);
+		if (p->cmptype != 0 && p->cmptype != 8) {
+			fprintf(stderr, "%s/%s is not encrypted, or stored with non-handled compression type=%"PRIu16"\n",
+			        zfp->fname, p->file_name, p->cmptype);
 			return 0;
 		}
 
 		// Ok, now set checksum bytes.  This will depend upon if from crc, or from timestamp
-		sprintf(p->chksum, "%02x%02x", (p->crc>>24)&0xFF, (p->crc>>16)&0xFF);
-		sprintf(p->chksum2, "%02x%02x", p->lastmod_time>>8, p->lastmod_time&0xFF);
+		if (p->flags & FLAG_LOCAL_SIZE_UNKNOWN)
+			sprintf(p->cs, "%02x%02x", p->lastmod_time >> 8, p->lastmod_time & 0xFF);
+		else
+			sprintf(p->cs, "%02x%02x", (p->crc >> 24) & 0xFF, (p->crc >> 16) & 0xFF);
+
+		fprintf(stderr,
+		        "%s/%s PKZIP%s Encr: %s%scmplen=%"PRIu64", decmplen=%"PRIu64", crc=%08X ts=%04X cs=%s type=%"PRIu16"\n",
+		        jtr_basename(zfp->fname), p->file_name,
+		        zfp->zip64 ? "64" : "",
+		        zfp->check_bytes == 2 ? "2b chk, " : "",
+		        p->flags & FLAG_LOCAL_SIZE_UNKNOWN ? "TS_chk, " : "",
+		        p->cmp_len, p->decomp_len, p->crc, p->lastmod_time, p->cs, p->cmptype);
+
+		MEM_FREE(p->hash_data);
+		p->hash_data = mem_alloc(p->cmp_len + 1);
+		if (fread(p->hash_data, 1, p->cmp_len, fp) != p->cmp_len) {
+			fprintf(stderr, "Error, fread could not read the data from the file: %s\n", zfp->fname);
+			return 0;
+		}
 
 		return 1;
 	}
@@ -965,8 +983,8 @@ static int process_legacy(zip_file *zfp, zip_ptr *p)
 
 static void move_entry(zip_ptr *dst, zip_ptr *src)
 {
-	free(dst->file_name);
-	free(dst->hash_data);
+	MEM_FREE(dst->file_name);
+	MEM_FREE(dst->hash_data);
 	memcpy(dst, src, sizeof(zip_ptr));
 	src->file_name = NULL;
 	src->hash_data = NULL;
@@ -1002,73 +1020,19 @@ static void handle_file_entry(zip_context *ctx)
 	}
 
 	// Suitable file with legacy encryption
-	if (ctx->num_candidates == 0) {
-		move_entry(&(ctx->best_files[ctx->num_candidates++]), &ctx->curzip);
-	} else if (ctx->num_candidates == 1) {
-		if (ctx->curzip.cmp_len < ctx->best_files[0].cmp_len) {
-			move_entry(&(ctx->best_files[ctx->num_candidates++]), &(ctx->best_files[0]));
-			move_entry(&(ctx->best_files[0]), &ctx->curzip);
-		} else {
-			move_entry(&(ctx->best_files[ctx->num_candidates++]), &ctx->curzip);
-		}
-	} else if (ctx->num_candidates == 2) {
-		if (ctx->curzip.cmp_len < ctx->best_files[0].cmp_len) {
-			move_entry(&(ctx->best_files[ctx->num_candidates++]), &(ctx->best_files[1]));
-			move_entry(&(ctx->best_files[1]), &(ctx->best_files[0]));
-			move_entry(&(ctx->best_files[0]), &ctx->curzip);
-		} else if (ctx->curzip.cmp_len < ctx->best_files[1].cmp_len) {
-			move_entry(&(ctx->best_files[ctx->num_candidates++]), &(ctx->best_files[1]));
-			move_entry(&(ctx->best_files[1]), &ctx->curzip);
-		} else {
-			move_entry(&(ctx->best_files[ctx->num_candidates++]), &ctx->curzip);
-		}
-	} else {
-		int done = 0;
-		if (ctx->curzip.magic_type && ctx->curzip.cmp_len > ctx->best_files[0].cmp_len) {
-			// if we have a magic type, we will replace any NON magic type, for the 2nd and 3rd largest, without caring about
-			// the size.
-			if (ctx->best_files[1].magic_type == 0) {
-				if (ctx->best_files[2].cmp_len < ctx->curzip.cmp_len) {
-					move_entry(&(ctx->best_files[1]), &(ctx->best_files[2]));
-					move_entry(&(ctx->best_files[2]), &ctx->curzip);
-					done = 1;
-				} else {
-					move_entry(&(ctx->best_files[1]), &ctx->curzip);
-					done = 1;
-				}
-			} else if (ctx->best_files[2].magic_type == 0) {
-				if (ctx->best_files[1].cmp_len < ctx->curzip.cmp_len) {
-					move_entry(&(ctx->best_files[2]), &ctx->curzip);
-					done = 1;
-				} else {
-					move_entry(&(ctx->best_files[2]), &(ctx->best_files[1]));
-					move_entry(&(ctx->best_files[1]), &ctx->curzip);
-					done = 1;
-				}
-			}
-		}
-		if (!done && ctx->curzip.cmp_len < ctx->best_files[0].cmp_len) {
-			// we 'only' replace the smallest zip, and always keep as many any other magic as possible.
-			if (ctx->best_files[0].magic_type == 0) {
-				move_entry(&(ctx->best_files[0]), &ctx->curzip);
-			} else {
-				// Ok, the 1st is a magic, we WILL keep it.
-				if (ctx->best_files[1].magic_type) {  // Ok, we found our 2
-					move_entry(&(ctx->best_files[2]), &(ctx->best_files[1]));
-					move_entry(&(ctx->best_files[1]), &(ctx->best_files[0]));
-					move_entry(&(ctx->best_files[0]), &ctx->curzip);
-				} else if (ctx->best_files[2].magic_type) {  // Ok, we found our 2
-					move_entry(&(ctx->best_files[1]), &(ctx->best_files[0]));
-					move_entry(&(ctx->best_files[0]), &ctx->curzip);
-				} else {
-					// found none.  So we will simply roll them down (like when #1 was a magic also).
-					move_entry(&(ctx->best_files[2]), &(ctx->best_files[1]));
-					move_entry(&(ctx->best_files[1]), &(ctx->best_files[0]));
-					move_entry(&(ctx->best_files[0]), &ctx->curzip);
-				}
-			}
+	int i, j;
+
+	for (i = 0; i < ctx->num_candidates; i++) {
+		if (ctx->curzip.cmp_len < ctx->best_files[i].cmp_len) {
+			for (j = ctx->num_candidates; j > i; j--)
+				if (j < MAX_PKZ_FILES)
+					move_entry(&(ctx->best_files[j]), &(ctx->best_files[j - 1]));
+			break;
 		}
 	}
+	move_entry(&(ctx->best_files[i]), &ctx->curzip);
+	if (ctx->num_candidates < MAX_PKZ_FILES)
+		ctx->num_candidates++;
 }
 
 static void print_and_cleanup(zip_context *ctx);
@@ -1077,9 +1041,7 @@ static void init_zip_context(zip_context *ctx, const char *fname, FILE *fp)
 {
 	memset(ctx, 0, sizeof(*ctx));
 	ctx->archive.fname = fname;
-	ctx->archive.check_in_crc = 1;
-	ctx->archive.check_bytes = 1;
-	ctx->archive.unix_made = 0;
+	ctx->archive.check_bytes = 2;
 	ctx->archive.fp = fp;
 }
 
@@ -1131,10 +1093,10 @@ static void print_and_cleanup(zip_context *ctx)
 	if (ctx->num_candidates == 0)
 		return;
 
-	filenames = strdup(ctx->best_files[0].file_name);
+	filenames = xstrdup(ctx->best_files[0].file_name);
 	bname = jtr_basename(ctx->archive.fname);
 
-	printf("%s%s%s:$pkzip2$%x*%x*", bname,
+	printf("%s%s%s:$pkzip$%x*%x*", bname,
 			 ctx->num_candidates == 1 ? "/" : "",
 			 ctx->num_candidates == 1 ? ctx->best_files[0].file_name : "",
 			 ctx->num_candidates, ctx->archive.check_bytes);
@@ -1154,19 +1116,21 @@ static void print_and_cleanup(zip_context *ctx)
 			len = 12+180;
 		if (len > ctx->best_files[i].cmp_len)
 			len = ctx->best_files[i].cmp_len; // even though we 'could' output a '2', we do not.  We only need one full inflate CRC check file.
-		printf("1*%x*%x*%"PRIx64"*%s*%s*", ctx->best_files[i].magic_type, ctx->best_files[i].cmptype, (uint64_t)len, ctx->best_files[i].chksum, ctx->best_files[i].chksum2);
+		printf("1*%x*%x*%"PRIx64"*%s*", ctx->best_files[i].magic_type, ctx->best_files[i].cmptype, (uint64_t)len, ctx->best_files[i].cs);
 		print_hex((unsigned char*)ctx->best_files[i].hash_data, len);
 	}
 	// Ok, now output the 'little' one (the first).
 	if (!checksum_only) {
 		printf("%x*%x*%"PRIx64"*%"PRIx64"*%x*%"PRIx64"*%"PRIx64"*%x*", 2, ctx->best_files[0].magic_type, ctx->best_files[0].cmp_len, ctx->best_files[0].decomp_len, ctx->best_files[0].crc, ctx->best_files[0].offset, ctx->best_files[0].offex, ctx->best_files[0].cmptype);
-		printf("%"PRIx64"*%s*%s*", ctx->best_files[0].cmp_len, ctx->best_files[0].chksum, ctx->best_files[0].chksum2);
+		printf("%"PRIx64"*%s*", ctx->best_files[0].cmp_len, ctx->best_files[0].cs);
 		print_hex((unsigned char*)ctx->best_files[0].hash_data, ctx->best_files[0].cmp_len);
 	}
+	/* Don't allow our delimiter in there! */
+	replace(filenames, ':', ' ');
 	if (ctx->num_candidates > 1)
-		printf("$/pkzip2$::%s:%s:%s\n", bname, replace(filenames, ':', ' '), ctx->archive.fname);
+		printf("$/pkzip$::%s:%s:%s\n", bname, filenames, ctx->archive.fname);
 	else
-		printf("$/pkzip2$:%s:%s::%s\n", replace(filenames, ':', ' '), bname, ctx->archive.fname);
+		printf("$/pkzip$:%s:%s::%s\n", filenames, bname, ctx->archive.fname);
 
 	if (ctx->num_candidates > 1 && !once++)
 		fprintf(stderr,
@@ -1175,10 +1139,10 @@ static void print_and_cleanup(zip_context *ctx)
 			"option -o to pick a file at a time.\n");
 
 	for (i = 0; i < ctx->num_candidates; ++i) {
-		free(ctx->best_files[i].hash_data);
-		free(ctx->best_files[i].file_name);
+		MEM_FREE(ctx->best_files[i].hash_data);
+		MEM_FREE(ctx->best_files[i].file_name);
 	}
-	free(filenames);
+	MEM_FREE(filenames);
 }
 
 /**
@@ -1305,7 +1269,7 @@ static void scan_central_index(const char *fname)
 		fget16LE(fp); // internal file attributes
 		fget32LE(fp); // external file attributes
 		ctx.curzip.offset = fget32LE(fp); // relative offset of local file header
-		ctx.curzip.file_name = malloc(fn_len + 1);
+		ctx.curzip.file_name = mem_alloc(fn_len + 1);
 		xfread(ctx.curzip.file_name, fn_len, 1, fp);
 		ctx.curzip.file_name[fn_len] = '\0';
 		// Handle extra fields
@@ -1331,7 +1295,7 @@ static void scan_central_index(const char *fname)
 		} else {
 			handle_file_entry(&ctx);
 		}
-		free(ctx.curzip.file_name);
+		MEM_FREE(ctx.curzip.file_name);
 		xfseek(fp, old_pos + extra_len + comment_len, SEEK_SET);
 		if (num_records > 0) {
 			if (fget32LE(fp) != 0x02014b50UL) {
@@ -1360,13 +1324,10 @@ static int usage(char *name)
 	fprintf(stderr, " -o <filename>   Only use this file from the .zip file.\n");
 	fprintf(stderr, " -c This will create a 'checksum only' hash.  If there are many encrypted\n");
 	fprintf(stderr, "    files in the .zip file, then this may be an option, and there will be\n");
-	fprintf(stderr, "    enough data that false positives will not be seen.  If the .zip is 2\n");
-	fprintf(stderr, "    byte checksums, and there are 3 or more of them, then we have 48 bits\n");
-	fprintf(stderr, "    knowledge, which 'may' be enough to crack the password, without having\n");
-	fprintf(stderr, "    to force the user to have the .zip file present.\n");
+	fprintf(stderr, "    enough data that false positives will not be seen.  Up to " MAX_FILES " files are\n");
+	fprintf(stderr, "    supported. These hashes do not reveal actual file data.\n");
 	fprintf(stderr, " -m Use \"file magic\" as known-plain if applicable. This can be faster but\n");
 	fprintf(stderr, "    not 100%% safe in all situations.\n");
-	fprintf(stderr, " -2 Force 2 byte checksum computation.\n");
 	fprintf(stderr, "\nNOTE: By default it is assumed that all files in each archive have the same\n");
 	fprintf(stderr, "password. If that's not the case, the produced hash may be uncrackable.\n");
 	fprintf(stderr, "To avoid this, use -o option to pick a file at a time.\n");
@@ -1398,10 +1359,6 @@ int main(int argc, char **argv)
 			use_magic = 1;
 			fprintf(stderr, "Using file 'magic' signatures if applicable (not 100%% safe)\n");
 			break;
-		case '2':
-			force_2_byte_checksum = 1;
-			fprintf(stderr, "Forcing a 2 byte checksum detection\n");
-			break;
 		case 's':
 			do_scan = 1;
 			fprintf(stderr, "Scanning archive for local file headers\n");
@@ -1423,6 +1380,8 @@ int main(int argc, char **argv)
 			scan_central_index(*argv++);
 		}
 	}
+
+	// cleanup_tiny_memory();
 
 	return EXIT_SUCCESS;
 }
