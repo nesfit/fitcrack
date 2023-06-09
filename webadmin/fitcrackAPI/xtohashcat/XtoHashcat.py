@@ -172,7 +172,7 @@ class Format:
                 print(err.decode('utf-8'), file=stderr)
             exit(1)
         else:
-            hashStr = out.decode('utf-8')
+            hashStr = out.decode('unicode_escape')
 
             # ZIP/RAR john2hashcat
             if self.extensions[0] == '.rar' or self.extensions[0] == '.zip':
