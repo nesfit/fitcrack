@@ -565,21 +565,21 @@ class exportCrackedHashes(Resource):
 
 @ns.route('/<int:id>/exportNonCrackedHashes')
 @api.response(404, 'job not found.')
-class exportCrackedHashes(Resource):
+class exportNonCrackedHashes(Resource):
     def get(self, id):
         """
-        Exports cracked password hashes
+        Exports non-cracked password hashes
         """
-        crackedHashes = io.BytesIO()
+        nonCrackedHashes = io.BytesIO()
 
         job = FcJob.query.filter(FcJob.id == id).one()
         for job_hash in job.hashes:
             if job_hash.result is None:
-                crackedHashes.write(job_hash.hashText.encode('utf-8'))
-                crackedHashes.write(b'\n')
+                nonCrackedHashes.write(job_hash.hashText.encode('utf-8'))
+                nonCrackedHashes.write(b'\n')
 
-        crackedHashes.seek(0)
-        return send_file(crackedHashes, mimetype="text/plain")
+        nonCrackedHashes.seek(0)
+        return send_file(nonCrackedHashes, mimetype="text/plain")
 
 @ns.route('/verifyHash')
 class verifyHash(Resource):
