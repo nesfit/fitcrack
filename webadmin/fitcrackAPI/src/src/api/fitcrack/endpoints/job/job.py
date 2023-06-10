@@ -563,6 +563,23 @@ class exportCrackedHashes(Resource):
         crackedHashes.seek(0)
         return send_file(crackedHashes, mimetype="text/plain")
 
+@ns.route('/<int:id>/exportNonCrackedHashes')
+@api.response(404, 'job not found.')
+class exportCrackedHashes(Resource):
+    def get(self, id):
+        """
+        Exports cracked password hashes
+        """
+        crackedHashes = io.BytesIO()
+
+        job = FcJob.query.filter(FcJob.id == id).one()
+        for job_hash in job.hashes:
+            if job_hash.result is None:
+                crackedHashes.write(job_hash.hashText.encode('utf-8'))
+                crackedHashes.write(b'\n')
+
+        crackedHashes.seek(0)
+        return send_file(crackedHashes, mimetype="text/plain")
 
 @ns.route('/verifyHash')
 class verifyHash(Resource):

@@ -73,23 +73,36 @@
                   </v-col>
                   <v-col>
                     <v-card flat>
+                      <v-card-title>
+                        <span>Hashes</span>
+                      <v-spacer />
                       <div
                         v-if="anyHashCracked()"
                       >
-                        <v-card-title>
-                          <span>Hashes</span>
-                          <v-spacer />
                           <v-btn
                           @click="exportCrackedHashes"
-                          color="success"
+                          color="primary"
                           >
-                            <span>Export cracked hashes</span>
+                            <span>Cracked hashes</span>
                             <v-icon right>
                               mdi-file-download-outline
                             </v-icon>
                           </v-btn>
-                        </v-card-title>
                       </div>
+                      <div
+                        v-if="anyHashNonCracked()"
+                      >
+                          <v-btn
+                          @click="exportNonCrackedHashes"
+                          color="secondary"
+                          >
+                            <span>Non-cracked hashes</span>
+                            <v-icon right>
+                              mdi-file-download-outline
+                            </v-icon>
+                          </v-btn>
+                      </div>
+                      </v-card-title>
                       <v-card-text>
                         <hash-table
                           class="grow"
@@ -332,7 +345,7 @@ export default {
           const url = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', this.data.name + ".txt"); 
+          link.setAttribute('download', this.data.name + "_cracked_hashes.txt"); 
           document.body.appendChild(link);
           link.click();
         })
@@ -340,7 +353,22 @@ export default {
           console.error('Error downloading file:', error);
         });
     },
-
+    anyHashNonCracked () {
+      return this.data.hashes.some((hash) => hash.password == null);
+    },
+    exportNonCrackedHashes () {
+      this.axios.get(this.$serverAddr + '/job/' + this.data.id + '/exportNonCrackedHashes').then((response) => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', this.data.name + "_noncracked_hashes.txt"); 
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((error) => {
+          console.error('Error downloading file:', error);
+        });
+    },
   }
 }
 </script>
