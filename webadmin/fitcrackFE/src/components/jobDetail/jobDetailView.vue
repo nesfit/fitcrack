@@ -73,24 +73,23 @@
                   </v-col>
                   <v-col>
                     <v-card flat>
-                      <v-card-title>
-                        <span>Hashes</span>
-                        <v-spacer />
-                        <a
-                          :href="$serverAddr + '/job/' + data.id + '/exportCrackedHashes'"
-                          target="_blank"
-                          download
-                        >
+                      <div
+                        v-if="anyHashCracked()"
+                      >
+                        <v-card-title>
+                          <span>Hashes</span>
+                          <v-spacer />
                           <v-btn
-                           color="success"
+                          @click="exportCrackedHashes"
+                          color="success"
                           >
                             <span>Export cracked hashes</span>
                             <v-icon right>
                               mdi-file-download-outline
                             </v-icon>
                           </v-btn>
-                        </a>
-                      </v-card-title>
+                        </v-card-title>
+                      </div>
                       <v-card-text>
                         <hash-table
                           class="grow"
@@ -324,7 +323,24 @@ export default {
           w.style.height = this.chartHeight
         }
       })
-    }
+    },
+    anyHashCracked () {
+      return this.data.hashes.some((hash) => hash.password != null);
+    },
+    exportCrackedHashes () {
+      this.axios.get(this.$serverAddr + '/job/' + this.data.id + '/exportCrackedHashes').then((response) => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', this.data.name + ".txt"); 
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((error) => {
+          console.error('Error downloading file:', error);
+        });
+    },
+
   }
 }
 </script>

@@ -561,8 +561,7 @@ class exportCrackedHashes(Resource):
                 crackedHashes.write(b'\n')
 
         crackedHashes.seek(0)
-        filename = job.name + ".txt"
-        return send_file(crackedHashes, attachment_filename=filename, as_attachment=True, mimetype="text/plain")
+        return send_file(crackedHashes, mimetype="text/plain")
 
 
 @ns.route('/verifyHash')
