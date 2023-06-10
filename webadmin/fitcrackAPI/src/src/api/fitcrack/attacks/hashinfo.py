@@ -31,7 +31,7 @@ def getHashTypes():
   hashtypes = []
 
   for h in hash_info_json:
-    if hash_info_json[h]['is_deprecated']:
+    if hash_info_json[h].get('is_deprecated', False):
       continue
     hashtype = {}
     hashtype['code']     = h
