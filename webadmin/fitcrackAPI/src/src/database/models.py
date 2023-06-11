@@ -649,6 +649,7 @@ class FcWorkunit(Base):
     hc_keyspace = Column(BigInteger, nullable=False)
     progress = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     speed = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    remaining_time = Column(BigInteger, nullable=False, server_default=text("'0'"))
     mask_id = Column(BigInteger, nullable=False)
     dictionary_id = Column(BigInteger, nullable=False)
     duplicated = Column(Integer, nullable=False, server_default=text("'0'"))
@@ -703,6 +704,12 @@ class FcWorkunit(Base):
     @hybrid_property
     def cracking_time_str(self):
         return str(datetime.timedelta(seconds=math.floor(self.cracking_time)))
+
+    @hybrid_property
+    def remaining_time_str(self):
+        if self.keyspace > 0 and not self.finished: # normal wu, not a benchmark
+            return str(datetime.timedelta(seconds=math.floor(self.remaining_time)))
+        return "–"
 
 
 class FcHostActivity(Base):

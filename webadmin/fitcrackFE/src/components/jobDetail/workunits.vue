@@ -195,6 +195,7 @@ export default {
         {text: 'Keyspace', align: 'end', value: 'keyspace'},
         {text: 'Retry', align: 'center', value: 'retry'},
         {text: 'Finished', align: 'center', value: 'finished'},
+        {text: 'Remaining time', align: 'center', value: 'remaining_time_str'},
         {text: 'Log', align: 'center', value: 'data-table-expand'}
       ],
       footer: {

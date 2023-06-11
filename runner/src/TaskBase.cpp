@@ -88,6 +88,11 @@ void TaskBase::reportProgress() {
         trickle_xml.addElement("device_" + id + "_temp", temp);
         trickle_xml.addElement("device_" + id + "_util", util);
       }
+
+      uint64_t time_start = status_info_.at("time_start");
+      uint64_t estimated_stop = status_info_.at("estimated_stop");
+
+      trickle_xml.addElement("remaining_time", estimated_stop - time_start);
     }
 
     const std::string &trickle_message = trickle_xml.getXml();

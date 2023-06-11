@@ -50,7 +50,9 @@ workunit_model = api.model('Workunit', {
     'host': fields.Nested(boincHost_model),
     'result': fields.Nested(boincResult_model),
     'progress': fields.Integer(),
-    'speed': fields.Integer()
+    'speed': fields.Integer(),
+    'remaining_time': fields.Integer(),
+    'remaining_time_str': fields.String(),
 })
 
 mask_model = api.model('Mask', {
