@@ -90,6 +90,9 @@ if [ $INSTALL_BACKEND = "y" ]; then
   make -j$COMPILER_THREADS
   cd $INSTALLER_ROOT
 
+  echo "Installing back-end requirements..."
+  pip3 install -r webadmin/fitcrackAPI/src/requirements.txt
+
   echo "Updating Fitcrack WebAdmin back-end..."
   mkdir $APACHE_DOCUMENT_ROOT/fitcrackAPI
   cp -Rf webadmin/fitcrackAPI/* $APACHE_DOCUMENT_ROOT/fitcrackAPI/

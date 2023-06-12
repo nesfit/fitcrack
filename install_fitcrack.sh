@@ -39,6 +39,12 @@ if [[ $1 == "-s" ]]; then
         source installer/update_webadmin.sh
         exit
     elif [[ $2 == "-4" ]]; then
+        source installer/update_daemons.sh
+        source installer/update_webadmin.sh
+        (cd runner ; python3 update_binaries.py)
+        source installer/migrate_db.sh
+        exit
+    elif [[ $2 == "-5" ]]; then
         source installer/uninstall.sh
         cleanup_project
         cleanup_db
@@ -59,8 +65,9 @@ while ! $finished; do
   echo "[1] Install Fitcrack (default)"
   echo "[2] Update Fitcrack server daemons (requires project restart)"
   echo "[3] Update Fitcrack WebAdmin (requires Apache restart)"
-  echo "[4] Remove previous installation"
-  echo "[5] Exit"
+  echo "[4] Update Fitcrack system"
+  echo "[5] Remove previous installation"
+  echo "[6] Exit"
   echo "=============================================================="
   read -e -p ": " OPERATION
   if [ "$OPERATION" -eq "$OPERATION" ] 2>/dev/null; then
@@ -73,13 +80,19 @@ while ! $finished; do
       source installer/update_webadmin.sh
       exit
     elif [ $OPERATION -eq 4 ]; then
+      source installer/update_daemons.sh
+      source installer/update_webadmin.sh
+      (cd runner ; python3 update_binaries.py)
+      source installer/migrate_db.sh
+      exit
+    elif [ $OPERATION -eq 5 ]; then
       source installer/uninstall.sh
       cleanup_project
       cleanup_db
       cleanup_webadmin
       cleanup_collections
       exit
-    elif [  $OPERATION -eq 5 ]; then
+    elif [  $OPERATION -eq 6 ]; then
       echo "Bye."
       exit
     fi
