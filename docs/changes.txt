@@ -1,7 +1,7 @@
 v2.4.0 -> ...
 
 New features:
-* New option 'Use prestored dictionaries on hosts' when 'Fragmentation of dictionaries' is set to 'On hosts'. Check README for more details.
+* New option 'Use local (prestored) dictionaries on hosts' when 'Fragmentation of dictionaries' is set to 'On hosts'. Check README for more details.
 * New option in the job detail view to export non-cracked hashes to file.
 * New column 'Remaining time' in the job workunits view.
 
