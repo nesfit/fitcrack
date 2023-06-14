@@ -4,6 +4,7 @@ New features:
 * New option 'Use local (prestored) dictionaries on hosts' when 'Fragmentation of dictionaries' is set to 'On hosts'. Check README for more details.
 * New option in the job detail view to export non-cracked hashes to file.
 * New column 'Remaining time' in the job workunits view.
+* It is now possible to upgrade standard (non-dockerized) Fitcrack to newer versions. Please see UPGRADE.md file.
 
 Fixes:
 * ...
