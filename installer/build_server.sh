@@ -7,6 +7,9 @@
 
 echo "Building Fitcrack server..."
 
+(cd boinc ; git stash)
+patch -p0 < installer/fitcrack_changes_in_boinc.patch > /dev/null
+
 # Copy server files to BOINC server Root
 cp -f server/src/headers/*.h              boinc/sched/
 cp -f server/src/headers/AttackModes/*.h  boinc/sched/
