@@ -233,7 +233,7 @@ if [ $START_SERVER = "y" ]; then
 else
   echo "You can start the project later as $BOINC_USER by typing:"
   echo " cd $BOINC_PROJECT_DIR"
-  echo " ./bin/start"
+  echo " sudo -u $BOINC_USER ./bin/start"
 fi
 
 if [ -x "$(command -v boinccmd)" ]; then
