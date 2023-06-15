@@ -133,4 +133,4 @@ For deployments with **Installer** (or manual installations), see [this page](IN
 Visit [CHANGELOG](CHANGELOG.md) to see changes between different versions of Fitcrack
 
 ### Upgrade to newer Fitcrack version
-Visit [UPGRADE](UPGRADE.md) to sse how to upgrade Fitcrack (must be installed directly, not a docker version) to newer version.
+Visit [UPGRADE](UPGRADE.md) to see how to upgrade Fitcrack (must be installed directly, not a docker version) to newer version.

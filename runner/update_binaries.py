@@ -2,8 +2,8 @@ import os
 import shutil
 import subprocess
 
-FITCRACK_BASE_DIR = "/home/boincadm/projects/fitcrack/"
-FITCRACK_APPS_DIR = "/home/boincadm/projects/fitcrack/apps/fitcrack/"
+FITCRACK_BASE_DIR = os.environ.get('BOINC_PROJECT_DIR', '/home/boincadm/projects/fitcrack')
+FITCRACK_APPS_DIR = FITCRACK_BASE_DIR + "/apps/fitcrack/"
 
 
 def change_runner_ver(filename, old, new):

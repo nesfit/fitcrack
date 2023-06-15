@@ -69,6 +69,7 @@ BOINC_PROJECT=${BOINC_PROJECT:-fitcrack}
 #########################
 
 BOINC_PROJECT_DIR="$BOINC_HOME/projects/$BOINC_PROJECT"
+export BOINC_PROJECT_DIR
 
 ##############################
 # BOINC project HTTPD CONFIG #

@@ -8,7 +8,7 @@ In a root terminal run:
 $ bash install_fitcrack.sh
 ```
 
-Fill MYSQL hostname, database name, user name and password; others are not needed to be entered for upgrading (just press Enter). 
+Fill BOINC project name, MYSQL hostname, database name, user name and password; others are not needed to be entered for upgrading (just press Enter). 
 
 Then enter number corresponding to 'Upgrade Fitcrack system' to upgrade your Fitcrack system. Enter Yes for all questions.
 
