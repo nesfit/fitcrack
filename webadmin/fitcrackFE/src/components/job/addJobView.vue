@@ -436,6 +436,20 @@
                 />
               </div>
               <v-subheader><b>({{ hosts.length }} selected)</b></v-subheader>
+              <v-divider />
+              <v-card-title>
+                  <span>Device types</span>
+              </v-card-title>
+              <v-checkbox
+                v-model="deviceTypes"
+                :value="1"
+                label="CPU"
+              />
+              <v-checkbox
+                v-model="deviceTypes"
+                :value="2"
+                label="GPU"
+              />
               <v-row>
                 <v-spacer />
                 <v-btn
@@ -630,7 +644,8 @@
     computed: {
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
-        'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
+        'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 
+        'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob', 'deviceTypes',
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
@@ -880,6 +895,12 @@
         if (this.keyspace > 1.8446744e+19 /* 2^64 */) {
           this.$error('Job keyspace is higher than maximal allowed value 2^64.')
           this.step = 2
+          return
+        }
+
+        if (this.deviceTypes.length == 0) {
+          this.$error('No device types selected.')
+          this.step = 3
           return
         }
 

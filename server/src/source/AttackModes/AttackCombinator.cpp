@@ -62,7 +62,7 @@ bool CAttackCombinator::makeWorkunit()
 
     f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getDistributionMode(),
                              m_job->getName(), m_job->getHashType(), 0,
-                             m_job->getHWTempAbort(), m_job->getOptimizedFlag(),
+                             m_job->getHWTempAbort(), m_job->getOptimizedFlag(), m_job->getDeviceTypes(),
                              m_job->getRuleLeft(), m_job->getRuleRight());
 
     /** Load current workunit dictionary */

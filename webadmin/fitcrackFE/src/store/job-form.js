@@ -56,7 +56,8 @@ export const empty = {
   optimized: true,
   startNow: true,
   endNever: true,
-  timeForJob: undefined
+  timeForJob: undefined,
+  deviceTypes: [2], // Default: GPU
 }
 
 export default {
@@ -112,7 +113,8 @@ export default {
           "hash_type": state.hashType ? state.hashType.code : null,
           "hash_list": state.validatedHashes,
           "valid_only": !state.ignoreHashes
-        }
+        },
+        "device_types": state.deviceTypes,
       }
     },
     validAttackSpecificSettings (state) {

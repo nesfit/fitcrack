@@ -49,6 +49,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_generateRandomRules = std::stoul(jobMap["generate_random_rules"]);
         this->m_optimized = std::stoul(jobMap["optimized"]);
         this->m_dictDeploymentMode = static_cast<DictDeploymentMode>(std::stoul(jobMap["dict_deployment_mode"]));
+        this->m_deviceTypes = std::stoul(jobMap["device_types"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         uint64_t minSeconds = m_sqlLoader->getAbsoluteMinimumWorkunitSeconds();
@@ -367,6 +368,22 @@ bool CJob::getOptimizedFlag() const
     return m_optimized;
 }
 
+const std::string CJob::getDeviceTypes() {
+    std::string enabled_device_types;
+    bool first = true;
+
+    for (DeviceType dt : {host_default, cpu, gpu}) {
+        if (m_deviceTypes & (1u << dt)) {
+            if (!first) {
+              enabled_device_types += ",";
+            }
+            enabled_device_types += std::to_string(dt);
+            first = false;
+        }
+    }
+
+    return enabled_device_types;
+}
 
 /**
  * @section Getters/Setters for other member variables

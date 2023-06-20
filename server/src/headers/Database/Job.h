@@ -19,6 +19,7 @@ class CDictionary;
 using PtrJob = Config::Ptr<CJob>;
 
 enum DictDeploymentMode { send, use_prestored };
+enum DeviceType { host_default, cpu , gpu };                 
 
 class CJob {
     private:
@@ -138,6 +139,7 @@ class CJob {
         uint32_t m_maxElemInChain;
         uint32_t m_generateRandomRules;
         bool m_optimized;
+        uint32_t m_deviceTypes;
         DictDeploymentMode m_dictDeploymentMode;
         bool m_killFlag;
 
@@ -197,6 +199,8 @@ class CJob {
         bool getOptimizedFlag() const;
         DictDeploymentMode getDictDeploymentMode() const;
         bool getKillFlag() const;
+
+        const std::string getDeviceTypes();
 
         void setGrammar(const std::string & grammar);
 

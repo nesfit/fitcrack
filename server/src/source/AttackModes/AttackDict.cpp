@@ -61,9 +61,11 @@ bool CAttackDict::makeWorkunit()
         return false;
     }
 
-    configFile << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(),
-                             m_job->getDistributionMode(), m_job->getName(),
-                             m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag());
+    configFile << generateBasicConfig(
+        m_job->getAttackMode(), m_job->getAttackSubmode(),
+        m_job->getDistributionMode(), m_job->getName(), m_job->getHashType(), 0,
+        m_job->getHWTempAbort(), m_job->getOptimizedFlag(),
+        m_job->getDeviceTypes());
 
     if (m_job->getDistributionMode() == 0) {
       // Number of passwords in the sent dictionary (the dictionary fragment).

@@ -24,6 +24,7 @@ const char *ConfigTask::DISTRIBUTION_MODE = "distribution_mode";
 const char *ConfigTask::HEX_DICT = "hex_dict";
 const char *ConfigTask::DICT1_KEYSPACE = "dict1_keyspace";
 const char *ConfigTask::DICT1_NAME = "dict1_name";
+const char *ConfigTask::DEVICE_TYPES = "device_types";
 /* Private */
 
 void ConfigTask::convertLineToOption(std::string& line) {
@@ -81,6 +82,7 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::HEX_DICT);
   supported_.push_back(ConfigTask::DICT1_KEYSPACE);
   supported_.push_back(ConfigTask::DICT1_NAME);
+  supported_.push_back(ConfigTask::DEVICE_TYPES);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

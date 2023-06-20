@@ -5,6 +5,7 @@ New features:
 * New option in the job detail view to export non-cracked hashes to file.
 * New column 'Remaining time' in the job workunits view.
 * It is now possible to upgrade standard (non-dockerized) Fitcrack to newer versions. Please see UPGRADE.md file.
+* Added possibility to select device types (CPU or GPU) to be used for cracking.
 
 Fixes:
 * ...

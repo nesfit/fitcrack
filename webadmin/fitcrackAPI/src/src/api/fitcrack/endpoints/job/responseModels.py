@@ -182,6 +182,7 @@ job_big_model = api.model('Job', {
     'generate_random_rules': fields.Integer(),
     'optimized': fields.Boolean(),
     'dict_deployment_mode': fields.Integer(),
+    'device_types': fields.String(),
 })
 
 job_nano_model = api.model('Job nano', {

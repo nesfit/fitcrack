@@ -28,9 +28,6 @@ void AttackCrackingBase::addSpecificArguments() {
   findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "--generate-rules");
   findAndAddOptional(ConfigTask::HWMON_TEMP_ABORT, "--hwmon-temp-abort");
 
-  if (config_.find(ConfigTask::OPTIMIZED, value) && value == "1")
-    addArgument("--optimized-kernel-enable");
-
   if (config_.find(ConfigTask::HEX_DICT, value) && value == "1")
     addArgument("--hex-wordlist");
 
@@ -46,6 +43,12 @@ void AttackCrackingBase::addSpecificArguments() {
   addArgument("--restore-disable");
   addArgument("--potfile-disable");
   addArgument("--logfile-disable");
+
+  if (config_.find(ConfigTask::OPTIMIZED, value) && value == "1")
+    addArgument("--optimized-kernel-enable");
+
+  if (config_.find(ConfigTask::DEVICE_TYPES, value) && value != "0")
+    addArgument("--opencl-device-types=" + value);
 }
 
 std::string AttackCrackingBase::addRequiredFile(const std::string& file_name) {

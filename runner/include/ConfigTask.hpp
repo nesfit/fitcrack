@@ -147,6 +147,7 @@ class ConfigTask {
         static const char *HEX_DICT;
         static const char *DICT1_KEYSPACE;
         static const char *DICT1_NAME;
+        static const char *DEVICE_TYPES;
 };
 
 #endif // CONFIGTASK_HPP
