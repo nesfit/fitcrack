@@ -237,6 +237,7 @@ class FcJob(Base):
     dict_deployment_mode = Column(Integer, nullable=False, server_default=text("'0'"))
     optimized = Column(Integer, nullable=False, server_default=text("'1'"))
     device_types = Column(Integer, nullable=False, server_default=text("'2'"))
+    workload_profile = Column(Integer, nullable=False, server_default=text("'2'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)

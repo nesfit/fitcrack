@@ -57,7 +57,7 @@ bool CAttackMarkov::makeWorkunit()
 
     f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getDistributionMode(),
                              m_job->getName(), m_job->getHashType(), 0,
-                             m_job->getHWTempAbort(), m_job->getOptimizedFlag(), m_job->getDeviceTypes(),
+                             m_job->getHWTempAbort(), m_job->getOptimizedFlag(), m_job->getDeviceTypes(), m_job->getWorkloadProfile(),
                              "", "", m_job->getCharset1(), m_job->getCharset2(),
                              m_job->getCharset3(), m_job->getCharset4());
 

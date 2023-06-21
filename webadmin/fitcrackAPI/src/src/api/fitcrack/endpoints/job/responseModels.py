@@ -183,6 +183,7 @@ job_big_model = api.model('Job', {
     'optimized': fields.Boolean(),
     'dict_deployment_mode': fields.Integer(),
     'device_types': fields.String(),
+    'workload_profile': fields.Integer(),
 })
 
 job_nano_model = api.model('Job nano', {

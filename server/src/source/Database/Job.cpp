@@ -50,6 +50,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_optimized = std::stoul(jobMap["optimized"]);
         this->m_dictDeploymentMode = static_cast<DictDeploymentMode>(std::stoul(jobMap["dict_deployment_mode"]));
         this->m_deviceTypes = std::stoul(jobMap["device_types"]);
+        this->m_workloadProfile = std::stoul(jobMap["workload_profile"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         uint64_t minSeconds = m_sqlLoader->getAbsoluteMinimumWorkunitSeconds();
@@ -383,6 +384,11 @@ const std::string CJob::getDeviceTypes() {
     }
 
     return enabled_device_types;
+}
+
+uint32_t CJob::getWorkloadProfile() const
+{
+    return m_workloadProfile;
 }
 
 /**

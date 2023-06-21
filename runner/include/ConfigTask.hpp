@@ -148,6 +148,7 @@ class ConfigTask {
         static const char *DICT1_KEYSPACE;
         static const char *DICT1_NAME;
         static const char *DEVICE_TYPES;
+        static const char *WORKLOAD_PROFILE;
 };
 
 #endif // CONFIGTASK_HPP

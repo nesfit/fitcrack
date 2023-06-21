@@ -49,6 +49,9 @@ void AttackCrackingBase::addSpecificArguments() {
 
   if (config_.find(ConfigTask::DEVICE_TYPES, value) && value != "0")
     addArgument("--opencl-device-types=" + value);
+
+  if (config_.find(ConfigTask::WORKLOAD_PROFILE, value))
+    addArgument("--workload-profile=" + value);
 }
 
 std::string AttackCrackingBase::addRequiredFile(const std::string& file_name) {

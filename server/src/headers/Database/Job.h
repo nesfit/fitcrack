@@ -140,6 +140,7 @@ class CJob {
         uint32_t m_generateRandomRules;
         bool m_optimized;
         uint32_t m_deviceTypes;
+        uint32_t m_workloadProfile;
         DictDeploymentMode m_dictDeploymentMode;
         bool m_killFlag;
 
@@ -201,6 +202,7 @@ class CJob {
         bool getKillFlag() const;
 
         const std::string getDeviceTypes();
+        uint32_t getWorkloadProfile() const;
 
         void setGrammar(const std::string & grammar);
 

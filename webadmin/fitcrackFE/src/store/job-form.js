@@ -57,7 +57,8 @@ export const empty = {
   startNow: true,
   endNever: true,
   timeForJob: undefined,
-  deviceTypes: [2], // Default: GPU
+  deviceTypes: [2], // Default: GPU,
+  workloadProfile: 2, // Default: Normal
 }
 
 export default {
@@ -115,6 +116,7 @@ export default {
           "valid_only": !state.ignoreHashes
         },
         "device_types": state.deviceTypes,
+        'workload_profile': parseInt(state.workloadProfile),
       }
     },
     validAttackSpecificSettings (state) {

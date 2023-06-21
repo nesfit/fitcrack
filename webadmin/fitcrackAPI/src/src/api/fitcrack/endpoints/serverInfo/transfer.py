@@ -18,7 +18,7 @@ JOB_EXPORTABLE_COLUMNS = (
   'markov_threshold', 'case_permute', 'check_duplicates', 
   'min_password_len', 'max_password_len', 'min_elem_in_chain', 
   'max_elem_in_chain', 'generate_random_rules', 'optimized', 'dict_deployment_mode',
-  'device_types', 'deleted', 'masks'
+  'device_types', 'workload_profile', 'deleted', 'masks'
 )
 # relationship fields that get stored as dependencies
 JOB_EXPORTABLE_DEPENDENCIES = {

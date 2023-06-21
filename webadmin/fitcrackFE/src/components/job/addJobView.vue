@@ -423,11 +423,13 @@
             editable
             step="3"
           >
-            Host assignment
+            Host settings
           </v-stepper-step>
           <v-stepper-content step="3">
             <v-container>
-              <v-subheader>Select which hosts to distribute workunits to</v-subheader>
+              <v-card-title>
+                  <span>Distribute workunits to hosts</span>
+              </v-card-title>
               <div class="scroller">
                 <host-selector
                   v-model="hosts"
@@ -437,19 +439,48 @@
               </div>
               <v-subheader><b>({{ hosts.length }} selected)</b></v-subheader>
               <v-divider />
-              <v-card-title>
-                  <span>Device types</span>
-              </v-card-title>
-              <v-checkbox
-                v-model="deviceTypes"
-                :value="1"
-                label="CPU"
-              />
-              <v-checkbox
-                v-model="deviceTypes"
-                :value="2"
-                label="GPU"
-              />
+              <v-row>
+                <v-col>
+                  <v-card-title>
+                      <span>Device types</span>
+                  </v-card-title>
+                  <v-checkbox
+                    v-model="deviceTypes"
+                    :value="1"
+                    label="CPU"
+                  />
+                  <v-checkbox
+                    v-model="deviceTypes"
+                    :value="2"
+                    label="GPU"
+                  />
+                </v-col>
+                <v-col>
+                  <v-card-title>
+                    <span>Workload profile</span>
+                  </v-card-title>
+                  <v-radio-group
+                    v-model="workloadProfile"
+                  >
+                    <v-radio
+                      label="Low"
+                      :value="1"
+                    ></v-radio>
+                    <v-radio
+                      label="Normal"
+                      :value="2"
+                    ></v-radio>
+                    <v-radio
+                      label="High"
+                      :value="3"
+                    ></v-radio>
+                    <v-radio
+                      label="Nightmare"
+                      :value="4"
+                    ></v-radio>
+                  </v-radio-group>
+                </v-col>
+              </v-row>
               <v-row>
                 <v-spacer />
                 <v-btn
@@ -645,7 +676,7 @@
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
         'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 
-        'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob', 'deviceTypes',
+        'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob', 'deviceTypes', 'workloadProfile',
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {

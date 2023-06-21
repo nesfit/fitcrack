@@ -32,10 +32,16 @@ class CAttackBench : public BaseAttack {
         ~CAttackBench() override = default;
 
         virtual char getModeLetter() override;
-        
-        virtual std::string generateBasicConfig(unsigned attackMode, unsigned attackSubmode, unsigned distributionMode, std::string name, unsigned hashType,
-                unsigned generateRandomRules = 0, unsigned hwTempAbort = 90, bool optimized = true, std::string deviceTypes = "", std::string ruleLeft="", std::string ruleRight="",
-                std::string charset1="", std::string charset2="", std::string charset3="", std::string charset4="") override;
+
+        virtual std::string generateBasicConfig(
+            unsigned attackMode, unsigned attackSubmode,
+            unsigned distributionMode, std::string name, unsigned hashType,
+            unsigned generateRandomRules = 0, unsigned hwTempAbort = 90,
+            bool optimized = true, std::string deviceTypes = "",
+            unsigned workloadProfile = 2, std::string ruleLeft = "",
+            std::string ruleRight = "", std::string charset1 = "",
+            std::string charset2 = "", std::string charset3 = "",
+            std::string charset4 = "") override;
 
         virtual std::string makeLimitingConfigLine(const std::string &, const std::string &, const std::string &) override {return "";}
 
@@ -69,12 +75,15 @@ char CAttackBench<BaseAttack>::getModeLetter()
 
 template <typename BaseAttack>
 std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, unsigned distributionMode, std::string name,
-    unsigned hashType, unsigned generateRandomRules, unsigned hwTempAbort, bool optimized, std::string deviceTypes, std::string ruleLeft, std::string ruleRight, 
+    unsigned hashType, unsigned generateRandomRules, unsigned hwTempAbort, bool optimized, std::string deviceTypes, unsigned workloadProfile, std::string ruleLeft, std::string ruleRight, 
     std::string charset1, std::string charset2, std::string charset3, std::string charset4)
 {
     std::ostringstream configBuilder;
-    configBuilder << AttackMode::generateBasicConfig(attackMode, attackSubmode, distributionMode, name,
-        hashType, generateRandomRules, hwTempAbort, optimized, deviceTypes, ruleLeft, ruleRight, charset1, charset2, charset3, charset4);
+    configBuilder << AttackMode::generateBasicConfig(
+        attackMode, attackSubmode, distributionMode, name, hashType,
+        generateRandomRules, hwTempAbort, optimized, deviceTypes,
+        workloadProfile, ruleLeft, ruleRight, charset1, charset2, charset3,
+        charset4);
     auto dicts = this->m_job->getDictionaries();
     bool hasRightDicts = false;
     if (!this->hasStickyLeftDict()) {

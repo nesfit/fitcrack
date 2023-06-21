@@ -61,10 +61,14 @@ bool CAttackHybridDictMask::makeWorkunit()
 		return false;
 	}
 
-	f << generateBasicConfig(m_job->getAttackMode(), m_job->getAttackSubmode(), m_job->getDistributionMode(),
-		m_job->getName(), m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag(), m_job->getDeviceTypes(), m_job->getRuleLeft());
+        f << generateBasicConfig(
+            m_job->getAttackMode(), m_job->getAttackSubmode(),
+            m_job->getDistributionMode(), m_job->getName(),
+            m_job->getHashType(), 0, m_job->getHWTempAbort(),
+            m_job->getOptimizedFlag(), m_job->getDeviceTypes(),
+            m_job->getWorkloadProfile(), m_job->getRuleLeft());
 
-	auto dictVec = m_job->getDictionaries();
+        auto dictVec = m_job->getDictionaries();
 	bool hexDicts = std::all_of(dictVec.begin(), dictVec.end(), [](auto dict){ return dict->isHexDict(); });
 	f << "|||hex_dict|UInt|1|" << std::to_string(hexDicts) << "|||\n";
 
