@@ -369,21 +369,8 @@ bool CJob::getOptimizedFlag() const
     return m_optimized;
 }
 
-const std::string CJob::getDeviceTypes() {
-    std::string enabled_device_types;
-    bool first = true;
-
-    for (DeviceType dt : {host_default, cpu, gpu}) {
-        if (m_deviceTypes & (1u << dt)) {
-            if (!first) {
-              enabled_device_types += ",";
-            }
-            enabled_device_types += std::to_string(dt);
-            first = false;
-        }
-    }
-
-    return enabled_device_types;
+uint32_t CJob::getDeviceTypes() const {
+    return m_deviceTypes;
 }
 
 uint32_t CJob::getWorkloadProfile() const

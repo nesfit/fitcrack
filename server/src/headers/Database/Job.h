@@ -201,7 +201,7 @@ class CJob {
         DictDeploymentMode getDictDeploymentMode() const;
         bool getKillFlag() const;
 
-        const std::string getDeviceTypes();
+        uint32_t getDeviceTypes() const;
         uint32_t getWorkloadProfile() const;
 
         void setGrammar(const std::string & grammar);

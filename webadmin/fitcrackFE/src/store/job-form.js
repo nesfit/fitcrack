@@ -57,8 +57,8 @@ export const empty = {
   startNow: true,
   endNever: true,
   timeForJob: undefined,
-  deviceTypes: [2], // Default: GPU,
-  workloadProfile: 2, // Default: Normal
+  deviceTypes: 0, // Default: Host default
+  workloadProfile: 0, // Default: Host default
 }
 
 export default {
@@ -115,7 +115,7 @@ export default {
           "hash_list": state.validatedHashes,
           "valid_only": !state.ignoreHashes
         },
-        "device_types": state.deviceTypes,
+        "device_types": parseInt(state.deviceTypes),
         'workload_profile': parseInt(state.workloadProfile),
       }
     },

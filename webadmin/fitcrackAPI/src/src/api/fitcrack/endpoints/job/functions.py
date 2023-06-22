@@ -167,8 +167,8 @@ def create_job(data):
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         optimized=job['attack_settings'].get('optimized', 1),
-        device_types = sum(1 << type for type in job.get('device_types', [0])),
-        workload_profile = job.get('workload_profile', 2), # Normal
+        device_types = job.get('device_types', 0), # Default: Host default
+        workload_profile = job.get('workload_profile', 0), # Default: Host default
         dict_deployment_mode=job['attack_settings'].get('dict_deployment_mode', 0),
         deleted=False
         )

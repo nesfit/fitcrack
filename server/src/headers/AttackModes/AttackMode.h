@@ -97,8 +97,8 @@ protected:
             unsigned attackMode, unsigned attackSubmode,
             unsigned distributionMode, std::string name, unsigned hashType,
             unsigned generateRandomRules = 0, unsigned hwTempAbort = 90,
-            bool optimized = true, std::string deviceTypes = "",
-            unsigned workloadProfile = 2, std::string ruleLeft = "",
+            bool optimized = true, unsigned deviceTypes = 0,
+            unsigned workloadProfile = 0, std::string ruleLeft = "",
             std::string ruleRight = "", std::string charset1 = "",
             std::string charset2 = "", std::string charset3 = "",
             std::string charset4 = "");

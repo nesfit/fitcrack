@@ -35,7 +35,7 @@ void AttackMode::setDefaultWorkunitParams(DB_WORKUNIT * wu)
 
 
 std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, unsigned distributionMode, std::string name, unsigned hashType, unsigned generateRandomRules,
-                                            unsigned hwTempAbort, bool optimized, std::string deviceTypes, unsigned workloadProfile, std::string ruleLeft, std::string ruleRight, std::string charset1,
+                                            unsigned hwTempAbort, bool optimized, unsigned deviceTypes, unsigned workloadProfile, std::string ruleLeft, std::string ruleRight, std::string charset1,
                                             std::string charset2, std::string charset3, std::string charset4)
 {
     std::string result = "|||mode|String|1|" + std::string(1, getModeLetter()) + "|||\n";
@@ -78,7 +78,7 @@ std::string AttackMode::generateBasicConfig(unsigned attackMode, unsigned attack
 
     result += "|||optimized|UInt|1|" + std::to_string(optimized) + "|||\n";
 
-    result += "|||device_types|String|" + std::to_string(deviceTypes.length()) + "|" + deviceTypes + "|||\n";
+    result += "|||device_types|UInt|1|" + std::to_string(deviceTypes) + "|||\n";
 
     result += "|||workload_profile|UInt|1|" + std::to_string(workloadProfile) + "|||\n";
 

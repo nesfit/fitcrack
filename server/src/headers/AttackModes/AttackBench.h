@@ -37,8 +37,8 @@ class CAttackBench : public BaseAttack {
             unsigned attackMode, unsigned attackSubmode,
             unsigned distributionMode, std::string name, unsigned hashType,
             unsigned generateRandomRules = 0, unsigned hwTempAbort = 90,
-            bool optimized = true, std::string deviceTypes = "",
-            unsigned workloadProfile = 2, std::string ruleLeft = "",
+            bool optimized = true, unsigned deviceTypes = 0,
+            unsigned workloadProfile = 0, std::string ruleLeft = "",
             std::string ruleRight = "", std::string charset1 = "",
             std::string charset2 = "", std::string charset3 = "",
             std::string charset4 = "") override;
@@ -75,7 +75,7 @@ char CAttackBench<BaseAttack>::getModeLetter()
 
 template <typename BaseAttack>
 std::string CAttackBench<BaseAttack>::generateBasicConfig(unsigned attackMode, unsigned attackSubmode, unsigned distributionMode, std::string name,
-    unsigned hashType, unsigned generateRandomRules, unsigned hwTempAbort, bool optimized, std::string deviceTypes, unsigned workloadProfile, std::string ruleLeft, std::string ruleRight, 
+    unsigned hashType, unsigned generateRandomRules, unsigned hwTempAbort, bool optimized, unsigned deviceTypes, unsigned workloadProfile, std::string ruleLeft, std::string ruleRight, 
     std::string charset1, std::string charset2, std::string charset3, std::string charset4)
 {
     std::ostringstream configBuilder;

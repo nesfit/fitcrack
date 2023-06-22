@@ -444,16 +444,26 @@
                   <v-card-title>
                       <span>Device types</span>
                   </v-card-title>
-                  <v-checkbox
+                  <v-radio-group
                     v-model="deviceTypes"
-                    :value="1"
-                    label="CPU"
-                  />
-                  <v-checkbox
-                    v-model="deviceTypes"
-                    :value="2"
-                    label="GPU"
-                  />
+                  >
+                    <v-radio
+                      label="Host default"
+                      :value="0"
+                    ></v-radio>
+                    <v-radio
+                      label="CPU only"
+                      :value="1"
+                    ></v-radio>
+                    <v-radio
+                      label="GPU only"
+                      :value="2"
+                    ></v-radio>
+                    <v-radio
+                      label="CPU + GPU"
+                      :value="3"
+                    ></v-radio>
+                  </v-radio-group>
                 </v-col>
                 <v-col>
                   <v-card-title>
@@ -462,6 +472,10 @@
                   <v-radio-group
                     v-model="workloadProfile"
                   >
+                    <v-radio
+                      label="Host default"
+                      :value="0"
+                    ></v-radio>
                     <v-radio
                       label="Low"
                       :value="1"

@@ -47,10 +47,13 @@ void AttackCrackingBase::addSpecificArguments() {
   if (config_.find(ConfigTask::OPTIMIZED, value) && value == "1")
     addArgument("--optimized-kernel-enable");
 
-  if (config_.find(ConfigTask::DEVICE_TYPES, value) && value != "0")
+  if (config_.find(ConfigTask::DEVICE_TYPES, value) && value != "0") {
+    if (value == "3")
+      value = "1,2";
     addArgument("--opencl-device-types=" + value);
+  }
 
-  if (config_.find(ConfigTask::WORKLOAD_PROFILE, value))
+  if (config_.find(ConfigTask::WORKLOAD_PROFILE, value) && value != "0")
     addArgument("--workload-profile=" + value);
 }
 
