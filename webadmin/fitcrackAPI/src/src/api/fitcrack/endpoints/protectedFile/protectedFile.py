@@ -22,8 +22,8 @@ from src.database.models import FcEncryptedFile
 log = logging.getLogger(__name__)
 ns = api.namespace('protectedFiles', description='Endpoints for operations with files with passwords.')
 
-ALLOWED_EXTENSIONS = set(["doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "rar", "zip", "7z"])
-
+ALLOWED_OFFICE_EXTENSIONS = set(["doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "rar", "zip", "7z"])
+ALLOWED_WALLET_EXTENSIONS = set(["dat", "json"])
 
 @ns.route('/')
 class filesCollection(Resource):
@@ -35,7 +35,7 @@ class filesCollection(Resource):
         return {'items': FcEncryptedFile.query.all()}
 
 
-@ns.route('/add')
+@ns.route('/addFile')
 class filesAdd(Resource):
 
     @api.marshal_with(excryptedFileUploaded_model)
@@ -53,7 +53,7 @@ class filesAdd(Resource):
         if file.filename == '':
             abort(500, 'No selected file')
 
-        uploadedFile = fileUpload(file, PROTECTEDFILES_DIR, ALLOWED_EXTENSIONS, withTimestamp=True)
+        uploadedFile = fileUpload(file, PROTECTEDFILES_DIR, ALLOWED_OFFICE_EXTENSIONS, withTimestamp=True)
         if uploadedFile:
             loadedHash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
             encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=loadedHash['hash'].encode(),
@@ -73,9 +73,47 @@ class filesAdd(Resource):
                 'file_id': encFile.id
             }
         else:
-            abort(500, 'We only support ' + ', '.join(str(x) for x in ALLOWED_EXTENSIONS) + '.')
+            abort(500, 'We only support ' + ', '.join(str(x) for x in ALLOWED_OFFICE_EXTENSIONS) + '.')
 
 
+@ns.route('/addWallet')
+class walletsAdd(Resource):
+
+    @api.marshal_with(excryptedFileUploaded_model)
+    def post(self):
+        """
+        Uploads crypto wallets on server.
+        """
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            abort(500, 'No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            abort(500, 'No selected wallet file')
+        uploadedFile = fileUpload(file, PROTECTEDFILES_DIR, ALLOWED_WALLET_EXTENSIONS, withTimestamp=True)
+        if uploadedFile:
+            loadedHash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
+            encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=loadedHash['hash'].encode(),
+                                      hash_type=loadedHash['hash_type'])
+            try:
+                db.session.add(encFile)
+                db.session.commit()
+            except exc.IntegrityError as e:
+                db.session().rollback()
+                abort(500, 'Wallet with name ' + uploadedFile['filename'] + ' already exists.')
+            return {
+                'message': 'Successfully extracted hash from uploaded wallet.',
+                'status': True,
+                'hash': loadedHash['hash'],
+                'hash_type': loadedHash['hash_type'],
+                'hash_type_name': encFile.hash_type_name,
+                'file_id': encFile.id
+            }
+        else:
+            abort(500, 'We only support ' + ', '.join(str(x) for x in ALLOWED_WALLET_EXTENSIONS) + '.')
 
 
 @ns.route('/<id>')

@@ -7,6 +7,7 @@ New features:
 * It is now possible to upgrade standard (non-dockerized) Fitcrack to newer versions. Please see UPGRADE.md file.
 * Added possibility to select device types (CPU or GPU) to be used for cracking.
 * Added possibility to change hashcat's workload profile.
+* Added support to automatically extract hashes from your Bitcoin/Litecoin/Ethereum wallets.
 
 Fixes:
 * ...

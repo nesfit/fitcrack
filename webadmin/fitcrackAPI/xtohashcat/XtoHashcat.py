@@ -126,6 +126,18 @@ class StaticHelper:
         elif formatId == 4:
             # 7-Zip
             return '11600'              # 7-Zip
+        elif formatId == 5:
+            # Bitcoin/Litecoin wallet.dat
+            if hashStr[1:8] == 'bitcoin':
+                return '11300'
+        elif formatId == 6:
+            if hashStr[1:9] == 'ethereum':
+                if hashStr[10:11] == 'p':
+                    return '15600' # Ethereum Wallet, PBKDF2-HMAC-SHA256
+                elif hashStr[10:11] == 's':
+                    return '15700' # Ethereum Wallet, SCRYPT
+                elif hashStr[10:11] == 'w':
+                    return '16300' # Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256
         else:
             # Unsupported format
             return '-1'
@@ -143,6 +155,9 @@ class Format:
 
     def checkSignature(self, signature: bytes) -> bool:
         """Returns True if the signature of parsed file is expected, False otherwise."""
+        if not self.signatures:
+            return True
+
         for sig in self.signatures:
             if signature.startswith(sig):
                 return True
@@ -174,8 +189,8 @@ class Format:
         else:
             hashStr = out.decode('unicode_escape')
 
-            # ZIP/RAR john2hashcat
-            if self.extensions[0] == '.rar' or self.extensions[0] == '.zip':
+            # ZIP/RAR/JSON john2hashcat
+            if self.extensions[0] in ['.rar', '.zip', '.json']:
                 hashStr = hashStr[(hashStr.find(':') + 1):]
                 colonIndex = hashStr.find(':')
 
@@ -209,6 +224,8 @@ class Extractor:
         self.extractorFormats.append(Format(2, ['.rar'], [b'526172211a07'], 'scripts/rar2john', ''))
         self.extractorFormats.append(Format(3, ['.zip'], [b'504b0304'], 'scripts/zip2john', ''))
         self.extractorFormats.append(Format(4, ['.7z'], [b'377abcaf271c'], 'scripts/7z2hashcat.pl', 'perl'))
+        self.extractorFormats.append(Format(5, ['.dat'], [], 'scripts/bitcoin2john.py', 'python3'))
+        self.extractorFormats.append(Format(6, ['.json'], [], 'scripts/ethereum2john.py', 'python3'))
 
     def checkFormat(self) -> bool:
         """Attempts to recognize the file format.
@@ -253,6 +270,10 @@ class Extractor:
             self.activeFormat = 3
         elif file_format == 11600:
             self.activeFormat = 4
+        elif file_format == 11300:
+            self.activeFormat = 5
+        elif file_format in [15600, 15700, 16300]:
+            self.activeFormat = 6
         else:
             print(f'The --hash-type {file_format} is not supported by XtoHashcat.', file=stderr)
             return False

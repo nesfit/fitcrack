@@ -155,8 +155,11 @@
                   <v-btn id="job-input-mode-hashlist" value="hashFile">
                     From hash file
                   </v-btn>
-                  <v-btn id="job-input-mode-extract" value="extractFromFile">
+                  <v-btn id="job-input-mode-file-extract" value="extractFromFile">
                     Extract from file
+                  </v-btn>
+                  <v-btn id="job-input-mode-wallet-extract" value="extractFromWallet">
+                    Extract from wallet
                   </v-btn>
                 </v-btn-toggle>
                 <v-autocomplete
@@ -228,7 +231,23 @@
                   </v-alert>
                   <file-uploader
                     ref="encryptedFileUploader"
-                    :url="this.$serverAddr + '/protectedFiles/add'"
+                    :url="this.$serverAddr + '/protectedFiles/addFile'"
+                    @uploadComplete="uploadComplete"
+                  />
+                </v-col>
+                <v-col
+                  v-if="inputMethod === 'extractFromWallet'"
+                  cols="12"
+                >
+                    <v-alert
+                    type="info"
+                    text
+                  >
+                    Support wallet files: Bitcoin / Litecoin (.dat), Ethereum (.json).
+                  </v-alert>
+                  <file-uploader
+                    ref="encryptedFileUploader"
+                    :url="this.$serverAddr + '/protectedFiles/addWallet'"
                     @uploadComplete="uploadComplete"
                   />
                 </v-col>
@@ -843,8 +862,12 @@
         }
       },
       uploadComplete: function (data) {
-        this.$success("Successfully extracted hash form file.")
+        var previousHashType = this.hashType
+        this.$success("Hash extracted successfully.")
         this.hashType = this.hashTypes.find(h => h.code == data['hash_type'])
+        if (previousHashType != this.hashType) {
+          this.hashList = ''
+        }
         this.addHash(data['hash'])
         this.validateHashes(null)
       },
