@@ -148,6 +148,13 @@ class StaticHelper:
                 return '31900' # MetaMask Mobile Wallet
             elif hashStr[1:9] == 'metamask':
                 return '26600' # MetaMask Wallet (needs all data, checks AES-GCM tag)
+        elif formatId == 9:
+            if hashStr[10:11] == '1':
+                return '16600' # Electrum Wallet (Salt-Type 1-3)
+            elif hashStr[10:11] == '4':
+                return '21700' # Electrum Wallet (Salt-Type 4)
+            elif hashStr[10:11] == '5':
+                return '21800' # Electrum Wallet (Salt-Type 5)
         else:
             # Unsupported format
             return '-1'
@@ -199,8 +206,8 @@ class Format:
         else:
             hashStr = out.decode('unicode_escape')
 
-            # ZIP/RAR/JSON john2hashcat
-            if self.extensions[0] in ['.rar', '.zip', '.json']:
+            # remove filename prefix
+            if self.extensions[0] in ['.rar', '.zip', '.json', '.electrum']:
                 hashStr = hashStr[(hashStr.find(':') + 1):]
                 colonIndex = hashStr.find(':')
 
@@ -238,6 +245,7 @@ class Extractor:
         self.extractorFormats.append(Format(6, ['.json'], [], 'scripts/ethereum2john.py', 'python3'))
         self.extractorFormats.append(Format(7, ['.seco'], [], 'scripts/exodus2hashcat.py', 'python3'))
         self.extractorFormats.append(Format(8, ['.json'], [], 'scripts/metamask2hashcat.py', 'python3'))
+        self.extractorFormats.append(Format(9, ['.electrum'], [], 'scripts/electrum2john.py', 'python3'))
 
     def checkFormat(self) -> bool:
         """Attempts to recognize the file format.
@@ -301,6 +309,8 @@ class Extractor:
             self.activeFormat = 7
         elif file_format in [26600, 26610, 31900]:
             self.activeFormat = 8
+        elif file_format in [16600, 21700, 21800]:
+            self.activeFormat = 9
         else:
             print(f'The --hash-type {file_format} is not supported by XtoHashcat.', file=stderr)
             return False

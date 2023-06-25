@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 ns = api.namespace('protectedFiles', description='Endpoints for operations with files with passwords.')
 
 ALLOWED_OFFICE_EXTENSIONS = set(["doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "rar", "zip", "7z"])
-ALLOWED_WALLET_EXTENSIONS = set(["dat", "json", "seco"])
+ALLOWED_WALLET_EXTENSIONS = set(["dat", "json", "seco", "electrum"])
 
 @ns.route('/')
 class filesCollection(Resource):
