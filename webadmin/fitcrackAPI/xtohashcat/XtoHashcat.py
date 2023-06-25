@@ -138,6 +138,8 @@ class StaticHelper:
                     return '15700' # Ethereum Wallet, SCRYPT
                 elif hashStr[10:11] == 'w':
                     return '16300' # Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256
+        elif formatId == 7:
+            return '28200' # Exodus Desktop Wallet (scrypt)
         else:
             # Unsupported format
             return '-1'
@@ -226,6 +228,7 @@ class Extractor:
         self.extractorFormats.append(Format(4, ['.7z'], [b'377abcaf271c'], 'scripts/7z2hashcat.pl', 'perl'))
         self.extractorFormats.append(Format(5, ['.dat'], [], 'scripts/bitcoin2john.py', 'python3'))
         self.extractorFormats.append(Format(6, ['.json'], [], 'scripts/ethereum2john.py', 'python3'))
+        self.extractorFormats.append(Format(7, ['.seco'], [], 'scripts/exodus2hashcat.py', 'python3'))
 
     def checkFormat(self) -> bool:
         """Attempts to recognize the file format.
@@ -274,6 +277,8 @@ class Extractor:
             self.activeFormat = 5
         elif file_format in [15600, 15700, 16300]:
             self.activeFormat = 6
+        elif file_format == 28200:
+            self.activeFormat = 7
         else:
             print(f'The --hash-type {file_format} is not supported by XtoHashcat.', file=stderr)
             return False
