@@ -24,6 +24,7 @@ import argparse
 import os.path
 import binascii
 import subprocess
+import json
 
 from sys import exit, stderr, argv
 from typing import List
@@ -140,6 +141,13 @@ class StaticHelper:
                     return '16300' # Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256
         elif formatId == 7:
             return '28200' # Exodus Desktop Wallet (scrypt)
+        elif formatId == 8:
+            if hashStr[1:15] == 'metamask-short':
+                return '26610' # MetaMask Wallet (short hash, plaintext check)
+            elif hashStr[1:15] == 'metamaskMobile':
+                return '31900' # MetaMask Mobile Wallet
+            elif hashStr[1:9] == 'metamask':
+                return '26600' # MetaMask Wallet (needs all data, checks AES-GCM tag)
         else:
             # Unsupported format
             return '-1'
@@ -229,6 +237,7 @@ class Extractor:
         self.extractorFormats.append(Format(5, ['.dat'], [], 'scripts/bitcoin2john.py', 'python3'))
         self.extractorFormats.append(Format(6, ['.json'], [], 'scripts/ethereum2john.py', 'python3'))
         self.extractorFormats.append(Format(7, ['.seco'], [], 'scripts/exodus2hashcat.py', 'python3'))
+        self.extractorFormats.append(Format(8, ['.json'], [], 'scripts/metamask2hashcat.py', 'python3'))
 
     def checkFormat(self) -> bool:
         """Attempts to recognize the file format.
@@ -244,6 +253,17 @@ class Extractor:
         except OSError:
             print('Failed to open input file.', file=stderr)
             return False
+
+        # Custom match rules
+        try:
+            with open(self.path, 'r') as json_file:
+                json_data = json.load(json_file)
+                required_keys = ['data', 'iv', 'salt']
+                if all(key in json_data for key in required_keys):
+                    self.activeFormat = 8 # Metamask
+                    return True
+        except:
+            pass
 
         # Look for a match
         for file_format in self.extractorFormats:
@@ -279,6 +299,8 @@ class Extractor:
             self.activeFormat = 6
         elif file_format == 28200:
             self.activeFormat = 7
+        elif file_format in [26600, 26610, 31900]:
+            self.activeFormat = 8
         else:
             print(f'The --hash-type {file_format} is not supported by XtoHashcat.', file=stderr)
             return False

@@ -243,7 +243,7 @@
                     type="info"
                     text
                   >
-                    Support wallet files: Bitcoin / Litecoin (.dat), Ethereum (.json), Exodus (.seco).
+                    Support wallet files: Bitcoin / Litecoin (.dat), Ethereum (.json), Exodus (.seco), MetaMask (.json).
                   </v-alert>
                   <file-uploader
                     ref="encryptedFileUploader"
