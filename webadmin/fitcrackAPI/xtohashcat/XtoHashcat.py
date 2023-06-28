@@ -141,7 +141,7 @@ class StaticHelper:
                     return '16300' # Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256
         elif formatId == 7:
             return '28200' # Exodus Desktop Wallet (scrypt)
-        elif formatId == 8:
+        elif formatId in [8, 10]:
             if hashStr[1:15] == 'metamask-short':
                 return '26610' # MetaMask Wallet (short hash, plaintext check)
             elif hashStr[1:15] == 'metamaskMobile':
@@ -246,6 +246,7 @@ class Extractor:
         self.extractorFormats.append(Format(7, ['.seco'], [], 'scripts/exodus2hashcat.py', 'python3'))
         self.extractorFormats.append(Format(8, ['.json'], [], 'scripts/metamask2hashcat.py', 'python3'))
         self.extractorFormats.append(Format(9, ['.electrum'], [], 'scripts/electrum2john.py', 'python3'))
+        self.extractorFormats.append(Format(10, ['.ldb'], [], 'scripts/metamask_extractor', ''))
 
     def checkFormat(self) -> bool:
         """Attempts to recognize the file format.
@@ -260,18 +261,15 @@ class Extractor:
             ext = os.path.splitext(self.path)[1]
         except OSError:
             print('Failed to open input file.', file=stderr)
-            return False
 
         # Custom match rules
-        try:
+        if self.path.endswith(".json"):
             with open(self.path, 'r') as json_file:
                 json_data = json.load(json_file)
                 required_keys = ['data', 'iv', 'salt']
                 if all(key in json_data for key in required_keys):
                     self.activeFormat = 8 # Metamask
                     return True
-        except:
-            pass
 
         # Look for a match
         for file_format in self.extractorFormats:

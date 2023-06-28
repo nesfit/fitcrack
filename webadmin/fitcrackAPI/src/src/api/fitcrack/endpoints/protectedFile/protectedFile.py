@@ -4,7 +4,8 @@
 '''
 
 import logging
-
+import tempfile
+import zipfile
 import os
 from flask import request, redirect, send_file
 from flask_restx import Resource, abort
@@ -23,7 +24,7 @@ log = logging.getLogger(__name__)
 ns = api.namespace('protectedFiles', description='Endpoints for operations with files with passwords.')
 
 ALLOWED_OFFICE_EXTENSIONS = set(["doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "rar", "zip", "7z"])
-ALLOWED_WALLET_EXTENSIONS = set(["dat", "json", "seco", "electrum"])
+ALLOWED_WALLET_EXTENSIONS = set(["dat", "json", "seco", "electrum", "zip"])
 
 @ns.route('/')
 class filesCollection(Resource):
@@ -76,6 +77,17 @@ class filesAdd(Resource):
             abort(500, 'We only support ' + ', '.join(str(x) for x in ALLOWED_OFFICE_EXTENSIONS) + '.')
 
 
+def tryExtractMetaMaskHash(zip_name, zip_path):
+    with tempfile.TemporaryDirectory(dir=PROTECTEDFILES_DIR) as temp_dir:
+        with zipfile.ZipFile(os.path.join(PROTECTEDFILES_DIR, zip_path), 'r') as zip_ref:
+                zip_ref.extractall(temp_dir)
+                for file in os.listdir(temp_dir):
+                    if file.endswith(".ldb"):
+                        full_path = os.path.join(temp_dir, file)
+                        return getHashFromFile(filename=file, path=os.path.relpath(full_path, PROTECTEDFILES_DIR))
+    
+    return None
+
 @ns.route('/addWallet')
 class walletsAdd(Resource):
 
@@ -93,9 +105,12 @@ class walletsAdd(Resource):
         # submit a empty part without filename
         if file.filename == '':
             abort(500, 'No selected wallet file')
+            
         uploadedFile = fileUpload(file, PROTECTEDFILES_DIR, ALLOWED_WALLET_EXTENSIONS, withTimestamp=True)
         if uploadedFile:
-            loadedHash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
+            loadedHash = tryExtractMetaMaskHash(uploadedFile['filename'], uploadedFile['path'])
+            if not loadedHash:
+                loadedHash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
             encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=loadedHash['hash'].encode(),
                                       hash_type=loadedHash['hash_type'])
             try:

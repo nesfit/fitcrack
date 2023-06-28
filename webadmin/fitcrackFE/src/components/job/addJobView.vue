@@ -243,7 +243,7 @@
                     type="info"
                     text
                   >
-                    Supported wallet files: Bitcoin / Litecoin (.dat), Ethereum (.json), Exodus (.seco), MetaMask (.json), Electrum (.electrum).
+                    Supported wallet files: Bitcoin / Litecoin (.dat), Ethereum (.json), Exodus (.seco), MetaMask (.json), Electrum (.electrum), MetaMask (.zip containing LevelDB files).
                   </v-alert>
                   <file-uploader
                     ref="encryptedFileUploader"
