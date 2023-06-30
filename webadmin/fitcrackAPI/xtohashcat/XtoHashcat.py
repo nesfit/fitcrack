@@ -271,6 +271,10 @@ class Extractor:
                     self.activeFormat = 8 # Metamask
                     return True
 
+        if self.path.endswith(".ldb"):
+            self.activeFormat = 10 # MetaMask LDB
+            return True
+
         # Look for a match
         for file_format in self.extractorFormats:
             if file_format.checkSignature(sig) and file_format.checkExtension(ext):
