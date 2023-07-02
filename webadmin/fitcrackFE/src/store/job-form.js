@@ -37,6 +37,7 @@ export const empty = {
   masks: [''],
   hybridMask: '',
   charset: [],
+  priority: 1, // Normal
   submode: 0,
   distributionMode: 0, // Default: create fragment on server
   dictDeploymentMode: 0, // Default: Send dictionaries to hosts
@@ -117,6 +118,7 @@ export default {
         },
         "device_types": parseInt(state.deviceTypes),
         'workload_profile': parseInt(state.workloadProfile),
+        'priority': parseInt(state.priority),
       }
     },
     validAttackSpecificSettings (state) {

@@ -8,6 +8,7 @@ New features:
 * Added possibility to select device types (CPU or GPU) to be used for cracking.
 * Added possibility to change hashcat's workload profile.
 * Added support to automatically extract hashes from your Bitcoin/Litecoin/Ethereum/Exodus/MetaMask/Electrum wallets.
+* Added possibility to set priority (low/normal/high) of a new job in 'Additional settings'.
 
 Fixes:
 * ...

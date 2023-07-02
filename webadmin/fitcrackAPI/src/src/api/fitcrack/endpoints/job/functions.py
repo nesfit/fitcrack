@@ -169,6 +169,7 @@ def create_job(data):
         optimized=job['attack_settings'].get('optimized', 1),
         device_types = job.get('device_types', 0), # Default: Host default
         workload_profile = job.get('workload_profile', 0), # Default: Host default
+        priority = job.get('priority', 1), # Default: Normal
         dict_deployment_mode=job['attack_settings'].get('dict_deployment_mode', 0),
         deleted=False
         )

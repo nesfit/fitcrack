@@ -184,6 +184,8 @@ job_big_model = api.model('Job', {
     'dict_deployment_mode': fields.Integer(),
     'device_types': fields.String(),
     'workload_profile': fields.Integer(),
+    'priority': fields.Integer(),
+    'priority_str': fields.String(),
 })
 
 job_nano_model = api.model('Job nano', {

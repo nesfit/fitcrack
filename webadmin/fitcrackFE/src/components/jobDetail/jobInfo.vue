@@ -233,6 +233,7 @@ export default {
         {title: 'Estimated Cracking Time', icon: 'mdi-bell-ring-outline', value: d.estimated_cracking_time_str},
         {title: 'Start', icon: 'mdi-ray-start', value: this.startTime},
         {title: 'End', icon: 'mdi-ray-end', value: this.endTime},
+        {title: 'Priority', icon: 'mdi-priority-high', value: d.priority_str},
         {title: 'Efficiency', hide: () => !this.testmode, icon: 'mdi-chart-timeline-variant', value: d.efficiency, format: v => `${v} %`},
         {title: 'Cracked Hashes', icon: 'mdi-textbox-password', value: d.cracked_hashes_str},
         {title: 'Time per workunit', icon: 'mdi-timeline-clock', value: d.seconds_per_job, format: v => `${v} seconds`},

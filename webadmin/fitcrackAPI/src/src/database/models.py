@@ -238,6 +238,7 @@ class FcJob(Base):
     optimized = Column(Integer, nullable=False, server_default=text("'1'"))
     device_types = Column(Integer, nullable=False, server_default=text("'0'"))
     workload_profile = Column(Integer, nullable=False, server_default=text("'0'"))
+    priority = Column(Integer, nullable=False, server_default=text("'1'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
@@ -276,6 +277,11 @@ class FcJob(Base):
         if total == 0:
             return ""
         return "{} % ({}/{})".format(int((cracked * 100)/total), cracked, total)
+
+    @hybrid_property
+    def priority_str(self):
+        levels = ["High", "Normal", "Low"]
+        return levels[self.priority]
 
     @hybrid_property
     def host_count(self):

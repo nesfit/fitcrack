@@ -31,7 +31,7 @@ CSqlLoader::~CSqlLoader()
 
 std::vector<PtrJob> CSqlLoader::loadRunningJobs()
 {
-    return load<CJob>(formatQuery("WHERE status >= %d AND ( time_start <= now() OR time_start IS NULL) ORDER BY id ASC",
+    return load<CJob>(formatQuery("WHERE status >= %d AND ( time_start <= now() OR time_start IS NULL) ORDER BY priority ASC",
                                       Config::JobState::JobRunning));
 }
 

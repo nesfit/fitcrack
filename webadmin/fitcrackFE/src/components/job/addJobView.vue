@@ -591,6 +591,25 @@
                     label="No time limit"
                   />
                 </v-col>
+                <v-col>
+                  <div class="title mb-2">Priority</div>
+                  <v-radio-group
+                    v-model="priority"
+                  >
+                    <v-radio
+                      label="Low"
+                      :value="2"
+                    ></v-radio>
+                    <v-radio
+                      label="Normal"
+                      :value="1"
+                    ></v-radio>
+                    <v-radio
+                      label="High"
+                      :value="0"
+                    ></v-radio>
+                  </v-radio-group>
+                </v-col>
               </v-row>
             </v-container>
           </v-stepper-content>
@@ -709,7 +728,7 @@
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
         'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 
-        'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob', 'deviceTypes', 'workloadProfile',
+        'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob', 'deviceTypes', 'workloadProfile', 'priority',
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
