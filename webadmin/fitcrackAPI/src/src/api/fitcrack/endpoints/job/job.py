@@ -27,7 +27,7 @@ from src.api.fitcrack.endpoints.job.argumentsParser import jobList_parser, jobWo
     jobOperation, verifyHash_argument, crackingTime_argument, addJob_model, editHostMapping_argument, \
     editJob_argument, multiEditHosts_argument, jobList_argument, multiJobOperation_argument, job_permissions_arguments
 from src.api.fitcrack.endpoints.job.functions import verifyHashFormat, create_job, \
-    stop_job, start_job, kill_job, computeCrackingTime, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
+    stop_job, start_job, resume_job, kill_job, computeCrackingTime, visible_jobs_ids, editable_jobs_ids, actionable_jobs_ids, \
     can_view_job, can_edit_job, can_operate_job
 from src.api.fitcrack.endpoints.job.responseModels import page_of_jobs_model, page_of_jobs_model, \
     verifyHash_model, crackingTime_model, newJob_model, job_big_model, verifyHashes_model, \
@@ -168,6 +168,8 @@ class multiJobOperation(Resource):
                 stop_job(job)
             elif operation == 'start':
                 start_job(job, db)
+            elif operation == 'resume':
+                resume_job(job, db)
             elif operation == 'kill':
                 kill_job(job, db)
 
@@ -364,7 +366,7 @@ class OperationWithJob(Resource):
     @api.marshal_with(simpleResponse)
     def get(self, id):
         """
-        Operations with job(restart, start, stop).
+        Operations with job(restart, start, stop, resume).
         """
         if not current_user.role.OPERATE_ALL_JOBS and not can_operate_job(id):
             abort(401, 'Unauthorized access to job.')
@@ -375,6 +377,8 @@ class OperationWithJob(Resource):
 
         if action == 'start':
             start_job(job, db)
+        elif action == 'resume':
+            resume_job(job)
         elif action == 'stop':
             stop_job(job)
         elif action == 'restart':

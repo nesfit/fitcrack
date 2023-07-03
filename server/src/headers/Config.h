@@ -112,12 +112,12 @@ namespace Config {
         JobFinished   =  1,   /**< Password was found */
         JobExhausted  =  2,   /**< Keyspace was exhausted, pass not found */
         JobMalformed  =  3,   /**< Job has incorrect input */
-        JobTimeout    =  4,   /**< time_end of the job was reached, cracking stopped */
+        JobTimeout    =  4,   /**< End time of the job was reached, cracking stopped */
         JobRunning    = 10,   /**< Job is running */
         JobFinishing  = 12    /**< Job is running, but all workunits has been generated, ending soon */
     };
 
-    /** Attack modes in haschat*/
+    /** Attack modes in hashcat */
     enum AttackMode {
         AttackDict = 0,
         AttackCombinator = 1,

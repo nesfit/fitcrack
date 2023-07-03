@@ -214,6 +214,8 @@ export default {
     operation () {
       if (this.data.status === '0') {
         return {text: 'start', icon: 'mdi-play'}
+      } else if (this.data.status === '4') {
+        return {text: 'resume', icon: 'mdi-play'}
       } else if (this.data.status < 10) {
         return {text: 'restart', icon: 'mdi-restart'}
       } else {

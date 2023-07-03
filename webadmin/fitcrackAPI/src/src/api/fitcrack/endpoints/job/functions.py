@@ -33,6 +33,10 @@ from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 def stop_job(job):
     job.status = status_to_code['finishing']
 
+def resume_job(job):
+    job.time_end = None
+    job.status = status_to_code['running']
+
 def kill_job(job, db):
     id = job.id
     # Job is stopped in Generator after sending BOINC commands

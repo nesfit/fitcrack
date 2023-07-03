@@ -231,7 +231,7 @@ jobList_argument.add_argument('job_ids', type=list, required=True, location='jso
 
 jobOperation = reqparse.RequestParser()
 jobOperation.add_argument('operation', type=str, required=True,  help='job action',
-                       choices=["start", "stop", "restart", "kill"])
+                       choices=["start", "stop", "restart", "resume", "kill"])
 
 editHostMapping_argument = reqparse.RequestParser()
 editHostMapping_argument.add_argument('newHost_ids', type=list, required=True, location='json', help='An array of host IDs')
