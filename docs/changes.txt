@@ -12,4 +12,4 @@ New features:
 * Added possibility to resume timeouted jobs.
 
 Fixes:
-* ...
+* Fixed slow loading of a host detail page.

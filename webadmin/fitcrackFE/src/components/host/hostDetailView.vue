@@ -17,7 +17,7 @@
 
     <v-container>
       <fc-tile
-        title="Host info"
+        title="Info"
         :loading="data==null"
         class="mb-5"
       >
@@ -210,46 +210,6 @@
           </template>
         </v-data-table>
       </fc-tile>
-
-
-
-      <fc-tile
-        title="Workunits"
-        class="mb-5"
-        :loading="data === null"
-      >
-        <v-data-table
-          v-if="data !== null"
-          :footer-props="{itemsPerPageOptions: [10,30,60,{'text':'All','value':-1}], itemsPerPageText: 'Workunits per page'}"
-          :headers="workunitsHeader"
-          :items="data.workunits"
-          class="width100"
-        >
-          <template v-slot:item.job_id="{ item }">
-            <router-link
-              :to="{ name: 'jobDetail', params: { id: item.job_id}}"
-              class="middle"
-            >
-              {{ item.job.name || 'Detail' }}
-            </router-link>
-          </template>
-          <template v-slot:item.start_index_real="{ item }">
-            {{ fmt(item.start_index_real) }}
-          </template>
-          <template v-slot:item.hc_keyspace="{ item }">
-            {{ fmt(item.hc_keyspace) }}
-          </template>
-          <template v-slot:item.time="{ item }">
-            {{ $moment.utc(item.time).local().format('D.M.YYYY H:mm:ss') }}
-          </template>
-          <template v-slot:item.retry="{ item }">
-            {{ yesNo(item.retry) }}
-          </template>
-          <template v-slot:item.finished="{ item }">
-            {{ yesNo(item.finished) }}
-          </template>
-        </v-data-table>
-      </fc-tile>
     </v-container>
   </div>
 </template>
@@ -268,15 +228,6 @@
     data: function () {
       return {
         data: null,
-        workunitsHeader: [
-          {text: 'Job', align: 'start', value: 'job_id'},
-          {text: 'Cracking time', align: 'start', value: 'cracking_time_str'},
-          {text: 'Generated', align: 'end', value: 'time'},
-          {text: 'Start index', align: 'end', value: 'start_index_real'},
-          {text: 'Keyspace', align: 'end', value: 'hc_keyspace'},
-          {text: 'Retry', align: 'end', value: 'retry'},
-          {text: 'Finish', align: 'end', value: 'finished'}
-        ],
         jobHeaders: [
           {
             text: 'Name',
@@ -330,9 +281,6 @@
         this.axios.get(this.$serverAddr + '/hosts/' + this.$route.params.id).then((response) => {
           this.data = response.data;
         })
-      },
-      yesNo: function (val) {
-        return val ? 'Yes' : 'No'
       },
       getOsIcon (os) {
         if (/(windows|microsoft)/ig.test(os)) {

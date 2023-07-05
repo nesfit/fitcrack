@@ -14,10 +14,6 @@ page_of_hosts_model = api.inherit('Page of hosts', pagination, {
     'items': fields.List(fields.Nested(boincHost_model))
 })
 
-workunitWithJob_model = api.inherit('Workunit with job', workunit_model, {
-    'job': fields.Nested(job_short_model, attribute='job')
-})
-
 boincHostDetail_model = api.model('Host detail boinc', {
     'id': fields.Integer(readOnly=True, required=False),
     'domain_name': fields.String(),
@@ -26,7 +22,6 @@ boincHostDetail_model = api.model('Host detail boinc', {
     'os_name': fields.String(),
     'fc_host': fields.Nested(host_short_model),
     'active': fields.Boolean(),
-    'workunits': fields.List(fields.Nested(workunitWithJob_model)),
     'jobs': fields.List(fields.Nested(job_short_model)),
     'devices': fields.List(fields.Nested(device_model))
 })
