@@ -28,6 +28,12 @@ echo "                                                            "
 echo "       (C) 2017-2023 Fitcrack team - www.fitcrack.cz        "
 echo "============================================================"
 
+
+# Fix MySQL container network access
+sed -i 's/^bind-address/#bind-address/' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i 's/mysqlx-bind-address/#mysqlx-bind-address/' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+
 ##############################################
 # Check if project exists. If not, create it.
 if [ -d "$BOINC_PROJECT_DIR" ]; then
@@ -53,6 +59,8 @@ else # Create Fitcrack project
   usermod -d /var/lib/mysql/ mysql
   service mysql start
   mysql -e "CREATE DATABASE $DB_NAME";
+  mysql -e "CREATE USER 'root'@'%' IDENTIFIED BY '$DB_PW'";
+  mysql -e "GRANT ALL ON *.* TO 'root'@'%'";
   mysql -e "CREATE USER '$DB_USER'@'$DB_HOST' IDENTIFIED WITH mysql_native_password BY '$DB_PW'";
   mysql -e "GRANT ALL ON $DB_NAME.* TO '$DB_USER'@'$DB_HOST'";
   mysql -e "SET PERSIST log_bin_trust_function_creators = 1;"
