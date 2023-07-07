@@ -9,7 +9,7 @@ services:
       ports:
           - ${BACKEND_PORT}:${BACKEND_PORT}         # Mapping of WebAdmin backend
           - ${FRONTEND_PORT}:${FRONTEND_PORT}       # Mapping of WebAdmin frontend
-          - ${DATABASE_PORT:-3306}:${DATABASE_PORT:-3306}       # Mapping of WebAdmin frontend
+          - ${DATABASE_PORT_LOCAL:-3306}:${DATABASE_PORT_CONTAINER:-3306}       # Mapping of WebAdmin frontend
           #- ${BOINC_PORT}:${BOINC_PORT} # BOINC port (uncomment if different from webadmin)
       environment:
         - USER=root                      # root should be used for installation
