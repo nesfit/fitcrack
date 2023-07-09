@@ -4,6 +4,7 @@
 '''
 
 import logging.config
+import os
 import secrets
 
 from flask import Flask, Blueprint, request, url_for
@@ -44,7 +45,7 @@ app = Flask(__name__)
 
 
 def configure_app(flask_app):
-    flask_app.config['SECRET_KEY'] = secrets.token_hex(16)
+    flask_app.config['SECRET_KEY'] = os.environ.get('WEBADMIN_SECRET', secrets.token_hex(16))
     # flask_app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI
