@@ -29,7 +29,7 @@ services:
         - WEBADMIN_USER=${WEBADMIN_LOGIN}   # Login for the default WebAdmin account
         - WEBADMIN_EMAIL=${WEBADMIN_EMAIL}  # Email for the default WebAdmin account
         - WEBADMIN_PW=${WEBADMIN_PW}        # Password for dthe efault WebAdmin account
-
+        - WEBADMIN_SECRET=${WEBADMIN_SECRET} # Secret used for JWT
         - DYNAMIC_BACKEND_URL=${DYNAMIC_BACKEND_URL}
 
         # BOINC server environment variables
