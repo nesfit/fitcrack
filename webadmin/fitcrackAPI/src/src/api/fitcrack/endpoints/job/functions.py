@@ -26,7 +26,7 @@ from src.api.fitcrack.lang import status_to_code, attack_modes
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcJobDictionary, \
-    FcJobGraph, FcRule, FcHash, FcMask, FcUserPermission, FcSetting, FcWorkunit, FcDeviceInfo
+    FcJobGraph, FcRule, FcHash, FcHashlist, FcMask, FcUserPermission, FcSetting, FcWorkunit, FcDeviceInfo
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
@@ -194,8 +194,11 @@ def create_job(data):
         db_host_activity = FcHostActivity(job_id=db_job.id, boinc_host_id=db_host.id)
         db.session.add(db_host_activity)
 
+    hashlist = FcHashlist(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], name=db_job.name)
+    db.session.add(hashlist)
+
     for hashObj in data['hash_settings']['hash_list']:
-        hash = FcHash(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
+        hash = FcHash(hashlist_id=hashlist.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
         db.session.add(hash)
 
     perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)

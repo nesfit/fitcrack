@@ -430,7 +430,7 @@ class FcJob(Base):
                 base['operate'] = record.operate
         return base
 
-    hashes = relationship("FcHash", back_populates="job")
+    hashlist = relationship("FcHashlist")
 
 class FcBin(Base):
     __tablename__ = 'fc_bin'
@@ -890,19 +890,34 @@ class FcHostStatus(Base):
         total_seconds = math.floor(delta.total_seconds())
         return True if total_seconds <= 60 else False
 
+class FcHashlist(Base):
+    __tablename__ = 'fc_hashlist'
+
+    id = Column(BigInteger, primary_key=True)
+    job_id = Column(BigInteger, ForeignKey(FcJob.id), nullable=False)
+    hash_type = Column(Integer, nullable=False)
+    name = Column(String(255), nullable=False)
+    added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    deleted = Column(Integer, nullable=False, server_default=text("'0'"))
+
+    job = relationship("FcJob")
+
+    @hybrid_property
+    def hash_type_name(self):
+        return getHashNameById(self.hash_type)
 
 class FcHash(Base):
     __tablename__ = 'fc_hash'
 
     id = Column(BigInteger, primary_key=True)
-    job_id = Column(BigInteger, ForeignKey(FcJob.id), nullable=False)
-    hash_type = Column(Integer, nullable=False)
+    hashlist_id = Column(BigInteger, ForeignKey(FcHashlist.id), nullable=False)
+    hash_type = Column(Integer, nullable=False) # TODO: Could go away
     hash = Column(LargeBinary, nullable=False)
     result = Column(String(400, collation='utf8_bin'))
     added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     time_cracked = Column(DateTime)
 
-    job = relationship("FcJob", back_populates="hashes")
+    hashlist = relationship("FcHashlist")
 
     @hybrid_property
     def hashText(self):

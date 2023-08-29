@@ -12,6 +12,7 @@ from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
 from src.api.fitcrack.responseModels import pagination, simpleResponse, job_short_model, \
     boincHost_model, job_permissions
+from src.api.fitcrack.endpoints.hashCache.responseModels import hashlist_model
 
 
 boincResult_model = api.model('boinc result', {
@@ -165,7 +166,7 @@ job_big_model = api.model('Job', {
     'hosts': fields.List(fields.Nested(boincHost_model)),
     'workunits': fields.List(fields.Nested(workunit_model)),
     'masks': fields.List(fields.Nested(mask_model)),
-    'hashes': fields.List(fields.Nested(hash_model)),
+    'hashlist': fields.Nested(hashlist_model),
     'left_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'grammar_id': fields.Integer(),
