@@ -6,7 +6,7 @@
 from flask_restx import fields
 
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.job.responseModels import workunit_model
+from src.api.fitcrack.responseModels import workunit_model
 from src.api.fitcrack.responseModels import pagination, host_short_model, boincHost_model, \
     user_model
 
