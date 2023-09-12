@@ -23,22 +23,6 @@ git submodule init
 git submodule update
 ```
 
-### Building Fitcrack image
-Once you have everything prepared, you can start the build of your own **fitcrack_server** with:
-```
-docker-compose -f docker-compose-custom-build.yml build
-```
-Please note that this process will compile everything from source and it may take some time.
-
-Once done, you can type
-```
-docker image ls
-```
-to see whether you have your image ready. You should see something like this:
-```
-REPOSITORY        TAG       IMAGE ID       CREATED       SIZE
-fitcrack_server   latest    9742ce4d598a   3 hours ago   3.79GB
-```
 
 ### Preparing the .env configuration file
 Now it is time for the setup! Create a new **.env** config file from the example attached:
@@ -56,10 +40,28 @@ Edit the newly-created **.env** file and configure:
 - SSL is disabled by default. If you want to enable it, follow the instructions below.
 
 
+### Building Fitcrack image
+Once you have everything prepared, you can start the build of your own **fitcrack_server** with:
+```
+docker-compose -f docker-compose-custom-build.yml build
+```
+Please note that this process will compile everything from source and it may take some time.
+
+Once done, you can type
+```
+docker image ls
+```
+to see whether you have your image ready. You should see something like this:
+```
+REPOSITORY        TAG       IMAGE ID       CREATED       SIZE
+fitcrack_server   latest    9742ce4d598a   3 hours ago   3.79GB
+```
+
+
 ### Starting the fitcrack_server container
 Once the `fitcrack_server` image is prepared and `.env` file configured, you can run the server container using:
 ```
-docker-compose up
+docker-compose -f docker-compose-custom-build.yml up
 ```
 
 ![Fitcrack-architecture](img/dockerstart.png)
