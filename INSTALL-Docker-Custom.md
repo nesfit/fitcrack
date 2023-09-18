@@ -23,6 +23,23 @@ git submodule init
 git submodule update
 ```
 
+
+### Preparing the .env configuration file
+Now it is time for the setup! Create a new **.env** config file from the example attached:
+```
+cp env.example .env
+```
+
+![Fitcrack-architecture](img/dockerenv.png)
+
+Edit the newly-created **.env** file and configure:
+- `FITCRACK_SERVER_HOST` to the domain name or IP of your host machine
+- In most cases, it is fine to default ports: `80` for the WebAdmin frontend and the BOINC server, and `5000`for the WebAdmin backend. But you can change them if you want.
+- It is **recommended** to change the MySQL password `FITCRACK_DB_PW`.
+- The default WebAdmin login is `fitcrack`/`FITCRACK`. We **highly recommend** to change it by modifying the `WEBADMIN_LOGIN` and `WEBADMIN_PW` variables.
+- SSL is disabled by default. If you want to enable it, follow the instructions below.
+
+
 ### Building Fitcrack image
 Once you have everything prepared, you can start the build of your own **fitcrack_server** with:
 ```
@@ -39,21 +56,6 @@ to see whether you have your image ready. You should see something like this:
 REPOSITORY        TAG       IMAGE ID       CREATED       SIZE
 fitcrack_server   latest    9742ce4d598a   3 hours ago   3.79GB
 ```
-
-### Preparing the .env configuration file
-Now it is time for the setup! Create a new **.env** config file from the example attached:
-```
-cp env.example .env
-```
-
-![Fitcrack-architecture](img/dockerenv.png)
-
-Edit the newly-created **.env** file and configure:
-- `FITCRACK_SERVER_HOST` to the domain name or IP of your host machine
-- In most cases, it is fine to default ports: `80` for the WebAdmin frontend and the BOINC server, and `5000`for the WebAdmin backend. But you can change them if you want.
-- It is **recommended** to change the MySQL password `FITCRACK_DB_PW`.
-- The default WebAdmin login is `fitcrack`/`FITCRACK`. We **highly recommend** to change it by modifying the `WEBADMIN_LOGIN` and `WEBADMIN_PW` variables.
-- SSL is disabled by default. If you want to enable it, follow the instructions below.
 
 
 ### Starting the fitcrack_server container

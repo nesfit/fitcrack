@@ -193,7 +193,7 @@ class Format:
         :param path: Path to the file.
         """
         # Call extraction script
-        process = subprocess.Popen([self.scriptPath, path], stdout=subprocess.PIPE)
+        process = subprocess.Popen([self.scriptPath, path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = process.communicate()
 
         # Check output
@@ -201,7 +201,7 @@ class Format:
             if err is None or len(err) == 0:
                 print('Empty output. Is the file encrypted?', file=stderr)
             else:
-                print(err.decode('utf-8'), file=stderr)
+                print(err.decode('unicode_escape'), file=stderr)
             exit(1)
         else:
             hashStr = out.decode('unicode_escape')
