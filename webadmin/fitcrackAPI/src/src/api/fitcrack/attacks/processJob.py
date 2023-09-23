@@ -403,3 +403,52 @@ def process_job_9(job):
 def post_process_job_9(data, db_job):
     print("\n PCFG attack post_process\n")
 
+
+
+# association attack
+def process_job_10(job):
+    job['attack_settings']['attack_submode'] = 0
+    job['attack_name'] = 'association'
+    job['hc_keyspace'] = 0
+
+    for dictObj in job['attack_settings']['left_dictionaries']:
+        dict = FcDictionary.query.filter(FcDictionary.id == dictObj['id']).first()
+        if not dict:
+            abort(500, 'Wrong dictionary selected.')
+
+        if not os.path.exists(os.path.join(DICTIONARY_DIR, dict.path)):
+            abort(500, 'Dictionary does not exist.')
+
+        job['hc_keyspace'] += dict.keyspace
+
+    ruleFileMultiplier = 1
+
+    if job['attack_settings']['rules']:
+        rules = FcRule.query.filter(FcRule.id == job['attack_settings']['rules']['id']).first()
+        ruleFileMultiplier = rules.count
+
+        if ruleFileMultiplier == 0:
+            ruleFileMultiplier = 1
+
+        if not rules:
+            abort(500, 'Wrong rules file selected.')
+
+        if not os.path.exists(os.path.join(RULE_DIR, rules.path)):
+            abort(500, 'Rules file does not exist.')
+
+        job['attack_settings']['attack_submode'] = 1
+        job['rules'] = rules.name
+
+    job['keyspace'] = job['hc_keyspace'] * ruleFileMultiplier
+    
+    # in case of rule distribution hashcat keyspace is defined by rules
+    if job['attack_settings']['distribution_mode'] == 2:
+        job['hc_keyspace'] = ruleFileMultiplier
+
+    return job
+
+def post_process_job_10(data, db_job):
+    for dict in data['attack_settings']['left_dictionaries']:
+        jobDict = FcJobDictionary(job_id=db_job.id, dictionary_id=dict['id'])
+        db.session.add(jobDict)
+

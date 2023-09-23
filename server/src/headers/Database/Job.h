@@ -149,6 +149,7 @@ class CJob {
         std::vector<Config::Ptr<CDictionary>> m_dictionaries;  /**< Vector of non-exhausted dictionaries */
     private:
         std::string m_hashes;           /**< job hash(es) denoted by newlines */
+        std::string m_all_hashes;           /**< job hash(es) denoted by newlines */
 
         uint64_t m_totalPower;          /**< Sum of host power for this job */
         uint64_t m_secondsPassed;       /**< Seconds from time_start to now() */
@@ -209,6 +210,7 @@ class CJob {
         void addDictionary(Config::Ptr<CDictionary> dictionary);
 
         std::string getHashes() const;
+        std::string getAllHashes() const;
 
         uint64_t getTotalPower() const;
         uint64_t getSecondsPassed() const;
