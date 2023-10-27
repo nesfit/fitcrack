@@ -15,6 +15,7 @@ import subprocess
 import os
 
 from os.path import basename
+from typing import TypedDict
 from uuid import uuid1
 from flask_restx import abort
 from flask_login import current_user
@@ -85,9 +86,10 @@ def start_job(job, db):
 def create_job(data):
     if data['name'] == '':
         abort(500, 'Name can not be empty.')
-    if len(data['hash_settings']['hash_list']) == 0:
+    if len(data['hash_settings']['hash_list']) == 0: #TODO: Hashlist is created separately
         abort(500, 'Hash list can not be empty.')
 
+    #TODO: This should be moved as well; this just checks that the list is valid.
     settings = FcSetting.query.first()
     if settings.verify_hash_format:
         hashes = '\n'.join([hashObj['hash'] for hashObj in data['hash_settings']['hash_list']])
@@ -96,13 +98,14 @@ def create_job(data):
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(decoded)
                 fp.seek(0)
-                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'], binaryHash=hashes)
+                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'], binaryHash=hashes)['items']
         else:
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(hashes.encode())
                 fp.seek(0)
                 verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
 
+    #We coerce the received data into a good format I guess.
     for hashObj in data['hash_settings']['hash_list']:
         if hashObj['hash'].startswith('BASE64:'):
             decoded = base64.decodebytes(hashObj['hash'][7:].encode())
@@ -111,10 +114,12 @@ def create_job(data):
         else:
             hashObj['hash'] = hashObj['hash'].encode()
 
+    #This seems to maybe just be for the job
     hybrid_mask_dict = False
     #Hybrid attack mask-wordlist
     if int(data['attack_settings']['attack_mode']) == 7:    hybrid_mask_dict = True
 
+    #This is a bit cursed.
     process_func = getattr(attacks, 'process_job_' + str(data['attack_settings']['attack_mode']))
 
     if not process_func:
@@ -131,6 +136,7 @@ def create_job(data):
     if job['time_end'] == '':
         job['time_end'] = None
 
+    #Here we defonitely want to edit it to be nice and good.
     db_job = FcJob(
         attack=job['attack_name'],
         attack_mode=job['attack_settings']['attack_mode'],
@@ -170,6 +176,7 @@ def create_job(data):
         deleted=False
         )
 
+    #Nothing much interesting after this
     try:
         db.session.add(db_job)
         db.session.commit()
@@ -194,6 +201,7 @@ def create_job(data):
         db_host_activity = FcHostActivity(job_id=db_job.id, boinc_host_id=db_host.id)
         db.session.add(db_host_activity)
 
+    #This won't work, chief
     hashlist = FcHashlist(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], name=db_job.name)
     db.session.add(hashlist)
 
@@ -207,8 +215,9 @@ def create_job(data):
     db.session.commit()
     return db_job
 
-
-def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
+verifyHashFormatResultItem = TypedDict('verifyHashFormatResultItem',{'hash' : str, 'result' : str, 'isInCache' : bool})
+verifyHashFormatResult = TypedDict('verifyHashFormatResult', {'items' : list[verifyHashFormatResultItem], 'error' : bool})
+def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False) -> verifyHashFormatResult:
     hashes = []
     settings = FcSetting.query.first()
     if not settings.verify_hash_format:

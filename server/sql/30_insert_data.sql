@@ -44,13 +44,13 @@ INSERT INTO `fc_dictionary` (`id`, `name`, `path`, `password_distribution`, `key
 -- Insert default hashlists 
 --
 
-INSERT INTO `fc_hashlist` (`id`, `job_id`, `hash_type`, `name`, `added`, `deleted`) VALUES
-(1,	2, 0, 'MD5 Big Hashlist', '2018-08-18 12:00:00', 0), 
-(2,	3, 3200, 'Hashlist', '2018-08-18 12:00:00', 0), 
-(3,	4, 18000, 'Hashlist', '2018-08-18 12:00:00', 0),
-(4,	5, 1700, 'Hashlist', '2018-08-18 12:00:00', 0), 
-(5,	6, 1700, 'Hashlist', '2018-08-18 12:00:00', 0), 
-(6,	7, 0, 'Hashlist', '2018-08-18 12:00:00', 0);
+INSERT INTO `fc_hashlist` (`id`, `hash_type`, `name`, `added`, `deleted`) VALUES
+(1, 0, 'MD5 Big Hashlist', '2018-08-18 12:00:00', 0), 
+(2, 3200, 'Hashlist', '2018-08-18 12:00:00', 0), 
+(3, 18000, 'Hashlist', '2018-08-18 12:00:00', 0),
+(4, 1700, 'Hashlist', '2018-08-18 12:00:00', 0), 
+(5, 1700, 'Hashlist', '2018-08-18 12:00:00', 0), 
+(6, 0, 'Hashlist', '2018-08-18 12:00:00', 0);
 
 --
 -- Insert default hashes
@@ -6624,14 +6624,16 @@ INSERT INTO `fc_bin` (`name`) VALUES
 -- Insert default BENCH_ALL job and sample jobs
 --
 
-INSERT INTO `fc_job` (`id`, `attack`, `attack_mode`, `attack_submode`, `distribution_mode`, `hash_type`, `status`, `keyspace`, `hc_keyspace`, `indexes_verified`, `current_index`, `current_index_2`, `time`, `name`, `comment`, `time_start`, `time_end`, `workunit_sum_time`, `seconds_per_workunit`, `charset1`, `charset2`, `charset3`, `charset4`, `rules`, `rule_left`, `rule_right`, `markov_hcstat`, `markov_threshold`, `grammar_id`, `min_password_len`, `max_password_len`, `min_elem_in_chain`, `max_elem_in_chain`, `optimized`, `deleted`) VALUES
-(1, 'mask', 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, NOW(), 'BENCH_ALL', 'This is default job for benchmarking all hosts.', NULL, NULL, 0, 3600, '', '', '', '', NULL, '', '', NULL, 0, NULL, 0, 0, 0, 0, 1, 1),
-(2, 'dictionary',	0,	0,	0,  0,	0,	92431,	92431,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick',	'Default hashcat MD5 hashlist',	NULL,	NULL,	0,	120, '',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0),
-(3, 'dictionary',	0,	0,	0,  3200,	0,	226082,	226081, 0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0),
-(4, 'mask',	3,	0,	0,  18000,	0,	217180147158,	13270583,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-mask-sha3',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0),
-(5, 'combinator',	1,	0,	0,  3200,	0,	397000,	1000,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-combinator-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0),
-(6,	'pcfg',	9,	0,	0,  1700,	0,	1096,	1096,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-pcfg-sha512',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, 3, 0, 0, 0, 0, 1, 0),
-(7, 'prince',	8,	0,	0,  0,	0,	2306859,	2306859,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-prince-md5',	'',	NULL,	NULL,	0,	120,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 1, 8, 1, 8, 1, 0);
+INSERT INTO `fc_job` (`id`, `attack`, `attack_mode`, `attack_submode`, `distribution_mode`, `hash_type`, `status`, `keyspace`, `hc_keyspace`, `indexes_verified`, `current_index`, `current_index_2`, `time`, `name`, `comment`, `time_start`, `time_end`, `workunit_sum_time`, `seconds_per_workunit`, `charset1`, `charset2`, `charset3`, `charset4`, `rules`, `rule_left`, `rule_right`, `markov_hcstat`, `markov_threshold`, `grammar_id`, `min_password_len`, `max_password_len`, `min_elem_in_chain`, `max_elem_in_chain`, `optimized`, `deleted`, `hashlist_id`) VALUES
+(1, 'mask', 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, NOW(), 'BENCH_ALL', 'This is default job for benchmarking all hosts.', NULL, NULL, 0, 3600, '', '', '', '', NULL, '', '', NULL, 0, NULL, 0, 0, 0, 0, 1, 1, 1),
+(2, 'dictionary',	0,	0,	0,  0,	0,	92431,	92431,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick',	'Default hashcat MD5 hashlist',	NULL,	NULL,	0,	120, '',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 1),
+(3, 'dictionary',	0,	0,	0,  3200,	0,	226082,	226081, 0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 1),
+(4, 'mask',	3,	0,	0,  18000,	0,	217180147158,	13270583,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-mask-sha3',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 1),
+(5, 'combinator',	1,	0,	0,  3200,	0,	397000,	1000,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-combinator-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 1),
+(6,	'pcfg',	9,	0,	0,  1700,	0,	1096,	1096,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-pcfg-sha512',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, 3, 0, 0, 0, 0, 1, 0, 1),
+(7, 'prince',	8,	0,	0,  0,	0,	2306859,	2306859,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-prince-md5',	'',	NULL,	NULL,	0,	120,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 1, 8, 1, 8, 1, 0, 1);
+
+-- TODO: Make sensible connections to the hashlists.
 
 --
 -- Insert default job dictionaries

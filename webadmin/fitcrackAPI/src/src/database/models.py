@@ -239,6 +239,9 @@ class FcJob(Base):
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
     queue_position = Column(Integer)
+    hashlist_id = Column(ForeignKey('fc_hashlist.id', ondelete='SET NULL'), index=True)
+
+    hashlist = relationship("FcHashlist", back_populates="jobs")
 
     permission_records = relationship("FcUserPermission",
                           primaryjoin="FcJob.id==FcUserPermission.job_id")
@@ -430,7 +433,6 @@ class FcJob(Base):
                 base['operate'] = record.operate
         return base
 
-    hashlist = relationship("FcHashlist")
 
 class FcBin(Base):
     __tablename__ = 'fc_bin'
@@ -894,17 +896,25 @@ class FcHashlist(Base):
     __tablename__ = 'fc_hashlist'
 
     id = Column(BigInteger, primary_key=True)
-    job_id = Column(BigInteger, ForeignKey(FcJob.id), nullable=False)
-    hash_type = Column(Integer, nullable=False)
+    hash_type = Column(Integer) #Should be null only if we want to support non-initialised lists
     name = Column(String(255), nullable=False)
     added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
 
-    job = relationship("FcJob")
+    jobs = relationship("FcJob")
+    hashes = relationship("FcHash")
 
     @hybrid_property
     def hash_type_name(self):
         return getHashNameById(self.hash_type)
+
+    @hybrid_property
+    def job_count(self):
+        return len(self.jobs)
+    
+    @hybrid_property
+    def hash_count(self):
+        return len(self.hashes) #This is probably horribly inefficient
 
 class FcHash(Base):
     __tablename__ = 'fc_hash'
@@ -917,7 +927,7 @@ class FcHash(Base):
     added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     time_cracked = Column(DateTime)
 
-    hashlist = relationship("FcHashlist")
+    hashlist = relationship("FcHashlist",back_populates="hashes")
 
     @hybrid_property
     def hashText(self):
