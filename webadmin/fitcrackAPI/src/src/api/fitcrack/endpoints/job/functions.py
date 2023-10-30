@@ -8,7 +8,6 @@ import base64
 import datetime
 import json
 import math
-import tempfile
 import time
 import sys
 import subprocess
@@ -87,32 +86,9 @@ def create_job(data):
     if data['name'] == '':
         abort(500, 'Name can not be empty.')
     if len(data['hash_settings']['hash_list']) == 0: #TODO: Hashlist is created separately
-        abort(500, 'Hash list can not be empty.')
+        abort(500, 'Hash list can not be empty.')    
 
-    #TODO: This should be moved as well; this just checks that the list is valid.
-    settings = FcSetting.query.first()
-    if settings.verify_hash_format:
-        hashes = '\n'.join([hashObj['hash'] for hashObj in data['hash_settings']['hash_list']])
-        if hashes.startswith('BASE64:'):
-            decoded = base64.decodebytes(hashes[7:].encode())
-            with tempfile.NamedTemporaryFile() as fp:
-                fp.write(decoded)
-                fp.seek(0)
-                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'], binaryHash=hashes)['items']
-        else:
-            with tempfile.NamedTemporaryFile() as fp:
-                fp.write(hashes.encode())
-                fp.seek(0)
-                verifyHashFormat(fp.name, data['hash_settings']['hash_type'], abortOnFail=data['hash_settings']['valid_only'])
-
-    #We coerce the received data into a good format I guess.
-    for hashObj in data['hash_settings']['hash_list']:
-        if hashObj['hash'].startswith('BASE64:'):
-            decoded = base64.decodebytes(hashObj['hash'][7:].encode())
-            hashObj['hash'] = decoded
-
-        else:
-            hashObj['hash'] = hashObj['hash'].encode()
+    
 
     #This seems to maybe just be for the job
     hybrid_mask_dict = False
@@ -201,13 +177,15 @@ def create_job(data):
         db_host_activity = FcHostActivity(job_id=db_job.id, boinc_host_id=db_host.id)
         db.session.add(db_host_activity)
 
-    #This won't work, chief
+    #~~This won't work, chief~~
+    #Actually, David probably meant to leave the endpoint as is and create here a hashlist for the currently created job
+    #This would leave the endpoint behaviour the same from the API user's side but make it use the new hash list way
+    #Smart, I suppose. But this would work only for the hash list import; hash files and protected files would still need to
+    #be handled using the *new* way because we want to fix issues with how they are implemented now.
+    #Still, letting the endpoint still have the old behaviour might be good to keep backwards compatibility
+    #But the team will need to weigh in on this one.
     hashlist = FcHashlist(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], name=db_job.name)
     db.session.add(hashlist)
-
-    for hashObj in data['hash_settings']['hash_list']:
-        hash = FcHash(hashlist_id=hashlist.id, hash_type=job['hash_settings']['hash_type'], hash=hashObj['hash'])
-        db.session.add(hash)
 
     perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)
     db.session.add(perms)

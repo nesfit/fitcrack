@@ -5,7 +5,9 @@
 
 from flask_restx import reqparse, inputs
 
+from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
+
 
 hash_list_parser = pagination.copy()
 hash_list_parser.add_argument('name', type=str, required=False, help='filter by name')
@@ -18,3 +20,33 @@ hash_list_parser.add_argument('showDeleted', type=inputs.boolean, required=False
 
 make_empty_hash_list_parser = reqparse.RequestParser()
 make_empty_hash_list_parser.add_argument('name', type=str, required=True)
+
+#Taken from the former endpoint for adding jobs.
+hash_list_add_hash_list_parser = api.schema_model('addHashList_hashes', {
+   'type': 'object',
+   'required': ['hash_type'],
+   'properties': {
+         'hash_type': {
+            'default': '0',
+            'type': 'string',
+            'description': 'Hash code from /hashcat/hashTypes'
+         },
+         'hash_list': {
+            'type': 'array',
+            'items': {
+               'type': 'object',
+               'properties': {
+                     'hash': {
+                        'type': 'string',
+                        'description': 'hash'
+                     }
+               }
+            }
+         },
+         'valid_only': {
+            'default': False,
+            'type': 'boolean',
+            'description': 'Specifies whether hash validation is enforced'
+         }
+   }
+})

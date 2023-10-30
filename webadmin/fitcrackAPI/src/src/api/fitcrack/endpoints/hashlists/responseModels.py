@@ -25,6 +25,16 @@ page_of_hash_lists_model = api.inherit('Page of jobs', pagination, {
     'items': fields.List(fields.Nested(hash_list_short_model))
 })
 
+hash_addition_result_model = api.model('added hashes', {
+    'result' : fields.String(),
+    'id' : fields.Integer(),
+    'name' : fields.String(),
+    'hashCount' : fields.Integer(),
+    'addedCount' : fields.Integer(),
+    'erroredCount' : fields.Integer()
+    #Here shall be also the list of hash errors.
+})
+
 """ charset_model = api.model('charset', {
     'id': fields.Integer(readOnly=True, required=False),
     'name': fields.String(readOnly=True, required=False),
