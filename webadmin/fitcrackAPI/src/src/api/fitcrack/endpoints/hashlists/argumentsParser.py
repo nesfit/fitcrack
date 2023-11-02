@@ -4,6 +4,7 @@
 '''
 
 from flask_restx import reqparse, inputs
+from werkzeug.datastructures import FileStorage
 
 from src.api.apiConfig import api
 from src.api.fitcrack.argumentsParser import pagination
@@ -50,3 +51,9 @@ hash_list_add_hash_list_parser = api.schema_model('addHashList_hashes', {
          }
    }
 })
+
+
+hash_list_add_hash_file_parser = reqparse.RequestParser()
+hash_list_add_hash_file_parser.add_argument('hash_type',type=int,required=True)
+hash_list_add_hash_file_parser.add_argument('valid_only',type=inputs.boolean, required=True)
+hash_list_add_hash_file_parser.add_argument('file', location='files', type=FileStorage, required=True)
