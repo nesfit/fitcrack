@@ -63,7 +63,7 @@ class hashListCollection(Resource):
     @api.expect(make_empty_hash_list_parser)
     def post(self):
         """
-        Creates a new empty hash list on the server.
+        Creates a new empty hash list on the server with the given name.
         """
         args = make_empty_hash_list_parser.parse_args(request)
 
@@ -82,6 +82,9 @@ class hashListCollection(Resource):
 class HashListDetails(Resource):
     @api.marshal_with(hash_list_short_model)
     def get(self,id:str):
+        """
+        Returns simple details about a hash list.
+        """
         hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
         if not hash_list:
             abort(404, 'Hash list not found')
@@ -93,6 +96,9 @@ class HashListDetails(Resource):
 class HashListDetails(Resource):
     @api.marshal_with(hash_list_long_model)
     def get(self,id:str):
+        """
+        Returns complex details about a hash list.
+        """
         hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
         if not hash_list:
             abort(404, 'Hash list not found')
@@ -105,6 +111,9 @@ class hashListUploadList(Resource):
     @api.expect(hash_list_add_hash_list_parser)
     @api.marshal_with(hash_addition_result_model)
     def post(self,id:str):
+        """
+        Takes a list of string hashes and ads them to hash list with the given id.
+        """
         data = request.json
         
         hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
@@ -123,7 +132,7 @@ class hashListUploadHashFile(Resource):
     def post(self,id:str):
         """
         Takes a hash file (a text or binary file containing hashes),
-         and adds the hashes contained within into the hashlist with the given id.
+        and adds the hashes contained within into the hashlist with the given id.
         """
         args = hash_list_add_hash_file_parser.parse_args(request)
 
@@ -146,7 +155,10 @@ class hashListUploadHashFile(Resource):
 class hashListUploadHashFile(Resource):
     @api.marshal_with(hash_addition_result_model)
     def post(self,id:str):
-        
+        """
+        Extract the hash from the given protected file and adds it to the hash list with the given id.
+        This also creates a ProtectedFile row in the database, just like the old ProtectedFile endpoint.
+        """
         # check if the post request has the file part
         if 'file' not in request.files:
             abort(500, 'No file part')

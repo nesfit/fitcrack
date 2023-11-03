@@ -6,11 +6,20 @@
 import base64
 import tempfile
 
+from flask_restx import abort
+
 from src.api.fitcrack.endpoints.job.functions import verifyHashFormat
 from src.database import db
 from src.database.models import FcHash, FcHashlist
 
 def upload_hash_list(new_hashes:list[str],hash_list:FcHashlist,hash_type:int,valid_only:bool):
+    """
+    Takes a list of string hashes and adds them to the given hash list.
+
+    If hash_list does not have a hash type, then this sets the hash list to the given type.
+    If hash_list does have a type and the input hash_type does not match, then this function fails and aborts.
+    """
+
     def convert_hash_list_to_binary(hashObj:str):
         if hashObj.startswith('BASE64:'):
             return base64.decodebytes(hashObj[7:].encode())
@@ -27,9 +36,12 @@ def upload_hash_list(new_hashes:list[str],hash_list:FcHashlist,hash_type:int,val
     #TODO: We definitely just want to append the good hashes, or not?
     #TODO: We can create invalid hashes, so we need a toggle to set whether we want to accept; which we already do I suppose.
 
-    #TODO: Check the hashtype of the incoming hashes and make sure that they are in sync with the hash list; also set the hash list automagically if the type is none and we get some hasherinos?
+    if hash_list.hash_type is None:
+        hash_list.hash_type = hash_type
+    elif hash_list.hash_type != hash_type:
+        abort(400,f'Hash type mismatch. Trying to add hashes of type {hash_type} to hash list of type {hash_list.hash_type}.')
 
-    #TODO: I think we want nice duplicate check like in a set?
+    #TODO: I think we want a nice duplicate check like in a set?
     for hashObj in hash_list_bin:
         hash = FcHash(hashlist_id=hash_list.id, hash_type=hash_type, hash=hashObj)
         db.session.add(hash)

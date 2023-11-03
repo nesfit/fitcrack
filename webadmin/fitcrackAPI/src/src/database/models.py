@@ -906,7 +906,7 @@ class FcHashlist(Base):
 
     @hybrid_property
     def hash_type_name(self):
-        return getHashNameById(self.hash_type)
+        return getHashNameById(self.hash_type) if self.hash_type is not None else 'None'
 
     @hybrid_property
     def job_count(self):
