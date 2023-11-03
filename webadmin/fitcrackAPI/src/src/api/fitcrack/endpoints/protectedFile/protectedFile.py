@@ -8,21 +8,16 @@ import logging
 import os
 from flask import request, redirect, send_file
 from flask_restx import Resource, abort
-from sqlalchemy import exc
 
 from settings import PROTECTEDFILES_DIR
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.protectedFile.functions import getHashFromFile
 from src.api.fitcrack.endpoints.protectedFile.responseModels import protectedFilesCollection_model, \
     excryptedFileUploaded_model
-from src.api.fitcrack.functions import fileUpload
-from src.database import db
+from src.api.fitcrack.endpoints.protectedFile.functions import addProtectedFile
 from src.database.models import FcEncryptedFile
 
 log = logging.getLogger(__name__)
 ns = api.namespace('protectedFiles', description='Endpoints for operations with files with passwords.')
-
-ALLOWED_EXTENSIONS = set(["doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "rar", "zip", "7z"])
 
 
 @ns.route('/')
@@ -53,28 +48,7 @@ class filesAdd(Resource):
         if file.filename == '':
             abort(500, 'No selected file')
 
-        uploadedFile = fileUpload(file, PROTECTEDFILES_DIR, ALLOWED_EXTENSIONS, withTimestamp=True)
-        if uploadedFile:
-            loadedHash = getHashFromFile(filename=uploadedFile['filename'], path=uploadedFile['path'])
-            encFile = FcEncryptedFile(name=uploadedFile['filename'], path=uploadedFile['path'], hash=loadedHash['hash'].encode(),
-                                      hash_type=loadedHash['hash_type'])
-            try:
-                db.session.add(encFile)
-                db.session.commit()
-            except exc.IntegrityError as e:
-                db.session().rollback()
-                abort(500, 'File with name ' + uploadedFile['filename'] + ' already exists.')
-            return {
-                'message': 'Successfully extracted hash from uploaded file.',
-                'status': True,
-                'hash': loadedHash['hash'],
-                'hash_type': loadedHash['hash_type'],
-                'hash_type_name': encFile.hash_type_name,
-                'file_id': encFile.id
-            }
-        else:
-            abort(500, 'We only support ' + ', '.join(str(x) for x in ALLOWED_EXTENSIONS) + '.')
-
+        return addProtectedFile(file)
 
 
 

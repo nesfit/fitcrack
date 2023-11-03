@@ -14,8 +14,9 @@ from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.hashlists.argumentsParser import make_empty_hash_list_parser, hash_list_parser, hash_list_add_hash_list_parser, hash_list_add_hash_file_parser
 from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model, hash_list_short_model, hash_list_long_model
 from src.api.fitcrack.endpoints.hashlists.functions import upload_hash_list
+from src.api.fitcrack.endpoints.protectedFile.functions import addProtectedFile
 from src.database import db
-from src.database.models import FcHashlist, FcHash
+from src.database.models import FcHashlist
 
 log = logging.getLogger(__name__)
 ns = api.namespace('hashlist', description='Endpoints for work with hash lists.')
@@ -140,3 +141,26 @@ class hashListUploadHashFile(Resource):
         new_hashes = text_io_wrapper.read().splitlines()
 
         return upload_hash_list(new_hashes,hash_list,args['hash_type'],args['valid_only'])
+
+@ns.route('/<id>/extract')
+class hashListUploadHashFile(Resource):
+    @api.marshal_with(hash_addition_result_model)
+    def post(self,id:str):
+        
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            abort(500, 'No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            abort(500, 'No selected file')
+
+        hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
+        if not hash_list:
+            abort(404, 'Hash list not found')
+        
+        result = addProtectedFile(file)
+
+        return upload_hash_list([result['hash']],hash_list,result['hash_type'],True)
