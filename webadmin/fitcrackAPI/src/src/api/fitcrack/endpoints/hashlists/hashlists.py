@@ -12,7 +12,7 @@ from flask_restx import Resource, abort
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.hashlists.argumentsParser import make_empty_hash_list_parser, hash_list_parser, hash_list_add_hash_list_parser, hash_list_add_hash_file_parser
-from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model
+from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model, hash_list_short_model, hash_list_long_model
 from src.api.fitcrack.endpoints.hashlists.functions import upload_hash_list
 from src.database import db
 from src.database.models import FcHashlist, FcHash
@@ -76,6 +76,28 @@ class hashListCollection(Resource):
             'id' : hashlist.id,
         }
 
+
+@ns.route('/<id>')
+class HashListDetails(Resource):
+    @api.marshal_with(hash_list_short_model)
+    def get(self,id:str):
+        hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
+        if not hash_list:
+            abort(404, 'Hash list not found')
+        
+        return hash_list
+    
+
+@ns.route('/<id>/details')
+class HashListDetails(Resource):
+    @api.marshal_with(hash_list_long_model)
+    def get(self,id:str):
+        hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
+        if not hash_list:
+            abort(404, 'Hash list not found')
+        
+        return hash_list
+
 @ns.route('/<id>/hashes')
 class hashListUploadList(Resource):
     
@@ -98,6 +120,10 @@ class hashListUploadHashFile(Resource):
     @api.expect(hash_list_add_hash_file_parser)
     @api.marshal_with(hash_addition_result_model)
     def post(self,id:str):
+        """
+        Takes a hash file (a text or binary file containing hashes),
+         and adds the hashes contained within into the hashlist with the given id.
+        """
         args = hash_list_add_hash_file_parser.parse_args(request)
 
         hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
@@ -106,8 +132,6 @@ class hashListUploadHashFile(Resource):
 
         if args['file'].filename == '': #I don't know, if we still need this... since we are using this new and fancy way...? I suppose we do?
             abort(500, 'No selected file')
-
-        log.error(f'[GEDOODLE] {type(args.file.stream)}')
 
         # TODO: Check if we have one of those fancy binary hash list files? And what the heck are they?
         
