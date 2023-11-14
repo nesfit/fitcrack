@@ -206,21 +206,21 @@ def create_job(data):
 
 
 def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
-    hashes = []
+    hashes : list[tuple[str,str]] = []
     settings = FcSetting.query.first()
     if not settings.verify_hash_format:
         if binaryHash:
-            hashes = ["HASH OK"]
+            hashes = [('HASH','OK')]
         else:
             with open(hash, "r") as hashFile:
-                hashes = [(h.strip() + " OK") for h in hashFile.readlines()]
+                hashes = [(h.strip(), 'OK') for h in hashFile.readlines()]
     else:
         result = shellExec(
             "{} -m {} {} --show --machine-readable".format(HASHCAT_PATH, hash_type, hash), getReturnCode=True
         )
 
         if binaryHash:
-            hashes = ["HASH OK" if result['returnCode'] == 0 else "HASH Token length exception"]
+            hashes = [('HASH','OK') if result['returnCode'] == 0 else ('HASH', 'Token length exception')]
         else:
             hash_validity = {}
             with open(hash, "r") as hashFile:
@@ -243,46 +243,42 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False):
                     else:
                         hash_validity[bad_hash] = error
 
-            hashes = []
-            for h, s in hash_validity.items():
-                hashes.append("{} {}".format(h, s))
+            hashes = list(hash_validity.items())
 
     hashesArr = []
     hasError = False
     for hash in hashes:
-        hashArr = hash.rsplit(' ', 1)
 
         isInCache = False
-        dbHash = FcHash.query.filter(FcHash.hash == bytes(hashArr[0], 'utf8'), FcHash.result != None).first()
+        dbHash = FcHash.query.filter(FcHash.hash == bytes(hash[0], 'utf8'), FcHash.result != None).first()
         if dbHash:
             isInCache = True
 
 
-        if abortOnFail and hashArr[1] != 'OK':
-            abort(500, 'Hash ' + hashArr[0] + ' has wrong format (' + hashArr[1] + ' exception).')
+        if abortOnFail and hash[1] != 'OK':
+            abort(500, 'Hash ' + hash[0] + ' has wrong format (' + hash[1] + ' exception).')
         if binaryHash:
-            hashArr[0] = binaryHash
+            hash[0] = binaryHash
 
-        if hashArr[0] == '':
+        if hash[0] == '':
             hashesArr.append({
-                'hash': hashArr[0],
+                'hash': hash[0],
                 'result': 'Empty hash',
                 'isInCache': False
             })
             hasError = True
         else:
             hashesArr.append({
-                'hash': hashArr[0],
-                'result': hashArr[1],
+                'hash': hash[0],
+                'result': hash[1],
                 'isInCache': isInCache
             })
-            if hashArr[1] != 'OK':
+            if hash[1] != 'OK':
                 hasError = True
     return {
                 'items': hashesArr,
                 'error': hasError
             }
-
 
 def computeCrackingTime(data):
     total_power = 0
