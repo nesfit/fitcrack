@@ -12,15 +12,23 @@ from src.api.fitcrack.endpoints.job.functions import verifyHashFormat
 from src.database import db
 from src.database.models import FcHash, FcHashlist
 
-def upload_hash_list(new_hashes:list[str],hash_list:FcHashlist,hash_type:int,valid_only:bool):
+def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashlist,hash_type:int,valid_only:bool):
     """
-    Takes a list of string hashes and adds them to the given hash list.
+    Takes a list of strings or bytes objects representing hashes and adds them to the given hash list.
+
+    If an entry in the list is a bytes object, it will be added to the hash list as is.
+    
+    If an entry in the list is a string object, it will be converted to a bytes object like so:
+    If it starts with "BASE64:", the object will be base64 decoded, otherwise it will be converted
+    to its utf-8 representation.
 
     If hash_list does not have a hash type, then this sets the hash list to the given type.
     If hash_list does have a type and the input hash_type does not match, then this function fails and aborts.
     """
 
-    def convert_hash_list_to_binary(hashObj:str):
+    def hash_to_bytes(hashObj:str|bytes) -> bytes:
+        if type(hashObj) == bytes:
+            return hashObj
         if hashObj.startswith('BASE64:'):
             return base64.decodebytes(hashObj[7:].encode())
         else:
@@ -28,7 +36,7 @@ def upload_hash_list(new_hashes:list[str],hash_list:FcHashlist,hash_type:int,val
     
     validate_hash_list(new_hashes,hash_type,valid_only)
 
-    hash_list_bin = map(convert_hash_list_to_binary, new_hashes) #Warning: map instead of list; beware if you need to read twice.
+    hash_list_bin = map(hash_to_bytes, new_hashes) #Warning: map instead of list; beware if you need to read twice.
 
     #TODO: What kind of behaviour do we want from the endpoint?
     #TODO: As of now, it just stupidly appends.
@@ -58,7 +66,9 @@ def upload_hash_list(new_hashes:list[str],hash_list:FcHashlist,hash_type:int,val
         'erroredCount' : 0
     }
 
-def validate_hash_list(hash_list:list[str],hash_type:str,valid_only:bool):
+def validate_hash_list(hash_list:list[str],hash_type:str,valid_only:bool,binary_hash = False): ...
+def validate_hash_list(hash_list:list[bytes],hash_type:str,valid_only:bool,binary_hash = True): ...
+def validate_hash_list(hash_list:list[str|bytes],hash_type:str,valid_only:bool,binary_hash:bool):
     '''
     This was taken from the former add job endpoint. I don't exactly get what this
     is doing as of writing this comment, but it's verifying hashes, I suppose.
@@ -68,15 +78,23 @@ def validate_hash_list(hash_list:list[str],hash_type:str,valid_only:bool):
     TODO: I don't think this does anything if valid_only is set to false?
     But this behaviour was present in the old endpoint as well?
     '''
-    hashes = '\n'.join(hash_list)
-    if hashes.startswith('BASE64:'):
-        decoded = base64.decodebytes(hashes[7:].encode())
+    if binary_hash:
+        if len(hash_list) != 1:
+            abort(400,'Binary hash list may contain only exactly one binary hash.')
         with tempfile.NamedTemporaryFile() as fp:
-            fp.write(decoded)
+            fp.write(hash_list[0])
             fp.seek(0)
             verifyHashFormat(fp.name, hash_type, abortOnFail=valid_only, binaryHash=hashes)
     else:
-        with tempfile.NamedTemporaryFile() as fp:
-            fp.write(hashes.encode())
-            fp.seek(0)
-            verifyHashFormat(fp.name, hash_type, abortOnFail=valid_only)
+        hashes = '\n'.join(hash_list)
+        if hashes.startswith('BASE64:'):
+            decoded = base64.decodebytes(hashes[7:].encode())
+            with tempfile.NamedTemporaryFile() as fp:
+                fp.write(decoded)
+                fp.seek(0)
+                verifyHashFormat(fp.name, hash_type, abortOnFail=valid_only, binaryHash=hashes)
+        else:
+            with tempfile.NamedTemporaryFile() as fp:
+                fp.write(hashes.encode())
+                fp.seek(0)
+                verifyHashFormat(fp.name, hash_type, abortOnFail=valid_only)

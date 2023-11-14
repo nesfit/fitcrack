@@ -31,12 +31,10 @@ class hashListCollection(Resource):
         Returns a paginated list of hash lists.
         """
         args = hash_list_parser.parse_args(request)
-        page = args.get('page', 1) #TODO: Why is this like this? I think I copied this, but still... the pagination is defaulted in the parser, so... why?
+        page = args.get('page', 1)
         per_page = args.get('per_page', 10)
 
         hash_list_query = FcHashlist.query
-
-        #Some authenthication and filtration here perhaps?
 
         hash_list_query = hash_list_query.filter_by(deleted=args.showDeleted)
 
@@ -143,11 +141,12 @@ class hashListUploadHashFile(Resource):
         if args['file'].filename == '': #I don't know, if we still need this... since we are using this new and fancy way...? I suppose we do?
             abort(500, 'No selected file')
 
-        # TODO: Check if we have one of those fancy binary hash list files? And what the heck are they?
-        
-        #We get universal newline support by wrapping the binary IO into a string IO wrapper
-        text_io_wrapper = io.TextIOWrapper(args['file'].stream._file,encoding='ascii', errors='surrogateescape')
-        new_hashes = text_io_wrapper.read().splitlines()
+        if (args['binary'] != True):
+            #We get universal newline support by wrapping the binary IO into a string IO wrapper
+            text_io_wrapper = io.TextIOWrapper(args['file'].stream._file,encoding='ascii', errors='surrogateescape')
+            new_hashes = text_io_wrapper.read().splitlines()
+        else:
+            new_hashes = [args['file'].read()]
 
         return upload_hash_list(new_hashes,hash_list,args['hash_type'],args['valid_only'])
 

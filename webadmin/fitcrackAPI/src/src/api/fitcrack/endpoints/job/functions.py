@@ -196,7 +196,7 @@ def create_job(data):
 verifyHashFormatResultItem = TypedDict('verifyHashFormatResultItem',{'hash' : str, 'result' : str, 'isInCache' : bool})
 verifyHashFormatResult = TypedDict('verifyHashFormatResult', {'items' : list[verifyHashFormatResultItem], 'error' : bool})
 def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False) -> verifyHashFormatResult:
-    hashes = []
+    hashes : list[tuple[str,str]] = []
 
     settings = FcSetting.query.first()
     if not settings.verify_hash_format:
