@@ -88,7 +88,9 @@ def create_job(data):
     if len(data['hash_settings']['hash_list']) == 0: #TODO: Hashlist is created separately
         abort(500, 'Hash list can not be empty.')    
 
-    
+    hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==data['hash_list_id']).first()
+    if not hash_list:
+        abort(400, 'Hash list with given id does not exist')
 
     #This seems to maybe just be for the job
     hybrid_mask_dict = False
@@ -149,7 +151,8 @@ def create_job(data):
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         optimized=job['attack_settings'].get('optimized', 1),
-        deleted=False
+        deleted=False,
+        hashlist_id=job['hash_list_id']
         )
 
     #Nothing much interesting after this
@@ -176,16 +179,6 @@ def create_job(data):
             abort(400, 'Host with id ' + str(host) + ' does not exist.')
         db_host_activity = FcHostActivity(job_id=db_job.id, boinc_host_id=db_host.id)
         db.session.add(db_host_activity)
-
-    #~~This won't work, chief~~
-    #Actually, David probably meant to leave the endpoint as is and create here a hashlist for the currently created job
-    #This would leave the endpoint behaviour the same from the API user's side but make it use the new hash list way
-    #Smart, I suppose. But this would work only for the hash list import; hash files and protected files would still need to
-    #be handled using the *new* way because we want to fix issues with how they are implemented now.
-    #Still, letting the endpoint still have the old behaviour might be good to keep backwards compatibility
-    #But the team will need to weigh in on this one.
-    hashlist = FcHashlist(job_id=db_job.id, hash_type=job['hash_settings']['hash_type'], name=db_job.name)
-    db.session.add(hashlist)
 
     perms = FcUserPermission(user_id=current_user.id, job_id=db_job.id, view=1, modify=1, operate=1, owner=1)
     db.session.add(perms)
