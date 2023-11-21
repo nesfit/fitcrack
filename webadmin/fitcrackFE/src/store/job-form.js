@@ -11,9 +11,10 @@ const base = {
   // info
   name: '',
   // input
-  inputMethod: 'multipleHashes',
-  hashList: '',
-  hashType: null,
+  hashListId: null,
+  inputMethod: 'multipleHashes', // deprecated
+  hashList: '', // deprecated
+  hashType: null, // deprecated
   ignoreHashes: false,
   // hosts
   hosts: [],

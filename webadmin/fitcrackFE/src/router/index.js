@@ -19,6 +19,9 @@ const addJob = () => import('@/components/job/addJobView.vue')
 const templates = () => import('@/components/jobTemplate/templateList.vue')
 const hosts = () => import('@/components/host/hostsView.vue')
 const hashes = () => import('@/components/hashcache/hashCacheView.vue')
+const hashlists = () => import('@/components/hashlist/hashListLister.vue')
+const hashlistDetail = () => import('@/components/hashlist/hashListDetail.vue')
+const createHashlist = () => import('@/components/hashlist/createHashlistView.vue')
 const dictionaries = () => import('@/components/dictionary/dictionariesView.vue')
 const dictionaryDetail = () => import('@/components/dictionary/dictionaryDetailView.vue')
 const pcfg = () => import('@/components/pcfg/pcfgView.vue')
@@ -131,7 +134,7 @@ const appRoutes = [
     component: templates,
     meta: {
       title: 'Job templates',
-      icon: 'mdi-file',
+      icon: 'mdi-seed',
       navtab: 2
     }
   },
@@ -164,9 +167,29 @@ const appRoutes = [
     component: hashes,
     meta: {
       title: 'Hashes',
+      icon: 'mdi-archive',
+      navtab: 1
+    }
+  },
+  {
+    path: '/hashlists',
+    name: 'hashlists',
+    component: hashlists,
+    meta: {
+      title: 'Hashlists',
       icon: 'mdi-book-lock',
       navtab: 1
     }
+  },
+  {
+    path: '/hashlists/create',
+    name: 'createHashlist',
+    component: createHashlist
+  },
+  {
+    path: '/hashlists/:id',
+    name: 'hashlistDetail',
+    component: hashlistDetail
   },
   {
     path: '/dictionaries',
@@ -174,7 +197,7 @@ const appRoutes = [
     component: dictionaries,
     meta: {
       title: 'Dictionaries',
-      icon: 'mdi-dictionary',
+      icon: 'mdi-book-alphabet',
       navtab: 1
     }
   },
@@ -292,7 +315,7 @@ const appRoutes = [
     component: Server,
     meta: {
       title: 'Server monitor',
-      icon: 'mdi-gauge',
+      icon: 'mdi-chart-multiline',
       navtab: 2
     }
   },
@@ -302,7 +325,7 @@ const appRoutes = [
     component: Settings,
     meta: {
       title: 'Settings',
-      icon: 'mdi-cogs',
+      icon: 'mdi-tune',
       navtab: 2
     }
   },

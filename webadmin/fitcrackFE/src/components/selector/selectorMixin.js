@@ -24,7 +24,7 @@ export default {
   },
   mounted() {
     this.getData()
-    if (this.value) this.selected = this.value
+    if (this.value && Array.isArray(this.value)) this.selected = this.value
   },
   computed: {
     itemsPerPage() {

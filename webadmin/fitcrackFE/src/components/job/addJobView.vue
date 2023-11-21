@@ -138,10 +138,10 @@
             editable
             step="1"
           >
-            Input settings
+            Hashlist
           </v-stepper-step>
           <v-stepper-content step="1">
-            <v-container>
+            <!-- <v-container>
               <v-row class="mb-4">
                 <v-btn-toggle
                   v-model="inputMethod"
@@ -361,6 +361,38 @@
                   @click="step = 2"
                 >
                   Next
+                </v-btn>
+              </v-row>
+            </v-container> -->
+            <v-container>
+              <v-row>
+                <v-col>
+                  <v-btn
+                    large block
+                    color="primary"
+                    :to="{name: 'createHashlist', query: {attach: `${name} Hashlist`}}"
+                  >
+                    <v-icon left>mdi-book-plus</v-icon>
+                    Create new input hashlist
+                  </v-btn>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <div class="text-center text-overline text--secondary">or attach an existing one</div>
+                  <HashlistSelector
+                  v-model="hashListId"
+                  />
+                </v-col>
+              </v-row>
+              <v-row class="mb-2">
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="primary"
+                  @click="step = 2"
+                  :disabled="!hashListId"
+                >
+                  {{ hashListId ? 'Next' : 'Select a hashlist above' }}
                 </v-btn>
               </v-row>
             </v-container>
@@ -590,23 +622,27 @@
   import {twoWayMap} from '@/store'
 
   import { attacks } from '@/store/job-form'
+  import HashlistCreator from '@/components/hashlist/hashlistCreator.vue'
+  import HashlistSelector from '@/components/selector/hashlistSelector.vue'
 
   export default {
     name: 'AddJob',
     components: {
-      FileUploader,
-      'combinator': combinator,
-      'maskattack': mask,
-      'dictionary': dictionary,
-      'hybridMaskWordlist': hybridMaskWordlist,
-      'hybridWordlistMask': hybridWordlistMask,
-      'pcfgAttack': pcfgAttack,
-      'princeAttack': princeAttack,
-      'fc-textarea': fcTextarea,
-      'host-selector': hostSelector,
-      'template-modal': templateModal,
-      dtPicker
-    },
+    FileUploader,
+    'combinator': combinator,
+    'maskattack': mask,
+    'dictionary': dictionary,
+    'hybridMaskWordlist': hybridMaskWordlist,
+    'hybridWordlistMask': hybridWordlistMask,
+    'pcfgAttack': pcfgAttack,
+    'princeAttack': princeAttack,
+    'fc-textarea': fcTextarea,
+    'host-selector': hostSelector,
+    'template-modal': templateModal,
+    dtPicker,
+    HashlistCreator,
+    HashlistSelector
+},
     data: function () {
       return {
         loading: false,
@@ -630,7 +666,7 @@
     computed: {
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
-        'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
+        'step', 'attackSettingsTab', 'hashListId', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
