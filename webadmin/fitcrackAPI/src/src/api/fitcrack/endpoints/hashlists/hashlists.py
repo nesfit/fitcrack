@@ -150,6 +150,7 @@ class hashListUploadHashFile(Resource):
 
         return upload_hash_list(new_hashes,hash_list,args['hash_type'],args['valid_only'])
 
+
 @ns.route('/<id>/extract')
 class hashListUploadHashFile(Resource):
     @api.marshal_with(hash_addition_result_model)
@@ -174,4 +175,4 @@ class hashListUploadHashFile(Resource):
         
         result = addProtectedFile(file)
 
-        return upload_hash_list([result['hash']],hash_list,result['hash_type'],True)
+        return upload_hash_list([result['hash']],hash_list,int(result['hash_type']),True)

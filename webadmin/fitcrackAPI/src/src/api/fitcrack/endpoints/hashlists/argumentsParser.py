@@ -29,7 +29,7 @@ hash_list_add_hash_list_parser = api.schema_model('addHashList_hashes', {
    'properties': {
          'hash_type': {
             'default': '0',
-            'type': 'string',
+            'type': 'integer',
             'description': 'Hash code from /hashcat/hashTypes'
          },
          'hash_list': {

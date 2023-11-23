@@ -12,6 +12,7 @@ from src.api.fitcrack.endpoints.job.functions import verifyHashFormat
 from src.database import db
 from src.database.models import FcHash, FcHashlist
 
+
 def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashlist,hash_type:int,valid_only:bool):
     """
     Takes a list of strings or bytes objects representing hashes and adds them to the given hash list.
@@ -34,35 +35,31 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashlist,hash_type:i
         else:
             return hashObj.encode()
     
-    validate_hash_list(new_hashes,hash_type,valid_only)
+    validate_hash_list(new_hashes,hash_type,valid_only,False)
 
-    hash_list_bin = map(hash_to_bytes, new_hashes) #Warning: map instead of list; beware if you need to read twice.
-
-    #TODO: What kind of behaviour do we want from the endpoint?
-    #TODO: As of now, it just stupidly appends.
-
-    #TODO: We definitely just want to append the good hashes, or not?
-    #TODO: We can create invalid hashes, so we need a toggle to set whether we want to accept; which we already do I suppose.
+    new_hashes_bin = set(map(hash_to_bytes, new_hashes))
 
     if hash_list.hash_type is None:
         hash_list.hash_type = hash_type
     elif hash_list.hash_type != hash_type:
-        abort(400,f'Hash type mismatch. Trying to add hashes of type {hash_type} to hash list of type {hash_list.hash_type}.')
+        abort(400,f'Hash-type mismatch. Trying to add hashes of type {hash_type} to hash list of type {hash_list.hash_type}.')
+    
+    pre_existing_hashes : set[bytes] = {x[0] for x in db.session.query(FcHash.hash).filter((FcHash.hashlist == hash_list) & (FcHash.hash.in_(new_hashes_bin))).all()}
 
-    #TODO: I think we want a nice duplicate check like in a set?
-    for hashObj in hash_list_bin:
-        hash = FcHash(hashlist_id=hash_list.id, hash_type=hash_type, hash=hashObj)
+    hashes_to_add = new_hashes_bin - pre_existing_hashes
+
+    for hash_binary_string in hashes_to_add:
+        hash = FcHash(hashlist_id=hash_list.id, hash_type=hash_type, hash=hash_binary_string)
         db.session.add(hash)
 
     db.session.commit()
-    #Holy fuck, we need rollbacks; the return may fail. Or just make all the failable actions first and then just do a return of vars.
     
     return {
         'result' : 'OK',
         'id' : hash_list.id,
         'name' : hash_list.name,
         'hashCount' : hash_list.hash_count,
-        'addedCount' : len(new_hashes),
+        'addedCount' : len(hashes_to_add),
         'erroredCount' : 0
     }
 

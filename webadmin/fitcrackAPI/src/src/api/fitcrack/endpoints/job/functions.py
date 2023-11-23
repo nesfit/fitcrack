@@ -84,20 +84,20 @@ def start_job(job, db):
 
 def create_job(data):
     if data['name'] == '':
-        abort(500, 'Name can not be empty.')
-    if len(data['hash_settings']['hash_list']) == 0: #TODO: Hashlist is created separately
-        abort(500, 'Hash list can not be empty.')    
+        abort(500, 'Name can not be empty.')   
 
     hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==data['hash_list_id']).first()
     if not hash_list:
         abort(400, 'Hash list with given id does not exist')
+    if hash_list.hash_type is None:
+        abort(400, 'Hash list does not have any hash type set.')
+    if hash_list.hash_count == 0:
+        abort(400, 'Hash list does not contain any hashes.')
 
-    #This seems to maybe just be for the job
     hybrid_mask_dict = False
     #Hybrid attack mask-wordlist
     if int(data['attack_settings']['attack_mode']) == 7:    hybrid_mask_dict = True
 
-    #This is a bit cursed.
     process_func = getattr(attacks, 'process_job_' + str(data['attack_settings']['attack_mode']))
 
     if not process_func:
@@ -114,13 +114,13 @@ def create_job(data):
     if job['time_end'] == '':
         job['time_end'] = None
 
-    #Here we defonitely want to edit it to be nice and good.
+
     db_job = FcJob(
         attack=job['attack_name'],
         attack_mode=job['attack_settings']['attack_mode'],
         attack_submode=job['attack_settings']['attack_submode'],
         distribution_mode=job['attack_settings']['distribution_mode'],
-        hash_type=job['hash_settings']['hash_type'],
+        hash_type=hash_list.hash_type,
         status='0',
         keyspace=job['keyspace'],
         hc_keyspace=job['hc_keyspace'],
@@ -155,7 +155,6 @@ def create_job(data):
         hashlist_id=job['hash_list_id']
         )
 
-    #Nothing much interesting after this
     try:
         db.session.add(db_job)
         db.session.commit()

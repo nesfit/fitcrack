@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `kill` int(11) NOT NULL DEFAULT '0',
   `batch_id` int(11),
   `queue_position` int(11),
-  `hashlist_id` bigint(20) unsigned,
+  `hashlist_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `batch_id` (`batch_id`),
   KEY `hashlist_id` (`hashlist_id`)
@@ -579,8 +579,7 @@ CREATE TABLE IF NOT EXISTS `fc_server_usage` (
 -- Constraints for `fc_job`
 --
 ALTER TABLE `fc_job`
-  ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `hashlist_id` FOREIGN KEY (`hashlist_id`) REFERENCES `fc_hashlist` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `batch_link` FOREIGN KEY (`batch_id`) REFERENCES `fc_batch` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for `fc_batch`
