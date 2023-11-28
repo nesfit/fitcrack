@@ -11,12 +11,12 @@ from flask import request, redirect
 from flask_restx import Resource, abort
 
 from src.api.apiConfig import api
-from src.api.fitcrack.endpoints.hashlists.argumentsParser import make_empty_hash_list_parser, hash_list_parser, hash_list_add_hash_list_parser, hash_list_add_hash_file_parser
-from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model, hash_list_short_model, hash_list_long_model
+from src.api.fitcrack.endpoints.hashlists.argumentsParser import make_empty_hash_list_parser, hash_list_parser, hash_list_add_hash_list_parser, hash_list_add_hash_file_parser, hash_list_hashes_parser
+from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model, hash_list_model, page_of_hashes_model
 from src.api.fitcrack.endpoints.hashlists.functions import upload_hash_list
 from src.api.fitcrack.endpoints.protectedFile.functions import addProtectedFile
 from src.database import db
-from src.database.models import FcHashlist
+from src.database.models import FcHashlist, FcHash
 
 log = logging.getLogger(__name__)
 ns = api.namespace('hashlist', description='Endpoints for work with hash lists.')
@@ -49,9 +49,11 @@ class hashListCollection(Resource):
             if args.descending:
                 orderBy = orderBy.desc()
             hash_list_query = hash_list_query.order_by(orderBy)
-
         else:
-            hash_list_query = hash_list_query.order_by(FcHashlist.id.desc())
+            if args.descending:
+                hash_list_query = hash_list_query.order_by(FcHashlist.id.desc())
+            else:
+                hash_list_query = hash_list_query.order_by(FcHashlist.id.acs())
 
         hash_list_page = hash_list_query.paginate(page,per_page,error_out=True)
 
@@ -77,11 +79,11 @@ class hashListCollection(Resource):
 
 
 @ns.route('/<id>')
-class HashListDetails(Resource):
-    @api.marshal_with(hash_list_short_model)
+class HashListHashes(Resource):
+    @api.marshal_with(hash_list_model)
     def get(self,id:str):
         """
-        Returns simple details about a hash list.
+        Returns details about a hash list.
         """
         hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
         if not hash_list:
@@ -91,17 +93,39 @@ class HashListDetails(Resource):
     
 
 @ns.route('/<id>/details')
-class HashListDetails(Resource):
-    @api.marshal_with(hash_list_long_model)
+class HashListHashes(Resource):
+    @api.expect(hash_list_hashes_parser)
+    @api.marshal_with(page_of_hashes_model)
     def get(self,id:str):
         """
-        Returns complex details about a hash list.
+        Returns a paginated list of hashes of the given hash list.
         """
         hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==id).first()
         if not hash_list:
             abort(404, 'Hash list not found')
-        
-        return hash_list
+
+        args = hash_list_hashes_parser.parse_args(request)
+        page = args.get('page', 1)
+        per_page = args.get('per_page', 10)
+
+        hash_query = FcHash.query
+
+        hash_query = hash_query.filter_by(hashlist_id=id)
+
+        if args.order_by:
+            orderBy = getattr(FcHash, args.order_by)
+            if args.descending:
+                orderBy = orderBy.desc()
+            hash_query = hash_query.order_by(orderBy)
+        else:
+            if args.descending:
+                hash_query = hash_query.order_by(FcHash.id.desc())
+            else:
+                hash_query = hash_query.order_by(FcHash.id.asc())
+
+        hash_page = hash_query.paginate(page,per_page,error_out=True)
+
+        return hash_page
 
 @ns.route('/<id>/hashes')
 class hashListUploadList(Resource):

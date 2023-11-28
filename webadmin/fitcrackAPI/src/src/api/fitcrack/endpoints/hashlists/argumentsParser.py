@@ -18,6 +18,11 @@ hash_list_parser.add_argument('order_by', type=str, required=False, help='result
 hash_list_parser.add_argument('descending', type=inputs.boolean, required=False)
 hash_list_parser.add_argument('showDeleted', type=inputs.boolean, required=False, default=False)
 
+hash_list_hashes_parser = pagination.copy()
+#hash_list_hashes_parser.add_argument('cracked',type=bool,required=False,help='show only cracked/not cracked')
+hash_list_hashes_parser.add_argument('order_by',type=str,required=False,help='result ordering',
+                              choices=['hash', 'result'])
+hash_list_hashes_parser.add_argument('descending', type=inputs.boolean, required=False)
 
 make_empty_hash_list_parser = reqparse.RequestParser()
 make_empty_hash_list_parser.add_argument('name', type=str, required=True)
