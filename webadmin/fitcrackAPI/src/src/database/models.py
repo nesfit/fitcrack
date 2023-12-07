@@ -239,9 +239,9 @@ class FcJob(Base):
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
     queue_position = Column(Integer)
-    hashlist_id = Column(ForeignKey('fc_hashlist.id', ondelete='SET NULL'), index=True)
+    hash_list_id = Column(ForeignKey('fc_hash_list.id', ondelete='SET NULL'), index=True)
 
-    hashlist = relationship("FcHashlist", back_populates="jobs")
+    hash_list = relationship("FcHashList", back_populates="jobs")
 
     permission_records = relationship("FcUserPermission",
                           primaryjoin="FcJob.id==FcUserPermission.job_id")
@@ -271,8 +271,8 @@ class FcJob(Base):
 
     @hybrid_property
     def cracked_hashes_str(self):
-        cracked = len([hash.result for hash in self.hashes if hash.result != None])
-        total = len(self.hashes)
+        cracked = len([hash.result for hash in self.hash_list.hashes if hash.result != None])
+        total = len(self.hash_list.hashes)
         if total == 0:
             return ""
         return "{} % ({}/{})".format(int((cracked * 100)/total), cracked, total)
@@ -892,8 +892,8 @@ class FcHostStatus(Base):
         total_seconds = math.floor(delta.total_seconds())
         return True if total_seconds <= 60 else False
 
-class FcHashlist(Base):
-    __tablename__ = 'fc_hashlist'
+class FcHashList(Base):
+    __tablename__ = 'fc_hash_list'
 
     id = Column(BigInteger, primary_key=True)
     hash_type = Column(Integer) #Should be null only if we want to support non-initialised lists
@@ -915,19 +915,23 @@ class FcHashlist(Base):
     @hybrid_property
     def hash_count(self):
         return len(self.hashes) #This is probably horribly inefficient
+    
+    @hybrid_property
+    def is_locked(self):
+        return len(self.jobs) != 0
 
 class FcHash(Base):
     __tablename__ = 'fc_hash'
 
     id = Column(BigInteger, primary_key=True)
-    hashlist_id = Column(BigInteger, ForeignKey(FcHashlist.id), nullable=False)
+    hash_list_id = Column(BigInteger, ForeignKey(FcHashList.id), nullable=False)
     hash_type = Column(Integer, nullable=False) # TODO: Could go away
     hash = Column(LargeBinary, nullable=False)
     result = Column(String(400, collation='utf8_bin'))
     added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     time_cracked = Column(DateTime)
 
-    hashlist = relationship("FcHashlist",back_populates="hashes")
+    hash_list = relationship("FcHashList",back_populates="hashes")
 
     @hybrid_property
     def hashText(self):

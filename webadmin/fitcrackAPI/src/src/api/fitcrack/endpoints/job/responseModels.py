@@ -12,7 +12,6 @@ from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
 from src.api.fitcrack.responseModels import pagination, simpleResponse, job_short_model, \
     boincHost_model, job_permissions, workunit_model
-from src.api.fitcrack.endpoints.hashCache.responseModels import hashlist_model
 
 
 rule_model = api.model('Rule', {
@@ -135,7 +134,6 @@ job_big_model = api.model('Job', {
     'hosts': fields.List(fields.Nested(boincHost_model)),
     'workunits': fields.List(fields.Nested(workunit_model)),
     'masks': fields.List(fields.Nested(mask_model)),
-    'hashlist': fields.Nested(hashlist_model),
     'left_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'grammar_id': fields.Integer(),
@@ -149,6 +147,7 @@ job_big_model = api.model('Job', {
     'max_elem_in_chain': fields.Integer(),
     'generate_random_rules': fields.Integer(),
     'optimized': fields.Boolean(),
+    'hash_list_id': fields.Integer()
 })
 
 job_nano_model = api.model('Job nano', {
@@ -162,6 +161,7 @@ job_nano_model = api.model('Job nano', {
     'progress': fields.Float(required=False),
     'cracked_hashes_str': fields.String(),
     'estimated_cracking_time_str': fields.String(),
+    'hash_list_id': fields.Integer()
 })
 
 job_nano_list_model = api.inherit('Job nano list', {

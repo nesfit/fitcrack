@@ -60,10 +60,10 @@ CREATE TABLE IF NOT EXISTS `fc_dictionary` (
 -- --------------------------------------------------------
 
 --
--- Table definition for `fc_hashlist`
+-- Table definition for `fc_hash_list`
 --
 
-CREATE TABLE IF NOT EXISTS`fc_hashlist` (
+CREATE TABLE IF NOT EXISTS`fc_hash_list` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `hash_type` int(11) unsigned,
   `name` varchar(255) NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS`fc_hashlist` (
 
 CREATE TABLE IF NOT EXISTS`fc_hash` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `hashlist_id` bigint(20) unsigned NOT NULL,
+  `hash_list_id` bigint(20) unsigned NOT NULL,
   `hash_type` int(11) unsigned NOT NULL,
   `hash` longblob NOT NULL,
   `result` longtext DEFAULT NULL,
@@ -337,10 +337,10 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `kill` int(11) NOT NULL DEFAULT '0',
   `batch_id` int(11),
   `queue_position` int(11),
-  `hashlist_id` bigint(20) unsigned NOT NULL,
+  `hash_list_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `batch_id` (`batch_id`),
-  KEY `hashlist_id` (`hashlist_id`)
+  KEY `hash_list_id` (`hash_list_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 --

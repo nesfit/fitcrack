@@ -158,7 +158,8 @@ job_short_model = api.model('Job short', {
     'hash_type': fields.String(required=True),
     'time_start': fields.DateTime(required=True),
     'time_end': fields.DateTime(required=True),
-    'deleted': fields.Boolean()
+    'deleted': fields.Boolean(),
+    'hash_list_id': fields.Integer()
 })
 
 job_micro_model = api.model('Job micro', {
@@ -172,4 +173,5 @@ job_micro_model = api.model('Job micro', {
     'status_tooltip': fields.String(required=False),
     'status_type': fields.String(),
     'progress': fields.Float(required=False),
+    'hash_list_id': fields.Integer()
 })

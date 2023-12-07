@@ -26,7 +26,7 @@ from src.api.fitcrack.lang import status_to_code, attack_modes
 from src.api.fitcrack.functions import shellExec, lenStr
 from src.database import db
 from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcJobDictionary, \
-    FcJobGraph, FcRule, FcHash, FcHashlist, FcMask, FcUserPermission, FcSetting, FcWorkunit, FcDeviceInfo
+    FcJobGraph, FcRule, FcHash, FcHashList, FcMask, FcUserPermission, FcSetting, FcWorkunit, FcDeviceInfo
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 
 
@@ -86,7 +86,7 @@ def create_job(data):
     if data['name'] == '':
         abort(500, 'Name can not be empty.')   
 
-    hash_list : FcHashlist = FcHashlist.query.filter(FcHashlist.id==data['hash_list_id']).first()
+    hash_list : FcHashList = FcHashList.query.filter(FcHashList.id==data['hash_list_id']).first()
     if not hash_list:
         abort(400, 'Hash list with given id does not exist')
     if hash_list.hash_type is None:
@@ -152,7 +152,7 @@ def create_job(data):
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         optimized=job['attack_settings'].get('optimized', 1),
         deleted=False,
-        hashlist_id=job['hash_list_id']
+        hash_list_id=job['hash_list_id']
         )
 
     try:
@@ -188,6 +188,9 @@ def create_job(data):
 verifyHashFormatResultItem = TypedDict('verifyHashFormatResultItem',{'hash' : str, 'result' : str, 'isInCache' : bool})
 verifyHashFormatResult = TypedDict('verifyHashFormatResult', {'items' : list[verifyHashFormatResultItem], 'error' : bool})
 def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False) -> verifyHashFormatResult:
+    #This function is properly cursed. You will get a headache trying to understand it.
+    #Should be rewritten... eventually.
+       
     hashes : list[tuple[str,str]] = []
 
     settings = FcSetting.query.first()

@@ -18,15 +18,6 @@ hashes_model = api.model('Hashes model', {
     'added': fields.DateTime(),
 })
 
-hashlist_model = api.model('Hashlist model', {
-    'id': fields.Integer(readOnly=True, required=False),
-    'hash_type_name': fields.String(),
-    'name': fields.String(),
-    'added': fields.DateTime(),
-    'deleted': fields.Boolean(),
-    'items': fields.List(fields.Nested(hashes_model))
-})
-
 page_of_hashes_model = api.inherit('Page of hashes', pagination, {
     'items': fields.List(fields.Nested(hashes_model))
 })

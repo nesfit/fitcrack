@@ -41,23 +41,23 @@ INSERT INTO `fc_dictionary` (`id`, `name`, `path`, `password_distribution`, `key
 
 
 --
--- Insert default hashlists 
+-- Insert default hash lists 
 --
 
-INSERT INTO `fc_hashlist` (`id`, `hash_type`, `name`, `added`, `deleted`) VALUES
+INSERT INTO `fc_hash_list` (`id`, `hash_type`, `name`, `added`, `deleted`) VALUES
 (1, 0, 'BENCH_ALL', '2018-08-18 12:00:00', 1),
-(2, 0, 'MD5 Big Hashlist', '2018-08-18 12:00:00', 0), 
-(3, 3200, 'sample-dict-bcrypt hashlist', '2018-08-18 12:00:00', 0), 
-(4, 18000, 'sample-mask-sha3 hashlist', '2018-08-18 12:00:00', 0),
-(5, 1700, 'sample-combinator-bcrypt hashlist', '2018-08-18 12:00:00', 0), 
-(6, 1700, 'sample-pcfg-sha512 hashlist', '2018-08-18 12:00:00', 0), 
-(7, 0, 'sample-prince-md5 hashlist', '2018-08-18 12:00:00', 0);
+(2, 0, 'MD5 Big Hash List', '2018-08-18 12:00:00', 0), 
+(3, 3200, 'sample-dict-bcrypt hash list', '2018-08-18 12:00:00', 0), 
+(4, 18000, 'sample-mask-sha3 hash list', '2018-08-18 12:00:00', 0),
+(5, 1700, 'sample-combinator-bcrypt hash list', '2018-08-18 12:00:00', 0), 
+(6, 1700, 'sample-pcfg-sha512 hash list', '2018-08-18 12:00:00', 0), 
+(7, 0, 'sample-prince-md5 hash list', '2018-08-18 12:00:00', 0);
 
 --
 -- Insert default hashes
 --
 
-INSERT INTO `fc_hash` (`id`, `hashlist_id`, `hash_type`, `hash`, `result`, `added`, `time_cracked`) VALUES
+INSERT INTO `fc_hash` (`id`, `hash_list_id`, `hash_type`, `hash`, `result`, `added`, `time_cracked`) VALUES
 (1,	2,	0,	'1ffd9e753c8054cc61456ac7fac1ac89',	NULL,	'2018-08-18 12:00:00',	NULL),
 (2,	2,	0,	'79e262a81dd19d40ae008f74eb59edce',	NULL,	'2018-08-18 12:00:00',	NULL),
 (3,	2,	0,	'6517217c0041e7f36e9eae5caca8b69e',	NULL,	'2018-08-18 12:00:00',	NULL),
@@ -6625,9 +6625,9 @@ INSERT INTO `fc_bin` (`name`) VALUES
 -- Insert default BENCH_ALL job and sample jobs
 --
 
-INSERT INTO `fc_job` (`id`, `attack`, `attack_mode`, `attack_submode`, `distribution_mode`, `hash_type`, `status`, `keyspace`, `hc_keyspace`, `indexes_verified`, `current_index`, `current_index_2`, `time`, `name`, `comment`, `time_start`, `time_end`, `workunit_sum_time`, `seconds_per_workunit`, `charset1`, `charset2`, `charset3`, `charset4`, `rules`, `rule_left`, `rule_right`, `markov_hcstat`, `markov_threshold`, `grammar_id`, `min_password_len`, `max_password_len`, `min_elem_in_chain`, `max_elem_in_chain`, `optimized`, `deleted`, `hashlist_id`) VALUES
+INSERT INTO `fc_job` (`id`, `attack`, `attack_mode`, `attack_submode`, `distribution_mode`, `hash_type`, `status`, `keyspace`, `hc_keyspace`, `indexes_verified`, `current_index`, `current_index_2`, `time`, `name`, `comment`, `time_start`, `time_end`, `workunit_sum_time`, `seconds_per_workunit`, `charset1`, `charset2`, `charset3`, `charset4`, `rules`, `rule_left`, `rule_right`, `markov_hcstat`, `markov_threshold`, `grammar_id`, `min_password_len`, `max_password_len`, `min_elem_in_chain`, `max_elem_in_chain`, `optimized`, `deleted`, `hash_list_id`) VALUES
 (1, 'mask', 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, NOW(), 'BENCH_ALL', 'This is default job for benchmarking all hosts.', NULL, NULL, 0, 3600, '', '', '', '', NULL, '', '', NULL, 0, NULL, 0, 0, 0, 0, 1, 1, 1),
-(2, 'dictionary',	0,	0,	0,  0,	0,	92431,	92431,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick',	'Default hashcat MD5 hashlist',	NULL,	NULL,	0,	120, '',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 2),
+(2, 'dictionary',	0,	0,	0,  0,	0,	92431,	92431,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-md5-quick',	'Default hashcat MD5 hash list',	NULL,	NULL,	0,	120, '',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 2),
 (3, 'dictionary',	0,	0,	0,  3200,	0,	226082,	226081, 0,	0,	0,	'2018-08-18 12:00:00',	'sample-dict-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 3),
 (4, 'mask',	3,	0,	0,  18000,	0,	217180147158,	13270583,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-mask-sha3',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 4),
 (5, 'combinator',	1,	0,	0,  3200,	0,	397000,	1000,	0,	0,	0,	'2018-08-18 12:00:00',	'sample-combinator-bcrypt',	'',	NULL,	NULL,	0,	60,	'',	'',	'',	'',	NULL,	'',	'',	'',	0, NULL, 0, 0, 0, 0, 1, 0, 5),
