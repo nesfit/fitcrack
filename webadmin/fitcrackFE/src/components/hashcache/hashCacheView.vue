@@ -127,7 +127,7 @@
         this.axios.get(this.$serverAddr + '/hashes', {
           params: {
             'page': this.pagination.page,
-            'per_page': this.pagination.rowsPerPage,
+            'per_page': this.pagination.itemsPerPage,
             'order_by': this.pagination.sortBy,
             'descending': this.pagination.descending,
             'search': this.search

@@ -166,7 +166,7 @@ import HashTypeAutocomplete from './hashTypeAutocomplete.vue'
             this.axios.get(this.$serverAddr + '/hashlist', {
                 params: {
                     'page': this.dataTableOptions.page,
-                    'per_page': this.dataTableOptions.rowsPerPage,
+                    'per_page': this.dataTableOptions.itemsPerPage,
                     'order_by': this.orderBy,
                     'descending': this.dataTableOptions.sortDesc ? this.dataTableOptions.sortDesc[0] : false,
                     'name': this.search,

@@ -32,12 +32,15 @@ export default {
       search: '',
       selected: [],
       footerProps: {
-        itemsPerPageOptions: [ 3, 5, 10, 20, -1 ]
+        itemsPerPageOptions: [ 3, 5, 10, 20, -1 ],
+        itemsPerPageText: 'Hashlists per page'
       },
       interval: null,
       status: 'active',
       totalItems: 0,
-      dataTableOptions: {},
+      dataTableOptions: {
+        itemsPerPage: 3
+      },
       loading: true,
       headers: [
         { text: 'Name', value: 'name', align: 'start', sortable: true },
@@ -57,10 +60,6 @@ export default {
     clearInterval(this.interval)
   },
   computed: {
-    itemsPerPage() {
-      // return value of perpage in localStorage or default value
-      return parseInt(localStorage.getItem('defaultItemsPerPage') || 10)
-    },
     orderBy() {
         const dt = this.dataTableOptions.sortBy;
         if (dt.length > 0) {
@@ -82,7 +81,7 @@ export default {
       this.axios.get(this.$serverAddr + '/hashlist', {
         params: {
           'page': this.dataTableOptions.page,
-          'per_page': this.dataTableOptions.rowsPerPage,
+          'per_page': this.dataTableOptions.itemsPerPage,
           'order_by': this.orderBy,
           'descending': this.dataTableOptions.sortDesc ? this.dataTableOptions.sortDesc[0] : false,
           'name': this.search
