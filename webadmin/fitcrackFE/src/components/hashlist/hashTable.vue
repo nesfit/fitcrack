@@ -145,7 +145,7 @@ export default {
   methods: {
     loadHashes() {
       this.loading = true
-      this.axios.get(this.$serverAddr + '/hashlist/' + this.$route.params.id + '/details', {
+      this.axios.get(this.$serverAddr + '/hashlist/' + this.id + '/details', {
         params: {
           page: this.dataTableOptions.page,
           per_page: this.dataTableOptions.itemsPerPage,
