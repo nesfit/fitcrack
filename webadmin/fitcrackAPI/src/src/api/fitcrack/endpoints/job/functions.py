@@ -273,12 +273,17 @@ def computeCrackingTime(data):
 
     attackSettings = json.loads(data['attack_settings'])
 
+    hash_type_code = -1
+    hashlist = FcHashList.query.filter(FcHashList.id == data['hash_list_id']).first()
+    if hashlist:
+        hash_type_code = hashlist.hash_type
+
     data['boinc_host_ids'] = [x.strip() for x in data['boinc_host_ids'].split(',')]
 
     # Check if we have valid hash type code and if we have any host
     # -1 is indicator that no hash type was selected in webadmin
-    if data['hash_type_code'] != -1 and len(data['boinc_host_ids']) > 0:
-        hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == data['hash_type_code']). \
+    if hash_type_code != -1 and len(data['boinc_host_ids']) > 0:
+        hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == hash_type_code). \
             filter(FcBenchmark.attack_mode == attackSettings['attack_mode']). \
             filter(FcBenchmark.boinc_host_id.in_(data['boinc_host_ids'])).all()
 
@@ -286,7 +291,7 @@ def computeCrackingTime(data):
             # We were unable to find benchmark data for (host, job_hash_type, job_attack_mode).
             # Instead of no data, try to use less precise data for (host, job_hash_type, X)
             # where X is any attack mode
-            hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == data['hash_type_code']). \
+            hosts = FcBenchmark.query.filter(FcBenchmark.hash_type == hash_type_code). \
                 filter(FcBenchmark.boinc_host_id.in_(data['boinc_host_ids'])).all()
 
         for host in hosts:
@@ -391,7 +396,7 @@ def computeCrackingTime(data):
             display_time = 'really long'
 
     result = {
-        "hash_code": data['hash_type_code'],
+        "hash_code": hash_type_code,
         "keyspace": keyspace,
         "hosts": hosts_dict,
         "total_power": total_power,

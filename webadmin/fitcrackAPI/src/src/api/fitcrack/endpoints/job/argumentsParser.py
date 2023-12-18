@@ -30,7 +30,7 @@ verifyHash_argument.add_argument('hashtype', type=str, required=True,
                                  default='0', help='hash code from /hashcat/hashTypes')
 
 crackingTime_argument = reqparse.RequestParser()
-crackingTime_argument.add_argument('hash_type_code', type=str, required=True, help='hash type', default='0')
+crackingTime_argument.add_argument('hash_list_id', type=int, required=True, help='hash list ID to determine hash type')
 crackingTime_argument.add_argument('boinc_host_ids', type=str, required=True, help='host IDs')
 crackingTime_argument.add_argument('attack_settings', required=True)
 

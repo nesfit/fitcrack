@@ -469,13 +469,10 @@
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
           }
-          // -1 means no hash entered
-          // TODO: USE HASH LIST ID TO GET TYPE ON SERVER INSTEAD OF THIS
-          // We would have to fetch the list to find a type name and then go thrrough the types to find a code
-          var hash_code = this.hashType == null ? -1 : this.hashType.code
           // Compute new keyspace and new estimation of cracking time
+          if (!this.hashListId) return // early return if no hashlist is selected
           this.axios.post(this.$serverAddr + '/job/crackingTime', {   
-            'hash_type_code': hash_code,
+            'hash_list_id': this.hashListId,
             'boinc_host_ids': boincIds.join(","),
             'attack_settings': JSON.stringify(val.attack_settings)
           }).then((response) => {
