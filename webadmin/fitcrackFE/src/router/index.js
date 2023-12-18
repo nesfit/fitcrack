@@ -192,6 +192,11 @@ const appRoutes = [
     component: hashlistDetail
   },
   {
+    path: '/hashlists/:id/extend',
+    name: 'hashlistExtend',
+    component: createHashlist
+  },
+  {
     path: '/dictionaries',
     name: 'dictionaries',
     component: dictionaries,

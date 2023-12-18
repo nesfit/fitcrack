@@ -134,7 +134,6 @@ export default {
   display: flex;
   margin-right: 1.5em;
   min-width: var(--mj-basis);
-  min-height: var(--mj-height);
 }
 
 .minijob.detailed {
@@ -161,13 +160,14 @@ export default {
 .mj-progress {
   font-weight: bold;
   font-size: 2.5em;
+  margin-block: .2em;
 }
 .mj-progress span {
   font-size: 1rem;
 }
 
 .minijob-main {
-  flex: 0 0 var(--mj-basis);
+  flex: 1 0 var(--mj-basis);
 }
 
 .minijob-detail {

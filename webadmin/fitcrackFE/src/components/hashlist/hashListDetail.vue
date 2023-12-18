@@ -15,7 +15,7 @@
       divider="/"
     />
 
-    <v-container>
+    <v-container v-if="info != null">
       <v-card flat class="mb-4">
         <v-card-title>
           {{ info.name }}
@@ -23,10 +23,29 @@
         <v-card-text>
           Hash type: <strong>{{ info.hash_type_name }}</strong>
         </v-card-text>
+        <v-card-actions>
+          <v-btn
+            :to="{name: 'hashlistExtend', params: {id: info.id}}"
+            color="primary"
+            :disabled="info.is_locked"
+          >
+            <v-icon left>mdi-plus</v-icon>
+            Add hashes
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            @click="deleteHashlist"
+            color="error"
+            text
+          >
+            <v-icon left>mdi-delete</v-icon>
+            Discard or restore
+          </v-btn>
+        </v-card-actions>
       </v-card>
-      <v-card v-if="info.jobs.length > 0" flat class="mb-4">
+      <v-card flat class="mb-4 transparent">
         <v-card-title>Jobs</v-card-title>
-        <v-card-text class="d-flex">
+        <v-card-text v-if="info.jobs.length > 0" class="d-flex overflow-x-auto">
           <miniJob
             v-for="job in info.jobs"
             :key="job.id"
@@ -34,59 +53,17 @@
           >
           </miniJob>
         </v-card-text>
+        <v-card-actions>
+          <v-btn
+            @click="attachToJob"
+            color="primary"
+          >
+            <v-icon left>mdi-briefcase-plus</v-icon>
+            Add to a new job
+          </v-btn>
+        </v-card-actions>
       </v-card>
-      <v-data-table
-        ref="table"
-        :headers="headers"
-        :items="info.hashes"
-        :search="search"
-        :options.sync="pagination"
-        :server-items-length="totalItems"
-        :loading="loading"
-        :footer-props="{itemsPerPageOptions: [25,50,100], itemsPerPageText: 'Hashes per page'}"
-      >
-        <template v-slot:item.password="{ item }">
-          <span v-if="item.password">{{ item.password }}</span>
-          <span v-else class="red--text">–</span>
-        </template>
-        <template v-slot:item.hashText="{ item }">
-          <div class="d-flex align-center mw-50">
-            <v-dialog max-width="600">
-              <template v-slot:activator="{ on }">
-                <span 
-                  class="text-truncate d-inline-block cursor-pointer"
-                  v-on="on"
-                >
-                  {{ item.hashText }}
-                </span>
-              </template>
-              <v-card>
-                <v-card-title>
-                  Full hash
-                </v-card-title>
-                <v-card-text>
-                  {{ item.hashText }}
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-            <!-- <svg 
-              xmlns="http://www.w3.org/2000/svg"
-              height="18"
-              width="100%"
-            >
-              <rect
-                v-for="(char, i) in item.hashText"
-                :key="i"
-                :x="i"
-                :y="18 + 5 - char.charCodeAt(0) / 5"
-                width="1"
-                :height="char.charCodeAt(0) / 5 - 5"
-                :fill="'hsla(' + (char.charCodeAt(0) * 5 - 100) + ',100%,50%,50%)'"
-              />
-            </svg> -->
-          </div>
-        </template>
-      </v-data-table>
+      <HashTable :id="$route.params.id"></HashTable>
     </v-container>
   </div>
 </template>
@@ -94,40 +71,41 @@
 <script>
   import fmt from '@/assets/scripts/numberFormat'
   import miniJob from '@/components/dashboard/miniJob.vue'
+  import {mapMutations} from "vuex"
+import HashTable from './hashTable.vue'
+
   export default {
     name: "HashlistDetail",
     components: {
-      miniJob
-    },
+    miniJob,
+    HashTable
+},
     data: function () {
       return {
-        info: {
-          hashes: []
-        },
-        interval: null,
-        status: 'active',
-        search: '',
-        totalItems: 0,
-        pagination: {},
-        loading: true,
-        headers: [
-          {text: 'Hash', value: 'hashText', align: 'start', sortable: true},
-          {text: 'Password', value: 'password', align: 'end', sortable: true},
-        ]
+        info: null
       }
     },
     mounted: function () {
-      this.loadData()
+      this.loadHashlistData()
     },
     methods: {
+      ...mapMutations('jobForm', ['hashListIdMut', 'stepMut']),
       fmt,
-      loadData: function ($state) {
-        this.axios.get(this.$serverAddr + '/hashlist/' + this.$route.params.id + '/details').then((response) => {
+      loadHashlistData() {
+        this.axios.get(this.$serverAddr + '/hashlist/' + this.$route.params.id).then((response) => {
             this.info = response.data
             this.loading = false
-            // this needs to be replaced by proper pagination
-            this.totalItems = this.info.hashes.length
         });
+      },
+      attachToJob() {
+        this.hashListIdMut(this.$route.params.id)
+        this.stepMut(2)
+        this.$router.push({name: 'addJob'})
+      },
+      deleteHashlist() {
+        this.axios.delete(this.$serverAddr + '/hashlist/' + this.$route.params.id).then((response) => {
+          this.$router.push({name: 'hashlists'})
+        })
       }
     }
   }

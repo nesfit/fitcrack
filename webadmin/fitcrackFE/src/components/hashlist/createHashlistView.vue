@@ -13,10 +13,11 @@
     </v-row>
     <v-row>
       <v-col>
-        <h2>Create a Hashlist</h2>
+        <h2 v-if="existingId">Extend Hashlist</h2>
+        <h2 v-else>Create a Hashlist</h2>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="!existingId">
       <v-col>
         <v-text-field
           v-model="name"
@@ -35,6 +36,7 @@
         <HashlistCreator
           ref="creator"
           :hashlist-name="name"
+          :hashlist-id="existingId"
           :autofocus="name.length > 0"
           @validation="val => validCreatorInput = val"
         />
@@ -104,12 +106,18 @@ export default {
     }
   },
   computed: {
+    existingId () {
+      return parseInt(this.$route.params.id) || null
+    },
+    validNameOrId () {
+      return this.name.length > 0 || this.existingId
+    },
     invalidInput () {
-      return this.name.length <= 0 || !this.validCreatorInput
+      return !this.validNameOrId || !this.validCreatorInput
     },
     toDo () {
       const todos = []
-      if (this.name.length <= 0) todos.push("Name it.")
+      if (!this.validNameOrId) todos.push("Name it.")
       return todos
     }
   },
@@ -122,15 +130,18 @@ export default {
           // maybe do something?
           //
           // if attaching, set the id in job form
-          this.hashListIdMut(result.data.id)
+          if (this.$route.query.attach) {
+            this.hashListIdMut(result.data.id)
+          }
           // return
-          this.router.go(-1)
+          this.$router.go(-1)
         })
         .catch(error => {
           console.error(error)
           this.$error(error)
         })
-    }
+    },
+
   }
 }
 </script>

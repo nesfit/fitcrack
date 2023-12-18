@@ -137,233 +137,13 @@
             id="job-step-1"
             editable
             step="1"
+            :color="hashListId ? 'success' : 'primary'"
+            :complete="!!hashListId"
+            edit-icon="mdi-check"
           >
-            Hashlist
+            {{ hashlistStepTitle }}
           </v-stepper-step>
           <v-stepper-content step="1">
-            <!-- <v-container>
-              <v-row class="mb-4">
-                <v-btn-toggle
-                  v-model="inputMethod"
-                  mandatory
-                  color="primary"
-                  class="mr-2"
-                >
-                  <v-btn id="job-input-mode-manual" value="multipleHashes">
-                    Manual entry
-                  </v-btn>
-                  <v-btn id="job-input-mode-hashlist" value="hashFile">
-                    From hash file
-                  </v-btn>
-                  <v-btn id="job-input-mode-extract" value="extractFromFile">
-                    Extract from file
-                  </v-btn>
-                </v-btn-toggle>
-                <v-autocomplete
-                  id="hash-type-select"
-                  v-model="hashType"
-                  editable
-                  validate-on-blur
-                  clearable
-                  label="Select hash type"
-                  :items="hashTypes"
-                  item-text="name"
-                  :filter="hashTypeFilter"
-                  return-object
-                  required
-                  hide-details
-                  single-line
-                  flat
-                  solo-inverted
-                  no-data-text="No matching hash type"
-                  @change="validateHashes(null)"
-                >
-                  <template #item="{ item }">
-                    <v-list-item-content>
-                      <v-list-item-title><b>{{ item.code }}</b> - {{ item.name }}</v-list-item-title>
-                    </v-list-item-content>
-                  </template>
-                </v-autocomplete>
-              </v-row>
-              <v-row>
-                <v-col
-                  v-if="inputMethod === 'extractFromFile'"
-                  cols="12"
-                >
-                  <v-alert
-                    type="info"
-                    text
-                  >
-                    Supported formats:
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">MS_OFFICE</a>,</span>
-                      </template>
-                      <span>Hash types: 9400, 9500, 9600, 9700, 9800</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">PDF</a>,</span>
-                      </template>
-                      <span>Hash types: 10400, 10500, 10600, 10700</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">7Z</a>,</span>
-                      </template>
-                      <span>Hash type: 11600</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">RAR</a> and </span>
-                      </template>
-                      <span>Hash types: 12500, 13000, 23700, 23800</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">ZIP</a>.</span>
-                      </template>
-                      <span>Hash types: 13600, 17200, 17210, 17225, 13001, 23002, 23003</span>
-                    </v-tooltip>
-                  </v-alert>
-                  <file-uploader
-                    ref="encryptedFileUploader"
-                    :url="this.$serverAddr + '/protectedFiles/add'"
-                    @uploadComplete="uploadComplete"
-                  />
-                </v-col>
-                <v-col
-                  v-if="inputMethod === 'hashFile'"
-                  cols="12"
-                >
-                  <v-alert
-                    type="info"
-                    text
-                  >
-                    Input to hashcat. Select a binary hash (WPA/WPA2), or plain text hashlist.
-                  </v-alert>
-                  <file-uploader
-                    ref="hashFileUploader"
-                    :multiple="false"
-                    no-upload
-                    label="Select a file to read"
-                    @filesChanged="hashFileSelected"
-                  />
-                </v-col>
-                <v-col cols="12">
-                  <v-alert
-                    :value="gotBinaryHash"
-                    text
-                    type="info"
-                    color="primary"
-                    class="mt-0 mb-0"
-                  >
-                    You can select only one binary hash.
-                  </v-alert>
-                  <fc-textarea
-                    id="hashes-input"
-                    v-if="inputMethod !== null"
-                    ref="textarea"
-                    v-model="hashList"
-                    :class="{'hasherror': hashListError}"
-                    class="textarea"
-                    max-height="500"
-                    :readonly="!(inputMethod === 'multipleHashes' && !gotBinaryHash) "
-                    :can-remove-line="true "
-                    @blur="validateHashes"
-                    @focus="unvalidateHashes"
-                  >
-                    <div
-                      slot="after"
-                      class="hashCeckContainer pl-1 pt-2"
-                    >
-                      <div
-                        v-for="hashObj in validatedHashes"
-                        :key="hashObj.id"
-                      >
-                        <v-icon
-                          v-if="hashObj.result === 'OK'"
-                          small
-                          color="success"
-                        >
-                          check_circle_outlined
-                        </v-icon>
-                        <v-tooltip
-                          v-else
-                          left
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-icon
-                              small
-                              color="error"
-                              class="clickable"
-                              v-on="on"
-                            >
-                              error_circle_outlined
-                            </v-icon>
-                          </template>
-                          <span>{{ hashObj.result }}</span>
-                        </v-tooltip>
-                        <v-tooltip
-                          v-if="hashObj.isInCache"
-                          left
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-icon
-                              small
-                              color="warning"
-                              class="clickable"
-                              v-on="on"
-                            >
-                              error_circle_outlined
-                            </v-icon>
-                          </template>
-                          <span>hash already in hashcache</span>
-                        </v-tooltip>
-                      </div>
-                    </div>
-                  </fc-textarea>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-btn
-                  v-if="dev"
-                  text
-                  color="success"
-                  @click="getRandomHash"
-                >
-                  <v-icon left>
-                    mdi-auto-fix
-                  </v-icon>
-                  Random SHA1
-                </v-btn>
-                <v-checkbox
-                  v-show="invalidHashes.length > 0"
-                  v-model="ignoreHashes"
-                  label="Ignore invalid hashes"
-                  hide-details
-                  :height="15"
-                  color="error"
-                  class="ml-2 mt-1"
-                />
-                <v-spacer />
-                <v-btn
-                  v-show="hashList !== ''"
-                  color="error"
-                  class="mr-2"
-                  text
-                  @click="clearInput"
-                >
-                  Reset
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  @click="step = 2"
-                >
-                  Next
-                </v-btn>
-              </v-row>
-            </v-container> -->
             <v-container>
               <v-row>
                 <v-col>
@@ -680,6 +460,9 @@
       },
       helpAlreadyDismissed () {
         return localStorage.getItem('dismissedHelp') == 'true'
+      },
+      hashlistStepTitle () {
+        return this.hashListId ? 'Hashlist attached' : 'Hashlist selection'
       }
     },
     watch: {
@@ -713,7 +496,6 @@
       this.getHashTypes()
       this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm')
       this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm')
-      if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
       if (this.name === '') {
         this.generateJobName()

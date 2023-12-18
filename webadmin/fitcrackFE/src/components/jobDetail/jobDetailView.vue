@@ -72,32 +72,11 @@
                     />
                   </v-col>
                   <v-col>
-                    <v-card flat>
-                      <v-card-title>
-                        <span>Hashes</span>
-                        <v-spacer />
-                        <a
-                          :href="$serverAddr + '/job/' + data.id + '/exportCrackedHashes'"
-                          target="_blank"
-                          download
-                        >
-                          <v-btn
-                           color="success"
-                          >
-                            <span>Export cracked hashes</span>
-                            <v-icon right>
-                              mdi-file-download-outline
-                            </v-icon>
-                          </v-btn>
-                        </a>
-                      </v-card-title>
-                      <v-card-text>
-                        <hash-table
-                          class="grow"
-                          :hashes="data.hashes"
-                        />
-                      </v-card-text>
-                    </v-card>
+                    <hash-table
+                      class="grow"
+                      link-back
+                      :id="data.hash_list_id"
+                    />
                   </v-col>
                 </v-row>
               </v-expansion-panel-content>
@@ -194,10 +173,11 @@
 import jobInfo from './jobInfo.vue'
 import workunits from './workunits.vue'
 import statusTimeline from './statusTimeline.vue'
-import hashTable from './hashTable.vue'
 import hostTable from './hostTable.vue'
 import hostEditor from './hostEditor.vue'
 import permsEditor from './jobPermissions.vue'
+//
+import hashTable from '@/components/hashlist/hashTable.vue'
 //
 import jobProgressChart from '@/components/chart/jobProgress.vue'
 import jobWorkunitChart from '@/components/chart/jobWorkunits.vue'
@@ -236,6 +216,7 @@ export default {
   data () {
     return {
       data: null,
+      hashes: null,
       statusHistory: null,
       progressGraph: null,
       hostGraph: null,

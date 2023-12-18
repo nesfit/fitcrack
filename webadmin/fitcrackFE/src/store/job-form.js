@@ -7,15 +7,10 @@ import { supermutator9000 } from '@/store'
 const base = {
   selectedTemplate: 0, // empty
   step: 1, // Form stepper step
-  validatedHashes: [],
   // info
   name: '',
   // input
   hashListId: null,
-  inputMethod: 'multipleHashes', // deprecated
-  hashList: '', // deprecated
-  hashType: null, // deprecated
-  ignoreHashes: false,
   // hosts
   hosts: [],
   // other
