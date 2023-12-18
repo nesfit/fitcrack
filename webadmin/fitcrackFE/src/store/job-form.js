@@ -102,11 +102,7 @@ export default {
         "time_start": (state.startNow ? '' : state.startDate),
         "time_end": (state.endNever ? '' : state.endDate),
         'attack_settings': attackSettings,
-        "hash_settings": {
-          "hash_type": state.hashType ? state.hashType.code : null,
-          "hash_list": state.validatedHashes,
-          "valid_only": !state.ignoreHashes
-        }
+        'hash_list_id': state.hashListId,
       }
     },
     validAttackSpecificSettings (state) {
@@ -162,8 +158,7 @@ export default {
       if (
         !state.attackSettingsTab ||
         !attackSettings ||
-        state.hashType == null ||
-        state.validatedHashes.length == 0 ||
+        state.hashListId == null ||
         state.timeForJob < 10 ||
         state.name === ''
       ) {

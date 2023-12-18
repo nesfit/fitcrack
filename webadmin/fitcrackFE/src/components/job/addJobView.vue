@@ -427,12 +427,9 @@
       return {
         loading: false,
         helpDismissedMessage: false,
-        hashTypes: [],
         showEstimatedTime: false,
         estimatedTime: null,
         keyspace: null,
-        gotBinaryHash: false,
-        hashListError: false,
         selectedTemplateName: '',
         attacks,
         templates: [
@@ -446,14 +443,11 @@
     computed: {
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
-        'step', 'attackSettingsTab', 'hashListId', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
+        'step', 'attackSettingsTab', 'hashListId', 'name', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
         return this.templates.map((t, i) => ({text: t.template, value: i}))
-      },
-      invalidHashes () {
-        return this.validatedHashes.filter(h => h.result !== 'OK')
       },
       dev () {
         return localStorage.getItem('testmode') == 'true'
@@ -476,6 +470,8 @@
             boincIds.push(this.hosts[i].id)
           }
           // -1 means no hash entered
+          // TODO: USE HASH LIST ID TO GET TYPE ON SERVER INSTEAD OF THIS
+          // We would have to fetch the list to find a type name and then go thrrough the types to find a code
           var hash_code = this.hashType == null ? -1 : this.hashType.code
           // Compute new keyspace and new estimation of cracking time
           this.axios.post(this.$serverAddr + '/job/crackingTime', {   
@@ -493,7 +489,6 @@
     },
     mounted: function () {
       this.loadSettings()
-      this.getHashTypes()
       this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm')
       this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm')
       this.fetchTemplates()
@@ -547,139 +542,10 @@
         })
         .catch(console.error)
       },
-      hashTypeFilter ({name, code}, query) {
-        const q = query.toLowerCase()
-        return name.toLowerCase().includes(q) || code.toLowerCase().includes(q)
-      },
-      subHashtypeChanged: function (key, val) {
-        this.hashType.code = this.hashType.code.replace(key, val.code)
-        this.validateHashes(null)
-      },
-      focusTextarea: function () {
-        this.$refs.textarea.focus()
-      },
-      validateHashes: function (data = null) {
-        if (data === null) {
-          data = this.hashList
-        }
-        var hashesList = data.split('\n')
-        if (data.startsWith("BASE64:")) {
-          this.gotBinaryHash = true
-        } else {
-          this.gotBinaryHash = false
-        }
-        if (this.hashType === null || isNaN(this.hashType.code)) {
-          return
-        }
-        if (data === '') {
-          return
-        }
-
-        this.axios.post(this.$serverAddr + '/job/verifyHash', {
-          'hashtype': this.hashType.code,
-          'hashes': data
-        }).then((response) => {
-          this.hashListError = response.data.error
-          this.validatedHashes = response.data.items
-        })
-      },
-      unvalidateHashes: function (data) {
-        this.validatedHashes = []
-      },
-      getHashTypes: function () {
-        this.axios.get(this.$serverAddr + '/hashcat/hashTypes').then((response) => {
-          this.hashTypes = response.data.hashtypes
-        })
-      },
-      addHash: function (hash) {
-        var parsedHashlist = this.hashList.split('\n')
-        var lastHash = parsedHashlist[parsedHashlist.length-1]
-        if (lastHash === '') {
-          this.hashList = this.hashList + hash
-        } else {
-          this.hashList = this.hashList + '\n' + hash
-        }
-      },
-      uploadComplete: function (data) {
-        this.$success("Successfully extracted hash form file.")
-        this.hashType = this.hashTypes.find(h => h.code == data['hash_type'])
-        this.addHash(data['hash'])
-        this.validateHashes(null)
-      },
-      isBinaryFile: function(content) {
-        for (var i = 0; i < 24; i++) {
-          var charCode = content.charCodeAt(i);
-          if (charCode === 65533 || charCode <= 8) {
-            return true
-          }
-        }
-        return false
-      },
-      hashFileSelected: function (file) {
-        var reader = new FileReader()
-        reader.onloadend = function(evt) {
-          if (evt.target.readyState == FileReader.DONE) {
-
-            if (this.isBinaryFile(evt.target.result)) {
-              // we got binary hash
-              var binReader = new FileReader()
-              binReader.onloadend = function(evt) {
-                if (evt.target.readyState == FileReader.DONE) {
-                  this.hashList = 'BASE64:' + evt.target.result.substr(evt.target.result.indexOf(',') + 1)
-                  this.validateHashes(null)
-                  this.gotBinaryHash = true
-                }
-              }.bind(this)
-              binReader.readAsDataURL(file)
-
-            } else {
-              // we got hashlists
-              var parsedHashlist = this.hashList.split('\n')
-              var lastHash = parsedHashlist[parsedHashlist.length-1]
-              if (lastHash === '') {
-                this.hashList += evt.target.result
-              } else {
-                this.hashList += '\n' + evt.target.result
-              }
-              this.validateHashes(null)
-            }
-          }
-        }.bind(this)
-        reader.readAsText(file, 'utf-8')
-      },
-      clearInput () {
-        this.hashType = null
-        this.hashList = ''
-        this.unvalidateHashes()
-      },
       submit () {
         // TODO: maybe delete this condition
         if (this.name === '') {
           this.$error('Job name can not be empty.')
-          return
-        }
-
-        if (this.inputMethod === 'encryptedFile' && !this.$refs.encryptedFileUploader.fileUploaded ) {
-          this.$error('No file uploaded.')
-          this.step = 1
-          return
-        }
-
-        if (this.hashType === null) {
-          this.$error('No hash type selected.')
-          this.step = 1
-          return
-        }
-
-        if (this.invalidHashes.length > 0 && !this.ignoreHashes) {
-          this.$error('Some hashes are invalid.')
-          this.step = 1
-          return
-        }
-
-        if (this.validatedHashes.length == 0) {
-          this.$error('List of validated hashes is empty.')
-          this.step = 1
           return
         }
 
@@ -716,7 +582,6 @@
         }
 
         this.loading = true
-        console.log(this.jobSettings.endNever)
         const finalStartTime = this.startNow ? 
           this.jobSettings['time_start'] : 
           this.$moment(this.jobSettings['time_start']).utc().toISOString(true).slice(0, 16)
@@ -791,12 +656,6 @@
     color: inherit
   }
 
-  .hashCeckContainer {
-    display: block;
-    max-width: 35px;
-    overflow: hidden;
-  }
-
   .mode-btn {
     height: initial !important;
     margin: 1em;
@@ -805,11 +664,5 @@
   .scroller {
     max-height: 400px;
     overflow-y: auto;
-  }
-</style>
-
-<style>
-  .hasherror .scrollCont {
-    border-color: #e01 !important;
   }
 </style>
