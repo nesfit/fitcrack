@@ -41,8 +41,8 @@ class hashListCollection(Resource):
         if args.name:
             hash_list_query = hash_list_query.filter(FcHashList.name.like('%' + args.name + '%'))
 
-        if args.hash_type:
-            hash_list_query = hash_list_query.filter(FcHashList.hash_type.like('%' + args.hash_type + '%'))
+        if args.hash_type is not None:
+            hash_list_query = hash_list_query.filter(FcHashList.hash_type == args.hash_type)
 
         if args.order_by:
             orderBy = getattr(FcHashList, args.order_by)

@@ -12,7 +12,7 @@ from src.api.fitcrack.argumentsParser import pagination
 
 hash_list_parser = pagination.copy()
 hash_list_parser.add_argument('name', type=str, required=False, help='filter by name')
-hash_list_parser.add_argument('hash_type', type=str, required=False, help='filter by hash type')
+hash_list_parser.add_argument('hash_type', type=int, required=False, help='filter by hash type code')
 hash_list_parser.add_argument('order_by', type=str, required=False, help='result ordering',
                                 choices=['name', 'hash_type']) #'hash_count', 'job_count' maybe later
 hash_list_parser.add_argument('descending', type=inputs.boolean, required=False)

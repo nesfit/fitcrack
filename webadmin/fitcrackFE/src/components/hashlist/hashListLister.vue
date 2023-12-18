@@ -170,7 +170,7 @@ import HashTypeAutocomplete from './hashTypeAutocomplete.vue'
                     'order_by': this.orderBy,
                     'descending': this.dataTableOptions.sortDesc ? this.dataTableOptions.sortDesc[0] : false,
                     'name': this.search,
-                    'hash_type': this.hash_type ? this.hash_type.name : null,
+                    'hash_type': this.hash_type != null ? this.hash_type.code : null,
                     'showDeleted': this.isTrash,
                 }
             }).then((response) => {
