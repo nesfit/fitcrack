@@ -133,9 +133,9 @@ def build_hash_query(args:reqparse.ParseResult,hash_list_id:int):
 
     if args.cracked is not None:
         if args.cracked:
-            hash_query = hash_query.filter(FcHash.result != '')
+            hash_query = hash_query.filter(FcHash.result != None)
         else:
-            hash_query = hash_query.filter(FcHash.result == '')
+            hash_query = hash_query.filter(FcHash.result == None)
 
     if args.order_by:
         orderBy = getattr(FcHash, args.order_by)
