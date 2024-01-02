@@ -244,7 +244,7 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False) -> ve
         if abortOnFail and hash[1] != 'OK':
             abort(500, 'Hash ' + hash[0] + ' has wrong format (' + hash[1] + ' exception).')
         if binaryHash:
-            hash[0] = binaryHash
+            hash = (binaryHash,hash[1])
 
         if hash[0] == '':
             hashesArr.append({
