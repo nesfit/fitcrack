@@ -94,6 +94,11 @@ def create_job(data):
     if hash_list.hash_count == 0:
         abort(400, 'Hash list does not contain any hashes.')
 
+    #The hash type was previously given through the API request alongside the list of hashes to be cracked.
+    #Since we now store hashes externally in a hash list, we extract the hash type from the hash list and
+    #inject it into the API request data--old code then finds the hash type where it expects.
+    data['hash_settings'] = {'hash_type': str(hash_list.hash_type)}
+
     hybrid_mask_dict = False
     #Hybrid attack mask-wordlist
     if int(data['attack_settings']['attack_mode']) == 7:    hybrid_mask_dict = True
