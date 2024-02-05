@@ -14,7 +14,7 @@ hash_list_parser = pagination.copy()
 hash_list_parser.add_argument('name', type=str, required=False, help='filter by name')
 hash_list_parser.add_argument('hash_type', type=int, required=False, help='filter by hash type code')
 hash_list_parser.add_argument('order_by', type=str, required=False, help='result ordering',
-                                choices=['name', 'hash_type']) #'hash_count', 'job_count' maybe later
+                                choices=['name', 'hash_type','added']) #'hash_count', 'job_count' maybe later
 hash_list_parser.add_argument('descending', type=inputs.boolean, required=False)
 hash_list_parser.add_argument('showDeleted', type=inputs.boolean, required=False, default=False)
 
