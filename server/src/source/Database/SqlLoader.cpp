@@ -2,6 +2,7 @@
  * @file SqlLoader.cpp
  * @brief Source file for common MySQL access
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
+ * @authors Radek Hranicky (hranicky(at)fit.vut.cz)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
@@ -304,11 +305,56 @@ CSqlLoader::loadJobDictionaries(uint64_t jobId) {
       Config::tableNameJobDictionary.c_str()));
 }
 
+uint64_t CSqlLoader::getHashlistId(uint64_t jobId)
+{
+    std::vector<std::string> result;
+    uint64_t hashlistId;
+
+    updateSql(formatQuery("SELECT hash_list_id FROM `%s` WHERE `id` = %" PRIu64 ";",
+                          Config::tableNameJob.c_str(), jobId));
+    MYSQL_RES* sqlResult;
+    sqlResult = mysql_store_result(boinc_db.mysql);
+    if (!sqlResult)
+    {
+        Tools::printDebugTimestamp("Problem with DB query.\nShutting down now.\n");
+        boinc_db.close();
+        exit(1);
+    }
+
+    MYSQL_ROW row;
+    if (row = mysql_fetch_row(sqlResult))
+    {
+        if (row[0])
+        {
+            hashlistId = std::stoull(row[0]); // Convert string with ID to uint64_t
+        } else {
+            Tools::printDebugTimestamp("Job with ID %d does not have a hashlist specified.\n", jobId);
+            boinc_db.close();
+            exit(1);
+        }
+    } else {
+        Tools::printDebugTimestamp("Job with ID %d not found.\n", jobId);
+        boinc_db.close();
+        exit(1);
+    }
+
+    mysql_free_result(sqlResult);
+    Tools::printDebugJob(Config::DebugType::Log, jobId,
+                         "Hashlist ID is %d for job %d.\n", hashlistId, jobId);
+    
+    return hashlistId;
+}
+
 std::vector<std::string> CSqlLoader::loadJobHashes(uint64_t jobId)
 {
     std::vector<std::string> result;
-    updateSql(formatQuery("SELECT REPLACE(TO_BASE64(`hash`), '\n', '') FROM `%s` WHERE `job_id` = %" PRIu64 " AND `result` IS NULL ;",
-                          Config::tableNameHash.c_str(), jobId));
+    
+    /** Get the ID of the hashlist associated with the job */
+    uint64_t hashlistId = this->getHashlistId(jobId);
+
+    /** Get hashes from the hashlist */
+    updateSql(formatQuery("SELECT REPLACE(TO_BASE64(`hash`), '\n', '') FROM `%s` WHERE `hash_list_id` = %" PRIu64 " AND `result` IS NULL ;",
+                          Config::tableNameHash.c_str(), hashlistId));
 
     MYSQL_RES* sqlResult;
     sqlResult = mysql_store_result(boinc_db.mysql);
@@ -439,8 +485,12 @@ std::string CSqlLoader::getDictFileName(uint64_t dictId)
 
 bool CSqlLoader::isAnythingCracked(uint64_t jobId)
 {
-    return getSqlNumber(formatQuery("SELECT COUNT(*) FROM `%s` WHERE `job_id` = %" PRIu64 " AND `result` IS NOT NULL ;",
-            Config::tableNameHash.c_str(), jobId)) != 0;
+    /** Get the ID of the hashlist associated with the job */
+    uint64_t hashlistId = this->getHashlistId(jobId);
+
+    /** Check is there is any cracked hash in the hashlist **/
+    return getSqlNumber(formatQuery("SELECT COUNT(*) FROM `%s` WHERE `hash_list_id` = %" PRIu64 " AND `result` IS NOT NULL ;",
+            Config::tableNameHash.c_str(), hashlistId)) != 0;
 }
 
 

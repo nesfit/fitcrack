@@ -2,6 +2,7 @@
  * @file assimilator.cpp
  * @authors Martin Holkovic
  * @authors Lukas Zobal
+ * @authors Radek Hranicky
  * @date 4. 2. 2017
  * @note Huge refactoring needed
  */
@@ -89,6 +90,7 @@ std::string mysql_table_mask =          "fc_mask";
 std::string mysql_table_settings =      "fc_settings";
 std::string mysql_table_benchmark =     "fc_benchmark";
 std::string mysql_table_hash =          "fc_hash";
+std::string mysql_table_hash_list =     "fc_hash_list";
 
 template <typename T> T convert_str_to_number(const char *str) {
   T num;
@@ -480,7 +482,14 @@ bool is_binary(uint64_t job_id)
 bool no_hashes_left(uint64_t job_id)
 {
     char buf[SQL_BUF_SIZE];
-    std::snprintf(buf, SQL_BUF_SIZE, "SELECT COUNT(*) FROM `%s` WHERE job_id = %" PRIu64 " AND result IS NULL ;", mysql_table_hash.c_str(), job_id);
+    uint64_t hash_list_id;
+
+    /** Get the ID of the hashlist associated with the job */
+    std::snprintf(buf, SQL_BUF_SIZE, "SELECT hash_list_id FROM `%s` WHERE id = %lu LIMIT 1;", mysql_table_job.c_str(), job_id);
+    hash_list_id = get_num_from_mysql(buf);
+
+    /** Check if there is any non-cracked hash in the hashlist */
+    std::snprintf(buf, SQL_BUF_SIZE, "SELECT COUNT(*) FROM `%s` WHERE hash_list_id = %" PRIu64 " AND result IS NULL ;", mysql_table_hash.c_str(), hash_list_id);
     uint64_t hashes_left = get_num_from_mysql(buf);
 
     return (hashes_left == 0);
@@ -505,7 +514,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
     char param[256] = {0};    // Other string params (err msg)
     char hash_string[MAX_HASH_SIZE] = {0};   // hash results
 
-    uint64_t host_id, boinc_host_id, job_id;
+    uint64_t host_id, boinc_host_id, job_id, hash_list_id;
     std::vector<MysqlWorkunit *> workunits;
 
     retval = boinc_mkdir(config.project_path("sample_results"));
@@ -542,6 +551,10 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
     /** Find out which job is the result from */
     std::snprintf(buf, SQL_BUF_SIZE, "SELECT job_id FROM `%s` WHERE workunit_id = %lu LIMIT 1;", mysql_table_workunit.c_str(), wu.id);
     job_id = get_num_from_mysql(buf);
+
+    /** Get the ID of the hashlist associated with the job */
+    std::snprintf(buf, SQL_BUF_SIZE, "SELECT hash_list_id FROM `%s` WHERE id = %lu LIMIT 1;", mysql_table_job.c_str(), job_id);
+    hash_list_id = get_num_from_mysql(buf);
 
     std::cerr << __LINE__ << " - From job " << job_id << std::endl;
 
@@ -861,11 +874,11 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                           std::snprintf(
                               sql_buf, SQL_BUF_SIZE + MAX_HASH_SIZE,
                               "UPDATE `%s` SET `result` = '%s', `time_cracked` "
-                              "= NOW() WHERE `job_id` = %" PRIu64
+                              "= NOW() WHERE `hash_list_id` = %" PRIu64
                               " AND LOWER(CONVERT(`hash` USING latin1)) = "
                               "LOWER(CONVERT('%s' USING latin1)) AND `result` "
                               "IS NULL ; ",
-                              mysql_table_hash.c_str(), found_hash, job_id,
+                              mysql_table_hash.c_str(), found_hash, hash_list_id,
                               hash_string);
                           update_mysql(sql_buf);
                           free(sql_buf);
