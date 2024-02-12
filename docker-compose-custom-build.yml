@@ -1,5 +1,4 @@
 version: '3'
-name: fitcrack
 services:
     fitcrack_server:
       # Perform a custom build of Fitcrack server from source
