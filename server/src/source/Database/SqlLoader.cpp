@@ -322,7 +322,7 @@ uint64_t CSqlLoader::getHashlistId(uint64_t jobId)
     }
 
     MYSQL_ROW row;
-    if (row = mysql_fetch_row(sqlResult))
+    if ((row = mysql_fetch_row(sqlResult)))
     {
         if (row[0])
         {

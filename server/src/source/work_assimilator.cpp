@@ -423,7 +423,6 @@ void update_power(uint64_t host_id, uint64_t count, double elapsed_time)
  */
 bool find_benchmark_results(std::map<uint32_t, std::set<uint32_t>> & benchmarked_attackmodes_per_types, uint64_t boinc_host_id)
 {
-    uint64_t power;
     uint32_t hash_type;
     uint32_t attack_mode;
 
@@ -509,7 +508,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
     char buf[SQL_BUF_SIZE] = {0};     // SQL queries
     char mode;          // Result mode (b/n)
     int code;           // Result status code (0 OK, 1 notFound/err, etc.)
-    long long unsigned int power; // Host power (bench)
+    uint64_t power; // Host power (bench)
     double cracking_time;       // Cracking time
     char param[256] = {0};    // Other string params (err msg)
     char hash_string[MAX_HASH_SIZE] = {0};   // hash results
@@ -617,7 +616,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 log_messages.printf(MSG_DEBUG, "code %d\n", code);
 
                 /** Read Power (p/s) */
-                retval = std::fscanf(f,"%llu\n", &power);
+                retval = std::fscanf(f,"%" PRIu64 "\n", &power);
                 if (retval != 1)
                 {
                     std::cerr << __LINE__ << " - ERROR: Failed to read host power." << std::endl;
@@ -626,7 +625,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 }
 
                 /** Save original power for fc_benchmark */
-                long long unsigned int original_power = power;
+                uint64_t original_power = power;
 
                 //power is in hashes per second, and rules multiply the keyspace
                 std::snprintf(buf, SQL_BUF_SIZE, "SELECT rules FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
@@ -664,11 +663,11 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                       /** Entry with this hash type and this attack mode already exists, update it */
                       std::snprintf(
                           buf, SQL_BUF_SIZE,
-                          "UPDATE `%s` SET `power` = %llu, `last_update` = "
+                          "UPDATE `%s` SET `power` = %" PRIu64 ", `last_update` = "
                           "now() "
                           "WHERE `boinc_host_id` = %" PRIu64
-                          " AND `hash_type` = %" PRIu64
-                          " AND `attack_mode` = %" PRIu64 " LIMIT 1 ;",
+                          " AND `hash_type` = %" PRIu32
+                          " AND `attack_mode` = %" PRIu32 " LIMIT 1 ;",
                           mysql_table_benchmark.c_str(), original_power,
                           boinc_host_id, hash_type, attack_mode);
                       update_mysql(buf);
@@ -679,7 +678,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                           buf, SQL_BUF_SIZE,
                           "INSERT INTO `%s` "
                           "(`boinc_host_id`,`hash_type`,`attack_mode`,`"
-                          "power`) VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64
+                          "power`) VALUES (%" PRIu64 ", %" PRIu32 ", %" PRIu32
                           ", %" PRIu64 ") ;",
                           mysql_table_benchmark.c_str(), boinc_host_id,
                           hash_type, attack_mode, original_power);
@@ -690,8 +689,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                     std::snprintf(buf, SQL_BUF_SIZE,
                                   "INSERT INTO `%s` "
                                   "(`boinc_host_id`,`hash_type`,`attack_mode`,`"
-                                  "power`) VALUES (%" PRIu64 ", %" PRIu64
-                                  ", %" PRIu64 ", %" PRIu64 ") ;",
+                                  "power`) VALUES (%" PRIu64 ", %" PRIu32
+                                  ", %" PRIu32 ", %" PRIu64 ") ;",
                                   mysql_table_benchmark.c_str(), boinc_host_id,
                                   hash_type, attack_mode, original_power);
                     update_mysql(buf);
@@ -702,8 +701,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                   std::snprintf(buf, SQL_BUF_SIZE,
                                 "INSERT INTO `%s` "
                                 "(`boinc_host_id`,`hash_type`,`attack_mode`,`"
-                                "power`) VALUES (%" PRIu64 ", %" PRIu64
-                                ", %" PRIu64 ", %" PRIu64 ") ;",
+                                "power`) VALUES (%" PRIu64 ", %" PRIu32
+                                ", %" PRIu32 ", %" PRIu64 ") ;",
                                 mysql_table_benchmark.c_str(), boinc_host_id,
                                 hash_type, attack_mode, original_power);
                   update_mysql(buf);
@@ -711,7 +710,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                 /** Update fc_host power */
                 std::cerr << __LINE__ << " - New host power: " << power << std::endl;
-                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET power = %llu, status = %d, time = now() WHERE id = %" PRIu64 " ;", mysql_table_host.c_str(), power ? power : 1, Host_normal, host_id);
+                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET power = %" PRIu64 ", status = %d, time = now() WHERE id = %" PRIu64 " ;", mysql_table_host.c_str(), power ? power : 1, Host_normal, host_id);
                 update_mysql(buf);
 
                 /** Read cracking_time */
@@ -1035,7 +1034,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 if (find_benchmark_results(benchmarked_attackmodes_per_types, boinc_host_id))
                 {
                     /** benchmark was already run in the past */
-                    while (std::fscanf(f,"%u:%llu\n", &hash_type, &power) == 2)
+                    while (std::fscanf(f,"%u:%" PRIu64 "\n", &hash_type, &power) == 2)
                     {
                       auto it =
                           benchmarked_attackmodes_per_types.find(hash_type);
@@ -1047,10 +1046,10 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
 
                           std::snprintf(
                               buf, SQL_BUF_SIZE,
-                              "UPDATE `%s` SET `power` = %llu, `last_update` = "
+                              "UPDATE `%s` SET `power` = %" PRIu64 ", `last_update` = "
                               "now() WHERE `boinc_host_id` = %" PRIu64
-                              " AND `hash_type` = %" PRIu64
-                              " AND `attack_mode` = %" PRIu64 " LIMIT 1 ;",
+                              " AND `hash_type` = %" PRIu32
+                              " AND `attack_mode` = %" PRIu32 " LIMIT 1 ;",
                               mysql_table_benchmark.c_str(), power,
                               boinc_host_id, attack_mode, hash_type);
                           update_mysql(buf);
@@ -1061,8 +1060,8 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                                         "INSERT INTO `%s` "
                                         "(`boinc_host_id`,`hash_type`,`attack_"
                                         "mode`,`power`"
-                                        ") VALUES (%" PRIu64 ", %" PRIu64
-                                        ", %" PRIu64 ", %" PRIu64 ") ;",
+                                        ") VALUES (%" PRIu64 ", %" PRIu32
+                                        ", %" PRIu32 ", %" PRIu64 ") ;",
                                         mysql_table_benchmark.c_str(),
                                         boinc_host_id, hash_type, attack_mode,
                                         power);
@@ -1078,7 +1077,7 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                             buf, SQL_BUF_SIZE,
                             "INSERT INTO `%s` "
                             "(`boinc_host_id`,`hash_type`,`attack_mode`,`power`"
-                            ") VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64
+                            ") VALUES (%" PRIu64 ", %" PRIu32 ", %" PRIu32
                             ", %" PRIu64 ") ;",
                             mysql_table_benchmark.c_str(), boinc_host_id,
                             hash_type, attack_mode, power);
@@ -1089,13 +1088,13 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 else
                 {
                     /** No results for this host yet */
-                    while (std::fscanf(f,"%u:%llu\n", &hash_type, &power) == 2)
+                    while (std::fscanf(f,"%u:%" PRIu64 "\n", &hash_type, &power) == 2)
                     {
                       std::snprintf(
                           buf, SQL_BUF_SIZE,
                           "INSERT INTO `%s` "
                           "(`boinc_host_id`,`hash_type`,`attack_mode`,`power`"
-                          ") VALUES (%" PRIu64 ", %" PRIu64 ", %" PRIu64
+                          ") VALUES (%" PRIu64 ", %" PRIu32 ", %" PRIu32
                           ", %" PRIu64 ") ;",
                           mysql_table_benchmark.c_str(), boinc_host_id,
                           hash_type, attack_mode, power);
