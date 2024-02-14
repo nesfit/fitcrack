@@ -70,7 +70,7 @@ def kill_job(job, db):
     for item in graphData:
         db.session.delete(item)
 
-    for job_hash in job.hashes:
+    for job_hash in job.hash_list.hashes:
         job_hash.result = None
         job_hash.time_cracked = None
 
