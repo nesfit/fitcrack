@@ -896,7 +896,7 @@ class FcHashList(Base):
     __tablename__ = 'fc_hash_list'
 
     id = Column(BigInteger, primary_key=True)
-    hash_type = Column(Integer) #Should be null only if we want to support non-initialised lists
+    hash_type = Column(Integer)
     name = Column(String(255), nullable=False)
     added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
