@@ -935,8 +935,18 @@ class FcHash(Base):
 
     @hybrid_property
     def hashText(self):
+        output = self.hash
+        if len(output) > 128:
+            output = output[0:128] + b"..."
         try:
-            return self.hash.decode("utf-8")
+            return output.decode("ascii")
+        except UnicodeDecodeError:
+            return "BASE64<{}>".format(base64.encodebytes(output).decode("utf-8"))
+    
+    @hybrid_property
+    def hashTextWithoutTruncation(self):
+        try:
+            return self.hash.decode("ascii")
         except UnicodeDecodeError:
             return "BASE64<{}>".format(base64.encodebytes(self.hash).decode("utf-8"))
 

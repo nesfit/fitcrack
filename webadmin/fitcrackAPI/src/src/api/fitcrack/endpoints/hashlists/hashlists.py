@@ -146,7 +146,7 @@ class exportHashes(Resource):
         hashes : list[FcHash] = hash_query.all()
 
         for hash in hashes:
-            hash_list_file.write(hash.hashText.encode('utf-8'))
+            hash_list_file.write(hash.hashTextWithoutTruncation.encode('ascii'))
             hash_list_file.write(b':')
             hash_list_file.write(hash.password.encode('utf-8') if hash.password is not None else b'')
             hash_list_file.write(b'\n')
