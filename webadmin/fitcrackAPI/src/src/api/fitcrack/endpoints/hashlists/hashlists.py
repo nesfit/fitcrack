@@ -3,11 +3,10 @@
    * Licence: MIT, see LICENSE
 '''
 
-import base64
 import logging
 import io
 
-from flask import request, redirect, send_file
+from flask import request, send_file
 from flask_restx import Resource, abort
 
 from src.api.apiConfig import api
@@ -43,6 +42,11 @@ class hashListCollection(Resource):
 
         if args.hash_type is not None:
             hash_list_query = hash_list_query.filter(FcHashList.hash_type == args.hash_type)
+
+        if args.hide_fully_cracked_hash_lists == True:
+            hash_list_query = hash_list_query.filter(
+                FcHashList.hashes.any(FcHash.result == None)
+            )
 
         if args.order_by:
             orderBy = getattr(FcHashList, args.order_by)

@@ -16,6 +16,7 @@ hash_list_parser.add_argument('hash_type', type=int, required=False, help='filte
 hash_list_parser.add_argument('order_by', type=str, required=False, help='result ordering',
                                 choices=['name', 'hash_type','added']) #'hash_count', 'job_count' maybe later
 hash_list_parser.add_argument('descending', type=inputs.boolean, required=False)
+hash_list_parser.add_argument('hide_fully_cracked_hash_lists', type=inputs.boolean, required=False, default=False)
 hash_list_parser.add_argument('showDeleted', type=inputs.boolean, required=False, default=False)
 
 
