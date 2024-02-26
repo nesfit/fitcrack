@@ -33,7 +33,7 @@ from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
 def stop_job(job):
     job.status = status_to_code['finishing']
 
-def kill_job(job, db):
+def kill_job(job:FcJob, db):
     id = job.id
     # Job is stopped in Generator after sending BOINC commands
     if (int(job.status) != status_to_code['running']) and (int(job.status) != status_to_code['finishing']):
@@ -70,9 +70,6 @@ def kill_job(job, db):
     for item in graphData:
         db.session.delete(item)
 
-    for job_hash in job.hash_list.hashes:
-        job_hash.result = None
-        job_hash.time_cracked = None
 
 def start_job(job, db):
     hosts = [ a[0] for a in db.session.query(Host.id).all() ]

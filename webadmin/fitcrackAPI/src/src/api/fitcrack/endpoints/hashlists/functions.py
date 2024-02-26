@@ -159,7 +159,7 @@ def build_hash_query(args:reqparse.ParseResult,hash_list_id:int):
     return hash_query
 
 
-def acquire_hash_list(id:str,name:Optional[str]) -> FcHashList:
+def acquire_hash_list(id:str,name:Optional[str]=None) -> FcHashList:
     """
     Common function for all "add hashes to hash list" endpoints. Given an id, returns an FcHashList object.
     

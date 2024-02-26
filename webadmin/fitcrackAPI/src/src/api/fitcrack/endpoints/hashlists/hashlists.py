@@ -8,12 +8,14 @@ import io
 
 from flask import request, send_file
 from flask_restx import Resource, abort
+from flask_login import current_user
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.hashlists.argumentsParser import make_empty_hash_list_parser, hash_list_parser, hash_list_add_hash_list_parser, hash_list_add_hash_file_parser, hash_list_hashes_parser_paginated, hash_list_hashes_parser, hash_list_add_protected_file_parser
 from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model, page_of_hashes_model, hash_list_model_long
 from src.api.fitcrack.endpoints.hashlists.functions import upload_hash_list, build_hash_query, acquire_hash_list
 from src.api.fitcrack.endpoints.protectedFile.functions import addProtectedFile
+from src.api.fitcrack.endpoints.job.functions import editable_jobs_ids, kill_job
 from src.database import db
 from src.database.models import FcHashList, FcHash
 
@@ -107,6 +109,7 @@ class HashListHashes(Resource):
         db.session.commit()
         return None, 204
 
+
 @ns.route('/<int:id>/details')
 class HashListHashes(Resource):
     @api.expect(hash_list_hashes_parser_paginated)
@@ -128,6 +131,7 @@ class HashListHashes(Resource):
         hash_page = hash_query.paginate(page,per_page,error_out=True)
 
         return hash_page
+
 
 @ns.route('/<int:id>/download')
 class exportHashes(Resource):
@@ -158,6 +162,7 @@ class exportHashes(Resource):
         hash_list_file.seek(0)
         filename = hash_list.name + ".txt"
         return send_file(hash_list_file, attachment_filename=filename, as_attachment=True, mimetype="text/plain")
+
 
 @ns.route('/<id>/hashes')
 class hashListUploadList(Resource):
@@ -230,3 +235,35 @@ class hashListUploadHashFile(Resource):
         result = addProtectedFile(args.file)
 
         return upload_hash_list([result['hash']],hash_list,int(result['hash_type']),'fail_invalid',False)
+
+
+@ns.route('/<int:id>/purge')
+class hashListPurge(Resource):
+    @api.response(200, 'Hash list purged.')
+    @api.response(403, 'Hash list contains jobs that you do not have rights to; cannot perform purge.')
+    def post(self,id:int):
+        """
+        Removes all cracked hashes from the hash list; it will be as if the hash list was created anew.
+        This also kills all jobs that are attached to the hash list.
+        This endpoint does check that the user has rights to all jobs that are part of the hash list.
+        """
+        hash_list = acquire_hash_list(id)
+        jobs = hash_list.jobs
+        if not current_user.role.EDIT_ALL_JOBS: #Logic taken from job/multiJobOperation endpoint.
+            editable = editable_jobs_ids()
+            if not {job.id for job in jobs} <= set(editable):
+                abort(403, 'Hash list contains jobs that you do not have rights to; cannot perform purge.')
+        
+        for job in jobs:
+            kill_job(job,db)
+        
+        for job_hash in hash_list.hashes:
+            job_hash.result = None
+            job_hash.time_cracked = None
+        
+        try:
+            db.session.commit()
+        except:
+            return 'Something went wrong.', 500
+
+        return 'Hash list purged', 200
