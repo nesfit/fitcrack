@@ -50,7 +50,7 @@ page_of_hashes_model = api.inherit('Page of hashes of a given hash list', pagina
 
 
 error_model = api.model('a hash and a validation error message', {
-    'hash' : fields.String(),
+    'order_in_input' : fields.Integer(),
     'error' : fields.String()
 })
 

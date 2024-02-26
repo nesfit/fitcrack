@@ -39,12 +39,13 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
             return base64.decodebytes(hashObj[7:].encode())
         else:
             return hashObj.encode()
-    
+
 
     if hash_list.is_locked:
         abort(400,'Hash list is locked for editing.')
     
-    new_hashes_bin = set(map(hash_to_bytes, new_hashes))
+    new_hashes_bin_list = list(map(hash_to_bytes, new_hashes))
+    new_hashes_bin = set(new_hashes_bin_list)
 
     if not binary_hash:
         validation_result = validate_hash_list(new_hashes_bin,hash_type,False)
@@ -53,7 +54,7 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
             abort(500,'If input is binary, then hash list may only contain one hash.')
         base_64 = base64.encodebytes(list(new_hashes_bin)[0]).decode("ascii")
         validation_result = validate_hash_list(new_hashes_bin,hash_type,False, f'BASE64<{base_64[0:64]}{"..." if len(base_64) > 64 else ""}>') #Placeholder is the first 64 characters of BASE 64 representation
-    
+
     errored_validation_results = [x for x in validation_result['items'] if x['result'] != 'OK']
     error_output = {bytes(x['hash'],encoding='ascii'):x['result'] for x in errored_validation_results}
 
@@ -66,7 +67,10 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
             'hashCount' : hash_list.hash_count,
             'addedCount' : 0,
             'erroredCount' : len(errored_validation_results),
-            'errors' : [{'hash': hash.decode('ascii'), 'error' : error} for (hash,error) in error_output.items()]
+            'errors' : [{
+                'order_in_input': new_hashes_bin_list.index(hash),
+                'error' : error}
+                for (hash,error) in error_output.items()]
             },400
         if validation_mode == 'skip_invalid':
             new_hashes_bin = new_hashes_bin - error_output.keys()
@@ -96,7 +100,11 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
         'hashCount' : hash_list.hash_count,
         'addedCount' : len(hashes_to_add),
         'erroredCount' : 0 if validation_mode == 'no_validate' else len(errored_validation_results),
-        'errors' : [] if validation_mode == 'no_validate' else [{'hash': hash.decode('ascii'), 'error' : error} for (hash,error) in error_output.items()]
+        'errors' : [] if validation_mode == 'no_validate' else [
+            {'order_in_input': new_hashes_bin_list.index(hash),
+             'error' : error}
+            for (hash,error) in error_output.items()
+            ]
     }
 
 
