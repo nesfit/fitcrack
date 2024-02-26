@@ -919,6 +919,11 @@ class FcHashList(Base):
     @hybrid_property
     def is_locked(self):
         return len(self.jobs) != 0
+    
+    @hybrid_property
+    def cracked_hash_count(self):
+        return FcHash.query.filter_by(hash_list_id=self.id).filter(FcHash.result != None).count()
+
 
 class FcHash(Base):
     __tablename__ = 'fc_hash'
