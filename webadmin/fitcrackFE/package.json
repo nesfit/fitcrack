@@ -8,12 +8,12 @@
   },
   "dependencies": {
     "@bundled-es-modules/axios": "^0.21.1",
-    "@mdi/font": "^4.9.95",
+    "@mdi/font": "^7.3.67",
     "@oviovocny/vue-chartjs": "^3.5.1",
     "buffer": "^6.0.3",
-    "deepmerge": "^4.2.2",
     "chart.js": "^3.0.0-alpha",
     "chartjs-adapter-moment": "^1.0.0",
+    "deepmerge": "^4.2.2",
     "iconv-lite": "^0.6.2",
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.9.3",
+    "@vue/runtime-dom": "^3.3.8",
     "vite": "^2.6.4",
     "vite-plugin-vue2": "^1.9.0"
   }

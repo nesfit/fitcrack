@@ -156,7 +156,7 @@
                   </span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content class="limit-width">
-                  The API server could be offline or malfunctoining. You could try to restart the Fitcrack service.
+                  The API server could be offline or malfunctioning. You could try to restart the Fitcrack service.
                   <ul>
                     <li>Access the server shell and check if the service is enabled with <code>service fitcrack status</code></li>
                     <li>Try to start it up if needed with <code>service fitcrack start</code></li>

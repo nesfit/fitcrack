@@ -11,14 +11,8 @@ from src.api.fitcrack.endpoints.dictionary.responseModels import dictionary_mode
 from src.api.fitcrack.endpoints.pcfg.responseModels import pcfg_model
 from src.api.fitcrack.endpoints.markov.responseModels import hcStat_model
 from src.api.fitcrack.responseModels import pagination, simpleResponse, job_short_model, \
-    boincHost_model, job_permissions
+    boincHost_model, job_permissions, workunit_model
 
-
-boincResult_model = api.model('boinc result', {
-    'id': fields.String(),
-    'stderr_out_text': fields.String(),
-
-})
 
 rule_model = api.model('Rule', {
     'id': fields.Integer(readOnly=True, required=False),
@@ -26,31 +20,6 @@ rule_model = api.model('Rule', {
     'path': fields.String(readOnly=True, required=False),
     'count': fields.Integer(readOnly=True),
     'time': fields.DateTime(readOnly=True, required=False),
-})
-
-workunit_model = api.model('Workunit', {
-    'id': fields.String(),
-    'job_id': fields.Integer(),
-    'workunit_id': fields.Integer(),
-    'host_id': fields.Integer(),
-    'boinc_host_id': fields.Integer(),
-    'start_index': fields.Integer(),
-    'start_index_2': fields.Integer(),
-    'start_index_real': fields.Integer(),
-    'hc_keyspace': fields.Integer(),
-    'keyspace': fields.Integer(),
-    'mask_id': fields.Integer(),
-    'duplicated': fields.Boolean(),
-    'duplicate': fields.Integer(),
-    'time': fields.DateTime(),
-    'cracking_time': fields.Integer(),
-    'cracking_time_str': fields.String(),
-    'retry': fields.Boolean(),
-    'finished': fields.Boolean(),
-    'host': fields.Nested(boincHost_model),
-    'result': fields.Nested(boincResult_model),
-    'progress': fields.Integer(),
-    'speed': fields.Integer()
 })
 
 mask_model = api.model('Mask', {
@@ -165,7 +134,6 @@ job_big_model = api.model('Job', {
     'hosts': fields.List(fields.Nested(boincHost_model)),
     'workunits': fields.List(fields.Nested(workunit_model)),
     'masks': fields.List(fields.Nested(mask_model)),
-    'hashes': fields.List(fields.Nested(hash_model)),
     'left_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'right_dictionaries': fields.List(fields.Nested(dictionary_job_model)),
     'grammar_id': fields.Integer(),
@@ -179,6 +147,7 @@ job_big_model = api.model('Job', {
     'max_elem_in_chain': fields.Integer(),
     'generate_random_rules': fields.Integer(),
     'optimized': fields.Boolean(),
+    'hash_list_id': fields.Integer()
 })
 
 job_nano_model = api.model('Job nano', {
@@ -192,6 +161,7 @@ job_nano_model = api.model('Job nano', {
     'progress': fields.Float(required=False),
     'cracked_hashes_str': fields.String(),
     'estimated_cracking_time_str': fields.String(),
+    'hash_list_id': fields.Integer()
 })
 
 job_nano_list_model = api.inherit('Job nano list', {

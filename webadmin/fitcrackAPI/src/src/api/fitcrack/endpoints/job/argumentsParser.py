@@ -30,12 +30,12 @@ verifyHash_argument.add_argument('hashtype', type=str, required=True,
                                  default='0', help='hash code from /hashcat/hashTypes')
 
 crackingTime_argument = reqparse.RequestParser()
-crackingTime_argument.add_argument('hash_type_code', type=str, required=True, help='hash type', default='0')
+crackingTime_argument.add_argument('hash_list_id', type=int, required=True, help='hash list ID to determine hash type')
 crackingTime_argument.add_argument('boinc_host_ids', type=str, required=True, help='host IDs')
 crackingTime_argument.add_argument('attack_settings', required=True)
 
 addJob_model = api.schema_model('addJob', {
-    "required": ["name"],
+    "required": ["name", "hash_list_id"],
     'properties': {
         'name': {
             "type": "string",
@@ -194,33 +194,8 @@ addJob_model = api.schema_model('addJob', {
                 }, 'null'],
             }
         },
-        'hash_settings':  {
-            'type': 'object',
-            'required': ['hash_type'],
-            'properties': {
-                'hash_type': {
-                    'default': '0',
-                    'type': 'string',
-                    'description': 'Hash code from /hashcat/hashTypes'
-                },
-                'hash_list': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'object',
-                        'properties': {
-                            'hash': {
-                                'type': 'string',
-                                'description': 'hash'
-                            }
-                        }
-                    }
-                },
-                'valid_only': {
-                    'default': False,
-                    'type': 'boolean',
-                    'description': 'Specifies whether hash validation is enforced'
-                }
-            }
+        'hash_list_id':  {
+            'type': 'integer'
         }
     },
     'type': 'object'

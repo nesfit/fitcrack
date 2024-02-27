@@ -2,6 +2,7 @@
  * @file SqlLoader.h
  * @brief Header file for common MySQL access
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
+ * @authors Radek Hranicky (hranicky(at)fit.vut.cz)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
@@ -239,6 +240,14 @@ class CSqlLoader {
          * @return Vector of smart pointers to found dictionaries
          */
         std::vector<Config::Ptr<CDictionary>> loadJobDictionaries(uint64_t jobId);
+
+
+        /**
+         * @brief Returns ID of the hashlist associated with the job
+         * @param jobId Job ID
+         * @return Hashlist ID
+         */
+        uint64_t getHashlistId(uint64_t jobId);
 
         /**
          * @brief Returns vector of hashes as strings, possibly even binary ones

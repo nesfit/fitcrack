@@ -4,6 +4,7 @@
  * It loads arguments and runs selected generator
  *
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
+ * @authors Radek Hranicky (hranicky(at)fit.vut.cz)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */

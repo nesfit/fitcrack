@@ -137,230 +137,42 @@
             id="job-step-1"
             editable
             step="1"
+            :color="hashListId ? 'success' : 'primary'"
+            :complete="!!hashListId"
+            edit-icon="mdi-check"
           >
-            Input settings
+            {{ hashlistStepTitle }}
           </v-stepper-step>
           <v-stepper-content step="1">
             <v-container>
-              <v-row class="mb-4">
-                <v-btn-toggle
-                  v-model="inputMethod"
-                  mandatory
-                  color="primary"
-                  class="mr-2"
-                >
-                  <v-btn id="job-input-mode-manual" value="multipleHashes">
-                    Manual entry
-                  </v-btn>
-                  <v-btn id="job-input-mode-hashlist" value="hashFile">
-                    From hash file
-                  </v-btn>
-                  <v-btn id="job-input-mode-extract" value="extractFromFile">
-                    Extract from file
-                  </v-btn>
-                </v-btn-toggle>
-                <v-autocomplete
-                  id="hash-type-select"
-                  v-model="hashType"
-                  editable
-                  validate-on-blur
-                  clearable
-                  label="Select hash type"
-                  :items="hashTypes"
-                  item-text="name"
-                  :filter="hashTypeFilter"
-                  return-object
-                  required
-                  hide-details
-                  single-line
-                  flat
-                  solo-inverted
-                  no-data-text="No matching hash type"
-                  @change="validateHashes(null)"
-                >
-                  <template #item="{ item }">
-                    <v-list-item-content>
-                      <v-list-item-title><b>{{ item.code }}</b> - {{ item.name }}</v-list-item-title>
-                    </v-list-item-content>
-                  </template>
-                </v-autocomplete>
-              </v-row>
               <v-row>
-                <v-col
-                  v-if="inputMethod === 'extractFromFile'"
-                  cols="12"
-                >
-                  <v-alert
-                    type="info"
-                    text
-                  >
-                    Supported formats:
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">MS_OFFICE</a>,</span>
-                      </template>
-                      <span>Hash types: 9400, 9500, 9600, 9700, 9800</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">PDF</a>,</span>
-                      </template>
-                      <span>Hash types: 10400, 10500, 10600, 10700</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">7Z</a>,</span>
-                      </template>
-                      <span>Hash type: 11600</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">RAR</a> and </span>
-                      </template>
-                      <span>Hash types: 12500, 13000, 23700, 23800</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on"><a href="#" class="filetype-link">ZIP</a>.</span>
-                      </template>
-                      <span>Hash types: 13600, 17200, 17210, 17225, 13001, 23002, 23003</span>
-                    </v-tooltip>
-                  </v-alert>
-                  <file-uploader
-                    ref="encryptedFileUploader"
-                    :url="this.$serverAddr + '/protectedFiles/add'"
-                    @uploadComplete="uploadComplete"
-                  />
-                </v-col>
-                <v-col
-                  v-if="inputMethod === 'hashFile'"
-                  cols="12"
-                >
-                  <v-alert
-                    type="info"
-                    text
-                  >
-                    Input to hashcat. Select a binary hash (WPA/WPA2), or plain text hashlist.
-                  </v-alert>
-                  <file-uploader
-                    ref="hashFileUploader"
-                    :multiple="false"
-                    no-upload
-                    label="Select a file to read"
-                    @filesChanged="hashFileSelected"
-                  />
-                </v-col>
-                <v-col cols="12">
-                  <v-alert
-                    :value="gotBinaryHash"
-                    text
-                    type="info"
+                <v-col>
+                  <v-btn
+                    large block
                     color="primary"
-                    class="mt-0 mb-0"
+                    :to="{name: 'createHashlist', query: {attach: `${name} Hashlist`}}"
                   >
-                    You can select only one binary hash.
-                  </v-alert>
-                  <fc-textarea
-                    id="hashes-input"
-                    v-if="inputMethod !== null"
-                    ref="textarea"
-                    v-model="hashList"
-                    :class="{'hasherror': hashListError}"
-                    class="textarea"
-                    max-height="500"
-                    :readonly="!(inputMethod === 'multipleHashes' && !gotBinaryHash) "
-                    :can-remove-line="true "
-                    @blur="validateHashes"
-                    @focus="unvalidateHashes"
-                  >
-                    <div
-                      slot="after"
-                      class="hashCeckContainer pl-1 pt-2"
-                    >
-                      <div
-                        v-for="hashObj in validatedHashes"
-                        :key="hashObj.id"
-                      >
-                        <v-icon
-                          v-if="hashObj.result === 'OK'"
-                          small
-                          color="success"
-                        >
-                          check_circle_outlined
-                        </v-icon>
-                        <v-tooltip
-                          v-else
-                          left
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-icon
-                              small
-                              color="error"
-                              class="clickable"
-                              v-on="on"
-                            >
-                              error_circle_outlined
-                            </v-icon>
-                          </template>
-                          <span>{{ hashObj.result }}</span>
-                        </v-tooltip>
-                        <v-tooltip
-                          v-if="hashObj.isInCache"
-                          left
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-icon
-                              small
-                              color="warning"
-                              class="clickable"
-                              v-on="on"
-                            >
-                              error_circle_outlined
-                            </v-icon>
-                          </template>
-                          <span>hash already in hashcache</span>
-                        </v-tooltip>
-                      </div>
-                    </div>
-                  </fc-textarea>
+                    <v-icon left>mdi-book-plus</v-icon>
+                    Create new input hashlist
+                  </v-btn>
                 </v-col>
               </v-row>
               <v-row>
-                <v-btn
-                  v-if="dev"
-                  text
-                  color="success"
-                  @click="getRandomHash"
-                >
-                  <v-icon left>
-                    mdi-auto-fix
-                  </v-icon>
-                  Random SHA1
-                </v-btn>
-                <v-checkbox
-                  v-show="invalidHashes.length > 0"
-                  v-model="ignoreHashes"
-                  label="Ignore invalid hashes"
-                  hide-details
-                  :height="15"
-                  color="error"
-                  class="ml-2 mt-1"
-                />
-                <v-spacer />
-                <v-btn
-                  v-show="hashList !== ''"
-                  color="error"
-                  class="mr-2"
-                  text
-                  @click="clearInput"
-                >
-                  Reset
-                </v-btn>
+                <v-col>
+                  <div class="text-center text-overline text--secondary">or attach an existing one</div>
+                  <HashlistSelector
+                  v-model="hashListId"
+                  />
+                </v-col>
+              </v-row>
+              <v-row class="mb-2">
+                <v-spacer></v-spacer>
                 <v-btn
                   color="primary"
                   @click="step = 2"
+                  :disabled="!hashListId"
                 >
-                  Next
+                  {{ hashListId ? 'Next' : 'Select a hashlist above' }}
                 </v-btn>
               </v-row>
             </v-container>
@@ -590,33 +402,34 @@
   import {twoWayMap} from '@/store'
 
   import { attacks } from '@/store/job-form'
+  import HashlistCreator from '@/components/hashlist/hashlistCreator.vue'
+  import HashlistSelector from '@/components/selector/hashlistSelector.vue'
 
   export default {
     name: 'AddJob',
     components: {
-      FileUploader,
-      'combinator': combinator,
-      'maskattack': mask,
-      'dictionary': dictionary,
-      'hybridMaskWordlist': hybridMaskWordlist,
-      'hybridWordlistMask': hybridWordlistMask,
-      'pcfgAttack': pcfgAttack,
-      'princeAttack': princeAttack,
-      'fc-textarea': fcTextarea,
-      'host-selector': hostSelector,
-      'template-modal': templateModal,
-      dtPicker
-    },
+    FileUploader,
+    'combinator': combinator,
+    'maskattack': mask,
+    'dictionary': dictionary,
+    'hybridMaskWordlist': hybridMaskWordlist,
+    'hybridWordlistMask': hybridWordlistMask,
+    'pcfgAttack': pcfgAttack,
+    'princeAttack': princeAttack,
+    'fc-textarea': fcTextarea,
+    'host-selector': hostSelector,
+    'template-modal': templateModal,
+    dtPicker,
+    HashlistCreator,
+    HashlistSelector
+},
     data: function () {
       return {
         loading: false,
         helpDismissedMessage: false,
-        hashTypes: [],
         showEstimatedTime: false,
         estimatedTime: null,
         keyspace: null,
-        gotBinaryHash: false,
-        hashListError: false,
         selectedTemplateName: '',
         attacks,
         templates: [
@@ -630,20 +443,20 @@
     computed: {
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
-        'step', 'attackSettingsTab', 'validatedHashes', 'name', 'inputMethod', 'hashList', 'hashType', 'ignoreHashes', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
+        'step', 'attackSettingsTab', 'hashListId', 'name', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
         return this.templates.map((t, i) => ({text: t.template, value: i}))
-      },
-      invalidHashes () {
-        return this.validatedHashes.filter(h => h.result !== 'OK')
       },
       dev () {
         return localStorage.getItem('testmode') == 'true'
       },
       helpAlreadyDismissed () {
         return localStorage.getItem('dismissedHelp') == 'true'
+      },
+      hashlistStepTitle () {
+        return this.hashListId ? 'Hashlist attached' : 'Hashlist selection'
       }
     },
     watch: {
@@ -656,11 +469,10 @@
           for (let i = 0; i < this.hosts.length; i++) {
             boincIds.push(this.hosts[i].id)
           }
-          // -1 means no hash entered
-          var hash_code = this.hashType == null ? -1 : this.hashType.code
           // Compute new keyspace and new estimation of cracking time
+          if (!this.hashListId) return // early return if no hashlist is selected
           this.axios.post(this.$serverAddr + '/job/crackingTime', {   
-            'hash_type_code': hash_code,
+            'hash_list_id': this.hashListId,
             'boinc_host_ids': boincIds.join(","),
             'attack_settings': JSON.stringify(val.attack_settings)
           }).then((response) => {
@@ -674,10 +486,8 @@
     },
     mounted: function () {
       this.loadSettings()
-      this.getHashTypes()
       this.startDate = this.$moment().format('YYYY-MM-DDTHH:mm')
       this.endDate = this.$moment().format('YYYY-MM-DDTHH:mm')
-      if (this.hashList.length > 0) this.validateHashes()
       this.fetchTemplates()
       if (this.name === '') {
         this.generateJobName()
@@ -729,139 +539,10 @@
         })
         .catch(console.error)
       },
-      hashTypeFilter ({name, code}, query) {
-        const q = query.toLowerCase()
-        return name.toLowerCase().includes(q) || code.toLowerCase().includes(q)
-      },
-      subHashtypeChanged: function (key, val) {
-        this.hashType.code = this.hashType.code.replace(key, val.code)
-        this.validateHashes(null)
-      },
-      focusTextarea: function () {
-        this.$refs.textarea.focus()
-      },
-      validateHashes: function (data = null) {
-        if (data === null) {
-          data = this.hashList
-        }
-        var hashesList = data.split('\n')
-        if (data.startsWith("BASE64:")) {
-          this.gotBinaryHash = true
-        } else {
-          this.gotBinaryHash = false
-        }
-        if (this.hashType === null || isNaN(this.hashType.code)) {
-          return
-        }
-        if (data === '') {
-          return
-        }
-
-        this.axios.post(this.$serverAddr + '/job/verifyHash', {
-          'hashtype': this.hashType.code,
-          'hashes': data
-        }).then((response) => {
-          this.hashListError = response.data.error
-          this.validatedHashes = response.data.items
-        })
-      },
-      unvalidateHashes: function (data) {
-        this.validatedHashes = []
-      },
-      getHashTypes: function () {
-        this.axios.get(this.$serverAddr + '/hashcat/hashTypes').then((response) => {
-          this.hashTypes = response.data.hashtypes
-        })
-      },
-      addHash: function (hash) {
-        var parsedHashlist = this.hashList.split('\n')
-        var lastHash = parsedHashlist[parsedHashlist.length-1]
-        if (lastHash === '') {
-          this.hashList = this.hashList + hash
-        } else {
-          this.hashList = this.hashList + '\n' + hash
-        }
-      },
-      uploadComplete: function (data) {
-        this.$success("Successfully extracted hash form file.")
-        this.hashType = this.hashTypes.find(h => h.code == data['hash_type'])
-        this.addHash(data['hash'])
-        this.validateHashes(null)
-      },
-      isBinaryFile: function(content) {
-        for (var i = 0; i < 24; i++) {
-          var charCode = content.charCodeAt(i);
-          if (charCode === 65533 || charCode <= 8) {
-            return true
-          }
-        }
-        return false
-      },
-      hashFileSelected: function (file) {
-        var reader = new FileReader()
-        reader.onloadend = function(evt) {
-          if (evt.target.readyState == FileReader.DONE) {
-
-            if (this.isBinaryFile(evt.target.result)) {
-              // we got binary hash
-              var binReader = new FileReader()
-              binReader.onloadend = function(evt) {
-                if (evt.target.readyState == FileReader.DONE) {
-                  this.hashList = 'BASE64:' + evt.target.result.substr(evt.target.result.indexOf(',') + 1)
-                  this.validateHashes(null)
-                  this.gotBinaryHash = true
-                }
-              }.bind(this)
-              binReader.readAsDataURL(file)
-
-            } else {
-              // we got hashlists
-              var parsedHashlist = this.hashList.split('\n')
-              var lastHash = parsedHashlist[parsedHashlist.length-1]
-              if (lastHash === '') {
-                this.hashList += evt.target.result
-              } else {
-                this.hashList += '\n' + evt.target.result
-              }
-              this.validateHashes(null)
-            }
-          }
-        }.bind(this)
-        reader.readAsText(file, 'utf-8')
-      },
-      clearInput () {
-        this.hashType = null
-        this.hashList = ''
-        this.unvalidateHashes()
-      },
       submit () {
         // TODO: maybe delete this condition
         if (this.name === '') {
           this.$error('Job name can not be empty.')
-          return
-        }
-
-        if (this.inputMethod === 'encryptedFile' && !this.$refs.encryptedFileUploader.fileUploaded ) {
-          this.$error('No file uploaded.')
-          this.step = 1
-          return
-        }
-
-        if (this.hashType === null) {
-          this.$error('No hash type selected.')
-          this.step = 1
-          return
-        }
-
-        if (this.invalidHashes.length > 0 && !this.ignoreHashes) {
-          this.$error('Some hashes are invalid.')
-          this.step = 1
-          return
-        }
-
-        if (this.validatedHashes.length == 0) {
-          this.$error('List of validated hashes is empty.')
-          this.step = 1
           return
         }
 
@@ -898,7 +579,6 @@
         }
 
         this.loading = true
-        console.log(this.jobSettings.endNever)
         const finalStartTime = this.startNow ? 
           this.jobSettings['time_start'] : 
           this.$moment(this.jobSettings['time_start']).utc().toISOString(true).slice(0, 16)
@@ -973,12 +653,6 @@
     color: inherit
   }
 
-  .hashCeckContainer {
-    display: block;
-    max-width: 35px;
-    overflow: hidden;
-  }
-
   .mode-btn {
     height: initial !important;
     margin: 1em;
@@ -987,11 +661,5 @@
   .scroller {
     max-height: 400px;
     overflow-y: auto;
-  }
-</style>
-
-<style>
-  .hasherror .scrollCont {
-    border-color: #e01 !important;
   }
 </style>
