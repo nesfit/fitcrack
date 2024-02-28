@@ -7,6 +7,18 @@
         {{ item.name }}
       </router-link>
     </template>
+    <template v-slot:item.added="{ item }">
+      {{ new Date(item.added).toLocaleString() }}
+    </template>
+    <template v-slot:item.progress="{ item }">
+      <div class="d-inline-flex align-center">
+        <span class="mr-1">{{ item.cracked_hash_count }} / {{ item.hash_count }}</span>
+        <v-progress-circular
+          :value="item.cracked_hash_count / item.hash_count * 100"
+          :max="100" color="success" size="18" rotate="270"
+        />
+      </div>
+    </template>
     <template #footer.prepend="ctx">
       <v-text-field v-model="search" class="mx-2 mr-8" clearable prepend-icon="mdi-table-search" label="Search hashlists"
         single-line @input="getData" />
@@ -24,7 +36,8 @@ export default {
     value: {
       type: Number
     },
-    autoRefresh: Boolean
+    autoRefresh: Boolean,
+    hideCompleted: Boolean
   },
   data() {
     return {
@@ -39,13 +52,16 @@ export default {
       status: 'active',
       totalItems: 0,
       dataTableOptions: {
-        itemsPerPage: 3
+        itemsPerPage: 3,
+        sortBy: [ 'added' ],
+        sortDesc: [ true ],
       },
       loading: true,
       headers: [
         { text: 'Name', value: 'name', align: 'start', sortable: true },
         { text: 'Hash type', value: 'hash_type_name', align: 'end', sortable: true },
-        { text: 'Entries', value: 'hash_count', align: 'end', sortable: false },
+        { text: 'Progress', value: 'progress', align: 'end', sortable: false },
+        { text: 'Created', value: 'added', align: 'end', sortable: true }
       ],
       hashlists: []
     }
@@ -61,20 +77,22 @@ export default {
   },
   computed: {
     orderBy() {
-        const dt = this.dataTableOptions.sortBy;
-        if (dt.length > 0) {
-          switch (dt[0]) {
-            case 'name':
-              return 'name';
-            case 'hash_type_name':
-              return 'hash_type';
-            default:
-              return null;
-          }
-        } else {
-          return null;
+      const dt = this.dataTableOptions.sortBy;
+      if (dt.length > 0) {
+        switch (dt[ 0 ]) {
+          case 'name':
+            return 'name';
+          case 'hash_type_name':
+            return 'hash_type';
+          case 'added':
+            return 'added';
+          default:
+            return dt[ 0 ];
         }
+      } else {
+        return null;
       }
+    }
   },
   methods: {
     getData() {
@@ -83,8 +101,9 @@ export default {
           'page': this.dataTableOptions.page,
           'per_page': this.dataTableOptions.itemsPerPage,
           'order_by': this.orderBy,
-          'descending': this.dataTableOptions.sortDesc ? this.dataTableOptions.sortDesc[0] : false,
-          'name': this.search
+          'descending': this.dataTableOptions.sortDesc ? this.dataTableOptions.sortDesc[ 0 ] : false,
+          'name': this.search,
+          'hide_fully_cracked_hash_lists': this.hideCompleted
         }
       }).then((response) => {
         this.hashlists = response.data.items;

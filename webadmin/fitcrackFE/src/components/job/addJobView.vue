@@ -162,6 +162,7 @@
                   <div class="text-center text-overline text--secondary">or attach an existing one</div>
                   <HashlistSelector
                   v-model="hashListId"
+                  hide-completed
                   />
                 </v-col>
               </v-row>

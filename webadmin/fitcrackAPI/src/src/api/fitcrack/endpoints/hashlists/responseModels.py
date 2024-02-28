@@ -18,19 +18,13 @@ hash_list_model_short = api.model('short hash list', {
     'cracked_hash_count' : fields.Integer(readOnly=True, required=True),
     'added': fields.DateTime(readOnly=True, required=True),
     'job_count' : fields.Integer(readOnly=True, required=True),
-    'is_locked' : fields.Boolean(readOnly=True, required=True)
+    'is_locked' : fields.Boolean(readOnly=True, required=True),
+    'deleted' : fields.Boolean(readOnly=True, required=True)
 })
 
 
-hash_list_model_long = api.model('short hash list', {
-    'id': fields.Integer(readOnly=True, required=False),
-    'name' : fields.String(readOnly=True,required=True),
-    'hash_type_name' : fields.String('hash_type',readOnly=True),
-    'added': fields.DateTime(readOnly=True, required=True),
-    'hash_count' : fields.Integer(readOnly=True, required=True),
-    'cracked_hash_count' : fields.Integer(readOnly=True, required=True),
+hash_list_model_long = api.inherit('long hash list', hash_list_model_short, {
     'jobs' : fields.List(fields.Nested(job_nano_model)),
-    'is_locked' : fields.Boolean(readOnly=True, required=True)
 })
 
 

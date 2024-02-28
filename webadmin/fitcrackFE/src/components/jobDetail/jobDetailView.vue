@@ -46,14 +46,14 @@
                       <span>Status History</span>
                       <v-spacer />
                       <v-btn
-                        v-if="data.permissions.operate || $userCan('OPERATE_ALL_JOBS')"
+                        v-if="(data.permissions.operate || $userCan('OPERATE_ALL_JOBS')) && parseInt(data.status) >= 10"
                         :color="purging ? '' : 'error'"
                         :ripple="false"
                         @click="purgeHandler"
                       >
-                        <span>{{ purging ? 'Click to confirm' : 'Purge' }}</span>
+                        <span>{{ purging ? 'Click to confirm' : 'Kill' }}</span>
                         <v-icon right>
-                          mdi-undo-variant
+                          mdi-cog-stop
                         </v-icon>
                       </v-btn>
                     </v-card-title>
