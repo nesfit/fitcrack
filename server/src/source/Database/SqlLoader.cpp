@@ -522,6 +522,21 @@ void CSqlLoader::killJob(PtrJob &job)
 }
 
 
+uint64_t CSqlLoader::getLatestBenchmarkPower(uint64_t hostId, uint32_t attack_mode, uint32_t hash_type)
+{
+    return getSqlNumber(formatQuery("SELECT `power` FROM `%s` WHERE boinc_host_id = %" PRIu64 " AND attack_mode = %" PRIu32 " AND hash_type = %" PRIu32 " AND \
+        NOT EXISTS (SELECT * FROM `%s` AS temp WHERE boinc_host_id = %" PRIu64 " AND attack_mode = %" PRIu32 " AND hash_type = %" PRIu32 " AND temp.last_update > %s.last_update);",
+        Config::tableNameBenchmark.c_str(), hostId, attack_mode, hash_type, Config::tableNameBenchmark.c_str(), hostId, attack_mode, hash_type, Config::tableNameBenchmark.c_str()));
+}
+
+
+void CSqlLoader::updateHostPower(uint64_t hostId, uint64_t newPower)
+{
+    return updateSql(formatQuery("UPDATE `%s` SET power = %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CHost::getTableName().c_str(), newPower, hostId));
+}
+
+
 uint64_t CSqlLoader::getSecondsPassed(uint64_t jobId)
 {
     return getSqlNumber(formatQuery("SELECT TIMESTAMPDIFF(SECOND, time_start, now()) FROM `%s` WHERE id = %" PRIu64 ";",
@@ -582,6 +597,24 @@ void CSqlLoader::addNewHosts(uint64_t jobId)
             /** Insert new hosts to fc_host */
             updateSql(formatQuery("INSERT INTO `%s` (`boinc_host_id`, `job_id`) VALUES (%" PRIu64 ", %" PRIu64 ");",
                                   CHost::getTableName().c_str(), newHostId, jobId));
+
+            //skip benchmark if enabled
+            uint64_t skipBenchmark = getSqlNumber("SELECT skip_benchmark FROM `fc_settings`;");
+            if(skipBenchmark)
+            {
+                PtrJob job = loadJob(jobId);
+                uint64_t power = getLatestBenchmarkPower(newHostId, job->getAttackMode(), job->getHashType());
+
+                if(power > 0)
+                {
+                    Tools::printDebug("there are some benchmarks, setting power to: %" PRIu64 "\n", power);
+
+                    //update host power and status
+                    updateSql(formatQuery("UPDATE `%s` SET status = %d, power = %" PRIu64 " WHERE boinc_host_id = %" PRIu64 ";",
+                                  CHost::getTableName().c_str(), Config::HostState::HostNormal, power, newHostId));
+                                  
+                }   
+            }
 
             Tools::printDebugHost(Config::DebugType::Log, jobId, newHostId,
                     "New host #%" PRIu64 " added to job #%" PRIu64 "\n", newHostId, jobId);

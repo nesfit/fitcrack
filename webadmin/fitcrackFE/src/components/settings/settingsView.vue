@@ -82,6 +82,15 @@
                   persistent-hint
                   class="mb-4 mt-0"
                 />
+                <v-switch
+                  v-model="settings.skip_benchmark"
+                  :loading="loading"
+                  outlined
+                  label="Skip benchmark-f"
+                  hint="Do not benchmark already benchmarked hosts."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
               </v-col>
               <v-col class="mw">
                 <v-switch

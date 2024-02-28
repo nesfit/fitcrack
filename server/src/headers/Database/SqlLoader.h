@@ -318,6 +318,22 @@ class CSqlLoader {
         */
         void killJob(Config::Ptr<CJob> &job);
 
+        /**
+         * @brief Return power of the last benchmark of a specified host, attack mode and hash type
+         * @param hostId [in] host ID used for filtering
+         * @param attack_mode [in] attack mode code used for filtering
+         * @param hash_type [in] hash type used for filtering
+         * @return Benchmarked power
+         */
+        uint64_t getLatestBenchmarkPower(uint64_t hostId, uint32_t attack_mode, uint32_t hash_type);
+
+        /**
+         * @brief Updates power of a host in fc_host table
+         * @param hostId [in] Host ID which power we are updating
+         * @param newPower [in] New power of this host
+         */
+        void updateHostPower(uint64_t hostId, uint64_t newPower);
+
 private:
 
         /**
