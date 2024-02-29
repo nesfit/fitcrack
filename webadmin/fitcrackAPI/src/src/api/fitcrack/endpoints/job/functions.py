@@ -207,7 +207,11 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False) -> ve
             "{} -m {} {} --show --machine-readable".format(HASHCAT_PATH, hash_type, hash), getReturnCode=True
         )
 
-        if binaryHash:
+        if result['returnCode'] not in (0, 255): # 0 means success (at least one hash passes); 255 means error (no hash passes); everything else is bad and validation failed completely.
+            with open(hash, "r") as hashFile:
+                for h in hashFile.readlines():
+                    hashes.append((h.strip(),"Hashcat crashed or exited unexpectedly when validating; no hashes could be validated."))
+        elif binaryHash:
             hashes = [('HASH','OK') if result['returnCode'] == 0 else ('HASH', 'Token length exception')]
         else:
             hash_validity = {}
