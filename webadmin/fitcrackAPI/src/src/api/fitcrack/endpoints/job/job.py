@@ -393,6 +393,7 @@ class OperationWithJob(Resource):
                 dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
                 for dictionary in dictionaries:
                     dictionary.current_index = 0
+                    dictionary.current_pos = 0
             graphData = FcJobGraph.query.filter(FcJobGraph.job_id == id).all()
             for item in graphData:
                 db.session.delete(item)
