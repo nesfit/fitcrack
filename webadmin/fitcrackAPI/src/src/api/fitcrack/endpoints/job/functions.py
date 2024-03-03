@@ -61,6 +61,7 @@ def kill_job(job:FcJob, db):
         dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
         for dictionary in dictionaries:
             dictionary.current_index = 0
+            dictionary.current_pos = 0
 
     hosts = FcHostActivity.query.filter(FcHostActivity.job_id == id).all()
     for host in hosts:
