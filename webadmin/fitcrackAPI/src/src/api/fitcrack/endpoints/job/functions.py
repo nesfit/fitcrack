@@ -153,6 +153,7 @@ def create_job(data):
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         optimized=job['attack_settings'].get('optimized', 1),
+        slow_candidates=job['attack_settings'].get('slow_candidates', 0),
         deleted=False,
         hash_list_id=job['hash_list_id']
         )

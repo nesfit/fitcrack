@@ -73,6 +73,11 @@ bool CAttackRules::makeWorkunit() {
                              m_job->getDistributionMode(), m_job->getName(),
                              m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag());
 
+    if(m_job->getSlowCandidatesFlag())
+    {
+      configFile << "|||slow_candidates|BigUInt|1|1|||\n";
+    }
+
     if (m_job->getDistributionMode() == 0) {
       // Number of passwords in the sent dictionary (the dictionary fragment).
       std::string dict1Keyspace = std::to_string(m_workunit->getHcKeyspace());

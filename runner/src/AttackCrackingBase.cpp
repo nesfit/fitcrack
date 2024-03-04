@@ -25,6 +25,9 @@ void AttackCrackingBase::addSpecificArguments() {
   if (config_.find(ConfigTask::HC_KEYSPACE, value) && value != "0")
     addArgument("--limit=" + value);
 
+  if (config_.find(ConfigTask::SLOW_CANDIDATES, value) && value != "0")
+    addArgument("--slow-candidates");
+
   findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "--generate-rules");
   findAndAddOptional(ConfigTask::HWMON_TEMP_ABORT, "--hwmon-temp-abort");
 

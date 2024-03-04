@@ -10,7 +10,8 @@ from src.api.apiConfig import api
 hashType = api.model('HashType', {
     'code': fields.String(description='Code of the hash'),
     'name': fields.String(description='Name of the hash'),
-    'category': fields.String(description='Category of the hash')
+    'category': fields.String(description='Category of the hash'),
+    'isSlow': fields.Boolean(description='Speed of the hash')
 })
 
 hashType_list = api.model('HashTypeList', {
