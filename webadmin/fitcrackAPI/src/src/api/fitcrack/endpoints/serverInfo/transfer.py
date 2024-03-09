@@ -6,13 +6,14 @@ from src.database import db
 from sqlalchemy import exc
 
 from src.database.models import FcJob, FcUserPermission
-from src.database.models import FcHash, FcMask # for (un)packing directly
+from src.database.models import FcMask # for (un)packing directly
 from src.database.models import FcRule, FcHcstat, FcDictionary, FcJobDictionary, FcPcfg # for dependencies
+from src.database.models import FcHashList
 
 
 # scalar or relationship fields that get copied over
 JOB_EXPORTABLE_COLUMNS = (
-  'attack', 'attack_mode', 'attack_submode', 'distribution_mode', 'hash_type', 'hashes',
+  'attack', 'attack_mode', 'attack_submode', 'distribution_mode', 'hash_type',
   'keyspace', 'hc_keyspace', 'name', 'comment', 'seconds_per_workunit', 
   'charset1', 'charset2', 'charset3', 'charset4', 'rule_left', 'rule_right', 
   'markov_threshold', 'case_permute', 'check_duplicates', 
@@ -26,7 +27,8 @@ JOB_EXPORTABLE_DEPENDENCIES = {
   'markov': 'name',
   'pcfg': 'name',
   'left_dictionaries': 'dictionary.name',
-  'right_dictionaries': 'dictionary.name'
+  'right_dictionaries': 'dictionary.name',
+  'hash_list': 'name'
 }
 # mapping of dependency names from db columns to tables
 DEP_MAP = {
@@ -34,14 +36,16 @@ DEP_MAP = {
   'markov': 'markov',
   'pcfg': 'pcfg',
   'left_dictionaries': 'dictionary',
-  'right_dictionaries': 'dictionary'
+  'right_dictionaries': 'dictionary',
+  'hash_list': 'hash_list'
 }
 # maps dep type annotations to actual sqlalchemy model classes and columns
 ORM_MAP = {
   'rule': (FcRule, 'name'),
   'markov': (FcHcstat, 'name'),
   'pcfg': (FcPcfg, 'name'),
-  'dictionary': (FcDictionary, 'name')
+  'dictionary': (FcDictionary, 'name'),
+  'hash_list': (FcHashList, 'name')
 }
 
 # Example for this craziness:
@@ -114,8 +118,6 @@ class JobSerializer:
 
 def orm_pack (obj):
   """Describes to msgpack how to serialize some ORM objects"""
-  if isinstance(obj, FcHash):
-    obj = obj.hash
   if isinstance(obj, FcMask):
     obj = {
       'mask': obj.mask,
@@ -163,9 +165,6 @@ class ImportDependencyMissing (Exception):
   def __init__(self, missing_deps):
     self.missing = missing_deps
 
-def recreate_hash (hashstring, hashtype):
-  return FcHash(hash=hashstring, hash_type=hashtype)
-
 def recreate_mask (data):
   return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0)
 
@@ -181,7 +180,6 @@ def unpack (package):
   # start creating jobs
   for job in contents['jobs']:
     # transform directly stored object back
-    job['hashes'] = list(map(lambda h: recreate_hash(h, job['hash_type']), job['hashes']))
     if job.get('masks'):
       job['masks'] = list(map(recreate_mask, job['masks']))
     newjob = FcJob()
@@ -210,6 +208,9 @@ def unpack (package):
     dep_pcfg = job.get('pcfg')
     if dep_pcfg:
       newjob.pcfg = deps[dep_pcfg[0]]
+    dep_hash_list = job.get('hash_list')
+    if dep_hash_list:
+      newjob.hash_list = deps[dep_hash_list[0]]
     # adding values for useless non-null fields
     newjob.indexes_verified = 0
     newjob.current_index_2 = 0
