@@ -880,6 +880,25 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                               mysql_table_hash.c_str(), found_hash, hash_list_id,
                               hash_string);
                           update_mysql(sql_buf);
+
+                          // Check if updating hashes across hash lists is enabled
+                          std::snprintf(buf, SQL_BUF_SIZE, "SELECT update_hashes FROM `%s`;", mysql_table_settings.c_str());
+                          uint64_t update_hashes = get_num_from_mysql(buf);
+                          if(update_hashes)
+                          {
+                            // Flag identical hashes in other hash lists too
+                            std::snprintf(
+                                sql_buf, SQL_BUF_SIZE + MAX_HASH_SIZE,
+                                "UPDATE `%s` SET `result` = '%s', `time_cracked` "
+                                "= NOW() WHERE `hash_list_id` <> %" PRIu64
+                                " AND LOWER(CONVERT(`hash` USING latin1)) = "
+                                "LOWER(CONVERT('%s' USING latin1)) AND `result` "
+                                "IS NULL ; ",
+                                mysql_table_hash.c_str(), found_hash, hash_list_id,
+                                hash_string);
+                            update_mysql(sql_buf);
+                          }
+
                           free(sql_buf);
                         }
 

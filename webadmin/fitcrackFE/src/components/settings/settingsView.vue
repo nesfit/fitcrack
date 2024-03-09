@@ -82,6 +82,15 @@
                   persistent-hint
                   class="mb-4 mt-0"
                 />
+                <v-switch
+                  v-model="settings.update_hashes"
+                  :loading="loading"
+                  outlined
+                  label="Update hashes"
+                  hint="Cracked hashes are updated across all hash lists."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
               </v-col>
               <v-col class="mw">
                 <v-switch
