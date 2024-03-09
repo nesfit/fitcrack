@@ -29,8 +29,10 @@ mask_model = api.model('Mask', {
     'current_index': fields.Integer(),
     'keyspace': fields.Integer(),
     'hc_keyspace': fields.Integer(),
-    'progress': fields.Float(required=False)
-
+    'progress': fields.Float(required=False),
+    'increment_min': fields.Integer(),
+    'increment_mask_range': fields.String(required=False),
+    'increment_all_masks': fields.String(required=False),
 })
 
 hash_model = api.model('Hash', {

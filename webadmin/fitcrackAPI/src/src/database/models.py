@@ -101,6 +101,8 @@ class FcMask(Base):
     current_index = Column(BigInteger, nullable=False)
     keyspace = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
+    increment_min = Column(Integer, nullable=False, server_default=text("'0'"))
+    increment_max = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship("FcJob", back_populates="masks")
 
@@ -111,6 +113,43 @@ class FcMask(Base):
         if self.job.status == 1:
             return 100
         return round((self.current_index / self.hc_keyspace) * 100, 2)
+    
+    @hybrid_property
+    def increment_mask_range(self):
+        if self.increment_min == 0:
+            return self.mask
+        index = 0
+        charIndex = 0
+        while charIndex < self.increment_min:
+            if self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        return self.mask[:index] + ' - ' + self.mask
+    
+    @hybrid_property
+    def increment_all_masks(self):
+        if self.increment_min == 0:
+            return self.mask
+        result = ''
+        index = 0
+        charIndex = 0
+        while charIndex < self.increment_min:
+            if self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        while charIndex <= self.increment_max:
+            result += self.mask[:index] + ', '
+            if index == len(self.mask) or self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        result = result[:-2]
+        return result
+            
+        
+    
 
 
 class FcDictionary(Base):
@@ -509,6 +548,7 @@ class FcSetting(Base):
     ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
     verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
     auto_add_hosts_to_running_jobs = Column(Integer, nullable=False, server_default=text("'0'"))
+    merge_masks = Column(Integer, nullable=False, server_default=text("'1'"))
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'

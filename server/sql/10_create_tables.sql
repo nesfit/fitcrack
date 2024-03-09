@@ -206,6 +206,8 @@ CREATE TABLE IF NOT EXISTS `fc_mask` (
   `current_index` bigint(20) unsigned NOT NULL,
   `keyspace` bigint(20) unsigned NOT NULL,
   `hc_keyspace` bigint(20) unsigned NOT NULL,
+  `increment_min` int(11) unsigned NOT NULL DEFAULT '0',
+  `increment_max` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
@@ -487,6 +489,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
   `verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `auto_add_hosts_to_running_jobs` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `merge_masks` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

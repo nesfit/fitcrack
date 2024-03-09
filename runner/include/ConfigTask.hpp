@@ -146,6 +146,8 @@ class ConfigTask {
         static const char *DISTRIBUTION_MODE;
         static const char *HEX_DICT;
         static const char *DICT1_KEYSPACE;
+        static const char *MASK_INCREMENT_MIN;
+        static const char *MASK_INCREMENT_MAX;
 };
 
 #endif // CONFIGTASK_HPP

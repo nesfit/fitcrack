@@ -82,6 +82,15 @@
                   persistent-hint
                   class="mb-4 mt-0"
                 />
+                <v-switch
+                  v-model="settings.merge_masks"
+                  :loading="loading"
+                  outlined
+                  label="Merge masks"
+                  hint="Merge small masks into larger ones."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
               </v-col>
               <v-col class="mw">
                 <v-switch

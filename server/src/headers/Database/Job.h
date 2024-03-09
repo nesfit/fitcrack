@@ -203,6 +203,7 @@ class CJob {
 
         virtual std::vector<Config::Ptr<CMask>> getMasks() const;
         void addMask(Config::Ptr<CMask> mask);
+        void removeMask(uint64_t id);
 
         virtual std::vector<Config::Ptr<CDictionary>> getDictionaries() const;
         virtual std::vector<Config::Ptr<CDictionary>> getRightDictionaries() const;
