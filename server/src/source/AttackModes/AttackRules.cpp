@@ -164,7 +164,7 @@ bool CAttackRules::makeWorkunit() {
         {
           Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
               "New rule split.\n");
-          file_descriptor.seekg(ptrDict->getCurrentPos());
+          file_descriptor.seekg(m_workunit->getSplitPos());
           std::getline(file_descriptor, password);
           if (!m_workunit->isDuplicated()) 
           {
@@ -175,10 +175,13 @@ bool CAttackRules::makeWorkunit() {
         {
           Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
               "Continuing with existing rule split.\n");
-          file_descriptor.seekg(m_job->getSplitDictPos());
+          file_descriptor.seekg(m_workunit->getSplitPos());
           std::getline(file_descriptor, password);
         }
         file_descriptor.close();
+
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                  "RuleIndex: %" PRIu64 ", RuleCount: %" PRIu64 ".\n", m_workunit->getStartIndex2(), m_workunit->getRuleCount());
 
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
               "Password: '%s'\n", password.c_str());
@@ -470,9 +473,15 @@ bool CAttackRules::generateWorkunit()
             "Generating dictionary workunit ...\n");
     uint64_t currentIndex = m_job->getCurrentIndex();
     uint64_t jobHcKeyspace = m_job->getHcKeyspace();
+    bool split = false;
     /** Check if the job isn't finished */
     if (currentIndex >= jobHcKeyspace)
-      return false;
+    {
+      if(m_job->getSplitRuleIndex() != 0)
+        split = true;
+      else
+        return false;
+    }
 
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess();
@@ -481,7 +490,6 @@ bool CAttackRules::generateWorkunit()
     uint64_t realPower;
     // Total number of rules in this job
     uint64_t totalRuleCount;
-    bool split = false;
 
     // Password count may be inaccurate
     if(passCount == m_seconds)
@@ -502,92 +510,103 @@ bool CAttackRules::generateWorkunit()
         }
     }
 
-    if (split || m_job->getDistributionMode() == 0) {
-      /** Load job dictionaries */
-      std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
-      Tools::printDebugHost(
-          Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-          "Dictionaries left for this job: %" PRIu64 "\n", dictVec.size());
-
-      /** Find the following dictionary */
-      PtrDictionary currentDict = FindCurrentDict(dictVec);
-
-      if (!currentDict) {
-        /** No dictionaries found, no workunit could be generated */
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
-                              m_host->getBoincHostId(),
-                              "No dictionaries found for this job\n");
-        return false;
-      }
-
-      uint64_t dictIndex = currentDict->getCurrentIndex();
-      uint64_t dictId = currentDict->getId();
+    if (split || m_job->getDistributionMode() == 0) 
+    {
+      uint64_t dictIndex = 0;
+      uint64_t dictId = 0;
       uint64_t splitRuleIndex = 0;
       uint64_t splitRuleCount = 0;
+      uint64_t splitPos = 0;
 
-      if(split)
+      PtrDictionary currentDict;
+
+      // Job already started splitting rules and contains unfinished password
+      if(split && m_job->getSplitRuleIndex() != 0)
       {
-        // Job already started splitting rules and contains unfinished password
-        if(m_job->getSplitRuleIndex() != 0) 
+        // Get starting rule index and number of rules remaining in rule file
+        splitRuleIndex = m_job->getSplitRuleIndex();
+        uint64_t remainingRules = totalRuleCount - splitRuleIndex;
+
+        // Cap the number of rules assigned to this split
+        splitRuleCount = (realPower * m_seconds > remainingRules) ? remainingRules : realPower * m_seconds; 
+
+        // Load dictionary id, index and split password dict position
+        dictId = m_job->getSplitDictId();
+        dictIndex = m_job->getSplitDictIndex();
+        splitPos = m_job->getSplitDictPos();
+
+        // Workunit finishes all rules for this passsword, reset job split_* values 
+        if(splitRuleCount == remainingRules)
         {
-            // Get starting rule index and number of rules remaining in rule file
-            splitRuleIndex = m_job->getSplitRuleIndex();
-            uint64_t remainingRules = totalRuleCount - splitRuleIndex;
-
-            // Cap the number of rules assigned to this split
-            splitRuleCount = (realPower * m_seconds > remainingRules) ? remainingRules : realPower * m_seconds; 
-
-            // Load dictionary id and index
-            dictId = m_job->getSplitDictId();
-            dictIndex = m_job->getSplitDictIndex();
-
-            // Workunit finishes all rules for this passsword, reset job split_* values 
-            if(splitRuleCount == remainingRules)
-            {
-              Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                  "Rule split complete.\n");
-              m_job->removeRuleSplit();
-            }
-            // Workunit continues with rule splitting, update rule index
-            else
-            {
-              Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                  "Rule split fragment, new ruleIndex value: %" PRIu64 "\n", splitRuleIndex + splitRuleCount);
-              m_job->updateRuleIndex(splitRuleIndex + splitRuleCount);
-            }
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Rule split complete.\n");
+          m_job->removeRuleSplit();
         }
-        // Create new rule split
+        // Workunit continues with rule splitting, update rule index
         else
         {
-            splitRuleIndex = 0;
-            
-            // Cap the number of rules assigned to this split
-            splitRuleCount = (realPower * m_seconds > totalRuleCount) ? totalRuleCount : realPower * m_seconds; 
-
-            // Create new rule split
-            m_job->createRuleSplit(currentDict->getId(), dictIndex, currentDict->getCurrentPos(), splitRuleCount);
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Rule split fragment, new ruleIndex value: %" PRIu64 "\n", splitRuleIndex + splitRuleCount);
+          m_job->updateRuleIndex(splitRuleIndex + splitRuleCount);
         }
       }
       else
       {
-        // No split - standard distribution 0 workunit
-        uint64_t dictHcKeyspace = currentDict->getHcKeyspace();
-        if (dictIndex + passCount > dictHcKeyspace) {
-          /** Host is too powerful for this mask, it will finish it */
-          passCount = dictHcKeyspace - dictIndex;
-          Tools::printDebugHost(
-              Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-              "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n",
-              passCount);
+        /** Load job dictionaries */
+        std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
+        Tools::printDebugHost(
+            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+            "Dictionaries left for this job: %" PRIu64 "\n", dictVec.size());
+
+        /** Find the following dictionary */
+        currentDict = FindCurrentDict(dictVec);
+
+        if (!currentDict) {
+          /** No dictionaries found, no workunit could be generated */
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                                m_host->getBoincHostId(),
+                                "No dictionaries found for this job\n");
+          return false;
+        }
+
+        dictIndex = currentDict->getCurrentIndex();
+        dictId = currentDict->getId();
+
+        // Create new rule split
+        if(split)
+        {
+          splitRuleIndex = 0;
+
+          splitPos = currentDict->getCurrentPos();
+          
+          // Cap the number of rules assigned to this split
+          splitRuleCount = (realPower * m_seconds > totalRuleCount) ? totalRuleCount : realPower * m_seconds; 
+
+          // Create new rule split
+          m_job->createRuleSplit(currentDict->getId(), dictIndex, splitPos, splitRuleCount);
+        }
+        else
+        {
+          // No split - standard distribution 0 workunit
+          uint64_t dictHcKeyspace = currentDict->getHcKeyspace();
+          if (dictIndex + passCount > dictHcKeyspace) {
+            /** Host is too powerful for this mask, it will finish it */
+            passCount = dictHcKeyspace - dictIndex;
+            Tools::printDebugHost(
+                Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n",
+                passCount);
+          }
         }
       }
 
       /** Create the workunit */
       m_workunit = CWorkunit::create(
           m_job->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex,
-          splitRuleIndex, passCount, 0, dictId, false, 0, false, splitRuleCount);
+          splitRuleIndex, passCount, 0, dictId, false, 0, false, splitRuleCount, splitPos);
       if (!m_workunit)
         return false;
+
       /** Update the job/dictionary index if current workunit does not continue with rule splitting */
       if(splitRuleIndex == 0)
       {

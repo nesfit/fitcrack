@@ -252,10 +252,10 @@ bool CSqlLoader::isJobTimeout(uint64_t jobId)
 void CSqlLoader::addNewWorkunit(PtrWorkunit workunit)
 {
     return updateSql(formatQuery("INSERT INTO `%s` (`job_id`,`workunit_id`,`host_id`, `boinc_host_id`, \
-`start_index`, `start_index_2`, `rule_count`, `hc_keyspace`, `mask_id`, `dictionary_id`, `duplicated`, `duplicate`, `retry`) VALUES ('%" PRIu64 "','%" PRIu64 "',\
-'%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%d', '%" PRIu64 "', '%d');",
+`start_index`, `start_index_2`, `rule_count`, `split_pos`, `hc_keyspace`, `mask_id`, `dictionary_id`, `duplicated`, `duplicate`, `retry`) VALUES ('%" PRIu64 "','%" PRIu64 "',\
+'%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%d', '%" PRIu64 "', '%d');",
                                  CWorkunit::getTableName().c_str(), workunit->getJobId(), workunit->getWorkunitId(), workunit->getHostId(),
-                                 workunit->getBoincHostId(), workunit->getStartIndex(), workunit->getStartIndex2(), workunit->getRuleCount(), workunit->getHcKeyspace(),
+                                 workunit->getBoincHostId(), workunit->getStartIndex(), workunit->getStartIndex2(), workunit->getRuleCount(), workunit->getSplitPos(), workunit->getHcKeyspace(),
                                  workunit->getMaskId(), workunit->getDictionaryId(), workunit->isDuplicated(), workunit->getDuplicate(),
                                  workunit->isRetry()));
 }

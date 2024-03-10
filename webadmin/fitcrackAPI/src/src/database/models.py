@@ -700,6 +700,7 @@ class FcWorkunit(Base):
     start_index = Column(BigInteger, nullable=False)
     start_index_2 = Column(BigInteger, nullable=False)
     rule_count = Column(BigInteger, nullable=False)
+    split_pos = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
     progress = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     speed = Column(BigInteger, nullable=False, server_default=text("'0'"))

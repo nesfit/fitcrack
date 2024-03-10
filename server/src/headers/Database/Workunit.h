@@ -33,7 +33,7 @@ class CWorkunit {
          */
         explicit CWorkunit(uint64_t &jobId, uint64_t &hostId, uint64_t &boincHostId, uint64_t &startIndex,
                            uint64_t &startIndex2, uint64_t &hcKeyspace, uint64_t &maskId, uint64_t &dictionaryId,
-                           bool &duplicated, uint64_t &duplicate, bool &retry, uint64_t &ruleCount);
+                           bool &duplicated, uint64_t &duplicate, bool &retry, uint64_t &ruleCount, uint64_t &splitPos);
 
     public:
         /** Default destructor */
@@ -54,7 +54,7 @@ class CWorkunit {
          */
         static PtrWorkunit create(uint64_t jobId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
                                   uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
-                                  bool duplicated, uint64_t duplicate, bool retry, uint64_t ruleCount = 0UL);
+                                  bool duplicated, uint64_t duplicate, bool retry, uint64_t ruleCount = 0UL, uint64_t splitPos = 0UL);
 
         /**
          * @brief Get the workunit SQL table name, usually fc_workunit
@@ -77,6 +77,7 @@ class CWorkunit {
         uint64_t m_startIndex;
         uint64_t m_startIndex2;
         uint64_t m_ruleCount;
+        uint64_t m_splitPos;
         uint64_t m_hcKeyspace;
         uint64_t m_maskId;
         uint64_t m_dictionaryId;
@@ -105,6 +106,7 @@ public:
         uint64_t getStartIndex() const;
         uint64_t getStartIndex2() const;
         uint64_t getRuleCount() const;
+        uint64_t getSplitPos() const;
         uint64_t getHcKeyspace() const;
         uint64_t getMaskId() const;
         uint64_t getDictionaryId() const;
