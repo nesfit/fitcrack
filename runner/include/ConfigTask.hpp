@@ -148,6 +148,7 @@ class ConfigTask {
         static const char *DICT1_KEYSPACE;
         static const char *MASK_INCREMENT_MIN;
         static const char *MASK_INCREMENT_MAX;
+        static const char *SLOW_CANDIDATES;
 };
 
 #endif // CONFIGTASK_HPP

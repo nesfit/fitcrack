@@ -25,6 +25,7 @@ const char *ConfigTask::HEX_DICT = "hex_dict";
 const char *ConfigTask::DICT1_KEYSPACE = "dict1_keyspace";
 const char *ConfigTask::MASK_INCREMENT_MIN = "mask_increment_min";
 const char *ConfigTask::MASK_INCREMENT_MAX = "mask_increment_max";
+const char *ConfigTask::SLOW_CANDIDATES = "slow_candidates";
 /* Private */
 
 void ConfigTask::convertLineToOption(std::string& line) {
@@ -83,6 +84,7 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::DICT1_KEYSPACE);
   supported_.push_back(ConfigTask::MASK_INCREMENT_MIN);
   supported_.push_back(ConfigTask::MASK_INCREMENT_MAX);
+  supported_.push_back(ConfigTask::SLOW_CANDIDATES);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

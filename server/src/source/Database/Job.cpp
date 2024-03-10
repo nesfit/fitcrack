@@ -48,6 +48,7 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
         this->m_generateRandomRules = std::stoul(jobMap["generate_random_rules"]);
         this->m_optimized = std::stoul(jobMap["optimized"]);
+        this->m_slowCandidates = std::stoul(jobMap["slow_candidates"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
 
         uint64_t minSeconds = m_sqlLoader->getAbsoluteMinimumWorkunitSeconds();
@@ -359,6 +360,11 @@ bool CJob::getCheckDuplicatesFlag() const
 bool CJob::getOptimizedFlag() const
 {
     return m_optimized;
+}
+
+bool CJob::getSlowCandidatesFlag() const
+{
+    return m_slowCandidates;
 }
 
 

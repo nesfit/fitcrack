@@ -33,6 +33,9 @@ void AttackCrackingBase::addSpecificArguments() {
   if (config_.find(ConfigTask::MASK_INCREMENT_MAX, value) && value != "0")
     addArgument("--increment-max=" + value);
 
+  if (config_.find(ConfigTask::SLOW_CANDIDATES, value) && value != "0")
+    addArgument("--slow-candidates");
+
   findAndAddOptional(ConfigTask::GENERATE_RANDOM_RULES, "--generate-rules");
   findAndAddOptional(ConfigTask::HWMON_TEMP_ABORT, "--hwmon-temp-abort");
 

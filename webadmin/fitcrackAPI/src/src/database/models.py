@@ -274,6 +274,7 @@ class FcJob(Base):
     max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     generate_random_rules = Column(Integer, nullable=False, server_default=text("'0'"))
     optimized = Column(Integer, nullable=False, server_default=text("'1'"))
+    slow_candidates = Column(Integer, nullable=False, server_default=text("'0'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)

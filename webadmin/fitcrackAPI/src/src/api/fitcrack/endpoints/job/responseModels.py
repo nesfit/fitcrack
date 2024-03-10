@@ -149,6 +149,7 @@ job_big_model = api.model('Job', {
     'max_elem_in_chain': fields.Integer(),
     'generate_random_rules': fields.Integer(),
     'optimized': fields.Boolean(),
+    'slow_candidates': fields.Boolean(),
     'hash_list_id': fields.Integer()
 })
 

@@ -47,6 +47,8 @@ export const empty = {
   minElemInChain: 1,
   maxElemInChain: 8,
   generateRandomRules: 0,
+  // rules
+  slowCandidates: false,
   // other
   optimized: true,
   startNow: true,
@@ -89,6 +91,8 @@ export default {
         'min_elem_in_chain': parseInt(state.minElemInChain),
         'max_elem_in_chain': parseInt(state.maxElemInChain),
         'generate_random_rules': parseInt(state.generateRandomRules),
+        // rules
+        'slow_candidates': state.slowCandidates,
          // other
         'optimized': Vue.prototype.$optimizedOnly ? true : state.optimized,
       }
