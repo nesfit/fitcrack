@@ -607,6 +607,15 @@ void CSqlLoader::addNewHosts(uint64_t jobId)
 
                 if(power > 0)
                 {
+                    // Job has rules, power in fc_host should be divided by rule count
+                    if(!job->getRules().empty())
+                    {
+                        uint64_t ruleCount = getRuleCount(job->getRulesId());
+                        power /= ruleCount;
+                        if(power == 0)
+                            power = 1;
+                    }
+                    
                     Tools::printDebug("there are some benchmarks, setting power to: %" PRIu64 "\n", power);
 
                     //update host power and status
