@@ -22,6 +22,7 @@ CWorkunit::CWorkunit(DbMap & workunitMap)
         this->m_startIndex = std::stoull(workunitMap["start_index"]);
         this->m_startIndex2 = std::stoull(workunitMap["start_index_2"]);
         this->m_ruleCount = std::stoull(workunitMap["rule_count"]);
+        this->m_splitPos = std::stoull(workunitMap["split_pos"]);
         this->m_hcKeyspace = std::stoull(workunitMap["hc_keyspace"]);
         this->m_maskId = std::stoull(workunitMap["mask_id"]);
         this->m_dictionaryId = std::stoull(workunitMap["dictionary_id"]);
@@ -42,7 +43,7 @@ CWorkunit::CWorkunit(DbMap & workunitMap)
 
 CWorkunit::CWorkunit(uint64_t &jobId, uint64_t &hostId, uint64_t &boincHostId, uint64_t &startIndex,
                      uint64_t &startIndex2, uint64_t &hcKeyspace, uint64_t &maskId, uint64_t &dictionaryId,
-                     bool &duplicated, uint64_t &duplicate, bool &retry, uint64_t &ruleCount)
+                     bool &duplicated, uint64_t &duplicate, bool &retry, uint64_t &ruleCount, uint64_t &splitPos)
 {
     this->m_id = 0;     /**< ID will be filled by BOINC*/
     this->m_jobId = jobId;
@@ -52,6 +53,7 @@ CWorkunit::CWorkunit(uint64_t &jobId, uint64_t &hostId, uint64_t &boincHostId, u
     this->m_startIndex = startIndex;
     this->m_startIndex2 = startIndex2;
     this->m_ruleCount = ruleCount;
+    this->m_splitPos = splitPos;
     this->m_hcKeyspace = hcKeyspace;
     this->m_maskId = maskId;
     this->m_dictionaryId = dictionaryId;
@@ -66,10 +68,10 @@ CWorkunit::CWorkunit(uint64_t &jobId, uint64_t &hostId, uint64_t &boincHostId, u
 
 PtrWorkunit CWorkunit::create(uint64_t jobId, uint64_t hostId, uint64_t boincHostId, uint64_t startIndex,
                               uint64_t startIndex2, uint64_t hcKeyspace, uint64_t maskId, uint64_t dictionaryId,
-                              bool duplicated, uint64_t duplicate, bool retry, uint64_t ruleCount)
+                              bool duplicated, uint64_t duplicate, bool retry, uint64_t ruleCount, uint64_t splitPos)
 {
     return PtrWorkunit(new CWorkunit(jobId, hostId, boincHostId, startIndex, startIndex2, hcKeyspace, maskId, dictionaryId,
-                           duplicated, duplicate, retry, ruleCount));
+                           duplicated, duplicate, retry, ruleCount, splitPos));
 }
 
 
@@ -136,6 +138,12 @@ uint64_t CWorkunit::getStartIndex2() const
 uint64_t CWorkunit::getRuleCount() const
 {
     return m_ruleCount;
+}
+
+
+uint64_t CWorkunit::getSplitPos() const
+{
+    return m_splitPos;
 }
 
 

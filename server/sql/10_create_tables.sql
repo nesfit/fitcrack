@@ -180,6 +180,7 @@ CREATE TABLE IF NOT EXISTS `fc_workunit` (
   `start_index` bigint(20) unsigned NOT NULL,
   `start_index_2` bigint(20) unsigned NOT NULL,
   `rule_count` bigint(20) unsigned NOT NULL,
+  `split_pos` bigint(20) unsigned NOT NULL,
   `hc_keyspace` bigint(20) unsigned NOT NULL,
   `progress` double NOT NULL DEFAULT '0',
   `speed` bigint(20) unsigned NOT NULL DEFAULT '0',
