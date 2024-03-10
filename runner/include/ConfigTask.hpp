@@ -146,6 +146,7 @@ class ConfigTask {
         static const char *DISTRIBUTION_MODE;
         static const char *HEX_DICT;
         static const char *DICT1_KEYSPACE;
+        static const char *SLOW_CANDIDATES;
 };
 
 #endif // CONFIGTASK_HPP

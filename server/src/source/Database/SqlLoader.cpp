@@ -141,6 +141,34 @@ Config::Ptr<CWorkunit> CSqlLoader::getEasiestRetry(uint64_t jobId)
 }
 
 
+uint64_t CSqlLoader::getRuleCount(uint64_t rulesId)
+{
+    return getSqlNumber(formatQuery("SELECT `count` FROM `%s` WHERE id = %" PRIu64 ";",
+                                    Config::tableNameRule.c_str(), rulesId));
+}
+
+
+void CSqlLoader::createRuleSplit(uint64_t jobId, uint64_t dictId, uint64_t dictIndex, uint64_t dictPos, uint64_t ruleIndex)
+{
+    updateSql(formatQuery("UPDATE `%s` SET split_dict_id = %" PRIu64 ", split_dict_index = %" PRIu64 ", split_dict_pos = %" PRIu64 ", split_rule_index = %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CJob::getTableName().c_str(), dictId, dictIndex, dictPos, ruleIndex, jobId));
+}
+
+
+void CSqlLoader::removeRuleSplit(uint64_t jobId)
+{
+    updateSql(formatQuery("UPDATE `%s` SET split_dict_id = 0, split_dict_index = 0, split_dict_pos = 0, split_rule_index = 0 WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CJob::getTableName().c_str(), jobId));
+}
+
+
+void CSqlLoader::updateRuleIndex(uint64_t jobId, uint64_t newRuleIndex)
+{
+    updateSql(formatQuery("UPDATE `%s` SET split_rule_index = %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CJob::getTableName().c_str(), newRuleIndex, jobId));
+}
+
+
 void CSqlLoader::updateHostStatus(uint64_t hostId, uint32_t newStatus)
 {
     return updateSql(formatQuery("UPDATE `%s` SET status = %" PRIu32 " WHERE id = %" PRIu64 " LIMIT 1;",
@@ -205,10 +233,10 @@ bool CSqlLoader::isJobTimeout(uint64_t jobId)
 void CSqlLoader::addNewWorkunit(PtrWorkunit workunit)
 {
     return updateSql(formatQuery("INSERT INTO `%s` (`job_id`,`workunit_id`,`host_id`, `boinc_host_id`, \
-`start_index`, `start_index_2`, `hc_keyspace`, `mask_id`, `dictionary_id`, `duplicated`, `duplicate`, `retry`) VALUES ('%" PRIu64 "','%" PRIu64 "',\
-'%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%d', '%" PRIu64 "', '%d');",
+`start_index`, `start_index_2`, `rule_count`, `hc_keyspace`, `mask_id`, `dictionary_id`, `duplicated`, `duplicate`, `retry`) VALUES ('%" PRIu64 "','%" PRIu64 "',\
+'%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%d', '%" PRIu64 "', '%d');",
                                  CWorkunit::getTableName().c_str(), workunit->getJobId(), workunit->getWorkunitId(), workunit->getHostId(),
-                                 workunit->getBoincHostId(), workunit->getStartIndex(), workunit->getStartIndex2(), workunit->getHcKeyspace(),
+                                 workunit->getBoincHostId(), workunit->getStartIndex(), workunit->getStartIndex2(), workunit->getRuleCount(), workunit->getHcKeyspace(),
                                  workunit->getMaskId(), workunit->getDictionaryId(), workunit->isDuplicated(), workunit->getDuplicate(),
                                  workunit->isRetry()));
 }
@@ -519,6 +547,14 @@ void CSqlLoader::killJob(PtrJob &job)
 
     Tools::printDebugJob(Config::DebugType::Log, jobId,
                          "Job killed successfully!\n");
+}
+
+
+uint64_t CSqlLoader::getLatestBenchmarkPower(uint64_t hostId, uint32_t attack_mode, uint32_t hash_type)
+{
+    return getSqlNumber(formatQuery("SELECT `power` FROM `%s` WHERE boinc_host_id = %" PRIu64 " AND attack_mode = %" PRIu32 " AND hash_type = %" PRIu32 " AND \
+        NOT EXISTS (SELECT * FROM `%s` AS temp WHERE boinc_host_id = %" PRIu64 " AND attack_mode = %" PRIu32 " AND hash_type = %" PRIu32 " AND temp.last_update > %s.last_update);",
+        Config::tableNameBenchmark.c_str(), hostId, attack_mode, hash_type, Config::tableNameBenchmark.c_str(), hostId, attack_mode, hash_type, Config::tableNameBenchmark.c_str()));
 }
 
 

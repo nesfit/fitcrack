@@ -91,6 +91,7 @@ std::string mysql_table_settings =      "fc_settings";
 std::string mysql_table_benchmark =     "fc_benchmark";
 std::string mysql_table_hash =          "fc_hash";
 std::string mysql_table_hash_list =     "fc_hash_list";
+std::string mysql_table_rule =          "fc_rule";
 
 template <typename T> T convert_str_to_number(const char *str) {
   T num;
@@ -788,6 +789,11 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
             std::snprintf(buf, SQL_BUF_SIZE, "SELECT power FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_host.c_str(), host_id);
             uint64_t old_power = get_num_from_mysql(buf);
 
+            std::snprintf(buf, SQL_BUF_SIZE, "SELECT start_index_2 FROM `%s` WHERE workunit_id = %lu LIMIT 1;", mysql_table_workunit.c_str(), wu.id);
+            uint64_t split_rule_index = get_num_from_mysql(buf);
+            std::snprintf(buf, SQL_BUF_SIZE, "SELECT rule_count FROM `%s` WHERE workunit_id = %lu LIMIT 1;", mysql_table_workunit.c_str(), wu.id);
+            uint64_t split_rule_count = get_num_from_mysql(buf);
+
             /** SOME of the passwords FOUND */
             if (code == 0)
             {
@@ -911,8 +917,29 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                 else
                 {
                     // Update job progress
-                    std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET indexes_verified = indexes_verified + %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), hc_keyspace, job_id);
-                    update_mysql(buf);
+                    // Workunit without rule splitting
+                    if(split_rule_count == 0)
+                    {
+                        std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET indexes_verified = indexes_verified + %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), hc_keyspace, job_id);
+                        update_mysql(buf);
+                    }
+                    // Workunit with rule splitting
+                    // Progress is updated only when the split is finished (+ 1 verified index)
+                    else
+                    {
+                        // Get rule count
+                        std::snprintf(buf, SQL_BUF_SIZE, "SELECT rules_id FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
+                        uint64_t rulesId = get_num_from_mysql(buf);
+                        std::snprintf(buf, SQL_BUF_SIZE, "SELECT count FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_rule.c_str(), rulesId);
+                        uint64_t ruleCount = get_num_from_mysql(buf);
+
+                        // Update progress if finished
+                        if(split_rule_index + split_rule_count == ruleCount)
+                        {
+                            std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET indexes_verified = indexes_verified + %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), hc_keyspace, job_id);
+                            update_mysql(buf);
+                        }
+                    }
 
                     /** Update the host power, if workunit was large enough (more then 1/2 benchmarked power) */
                     if (power_keyspace > (0.5 * seconds_per_workunit * old_power))
@@ -952,9 +979,29 @@ int assimilate_handler(WORKUNIT& wu, vector<RESULT>& /*results*/, RESULT& canoni
                     std::cerr << __LINE__ << " - WARNING: Was NOT able to read cracking_time of a workunit, not updating power" << std::endl;
 
                 // Update job progress
-                std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET indexes_verified = indexes_verified + %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), hc_keyspace, job_id);
-                update_mysql(buf);
+                // Workunit without rule splitting
+                if(split_rule_count == 0)
+                {
+                    std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET indexes_verified = indexes_verified + %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), hc_keyspace, job_id);
+                    update_mysql(buf);
+                }
+                // Workunit with rule splitting
+                // Progress is updated only when the split is finished (+ 1 verified index)
+                else
+                {
+                    // Get rule count
+                    std::snprintf(buf, SQL_BUF_SIZE, "SELECT rules_id FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), job_id);
+                    uint64_t rulesId = get_num_from_mysql(buf);
+                    std::snprintf(buf, SQL_BUF_SIZE, "SELECT count FROM `%s` WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_rule.c_str(), rulesId);
+                    uint64_t ruleCount = get_num_from_mysql(buf);
 
+                    // Update progress if finished
+                    if(split_rule_index + split_rule_count == ruleCount)
+                    {
+                        std::snprintf(buf, SQL_BUF_SIZE, "UPDATE `%s` SET indexes_verified = indexes_verified + %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;", mysql_table_job.c_str(), hc_keyspace, job_id);
+                        update_mysql(buf);
+                    }
+                }
             }
 
             /** Host error */

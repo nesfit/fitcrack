@@ -35,19 +35,32 @@ bool CAttackRules::makeWorkunit() {
     const char *infiles[4];
     int retval;
 
+    // Check if workunit contains split rules
+    bool split = (m_workunit->getRuleCount() != 0);
+
     /** Make a unique name for the workunit and its input file */
     std::snprintf(name1, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
     std::snprintf(name2, Config::SQL_BUF_SIZE, "%s_%d_%d", Config::appName, Config::startTime, Config::seqNo++);
 
-    if (m_job->getDistributionMode() == 0)
+    // Dictionary name is unique if fragmented on server or if workunit contains split rules
+    if (split || m_job->getDistributionMode() == 0)
       std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_%d_%d.dict",
                     Config::appName, Config::startTime, Config::seqNo++);
     else if (m_job->getDistributionMode() == 1)
       std::snprintf(name3, Config::SQL_BUF_SIZE, "%s_dict_%" PRIu64 "",
                     Config::appName, m_job->getId());
 
-    /** Same name of rules file - for sticky flag to work */
-    std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId());
+    // Rule filename must be unique for split rules
+    if(split)
+    {
+      std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_%d_%d.rule",
+                    Config::appName, Config::startTime, Config::seqNo++);
+    }
+    else
+    {
+      /** Same name of rules file - for sticky flag to work */
+      std::snprintf(name4, Config::SQL_BUF_SIZE, "%s_rules_%" PRIu64 "", Config::appName, m_job->getId());
+    }
 
     /** Append mode to config */
     retval = config.download_path(name1, path);
@@ -73,7 +86,13 @@ bool CAttackRules::makeWorkunit() {
                              m_job->getDistributionMode(), m_job->getName(),
                              m_job->getHashType(), 0, m_job->getHWTempAbort(), m_job->getOptimizedFlag());
 
-    if (m_job->getDistributionMode() == 0) {
+    // Single password with large number of rules must use slow candidates mode for optimal speed
+    if(split)
+    {
+      configFile << "|||slow_candidates|BigUInt|1|1|||\n";
+    }
+
+    if (split || m_job->getDistributionMode() == 0) {
       // Number of passwords in the sent dictionary (the dictionary fragment).
       std::string dict1Keyspace = std::to_string(m_workunit->getHcKeyspace());
       configFile << "|||dict1_keyspace|BigUInt|" << dict1Keyspace.size()
@@ -127,7 +146,62 @@ bool CAttackRules::makeWorkunit() {
 
     try
     {
-      if (m_job->getDistributionMode() == 0) {
+      if(split)
+      {
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Creating dictionary fragment with 1 password.\n");
+
+        // Open dictionary containing the password
+        uint64_t dictId = m_workunit->getDictionaryId();
+        PtrDictionary ptrDict = m_sqlLoader->loadDictionary(dictId);
+        std::string dictPath = Config::dictDir + ptrDict->getDictFileName();
+        std::ifstream file_descriptor(dictPath);
+
+        std::string password;
+
+        // Get the password
+        if(m_workunit->getStartIndex2() == 0)
+        {
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "New rule split.\n");
+          file_descriptor.seekg(ptrDict->getCurrentPos());
+          std::getline(file_descriptor, password);
+          if (!m_workunit->isDuplicated()) 
+          {
+            ptrDict->updatePos(file_descriptor.tellg());
+          }
+        }
+        else
+        {
+          Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Continuing with existing rule split.\n");
+          file_descriptor.seekg(m_job->getSplitDictPos());
+          std::getline(file_descriptor, password);
+        }
+        file_descriptor.close();
+
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Password: '%s'\n", password.c_str());
+        
+        // Create dictionary fragment containing the password
+        std::ofstream dictFile;
+        dictFile.open(path);
+        if (!dictFile.is_open()) {
+          Tools::printDebugHost(Config::DebugType::Error, m_job->getId(),
+                                m_host->getBoincHostId(),
+                                "Failed to open dict1 BOINC input file!"
+                                "Setting job to malformed.\n");
+          m_sqlLoader->updateRunningJobStatus(m_job->getId(),
+                                              Config::JobState::JobMalformed);
+          return false;
+        }
+        dictFile << password << '\n';
+        dictFile.close();
+        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
+                              m_host->getBoincHostId(),
+                              "Workunit dictionary prepared.\n");
+      }
+      else if (m_job->getDistributionMode() == 0) {
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(),
                               m_host->getBoincHostId(),
                               "Creating dictionary fragment\n");
@@ -304,7 +378,39 @@ bool CAttackRules::makeWorkunit() {
             return false;
         }
 
-        rulesFile << rules.rdbuf();
+        // Copy part of the rules
+        if(split)
+        {
+          uint64_t splitStart = m_workunit->getStartIndex2();
+          uint64_t splitEnd = splitStart + m_workunit->getRuleCount();
+
+          std::string line;
+          uint64_t lineCount = 0;
+          while (std::getline(rules, line)) 
+          {
+              if(lineCount < splitStart)
+              {
+                lineCount++;
+                continue;
+              }
+
+              if(lineCount < splitEnd)
+              {
+                rulesFile << line << '\n';
+                lineCount++;
+              }
+              else
+              {
+                break;
+              }
+          }
+        }
+        // Copy all the rules
+        else
+        {
+          rulesFile << rules.rdbuf();
+        }
+
         rulesFile.close();
     }
 
@@ -321,11 +427,17 @@ bool CAttackRules::makeWorkunit() {
 
     setDefaultWorkunitParams(&wu);
 
+    char * templatePath;
+    if(split)
+      templatePath = Config::inTemplatePathRuleSplit;
+    else
+      templatePath = (m_job->getDistributionMode() == 0) ? Config::inTemplatePathRule : Config::inTemplatePathRuleAlt;
+
     /** Register the workunit with BOINC */
     std::snprintf(path, Config::SQL_BUF_SIZE, "templates/%s", Config::outTemplateFile.c_str());
     retval = create_work(
             wu,
-            m_job->getDistributionMode() == 0 ? Config::inTemplatePathRule : Config::inTemplatePathRuleAlt,
+            templatePath,
             path,
             config.project_path(path),
             infiles,
@@ -365,14 +477,32 @@ bool CAttackRules::generateWorkunit()
     /** Compute password count */
     uint64_t passCount = getPasswordCountToProcess();
 
-    if (passCount < getMinPassCount())
+    // Real host power, taken from the last benchmark
+    uint64_t realPower;
+    // Total number of rules in this job
+    uint64_t totalRuleCount;
+    bool split = false;
+
+    // Password count may be inaccurate
+    if(passCount == m_seconds)
     {
-        Tools::printDebugHost(Config::DebugType::Warn, m_job->getId(), m_host->getBoincHostId(),
-                "Passcount is too small! Falling back to minimum passwords\n");
-        passCount = getMinPassCount();
+        realPower = m_sqlLoader->getLatestBenchmarkPower(m_host->getBoincHostId(), m_job->getAttackMode(), m_job->getHashType());
+        totalRuleCount = m_sqlLoader->getRuleCount(m_job->getRulesId());
+
+        // Split rules if the host is not able to complete a single password in m_seconds
+        if(realPower * m_seconds < totalRuleCount)
+        {
+          split = true;
+          passCount = 1;
+        }
+        // Recalculate password count
+        else
+        {
+          passCount = (realPower * m_seconds) / totalRuleCount;
+        }
     }
 
-    if (m_job->getDistributionMode() == 0) {
+    if (split || m_job->getDistributionMode() == 0) {
       /** Load job dictionaries */
       std::vector<PtrDictionary> dictVec = m_job->getDictionaries();
       Tools::printDebugHost(
@@ -391,25 +521,79 @@ bool CAttackRules::generateWorkunit()
       }
 
       uint64_t dictIndex = currentDict->getCurrentIndex();
-      uint64_t dictHcKeyspace = currentDict->getHcKeyspace();
-      if (dictIndex + passCount > dictHcKeyspace) {
-        /** Host is too powerful for this mask, it will finish it */
-        passCount = dictHcKeyspace - dictIndex;
-        Tools::printDebugHost(
-            Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-            "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n",
-            passCount);
+      uint64_t dictId = currentDict->getId();
+      uint64_t splitRuleIndex = 0;
+      uint64_t splitRuleCount = 0;
+
+      if(split)
+      {
+        // Job already started splitting rules and contains unfinished password
+        if(m_job->getSplitRuleIndex() != 0) 
+        {
+            // Get starting rule index and number of rules remaining in rule file
+            splitRuleIndex = m_job->getSplitRuleIndex();
+            uint64_t remainingRules = totalRuleCount - splitRuleIndex;
+
+            // Cap the number of rules assigned to this split
+            splitRuleCount = (realPower * m_seconds > remainingRules) ? remainingRules : realPower * m_seconds; 
+
+            // Load dictionary id and index
+            dictId = m_job->getSplitDictId();
+            dictIndex = m_job->getSplitDictIndex();
+
+            // Workunit finishes all rules for this passsword, reset job split_* values 
+            if(splitRuleCount == remainingRules)
+            {
+              Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                  "Rule split complete.\n");
+              m_job->removeRuleSplit();
+            }
+            // Workunit continues with rule splitting, update rule index
+            else
+            {
+              Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                  "Rule split fragment, new ruleIndex value: %" PRIu64 "\n", splitRuleIndex + splitRuleCount);
+              m_job->updateRuleIndex(splitRuleIndex + splitRuleCount);
+            }
+        }
+        // Create new rule split
+        else
+        {
+            splitRuleIndex = 0;
+            
+            // Cap the number of rules assigned to this split
+            splitRuleCount = (realPower * m_seconds > totalRuleCount) ? totalRuleCount : realPower * m_seconds; 
+
+            // Create new rule split
+            m_job->createRuleSplit(currentDict->getId(), dictIndex, currentDict->getCurrentPos(), splitRuleCount);
+        }
+      }
+      else
+      {
+        // No split - standard distribution 0 workunit
+        uint64_t dictHcKeyspace = currentDict->getHcKeyspace();
+        if (dictIndex + passCount > dictHcKeyspace) {
+          /** Host is too powerful for this mask, it will finish it */
+          passCount = dictHcKeyspace - dictIndex;
+          Tools::printDebugHost(
+              Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+              "Adjusting #passwords, dictionary too small, new #: %" PRIu64 "\n",
+              passCount);
+        }
       }
 
       /** Create the workunit */
       m_workunit = CWorkunit::create(
           m_job->getId(), m_host->getId(), m_host->getBoincHostId(), dictIndex,
-          0, passCount, 0, currentDict->getId(), false, 0, false);
+          splitRuleIndex, passCount, 0, dictId, false, 0, false, splitRuleCount);
       if (!m_workunit)
         return false;
-      /** Update the job/dictionary index */
-      m_job->updateIndex(currentIndex + passCount);
-      currentDict->updateIndex(dictIndex + passCount);
+      /** Update the job/dictionary index if current workunit does not continue with rule splitting */
+      if(splitRuleIndex == 0)
+      {
+        m_job->updateIndex(currentIndex + passCount);
+        currentDict->updateIndex(dictIndex + passCount);
+      }
     } else if (m_job->getDistributionMode() == 1) {
       /** Adjust password count */
       if (currentIndex + passCount > jobHcKeyspace)

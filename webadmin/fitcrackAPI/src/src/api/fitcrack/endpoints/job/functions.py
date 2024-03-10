@@ -51,6 +51,10 @@ def kill_job(job:FcJob, db):
     job.indexes_verified = 0
     job.current_index = 0
     job.current_index_2 = 0
+    job.split_dict_id = 0
+    job.split_dict_index = 0
+    job.split_dict_pos = 0
+    job.split_rule_index = 0
     job.workunit_sum_time = 0
     job.time_start = job.time_end = None
     if job.attack_mode == attack_modes['mask'] or job.attack_mode == attack_modes['hybrid (wordlist + mask)']:
@@ -140,6 +144,7 @@ def create_job(data):
         charset3=job['charset3'] if job.get('charset3') else '',
         charset4=job['charset4'] if job.get('charset4') else '',
         rules=(job['attack_settings']['rules']['name'] if job.get('rules') else None),
+        rules_id=(job['attack_settings']['rules']['id'] if job.get('rules') else None),
         rule_left=(job['attack_settings']['rule_left'] if job['attack_settings'].get('rule_left') else ''),
         rule_right=(job['attack_settings']['rule_right'] if job['attack_settings'].get('rule_right') else ''),
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',

@@ -107,6 +107,36 @@ class CSqlLoader {
         Config::Ptr<CWorkunit> getEasiestRetry(uint64_t jobId);
 
         /**
+         * @brief Return number of rules in a rule file
+         * @param rulesId [in] id of the rule file
+         * @return Number of rules in the specified file
+         */
+        uint64_t getRuleCount(uint64_t rulesId);
+
+        /**
+         * @brief Start splitting rules for a single password in a job
+         * @param jobId [in] id of the job
+         * @param dictId [in] id of the password dictionary
+         * @param dictIndex [in] password index in the dictionary
+         * @param dictPos [in] password position in the dictionary
+         * @param ruleIndex [in] current rule index
+         */
+        void createRuleSplit(uint64_t jobId, uint64_t dictId, uint64_t dictIndex, uint64_t dictPos, uint64_t ruleIndex);
+
+        /**
+         * @brief Stop splitting rules in a job
+         * @param jobId [in] id of the job
+         */
+        void removeRuleSplit(uint64_t jobId);
+
+        /**
+         * @brief Update rule index in a job
+         * @param jobId [in] id of the job
+         * @param newRuleIndex [in] New rule index of this job
+         */
+        void updateRuleIndex(uint64_t jobId, uint64_t newRuleIndex);
+
+        /**
          * @brief Updates status of a host in fc_host table
          * @param hostId [in] Host ID which status we are updating
          * @param newStatus [in] New status of this host
@@ -317,6 +347,15 @@ class CSqlLoader {
         * @param job Pointer to the job
         */
         void killJob(Config::Ptr<CJob> &job);
+
+        /**
+         * @brief Return power of the last benchmark of a specified host, attack mode and hash type
+         * @param hostId [in] host ID used for filtering
+         * @param attack_mode [in] attack mode code used for filtering
+         * @param hash_type [in] hash type used for filtering
+         * @return Benchmarked power
+         */
+        uint64_t getLatestBenchmarkPower(uint64_t hostId, uint32_t attack_mode, uint32_t hash_type);
 
 private:
 
