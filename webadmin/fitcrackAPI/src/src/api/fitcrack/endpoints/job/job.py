@@ -382,6 +382,10 @@ class OperationWithJob(Resource):
             job.indexes_verified = 0
             job.current_index = 0
             job.current_index_2 = 0
+            job.split_dict_id = 0
+            job.split_dict_index = 0
+            job.split_dict_pos = 0
+            job.split_rule_index = 0
             job.workunit_sum_time = 0
             job.time_start = None
             job.time_end = None

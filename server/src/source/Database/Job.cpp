@@ -30,6 +30,8 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_name = jobMap["name"];
         this->m_secondsPerWorkunit = std::stoull(jobMap["seconds_per_workunit"]);
         this->m_rules = jobMap["rules"];
+        if (!jobMap["rules_id"].empty())
+            this->m_rules_id = std::stoull(jobMap["rules_id"]);
         this->m_ruleLeft = jobMap["rule_left"];
         this->m_ruleRight = jobMap["rule_right"];
         this->m_charset1 = jobMap["charset1"];
@@ -47,6 +49,10 @@ CJob::CJob(DbMap &jobMap, CSqlLoader * sqlLoader)
         this->m_minElemInChain = std::stoul(jobMap["min_elem_in_chain"]);
         this->m_maxElemInChain = std::stoul(jobMap["max_elem_in_chain"]);
         this->m_generateRandomRules = std::stoul(jobMap["generate_random_rules"]);
+        this->m_splitDictId = std::stoul(jobMap["split_dict_id"]);
+        this->m_splitDictIndex = std::stoul(jobMap["split_dict_index"]);
+        this->m_splitDictPos = std::stoul(jobMap["split_dict_pos"]);
+        this->m_splitRuleIndex = std::stoul(jobMap["split_rule_index"]);
         this->m_optimized = std::stoul(jobMap["optimized"]);
         this->m_slowCandidates = std::stoul(jobMap["slow_candidates"]);
         this->m_killFlag = std::stoul(jobMap["kill"]) != 0;
@@ -309,6 +315,12 @@ const std::string & CJob::getRules() const
 }
 
 
+uint64_t CJob::getRulesId() const
+{
+    return m_rules_id;
+}
+
+
 const std::string & CJob::getRuleLeft() const
 {
     return m_ruleLeft;
@@ -513,4 +525,57 @@ uint32_t CJob::getMinElemInChain() const
 uint32_t CJob::getMaxElemInChain() const
 {
     return m_maxElemInChain;
+}
+
+
+void CJob::createRuleSplit(uint64_t dictId, uint64_t dictIndex, uint64_t dictPos, uint64_t ruleIndex)
+{
+    this->m_splitDictId = dictId;
+    this->m_splitDictIndex = dictIndex;
+    this->m_splitDictPos = dictPos;
+    this->m_splitRuleIndex = ruleIndex;
+
+    m_sqlLoader->createRuleSplit(m_id, dictId, dictIndex, dictPos, ruleIndex);
+}
+
+
+void CJob::removeRuleSplit()
+{
+    this->m_splitDictId = 0;
+    this->m_splitDictIndex = 0;
+    this->m_splitDictPos = 0;
+    this->m_splitRuleIndex = 0;
+
+    m_sqlLoader->removeRuleSplit(m_id);
+}
+
+
+void CJob::updateRuleIndex(uint64_t newRuleIndex)
+{
+    this->m_splitRuleIndex = newRuleIndex;
+
+    m_sqlLoader->updateRuleIndex(m_id, newRuleIndex);
+}
+
+
+uint64_t CJob::getSplitDictId() const
+{
+    return m_splitDictId;
+}
+
+uint64_t CJob::getSplitDictIndex() const
+{
+    return m_splitDictIndex;
+}
+
+
+uint64_t CJob::getSplitDictPos() const
+{
+    return m_splitDictPos;
+}
+
+
+uint64_t CJob::getSplitRuleIndex() const
+{
+    return m_splitRuleIndex;
 }

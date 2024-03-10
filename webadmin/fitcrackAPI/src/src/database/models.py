@@ -261,6 +261,7 @@ class FcJob(Base):
     charset3 = Column(String(4096, 'utf8_bin'))
     charset4 = Column(String(4096, 'utf8_bin'))
     rules = Column(String(100, 'utf8_bin'), ForeignKey('fc_rule.name'))
+    rules_id = Column(BigInteger, ForeignKey('fc_rule.id'))
     rule_left = Column(String(255, 'utf8_bin'))
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
@@ -273,6 +274,10 @@ class FcJob(Base):
     min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
     max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     generate_random_rules = Column(Integer, nullable=False, server_default=text("'0'"))
+    split_dict_id = Column(BigInteger, ForeignKey('fc_job_dictionary.id'), nullable=False, server_default=text("'0'"))
+    split_dict_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    split_dict_pos = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    split_rule_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
     optimized = Column(Integer, nullable=False, server_default=text("'1'"))
     slow_candidates = Column(Integer, nullable=False, server_default=text("'0'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
@@ -694,6 +699,7 @@ class FcWorkunit(Base):
     boinc_host_id = Column(Integer, ForeignKey('host.id'), nullable=False)
     start_index = Column(BigInteger, nullable=False)
     start_index_2 = Column(BigInteger, nullable=False)
+    rule_count = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
     progress = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     speed = Column(BigInteger, nullable=False, server_default=text("'0'"))
@@ -721,7 +727,10 @@ class FcWorkunit(Base):
             return self.hc_keyspace * rules if rules else self.hc_keyspace
         else:
             if self.job.rulesFile:
-                return self.hc_keyspace * self.job.rulesFile.count
+                if self.rule_count > 0:
+                    return self.rule_count
+                else:
+                    return self.hc_keyspace * self.job.rulesFile.count
             return self.hc_keyspace
 
     @hybrid_property
@@ -738,7 +747,10 @@ class FcWorkunit(Base):
                 return self.start_index * rules if rules else self.start_index
             else:
                 if self.job.rulesFile:
-                    return self.start_index * self.job.rulesFile.count
+                    if self.rule_count > 0:
+                        return self.start_index * self.job.rulesFile.count + self.start_index_2
+                    else:
+                        return self.start_index * self.job.rulesFile.count
                 return self.start_index
 
     def as_graph(self):
