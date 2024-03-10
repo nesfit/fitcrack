@@ -355,6 +355,10 @@ class FcJob(Base):
                 # Job is running
                 total_time += (now - last_run_time).total_seconds()
 
+                # Make sure the job is not finished already (restart bug)
+                if(self.status < 10):
+                    return (self.time_end - self.time_start).total_seconds()
+
             return total_time
 
     @hybrid_property
@@ -551,6 +555,7 @@ class FcSetting(Base):
     auto_add_hosts_to_running_jobs = Column(Integer, nullable=False, server_default=text("'0'"))
     skip_benchmark = Column(Integer, nullable=False, server_default=text("'0'"))
     merge_masks = Column(Integer, nullable=False, server_default=text("'1'"))
+    update_hashes = Column(Integer, nullable=False, server_default=text("'1'"))
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'

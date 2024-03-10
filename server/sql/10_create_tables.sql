@@ -492,6 +492,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `auto_add_hosts_to_running_jobs` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `skip_benchmark` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `merge_masks` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `update_hashes` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

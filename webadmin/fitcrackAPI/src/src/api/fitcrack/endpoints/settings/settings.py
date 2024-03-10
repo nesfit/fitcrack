@@ -49,6 +49,7 @@ class settings(Resource):
         aahtrj = args['auto_add_hosts_to_running_jobs']
         sb = args['skip_benchmark']
         mm = args['merge_masks']
+        uh = args['update_hashes']
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
@@ -63,6 +64,7 @@ class settings(Resource):
         if (aahtrj is not None): settings.auto_add_hosts_to_running_jobs = aahtrj
         if (sb is not None): settings.skip_benchmark = sb
         if (mm is not None): settings.merge_masks = mm
+        if (uh is not None): settings.update_hashes = uh
         db.session.commit()
 
         return {

@@ -20,4 +20,5 @@ settings_model = api.model('Settings', {
     'auto_add_hosts_to_running_jobs': fields.Boolean(),
     'skip_benchmark': fields.Boolean(),
     'merge_masks': fields.Boolean(),
+    'update_hashes': fields.Boolean(),
 })
