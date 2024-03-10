@@ -121,6 +121,29 @@ class CSqlLoader {
         void updateMaskIndex(uint64_t maskId, uint64_t newIndex);
 
         /**
+         * @brief Updates mask in the fc_mask table
+         * @param maskId [in] ID of fc_mask entry
+         * @param newMask [in] New mask string
+         * @param newKeyspace [in] New real keyspace
+         * @param newHcKeyspace [in] New hashcat keyspace
+         * @param incrementMin [in] New increment min size
+         * @param incrementMax [in] New increment max size
+         */
+        void updateMask(uint64_t maskId, std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax);
+
+        /**
+         * @brief Removes mask from fc_mask table
+         * @param maskId [in] ID of fc_mask entry
+         */
+        void removeMask(uint64_t id);
+
+        /**
+         * @brief Get current mask merge setting
+         * @return True if mask merging is enabled, False otherwise
+         */
+        bool getEnableMergeMasks();
+
+        /**
          * @brief Updates current_index of fc_job_dictionary entry
          * @param dictId [in] ID of job_dictionary entry
          * @param newIndex [in] New index value

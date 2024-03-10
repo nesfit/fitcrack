@@ -86,7 +86,7 @@
                   v-model="settings.skip_benchmark"
                   :loading="loading"
                   outlined
-                  label="Skip benchmark-f"
+                  label="Skip benchmark"
                   hint="Do not benchmark already benchmarked hosts."
                   persistent-hint
                   class="mb-4 mt-0"
@@ -108,6 +108,15 @@
                   outlined
                   label="Fully benchmark new hosts"
                   hint="Run a complete first-time benchmark on new hosts connected to the system."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
+                <v-switch
+                  v-model="settings.merge_masks"
+                  :loading="loading"
+                  outlined
+                  label="Merge masks"
+                  hint="Merge small masks into larger ones."
                   persistent-hint
                   class="mb-4 mt-0"
                 />

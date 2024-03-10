@@ -155,6 +155,25 @@ void CSqlLoader::updateMaskIndex(uint64_t maskId, uint64_t newIndex)
 }
 
 
+void CSqlLoader::updateMask(uint64_t maskId, std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax)
+{
+    updateSql(formatQuery("UPDATE `%s` SET mask = '%s', keyspace = %" PRIu64 ", hc_keyspace = %" PRIu64 ", increment_min = %" PRIu64 ", increment_max = %" PRIu64 " WHERE id = %" PRIu64 " ;",
+                                 CMask::getTableName().c_str(), newMask.c_str(), newKeyspace, newHcKeyspace, incrementMin, incrementMax, maskId));
+}
+
+void CSqlLoader::removeMask(uint64_t id)
+{
+    updateSql(formatQuery("DELETE FROM `%s` WHERE id = %" PRIu64 " ; ",
+                            CMask::getTableName().c_str(), id));
+}
+
+bool CSqlLoader::getEnableMergeMasks()
+{
+    return getSqlNumber(formatQuery("SELECT merge_masks FROM `%s` LIMIT 1",
+                                    Config::tableNameSettings.c_str()));
+}
+
+
 void CSqlLoader::updateDictionaryIndex(uint64_t dictId, uint64_t newIndex)
 {
     return updateSql(formatQuery("UPDATE `%s` SET current_index = %" PRIu64 " WHERE id = %" PRIu64 " ;",

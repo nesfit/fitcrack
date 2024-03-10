@@ -2,8 +2,8 @@
 -- Insert default settings row
 --
 
-INSERT INTO `fc_settings` (`default_seconds_per_workunit`, `workunit_timeout_factor`, `hwmon_temp_abort`, `bench_all`, `distribution_coefficient_alpha`, `t_pmin`, `ramp_up_workunits`, `ramp_down_coefficient`, `verify_hash_format`, `auto_add_hosts_to_running_jobs`, `skip_benchmark`) VALUES
-(3600, 48, 90, 0, 0.1, 20, 0, 0.25, 1, 0, 0);
+INSERT INTO `fc_settings` (`default_seconds_per_workunit`, `workunit_timeout_factor`, `hwmon_temp_abort`, `bench_all`, `distribution_coefficient_alpha`, `t_pmin`, `ramp_up_workunits`, `ramp_down_coefficient`, `verify_hash_format`, `auto_add_hosts_to_running_jobs`, `skip_benchmark`, `merge_masks`) VALUES
+(3600, 48, 90, 0, 0.1, 20, 0, 0.25, 1, 0, 0, 1);
 
 
 --
@@ -6583,15 +6583,15 @@ INSERT INTO `fc_hcstats` (`id`, `name`, `path`, `time`, `deleted`) VALUES
 -- Insert default masks
 --
 
-INSERT INTO `fc_mask` (`id`, `job_id`, `mask`, `current_index`, `keyspace`, `hc_keyspace`) VALUES
-(1,	4,	'?l',	0,	26,	1),
-(2,	4,	'?l?l',	0,	676,	26),
-(3,	4,	'?l?l?l',	0,	17576,	676),
-(4,	4,	'?l?l?l?l',	0,	456976,	17576),
-(5,	4,	'?l?l?l?l?l',	0,	11881376,	456976),
-(6,	4,	'?l?l?l?l?l?l',	0,	308915776,	456976),
-(7,	4,	'?l?l?l?l?l?l?l',	0,	8031810176,	456976),
-(8,	4,	'?l?l?l?l?l?l?l?l',	0,	208827064576,	11881376);
+INSERT INTO `fc_mask` (`id`, `job_id`, `mask`, `current_index`, `keyspace`, `hc_keyspace`, `increment_min`, `increment_max`) VALUES
+(1,	4,	'?l',	0,	26,	1, 0, 0),
+(2,	4,	'?l?l',	0,	676,	26, 0, 0),
+(3,	4,	'?l?l?l',	0,	17576,	676, 0, 0),
+(4,	4,	'?l?l?l?l',	0,	456976,	17576, 0, 0),
+(5,	4,	'?l?l?l?l?l',	0,	11881376,	456976, 0, 0),
+(6,	4,	'?l?l?l?l?l?l',	0,	308915776,	456976, 0, 0),
+(7,	4,	'?l?l?l?l?l?l?l',	0,	8031810176,	456976, 0, 0),
+(8,	4,	'?l?l?l?l?l?l?l?l',	0,	208827064576,	11881376, 0, 0);
 
 
 --

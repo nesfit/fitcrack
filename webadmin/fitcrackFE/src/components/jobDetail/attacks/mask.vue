@@ -10,6 +10,14 @@
       :items="data.masks"
       hide-default-footer
     >
+      <template v-slot:item.increment_mask_range="{ item }">
+        <v-tooltip top :disabled="item.increment_min == 0">
+          <template v-slot:activator="{ on }">
+            <div v-on="on">{{ item.increment_mask_range }}</div>
+          </template>
+          <span>{{  item.increment_all_masks  }}</span>
+        </v-tooltip>
+      </template>
       <template v-slot:item.progress="{ item }">
         <v-progress-circular
           size="16"
@@ -66,7 +74,7 @@
           {
             text: 'Mask',
             align: 'left',
-            value: 'mask'
+            value: 'increment_mask_range'
           },
           {text: 'Progress', value: 'progress', align: 'right'}
         ],

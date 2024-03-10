@@ -377,6 +377,11 @@ void CJob::addMask(Config::Ptr<CMask> mask)
     m_masks.push_back(mask);
 }
 
+void CJob::removeMask(uint64_t id)
+{
+    this->m_sqlLoader->removeMask(id);
+}
+
 
 std::vector<Config::Ptr<CDictionary>> CJob::getDictionaries() const
 {

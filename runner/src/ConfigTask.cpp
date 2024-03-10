@@ -23,6 +23,8 @@ const char *ConfigTask::OPTIMIZED = "optimized";
 const char *ConfigTask::DISTRIBUTION_MODE = "distribution_mode";
 const char *ConfigTask::HEX_DICT = "hex_dict";
 const char *ConfigTask::DICT1_KEYSPACE = "dict1_keyspace";
+const char *ConfigTask::MASK_INCREMENT_MIN = "mask_increment_min";
+const char *ConfigTask::MASK_INCREMENT_MAX = "mask_increment_max";
 /* Private */
 
 void ConfigTask::convertLineToOption(std::string& line) {
@@ -79,6 +81,8 @@ void ConfigTask::initSupported() {
   supported_.push_back(ConfigTask::DISTRIBUTION_MODE);
   supported_.push_back(ConfigTask::HEX_DICT);
   supported_.push_back(ConfigTask::DICT1_KEYSPACE);
+  supported_.push_back(ConfigTask::MASK_INCREMENT_MIN);
+  supported_.push_back(ConfigTask::MASK_INCREMENT_MAX);
 }
 
 bool ConfigTask::isSupported(const std::string& key) {

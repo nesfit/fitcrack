@@ -51,6 +51,17 @@ class CMask {
          */
         virtual void updateIndex(uint64_t newIndex);
 
+        /**
+         * @brief Updates mask
+         * @param newMask [in] New mask string
+         * @param newKeyspace [in] New real keyspace
+         * @param newHcKeyspace [in] New hashcat keyspace
+         * @param incrementMin [in] New increment min size
+         * @param incrementMax [in] New increment max size
+         */
+        virtual void updateMask(std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace,
+                                 uint64_t incrementMin, uint64_t incrementMax);
+
 
     private:
 
@@ -66,6 +77,8 @@ class CMask {
         uint64_t    m_currentIndex;
         uint64_t    m_hcKeyspace;
         uint64_t    m_keyspace;
+        uint64_t    m_incrementMin;
+        uint64_t    m_incrementMax;
 
     public:
 
@@ -79,6 +92,22 @@ class CMask {
         uint64_t getCurrentIndex() const;
         uint64_t getHcKeyspace() const;
         uint64_t getKeyspace() const;
+        uint64_t getIncrementMin() const;
+        uint64_t getIncrementMax() const;
+
+        /**
+         * @brief Get mask length (number of characters in candidate passwords created from the mask)
+         * @return Mask length - '?d?d' has length 2, 'X?d?l' length 3 etc.
+         */
+        uint64_t getLength() const;
+
+        /**
+         * @brief Compare 2 masks
+         * @param otherMask [in] Other mask to compare to
+         * @param length [in] Length from the start that should be compared
+         * @return True if masks are identical in specified range, False otherwise
+         */
+        bool compare(PtrMask otherMask, uint64_t length) const;
 };
 
 #endif //WORKGENERATOR_MASK_H

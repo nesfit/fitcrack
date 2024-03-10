@@ -17,3 +17,4 @@ settings_arguments.add_argument('ramp_down_coefficient', type=float, help='', re
 settings_arguments.add_argument('verify_hash_format', type=bool, help='', required=False, location='json')
 settings_arguments.add_argument('auto_add_hosts_to_running_jobs', type=bool, help='', required=False, location='json')
 settings_arguments.add_argument('skip_benchmark', type=bool, help='', required=False, location='json')
+settings_arguments.add_argument('merge_masks', type=bool, help='', required=False, location='json')
