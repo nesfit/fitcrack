@@ -124,7 +124,8 @@ def orm_pack (obj):
       'keyspace': obj.keyspace,
       'hc_keyspace': obj.hc_keyspace,
       'increment_min' : obj.increment_min,
-      'increment_max' : obj.increment_max
+      'increment_max' : obj.increment_max,
+      'merged': obj.merged
     }
   return obj
 
@@ -168,7 +169,7 @@ class ImportDependencyMissing (Exception):
     self.missing = missing_deps
 
 def recreate_mask (data):
-  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0, increment_min=data['increment_min'], increment_max=data['increment_max'])
+  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0, increment_min=data['increment_min'], increment_max=data['increment_max'], merged=data['merged'])
 
 def unpack (package):
   """

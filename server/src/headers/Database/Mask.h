@@ -51,17 +51,6 @@ class CMask {
          */
         virtual void updateIndex(uint64_t newIndex);
 
-        /**
-         * @brief Updates mask
-         * @param newMask [in] New mask string
-         * @param newKeyspace [in] New real keyspace
-         * @param newHcKeyspace [in] New hashcat keyspace
-         * @param incrementMin [in] New increment min size
-         * @param incrementMax [in] New increment max size
-         */
-        virtual void updateMask(std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace,
-                                 uint64_t incrementMin, uint64_t incrementMax);
-
 
     private:
 
@@ -79,6 +68,7 @@ class CMask {
         uint64_t    m_keyspace;
         uint64_t    m_incrementMin;
         uint64_t    m_incrementMax;
+        uint64_t    m_merged;
 
     public:
 
@@ -94,6 +84,9 @@ class CMask {
         uint64_t getKeyspace() const;
         uint64_t getIncrementMin() const;
         uint64_t getIncrementMax() const;
+        bool isMerged() const;
+
+        void setMerged();
 
         /**
          * @brief Get mask length (number of characters in candidate passwords created from the mask)

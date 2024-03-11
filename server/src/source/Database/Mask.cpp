@@ -23,6 +23,7 @@ CMask::CMask(DbMap & maskMap, CSqlLoader * sqlLoader)
         this->m_keyspace = std::stoull(maskMap["keyspace"]);
         this->m_incrementMin = std::stoull(maskMap["increment_min"]);
         this->m_incrementMax = std::stoull(maskMap["increment_max"]);
+        this->m_merged = std::stoull(maskMap["merged"]);
     }
     catch(std::logic_error & error)
     {
@@ -53,19 +54,6 @@ void CMask::updateIndex(uint64_t newIndex)
     this->m_sqlLoader->updateMaskIndex(this->m_id, newIndex);
 }
 
-
-void CMask::updateMask(std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax)
-{
-    /** Local update */
-    this->m_mask = newMask;
-    this->m_keyspace = newKeyspace;
-    this->m_hcKeyspace = newHcKeyspace;
-    this->m_incrementMin = incrementMin;
-    this->m_incrementMax = incrementMax;
-
-    /** Database update */
-    this->m_sqlLoader->updateMask(this->m_id, newMask, newKeyspace, newHcKeyspace, incrementMin, incrementMax);
-}
 
 
 /**
@@ -116,6 +104,18 @@ uint64_t CMask::getIncrementMax() const
     return m_incrementMax;
 }
 
+bool CMask::isMerged() const
+{
+    return m_merged;
+}
+
+void CMask::setMerged()
+{
+    m_merged = true;
+    m_currentIndex = m_hcKeyspace;
+    m_sqlLoader->maskSetMerged(m_id);
+}
+
 uint64_t CMask::getLength() const
 {
     uint64_t maskLen = 0;
@@ -145,8 +145,8 @@ bool CMask::compare(PtrMask otherMask, uint64_t length) const
     std::string m2 = otherMask->getMask();
     uint64_t m2Len = otherMask->getLength();
 
-    int index = 0;
-    int maskIndex = 0;
+    uint64_t index = 0;
+    uint64_t maskIndex = 0;
     while(maskIndex < length)
     {
         if(maskIndex >= m1Len && maskIndex < m2Len)

@@ -97,6 +97,17 @@ class CJob {
          */
         uint64_t getEndIndex() const;
 
+        /**
+         * @brief Create new mask
+         * @param newMask [in] New mask string
+         * @param newKeyspace [in] New real keyspace
+         * @param newHcKeyspace [in] New hashcat keyspace
+         * @param incrementMin [in] New increment min size
+         * @param incrementMax [in] New increment max size
+         * @return ID of the new fc_mask entry
+         */
+        uint64_t createMask(std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax);
+
     private:
 
         CSqlLoader * m_sqlLoader;         /**< SqlLoader for database updating */
@@ -220,7 +231,6 @@ class CJob {
 
         virtual std::vector<Config::Ptr<CMask>> getMasks() const;
         void addMask(Config::Ptr<CMask> mask);
-        void removeMask(uint64_t id);
 
         virtual std::vector<Config::Ptr<CDictionary>> getDictionaries() const;
         virtual std::vector<Config::Ptr<CDictionary>> getRightDictionaries() const;

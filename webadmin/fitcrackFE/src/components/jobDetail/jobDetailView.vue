@@ -269,6 +269,8 @@ export default {
     },
     async loadData () {
       this.data = await this.axios.get(this.$serverAddr + '/job/' + this.$route.params.id).then(r => r.data)
+      // Merged masks should not be visible
+      this.data.masks = this.data.masks.filter(item => item.merged == 0)
       document.title = `${this.data.name} – ${this.$store.state.project}`
     },
     loadAll () {

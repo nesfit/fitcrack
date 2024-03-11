@@ -31,6 +31,7 @@ mask_model = api.model('Mask', {
     'hc_keyspace': fields.Integer(),
     'progress': fields.Float(required=False),
     'increment_min': fields.Integer(),
+    'merged': fields.Boolean(),
     'increment_mask_range': fields.String(required=False),
     'increment_all_masks': fields.String(required=False),
 })

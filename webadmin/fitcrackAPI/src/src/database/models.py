@@ -103,6 +103,7 @@ class FcMask(Base):
     hc_keyspace = Column(BigInteger, nullable=False)
     increment_min = Column(Integer, nullable=False, server_default=text("'0'"))
     increment_max = Column(Integer, nullable=False, server_default=text("'0'"))
+    merged = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship("FcJob", back_populates="masks")
 
