@@ -222,6 +222,11 @@ uint64_t CJob::getEndIndex() const
     }
 }
 
+uint64_t CJob::createMask(std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax)
+{
+    return(m_sqlLoader->createMask(this->m_id, newMask, newKeyspace, newHcKeyspace, incrementMin, incrementMax));
+}
+
 /**
  * @section Table attributes getters
  */
@@ -375,11 +380,6 @@ std::vector<Config::Ptr<CMask>> CJob::getMasks() const
 void CJob::addMask(Config::Ptr<CMask> mask)
 {
     m_masks.push_back(mask);
-}
-
-void CJob::removeMask(uint64_t id)
-{
-    this->m_sqlLoader->removeMask(id);
 }
 
 

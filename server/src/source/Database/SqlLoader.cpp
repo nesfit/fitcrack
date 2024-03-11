@@ -155,17 +155,19 @@ void CSqlLoader::updateMaskIndex(uint64_t maskId, uint64_t newIndex)
 }
 
 
-void CSqlLoader::updateMask(uint64_t maskId, std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax)
+uint64_t CSqlLoader::createMask(uint64_t jobId, std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax)
 {
-    updateSql(formatQuery("UPDATE `%s` SET mask = '%s', keyspace = %" PRIu64 ", hc_keyspace = %" PRIu64 ", increment_min = %" PRIu64 ", increment_max = %" PRIu64 " WHERE id = %" PRIu64 " ;",
-                                 CMask::getTableName().c_str(), newMask.c_str(), newKeyspace, newHcKeyspace, incrementMin, incrementMax, maskId));
+    updateSql(formatQuery("INSERT INTO `%s` (`mask`, `keyspace`, `hc_keyspace`, `current_index`, `job_id`, `increment_min`, `increment_max`) VALUES ('%s','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "') ;",
+                                 CMask::getTableName().c_str(), newMask.c_str(), newKeyspace, newHcKeyspace, 0, jobId, incrementMin, incrementMax));
+    return getSqlNumber(formatQuery("SELECT LAST_INSERT_ID();"));
 }
 
-void CSqlLoader::removeMask(uint64_t id)
+void CSqlLoader::maskSetMerged(uint64_t maskId)
 {
-    updateSql(formatQuery("DELETE FROM `%s` WHERE id = %" PRIu64 " ; ",
-                            CMask::getTableName().c_str(), id));
+    updateSql(formatQuery("UPDATE `%s` SET merged = 1, current_index = hc_keyspace WHERE id = %" PRIu64 " ;",
+                                 CMask::getTableName().c_str(), maskId));
 }
+
 
 bool CSqlLoader::getEnableMergeMasks()
 {

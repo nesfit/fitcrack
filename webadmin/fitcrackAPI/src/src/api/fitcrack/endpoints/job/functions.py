@@ -57,6 +57,9 @@ def kill_job(job:FcJob, db):
         masks = FcMask.query.filter(FcMask.job_id == id).all()
         for mask in masks:
             mask.current_index = 0
+            mask.merged = False
+            if mask.increment_min > 0:
+                db.session.delete(mask)                       
     elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
         dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
         for dictionary in dictionaries:
@@ -72,6 +75,12 @@ def kill_job(job:FcJob, db):
 
 
 def start_job(job, db):
+    if job.attack_mode == attack_modes['mask']:
+        masks = FcMask.query.filter(FcMask.job_id == job.id).all()
+        for mask in masks:
+            mask.merged = False
+            if mask.increment_min > 0:
+                db.session.delete(mask)
     hosts = [ a[0] for a in db.session.query(Host.id).all() ]
     if job.host_count == 0:
         for hostId in hosts:

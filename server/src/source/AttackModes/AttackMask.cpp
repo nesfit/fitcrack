@@ -206,7 +206,7 @@ bool CAttackMask::generateWorkunit()
         std::vector<PtrMask> newMasks;
         for (PtrMask & mask : allMasks)
         {
-            if(mask->getCurrentIndex() == 0 && mask->getIncrementMin() == 0)
+            if(mask->getCurrentIndex() == 0 && mask->getIncrementMin() == 0 && mask->isMerged() == false)
                 newMasks.push_back(mask);
         }
 
@@ -307,20 +307,21 @@ bool CAttackMask::generateWorkunit()
             uint64_t min = (chain.back())->getLength();
             uint64_t max = (chain.front())->getLength();
 
-            // Update current mask
-            currentMask->updateMask(currentMask->getMask(), sumMaskKeyspace, sumMaskHcKeyspace, min, max);
-            
-            // Remove merged masks
+            // Create new merged mask
+            uint64_t newMaskId = m_job->createMask(currentMask->getMask(), sumMaskKeyspace, sumMaskHcKeyspace, min, max);
+
+            // Set merged flag to every mask in the chain
             for (PtrMask & mask : chain)
             {
-                if(mask->getId() == currentMask->getId())
-                    continue;
-
-                m_job->removeMask(mask->getId());
+                mask->setMerged();
             }
 
-            //Reload masks in job
+            // Reload masks in job
             m_job->loadMasks(false);
+
+            // Load new merged mask
+            PtrMask newMask = m_sqlLoader->loadMask(newMaskId);
+            currentMask = newMask;
         }
         // No chains found, increment wont be used
         else

@@ -208,6 +208,7 @@ CREATE TABLE IF NOT EXISTS `fc_mask` (
   `hc_keyspace` bigint(20) unsigned NOT NULL,
   `increment_min` int(11) unsigned NOT NULL DEFAULT '0',
   `increment_max` int(11) unsigned NOT NULL DEFAULT '0',
+  `merged` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
