@@ -12,7 +12,7 @@ from flask_login import current_user
 
 from src.api.apiConfig import api
 from src.api.fitcrack.endpoints.hashlists.argumentsParser import make_empty_hash_list_parser, hash_list_parser, hash_list_add_hash_list_parser, hash_list_add_hash_file_parser, hash_list_hashes_parser_paginated, hash_list_hashes_parser, hash_list_add_protected_file_parser
-from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model, page_of_hashes_model, hash_list_model_long
+from src.api.fitcrack.endpoints.hashlists.responseModels import empty_hash_list_created_model, page_of_hash_lists_model, hash_addition_result_model, page_of_hashes_model, hash_list_model_long, hash_extraction_result_model
 from src.api.fitcrack.endpoints.hashlists.functions import upload_hash_list, build_hash_query, acquire_hash_list
 from src.api.fitcrack.endpoints.protectedFile.functions import addProtectedFile
 from src.api.fitcrack.endpoints.job.functions import editable_jobs_ids, kill_job
@@ -165,7 +165,7 @@ class exportHashes(Resource):
 
 
 @ns.route('/<id>/hashes')
-class hashListUploadList(Resource):
+class HashListUploadList(Resource):
     
     @api.expect(hash_list_add_hash_list_parser)
     @api.marshal_with(hash_addition_result_model)
@@ -187,7 +187,7 @@ class hashListUploadList(Resource):
 
         
 @ns.route('/<id>/file')
-class hashListUploadHashFile(Resource):
+class HashListExtractHash(Resource):
     @api.expect(hash_list_add_hash_file_parser)
     @api.marshal_with(hash_addition_result_model)
     def post(self,id:str):
@@ -215,9 +215,9 @@ class hashListUploadHashFile(Resource):
 
 
 @ns.route('/<id>/extract')
-class hashListUploadHashFile(Resource):
+class HashListExtractHash(Resource):
     @api.expect(hash_list_add_protected_file_parser)
-    @api.marshal_with(hash_addition_result_model)
+    @api.marshal_with(hash_extraction_result_model)
     def post(self,id:str):
         """
         Extract the hash from the given protected file and adds it to the hash list with the given id.
@@ -232,13 +232,17 @@ class hashListUploadHashFile(Resource):
         if args['file'].filename == '': #I don't know if we still need this... since we are using this new and fancy way...? I suppose we do?
             abort(500, 'No selected file')
 
-        result = addProtectedFile(args.file)
+        extraction_result = addProtectedFile(args.file)
 
-        return upload_hash_list([result['hash']],hash_list,int(result['hash_type']),'fail_invalid',False)
+        #No need to validate the input to here because the extraction function already does validation for us.
+        upload_result, exit_code = upload_hash_list([extraction_result['hash']],hash_list,int(extraction_result['hash_type']),'no_validate',False)
+    
+        upload_result['extracted_easy_hash'] = extraction_result['easy_hash']
+        return upload_result, exit_code
 
 
 @ns.route('/<int:id>/purge')
-class hashListPurge(Resource):
+class HashListPurge(Resource):
     @api.response(200, 'Hash list purged.')
     @api.response(403, 'Hash list contains jobs that you do not have rights to; cannot perform purge.')
     def post(self,id:int):

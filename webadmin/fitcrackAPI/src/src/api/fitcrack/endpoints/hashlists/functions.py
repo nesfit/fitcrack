@@ -105,7 +105,7 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
              'error' : error}
             for (hash,error) in error_output.items()
             ]
-    }
+    },200
 
 
 def validate_hash_list(hash_list:list[bytes],hash_type:str,valid_only:bool,binary_placeholder:Optional[str]=None):

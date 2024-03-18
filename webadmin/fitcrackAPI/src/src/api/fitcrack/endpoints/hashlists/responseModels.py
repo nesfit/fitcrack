@@ -60,3 +60,8 @@ hash_addition_result_model = api.model('added hashes', {
     'erroredCount' : fields.Integer(),
     'errors': fields.List(fields.Nested(error_model))
 })
+
+
+hash_extraction_result_model = api.inherit('extracted hashes', hash_addition_result_model, {
+    'extracted_easy_hash' : fields.Boolean()
+})
