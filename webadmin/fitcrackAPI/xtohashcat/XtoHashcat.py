@@ -116,20 +116,20 @@ class StaticHelper:
                     return '-1'
             elif hashStr[1:6] == 'pkzip':
                 hashCount = hashStr[hashStr.find('*') - 1]
+                if extract_easy_hash:
+                    if int(hashCount) < 3:
+                        print(
+                            'Warning: You have requested to create an easy hash from a ZIP file that contains fewer than three files. ' +
+                            'The output hash is correct and well formed, but Hashcat does not support it and will reject it.', file=stderr)
+                    return '17230'      # PKZIP (Mixed Multi-File Checksum-Only)
                 if hashCount == '1':
-                    if extract_easy_hash:
-                        print('Generating easy hashes from ZIP files containing a single file is not supported.', file=stderr)
-                        exit(1)
                     compression_type = hashStr[hashStr.replace('*', 'X', 8).find('*') + 1]
                     if compression_type == '8':
                         return '17200'  # PKZIP compressed
                     else:
                         return '17210'  # PKZIP uncompressed
                 else:
-                    if extract_easy_hash:
-                        return '17230'      # PKZIP (Mixed Multi-File Checksum-Only) 
-                    else:
-                        return '17225'      # PKZIP Multifile Mixed
+                    return '17225'      # PKZIP Multifile Mixed
                     
         elif formatId == 4:
             # 7-Zip
