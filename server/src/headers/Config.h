@@ -52,6 +52,7 @@ namespace Config {
     extern std::string tableNameJobDictionary;
     extern std::string tableNameHash;
     extern std::string tableNamePcfgGrammar;
+    extern std::string tableNameRule;
 
     /** Path to dictionaries/markov/rules */
     extern std::string dictDir;
@@ -72,6 +73,7 @@ namespace Config {
     extern std::string inTemplateFileHybridMaskDict;
     extern std::string inTemplateFileRule;
     extern std::string inTemplateFileRuleAlt;
+    extern std::string inTemplateFileRuleSplit;
     extern std::string inTemplateFilePrince;
     extern std::string inTemplateFilePrinceRules;
     extern std::string inTemplateFilePcfg;
@@ -89,6 +91,7 @@ namespace Config {
     extern char * inTemplatePathHybridMaskDict;
     extern char * inTemplatePathRule;
     extern char * inTemplatePathRuleAlt;
+    extern char * inTemplatePathRuleSplit;
     extern char * inTemplatePathPrince;
     extern char * inTemplatePathPrinceRules;
     extern char * inTemplatePathPcfg;

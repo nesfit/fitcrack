@@ -192,6 +192,9 @@ addJob_model = api.schema_model('addJob', {
                         'minimum': 0
                     }
                 }, 'null'],
+                'slow_candidates':  {
+                    'type': 'boolean'
+                },
             }
         },
         'hash_list_id':  {

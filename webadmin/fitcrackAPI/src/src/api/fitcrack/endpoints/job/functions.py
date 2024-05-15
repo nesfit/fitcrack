@@ -51,16 +51,24 @@ def kill_job(job:FcJob, db):
     job.indexes_verified = 0
     job.current_index = 0
     job.current_index_2 = 0
+    job.split_dict_id = 0
+    job.split_dict_index = 0
+    job.split_dict_pos = 0
+    job.split_rule_index = 0
     job.workunit_sum_time = 0
     job.time_start = job.time_end = None
     if job.attack_mode == attack_modes['mask'] or job.attack_mode == attack_modes['hybrid (wordlist + mask)']:
         masks = FcMask.query.filter(FcMask.job_id == id).all()
         for mask in masks:
             mask.current_index = 0
+            mask.merged = False
+            if mask.increment_min > 0:
+                db.session.delete(mask)                       
     elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
         dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
         for dictionary in dictionaries:
             dictionary.current_index = 0
+            dictionary.current_pos = 0
 
     hosts = FcHostActivity.query.filter(FcHostActivity.job_id == id).all()
     for host in hosts:
@@ -72,6 +80,12 @@ def kill_job(job:FcJob, db):
 
 
 def start_job(job, db):
+    if job.attack_mode == attack_modes['mask']:
+        masks = FcMask.query.filter(FcMask.job_id == job.id).all()
+        for mask in masks:
+            mask.merged = False
+            if mask.increment_min > 0:
+                db.session.delete(mask)
     hosts = [ a[0] for a in db.session.query(Host.id).all() ]
     if job.host_count == 0:
         for hostId in hosts:
@@ -140,6 +154,7 @@ def create_job(data):
         charset3=job['charset3'] if job.get('charset3') else '',
         charset4=job['charset4'] if job.get('charset4') else '',
         rules=(job['attack_settings']['rules']['name'] if job.get('rules') else None),
+        rules_id=(job['attack_settings']['rules']['id'] if job.get('rules') else None),
         rule_left=(job['attack_settings']['rule_left'] if job['attack_settings'].get('rule_left') else ''),
         rule_right=(job['attack_settings']['rule_right'] if job['attack_settings'].get('rule_right') else ''),
         markov_hcstat=job['markov_hcstat'] if job.get('markov_hcstat') else '',
@@ -153,6 +168,7 @@ def create_job(data):
         max_elem_in_chain=job['attack_settings'].get('max_elem_in_chain', 0),
         generate_random_rules=job['attack_settings'].get('generate_random_rules', 0),
         optimized=job['attack_settings'].get('optimized', 1),
+        slow_candidates=job['attack_settings'].get('slow_candidates', 0),
         deleted=False,
         hash_list_id=job['hash_list_id']
         )

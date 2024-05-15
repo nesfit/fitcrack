@@ -37,6 +37,7 @@ def getHashTypes():
     hashtype['code']     = h
     hashtype['category'] = hash_info_json[h]['category']
     hashtype['name']     = hash_info_json[h]['name']
+    hashtype['isSlow']   = hash_info_json[h]['slow_hash']
 
     hashtypes.append(hashtype)
 

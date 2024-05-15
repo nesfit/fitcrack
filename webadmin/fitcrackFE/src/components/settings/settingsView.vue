@@ -82,6 +82,24 @@
                   persistent-hint
                   class="mb-4 mt-0"
                 />
+                <v-switch
+                  v-model="settings.skip_benchmark"
+                  :loading="loading"
+                  outlined
+                  label="Skip benchmark"
+                  hint="Do not benchmark already benchmarked hosts."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
+                <v-switch
+                  v-model="settings.update_hashes"
+                  :loading="loading"
+                  outlined
+                  label="Update hashes"
+                  hint="Cracked hashes are updated across all hash lists."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
               </v-col>
               <v-col class="mw">
                 <v-switch
@@ -99,6 +117,15 @@
                   outlined
                   label="Fully benchmark new hosts"
                   hint="Run a complete first-time benchmark on new hosts connected to the system."
+                  persistent-hint
+                  class="mb-4 mt-0"
+                />
+                <v-switch
+                  v-model="settings.merge_masks"
+                  :loading="loading"
+                  outlined
+                  label="Merge masks"
+                  hint="Merge small masks into larger ones."
                   persistent-hint
                   class="mb-4 mt-0"
                 />

@@ -126,9 +126,16 @@ PtrMask AttackMode::GetWorkunitMask() const
     return m_sqlLoader->loadMask(m_workunit->getMaskId());
 }
 
-PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace) const
+PtrMask AttackMode::FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace, bool findLongest) const
 {
-    for (PtrMask & mask : masks)
+    std::vector<PtrMask> masksTemp(masks);
+    // Sort masks by length in descending order
+    if(findLongest)
+        std::sort(masksTemp.begin(), masksTemp.end(), [](const PtrMask& a, const PtrMask& b){ 
+                return a->getLength() > b->getLength();
+            } );
+
+    for (PtrMask & mask : masksTemp)
     {
         auto maskKeyspace = useRealKeyspace ? mask->getKeyspace() : mask->getHcKeyspace();
         if (mask->getCurrentIndex() < maskKeyspace)

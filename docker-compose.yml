@@ -63,11 +63,11 @@ services:
         # When preserved, the entrypoint will attempt to load existing Fitcrack installation
         # When deleted, the entrypoint installs a new Fitcrack project
 
-        - "mysql:/var/lib/mysql"                           # MySQL server data directory
-        - "collections:/usr/share/collections"             # Collections of dictionaries, masks, etc.
+        - "etc:/etc"                                       # Linux system config directory
+        - "usr:/usr"                                       # Linux system binaries and libraries directory
+        - "run:/run"                                       # Linux system runtime directory
         - "boincadm:/home/boincadm"                        # BOINC server user home directory
-        - "apache:/etc/apache2"                            # Apache config directory
-        - "apache-conf:/etc/init.d"                        # Directory with service init scripts
+        - "mysql:/var/lib/mysql"                           # MySQL server data directory
         - "webadmin-be:/var/www/html/fitcrackAPI"          # Fitcrack backend installation
         - "webadmin-fe:/var/www/html/fitcrackFE"           # Fitcrack frontend installation
         - "./fitcrack-data/logs:/var/log/fitcrack"         # Log directory (host-mapped!)
@@ -81,11 +81,11 @@ services:
         #       using 'docker-compose build' or 'docker-compose build --no-cache'.
 
 volumes:
-  mysql:
+  etc:
+  usr:
+  run:
   boincadm:
-  collections:
-  apache:
-  apache-conf:
+  mysql:
   webadmin-be:
   webadmin-fe:
   logs:

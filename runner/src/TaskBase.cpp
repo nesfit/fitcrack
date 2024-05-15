@@ -21,14 +21,14 @@ TaskBase::TaskBase(Directory &directory, ConfigTask &task_config,
                    const std::string &output_file,
                    const std::string &workunit_name)
     : task_config_(task_config), host_config_(host_config),
-      directory_(directory), computed_hashes_(0), total_hashes_(0),
+      directory_(directory), computed_hashes_(0), total_hashes_(0), computed_hashes_increment_(0),
       output_file_(output_file), workunit_name_(workunit_name) {}
 
 TaskBase::TaskBase(Directory &directory, ConfigTask &task_config,
                    ConfigHost &host_config, const std::string &output_file,
                    const std::string &workunit_name)
     : task_config_(task_config), host_config_(host_config),
-      directory_(directory), computed_hashes_(0), total_hashes_(0),
+      directory_(directory), computed_hashes_(0), total_hashes_(0), computed_hashes_increment_(0),
       output_file_(output_file), workunit_name_(workunit_name) {}
 
 double TaskBase::fractionDone() {

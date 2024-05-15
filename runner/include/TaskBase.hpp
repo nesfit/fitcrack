@@ -44,7 +44,7 @@ protected:
   unsigned long long computed_hashes_; /**< Already computed hashes */
   unsigned long long
       total_hashes_; /**< Total number or hashes to compute in the task */
-
+  unsigned long long computed_hashes_increment_; /**< Already computed hashes in increment mode */
   nlohmann::json status_info_; /**< Hashcat status info in json format */
 
   std::string

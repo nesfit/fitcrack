@@ -15,7 +15,7 @@ For controlling your cracking network and management of jobs, you can use our fr
 
 A detailed documentation and other information can be found at [https://fitcrack.fit.vutbr.cz](https://fitcrack.fit.vutbr.cz).
 
-Any issue or feature request? Join Fitcrack community [on Discord](https://discord.gg/DJjwetJ8Td).
+Any issue or feature request? Join Fitcrack community [on Discord](https://discord.com/invite/6WU7gXbdgY).
 
 **Table of Contents**
 * [Installation](#inst)
