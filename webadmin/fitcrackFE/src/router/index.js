@@ -43,6 +43,7 @@ const Server = () => import('@/components/server/serverMonitor.vue')
 const Settings = () => import('@/components/settings/settingsView.vue')
 const Transfer = () => import('@/components/settings/dataTransfer.vue')
 const UnauthorizedError = () => import('@/components/errorPages/unauthorized.vue')
+const planner = () => import('@/components/planner/plannerView.vue')
 
 Vue.use(Router);
 
@@ -117,6 +118,16 @@ const appRoutes = [
       guard: 'ADD_NEW_JOB',
       title: 'Create a job',
       icon: 'mdi-briefcase-plus',
+      navtab: 0
+    }
+  },
+  {
+    path: '/planner',
+    name: 'planner',
+    component: planner,
+    meta: {
+      title: 'planner',
+      icon: 'mdi-magic-staff',
       navtab: 0
     }
   },
