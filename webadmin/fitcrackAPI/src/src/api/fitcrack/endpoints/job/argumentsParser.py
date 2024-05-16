@@ -33,6 +33,7 @@ crackingTime_argument = reqparse.RequestParser()
 crackingTime_argument.add_argument('hash_list_id', type=int, required=True, help='hash list ID to determine hash type')
 crackingTime_argument.add_argument('boinc_host_ids', type=str, required=True, help='host IDs')
 crackingTime_argument.add_argument('attack_settings', required=True)
+crackingTime_argument.add_argument('workunit_time', type=int, required=True)
 
 addJob_model = api.schema_model('addJob', {
     "required": ["name", "hash_list_id"],
