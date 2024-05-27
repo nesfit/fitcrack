@@ -127,8 +127,8 @@ def make_dict_attack(name, dict, rule, hash_list, hosts_ids):
 
   return data
 
-def make_bruteforce_attack(name, hash_list, hosts_ids, password_len_min, password_len_max, keyspace, mask_type, mask_count):
-  masks = generate_masks(password_len_min, password_len_max, keyspace, mask_type, mask_count)
+def make_bruteforce_attack(name, hash_list, hosts_ids, password_len_min, password_len_max, keyspace):
+  masks = generate_masks(password_len_min, password_len_max, keyspace)
 
   #Check if no masks were able to fit into the keyspace
   if not masks or masks == []:
