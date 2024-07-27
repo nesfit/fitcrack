@@ -910,15 +910,15 @@ class FcHashList(Base):
 
     @hybrid_property
     def job_count(self):
-        return len(self.jobs)
+        return FcJob.query.filter_by(hash_list_id=self.id).count()
     
     @hybrid_property
     def hash_count(self):
-        return len(self.hashes) #This is probably horribly inefficient
+        return FcHash.query.filter_by(hash_list_id=self.id).count()
     
     @hybrid_property
     def is_locked(self):
-        return len(self.jobs) != 0
+        return self.job_count != 0
     
     @hybrid_property
     def cracked_hash_count(self):
