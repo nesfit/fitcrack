@@ -43,37 +43,39 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
 
     if hash_list.is_locked:
         abort(400,'Hash list is locked for editing.')
-    
+
     new_hashes_bin_list = list(map(hash_to_bytes, new_hashes))
+
     new_hashes_bin = set(new_hashes_bin_list)
 
-    if not binary_hash:
-        validation_result = validate_hash_list(new_hashes_bin,hash_type,False)
-    else:
-        if len(new_hashes_bin) != 1:
-            abort(500,'If input is binary, then hash list may only contain one hash.')
-        base_64 = base64.encodebytes(list(new_hashes_bin)[0]).decode("ascii")
-        validation_result = validate_hash_list(new_hashes_bin,hash_type,False, f'BASE64<{base_64[0:64]}{"..." if len(base_64) > 64 else ""}>') #Placeholder is the first 64 characters of BASE 64 representation
+    if validation_mode != 'no_validate':
+        if not binary_hash:
+            validation_result = validate_hash_list(new_hashes_bin,hash_type,False)
+        else:
+            if len(new_hashes_bin) != 1:
+                abort(500,'If input is binary, then hash list may only contain one hash.')
+            base_64 = base64.encodebytes(list(new_hashes_bin)[0]).decode("ascii")
+            validation_result = validate_hash_list(new_hashes_bin,hash_type,False, f'BASE64<{base_64[0:64]}{"..." if len(base_64) > 64 else ""}>') #Placeholder is the first 64 characters of BASE 64 representation
 
-    errored_validation_results = [x for x in validation_result['items'] if x['result'] != 'OK']
-    error_output = {bytes(x['hash'],encoding='ascii'):x['result'] for x in errored_validation_results}
+        errored_validation_results = [x for x in validation_result['items'] if x['result'] != 'OK']
+        error_output = {bytes(x['hash'],encoding='ascii'):x['result'] for x in errored_validation_results}
 
-    if validation_result['error'] == True:
-        if validation_mode == 'fail_invalid':
-            return {
-            'result' : 'FUCKED',
-            'id' : hash_list.id,
-            'name' : hash_list.name,
-            'hashCount' : hash_list.hash_count,
-            'addedCount' : 0,
-            'erroredCount' : len(errored_validation_results),
-            'errors' : [{
-                'order_in_input': new_hashes_bin_list.index(hash),
-                'error' : error}
-                for (hash,error) in error_output.items()]
-            },400
-        if validation_mode == 'skip_invalid':
-            new_hashes_bin = new_hashes_bin - error_output.keys()
+        if validation_result['error'] == True:
+            if validation_mode == 'fail_invalid':
+                return {
+                'result' : 'FUCKED',
+                'id' : hash_list.id,
+                'name' : hash_list.name,
+                'hashCount' : hash_list.hash_count,
+                'addedCount' : 0,
+                'erroredCount' : len(errored_validation_results),
+                'errors' : [{
+                    'order_in_input': new_hashes_bin_list.index(hash),
+                    'error' : error}
+                    for (hash,error) in error_output.items()]
+                },400
+            if validation_mode == 'skip_invalid':
+                new_hashes_bin = new_hashes_bin - error_output.keys()
 
     if hash_list.hash_type is None:
         hash_list.hash_type = hash_type
@@ -89,7 +91,7 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
         db.session.add(hash)
 
     #WARNING: This function is called at the end of endpoints, so the db session might contain
-    #more objects than just the hashhes added in this function. For example, the adding endpoints
+    #more objects than just the hashes added in this function. For example, the adding endpoints
     #have a "new" variant that also adds a new hash list.
     db.session.commit()
     
@@ -171,6 +173,7 @@ def acquire_hash_list(id:str,name:Optional[str]=None) -> FcHashList:
     if id == 'new':
         hash_list = FcHashList(name=name if name is not None else f'Unnamed automatically created hash list')
         db.session.add(hash_list)
+        db.session.flush()
     else:
         try:
             id = int(id)
