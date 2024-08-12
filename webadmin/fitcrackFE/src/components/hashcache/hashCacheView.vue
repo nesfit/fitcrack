@@ -73,6 +73,7 @@
       </template>
       <template v-slot:item.job="{ item }">
       <router-link
+          v-if="item.job"
         :to="{ name: 'jobDetail', params: { id: item.job.id } }"
         class="middle"
       >
@@ -99,7 +100,7 @@
           {text: 'Hash type', value: 'hash_type_name', align: 'start', sortable: true},
           {text: 'Hash', value: 'hash', align: 'start', sortable: true},
           {text: 'Added', value: 'added', align: 'start', sortable: true},
-          {text: 'Job', value: 'job', align: 'end', sortable: true}
+          /* {text: 'Job', value: 'job', align: 'end', sortable: true} // for now there is no job link, so skip */
         ],
         hashes:
           []
@@ -127,7 +128,7 @@
         this.axios.get(this.$serverAddr + '/hashes', {
           params: {
             'page': this.pagination.page,
-            'per_page': this.pagination.rowsPerPage,
+            'per_page': this.pagination.itemsPerPage,
             'order_by': this.pagination.sortBy,
             'descending': this.pagination.descending,
             'search': this.search

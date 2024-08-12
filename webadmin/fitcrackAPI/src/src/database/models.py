@@ -239,6 +239,9 @@ class FcJob(Base):
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
     queue_position = Column(Integer)
+    hash_list_id = Column(ForeignKey('fc_hash_list.id', ondelete='SET NULL'), index=True)
+
+    hash_list = relationship("FcHashList", back_populates="jobs")
 
     permission_records = relationship("FcUserPermission",
                           primaryjoin="FcJob.id==FcUserPermission.job_id")
@@ -268,8 +271,8 @@ class FcJob(Base):
 
     @hybrid_property
     def cracked_hashes_str(self):
-        cracked = len([hash.result for hash in self.hashes if hash.result != None])
-        total = len(self.hashes)
+        cracked = len([hash.result for hash in self.hash_list.hashes if hash.result != None])
+        total = len(self.hash_list.hashes)
         if total == 0:
             return ""
         return "{} % ({}/{})".format(int((cracked * 100)/total), cracked, total)
@@ -430,7 +433,6 @@ class FcJob(Base):
                 base['operate'] = record.operate
         return base
 
-    hashes = relationship("FcHash", back_populates="job")
 
 class FcBin(Base):
     __tablename__ = 'fc_bin'
@@ -891,24 +893,66 @@ class FcHostStatus(Base):
         total_seconds = math.floor(delta.total_seconds())
         return True if total_seconds <= 60 else False
 
+class FcHashList(Base):
+    __tablename__ = 'fc_hash_list'
+
+    id = Column(BigInteger, primary_key=True)
+    hash_type = Column(Integer)
+    name = Column(String(255), nullable=False)
+    added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    deleted = Column(Integer, nullable=False, server_default=text("'0'"))
+
+    jobs = relationship("FcJob")
+    hashes = relationship("FcHash")
+
+    @hybrid_property
+    def hash_type_name(self):
+        return getHashNameById(self.hash_type) if self.hash_type is not None else 'None'
+
+    @hybrid_property
+    def job_count(self):
+        return FcJob.query.filter_by(hash_list_id=self.id).count()
+    
+    @hybrid_property
+    def hash_count(self):
+        return FcHash.query.filter_by(hash_list_id=self.id).count()
+    
+    @hybrid_property
+    def is_locked(self):
+        return self.job_count != 0
+    
+    @hybrid_property
+    def cracked_hash_count(self):
+        return FcHash.query.filter_by(hash_list_id=self.id).filter(FcHash.result != None).count()
+
 
 class FcHash(Base):
     __tablename__ = 'fc_hash'
 
     id = Column(BigInteger, primary_key=True)
-    job_id = Column(BigInteger, ForeignKey(FcJob.id), nullable=False)
-    hash_type = Column(Integer, nullable=False)
+    hash_list_id = Column(BigInteger, ForeignKey(FcHashList.id), nullable=False)
+    hash_type = Column(Integer, nullable=False) # TODO: Could go away
     hash = Column(LargeBinary, nullable=False)
     result = Column(String(400, collation='utf8_bin'))
     added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     time_cracked = Column(DateTime)
 
-    job = relationship("FcJob", back_populates="hashes")
+    hash_list = relationship("FcHashList",back_populates="hashes")
 
     @hybrid_property
     def hashText(self):
+        output = self.hash
+        if len(output) > 128:
+            output = output[0:128] + b"..."
         try:
-            return self.hash.decode("utf-8")
+            return output.decode("ascii")
+        except UnicodeDecodeError:
+            return "BASE64<{}>".format(base64.encodebytes(output).decode("utf-8"))
+    
+    @hybrid_property
+    def hashTextWithoutTruncation(self):
+        try:
+            return self.hash.decode("ascii")
         except UnicodeDecodeError:
             return "BASE64<{}>".format(base64.encodebytes(self.hash).decode("utf-8"))
 

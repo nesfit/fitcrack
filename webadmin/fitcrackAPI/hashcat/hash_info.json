@@ -2458,6 +2458,34 @@
             "HEX"
         ]
     },
+    "3730": {
+        "name": "md5($salt1.strtoupper(md5($salt2.$pass)))",
+        "category": "Raw Hash salted and/or iterated",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "generic",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "0e1484eb061b8e9cfd81868bba1dc4a0:229381927:182719643",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
     "3800": {
         "name": "md5($salt.$pass.$salt)",
         "category": "Raw Hash salted and/or iterated",
@@ -3222,6 +3250,62 @@
             "HEX"
         ]
     },
+    "6050": {
+        "name": "HMAC-RIPEMD160 (key = $pass)",
+        "category": "Raw Hash authenticated",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "generic",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "4f5edca01734e03dd7e735362625a76e6bcb61b2:52355614946067",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "6060": {
+        "name": "HMAC-RIPEMD160 (key = $salt)",
+        "category": "Raw Hash authenticated",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "generic",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "34d8e55a2ae1e9549a291326ce2f0a8dcdc75c5c:08523202563542341",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
     "6100": {
         "name": "Whirlpool",
         "category": "Raw Hash",
@@ -3740,7 +3824,7 @@
             "pure"
         ],
         "example_hash_format": "plain",
-        "example_hash": "82dbb8ccc9c7ead8c38a92a6b5740f94:500:pmix@trash-mail.com",
+        "example_hash": "02eb97e869e0ddc7dc760fc633b4b54d:100100:pmix@trash-mail.com:9b071db7b8e265d4cadd3eb65ac0864a",
         "example_pass": "hashcat",
         "benchmark_mask": "?b?b?b?b?b?b?b",
         "benchmark_charset1": "N/A",
@@ -3881,6 +3965,35 @@
         "example_hash_format": "plain",
         "example_hash": "3437343735333336383831353232323433383333303236303337333338363232303135383237333638363532373231343030313131333838323734373138363632343133333335353030353633373533333133313530363533303738343334313330303630343633333237373037383537333630303233303830303437323838333237313438363238343434383831363634323431333430383735323038:f4b376e25868751fc0264f573ff1fe50b65ce5a2",
         "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "7350": {
+        "name": "IPMI2 RAKP HMAC-MD5",
+        "category": "Network Protocol",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "generic",
+        "salt_len_min": 0,
+        "salt_len_max": 512,
+        "kernel_type": [
+            "pure",
+            "optimized"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "08b017f3628b9835c748521e412429c9:f3450000df540000cdd981b0b3441be8774a61e69321291891a29a0c5fdac3f06194bd2c29fa5246000000000000000000000000000000001400",
+        "example_pass": "admin",
         "benchmark_mask": "?b?b?b?b?b?b?b",
         "benchmark_charset1": "N/A",
         "autodetect_enabled": true,
@@ -5448,6 +5561,7 @@
         "salt_len_min": 0,
         "salt_len_max": 256,
         "kernel_type": [
+            "pure",
             "optimized"
         ],
         "example_hash_format": "plain",
@@ -7756,7 +7870,7 @@
     },
     "17010": {
         "name": "GPG (AES-128/AES-256 (SHA-1($pass)))",
-        "category": "Raw Hash",
+        "category": "Private Key",
         "slow_hash": true,
         "password_len_min": 0,
         "password_len_max": 256,
@@ -7771,6 +7885,62 @@
         "example_hash_format": "plain",
         "example_hash": "$gpg$*1*348*1024*8833fa3812b5500aa9eb7e46febfa31a0584b7e4a5b13c198f5c9b0814243895cce45ac3714e79692fb5a130a1c943b9130315ce303cb7e6831be68ce427892858f313fc29f533434dbe0ef26573f2071bbcc1499dc49bda90648221ef3823757e2fba6099a18c0c83386b21d8c9b522ec935ecd540210dbf0f21c859429fd4d35fa056415d8087f27b3e66b16081ea18c544d8b2ea414484f17097bc83b773d92743f76eb2ccb4df8ba5f5ff84a5474a5e8a8e5179a5b0908503c55e428de04b40628325739874e1b4aa004c4cbdf09b0b620990a8479f1c9b4187e33e63fe48a565bc1264bbf4062559631bef9e346a7217f1cabe101a38ac4be9fa94f6dafe6b0301e67792ed51bca04140cddd5cb6e80ac6e95e9a09378c9651588fe360954b622c258a3897f11246c944a588822cc6daf1cb81ccc95098c3bea8432f1ee0c663b193a7c7f1cdfeb91eee0195296bf4783025655cbebd7c70236*3*254*2*7*16*a47ef38987beab0a0b9bfe74b72822e8*65536*1f5c90d9820997db",
         "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "17020": {
+        "name": "GPG (AES-128/AES-256 (SHA-512($pass)))",
+        "category": "Private Key",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$gpg$*1*668*2048*57e1f19c69a86038e23d7e5af5d810f4f86d32e9aaaf04b54281cda2194dcca99ee1f23f4aa3a011d5d2dc9e47689c449f398d315f91a03f4765742d20a7046e986a9696f0e07380a73fdd61e7ab2caa463a049a5869e008e16bb30d22f93f9aa8b0fdd41d2b19e669d58ca462498905e79944bff578c24139a88ef44582aef93f94fe22406a3ae32dcc0f0602e2f4345db2bd9d775eaeb14a8d7aff963e1ca8c29bab2fc3d459941587f4242af6e100e2e668a6c9247c19969ba294f6f2ab60ef84d42aab2e3512153a283d321442840189733dc6024dab0ea5d10d2e07fee914fc2e7177b310e8835bf8a5ffe1bde5ce0a74d3dd570c1b2652672873d3c520364acc0af35f5f7d0e0e95df8c2db3855936e0a4a24cc463bf277b0c5ea37d4ac1ddae6ef9da18852620de15ab648306f3d7acbb918e79f3ab7a3eaf4f59416560c4d31d8a0220c3301c95db4b8fe6b69348657aed52d5e15aefb17fedd15a50630a4edbad362ba9b79a048b4966a70643d8fa31fb397a531db85e8ad5bb169f5188449dbcc1bbaf42440d1794a34296c2407092c76e59544133959309ce42a05899162c55a865018085a4c57068294a5389cf6fbf1c93b5ab7732625fb6a465bd7ec51a128c2f9b0cf3fd0367f92667098b3a8af40f9f434a2a727b09bddbad1762127cc785eda419ac3ff24c8724e04ea2d330b0b441f34623955efd383f20578cdc527f3076ee068b727cd399ce17ff9d5233409b2d16d55c5c80cb8ca01019cd068c6e803217d6f2b7124e354b89de0eb0dfd241384026a1cdca529b6fed37aa0ececb0d6c26de06407d75a6e3108b0d25621db418206291a67216306e1a18c992736e45ef7f87373c0a3f28ddc1b4543604cd154f6b79265a6d8c13550078c3bcf55063263e5bc5cae6b925c1dbb67f972e234006867849e653*3*254*10*9*16*d1547688c9cc944482d16dff17df0858*20971520*1fef4e57e302d34e",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "17030": {
+        "name": "GPG (AES-128/AES-256 (SHA-256($pass)))",
+        "category": "Private Key",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$gpg$*1*668*2048*e75985b4e7d0bce9e38925a5cf69494ae9a2ccfe2973f077d9423642fffec8bee0e327178a4a3431875ca1f377b9f89269e7c42b94150859d9e5bf5c4504d63076b270118183dda75d253492be8b680c0061e7f130010a00a09a0456710051f2483052ad209fcb9f194f78ecd04fd04953fa1cd6f7ce9babca8b2ee6432730de069648460b2822fe355ed19e0055c69251097681901d7183626019d938727399df47f5249f25b1c73e8654bf935014533845f278e6dd94b8c2964ad6a87c718967686f39a88b21a0e5a93321d4733c81d9310955db6990d8cd02bcf73159b1f48f5615def601aa3e12bf30384da41b558b1eef1111cfc85c8772c123a7b977e2ba399f65679c35b9a2abfde0230a5706fe99f5460c700b1498b1661353ec30eab25defb9af2e7e744fd050d2e7c87542d8bc49e728a7734accf2801dc5972192670858f2004308f3afdd94acd44e1161c44dd372296ca7fe40cbb541c21d640a10df34460c4f5c7cd1bf3b3282668d7edb53be4d843aef4b6f0357526d9c4432aa2a45e113a73e75bfec98cb4cc020ab6cca35336fd188140fd16183dbe288707421e698b6e4801508ae903de3e5d600bd613ea612af92780e53be37722897edb8a588193e7d28819c2f0cbb4e97c3e830113ce14ab05ddb82552fc5e82c386ec2fe9b2d86fc7ade39e341e3dd828502cc3dd038cb21cb0512e79dca9f5a9eae78b2e91aa0732ac77fbc3bc5575c210f519c178669ea99bef62eb6761dfa76407d0d501b07a696a0214dafde7b0bfb48e8ba445b6b42a859a63cb91c9d991ed030ef9e6c63f53b395e14821d7039e4455e0e3712f77f64b7abaa04467bd5b9be26c5e098430187676d0aa7206e2e4fa2e5b7bd486d18b0f3859e94319ccac587574a7bae6ccb3e9414cc769761cf6a0fa1b33cccd1a4b0b04c0d52cd*3*254*8*9*16*343d26cf2c10a8f8a161874fbb218c12*65536*666ae8d1c98404b0",
+        "example_pass": "8CdhZ2J8umrHg0tMjB0NDRDpKKFeL7i",
         "benchmark_mask": "?b?b?b?b?b?b?b",
         "benchmark_charset1": "N/A",
         "autodetect_enabled": true,
@@ -10352,7 +10522,7 @@
         "name": "SNMPv3 HMAC-MD5-96/HMAC-SHA1-96",
         "category": "Network Protocol",
         "slow_hash": true,
-        "password_len_min": 8,
+        "password_len_min": 0,
         "password_len_max": 256,
         "is_deprecated": false,
         "is_salted": true,
@@ -10380,7 +10550,7 @@
         "name": "SNMPv3 HMAC-MD5-96",
         "category": "Network Protocol",
         "slow_hash": true,
-        "password_len_min": 8,
+        "password_len_min": 0,
         "password_len_max": 256,
         "is_deprecated": false,
         "is_salted": true,
@@ -10408,7 +10578,7 @@
         "name": "SNMPv3 HMAC-SHA1-96",
         "category": "Network Protocol",
         "slow_hash": true,
-        "password_len_min": 8,
+        "password_len_min": 0,
         "password_len_max": 256,
         "is_deprecated": false,
         "is_salted": true,
@@ -10849,7 +11019,7 @@
         ]
     },
     "26600": {
-        "name": "MetaMask Wallet",
+        "name": "MetaMask Wallet (needs all data, checks AES-GCM tag)",
         "category": "Cryptocurrency Wallet",
         "slow_hash": true,
         "password_len_min": 8,
@@ -10863,7 +11033,35 @@
             "pure"
         ],
         "example_hash_format": "plain",
-        "example_hash": "$metamask$h0c2mQBGgnhlJ4EWMhdAAZhHlFeZNVlAEwOHQHaEBhY=$q9de9oljOBLWBQRtk9Ugog==$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",
+        "example_hash": "$metamask$jfGI3TXguhb8GPnKSXFrMzRk2NCEc131Gt5G3kZr5+s=$h+BoIf2CQ5BEjaIOShFE7g==$R95fzGt4UQ0uwrcrVYnIi4UcSlWn9wlmer+//526ZDwYAp50K82F1u1oacYcdjjhuEvbZnWk/uBG00UkgLLlO3WbINljqmu2QWdDEwjTgo/qWR6MU9d/82rxNiONHQE8UrZ8SV+htVr6XIB0ze3aCV0E+fwI93EeP79ZeDxuOEhuHoiYT0bHWMv5nA48AdluG4DbOo7SrDAWBVCBsEdXsOfYsS3/TIh0a/iFCMX4uhxY2824JwcWp4H36SFWyBYMZCJ3/U4DYFbbjWZtGRthoJlIik5BJq4FLu3Y1jEgza0AWlAvu4MKTEqrYSpUIghfxf1a1f+kPvxsHNq0as0kRwCXu09DObbdsiggbmeoBkxMZiFq0d9ar/3Gon0r3hfc3c124Wlivzbzu1JcZ3wURhLSsUS7b5cfG86aXHJkxmQDA5urBz6lw3bsIvlEUB2ErkQy/zD+cPwCG1Rs/WKt7KNh45lppCUkHccbf+xlpdc8OfUwj01Xp7BdH8LMR7Vx1C4hZCvSdtURVl0VaAMxHDX0MjRkwmqS",
+        "example_pass": "hashcat1",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "26610": {
+        "name": "MetaMask Wallet (short hash, plaintext check)",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": true,
+        "password_len_min": 8,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$metamask-short$jfGI3TXguhb8GPnKSXFrMzRk2NCEc131Gt5G3kZr5+s=$h+BoIf2CQ5BEjaIOShFE7g==$R95fzGt4UQ0uwrcrVYnIi4UcSlWn9wlmer+//526ZDwYAp50K82F1u1oacYcdjjhuEvbZnWk/uBG00UkgLLlOw==",
         "example_pass": "hashcat1",
         "benchmark_mask": "?b?b?b?b?b?b?b",
         "benchmark_charset1": "N/A",
@@ -11225,6 +11423,7 @@
         "salt_len_min": 0,
         "salt_len_max": 256,
         "kernel_type": [
+            "pure",
             "optimized"
         ],
         "example_hash_format": "plain",
@@ -11253,6 +11452,7 @@
         "salt_len_min": 0,
         "salt_len_max": 256,
         "kernel_type": [
+            "pure",
             "optimized"
         ],
         "example_hash_format": "plain",
@@ -13155,6 +13355,118 @@
             "HEX"
         ]
     },
+    "29910": {
+        "name": "ENCsecurity Datavault (PBKDF2/no keychain)",
+        "category": "File-Based Encryption (FBE)",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$encdv-pbkdf2$1$1$121f898edc51ffb2$14e6bf4e9256f9e4$32$1972489853882254644795101599063579097812661888813652597380052274$100000",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "29920": {
+        "name": "ENCsecurity Datavault (PBKDF2/keychain)",
+        "category": "File-Based Encryption (FBE)",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$encdv-pbkdf2$3$1$c232aba45699c80b$473d5dd2e0833ac7$32$4454716926322493581114042616371582782202532493983541577898367049$100000$9a030124cecc2fef5ca44f83ef6e4c7944f8d7c5234b9000c982e209a92bb5535f4c15be6e9914729eb8a9bf870bd0535a231fa1d443d27c1fc4f78b441a7aa765fa0a3d181c485f77f59334ec68f27e66f227eb4be3579464d907ed8cf8bacc817cceb4496587898e43ce41921f66114051c007e1a54b7215b220aed6e33064",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "29930": {
+        "name": "ENCsecurity Datavault (MD5/no keychain)",
+        "category": "File-Based Encryption (FBE)",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$encdv$1$1$3a427b9ee5851118$4f52176bb9a1b3b6",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "29940": {
+        "name": "ENCsecurity Datavault (MD5/keychain)",
+        "category": "File-Based Encryption (FBE)",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$encdv$3$1$91b9babb3820c527$1ff4cb6657adad34$d9067c4d059879dfee2edeb3999871973d422ff5fa868c51b025d07f644187889dc5509ec75d4a120184d619d10d02b138d64ba82f9d0936162c9e64d97771de3e74d6e52e5ab9b900c25fb446e14cbe3ef1fa34328a13f9473c669f22d7020bc036d9e99194c959e4c5ba885d6f9ff9ccc2299d67b26e68b850a02363fb2646",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
     "30000": {
         "name": "Python Werkzeug MD5 (HMAC-MD5 (key = $salt))",
         "category": "Framework",
@@ -13202,6 +13514,489 @@
         "example_hash_format": "plain",
         "example_hash": "sha256$70108387805$8b9472281c36c3a693703de0e0f1ffab8fc0ecdd3bc5ead04c76dd74ef431e49",
         "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30420": {
+        "name": "DANE RFC7929/RFC8162 SHA2-256",
+        "category": "Network Protocol",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure",
+            "optimized"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "127e6fbfe24a750e72930c220a8e138275656b8e5d8f48a98c3c92df",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30500": {
+        "name": "md5(md5($salt).md5(md5($pass)))",
+        "category": "Forums, CMS, E-Commerce",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "generic",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure",
+            "optimized"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "e13bb4b8e5a98db7277df344aa3363cf:28945624531",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30600": {
+        "name": "bcrypt(sha256($pass)) / bcryptsha256",
+        "category": "Forums, CMS, E-Commerce",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$2b$10$FxDtpTNaL303lLcWtd6LFO2U6Gc63VJ07qycHcfqbQQ71GhO/qSzu",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30700": {
+        "name": "Anope IRC Services (enc_sha256)",
+        "category": "Instant Messaging Service",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure",
+            "optimized"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "sha256:ab67666e1f91cd38c0ab5bee9c8d2132eca7460354477109a739d4e735b14131:47bcfd0d573653943231df07445da774e5d06465c897ce40578b120bde187e26",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30901": {
+        "name": "Bitcoin raw private key (P2PKH), compressed",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": false,
+        "password_len_min": 64,
+        "password_len_max": 64,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "14Fqy5AGRehazZ4NLzxFWy2E4BiNFdH9Ut",
+        "example_pass": "59887ec9920239bd45b6a9f82b7c4e024f80beaf887e5ee6aac5de0a899d3068",
+        "benchmark_mask": "?h?h?h?h?h?h?h9920239bd45b6a9f82b7c4e024f80beaf887e5ee6aac5de0a899d3068",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30902": {
+        "name": "Bitcoin raw private key (P2PKH), uncompressed",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": false,
+        "password_len_min": 64,
+        "password_len_max": 64,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "12sLRz1TKPZurKCwVqeT5FkW3Y7usipPbZ",
+        "example_pass": "2006a306cf8f61c18c4e78e5fc0f5a7aa473b5ffb41f34344a32f8e042786fa1",
+        "benchmark_mask": "?h?h?h?h?h?h?h6cf8f61c18c4e78e5fc0f5a7aa473b5ffb41f34344a32f8e042786fa1",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30903": {
+        "name": "Bitcoin raw private key (P2WPKH, Bech32), compressed",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": false,
+        "password_len_min": 64,
+        "password_len_max": 64,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "bc1q926ca6n7wz7gm2gfd8xc5p0vu687ngvnknpx74",
+        "example_pass": "4d1987d7a341d51557af59996845740135ab2506515426ada57cc8ec05adf794",
+        "benchmark_mask": "?h?h?h?h?h?h?h7a341d51557af59996845740135ab2506515426ada57cc8ec05adf794",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30904": {
+        "name": "Bitcoin raw private key (P2WPKH, Bech32), uncompressed",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": false,
+        "password_len_min": 64,
+        "password_len_max": 64,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "bc1qq6samcuksd2f6rsc48eu3lkq87zp33vfud0p0t",
+        "example_pass": "25c9f8f734d87aacd9308705ca50b9819a57425ffbfae41cef869b19764d72c2",
+        "benchmark_mask": "?h?h?h?h?h?h?h734d87aacd9308705ca50b9819a57425ffbfae41cef869b19764d72c2",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30905": {
+        "name": "Bitcoin raw private key (P2SH(P2WPKH)), compressed",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": false,
+        "password_len_min": 64,
+        "password_len_max": 64,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "3JqAMRQN3Gd6i8yV3Kw7v55RmFxW7iW2Aq",
+        "example_pass": "83b45ff8d85f37aafc05a8accd1f1cd5e50868b57e2ef0ef6f287bb4d8d17786",
+        "benchmark_mask": "?h?h?h?h?h?h?h8d85f37aafc05a8accd1f1cd5e50868b57e2ef0ef6f287bb4d8d17786",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "30906": {
+        "name": "Bitcoin raw private key (P2SH(P2WPKH)), uncompressed",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": false,
+        "password_len_min": 64,
+        "password_len_max": 64,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "3PmD8zdrFD8KVgLrguVDCP2RJB4Rh35G9Z",
+        "example_pass": "4c969ccc86d9e1f557b4ff1f19badc9a99718dd2aec8fcf66460612e05f5f7dd",
+        "benchmark_mask": "?h?h?h?h?h?h?hc86d9e1f557b4ff1f19badc9a99718dd2aec8fcf66460612e05f5f7dd",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31000": {
+        "name": "BLAKE2s-256",
+        "category": "Raw Hash",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure",
+            "optimized"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$BLAKE2$2c719b484789ad5f6fc1739012182169b25484af156adc91d4f64f72400e574a",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31100": {
+        "name": "SM3",
+        "category": "Raw Hash",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": false,
+        "kernel_type": [
+            "pure",
+            "optimized"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "51227e48ea74827b77fc142c3ec21d25cc42c794e6ac422825cd47ad4ac7913d",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31200": {
+        "name": "Veeam VBK",
+        "category": "Archive",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$vbk$*54731702769149752741495960625996207399688284541933702394775960978730695504382155223405444342855920150089170058956647576461877712*10000*78cf7df8f1ed8bb50bda1129ec8e6810",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": true,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31300": {
+        "name": "MS SNTP",
+        "category": "Network Protocol",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "generic",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure",
+            "optimized"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$sntp-ms$cfc7023381cf6bb474cdcbeb0a67bdb3$907733697536811342962140955567108526489624716566696971338784438986103976327367763739445744705380",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31400": {
+        "name": "SecureCRT MasterPassphrase v2",
+        "category": "Application Database",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "S:\"Config Passphrase\"=02:ded7137400e0a1004a12f1708453968ccc270908ba02ab0345c83690d1de3d9937587be66ad2a7fe8cc6cb16ecff02e61ac05e09d4f49f284efd24f6b16d6ae3",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31700": {
+        "name": "md5(md5(md5($pass).$salt1).$salt2)",
+        "category": "Raw Hash salted and/or iterated",
+        "slow_hash": false,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "generic",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "c7a971e405313d0ecc22e37e8b2424a1:2316355934:478467",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31800": {
+        "name": "1Password, mobilekeychain (1Password 8)",
+        "category": "Password Manager",
+        "slow_hash": true,
+        "password_len_min": 0,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$mobilekeychain$31800@hashcat.net$0226802599846590531367298686059042845608249051353268870564348733$fa53b7d424cdd36667dc12e585810729efc8ea9b2f8e5dd7a3ee72f7576a6788$100000$e1fea241e7b7c84535a0d53388bccbb9$dfd5f9ad6da1a72a47a3c04e03b02142b2fc301b3afff610669058527828a0e0388f5a2b0e6909813a5f9653c54f797adf0869107f4b875d4beb736cfbcec428ca19fc28346642fa32ec00f2ca4ad8dcf119af33cb247273e7b7427fd20eae8fb992779979a5e25aa465b3954794f62f4ea85355032efcd4e43ae3db6b14720d1dda963a384c37b521a92cef3494f77580edab210987ebcf2f0f7ed0220c0a4777be693e075b5f1e1302$995f3703b8ea4519f8cdc1cbded4d595",
+        "example_pass": "hashcat",
+        "benchmark_mask": "?b?b?b?b?b?b?b",
+        "benchmark_charset1": "N/A",
+        "autodetect_enabled": true,
+        "self_test_enabled": true,
+        "potfile_enabled": true,
+        "custom_plugin": false,
+        "plaintext_encoding": [
+            "ASCII",
+            "HEX"
+        ]
+    },
+    "31900": {
+        "name": "MetaMask Mobile Wallet",
+        "category": "Cryptocurrency Wallet",
+        "slow_hash": true,
+        "password_len_min": 8,
+        "password_len_max": 256,
+        "is_deprecated": false,
+        "is_salted": true,
+        "salt_type": "embedded",
+        "salt_len_min": 0,
+        "salt_len_max": 256,
+        "kernel_type": [
+            "pure"
+        ],
+        "example_hash_format": "plain",
+        "example_hash": "$metamaskMobile$MjU1NTA5MTU2ODY5MjY4OQ==$3cccb51c401e54abc82987fd9310a8d3$WQhIECN0blOaV31RC3lKfQ==",
+        "example_pass": "hashcat1",
         "benchmark_mask": "?b?b?b?b?b?b?b",
         "benchmark_charset1": "N/A",
         "autodetect_enabled": true,

@@ -2383,7 +2383,10 @@ def find_rc4_passinfo_xls(filename, stream):
         data = stream.read(length)
 
         if type == 0x2f:  # FILEPASS
-            if data[0:2] == b"\x00\x00":  # XOR obfuscation
+            if length == 4:  # Excel 95 XOR obfuscation
+                sys.stderr.write("%s : Excel 95 XOR obfuscation detected, key : %s, hash : %s\n" % \
+                    (filename, binascii.hexlify(data[0:2]), binascii.hexlify(data[2:4])))
+            elif data[0:2] == b"\x00\x00":  # XOR obfuscation
                 sys.stderr.write("%s : XOR obfuscation detected, key : %s, hash : %s\n" % \
                     (filename, binascii.hexlify(data[2:4]), binascii.hexlify(data[4:6])))
             elif data[0:6] == b'\x01\x00\x01\x00\x01\x00':
@@ -2432,10 +2435,23 @@ def find_rc4_passinfo_xls(filename, stream):
                 verifierHashSize = unpack("<I", stm.read(4))[0]
                 assert(verifierHashSize == 20)
                 encryptedVerifierHash = stm.read(verifierHashSize)
-                sys.stdout.write("$oldoffice$%s*%s*%s*%s\n" % (typ,
-                    binascii.hexlify(salt).decode("ascii"),
+
+                second_block_extra = ""
+                if typ == 3:
+                    offset_cur = stream.tell()
+                    assert(offset_cur < 1024)
+
+                    skip = 1024 - offset_cur
+                    stream.read(skip) # ignore remaining bytes of 1st block
+
+                    second_block_bytes = stream.read(32)
+                    second_block_extra = "*%s" % binascii.hexlify(second_block_bytes).decode("ascii")
+
+                sys.stdout.write("$oldoffice$%s*%s*%s*%s%s\n" % (
+                    typ, binascii.hexlify(salt).decode("ascii"),
                     binascii.hexlify(encryptedVerifier).decode("ascii"),
-                    binascii.hexlify(encryptedVerifierHash).decode("ascii")))
+                    binascii.hexlify(encryptedVerifierHash).decode("ascii"),
+                    second_block_extra))
 
     return None
 
@@ -2520,8 +2536,10 @@ def find_rc4_passinfo_doc(filename, stream):
             typ = 4
         elif keySize == 40:
             typ = 3
+        elif keySize == 56:
+            typ = 5
         else:
-            sys.stderr.write("%s : invalid keySize\n" % filename)
+            sys.stderr.write("%s : invalid keySize %u\n" % (filename, keySize))
 
         # Encryption verifier
         saltSize = unpack("<I", stream.read(4))[0]
@@ -2531,13 +2549,32 @@ def find_rc4_passinfo_doc(filename, stream):
         verifierHashSize = unpack("<I", stream.read(4))[0]
         assert(verifierHashSize == 20)
         encryptedVerifierHash = stream.read(verifierHashSize)
-        sys.stdout.write("$oldoffice$%s*%s*%s*%s\n" % (typ,
-            binascii.hexlify(salt).decode("ascii"),
+
+        second_block_extra = ""
+        if typ == 3:
+            offset_cur = stream.tell()
+            assert(offset_cur < 512)
+
+            skip = 512 - offset_cur
+            stream.read(skip) # ignore remaining bytes of 1st block
+
+            second_block_bytes = stream.read(32)
+            second_block_extra = "*%s" % binascii.hexlify(second_block_bytes).decode("ascii")
+
+        summary_extra = ""
+        #if have_summary:
+        #    summary_extra = ":::%s::%s" % (summary, filename)
+
+        sys.stdout.write("$oldoffice$%s*%s*%s*%s%s%s\n" % (
+            typ, binascii.hexlify(salt).decode("ascii"),
             binascii.hexlify(encryptedVerifier).decode("ascii"),
-            binascii.hexlify(encryptedVerifierHash).decode("ascii")))
+            binascii.hexlify(encryptedVerifierHash).decode("ascii"),
+            second_block_extra,
+            summary_extra
+            ))
 
     else:
-        sys.stderr.write("%s : Cannot find RC4 pass info, is document encrypted?\n" % filename)
+        sys.stderr.write("%s : Cannot find RC4 pass info, is the document encrypted?\n" % filename)
 
 
 def find_rc4_passinfo_ppt(filename, stream, offset):
@@ -2548,10 +2585,10 @@ def find_rc4_passinfo_ppt(filename, stream, offset):
     recLen = unpack("<L", stream.read(4))[0]
     if recLen != 32:
         sys.stderr.write("%s : Document is not encrypted!\n" % (filename))
-        return
+        return False
     if recType != 0x0FF5:
         sys.stderr.write("%s : Document is corrupt!\n" % (filename))
-        return
+        return False
     # read reset of UserEditAtom
     unpack("<L", stream.read(4))[0]  # lastSlideRef
     unpack("<h", stream.read(2))[0]  # version
@@ -2577,7 +2614,11 @@ def find_rc4_passinfo_ppt(filename, stream, offset):
     stream.read(4)  # unused
     while i < encryptSessionPersistIdRef:
         i += 1
-        persistOffset = unpack("<L", stream.read(4))[0]
+        try:
+            persistOffset = unpack("<L", stream.read(4))[0]
+        except:
+            # sys.stderr.write("%s : Document is corrupt, or %s has a bug\n" % (filename, sys.argv[0]))
+            return False
     # print persistOffset
     # go to the offset of encryption header
     stream.seek(persistOffset, 0)
@@ -2600,7 +2641,7 @@ def find_rc4_passinfo_ppt(filename, stream, offset):
         headerLength -= 4
         unpack("<I", stream.read(4))[0]  # algHashId
         headerLength -= 4
-        unpack("<I", stream.read(4))[0]  # keySize
+        keySize = unpack("<I", stream.read(4))[0]  # keySize
         headerLength -= 4
         unpack("<I", stream.read(4))[0]  # providerType
         headerLength -= 4
@@ -2609,11 +2650,15 @@ def find_rc4_passinfo_ppt(filename, stream, offset):
         unpack("<I", stream.read(4))[0]
         headerLength -= 4
         CSPName = stream.read(headerLength)
-        provider = CSPName.decode('utf-16').lower()
-        if "strong" in provider:
+        typ = None
+        if keySize == 128:
             typ = 4
-        else:
+        elif keySize == 40:
             typ = 3
+        elif keySize == 0:
+            typ = 3
+        else:
+            return False
         # Encryption verifier
         saltSize = unpack("<I", stream.read(4))[0]
         assert(saltSize == 16)
@@ -2622,12 +2667,193 @@ def find_rc4_passinfo_ppt(filename, stream, offset):
         verifierHashSize = unpack("<I", stream.read(4))[0]
         assert(verifierHashSize == 20)
         encryptedVerifierHash = stream.read(verifierHashSize)
-        sys.stdout.write("$oldoffice$%s*%s*%s*%s\n" % (major_version,
-            binascii.hexlify(salt).decode("ascii"),
+
+        second_block_extra = ""
+        if typ == 3:
+            # seek to the start and afterwards back to current pos:
+            offset_cur = stream.tell()
+            stream.seek(0)
+            second_block_bytes = stream.read(32)
+            second_block_extra = "*%s" % binascii.hexlify(second_block_bytes).decode("ascii")
+            stream.seek(offset_cur) # to be safe, seek back to old pos (not really needed)
+
+        sys.stdout.write("$oldoffice$%s*%s*%s*%s%s\n" % (
+            typ, binascii.hexlify(salt).decode("ascii"),
             binascii.hexlify(encryptedVerifier).decode("ascii"),
-            binascii.hexlify(encryptedVerifierHash).decode("ascii")))
+            binascii.hexlify(encryptedVerifierHash).decode("ascii"),
+            second_block_extra))
+        return True
     else:
+        # sys.stderr.write("%s : Cannot find RC4 pass info, is the document encrypted?\n" % filename)
+        return False
+
+
+def find_rc4_passinfo_ppt_bf(filename, stream, offset):
+    """We don't use stream and offset anymore! The current method is a bit slow for large files."""
+    sys.stderr.write("This can take a while, please wait.\n")
+    stream = open(filename, "rb")
+    original = stream.read()
+    found = False
+    for i in range(0, len(original)):
+        data = original[i:i+384]
+        stream = StringIO(data)
+        if len(data) < 128:
+            return
+        major_version = unpack("<h", stream.read(2))[0]
+        minor_version = unpack("<h", stream.read(2))[0]
+        if major_version >= 2 and minor_version == 2:
+            pass
+        else:
+            continue
+        # RC4 CryptoAPI Encryption Header, Section 2.3.5.1 - RC4 CryptoAPI
+        # Encryption Header in [MS-OFFCRYPTO].pdf
+        unpack("<I", stream.read(4))[0]  # encryptionFlags
+        headerLength = unpack("<I", stream.read(4))[0]
+        unpack("<I", stream.read(4))[0]  # skipFlags
+        headerLength -= 4
+        sizeExtra = unpack("<I", stream.read(4))[0]  # sizeExtra
+        headerLength -= 4
+        algId = unpack("<I", stream.read(4))[0]  # algId, 0x00006801 (RC4 encryption)
+        headerLength -= 4
+        algHashId = unpack("<I", stream.read(4))[0]  # algHashId, 0x00008004 (SHA-1)
+        if not type or (sizeExtra != 0) or (algId != 0x6801) or (algHashId != 0x8004):
+                continue
+        headerLength -= 4
+        keySize = unpack("<I", stream.read(4))[0]  # keySize, If set to 0, it MUST be interpreted as 40
+        headerLength -= 4
+        unpack("<I", stream.read(4))[0]  # providerType
+        headerLength -= 4
+        unpack("<I", stream.read(4))[0]  # unused
+        headerLength -= 4
+        unpack("<I", stream.read(4))[0]  # unused
+        headerLength -= 4
+        CSPName = stream.read(headerLength)
+        typ = None
+        if keySize == 128:
+            typ = 4
+        elif keySize == 40:
+            typ = 3
+        elif keySize == 0:
+            typ = 3
+        else:
+            continue
+
+        # Encryption verifier
+        saltSize = unpack("<I", stream.read(4))[0]
+        assert(saltSize == 16)
+        salt = stream.read(saltSize)
+        encryptedVerifier = stream.read(16)
+        verifierHashSize = unpack("<I", stream.read(4))[0]
+        assert(verifierHashSize == 20)
+        encryptedVerifierHash = stream.read(verifierHashSize)
+
+        second_block_extra = ""
+        #  TODO: how to test this BF thing?
+        # if typ == 3:
+        #     offset_cur = stream.tell()
+        #     assert(offset_cur < 512)
+        #
+        #     skip = 512 - offset_cur
+        #     stream.read(skip) # ignore remaining bytes of 1st block
+        #
+        #     second_block_bytes = stream.read(32)
+        #     second_block_extra = "*%s" % binascii.hexlify(second_block_bytes).decode("ascii")
+
+        found = True
+        sys.stdout.write("$oldoffice$%s*%s*%s*%s%s\n" % (
+            typ, binascii.hexlify(salt).decode("ascii"),
+            binascii.hexlify(encryptedVerifier).decode("ascii"),
+            binascii.hexlify(encryptedVerifierHash).decode("ascii"),
+            second_block_extra))
+
+    if not found:
         sys.stderr.write("%s : Cannot find RC4 pass info, is document encrypted?\n" % filename)
+
+
+def process_access_2007_older_crypto(filename):
+    """Dirty hash extractor for MS Office 2007 .accdb files which use CryptoAPI
+    based encryption."""
+
+    original = open(filename, "rb").read()
+
+    for i in range(0, len(original)):
+        data = original[i:40960]  # is this limit on data reasonable?
+        stream = StringIO(data)
+        if len(data) < 128:
+            return
+
+        major_version = unpack("<h", stream.read(2))[0]
+        minor_version = unpack("<h", stream.read(2))[0]
+
+        # RC4 CryptoAPI Encryption Header, Section 2.3.5.1 - RC4 CryptoAPI
+        # Encryption Header in [MS-OFFCRYPTO].pdf
+        unpack("<I", stream.read(4))[0]  # encryptionFlags
+        headerLength = unpack("<I", stream.read(4))[0]
+        unpack("<I", stream.read(4))[0]  # skipFlags
+        headerLength -= 4
+        sizeExtra = unpack("<I", stream.read(4))[0]  # sizeExtra
+        headerLength -= 4
+        algId = unpack("<I", stream.read(4))[0]  # algId, 0x00006801 (RC4 encryption)
+        headerLength -= 4
+        algHashId = unpack("<I", stream.read(4))[0]  # algHashId, 0x00008004 (SHA-1)
+        headerLength -= 4
+        keySize = unpack("<I", stream.read(4))[0]  # keySize, If set to 0, it MUST be interpreted as 40
+        headerLength -= 4
+        unpack("<I", stream.read(4))[0]  # providerType
+        headerLength -= 4
+        unpack("<I", stream.read(4))[0]  # unused
+        headerLength -= 4
+        unpack("<I", stream.read(4))[0]  # unused
+        headerLength -= 4
+        CSPName = stream.read(headerLength)
+        try:
+            provider = CSPName.decode('utf-16')
+            if provider.startswith("Microsoft Base Cryptographic Provider"):
+                pass
+        except:
+            continue
+
+        typ = None
+        if keySize == 128:
+            typ = 4
+        elif keySize == 40:
+            typ = 3
+        elif keySize == 0:
+            typ = 3
+        else:
+            # sys.stderr.write("%s : invalid keySize %u\n" % (filename, keySize))
+            continue
+
+        if not type or (sizeExtra != 0) or (algId != 0x6801) or (algHashId != 0x8004):
+            continue
+
+        # Encryption verifier
+        saltSize = unpack("<I", stream.read(4))[0]
+        assert(saltSize == 16)
+        salt = stream.read(saltSize)
+        encryptedVerifier = stream.read(16)
+        verifierHashSize = unpack("<I", stream.read(4))[0]
+        assert(verifierHashSize == 20)
+        encryptedVerifierHash = stream.read(verifierHashSize)
+
+        second_block_extra = ""
+        if typ == 3:
+            offset_cur = stream.tell()
+            assert(offset_cur < 512)
+
+            skip = 512 - offset_cur
+            stream.read(skip) # ignore remaining bytes of 1st block
+
+            second_block_bytes = stream.read(32)
+            second_block_extra = "*%s" % binascii.hexlify(second_block_bytes).decode("ascii")
+
+        sys.stdout.write("$oldoffice$%s*%s*%s*%s%s\n" % (
+            typ, binascii.hexlify(salt).decode("ascii"),
+            binascii.hexlify(encryptedVerifier).decode("ascii"),
+            binascii.hexlify(encryptedVerifierHash).decode("ascii"),
+            second_block_extra))
+        break
+
 
 from xml.etree.ElementTree import ElementTree
 import base64
@@ -2651,45 +2877,8 @@ def process_new_office(filename):
             return -2
 
         # rest of the data is in XML format
-        data = StringIO(stream.read())
-        tree = ElementTree()
-        tree.parse(data)
-
-        for node in tree.getiterator('{http://schemas.microsoft.com/office/2006/keyEncryptor/password}encryptedKey'):
-            spinCount = node.attrib.get("spinCount")
-            assert(spinCount)
-            saltSize = node.attrib.get("saltSize")
-            assert(saltSize)
-            blockSize = node.attrib.get("blockSize")
-            assert(blockSize)
-            keyBits = node.attrib.get("keyBits")
-            hashAlgorithm = node.attrib.get("hashAlgorithm")
-            if hashAlgorithm == "SHA1":
-                version = 2010
-            elif hashAlgorithm == "SHA512":
-                version = 2013
-            else:
-                sys.stderr.write("%s uses un-supported hashing algorithm %s, please file a bug! \n" \
-                        % (filename, hashAlgorithm))
-                return -3
-            cipherAlgorithm = node.attrib.get("cipherAlgorithm")
-            if not cipherAlgorithm.find("AES") > -1:
-                sys.stderr.write("%s uses un-supported cipher algorithm %s, please file a bug! \n" \
-                    % (filename, cipherAlgorithm))
-                return -4
-
-            saltValue = node.attrib.get("saltValue")
-            assert(saltValue)
-            encryptedVerifierHashInput = node.attrib.get("encryptedVerifierHashInput")
-            encryptedVerifierHashValue = node.attrib.get("encryptedVerifierHashValue")
-            encryptedVerifierHashValue = binascii.hexlify(base64.decodestring(encryptedVerifierHashValue.encode()))
-
-            sys.stdout.write("$office$*%d*%d*%d*%d*%s*%s*%s\n" % \
-                (version, int(spinCount), int(keyBits), int(saltSize),
-                binascii.hexlify(base64.decodestring(saltValue.encode())).decode("ascii"),
-                binascii.hexlify(base64.decodestring(encryptedVerifierHashInput.encode())).decode("ascii"),
-                encryptedVerifierHashValue[0:64].decode("ascii")))
-            return 0
+        data = stream.read()
+        xml_metadata_parser(data, filename)
     else:
         # Office 2007 file detected, process CryptoAPI Encryption Header
         stm = stream
@@ -2733,7 +2922,8 @@ def xml_metadata_parser(data, filename):
     tree = ElementTree()
     tree.parse(data)
 
-    for node in tree.getiterator('{http://schemas.microsoft.com/office/2006/keyEncryptor/password}encryptedKey'):
+    tree_iter = tree.iter if hasattr(ElementTree, 'iter') else tree.getiterator
+    for node in tree_iter('{http://schemas.microsoft.com/office/2006/keyEncryptor/password}encryptedKey'):
         spinCount = node.attrib.get("spinCount")
         assert(spinCount)
         saltSize = node.attrib.get("saltSize")
@@ -2760,12 +2950,23 @@ def xml_metadata_parser(data, filename):
         assert(saltValue)
         encryptedVerifierHashInput = node.attrib.get("encryptedVerifierHashInput")
         encryptedVerifierHashValue = node.attrib.get("encryptedVerifierHashValue")
-        encryptedVerifierHashValue = binascii.hexlify(base64.decodestring(encryptedVerifierHashValue.encode()))
+        if PY3:
+            encryptedVerifierHashValue = binascii.hexlify(base64.decodebytes(encryptedVerifierHashValue.encode()))
+        else:
+            encryptedVerifierHashValue = binascii.hexlify(base64.decodestring(encryptedVerifierHashValue.encode()))
+
+        if PY3:
+            saltAscii = binascii.hexlify(base64.decodebytes(saltValue.encode())).decode("ascii")
+            encryptedVerifierHashAscii = binascii.hexlify(base64.decodebytes(encryptedVerifierHashInput.encode())).decode("ascii")
+        else:
+            saltAscii = binascii.hexlify(base64.decodestring(saltValue.encode())).decode("ascii")
+            encryptedVerifierHashAscii = binascii.hexlify(base64.decodestring(encryptedVerifierHashInput.encode())).decode("ascii")
 
         sys.stdout.write("$office$*%d*%d*%d*%d*%s*%s*%s\n" % \
-            (version, int(spinCount), int(keyBits), int(saltSize),
-            binascii.hexlify(base64.decodestring(saltValue.encode())).decode("ascii"),
-            binascii.hexlify(base64.decodestring(encryptedVerifierHashInput.encode())).decode("ascii"),
+            (version,
+            int(spinCount), int(keyBits), int(saltSize),
+            saltAscii,
+            encryptedVerifierHashAscii,
             encryptedVerifierHashValue[0:64].decode("ascii")))
         return 0
 
@@ -2774,6 +2975,7 @@ have_summary = False
 summary = []
 
 import re
+from binascii import unhexlify
 
 
 def remove_html_tags(data):
@@ -2787,7 +2989,7 @@ def remove_extra_spaces(data):
 
 
 def process_file(filename):
-    # Test if a file is an OLE container:
+    # Test if a file is an OLE container
     try:
         f = open(filename, "rb")
         data = f.read(81920)  # is this enough?
@@ -2807,6 +3009,20 @@ def process_file(filename):
             start = data.find(accdb_xml_start)
             trailer = data.find(accdb_xml_trailer)
             xml_metadata_parser(data[start:trailer+len(accdb_xml_trailer)], filename)
+            return
+        elif accdb_magic in data:  # Access 2007 files using CryptoAPI
+            process_access_2007_older_crypto(filename)
+            return
+
+        # OneNote handling hack for OneNote versions >= 2013, see [MS-ONESTORE].pdf
+        onenote_magic = unhexlify("e4525c7b8cd8")
+        onenote_xml_start = b'<?xml version="1.0"'
+        onenote_xml_trailer = b'</encryption>'
+        if data.startswith(onenote_magic) and onenote_xml_start in data:
+            # find start and the end of the XML metadata stream
+            start = data.find(onenote_xml_start)
+            trailer = data.find(onenote_xml_trailer)
+            xml_metadata_parser(data[start:trailer+len(onenote_xml_trailer)], filename)
             return
 
         if not isOleFile(filename):
@@ -2858,6 +3074,8 @@ def process_file(filename):
         return process_new_office(filename)
     if ["Workbook"] in ole.listdir():
         stream = "Workbook"
+    elif ["Book"] in ole.listdir():
+        stream = "Book"
     elif ["WordDocument"] in ole.listdir():
         typ = 1
         sdoc = ole.openstream("WordDocument")
@@ -2884,7 +3102,7 @@ def process_file(filename):
         (filename, stream)
         return 3
 
-    if stream == "Workbook":
+    if stream == "Workbook" or stream == "Book":
         typ = 0
         passinfo = find_rc4_passinfo_xls(filename, workbookStream)
         if passinfo is None:
@@ -2897,14 +3115,23 @@ def process_file(filename):
         sppt = ole.openstream("Current User")
         offset = find_ppt_type(filename, sppt)
         sppt = ole.openstream("PowerPoint Document")
-        find_rc4_passinfo_ppt(filename, sppt, offset)
+        ret = find_rc4_passinfo_ppt(filename, sppt, offset)
+        if not ret:
+            find_rc4_passinfo_ppt_bf(filename, sppt, offset)
+
         return 6
 
     (salt, verifier, verifierHash) = passinfo
-    sys.stdout.write("$oldoffice$%s*%s*%s*%s\n" % (typ,
-        binascii.hexlify(salt).decode("ascii"),
+
+    summary_extra = ""
+    #if have_summary:
+    #    summary_extra = ":::%s::%s" % (summary, filename)
+
+    sys.stdout.write("$oldoffice$%s*%s*%s*%s%s\n" % (
+        typ, binascii.hexlify(salt).decode("ascii"),
         binascii.hexlify(verifier).decode("ascii"),
-        binascii.hexlify(verifierHash).decode("ascii")))
+        binascii.hexlify(verifierHash).decode("ascii"),
+        summary_extra))
 
     workbookStream.close()
     ole.close()
@@ -2916,10 +3143,10 @@ if __name__ == "__main__":
         sys.stderr.write("Usage: %s <encrypted Office file(s)>\n" % sys.argv[0])
         sys.exit(1)
 
-# set_debug_mode(1)
+    # set_debug_mode(1)
 
-for i in range(1, len(sys.argv)):
-    if not PY3:
-        ret = process_file(sys.argv[i].decode("utf8"))
-    else:
-        ret = process_file(sys.argv[i])
+    for i in range(1, len(sys.argv)):
+        if not PY3:
+            ret = process_file(sys.argv[i].decode("utf8"))
+        else:
+            ret = process_file(sys.argv[i])

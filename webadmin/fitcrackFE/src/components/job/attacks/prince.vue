@@ -163,7 +163,8 @@
     props: ['keyspace'],
     watch: {
       keyspace (val) {
-        this.keyspaceLimit = val
+        if (val)
+          this.keyspaceLimit = val
       }
     },
     computed: mapTwoWayState('jobForm', twoWayMap(['leftDicts', 'rules', 'checkDuplicates',

@@ -48,6 +48,17 @@
             <v-divider />
             <v-list-item>
               <v-list-item-action>
+                Words in HEX:
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title class="text-right">
+                  {{ info.hex_dict ? 'Yes' : 'No' }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider />
+            <v-list-item>
+              <v-list-item-action>
                 Added:
               </v-list-item-action>
               <v-list-item-content>

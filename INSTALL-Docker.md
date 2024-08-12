@@ -1,9 +1,9 @@
-# Deploying Fitcrack server using Docker
+# Deploying Fitcrack using a pre-built image from Docker Hub
 
-This document describes how to install Fitcrack server using Docker.
+This document describes how to install Fitcrack server using a pre-built Docker image.
 
 ### Requirements
-Install **Docker Engine 20.10x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+Install **Docker Engine 20.10.x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
 Install **docker-compose 1.29.x**. You can use the following command:
 ```
@@ -18,12 +18,6 @@ Create a new **.env** config file from the example attached:
 cp env.example .env
 ```
 
-### Building Fitcrack image
-In case you are not using a pre-built **fitcrack_server** image, build your own with:
-```
-docker-compose build
-```
-
 ![Fitcrack-architecture](img/dockerenv.png)
 
 Edit the newly-created **.env** file and configure:
@@ -33,12 +27,12 @@ Edit the newly-created **.env** file and configure:
 - The default WebAdmin login is `fitcrack`/`FITCRACK`. We **highly recommend** to change it by modifying the `WEBADMIN_LOGIN` and `WEBADMIN_PW` variables.
 - SSL is disabled by default. If you want to enable it, follow the instructions below.
 
-
 ### Starting the fitcrack_server container
-Once the `fitcrack_server` image is prepared and `.env` file configured, you can run the server container using:
+Once the `.env` file is configured, you can run the server container using:
 ```
 docker-compose up
 ```
+Note that if you are running Fitcrack for the first time, it may take several minutes to pull the image from the Docker Hub.
 
 ![Fitcrack-architecture](img/dockerstart.png)
 
