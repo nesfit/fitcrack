@@ -61,7 +61,7 @@ class hashListCollection(Resource):
             else:
                 hash_list_query = hash_list_query.order_by(FcHashList.id.asc())
 
-        hash_list_page = hash_list_query.paginate(page,per_page,error_out=True)
+        hash_list_page = hash_list_query.paginate(page,per_page if per_page != -1 else 10000,error_out=True) # This is an ugly ugly hack, but I don't think anyone will run Fitcrack with more than 10000 hashlists.
 
         return hash_list_page
 
