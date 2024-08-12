@@ -68,8 +68,8 @@
               <v-col class="mw">
                 <v-switch
                     v-model="confirmpurge"
-                    label="Job purge confirmation"
-                    hint="Job purge requires clicking the button twice."
+                    label="Job kill confirmation"
+                    hint="Job kill button will ask for confirmation to prevent accients."
                     persistent-hint
                     class="mb-4 mt-0"
                 />
