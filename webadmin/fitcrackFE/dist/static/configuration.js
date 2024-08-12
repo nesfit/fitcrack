@@ -29,6 +29,6 @@ window.theme = {
     info: '#6DA8ED',
     success: '#5CDEA0',
     warning: '#FF975E',
-    custom_grey: '#616161'
+    custom_grey: '#424242'
   }
 }
