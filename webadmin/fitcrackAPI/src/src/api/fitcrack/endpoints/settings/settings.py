@@ -47,7 +47,7 @@ class settings(Resource):
         rdc = args['ramp_down_coefficient']
         vhf = args['verify_hash_format']
         aahtrj = args['auto_add_hosts_to_running_jobs']
-        mmp = args['max_mangled_passwords']
+        mmp = args['max_mangled_passwords_in_preview']
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
@@ -60,7 +60,7 @@ class settings(Resource):
         if (rdc is not None): settings.ramp_down_coefficient = rdc
         if (vhf is not None): settings.verify_hash_format = vhf
         if (aahtrj is not None): settings.auto_add_hosts_to_running_jobs = aahtrj
-        if (mmp is not None): settings.max_mangled_passwords = mmp
+        if (mmp is not None): settings.max_mangled_passwords_in_preview = mmp
         db.session.commit()
 
         return {

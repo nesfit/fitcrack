@@ -66,10 +66,11 @@
                     <v-row>
                         <v-col>
                             <v-alert tile color="orange" text class="mb-0">
-                                Maximum number of mangled passwords is set to {{ max_mangled_passwords }}. For change go to
+                                Maximum number of mangled passwords is set to {{ max_mangled_passwords_in_preview }}. To change this, go to
                                 <router-link :to="{ name: 'settings' }">
                                     <b>advanced settings</b>.
-                                </router-link>
+                                </router-link><br />
+                                Note: Mangled passwords longer than 64 characters are not outputted in the preview.
                             </v-alert>
                         </v-col>
                     </v-row>
@@ -121,7 +122,7 @@ export default {
     data() {
         return {
             appendDictPopup: false, // true if append dictionary popup should be shown, false if hidden
-            max_mangled_passwords: 50000,
+            max_mangled_passwords_in_preview: 50000,
         }
     },
     methods: {
@@ -149,7 +150,7 @@ export default {
     mounted() {
         // get the maximum number of mangled passwords from database
         this.axios.get(this.$serverAddr + '/settings').then((response) => {
-            this.max_mangled_passwords = response.data.max_mangled_passwords;
+            this.max_mangled_passwords_in_preview = response.data.max_mangled_passwords_in_preview;
         });
     },
     components: {

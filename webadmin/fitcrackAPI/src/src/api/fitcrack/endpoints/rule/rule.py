@@ -38,7 +38,7 @@ def countRules(filePath):
     Function which counts rules
     '''
     ruleCount = 0
-    with open(os.path.join(RULE_DIR, filePath), encoding='latin-1') as file:
+    with open(os.path.join(RULE_DIR, filePath), encoding='ascii',errors='surrogateescape') as file:
         for line in file:
             if re.match('^\s*(\#.*)?$', line) == None:
                 ruleCount += 1
@@ -173,14 +173,8 @@ class rule(Resource):
             'status': True,
             'message': returnMessage
         }, 200
-        
-        
-        
-        
-        
-        
-        
-        
+
+
 @ns.route('/<id>/data')
 class ruleData(Resource):
     @api.expect(rule_parser)
@@ -203,13 +197,13 @@ class ruleData(Resource):
             }
 
         if args.get('search', None):
-            with open(rule_path, encoding='latin-1') as file:
+            with open(rule_path, encoding='ascii',errors='surrogateescape') as file:
                 head = ''
                 for line in file:
                     if line.find(args['search']) != -1:
                         head += line
         else:
-            with open(rule_path, encoding='latin-1') as file:
+            with open(rule_path, encoding='ascii',errors='surrogateescape') as file:
                 head = list(islice(file, page * per_page, page * per_page + per_page))
 
         if len(head) == 0:
@@ -282,7 +276,7 @@ class passwordsPreview(Resource):
         rules = requestData['rules']
         
         RETCODE_COMMENT = -3
-        maxMangledPasswords = FcSetting.query.first().max_mangled_passwords # get maximum number of mangled passwords from database
+        maxMangledPasswords = FcSetting.query.first().max_mangled_passwords_in_preview # get maximum number of mangled passwords from database
         preview = []
         mangledPasswordBuf = ctypes.create_string_buffer(64)
         
@@ -302,7 +296,7 @@ class passwordsPreview(Resource):
                     continue
                 
                 # Apply the rule to the password using the C function, returns -1 for rule syntax error, -2 for empty rule or password or new password length if OK
-                retCode = applyRule(rule.encode('latin-1'), len(rule), password.encode('utf-8'), passwordLength, mangledPasswordBuf)
+                retCode = applyRule(rule.encode('ascii',errors='surrogateescape'), len(rule), password.encode('ascii',errors='surrogateescape'), passwordLength, mangledPasswordBuf)
                 
                 if(retCode == -1):
                     mangledPasswordStr = ""
@@ -310,7 +304,7 @@ class passwordsPreview(Resource):
                     if(len(rule) > 0 and rule[0] == '#'):
                         retCode = RETCODE_COMMENT
                 else:
-                    mangledPasswordStr = mangledPasswordBuf.value.decode('latin-1')
+                    mangledPasswordStr = mangledPasswordBuf.value.decode('ascii',errors='surrogateescape')
                 
                 #Add element to a preview list
                 element = {

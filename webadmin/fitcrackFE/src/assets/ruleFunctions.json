@@ -47,7 +47,7 @@
     {
         "name": "Toggle Case",
         "sign": "t",
-        "description": "Toggle the case of all characters in word.",
+        "description": "Toggle the case of all characters in word",
         "operands": [],
         "example": "t",
         "input": "p@ssW0rd",
@@ -111,7 +111,7 @@
     {
         "name": "Rotate Left",
         "sign": "{",
-        "description": "Rotate the word left.",
+        "description": "Rotate the word left",
         "operands": [],
         "example": "{",
         "input": "p@ssW0rd",
@@ -585,9 +585,9 @@
         "output": "p@9sW0rd"
     },
     {
-        "name": "Ascii increment",
+        "name": "ASCII increment",
         "sign": "+N",
-        "description": "Increment character @ N by 1 ascii value",
+        "description": "Increment character @ N by 1 ASCII value",
         "operands": [
             {
                 "specification": "Position of character",
@@ -599,9 +599,9 @@
         "output": "p@tsW0rd"
     },
     {
-        "name": "Ascii decrement",
+        "name": "ASCII decrement",
         "sign": "-N",
-        "description": "Decrement character @ N by 1 ascii value",
+        "description": "Decrement character @ N by 1 ASCII value",
         "operands": [
             {
                 "specification": "Position of character",

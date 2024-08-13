@@ -207,14 +207,14 @@
               class="mb-4"
             />
             <v-divider class="mb-2"></v-divider>
-            <span class="text-subtitle-1 font-weight-medium">Rules editor settings (effects only Live preview of mangled passwords)</span>
+            <span class="text-subtitle-1 font-weight-medium">Rules editor settings (affects only live preview of mangled passwords)</span>
             <v-text-field
-              v-model="settings.max_mangled_passwords"
+              v-model="settings.max_mangled_passwords_in_preview"
               :loading="loading"
               outlined
               type="number"
               label="Maximum number of mangled passwords"
-              hint="Changing the default value (50000) to a higher number can lead to delays and performance issues when mangling passwords and checking rules. The number can not go beyond 1000000."
+              hint="Changing the default value (50 000) to a higher number can lead to delays and performance issues when mangling passwords and checking rules. The number cannot go beyond 1 000 000."
               persistent-hint
               class="my-2"
             />
@@ -318,8 +318,8 @@
             this.$error('Workunit timeout factor cannot be smaller than 5.')
             return
           }
-          if(this.settings.max_mangled_passwords > 1000000){ // check the maximum number of mangled passwords
-            this.$error('Maximum number of mangled passwords can not be more than 1000000.')
+          if(this.settings.max_mangled_passwords_in_preview > 1000000){ // check the maximum number of mangled passwords
+            this.$error('Maximum number of mangled passwords cannot be more than 1000000.')
             return
           }
           this.saving = true
