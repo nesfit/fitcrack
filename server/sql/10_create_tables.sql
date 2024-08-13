@@ -487,6 +487,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
   `verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `auto_add_hosts_to_running_jobs` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `max_mangled_passwords_in_preview` int(7) unsigned NOT NULL DEFAULT '50000',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

@@ -509,7 +509,8 @@ class FcSetting(Base):
     ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
     verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
     auto_add_hosts_to_running_jobs = Column(Integer, nullable=False, server_default=text("'0'"))
-
+    max_mangled_passwords_in_preview = Column(Integer, nullable=False, server_default=text("'5000'"))
+    
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
 
