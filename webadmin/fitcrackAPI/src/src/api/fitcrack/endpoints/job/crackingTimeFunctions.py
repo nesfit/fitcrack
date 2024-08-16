@@ -1,4 +1,8 @@
-# Author: Lucie Jadrná
+'''
+   * Author : Lucie Jadrná and authors listed in AUTHORS
+   * Licence: MIT, see LICENSE
+'''
+
 
 import math
 import datetime
@@ -46,6 +50,7 @@ def compute_hostkeyspace_from_tp(tp, powers, total_keyspace):
         host_keyspaces.append([min(tp * power, total_keyspace), power, 1]) 
     return host_keyspaces
 
+
 def which_node_will_compute(host_keyspaces, total_keyspace):
     """
     Determine which nodes will compute based on their keyspaces and the total keyspace.
@@ -60,7 +65,6 @@ def which_node_will_compute(host_keyspaces, total_keyspace):
     keyspaces_of_computing_nodes = []
 
     sum_host_keyspaces = sum(keyspace[0] for keyspace in host_keyspaces)
-    print("sum keyspaces: ",sum_host_keyspaces)
     
     if sum_host_keyspaces > total_keyspace:
 
@@ -101,7 +105,7 @@ def which_node_will_compute(host_keyspaces, total_keyspace):
         
         if cut_total_keyspace - sum_keyspaces < 0:
             while host_keyspaces and (cut_total_keyspace - max(keyspace[0] for keyspace in host_keyspaces) >= 0):
-                x = max(keyspace[0] for keyspace in host_keyspaces)     # největší keyspace
+                x = max(keyspace[0] for keyspace in host_keyspaces)     # largest keyspace
                 
                 for i,sublist in enumerate(host_keyspaces):      
                     if sublist[0] == x:
@@ -123,7 +127,6 @@ def which_node_will_compute(host_keyspaces, total_keyspace):
     return keyspaces_of_computing_nodes
 
 
-
 def compute_estimate_forall(list_key_power_wu, wu_overhead):
     """
     Calculates the estimated time for all computing hosts and returns the maximum.
@@ -140,6 +143,3 @@ def compute_estimate_forall(list_key_power_wu, wu_overhead):
         list_times.append((list[0] / list[1]) + (list[2] + 1) * wu_overhead + 34)
     
     return max(list_times)
-
-
-
