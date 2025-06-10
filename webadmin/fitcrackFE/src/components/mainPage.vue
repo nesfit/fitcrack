@@ -90,6 +90,18 @@
             </v-list-item>
 
             <v-list-item 
+              :to="{ name: 'planner'}"
+              exact
+            >
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('planner') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Batch Planner</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item 
               :to="{ name: 'batches'}"
               exact
             >

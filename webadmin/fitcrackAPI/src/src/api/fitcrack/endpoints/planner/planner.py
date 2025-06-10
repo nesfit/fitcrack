@@ -25,6 +25,7 @@ class planner(Resource):
     @api.expect(planner_parser)
     @api.response(201, 'Created')
     @api.response(200, 'Updated')
+    @api.response(400, 'Failed')
     @api.response(500, 'Failed')
     def post(self):
         """
@@ -71,6 +72,9 @@ class planner(Resource):
             if data:
                 job = create_job(data)
                 final_jobs.append(job.id)
+
+        if final_jobs == []:
+            abort(400, 'Couldn\'t plan any jobs. Time is too short or cracking speed is too low.')
 
         #Batch creation
         batch = FcBatch()

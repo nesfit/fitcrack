@@ -7,7 +7,7 @@
           icon="mdi-information"
           color="success"
         >
-          Once created, this hashlist will be attached to your new job in the form.
+          Once created, this hashlist will be attached to your new job or job batch in the form.
         </v-alert>
       </v-col>
     </v-row>
@@ -64,7 +64,7 @@
           <v-icon left>
             {{ $route.query.attach ? 'mdi-briefcase-plus' : 'mdi-check' }}
           </v-icon>
-          {{ $route.query.attach ? 'Create and attach to job' : 'Confirm' }}
+          {{ $route.query.attach ? 'Create and attach to job/batch' : 'Confirm' }}
         </v-btn>
       </v-col>
     </v-row>

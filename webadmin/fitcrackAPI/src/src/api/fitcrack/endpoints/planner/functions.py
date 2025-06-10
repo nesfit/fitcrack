@@ -2,6 +2,7 @@
    * Author : David Brandšteter (xbrand13)
    * Licence: MIT, see LICENSE
 '''
+from src.database.models import FcSetting
 
 #Makes a data template for create_job() method in job endpoint
 def create_job_template():
@@ -9,7 +10,7 @@ def create_job_template():
       "name": "",
       "comment": "",
       "hosts_ids": [],
-      "seconds_per_job": 3600,
+      "seconds_per_job": FcSetting.query.first().default_seconds_per_workunit,
       "time_start": "",
       "time_end": "",
       "attack_settings": {
@@ -165,30 +166,31 @@ def generate_masks(password_len_min, password_len_max, keyspace):
   mask = mask + next_mask["mask"]
   current_length += 1
   current_keyspace = next_mask["count"]
-  keyspace = keyspace - current_keyspace
+  orig_keyspace = keyspace
   
   #If min length is 1, add it to result
   if current_length >= password_len_min and current_length <= password_len_max:
     masks.append(mask)
+    keyspace = keyspace - current_keyspace
 
   while current_length < password_len_max:
     #Decide on next mask
     next_mask = decide_next_mask(keyspace, current_keyspace, mask_list)
     #Return masks if no more masks fit
     if not next_mask:
-      return masks
+      break
 
     mask = mask + next_mask["mask"]
     current_length += 1
     current_keyspace = current_keyspace * next_mask["count"]
-    keyspace = keyspace - current_keyspace
     
     #If fits user requirements, add it to result
     if current_length >= password_len_min and current_length <= password_len_max:
       masks.append(mask)
+      keyspace = keyspace - current_keyspace
   
+  print(f'So I reckon that my jobby job has a keyspace of {orig_keyspace-keyspace}',file=sys.stderr)
   return masks
-
 
 def decide_first_mask(keyspace, mask_list):
   for mask_name in mask_list:
