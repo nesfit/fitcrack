@@ -82,8 +82,7 @@ class planner(Resource):
         batch.creator_id = current_user.id
         for index, job_id in enumerate(final_jobs):
             job = FcJob.query.filter_by(id=job_id).one_or_none()
-            if job:
-                job.queue_position = index
+            job.queue_position = index
 
         try:
             db.session.add(batch)
