@@ -18,43 +18,35 @@
           label="Name"
     />
 
-    <v-expansion-panels class="margin">
-      <v-expansion-panel>
-        <v-expansion-panel-header>
-          <span class="d-flex align-center">
-                <v-icon left>
-                  mdi-book-lock
-                </v-icon>
-                <span class="text-h6">Select Hashlist</span>
-              </span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-container>
-            <v-row>
-              <v-col>
-                <v-btn
-                  large block
-                  color="primary"
-                  :to="{name: 'createHashlist', query: {attach: `${name} Hashlist`}}"
-                >
-                  <v-icon left>mdi-book-plus</v-icon>
-                  Create new input hashlist
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <div class="text-center text-overline text--secondary">or attach an existing one</div>
-                <HashlistSelector
-                v-model="hashListId"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+    <v-card-title>
+      <span>Select Hashlist</span>
+    </v-card-title>
+    <v-container>
+      <v-row>
+        <v-col>
+          <v-btn
+            large block
+            color="primary"
+            :to="{name: 'createHashlist', query: {attach: `${name} Hashlist`}}"
+          >
+            <v-icon left>mdi-book-plus</v-icon>
+            Create new input hashlist
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <div class="text-center text-overline text--secondary">or attach an existing one</div>
+          <HashlistSelector
+          v-model="hashListId"
+          />
+        </v-col>
+      </v-row>
+    </v-container>
 
+    <v-card-title>
+      <span>How long should the batch take?</span>
+    </v-card-title>
     <div class="d-flex">
       <v-text-field
       v-model="time.days"
@@ -108,11 +100,16 @@
       </v-expansion-panel>
     </v-expansion-panels>
 
-    <v-text-field
+    <v-checkbox 
+      label="Plan batch according to saved benchmark performance"
+      v-model="useBenchmarkedCrackSpeed" 
+    />
+    <div v-show="!useBenchmarkedCrackSpeed">
+      <v-text-field
       v-model="crackSpeed"
       class="mx-2 speed-width"
       type="number"
-      label="Cracking Speed (Hs/s)"
+      label="Assumed Cracking Speed (Hs/s)"
       step="1000000"
       min="0"
       />
@@ -123,6 +120,8 @@
       >
       Get Speed from Benchmarks
       </v-btn>
+    </div>
+
     <div class="fill_div">
       <v-checkbox 
       label="Fill rest with brute-force attack"
@@ -148,6 +147,7 @@
         />
       </div>
     </div>
+  
     <div class="text-center pa-3">
     <v-btn
         :disabled="loading"
@@ -199,6 +199,7 @@
         benchmarkPowerSum: 0,
 
         totalSeconds: 0,
+        useBenchmarkedCrackSpeed: true,
         crackSpeed: 1000000,
         totalCrackSpeed: 0,
         availableKeySpace: 0,
@@ -216,7 +217,7 @@
       this.getHostsInfo()
     },
     methods: {
-      submit() {
+      submit: async function () {
         if (this.name === '') {
           this.$error('Job name can not be empty.')
           return
@@ -241,17 +242,24 @@
           this.$error('Minimal password lenght cannot be higher than maximum.')
           return
         }
-
+        
         this.loading = true
+
+        if (this.useBenchmarkedCrackSpeed){
+          if (!await this.getSpeedFromHostBenchmark()){
+            this.loading = false
+            return
+          }
+        }
         
         for (let i = 0; i < this.hosts.length; i++) {
             this.hostsIds.push(this.hosts[i].id)
         }
 
-        this.axios.post(this.$serverAddr + '/planner', {
-          'days': this.time.days,
-          'hours': this.time.hours,
-          'minutes': this.time.minutes,
+        await this.axios.post(this.$serverAddr + '/planner', {
+          'days': this.time.days == '' ? 0 : this.time.days,
+          'hours': this.time.hours == '' ? 0 : this.time.hours,
+          'minutes': this.time.minutes == '' ? 0 : this.time.minutes,
           'cracking_speed': this.crackSpeed,
           'name': this.name,
           'hashList': this.hashListId,
@@ -264,6 +272,7 @@
           const routeUrl = '/batches/' + batchId
           this.$router.push(routeUrl)
         })
+        this.loading = false
       },
 
       getSpeedFromHostBenchmark: async function () {
@@ -271,12 +280,12 @@
 
         if (this.hosts.length === 0) {
           this.$error('No hosts selected')
-          return
+          return false
         }
 
         if (!this.hashListId) {
           this.$error('No Hashlist selected')
-          return
+          return false
         }
 
         const hash_list = await this.axios.get(this.$serverAddr + '/hashlist/' + this.hashListId);
@@ -291,7 +300,7 @@
 
         if (this.hostsBenchmarks.length == 0) {
           this.$error('No benchmarks for one of the selected host found.')
-          return
+          return false
         }
 
         this.hashTypeCode = this.hashTypes.find(type => type.name === this.hashTypeName).code
@@ -301,13 +310,14 @@
           const FoundSpeed = this.hostsBenchmarks[this.hosts[i].id].find(benchmark => benchmark.attack_mode == 0 && benchmark.hash_type == this.hashTypeCode)
           if (FoundSpeed == null) {
             this.$error('No benchmarks for one of the selected attack/hash type found.')
-            return
+            return false
           }
         
           this.benchmarkPowerSum += FoundSpeed.power
         }
 
         this.crackSpeed = this.benchmarkPowerSum
+        return true
       },
       getHashTypes: function () {
         this.axios.get(this.$serverAddr + '/hashcat/hashTypes').then((response) => {

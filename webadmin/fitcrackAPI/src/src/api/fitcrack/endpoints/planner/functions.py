@@ -189,7 +189,6 @@ def generate_masks(password_len_min, password_len_max, keyspace):
       masks.append(mask)
       keyspace = keyspace - current_keyspace
   
-  print(f'So I reckon that my jobby job has a keyspace of {orig_keyspace-keyspace}',file=sys.stderr)
   return masks
 
 def decide_first_mask(keyspace, mask_list):

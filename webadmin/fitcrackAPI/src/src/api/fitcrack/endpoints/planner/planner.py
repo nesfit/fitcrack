@@ -29,7 +29,7 @@ class planner(Resource):
     @api.response(500, 'Failed')
     def post(self):
         """
-        Generates a Batch of planned attacks.
+        Generates a batch of planned attacks.
         """
         args = planner_parser.parse_args(request)
 
@@ -38,7 +38,6 @@ class planner(Resource):
         dictionaries = FcDictionary.query.filter(FcDictionary.keyspace <= keyspace).all()
 
         #Args
-        is_new = True
         final_jobs = []
         name = args['name']
         hash_list = args['hashList']
@@ -87,8 +86,7 @@ class planner(Resource):
                 job.queue_position = index
 
         try:
-            if is_new:
-                db.session.add(batch)
+            db.session.add(batch)
             db.session.commit()
         except exc.IntegrityError as e:
             db.session().rollback()
