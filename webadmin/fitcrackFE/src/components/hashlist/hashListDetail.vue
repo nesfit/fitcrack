@@ -21,7 +21,13 @@
           {{ info.name }}
         </v-card-title>
         <v-card-text>
-          Hash type: <strong>{{ info.hash_type_name }}</strong>
+          <div>Created at: <strong>{{ new Date(info.added).toLocaleString() }}</strong> UTC</div>
+          <div>Hash type: <strong>{{ info.hash_type_name }}</strong></div>
+          <div class="d-flex align-center">
+            <span class="mr-2">Progress: <strong>{{ info.cracked_hash_count }} / {{ info.hash_count }} ({{ Math.round(percentProgress) }} %)</strong></span>
+            <v-progress-circular :value="percentProgress" :max="100" color="success"
+              size="18" rotate="270" />
+          </div>
         </v-card-text>
         <v-card-actions>
           <v-btn
@@ -35,11 +41,19 @@
           <v-spacer></v-spacer>
           <v-btn
             @click="deleteHashlist"
+            color=""
+            text
+          >
+            <v-icon left>{{ info.deleted ? 'mdi-delete-restore' : 'mdi-delete' }}</v-icon>
+            {{ info.deleted ? 'Restore' : 'Discard' }}
+          </v-btn>
+          <v-btn
+            @click="purgeHashlistConfirm"
             color="error"
             text
           >
-            <v-icon left>mdi-delete</v-icon>
-            Discard or restore
+            <v-icon left>mdi-undo</v-icon>
+            Purge
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -63,7 +77,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <HashTable :id="$route.params.id"></HashTable>
+      <HashTable :id="parseInt($route.params.id)"></HashTable>
     </v-container>
   </div>
 </template>
@@ -88,6 +102,11 @@ import HashTable from './hashTable.vue'
     mounted: function () {
       this.loadHashlistData()
     },
+    computed: {
+      percentProgress() {
+        return this.info.cracked_hash_count / this.info.hash_count * 100
+      }
+    },
     methods: {
       ...mapMutations('jobForm', ['hashListIdMut', 'stepMut']),
       fmt,
@@ -105,6 +124,17 @@ import HashTable from './hashTable.vue'
       deleteHashlist() {
         this.axios.delete(this.$serverAddr + '/hashlist/' + this.$route.params.id).then((response) => {
           this.$router.push({name: 'hashlists'})
+        })
+      },
+      purgeHashlistConfirm() {
+        this.$root.$confirm('Purge Hashlist', `This will undo all cracking progress for ${this.info.name}. Any attached and running job will be killed with it! Are you sure?`)
+          .then((confirm) => {
+            this.purgeHashlist()
+          })
+      },
+      purgeHashlist() {
+        this.axios.post(this.$serverAddr + '/hashlist/' + this.$route.params.id + '/purge').then((response) => {
+          this.loadHashlistData()
         })
       }
     }

@@ -1,8 +1,8 @@
- ______________________________________________________________
-|                                                              |
-| XtoHashcat - Automated tool for hascat inputs extraction     |
-| Last update: 08/27/2018, Lukas Zobal (izobal@fit.vutbr.cz)   |
-|______________________________________________________________|
+ _______________________________________________________________________
+|                                                                      |
+| XtoHashcat - Automated tool for hascat inputs extraction             |
+| Last update: 2024-03-18, Viktor Rucky (xrucky01@stud.fit.vutbr.cz)   |
+|______________________________________________________________________|
 
 
 1) PREREQUISITES
@@ -31,6 +31,10 @@ chmod +x XtoHashcat.py
 
 where:
   <PathToFile> is the file you want to extract hash from
+  -e When this flag is set, the tool will try to extract smaller easier hashes
+     which have, however, a higher chance for false positives. This is useful
+     because sometimes the regular hashes produced by this tool are too large
+     to be accepted by hashcat. Can also be set by the long option --easy-hash
   -f <Mode> is optional argument, which sets manually file format
     There are following <Modes>:
       Microsoft Office documents versions 97-2016 (-f 9400-9800)

@@ -28,7 +28,7 @@ from src.database import db
 from src.database.models import FcJob, FcHostActivity, FcBenchmark, Host, FcDictionary, FcJobDictionary, \
     FcJobGraph, FcRule, FcHash, FcHashList, FcMask, FcUserPermission, FcSetting, FcWorkunit, FcDeviceInfo
 from src.api.fitcrack.endpoints.pcfg.functions import extractNameFromZipfile
-
+from src.api.fitcrack.endpoints.job.crackingTimeFunctions import adaptive_scheduling, which_node_will_compute,compute_hostkeyspace_from_tp,compute_estimate_forall
 
 def stop_job(job):
     job.status = status_to_code['finishing']
@@ -207,7 +207,11 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False) -> ve
             "{} -m {} {} --show --machine-readable".format(HASHCAT_PATH, hash_type, hash), getReturnCode=True
         )
 
-        if binaryHash:
+        if result['returnCode'] not in (0, 255): # 0 means success (at least one hash passes); 255 means error (no hash passes); everything else is bad and validation failed completely.
+            with open(hash, "r") as hashFile:
+                for h in hashFile.readlines():
+                    hashes.append((h.strip(),"Hashcat crashed or exited unexpectedly when validating; no hashes could be validated."))
+        elif binaryHash:
             hashes = [('HASH','OK') if result['returnCode'] == 0 else ('HASH', 'Token length exception')]
         else:
             hash_validity = {}
@@ -271,7 +275,9 @@ def verifyHashFormat(hash, hash_type, abortOnFail=False, binaryHash=False) -> ve
 def computeCrackingTime(data):
     total_power = 0
     keyspace = 0
+    overhead_wu = 0
     hosts_dict = []
+    host_powers = []
 
     attackSettings = json.loads(data['attack_settings'])
 
@@ -279,6 +285,7 @@ def computeCrackingTime(data):
     hashlist = FcHashList.query.filter(FcHashList.id == data['hash_list_id']).first()
     if hashlist:
         hash_type_code = hashlist.hash_type
+        num_hashes = hashlist.hash_count
 
     data['boinc_host_ids'] = [x.strip() for x in data['boinc_host_ids'].split(',')]
 
@@ -298,12 +305,13 @@ def computeCrackingTime(data):
 
         for host in hosts:
             total_power += host.power
+            host_powers.append(host.power)
             hosts_dict.append(host.as_dict())
-
     else:
         abort(500, 'No hosts selected.')
 
     if attackSettings['attack_mode'] == 0:
+        overhead_wu = 55
         dictsKeyspace = 0
         for dict in attackSettings['left_dictionaries']:
             dictsKeyspace += dict['keyspace']
@@ -315,6 +323,7 @@ def computeCrackingTime(data):
         keyspace = dictsKeyspace * rulesKeyspace
 
     elif attackSettings['attack_mode'] == 1:
+        overhead_wu = 30
         leftDictsKeyspace = 0
         for dict in attackSettings['left_dictionaries']:
             leftDictsKeyspace += dict['keyspace']
@@ -326,6 +335,7 @@ def computeCrackingTime(data):
         keyspace = leftDictsKeyspace * rightDictsKeyspace
 
     elif attackSettings['attack_mode'] == 3:
+        overhead_wu = 30
         if attackSettings.get('masks') and len(attackSettings['masks']) > 0:
             thresh = attackSettings.get('markov_treshold', None)
             customCharsetDict = {}
@@ -335,12 +345,14 @@ def computeCrackingTime(data):
                 keyspace += compute_keyspace_from_mask(mask, customCharsetDict, thresh)
 
     elif attackSettings['attack_mode'] == 6:
+        overhead_wu = 20
         dictsKeyspace = 0
         for dict in attackSettings['left_dictionaries']:
             dictsKeyspace += dict['keyspace']
         keyspace = compute_keyspace_from_mask(attackSettings['mask']) * dictsKeyspace
 
     elif attackSettings['attack_mode'] == 7:
+        overhead_wu = 30
         dictsKeyspace = 0
         for dict in attackSettings['right_dictionaries']:
             dictsKeyspace += dict['keyspace']
@@ -385,13 +397,33 @@ def computeCrackingTime(data):
         if int(keyspace) >= INT_MAX:
             keyspace = INT_MAX
 
+    settings = FcSetting.query.first()
+    ramp_down_coefficient = settings.ramp_down_coefficient
+    tmin = settings.t_pmin
+    alpha = settings.distribution_coefficient_alpha
+    num_hosts = len(hosts_dict)
+    tmax = data['workunit_time']
+    
     display_time = None
     if (total_power > 0):
-        display_time = float(keyspace / total_power)
+        base_time = float(keyspace / total_power)
+        tp = adaptive_scheduling(tmin, tmax, keyspace, host_powers, alpha, ramp_down_coefficient)
+        host_power_key_list = compute_hostkeyspace_from_tp(tp, host_powers, keyspace)
+        if attackSettings['attack_mode'] == 8 or attackSettings['attack_mode'] == 9:
+            display_time = base_time + 34
+        else:
+            if num_hosts == 1:
+                wu_keyspace = host_power_key_list[0][0]
+                num_wu = math.ceil(keyspace / wu_keyspace) + 1
+                display_time = base_time + num_wu * overhead_wu + 34
+            else:
+                computing_nodes_list = which_node_will_compute(host_power_key_list, keyspace)
+                display_time = compute_estimate_forall(computing_nodes_list, overhead_wu)
+
         try:
             time_delta = datetime.timedelta(seconds=math.floor(display_time))
-            if time_delta.total_seconds() < 60:
-                display_time = 'About a minute'
+            if time_delta.total_seconds() < 120:
+                display_time = 'About two minutes'
             else:
                 display_time = str(time_delta)
         except OverflowError:
