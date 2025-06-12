@@ -501,6 +501,7 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `skip_benchmark` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `merge_masks` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `update_hashes` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `max_mangled_passwords_in_preview` int(7) unsigned NOT NULL DEFAULT '50000',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

@@ -175,6 +175,7 @@
                   <div class="text-center text-overline text--secondary">or attach an existing one</div>
                   <HashlistSelector
                   v-model="hashListId"
+                  hide-completed
                   />
                 </v-col>
               </v-row>
@@ -489,7 +490,8 @@
           this.axios.post(this.$serverAddr + '/job/crackingTime', {   
             'hash_list_id': this.hashListId,
             'boinc_host_ids': boincIds.join(","),
-            'attack_settings': JSON.stringify(val.attack_settings)
+            'attack_settings': JSON.stringify(val.attack_settings),
+            'workunit_time': this.timeForJob
           }).then((response) => {
             if (response['data']) {
               this.estimatedTime = response.data.display_time

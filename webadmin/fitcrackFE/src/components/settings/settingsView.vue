@@ -68,8 +68,8 @@
               <v-col class="mw">
                 <v-switch
                     v-model="confirmpurge"
-                    label="Job purge confirmation"
-                    hint="Job purge requires clicking the button twice."
+                    label="Job kill confirmation"
+                    hint="Job kill button will ask for confirmation to prevent accients."
                     persistent-hint
                     class="mb-4 mt-0"
                 />
@@ -233,6 +233,18 @@
               persistent-hint
               class="mb-4"
             />
+            <v-divider class="mb-2"></v-divider>
+            <span class="text-subtitle-1 font-weight-medium">Rules editor settings (affects only live preview of mangled passwords)</span>
+            <v-text-field
+              v-model="settings.max_mangled_passwords_in_preview"
+              :loading="loading"
+              outlined
+              type="number"
+              label="Maximum number of mangled passwords"
+              hint="Changing the default value (50 000) to a higher number can lead to delays and performance issues when mangling passwords and checking rules. The number cannot go beyond 1 000 000."
+              persistent-hint
+              class="my-2"
+            />
           </v-card-text>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -331,6 +343,10 @@
           }
           if (this.settings.workunit_timeout_factor < 5) { // see minTimeoutFactor in generator's Config.h
             this.$error('Workunit timeout factor cannot be smaller than 5.')
+            return
+          }
+          if(this.settings.max_mangled_passwords_in_preview > 1000000){ // check the maximum number of mangled passwords
+            this.$error('Maximum number of mangled passwords cannot be more than 1000000.')
             return
           }
           this.saving = true

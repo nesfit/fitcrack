@@ -20,6 +20,7 @@ from src.api.fitcrack.functions import getStringBetween, get_batch_status
 from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
     job_status_text_info_to_code_dict, status_to_code
 from src.database import db
+from src.api.fitcrack.endpoints.job.crackingTimeFunctions import adaptive_scheduling, which_node_will_compute,compute_hostkeyspace_from_tp,compute_estimate_forall
 
 Base = db.Model
 
@@ -399,6 +400,7 @@ class FcJob(Base):
             filter(FcHost.boinc_host_id.in_(boinc_host_ids)).all()
 
         hostsPower = {}
+        host_powers = []
         for host in jobHosts:
             hostsPower[host.boinc_host_id] = host.power
 
@@ -417,16 +419,50 @@ class FcJob(Base):
         for benchmark in hostBenchmarks:
             if hostsPower.get(benchmark.boinc_host_id, 0) == 0:
                 total_power += benchmark.power
+                host_powers.append(benchmark.power)
             else:
                 total_power += hostsPower[benchmark.boinc_host_id]
+                host_powers.append(hostsPower[benchmark.boinc_host_id])
 
+        overhead_wu = 0
+        if self.attack_mode == 0:
+            overhead_wu = 55
+        elif self.attack_mode == 1:
+            overhead_wu = 30
+        elif self.attack_mode == 3:
+            overhead_wu = 30
+        elif self.attack_mode == 6:
+            overhead_wu = 20
+        elif self.attack_mode == 7:
+            overhead_wu = 30
+        
+        settings = FcSetting.query.first()
+        ramp_down_coefficient = settings.ramp_down_coefficient
+        tmin = settings.t_pmin
+        alpha = settings.distribution_coefficient_alpha
+        num_hosts = len(host_powers)
+        
         est_time = None
         if (total_power > 0):
-            est_time = float(self.keyspace / total_power)
+            base_time = float(self.keyspace / total_power)
+            tp = adaptive_scheduling(tmin, self.seconds_per_workunit, self.keyspace, host_powers, alpha, ramp_down_coefficient)
+            host_power_key_list = compute_hostkeyspace_from_tp(tp, host_powers, self.keyspace)
+            
+            if self.attack_mode == 8 or self.attack_mode == 9:
+                display_time = base_time + 34
+            else:
+                if num_hosts == 1:
+                    wu_keyspace = host_power_key_list[0][0]
+                    num_wu =  math.ceil(self.keyspace / wu_keyspace) + 1
+                    display_time = base_time + num_wu * overhead_wu + 34
+                else:
+                    computing_nodes_list = which_node_will_compute(host_power_key_list, self.keyspace)
+                    display_time = compute_estimate_forall(computing_nodes_list, overhead_wu)
+
             try:
-                time_delta = datetime.timedelta(seconds=math.floor(est_time))
-                if time_delta.total_seconds() < 60:
-                    est_time = 'About a minute'
+                time_delta = datetime.timedelta(seconds=math.floor(display_time))
+                if time_delta.total_seconds() < 120:
+                    est_time = 'About two minutes'
                 else:
                     est_time = str(time_delta)
             except OverflowError:
@@ -562,6 +598,8 @@ class FcSetting(Base):
     skip_benchmark = Column(Integer, nullable=False, server_default=text("'0'"))
     merge_masks = Column(Integer, nullable=False, server_default=text("'1'"))
     update_hashes = Column(Integer, nullable=False, server_default=text("'1'"))
+    max_mangled_passwords_in_preview = Column(Integer, nullable=False, server_default=text("'5000'"))
+   
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
@@ -971,15 +1009,15 @@ class FcHashList(Base):
 
     @hybrid_property
     def job_count(self):
-        return len(self.jobs)
+        return FcJob.query.filter_by(hash_list_id=self.id).count()
     
     @hybrid_property
     def hash_count(self):
-        return len(self.hashes) #This is probably horribly inefficient
+        return FcHash.query.filter_by(hash_list_id=self.id).count()
     
     @hybrid_property
     def is_locked(self):
-        return len(self.jobs) != 0
+        return self.job_count != 0
     
     @hybrid_property
     def cracked_hash_count(self):

@@ -21,4 +21,5 @@ settings_model = api.model('Settings', {
     'skip_benchmark': fields.Boolean(),
     'merge_masks': fields.Boolean(),
     'update_hashes': fields.Boolean(),
+    'max_mangled_passwords_in_preview': fields.Integer()
 })

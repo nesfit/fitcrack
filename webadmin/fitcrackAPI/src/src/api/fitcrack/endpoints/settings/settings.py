@@ -50,6 +50,7 @@ class settings(Resource):
         sb = args['skip_benchmark']
         mm = args['merge_masks']
         uh = args['update_hashes']
+        mmp = args['max_mangled_passwords_in_preview']
 
         settings = FcSetting.query.first()
         if (spw is not None): settings.default_seconds_per_workunit = spw
@@ -65,6 +66,8 @@ class settings(Resource):
         if (sb is not None): settings.skip_benchmark = sb
         if (mm is not None): settings.merge_masks = mm
         if (uh is not None): settings.update_hashes = uh
+        if (mmp is not None): settings.max_mangled_passwords_in_preview = mmp
+          
         db.session.commit()
 
         return {
