@@ -29,8 +29,11 @@ mask_model = api.model('Mask', {
     'current_index': fields.Integer(),
     'keyspace': fields.Integer(),
     'hc_keyspace': fields.Integer(),
-    'progress': fields.Float(required=False)
-
+    'progress': fields.Float(required=False),
+    'increment_min': fields.Integer(),
+    'merged': fields.Boolean(),
+    'increment_mask_range': fields.String(required=False),
+    'increment_all_masks': fields.String(required=False),
 })
 
 hash_model = api.model('Hash', {
@@ -127,6 +130,7 @@ job_big_model = api.model('Job', {
     'charset3': fields.String(),
     'charset4': fields.String(),
     'rulesFile': fields.Nested(rule_model),
+    'rules_id' : fields.Integer(),
     'rule_left': fields.String(),
     'rule_right': fields.String(),
     'markov': fields.Nested(hcStat_model),
@@ -146,7 +150,12 @@ job_big_model = api.model('Job', {
     'min_elem_in_chain': fields.Integer(),
     'max_elem_in_chain': fields.Integer(),
     'generate_random_rules': fields.Integer(),
+    'split_dict_id': fields.Integer(),
+    'split_dict_index': fields.Integer(),
+    'split_dict_pos': fields.Integer(),
+    'split_rule_index': fields.Integer(),
     'optimized': fields.Boolean(),
+    'slow_candidates': fields.Boolean(),
     'hash_list_id': fields.Integer()
 })
 

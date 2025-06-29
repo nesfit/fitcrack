@@ -141,6 +141,34 @@ Config::Ptr<CWorkunit> CSqlLoader::getEasiestRetry(uint64_t jobId)
 }
 
 
+uint64_t CSqlLoader::getRuleCount(uint64_t rulesId)
+{
+    return getSqlNumber(formatQuery("SELECT `count` FROM `%s` WHERE id = %" PRIu64 ";",
+                                    Config::tableNameRule.c_str(), rulesId));
+}
+
+
+void CSqlLoader::createRuleSplit(uint64_t jobId, uint64_t dictId, uint64_t dictIndex, uint64_t dictPos, uint64_t ruleIndex)
+{
+    updateSql(formatQuery("UPDATE `%s` SET split_dict_id = %" PRIu64 ", split_dict_index = %" PRIu64 ", split_dict_pos = %" PRIu64 ", split_rule_index = %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CJob::getTableName().c_str(), dictId, dictIndex, dictPos, ruleIndex, jobId));
+}
+
+
+void CSqlLoader::removeRuleSplit(uint64_t jobId)
+{
+    updateSql(formatQuery("UPDATE `%s` SET split_dict_id = 0, split_dict_index = 0, split_dict_pos = 0, split_rule_index = 0 WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CJob::getTableName().c_str(), jobId));
+}
+
+
+void CSqlLoader::updateRuleIndex(uint64_t jobId, uint64_t newRuleIndex)
+{
+    updateSql(formatQuery("UPDATE `%s` SET split_rule_index = %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CJob::getTableName().c_str(), newRuleIndex, jobId));
+}
+
+
 void CSqlLoader::updateHostStatus(uint64_t hostId, uint32_t newStatus)
 {
     return updateSql(formatQuery("UPDATE `%s` SET status = %" PRIu32 " WHERE id = %" PRIu64 " LIMIT 1;",
@@ -152,6 +180,27 @@ void CSqlLoader::updateMaskIndex(uint64_t maskId, uint64_t newIndex)
 {
     return updateSql(formatQuery("UPDATE `%s` SET current_index = %" PRIu64 " WHERE id = %" PRIu64 " ;",
                                  CMask::getTableName().c_str(), newIndex, maskId));
+}
+
+
+uint64_t CSqlLoader::createMask(uint64_t jobId, std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax)
+{
+    updateSql(formatQuery("INSERT INTO `%s` (`mask`, `keyspace`, `hc_keyspace`, `current_index`, `job_id`, `increment_min`, `increment_max`) VALUES ('%s','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "') ;",
+                                 CMask::getTableName().c_str(), newMask.c_str(), newKeyspace, newHcKeyspace, 0, jobId, incrementMin, incrementMax));
+    return getSqlNumber(formatQuery("SELECT LAST_INSERT_ID();"));
+}
+
+void CSqlLoader::maskSetMerged(uint64_t maskId)
+{
+    updateSql(formatQuery("UPDATE `%s` SET merged = 1, current_index = hc_keyspace WHERE id = %" PRIu64 " ;",
+                                 CMask::getTableName().c_str(), maskId));
+}
+
+
+bool CSqlLoader::getEnableMergeMasks()
+{
+    return getSqlNumber(formatQuery("SELECT merge_masks FROM `%s` LIMIT 1",
+                                    Config::tableNameSettings.c_str()));
 }
 
 
@@ -205,10 +254,10 @@ bool CSqlLoader::isJobTimeout(uint64_t jobId)
 void CSqlLoader::addNewWorkunit(PtrWorkunit workunit)
 {
     return updateSql(formatQuery("INSERT INTO `%s` (`job_id`,`workunit_id`,`host_id`, `boinc_host_id`, \
-`start_index`, `start_index_2`, `hc_keyspace`, `mask_id`, `dictionary_id`, `duplicated`, `duplicate`, `retry`) VALUES ('%" PRIu64 "','%" PRIu64 "',\
-'%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%d', '%" PRIu64 "', '%d');",
+`start_index`, `start_index_2`, `rule_count`, `split_pos`, `hc_keyspace`, `mask_id`, `dictionary_id`, `duplicated`, `duplicate`, `retry`) VALUES ('%" PRIu64 "','%" PRIu64 "',\
+'%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%" PRIu64 "','%d', '%" PRIu64 "', '%d');",
                                  CWorkunit::getTableName().c_str(), workunit->getJobId(), workunit->getWorkunitId(), workunit->getHostId(),
-                                 workunit->getBoincHostId(), workunit->getStartIndex(), workunit->getStartIndex2(), workunit->getHcKeyspace(),
+                                 workunit->getBoincHostId(), workunit->getStartIndex(), workunit->getStartIndex2(), workunit->getRuleCount(), workunit->getSplitPos(), workunit->getHcKeyspace(),
                                  workunit->getMaskId(), workunit->getDictionaryId(), workunit->isDuplicated(), workunit->getDuplicate(),
                                  workunit->isRetry()));
 }
@@ -522,6 +571,21 @@ void CSqlLoader::killJob(PtrJob &job)
 }
 
 
+uint64_t CSqlLoader::getLatestBenchmarkPower(uint64_t hostId, uint32_t attack_mode, uint32_t hash_type)
+{
+    return getSqlNumber(formatQuery("SELECT `power` FROM `%s` WHERE boinc_host_id = %" PRIu64 " AND attack_mode = %" PRIu32 " AND hash_type = %" PRIu32 " AND \
+        NOT EXISTS (SELECT * FROM `%s` AS temp WHERE boinc_host_id = %" PRIu64 " AND attack_mode = %" PRIu32 " AND hash_type = %" PRIu32 " AND temp.last_update > %s.last_update);",
+        Config::tableNameBenchmark.c_str(), hostId, attack_mode, hash_type, Config::tableNameBenchmark.c_str(), hostId, attack_mode, hash_type, Config::tableNameBenchmark.c_str()));
+}
+
+
+void CSqlLoader::updateHostPower(uint64_t hostId, uint64_t newPower)
+{
+    return updateSql(formatQuery("UPDATE `%s` SET power = %" PRIu64 " WHERE id = %" PRIu64 " LIMIT 1;",
+                                 CHost::getTableName().c_str(), newPower, hostId));
+}
+
+
 uint64_t CSqlLoader::getSecondsPassed(uint64_t jobId)
 {
     return getSqlNumber(formatQuery("SELECT TIMESTAMPDIFF(SECOND, time_start, now()) FROM `%s` WHERE id = %" PRIu64 ";",
@@ -582,6 +646,33 @@ void CSqlLoader::addNewHosts(uint64_t jobId)
             /** Insert new hosts to fc_host */
             updateSql(formatQuery("INSERT INTO `%s` (`boinc_host_id`, `job_id`) VALUES (%" PRIu64 ", %" PRIu64 ");",
                                   CHost::getTableName().c_str(), newHostId, jobId));
+
+            //skip benchmark if enabled
+            uint64_t skipBenchmark = getSqlNumber("SELECT skip_benchmark FROM `fc_settings`;");
+            if(skipBenchmark)
+            {
+                PtrJob job = loadJob(jobId);
+                uint64_t power = getLatestBenchmarkPower(newHostId, job->getAttackMode(), job->getHashType());
+
+                if(power > 0)
+                {
+                    // Job has rules, power in fc_host should be divided by rule count
+                    if(!job->getRules().empty())
+                    {
+                        uint64_t ruleCount = getRuleCount(job->getRulesId());
+                        power /= ruleCount;
+                        if(power == 0)
+                            power = 1;
+                    }
+                    
+                    Tools::printDebug("there are some benchmarks, setting power to: %" PRIu64 "\n", power);
+
+                    //update host power and status
+                    updateSql(formatQuery("UPDATE `%s` SET status = %d, power = %" PRIu64 " WHERE boinc_host_id = %" PRIu64 ";",
+                                  CHost::getTableName().c_str(), Config::HostState::HostNormal, power, newHostId));
+                                  
+                }   
+            }
 
             Tools::printDebugHost(Config::DebugType::Log, jobId, newHostId,
                     "New host #%" PRIu64 " added to job #%" PRIu64 "\n", newHostId, jobId);

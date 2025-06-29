@@ -47,6 +47,9 @@ class settings(Resource):
         rdc = args['ramp_down_coefficient']
         vhf = args['verify_hash_format']
         aahtrj = args['auto_add_hosts_to_running_jobs']
+        sb = args['skip_benchmark']
+        mm = args['merge_masks']
+        uh = args['update_hashes']
         mmp = args['max_mangled_passwords_in_preview']
 
         settings = FcSetting.query.first()
@@ -60,7 +63,11 @@ class settings(Resource):
         if (rdc is not None): settings.ramp_down_coefficient = rdc
         if (vhf is not None): settings.verify_hash_format = vhf
         if (aahtrj is not None): settings.auto_add_hosts_to_running_jobs = aahtrj
+        if (sb is not None): settings.skip_benchmark = sb
+        if (mm is not None): settings.merge_masks = mm
+        if (uh is not None): settings.update_hashes = uh
         if (mmp is not None): settings.max_mangled_passwords_in_preview = mmp
+          
         db.session.commit()
 
         return {

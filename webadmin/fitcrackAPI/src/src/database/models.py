@@ -102,6 +102,9 @@ class FcMask(Base):
     current_index = Column(BigInteger, nullable=False)
     keyspace = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
+    increment_min = Column(Integer, nullable=False, server_default=text("'0'"))
+    increment_max = Column(Integer, nullable=False, server_default=text("'0'"))
+    merged = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship("FcJob", back_populates="masks")
 
@@ -112,6 +115,43 @@ class FcMask(Base):
         if self.job.status == 1:
             return 100
         return round((self.current_index / self.hc_keyspace) * 100, 2)
+    
+    @hybrid_property
+    def increment_mask_range(self):
+        if self.increment_min == 0:
+            return self.mask
+        index = 0
+        charIndex = 0
+        while charIndex < self.increment_min:
+            if self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        return self.mask[:index] + ' - ' + self.mask
+    
+    @hybrid_property
+    def increment_all_masks(self):
+        if self.increment_min == 0:
+            return self.mask
+        result = ''
+        index = 0
+        charIndex = 0
+        while charIndex < self.increment_min:
+            if self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        while charIndex <= self.increment_max:
+            result += self.mask[:index] + ', '
+            if index == len(self.mask) or self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        result = result[:-2]
+        return result
+            
+        
+    
 
 
 class FcDictionary(Base):
@@ -223,6 +263,7 @@ class FcJob(Base):
     charset3 = Column(String(4096, 'utf8_bin'))
     charset4 = Column(String(4096, 'utf8_bin'))
     rules = Column(String(100, 'utf8_bin'), ForeignKey('fc_rule.name'))
+    rules_id = Column(BigInteger, ForeignKey('fc_rule.id'))
     rule_left = Column(String(255, 'utf8_bin'))
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
@@ -235,7 +276,12 @@ class FcJob(Base):
     min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
     max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     generate_random_rules = Column(Integer, nullable=False, server_default=text("'0'"))
+    split_dict_id = Column(BigInteger, ForeignKey('fc_job_dictionary.id'), nullable=False, server_default=text("'0'"))
+    split_dict_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    split_dict_pos = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    split_rule_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
     optimized = Column(Integer, nullable=False, server_default=text("'1'"))
+    slow_candidates = Column(Integer, nullable=False, server_default=text("'0'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
@@ -315,6 +361,10 @@ class FcJob(Base):
             if last_run_time:
                 # Job is running
                 total_time += (now - last_run_time).total_seconds()
+
+                # Make sure the job is not finished already (restart bug)
+                if(self.status < 10):
+                    return (self.time_end - self.time_start).total_seconds()
 
             return total_time
 
@@ -545,8 +595,12 @@ class FcSetting(Base):
     ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
     verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
     auto_add_hosts_to_running_jobs = Column(Integer, nullable=False, server_default=text("'0'"))
+    skip_benchmark = Column(Integer, nullable=False, server_default=text("'0'"))
+    merge_masks = Column(Integer, nullable=False, server_default=text("'1'"))
+    update_hashes = Column(Integer, nullable=False, server_default=text("'1'"))
     max_mangled_passwords_in_preview = Column(Integer, nullable=False, server_default=text("'5000'"))
-    
+   
+
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
 
@@ -684,6 +738,8 @@ class FcWorkunit(Base):
     boinc_host_id = Column(Integer, ForeignKey('host.id'), nullable=False)
     start_index = Column(BigInteger, nullable=False)
     start_index_2 = Column(BigInteger, nullable=False)
+    rule_count = Column(BigInteger, nullable=False)
+    split_pos = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
     progress = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     speed = Column(BigInteger, nullable=False, server_default=text("'0'"))
@@ -711,7 +767,10 @@ class FcWorkunit(Base):
             return self.hc_keyspace * rules if rules else self.hc_keyspace
         else:
             if self.job.rulesFile:
-                return self.hc_keyspace * self.job.rulesFile.count
+                if self.rule_count > 0:
+                    return self.rule_count
+                else:
+                    return self.hc_keyspace * self.job.rulesFile.count
             return self.hc_keyspace
 
     @hybrid_property
@@ -728,7 +787,10 @@ class FcWorkunit(Base):
                 return self.start_index * rules if rules else self.start_index
             else:
                 if self.job.rulesFile:
-                    return self.start_index * self.job.rulesFile.count
+                    if self.rule_count > 0:
+                        return self.start_index * self.job.rulesFile.count + self.start_index_2
+                    else:
+                        return self.start_index * self.job.rulesFile.count
                 return self.start_index
 
     def as_graph(self):

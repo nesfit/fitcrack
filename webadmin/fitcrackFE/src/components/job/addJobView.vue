@@ -98,6 +98,19 @@
 
     <v-row>
       <v-col>
+        <v-alert
+          v-if="slowCandidatesMessage"
+          text
+          type="info"
+          dismissible
+        >
+        You have selected a slow hash type. Slow candidates mode has been automatically activated for you.
+        </v-alert>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
         <v-text-field
           v-model="name"
           outlined
@@ -428,6 +441,8 @@
       return {
         loading: false,
         helpDismissedMessage: false,
+        hashTypes: [],
+        slowCandidatesMessage: false,
         showEstimatedTime: false,
         estimatedTime: null,
         keyspace: null,
@@ -444,7 +459,7 @@
     computed: {
       ...mapState('jobForm', ['selectedTemplate']),
       ...mapTwoWayState('jobForm', twoWayMap([
-        'step', 'attackSettingsTab', 'hashListId', 'name', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob'
+        'step', 'attackSettingsTab', 'hashListId', 'name', 'startDate', 'endDate', 'template', 'comment', 'hosts', 'startNow', 'endNever', 'timeForJob', 'slowCandidates'
       ])),
       ...mapGetters('jobForm', ['jobSettings', 'valid', 'validAttackSpecificSettings', 'keyspaceKnown']),
       templateItems () {
@@ -481,6 +496,18 @@
             if (response['data']) {
               this.estimatedTime = response.data.display_time
               this.keyspace = response.data.keyspace
+
+              // Enable slow candidates if slow hash is selected
+              if(this.slowCandidatesMessage == false && (val.attack_settings)['attack_mode'] == 0 && (val.attack_settings).rules)
+              {
+                var hashType = this.hashTypes.find(h => h.code == response.data.hash_code)
+                if(hashType != null && hashType.isSlow)
+                {
+                  this.$infoMessage('Slow hash detected; slow candidates mode has been turned on.')
+                  this.slowCandidatesMessage = true
+                  this.slowCandidates = true
+                }
+              }
             }
           })
         }
@@ -494,6 +521,7 @@
       if (this.name === '') {
         this.generateJobName()
       }
+      this.getHashTypes()
     },
     methods: {
       ...mapMutations('jobForm', ['applyTemplate']),
@@ -540,6 +568,11 @@
           }
         })
         .catch(console.error)
+      },
+      getHashTypes () {
+        this.axios.get(this.$serverAddr + '/hashcat/hashTypes').then((response) => {
+          this.hashTypes = response.data.hashtypes
+        })
       },
       submit () {
         // TODO: maybe delete this condition

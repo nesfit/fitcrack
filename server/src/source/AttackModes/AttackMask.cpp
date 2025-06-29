@@ -7,6 +7,7 @@
  */
 
 #include <AttackMask.h>
+#include <algorithm>
 
 
 CAttackMask::CAttackMask(PtrJob job, PtrHost &host, uint64_t seconds, CSqlLoader *sqlLoader)
@@ -64,29 +65,48 @@ bool CAttackMask::makeWorkunit()
     f << "|||mask|String|" << workunitMask->getMask().length() << "|" << workunitMask->getMask() << "|||\n";
     Tools::printDebug("|||mask|String|%d|%s|||\n", workunitMask->getMask().length(), workunitMask->getMask().c_str());
 
-    /** Output start_index */
-    auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(m_workunit->getStartIndex()));
-    f << skipLine;
-    Tools::printDebug(skipLine.c_str());
-
-    uint64_t maskHcKeyspace = workunitMask->getHcKeyspace();
-    uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
-
-    /** Output stop_index - only if it is not the last workunit in the current mask */
-    if (m_workunit->getStartIndex() + workunitHcKeyspace < maskHcKeyspace)
+    // Increment mode enabled
+    if(workunitMask->getIncrementMin() != 0)
     {
-        auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
-        f << limitLine;
-        Tools::printDebug(limitLine.c_str());
+        std::string min = std::to_string(workunitMask->getIncrementMin());
+        f << "|||mask_increment_min|UInt|" << min.size() << "|" << min << "|||\n";
+        Tools::printDebug("|||mask_increment_min|UInt|%d|%s|||\n", min.size(), min.c_str());
+
+        std::string max = std::to_string(workunitMask->getIncrementMax());
+        f << "|||mask_increment_max|UInt|" << max.size() << "|" << max << "|||\n";
+        Tools::printDebug("|||mask_increment_max|UInt|%d|%s|||\n", max.size(), max.c_str());
+    
+        uint64_t totalKeyspace = workunitMask->getKeyspace();
+        std::string totalKeyspaceStr = std::to_string(totalKeyspace);
+        f << "|||mask_hc_keyspace|BigUInt|" << totalKeyspaceStr.size() << "|" << totalKeyspaceStr << "|||\n";
+        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%s|||\n", totalKeyspaceStr.size(), totalKeyspaceStr.c_str());
     }
     else
     {
-        /** Otherwise, send whole mask_hc_keyspace for correct progress calculation, --limit is omitted */
-        std::string maskHcKeyspaceStr = std::to_string(maskHcKeyspace);
-        f << "|||mask_hc_keyspace|BigUInt|" << maskHcKeyspaceStr.size() << "|"
-          << maskHcKeyspaceStr << "|||\n";
-        Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%s|||\n",
-                          maskHcKeyspaceStr.size(), maskHcKeyspaceStr.c_str());
+        /** Output start_index */
+        auto skipLine = makeLimitingConfigLine("start_index", "BigUInt", std::to_string(m_workunit->getStartIndex()));
+        f << skipLine;
+        Tools::printDebug(skipLine.c_str());
+
+        uint64_t maskHcKeyspace = workunitMask->getHcKeyspace();
+        uint64_t workunitHcKeyspace = m_workunit->getHcKeyspace();
+
+        /** Output stop_index - only if it is not the last workunit in the current mask */
+        if (m_workunit->getStartIndex() + workunitHcKeyspace < maskHcKeyspace)
+        {
+            auto limitLine = makeLimitingConfigLine("hc_keyspace", "BigUInt", std::to_string(workunitHcKeyspace));
+            f << limitLine;
+            Tools::printDebug(limitLine.c_str());
+        }
+        else
+        {
+            /** Otherwise, send whole mask_hc_keyspace for correct progress calculation, --limit is omitted */
+            std::string maskHcKeyspaceStr = std::to_string(maskHcKeyspace);
+            f << "|||mask_hc_keyspace|BigUInt|" << maskHcKeyspaceStr.size() << "|"
+            << maskHcKeyspaceStr << "|||\n";
+            Tools::printDebug("|||mask_hc_keyspace|BigUInt|%d|%s|||\n",
+                            maskHcKeyspaceStr.size(), maskHcKeyspaceStr.c_str());
+        }
     }
 
     f.close();
@@ -172,34 +192,178 @@ bool CAttackMask::generateWorkunit()
         passCount = getMinPassCount();
     }
 
-    std::vector<PtrMask> maskVec = m_job->getMasks();
-    Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-            "Masks left for this job: %" PRIu64 "\n", maskVec.size());
+    bool noChainsFound = false;
+    PtrMask currentMask;
+    uint64_t hcKeyspace = 0;
+    uint64_t maskIndex = 0;
 
-    /** Find the following mask */
-    PtrMask currentMask = FindCurrentMask(maskVec, false);
-
-    if (!currentMask)
+    uint64_t mergeMasksEnabled = m_sqlLoader->getEnableMergeMasks();
+    // If enabled, try to find the longest mask chain with keyspace sum lower than host power
+    if(mergeMasksEnabled && passCount != 0)
     {
-        /** No masks found, no workunit could be generated */
-        Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "No masks found for this job\n");
-        return false;
+        // Filter new masks
+        std::vector<PtrMask> allMasks = m_job->getMasks();
+        std::vector<PtrMask> newMasks;
+        for (PtrMask & mask : allMasks)
+        {
+            if(mask->getCurrentIndex() == 0 && mask->getIncrementMin() == 0 && mask->isMerged() == false)
+                newMasks.push_back(mask);
+        }
+
+        // Sort them by length in descending order
+        std::sort(newMasks.begin(), newMasks.end(), [](const PtrMask& a, const PtrMask& b){
+                return a->getLength() > b->getLength();
+             } );
+
+        // Find all mask chains
+        std::vector<std::vector<PtrMask>> chains;
+        for (PtrMask & mask : newMasks)
+        {
+            // Current mask keyspaces
+            uint64_t maskHcKeyspace = mask->getHcKeyspace();
+            uint64_t maskKeyspace = mask->getKeyspace();
+
+            // Current chain
+            std::vector<PtrMask> mergedMasks;
+            mergedMasks.push_back(mask);
+
+            // Current chain keyspace sums
+            uint64_t sumMaskHcKeyspace = maskHcKeyspace;
+            uint64_t sumMaskKeyspace = maskKeyspace;
+
+            PtrMask current = mask;
+            int currentLen = 0;
+
+            bool found = true;
+            // Iterate through other masks, if any of them is merged into current chain, repeat
+            while(found)
+            {
+                found = false;
+                for (PtrMask & innerMask : newMasks)
+                {
+                    currentLen = current->getLength();
+                    int len = innerMask->getLength();
+
+                    // Inner mask must be one mask character shorter than current mask
+                    if(len != currentLen - 1)
+                    {
+                        continue;
+                    }
+
+                    // Masks must be identical, except for the last mask character
+                    if(!current->compare(innerMask, currentLen - 1))
+                    {
+                        continue;
+                    }
+
+                    // Host power (passCount) must be equal or greater than the keyspace of all merged masks combined
+                    if(sumMaskKeyspace + innerMask->getKeyspace() > passCount)
+                    {
+                        continue;
+                    }
+                        
+                    found = true;
+                    mergedMasks.push_back(innerMask);
+                    sumMaskHcKeyspace += innerMask->getHcKeyspace();
+                    sumMaskKeyspace += innerMask->getKeyspace();
+                    // Inner mask is now merged into the end of the chain, thus becoming the current mask
+                    current = innerMask;
+                    break;
+                }
+            }
+            // Current mask has changed, merge must have occured - create new chain
+            if(current != mask)
+            {
+                chains.push_back(mergedMasks);
+            }
+        }
+
+        // Sort chains by length in descending order
+        std::sort(chains.begin(), chains.end(), [](const std::vector<PtrMask>& a, const std::vector<PtrMask>& b){
+                return a.size() > b.size();
+             } );
+
+        // At least one chain exists, increment mode can be used
+        if(chains.size() > 0)
+        {
+            // Use the first (longest) chain
+            std::vector<PtrMask> chain = chains.front();
+            currentMask = chain.front();
+
+            uint64_t sumMaskHcKeyspace = 0;
+            uint64_t sumMaskKeyspace = 0;
+
+            // Calculate keyspace sums
+            // HcKeyspace sum will be inaccurate due to different mask division factors!
+            for (PtrMask & mask : chain)
+            {
+                sumMaskHcKeyspace += mask->getHcKeyspace();
+                sumMaskKeyspace += mask->getKeyspace();
+            }
+
+            hcKeyspace = sumMaskHcKeyspace;
+
+            // Get increment min and max from the first and the last mask in the chain
+            uint64_t min = (chain.back())->getLength();
+            uint64_t max = (chain.front())->getLength();
+
+            // Create new merged mask
+            uint64_t newMaskId = m_job->createMask(currentMask->getMask(), sumMaskKeyspace, sumMaskHcKeyspace, min, max);
+
+            // Set merged flag to every mask in the chain
+            for (PtrMask & mask : chain)
+            {
+                mask->setMerged();
+            }
+
+            // Reload masks in job
+            m_job->loadMasks(false);
+
+            // Load new merged mask
+            PtrMask newMask = m_sqlLoader->loadMask(newMaskId);
+            currentMask = newMask;
+        }
+        // No chains found, increment wont be used
+        else
+        {
+            noChainsFound = true;
+        }
     }
-    uint64_t maskHcKeyspace = currentMask->getHcKeyspace();
-    uint64_t maskKeyspace = currentMask->getKeyspace();
 
-    uint64_t hcDivisionFactor = maskKeyspace/maskHcKeyspace;
-    //round up
-    uint64_t hcKeyspace = (passCount+hcDivisionFactor-1)/hcDivisionFactor;
-
-    uint64_t maskIndex = currentMask->getCurrentIndex();
-    if (maskIndex + hcKeyspace > maskHcKeyspace)
+    if(!mergeMasksEnabled || noChainsFound || passCount == 0)
     {
-        /** Host is too powerful for this mask, it will finish it */
-        hcKeyspace = maskHcKeyspace - maskIndex;
+        std::vector<PtrMask> maskVec = m_job->getMasks();
         Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
-                "Adjusting #passwords, mask too small, new #: %" PRIu64 "\n", hcKeyspace);
+                "Masks left for this job: %" PRIu64 "\n", maskVec.size());
+
+        /** Find the following mask */
+        // Benchmark should use the longest one for most accurate results
+        bool findLongest = (passCount == 0) ? true : false;
+        currentMask = FindCurrentMask(maskVec, false, findLongest);
+
+        if (!currentMask)
+        {
+            /** No masks found, no workunit could be generated */
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "No masks found for this job\n");
+            return false;
+        }
+        uint64_t maskHcKeyspace = currentMask->getHcKeyspace();
+        uint64_t maskKeyspace = currentMask->getKeyspace();
+
+        uint64_t hcDivisionFactor = maskKeyspace/maskHcKeyspace;
+        //round up
+        hcKeyspace = (passCount+hcDivisionFactor-1)/hcDivisionFactor;
+
+        maskIndex = currentMask->getCurrentIndex();
+
+        if (maskIndex + hcKeyspace > maskHcKeyspace)
+        {
+            /** Host is too powerful for this mask, it will finish it */
+            hcKeyspace = maskHcKeyspace - maskIndex;
+            Tools::printDebugHost(Config::DebugType::Log, m_job->getId(), m_host->getBoincHostId(),
+                    "Adjusting #passwords, mask too small, new #: %" PRIu64 "\n", hcKeyspace);
+        }
     }
 
     /** Create new mask workunit */

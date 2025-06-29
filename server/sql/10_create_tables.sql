@@ -179,6 +179,8 @@ CREATE TABLE IF NOT EXISTS `fc_workunit` (
   `boinc_host_id` bigint(20) unsigned NOT NULL,
   `start_index` bigint(20) unsigned NOT NULL,
   `start_index_2` bigint(20) unsigned NOT NULL,
+  `rule_count` bigint(20) unsigned NOT NULL,
+  `split_pos` bigint(20) unsigned NOT NULL,
   `hc_keyspace` bigint(20) unsigned NOT NULL,
   `progress` double NOT NULL DEFAULT '0',
   `speed` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -206,6 +208,9 @@ CREATE TABLE IF NOT EXISTS `fc_mask` (
   `current_index` bigint(20) unsigned NOT NULL,
   `keyspace` bigint(20) unsigned NOT NULL,
   `hc_keyspace` bigint(20) unsigned NOT NULL,
+  `increment_min` int(11) unsigned NOT NULL DEFAULT '0',
+  `increment_max` int(11) unsigned NOT NULL DEFAULT '0',
+  `merged` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
@@ -320,6 +325,7 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `charset3` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
   `charset4` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
   `rules` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `rules_id` bigint(20) unsigned DEFAULT NULL,
   `rule_left` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `rule_right` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `markov_hcstat` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -332,7 +338,12 @@ CREATE TABLE IF NOT EXISTS `fc_job` (
   `min_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '1',
   `max_elem_in_chain` int(10) unsigned NOT NULL DEFAULT '8',
   `generate_random_rules` int(10) unsigned NOT NULL DEFAULT '0',
+  `split_dict_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `split_dict_index` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `split_dict_pos` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `split_rule_index` bigint(20) unsigned NOT NULL DEFAULT '0',
   `optimized` tinyint(1) NOT NULL DEFAULT '1',
+  `slow_candidates` tinyint(1) NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `kill` int(11) NOT NULL DEFAULT '0',
   `batch_id` int(11),
@@ -487,6 +498,9 @@ CREATE TABLE IF NOT EXISTS `fc_settings` (
   `ramp_down_coefficient` decimal(5,2) NOT NULL DEFAULT '0.25',
   `verify_hash_format` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `auto_add_hosts_to_running_jobs` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `skip_benchmark` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `merge_masks` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `update_hashes` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `max_mangled_passwords_in_preview` int(7) unsigned NOT NULL DEFAULT '50000',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

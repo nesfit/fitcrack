@@ -33,19 +33,48 @@ bool TaskNormal::parseHashcatStatus(const std::string &progress_line) {
     return false;
   }
 
+  std::string trash;
+
   /** When this is the first parsed line */
   if (total_hashes_ == 0) {
-    setTotalHashesFromProgress(current_progress, total_hashes, salt_count);
+    std::string keyspace_val;
+    // Total hash count in increment mode is passed in MASK_HC_KEYSPACE
+    if (task_config_.find(ConfigTask::MASK_INCREMENT_MIN, trash) && task_config_.find(ConfigTask::MASK_HC_KEYSPACE, keyspace_val))
+    {
+      setTotalHashesFromProgress(current_progress, std::stoull(keyspace_val), salt_count);
+    }
+    else
+    {
+      setTotalHashesFromProgress(current_progress, total_hashes, salt_count);
+    }
   }
 
   saveParsedProgress(current_progress);
+
+  // Mask finished in increment mode - reset computed hash count
+  if((current_progress == total_hashes) && (total_hashes != 0) && (task_config_.find(ConfigTask::MASK_INCREMENT_MIN, trash)))
+  {
+    computed_hashes_increment_ = 0;
+  }
+
   return true;
 }
 
 void TaskNormal::saveParsedProgress(uint64_t currentProgress) {
+  uint64_t difference_since_last_actualization;
 
-  uint64_t difference_since_last_actualization =
-      currentProgress - start_index_ - computed_hashes_;
+  std::string trash;
+  // Increment mode
+  if(task_config_.find(ConfigTask::MASK_INCREMENT_MIN, trash))
+  {
+    difference_since_last_actualization = currentProgress - start_index_ - computed_hashes_increment_;
+    computed_hashes_increment_ += difference_since_last_actualization;
+  }
+  else
+  {
+    difference_since_last_actualization = currentProgress - start_index_ - computed_hashes_;
+  }
+
   Logging::debugPrint(Logging::Detail::CustomOutput,
                       "Computed_hashes_index: " +
                           RunnerUtils::toString(currentProgress));
@@ -59,6 +88,14 @@ void TaskNormal::saveParsedProgress(uint64_t currentProgress) {
 
 void TaskNormal::setTotalHashesFromProgress(uint64_t current, uint64_t max,
                                             uint64_t salt_count) {
+  std::string trash;
+  // Increment mode - no skip, total hash count from config must be multiplied by salt count
+  if(task_config_.find(ConfigTask::MASK_INCREMENT_MIN, trash))
+  {
+    start_index_ = 0;
+    total_hashes_ = max * salt_count;
+    return;
+  }
 
   std::string keyspace_val;
   uint64_t limit = 0;

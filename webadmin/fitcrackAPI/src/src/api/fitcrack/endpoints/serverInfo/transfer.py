@@ -19,7 +19,7 @@ JOB_EXPORTABLE_COLUMNS = (
   'charset1', 'charset2', 'charset3', 'charset4', 'rule_left', 'rule_right', 
   'markov_threshold', 'case_permute', 'check_duplicates', 
   'min_password_len', 'max_password_len', 'min_elem_in_chain', 
-  'max_elem_in_chain', 'generate_random_rules', 'optimized', 'deleted', 'masks',
+  'max_elem_in_chain', 'generate_random_rules', 'optimized', 'slow_candidates', 'deleted', 'masks',
   'hash_list_id'
 )
 # relationship fields that get stored as dependencies
@@ -74,14 +74,14 @@ ORM_MAP = {
 # In addition to jobs and dependencies, a new field titled 'hash_lists' is exported.
 # This is a mapping from hash-list id (integer; the same id as stored in the database)
 # to a serialized hash list. Instead of including a list of hashes with each job, we now
-# store just the hash-list id. Of course, we only serialize those hash lists, that are referenced
+# store just the hash-list id. Of course, we only serialize those hash lists that are referenced
 # from at least one job. This is about it for exporting, but importing poses some challenges.
-# In the import process, we first handle hash lists. For convenience to the use, we check whether
+# In the import process, we first handle hash lists. For convenience to the user, we check whether
 # the imported hash list already exists on the server. To that end, first we check whether
 # a hash list with the same name already exists. Then we check whether it contains exactly the same
 # hashes as the imported hash list. If yes, we don't create a new hash list on the server, but we
-# just link to the pre-existing one. We do this by using an import id to server id mapping.
-# We just save the hash-list id from the import file corresponds to the hash list id in the server DB.
+# just link to the pre-existing one. We do this by using an import-ID--to--server-ID mapping.
+# We just save the hash-list ID from the import file corresponds to the hash-list ID in the server DB.
 # If we have to create a new hash list, we do that, but we also save its server id to the mapping.
 # Finally, when adding the job, we change out the hash-list id from the one from the import to the
 # new one from the mapping.
@@ -140,12 +140,15 @@ class JobSerializer:
 def orm_pack (obj):
   """Describes to msgpack how to serialize some ORM objects"""
   if isinstance(obj, FcHash):
-    obj = obj.hash
+      obj = obj.hash
   if isinstance(obj, FcMask):
     obj = {
       'mask': obj.mask,
       'keyspace': obj.keyspace,
-      'hc_keyspace': obj.hc_keyspace
+      'hc_keyspace': obj.hc_keyspace,
+      'increment_min' : obj.increment_min,
+      'increment_max' : obj.increment_max,
+      'merged': obj.merged
     }
   if isinstance(obj, FcHashList):
     obj = {
@@ -195,6 +198,7 @@ class ImportDependencyMissing (Exception):
   def __init__(self, missing_deps):
     self.missing = missing_deps
 
+
 def recreate_hash_list(hash_list) -> FcHashList:
   hash_type = hash_list['hash_type']
   new_hash_list = FcHashList(hash_type=hash_type, name=hash_list['name'])
@@ -205,7 +209,7 @@ def recreate_hash_list(hash_list) -> FcHashList:
   return new_hash_list
 
 def recreate_mask (data):
-  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0)
+  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0, increment_min=data['increment_min'], increment_max=data['increment_max'], merged=data['merged'])
 
 def unpack (package):
   """
