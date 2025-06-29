@@ -503,6 +503,7 @@
                 var hashType = this.hashTypes.find(h => h.code == response.data.hash_code)
                 if(hashType != null && hashType.isSlow)
                 {
+                  this.$infoMessage('Slow hash detected; slow candidates mode has been turned on.')
                   this.slowCandidatesMessage = true
                   this.slowCandidates = true
                 }

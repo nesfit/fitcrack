@@ -83,7 +83,11 @@
             this.alert = false;
           }
           if (response.data.hasOwnProperty('status') && response.data.hasOwnProperty('message') && response.data.status) {
-            this.alertType = 'success';
+            if (response.data.hasOwnProperty('infoAlert')){
+              this.alertType = 'info'
+            } else {
+              this.alertType = 'success';
+            }
             this.alert = true;
             this.alertText = response.data.message
           }

@@ -78,6 +78,16 @@ const UserPlugin = {
         })
     }
 
+    Vue.prototype.$infoMessage = function (message) {
+      this.axios.interceptors.response.handlers["0"].fulfilled(
+        {data:
+            { status: true,
+              infoAlert: true,
+              message: message
+            }
+        })
+    }
+
     Vue.prototype.$hideAlert = function () {
       this.axios.interceptors.response.handlers["0"].fulfilled(
         {data:
