@@ -7,7 +7,7 @@ from src.database import db
 from sqlalchemy import exc
 
 from src.database.models import FcJob, FcUserPermission
-from src.database.models import FcMask # for (un)packing directly
+from src.database.models import FcHash, FcMask # for (un)packing directly
 from src.database.models import FcRule, FcHcstat, FcDictionary, FcJobDictionary, FcPcfg # for dependencies
 from src.database.models import FcHashList
 
@@ -29,8 +29,7 @@ JOB_EXPORTABLE_DEPENDENCIES = {
   'markov': 'name',
   'pcfg': 'name',
   'left_dictionaries': 'dictionary.name',
-  'right_dictionaries': 'dictionary.name',
-  'hash_list': 'name'
+  'right_dictionaries': 'dictionary.name'
 }
 # mapping of dependency names from db columns to tables
 DEP_MAP = {
@@ -38,16 +37,14 @@ DEP_MAP = {
   'markov': 'markov',
   'pcfg': 'pcfg',
   'left_dictionaries': 'dictionary',
-  'right_dictionaries': 'dictionary',
-  'hash_list': 'hash_list'
+  'right_dictionaries': 'dictionary'
 }
 # maps dep type annotations to actual sqlalchemy model classes and columns
 ORM_MAP = {
   'rule': (FcRule, 'name'),
   'markov': (FcHcstat, 'name'),
   'pcfg': (FcPcfg, 'name'),
-  'dictionary': (FcDictionary, 'name'),
-  'hash_list': (FcHashList, 'name')
+  'dictionary': (FcDictionary, 'name')
 }
 
 # Example for this craziness:
@@ -77,14 +74,14 @@ ORM_MAP = {
 # In addition to jobs and dependencies, a new field titled 'hash_lists' is exported.
 # This is a mapping from hash-list id (integer; the same id as stored in the database)
 # to a serialized hash list. Instead of including a list of hashes with each job, we now
-# store just the hash-list id. Of course, we only serialize those hash lists, that are referenced
+# store just the hash-list id. Of course, we only serialize those hash lists that are referenced
 # from at least one job. This is about it for exporting, but importing poses some challenges.
-# In the import process, we first handle hash lists. For convenience to the use, we check whether
+# In the import process, we first handle hash lists. For convenience to the user, we check whether
 # the imported hash list already exists on the server. To that end, first we check whether
 # a hash list with the same name already exists. Then we check whether it contains exactly the same
 # hashes as the imported hash list. If yes, we don't create a new hash list on the server, but we
-# just link to the pre-existing one. We do this by using an import id to server id mapping.
-# We just save the hash-list id from the import file corresponds to the hash list id in the server DB.
+# just link to the pre-existing one. We do this by using an import-ID--to--server-ID mapping.
+# We just save the hash-list ID from the import file corresponds to the hash-list ID in the server DB.
 # If we have to create a new hash list, we do that, but we also save its server id to the mapping.
 # Finally, when adding the job, we change out the hash-list id from the one from the import to the
 # new one from the mapping.
@@ -142,6 +139,8 @@ class JobSerializer:
 
 def orm_pack (obj):
   """Describes to msgpack how to serialize some ORM objects"""
+  if isinstance(obj, FcHash):
+      obj = obj.hash
   if isinstance(obj, FcMask):
     obj = {
       'mask': obj.mask,
@@ -263,9 +262,6 @@ def unpack (package):
     dep_pcfg = job.get('pcfg')
     if dep_pcfg:
       newjob.pcfg = deps[dep_pcfg[0]]
-    dep_hash_list = job.get('hash_list')
-    if dep_hash_list:
-      newjob.hash_list = deps[dep_hash_list[0]]
     # adding values for useless non-null fields
     newjob.indexes_verified = 0
     newjob.current_index_2 = 0
