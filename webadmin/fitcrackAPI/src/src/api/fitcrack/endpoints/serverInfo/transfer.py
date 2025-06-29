@@ -140,7 +140,7 @@ class JobSerializer:
 def orm_pack (obj):
   """Describes to msgpack how to serialize some ORM objects"""
   if isinstance(obj, FcHash):
-      obj = obj.hash
+    obj = obj.hash
   if isinstance(obj, FcMask):
     obj = {
       'mask': obj.mask,
