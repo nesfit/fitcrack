@@ -572,6 +572,10 @@
           {
             'text': 'hybrid (mask + wordlist)',
             'code': 6
+          },
+          {
+            'text': 'association',
+            'code': 7
           }
         ],
         jobs:

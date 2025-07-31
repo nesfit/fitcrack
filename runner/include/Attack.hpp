@@ -21,6 +21,7 @@ enum AttackType {
   AT_Benchmark,
   AT_HybridDictMask,
   AT_HybridMaskDict,
+  AT_Association,
   AT_Unknown
 };
 

@@ -765,6 +765,8 @@ class FcWorkunit(Base):
             if self.job.rulesFile:
                 rules = self.job.rulesFile.count
             return self.hc_keyspace * rules if rules else self.hc_keyspace
+        elif self.job.attack_mode == 10 and self.job.distribution_mode == 2:
+                return self.hc_keyspace * len(self.job.hashes)
         else:
             if self.job.rulesFile:
                 if self.rule_count > 0:
@@ -785,6 +787,8 @@ class FcWorkunit(Base):
                 if rules != 0:
                     return self.start_index * rules
                 return self.start_index * rules if rules else self.start_index
+            elif self.job.attack_mode == 10 and self.job.distribution_mode == 2:
+                return self.start_index * len(self.job.hashes)
             else:
                 if self.job.rulesFile:
                     if self.rule_count > 0:

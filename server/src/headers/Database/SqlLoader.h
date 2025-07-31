@@ -311,6 +311,13 @@ class CSqlLoader {
         std::vector<std::string> loadJobHashes(uint64_t jobId);
 
         /**
+         * @brief Returns vector of hashes as strings, possibly even binary ones
+         * @param jobId Job ID which hashes we search for
+         * @return Vector of strings=hashes
+         */
+        std::vector<std::string> loadJobAllHashes(uint64_t jobId);
+
+        /**
          * @brief Loads mask object from database with supplied ID
          * @param maskId ID of the mask in DB
          * @return Loaded mask object

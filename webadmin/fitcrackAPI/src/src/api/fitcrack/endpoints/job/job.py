@@ -396,7 +396,7 @@ class OperationWithJob(Resource):
                     mask.merged = False
                     if mask.increment_min > 0:
                         db.session.delete(mask)  
-            elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
+            elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)', 'association']]:
                 dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
                 for dictionary in dictionaries:
                     dictionary.current_index = 0
