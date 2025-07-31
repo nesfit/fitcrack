@@ -19,6 +19,9 @@ const addJob = () => import('@/components/job/addJobView.vue')
 const templates = () => import('@/components/jobTemplate/templateList.vue')
 const hosts = () => import('@/components/host/hostsView.vue')
 const hashes = () => import('@/components/hashcache/hashCacheView.vue')
+const hashlists = () => import('@/components/hashlist/hashListLister.vue')
+const hashlistDetail = () => import('@/components/hashlist/hashListDetail.vue')
+const createHashlist = () => import('@/components/hashlist/createHashlistView.vue')
 const dictionaries = () => import('@/components/dictionary/dictionariesView.vue')
 const dictionaryDetail = () => import('@/components/dictionary/dictionaryDetailView.vue')
 const pcfg = () => import('@/components/pcfg/pcfgView.vue')
@@ -28,6 +31,7 @@ const myAccount = () => import('@/components/myAccount/myAccountView.vue')
 const hostDetail = () => import('@/components/host/hostDetailView.vue')
 const rules = () => import('@/components/rule/rulesView.vue')
 const ruleDetail = () => import('@/components/rule/ruleDetailView.vue')
+const ruleFileEdit = () => import('@/components/rule/ruleFileEdit.vue')
 const masks = () => import('@/components/mask/masksView.vue')
 const charsets = () => import('@/components/charset/charsetsView.vue')
 const charsetDetail = () => import('@/components/charset/charsetDetailView.vue')
@@ -40,6 +44,7 @@ const Server = () => import('@/components/server/serverMonitor.vue')
 const Settings = () => import('@/components/settings/settingsView.vue')
 const Transfer = () => import('@/components/settings/dataTransfer.vue')
 const UnauthorizedError = () => import('@/components/errorPages/unauthorized.vue')
+const planner = () => import('@/components/planner/plannerView.vue')
 
 Vue.use(Router);
 
@@ -118,6 +123,16 @@ const appRoutes = [
     }
   },
   {
+    path: '/planner',
+    name: 'planner',
+    component: planner,
+    meta: {
+      title: 'planner',
+      icon: 'mdi-magic-staff',
+      navtab: 0
+    }
+  },
+  {
     path: '/jobs/:id',
     name: 'jobDetail',
     component: jobDetail,
@@ -131,7 +146,7 @@ const appRoutes = [
     component: templates,
     meta: {
       title: 'Job templates',
-      icon: 'mdi-file',
+      icon: 'mdi-seed',
       navtab: 2
     }
   },
@@ -164,9 +179,34 @@ const appRoutes = [
     component: hashes,
     meta: {
       title: 'Hashes',
+      icon: 'mdi-archive',
+      navtab: 1
+    }
+  },
+  {
+    path: '/hashlists',
+    name: 'hashlists',
+    component: hashlists,
+    meta: {
+      title: 'Hashlists',
       icon: 'mdi-book-lock',
       navtab: 1
     }
+  },
+  {
+    path: '/hashlists/create',
+    name: 'createHashlist',
+    component: createHashlist
+  },
+  {
+    path: '/hashlists/:id',
+    name: 'hashlistDetail',
+    component: hashlistDetail
+  },
+  {
+    path: '/hashlists/:id/extend',
+    name: 'hashlistExtend',
+    component: createHashlist
   },
   {
     path: '/dictionaries',
@@ -174,7 +214,7 @@ const appRoutes = [
     component: dictionaries,
     meta: {
       title: 'Dictionaries',
-      icon: 'mdi-dictionary',
+      icon: 'mdi-book-alphabet',
       navtab: 1
     }
   },
@@ -209,7 +249,17 @@ const appRoutes = [
       title: 'Rules',
       icon: 'mdi-gavel',
       navtab: 1
-    }
+    },
+  },
+  {
+    path: '/rules/edit/new',
+    name: 'ruleFileCreate',
+    component: ruleFileEdit,
+  },
+  {
+    path: '/rules/edit/:id',
+    name: 'ruleFileEdit',
+    component: ruleFileEdit,
   },
   {
     path: '/rules/:id',
@@ -292,7 +342,7 @@ const appRoutes = [
     component: Server,
     meta: {
       title: 'Server monitor',
-      icon: 'mdi-gauge',
+      icon: 'mdi-chart-multiline',
       navtab: 2
     }
   },
@@ -302,7 +352,7 @@ const appRoutes = [
     component: Settings,
     meta: {
       title: 'Settings',
-      icon: 'mdi-cogs',
+      icon: 'mdi-tune',
       navtab: 2
     }
   },

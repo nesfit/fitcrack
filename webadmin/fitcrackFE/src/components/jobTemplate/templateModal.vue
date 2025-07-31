@@ -17,7 +17,7 @@
         @click="nameMe"
       >
         <v-icon left>
-          mdi-file-plus
+          mdi-seed-plus
         </v-icon>Manage Template
       </v-btn>
     </template>

@@ -62,7 +62,7 @@
         </v-tab>
         <v-tab id="nav-system-tab">
           System
-          <v-icon>mdi-settings-outline</v-icon>
+          <v-icon>mdi-cog-outline</v-icon>
         </v-tab>
       </v-tabs>
 
@@ -86,6 +86,18 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>Add Job</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item 
+              :to="{ name: 'planner'}"
+              exact
+            >
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('planner') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Batch Planner</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -139,12 +151,12 @@
             nav
             dense
           >
-            <v-list-item :to="{ name: 'hashes'}">
+            <v-list-item :to="{ name: 'hashlists'}">
               <v-list-item-action>
-                <v-icon>{{ routeIcon('hashes') }}</v-icon>
+                <v-icon>{{ routeIcon('hashlists') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Hashes</v-list-item-title>
+                <v-list-item-title>Hashlists</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -162,7 +174,7 @@
                 <v-icon>{{ routeIcon('pcfg') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>PCFG</v-list-item-title>
+                <v-list-item-title>PCFGs</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -171,7 +183,7 @@
                 <v-icon>{{ routeIcon('rules') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Rules</v-list-item-title>
+                <v-list-item-title>Mangling Rules</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -180,7 +192,7 @@
                 <v-icon>{{ routeIcon('charsets') }}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Charsets</v-list-item-title>
+                <v-list-item-title>Character Sets</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -199,6 +211,17 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>Markov Chains</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-divider></v-divider>
+
+            <v-list-item :to="{ name: 'hashes'}">
+              <v-list-item-action>
+                <v-icon>{{ routeIcon('hashes') }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Hash Cache</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -456,11 +479,10 @@
         large
         rounded
         icon
-        color="accent"
         :href="$docsLink"
         target="_blank"
       >
-        <v-icon>mdi-help-box</v-icon>
+        <v-icon small>mdi-help</v-icon>
       </v-btn>
     </v-app-bar>
     <!-- CONTENT -->

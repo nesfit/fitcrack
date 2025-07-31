@@ -90,7 +90,13 @@ COPY . /srv/fitcrack/
 WORKDIR /srv/fitcrack
 
 # Apply fitcrack specific changes to boinc
-RUN patch -p0 < installer/fitcrack_changes_in_boinc.patch
+# First check if the patch is not already applied locally (e.g. installer was used before)
+RUN if ! patch -p0 --dry-run --silent < installer/fitcrack_changes_in_boinc.patch 2>/dev/null; then \
+    echo "Patch already applied or failed to apply in dry run. Skipping."; \
+else \
+    patch -p0 < installer/fitcrack_changes_in_boinc.patch; \
+fi
+
 
 # Copy server files to BOINC server Root
 RUN cp -f server/src/headers/*.h              boinc/sched/

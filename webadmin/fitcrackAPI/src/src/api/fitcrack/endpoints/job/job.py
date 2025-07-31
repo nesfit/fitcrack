@@ -382,6 +382,10 @@ class OperationWithJob(Resource):
             job.indexes_verified = 0
             job.current_index = 0
             job.current_index_2 = 0
+            job.split_dict_id = 0
+            job.split_dict_index = 0
+            job.split_dict_pos = 0
+            job.split_rule_index = 0
             job.workunit_sum_time = 0
             job.time_start = None
             job.time_end = None
@@ -389,10 +393,14 @@ class OperationWithJob(Resource):
                 masks = FcMask.query.filter(FcMask.job_id == id).all()
                 for mask in masks:
                     mask.current_index = 0
+                    mask.merged = False
+                    if mask.increment_min > 0:
+                        db.session.delete(mask)  
             elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)', 'association']]:
                 dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
                 for dictionary in dictionaries:
                     dictionary.current_index = 0
+                    dictionary.current_pos = 0
             graphData = FcJobGraph.query.filter(FcJobGraph.job_id == id).all()
             for item in graphData:
                 db.session.delete(item)
@@ -542,27 +550,6 @@ class workunitsJob(Resource):
         jobs_page = jobs_query.paginate(page, per_page, error_out=True)
 
         return jobs_page
-
-@ns.route('/<int:id>/exportCrackedHashes')
-@api.response(404, 'job not found.')
-class exportCrackedHashes(Resource):
-    def get(self, id):
-        """
-        Exports cracked password hashes
-        """
-        crackedHashes = io.BytesIO()
-
-        job = FcJob.query.filter(FcJob.id == id).one()
-        for job_hash in job.hashes:
-            if job_hash.result:
-                crackedHashes.write(job_hash.hashText.encode('utf-8'))
-                crackedHashes.write(b':')
-                crackedHashes.write(job_hash.password.encode('utf-8'))
-                crackedHashes.write(b'\n')
-
-        crackedHashes.seek(0)
-        filename = job.name + ".txt"
-        return send_file(crackedHashes, attachment_filename=filename, as_attachment=True, mimetype="text/plain")
 
 
 @ns.route('/verifyHash')

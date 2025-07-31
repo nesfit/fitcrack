@@ -126,7 +126,7 @@ protected:
 
         virtual PtrMask GetWorkunitMask() const;
 
-        virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace) const;
+        virtual PtrMask FindCurrentMask(std::vector<PtrMask> &masks, bool useRealKeyspace, bool findLongest = false) const;
 
         uint64_t getPasswordCountToProcess() const;
 

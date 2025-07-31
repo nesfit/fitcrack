@@ -380,10 +380,24 @@ else # Create Fitcrack project
 
   # Restart Apache
   service apache2 restart
-  service fitcrack start
+
+  # All done
+  echo "All done."
+  echo "FITCRACK server is ready to use."
 fi
 
 #
 ##############################################
+
+echo "Fitcrack is already installed in this container."
+echo "Reviving daemons from the past. Please wait..."
+
+service mysql restart
+service apache2 restart
+service fitcrack restart
+
+# All done
+echo "All done."
+echo "FITCRACK server is ready to use."
 
 sleep infinity

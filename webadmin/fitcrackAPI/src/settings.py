@@ -13,6 +13,7 @@ HASHCAT_DIR = ROOT_DIR + '/../hashcat/'
 HASHCAT_PATH = HASHCAT_DIR + HASHCAT_EXECUTABLE
 HASHCAT_HASH_INFO_PATH = HASHCAT_DIR + HASHCAT_HASH_INFO_JSON
 HASHCAT_UTILS_PATH =  ROOT_DIR + '/../hashcat-utils/bin'
+RULE_APPLICATOR_PATH = ROOT_DIR + '/../hashcat-utils/src/cpu_rules.so'
 PWD_DIST_PATH =  ROOT_DIR + '/../pwd_dist/pwd_dist.bin'
 PRINCE_PROCESSOR_PATH = ROOT_DIR + '/../princeprocessor/pp64.bin'
 EXE_OR_BIN = 'bin'

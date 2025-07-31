@@ -1,4 +1,5 @@
 import platform, time
+from typing import Any
 import msgpack
 
 from flask_login import current_user
@@ -8,16 +9,18 @@ from sqlalchemy import exc
 from src.database.models import FcJob, FcUserPermission
 from src.database.models import FcHash, FcMask # for (un)packing directly
 from src.database.models import FcRule, FcHcstat, FcDictionary, FcJobDictionary, FcPcfg # for dependencies
+from src.database.models import FcHashList
 
 
 # scalar or relationship fields that get copied over
 JOB_EXPORTABLE_COLUMNS = (
-  'attack', 'attack_mode', 'attack_submode', 'distribution_mode', 'hash_type', 'hashes',
+  'attack', 'attack_mode', 'attack_submode', 'distribution_mode', 'hash_type',
   'keyspace', 'hc_keyspace', 'name', 'comment', 'seconds_per_workunit', 
   'charset1', 'charset2', 'charset3', 'charset4', 'rule_left', 'rule_right', 
   'markov_threshold', 'case_permute', 'check_duplicates', 
   'min_password_len', 'max_password_len', 'min_elem_in_chain', 
-  'max_elem_in_chain', 'generate_random_rules', 'optimized', 'deleted', 'masks'
+  'max_elem_in_chain', 'generate_random_rules', 'optimized', 'slow_candidates', 'deleted', 'masks',
+  'hash_list_id'
 )
 # relationship fields that get stored as dependencies
 JOB_EXPORTABLE_DEPENDENCIES = {
@@ -64,23 +67,45 @@ ORM_MAP = {
 # corresponds to the stored dependecny by its type (dictionary -> FcDictionary)
 # and what column to search for the stored value (dictionary -> name). It then
 # tries to find and return all the actual dependencies from DB or raises error.
+#
+#
+# EDITS TO MAKE THIS WORK WITH HASH LISTS:
+# Now that hash lists are a thing, the transfer function had to change a bit.
+# In addition to jobs and dependencies, a new field titled 'hash_lists' is exported.
+# This is a mapping from hash-list id (integer; the same id as stored in the database)
+# to a serialized hash list. Instead of including a list of hashes with each job, we now
+# store just the hash-list id. Of course, we only serialize those hash lists that are referenced
+# from at least one job. This is about it for exporting, but importing poses some challenges.
+# In the import process, we first handle hash lists. For convenience to the user, we check whether
+# the imported hash list already exists on the server. To that end, first we check whether
+# a hash list with the same name already exists. Then we check whether it contains exactly the same
+# hashes as the imported hash list. If yes, we don't create a new hash list on the server, but we
+# just link to the pre-existing one. We do this by using an import-ID--to--server-ID mapping.
+# We just save the hash-list ID from the import file corresponds to the hash-list ID in the server DB.
+# If we have to create a new hash list, we do that, but we also save its server id to the mapping.
+# Finally, when adding the job, we change out the hash-list id from the one from the import to the
+# new one from the mapping.
 
 
 class JobSerializer:
   """Creates a list of job dicts and a list of dependencies"""
   jobs = [] # jobs as dicts, referencing deps by index
   dependencies = [] # deps as '{type}/{identity value}' (type as per DEP_MAP)
+  hash_lists = {} # mapping of hash list id to hash list
 
   def __init__(self):
-    # initialize job list (deps can stay cached)
+    # initialize job list (deps and hash lists can stay cached)
     self.jobs = []
 
-  def add (self, job):
+  def add (self, job:FcJob):
     """Adds an FcJob record to the list"""
     result = {}
     # copy columns
     for field in JOB_EXPORTABLE_COLUMNS:
       result[field] = getattr(job, field)
+    # add the hash list of the job to the list of hash lists to be serialized, but only if we don't already have the hash list saved
+    if not job.hash_list_id in self.hash_lists:
+      self.hash_lists[job.hash_list_id] = job.hash_list
     # record deps
     for dep in JOB_EXPORTABLE_DEPENDENCIES:
       dep_list = []
@@ -120,7 +145,16 @@ def orm_pack (obj):
     obj = {
       'mask': obj.mask,
       'keyspace': obj.keyspace,
-      'hc_keyspace': obj.hc_keyspace
+      'hc_keyspace': obj.hc_keyspace,
+      'increment_min' : obj.increment_min,
+      'increment_max' : obj.increment_max,
+      'merged': obj.merged
+    }
+  if isinstance(obj, FcHashList):
+    obj = {
+      'hash_type' : obj.hash_type,
+      'name' : obj.name,
+      'hashes' : obj.hashes
     }
   return obj
 
@@ -151,6 +185,7 @@ def pack (**options):
 
   package['deps'] = js.dependencies
   package['jobs'] = js.jobs
+  package['hash_lists'] = js.hash_lists
 
   # packing
   packer = msgpack.Packer(use_bin_type=True, default=orm_pack)
@@ -163,25 +198,42 @@ class ImportDependencyMissing (Exception):
   def __init__(self, missing_deps):
     self.missing = missing_deps
 
-def recreate_hash (hashstring, hashtype):
-  return FcHash(hash=hashstring, hash_type=hashtype)
+
+def recreate_hash_list(hash_list) -> FcHashList:
+  hash_type = hash_list['hash_type']
+  new_hash_list = FcHashList(hash_type=hash_type, name=hash_list['name'])
+  hashes_list = []
+  for hash in hash_list['hashes']:
+    hashes_list.append(FcHash(hash=hash, hash_type=hash_type))
+  new_hash_list.hashes = hashes_list
+  return new_hash_list
 
 def recreate_mask (data):
-  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0)
+  return FcMask(mask=data['mask'], keyspace=data['keyspace'], hc_keyspace=data['hc_keyspace'], current_index=0, increment_min=data['increment_min'], increment_max=data['increment_max'], merged=data['merged'])
 
 def unpack (package):
   """
   Unpacks system data from exported package and saves to DB
   """
-  contents = msgpack.unpack(package)
+  contents = msgpack.unpack(package,strict_map_key=False)
   # load deps and check for missing
   deps, missing = dependency_check(contents['deps'])
   if len(missing) > 0:
     raise ImportDependencyMissing(missing)
+  # start checking for pre-existing hash lists and creating them if need be
+  hash_lists_to_add, hash_list_mapping = deduplicate_hash_lists(contents['hash_lists'])
+  for msg_id, hash_list in hash_lists_to_add.items():
+    new_hash_list = recreate_hash_list(hash_list)
+    db.session.add(new_hash_list)
+    hash_list_mapping[msg_id] = new_hash_list
+  db.session.flush()
+  for msg_id in hash_lists_to_add.keys():
+    hash_list_mapping[msg_id] = hash_list_mapping[msg_id].id
   # start creating jobs
   for job in contents['jobs']:
+    #connect the job to the proper hash list
+    job['hash_list_id'] = hash_list_mapping[job['hash_list_id']]
     # transform directly stored object back
-    job['hashes'] = list(map(lambda h: recreate_hash(h, job['hash_type']), job['hashes']))
     if job.get('masks'):
       job['masks'] = list(map(recreate_mask, job['masks']))
     newjob = FcJob()
@@ -238,4 +290,21 @@ def dependency_check (deps):
       missing.append(dep)
     records.append(found)
   return records, missing
-  
+
+
+def deduplicate_hash_lists(hash_lists:dict[int,dict[str,Any]]):
+  new_hash_lists : dict[int,Any] = dict()
+  existing_hash_list_mapping : dict[int,int] = dict()
+  for msg_id, hash_list in hash_lists.items():
+    possible_duplicate = FcHashList.query.filter_by(name=hash_list['name']).filter_by(deleted=False).first()
+    if not possible_duplicate:
+      new_hash_lists[msg_id] = hash_list
+      continue
+    set_of_incoming_hashes = set(hash_list['hashes'])
+    set_of_hashes_in_possible_duplicate = set(x.hash for x in possible_duplicate.hashes)
+    if set_of_incoming_hashes != set_of_hashes_in_possible_duplicate:
+      hash_list['name'] = hash_list['name'] + ' (imported from transfer)'
+      new_hash_lists[msg_id] = hash_list
+      continue
+    existing_hash_list_mapping[msg_id] = possible_duplicate.id
+  return new_hash_lists, existing_hash_list_mapping

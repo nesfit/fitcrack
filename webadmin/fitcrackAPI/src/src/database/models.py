@@ -20,6 +20,7 @@ from src.api.fitcrack.functions import getStringBetween, get_batch_status
 from src.api.fitcrack.lang import job_status_text_to_code_dict, host_status_text_to_code_dict, \
     job_status_text_info_to_code_dict, status_to_code
 from src.database import db
+from src.api.fitcrack.endpoints.job.crackingTimeFunctions import adaptive_scheduling, which_node_will_compute,compute_hostkeyspace_from_tp,compute_estimate_forall
 
 Base = db.Model
 
@@ -101,6 +102,9 @@ class FcMask(Base):
     current_index = Column(BigInteger, nullable=False)
     keyspace = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
+    increment_min = Column(Integer, nullable=False, server_default=text("'0'"))
+    increment_max = Column(Integer, nullable=False, server_default=text("'0'"))
+    merged = Column(Integer, nullable=False, server_default=text("'0'"))
 
     job = relationship("FcJob", back_populates="masks")
 
@@ -111,6 +115,43 @@ class FcMask(Base):
         if self.job.status == 1:
             return 100
         return round((self.current_index / self.hc_keyspace) * 100, 2)
+    
+    @hybrid_property
+    def increment_mask_range(self):
+        if self.increment_min == 0:
+            return self.mask
+        index = 0
+        charIndex = 0
+        while charIndex < self.increment_min:
+            if self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        return self.mask[:index] + ' - ' + self.mask
+    
+    @hybrid_property
+    def increment_all_masks(self):
+        if self.increment_min == 0:
+            return self.mask
+        result = ''
+        index = 0
+        charIndex = 0
+        while charIndex < self.increment_min:
+            if self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        while charIndex <= self.increment_max:
+            result += self.mask[:index] + ', '
+            if index == len(self.mask) or self.mask[index] == '?':
+                index += 1
+            index += 1
+            charIndex += 1
+        result = result[:-2]
+        return result
+            
+        
+    
 
 
 class FcDictionary(Base):
@@ -222,6 +263,7 @@ class FcJob(Base):
     charset3 = Column(String(4096, 'utf8_bin'))
     charset4 = Column(String(4096, 'utf8_bin'))
     rules = Column(String(100, 'utf8_bin'), ForeignKey('fc_rule.name'))
+    rules_id = Column(BigInteger, ForeignKey('fc_rule.id'))
     rule_left = Column(String(255, 'utf8_bin'))
     rule_right = Column(String(255, 'utf8_bin'))
     markov_hcstat = Column(String(100, 'utf8_bin'), ForeignKey('fc_hcstats.name'))
@@ -234,11 +276,19 @@ class FcJob(Base):
     min_elem_in_chain = Column(Integer, nullable=False, server_default=text("'1'"))
     max_elem_in_chain = Column(Integer, nullable=False, server_default=text("'8'"))
     generate_random_rules = Column(Integer, nullable=False, server_default=text("'0'"))
+    split_dict_id = Column(BigInteger, ForeignKey('fc_job_dictionary.id'), nullable=False, server_default=text("'0'"))
+    split_dict_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    split_dict_pos = Column(BigInteger, nullable=False, server_default=text("'0'"))
+    split_rule_index = Column(BigInteger, nullable=False, server_default=text("'0'"))
     optimized = Column(Integer, nullable=False, server_default=text("'1'"))
+    slow_candidates = Column(Integer, nullable=False, server_default=text("'0'"))
     deleted = Column(Integer, nullable=False, server_default=text("'0'"))
     kill = Column(Integer, nullable=False, server_default=text("'0'"))
     batch_id = Column(ForeignKey('fc_batch.id', ondelete='SET NULL'), index=True)
     queue_position = Column(Integer)
+    hash_list_id = Column(ForeignKey('fc_hash_list.id', ondelete='SET NULL'), index=True)
+
+    hash_list = relationship("FcHashList", back_populates="jobs")
 
     permission_records = relationship("FcUserPermission",
                           primaryjoin="FcJob.id==FcUserPermission.job_id")
@@ -268,8 +318,8 @@ class FcJob(Base):
 
     @hybrid_property
     def cracked_hashes_str(self):
-        cracked = len([hash.result for hash in self.hashes if hash.result != None])
-        total = len(self.hashes)
+        cracked = len([hash.result for hash in self.hash_list.hashes if hash.result != None])
+        total = len(self.hash_list.hashes)
         if total == 0:
             return ""
         return "{} % ({}/{})".format(int((cracked * 100)/total), cracked, total)
@@ -312,6 +362,10 @@ class FcJob(Base):
                 # Job is running
                 total_time += (now - last_run_time).total_seconds()
 
+                # Make sure the job is not finished already (restart bug)
+                if(self.status < 10):
+                    return (self.time_end - self.time_start).total_seconds()
+
             return total_time
 
     @hybrid_property
@@ -346,6 +400,7 @@ class FcJob(Base):
             filter(FcHost.boinc_host_id.in_(boinc_host_ids)).all()
 
         hostsPower = {}
+        host_powers = []
         for host in jobHosts:
             hostsPower[host.boinc_host_id] = host.power
 
@@ -364,16 +419,50 @@ class FcJob(Base):
         for benchmark in hostBenchmarks:
             if hostsPower.get(benchmark.boinc_host_id, 0) == 0:
                 total_power += benchmark.power
+                host_powers.append(benchmark.power)
             else:
                 total_power += hostsPower[benchmark.boinc_host_id]
+                host_powers.append(hostsPower[benchmark.boinc_host_id])
 
+        overhead_wu = 0
+        if self.attack_mode == 0:
+            overhead_wu = 55
+        elif self.attack_mode == 1:
+            overhead_wu = 30
+        elif self.attack_mode == 3:
+            overhead_wu = 30
+        elif self.attack_mode == 6:
+            overhead_wu = 20
+        elif self.attack_mode == 7:
+            overhead_wu = 30
+        
+        settings = FcSetting.query.first()
+        ramp_down_coefficient = settings.ramp_down_coefficient
+        tmin = settings.t_pmin
+        alpha = settings.distribution_coefficient_alpha
+        num_hosts = len(host_powers)
+        
         est_time = None
         if (total_power > 0):
-            est_time = float(self.keyspace / total_power)
+            base_time = float(self.keyspace / total_power)
+            tp = adaptive_scheduling(tmin, self.seconds_per_workunit, self.keyspace, host_powers, alpha, ramp_down_coefficient)
+            host_power_key_list = compute_hostkeyspace_from_tp(tp, host_powers, self.keyspace)
+            
+            if self.attack_mode == 8 or self.attack_mode == 9:
+                display_time = base_time + 34
+            else:
+                if num_hosts == 1:
+                    wu_keyspace = host_power_key_list[0][0]
+                    num_wu =  math.ceil(self.keyspace / wu_keyspace) + 1
+                    display_time = base_time + num_wu * overhead_wu + 34
+                else:
+                    computing_nodes_list = which_node_will_compute(host_power_key_list, self.keyspace)
+                    display_time = compute_estimate_forall(computing_nodes_list, overhead_wu)
+
             try:
-                time_delta = datetime.timedelta(seconds=math.floor(est_time))
-                if time_delta.total_seconds() < 60:
-                    est_time = 'About a minute'
+                time_delta = datetime.timedelta(seconds=math.floor(display_time))
+                if time_delta.total_seconds() < 120:
+                    est_time = 'About two minutes'
                 else:
                     est_time = str(time_delta)
             except OverflowError:
@@ -430,7 +519,6 @@ class FcJob(Base):
                 base['operate'] = record.operate
         return base
 
-    hashes = relationship("FcHash", back_populates="job")
 
 class FcBin(Base):
     __tablename__ = 'fc_bin'
@@ -507,6 +595,11 @@ class FcSetting(Base):
     ramp_down_coefficient = Column(Numeric(5, 2), nullable=False, server_default=text("'0.25'"))
     verify_hash_format = Column(Integer, nullable=False, server_default=text("'1'"))
     auto_add_hosts_to_running_jobs = Column(Integer, nullable=False, server_default=text("'0'"))
+    skip_benchmark = Column(Integer, nullable=False, server_default=text("'0'"))
+    merge_masks = Column(Integer, nullable=False, server_default=text("'1'"))
+    update_hashes = Column(Integer, nullable=False, server_default=text("'1'"))
+    max_mangled_passwords_in_preview = Column(Integer, nullable=False, server_default=text("'5000'"))
+   
 
 class FcJobGraph(Base):
     __tablename__ = 'fc_job_graph'
@@ -645,6 +738,8 @@ class FcWorkunit(Base):
     boinc_host_id = Column(Integer, ForeignKey('host.id'), nullable=False)
     start_index = Column(BigInteger, nullable=False)
     start_index_2 = Column(BigInteger, nullable=False)
+    rule_count = Column(BigInteger, nullable=False)
+    split_pos = Column(BigInteger, nullable=False)
     hc_keyspace = Column(BigInteger, nullable=False)
     progress = Column(Float(asdecimal=True), nullable=False, server_default=text("'0'"))
     speed = Column(BigInteger, nullable=False, server_default=text("'0'"))
@@ -674,7 +769,10 @@ class FcWorkunit(Base):
                 return self.hc_keyspace * len(self.job.hashes)
         else:
             if self.job.rulesFile:
-                return self.hc_keyspace * self.job.rulesFile.count
+                if self.rule_count > 0:
+                    return self.rule_count
+                else:
+                    return self.hc_keyspace * self.job.rulesFile.count
             return self.hc_keyspace
 
     @hybrid_property
@@ -693,7 +791,10 @@ class FcWorkunit(Base):
                 return self.start_index * len(self.job.hashes)
             else:
                 if self.job.rulesFile:
-                    return self.start_index * self.job.rulesFile.count
+                    if self.rule_count > 0:
+                        return self.start_index * self.job.rulesFile.count + self.start_index_2
+                    else:
+                        return self.start_index * self.job.rulesFile.count
                 return self.start_index
 
     def as_graph(self):
@@ -894,24 +995,66 @@ class FcHostStatus(Base):
         total_seconds = math.floor(delta.total_seconds())
         return True if total_seconds <= 60 else False
 
+class FcHashList(Base):
+    __tablename__ = 'fc_hash_list'
+
+    id = Column(BigInteger, primary_key=True)
+    hash_type = Column(Integer)
+    name = Column(String(255), nullable=False)
+    added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    deleted = Column(Integer, nullable=False, server_default=text("'0'"))
+
+    jobs = relationship("FcJob")
+    hashes = relationship("FcHash")
+
+    @hybrid_property
+    def hash_type_name(self):
+        return getHashNameById(self.hash_type) if self.hash_type is not None else 'None'
+
+    @hybrid_property
+    def job_count(self):
+        return FcJob.query.filter_by(hash_list_id=self.id).count()
+    
+    @hybrid_property
+    def hash_count(self):
+        return FcHash.query.filter_by(hash_list_id=self.id).count()
+    
+    @hybrid_property
+    def is_locked(self):
+        return self.job_count != 0
+    
+    @hybrid_property
+    def cracked_hash_count(self):
+        return FcHash.query.filter_by(hash_list_id=self.id).filter(FcHash.result != None).count()
+
 
 class FcHash(Base):
     __tablename__ = 'fc_hash'
 
     id = Column(BigInteger, primary_key=True)
-    job_id = Column(BigInteger, ForeignKey(FcJob.id), nullable=False)
-    hash_type = Column(Integer, nullable=False)
+    hash_list_id = Column(BigInteger, ForeignKey(FcHashList.id), nullable=False)
+    hash_type = Column(Integer, nullable=False) # TODO: Could go away
     hash = Column(LargeBinary, nullable=False)
     result = Column(String(400, collation='utf8_bin'))
     added = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     time_cracked = Column(DateTime)
 
-    job = relationship("FcJob", back_populates="hashes")
+    hash_list = relationship("FcHashList",back_populates="hashes")
 
     @hybrid_property
     def hashText(self):
+        output = self.hash
+        if len(output) > 128:
+            output = output[0:128] + b"..."
         try:
-            return self.hash.decode("utf-8")
+            return output.decode("ascii")
+        except UnicodeDecodeError:
+            return "BASE64<{}>".format(base64.encodebytes(output).decode("utf-8"))
+    
+    @hybrid_property
+    def hashTextWithoutTruncation(self):
+        try:
+            return self.hash.decode("ascii")
         except UnicodeDecodeError:
             return "BASE64<{}>".format(base64.encodebytes(self.hash).decode("utf-8"))
 

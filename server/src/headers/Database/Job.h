@@ -97,6 +97,17 @@ class CJob {
          */
         uint64_t getEndIndex() const;
 
+        /**
+         * @brief Create new mask
+         * @param newMask [in] New mask string
+         * @param newKeyspace [in] New real keyspace
+         * @param newHcKeyspace [in] New hashcat keyspace
+         * @param incrementMin [in] New increment min size
+         * @param incrementMax [in] New increment max size
+         * @return ID of the new fc_mask entry
+         */
+        uint64_t createMask(std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax);
+
     private:
 
         CSqlLoader * m_sqlLoader;         /**< SqlLoader for database updating */
@@ -119,6 +130,7 @@ class CJob {
         std::string m_name;
         uint64_t    m_secondsPerWorkunit;
         std::string m_rules;
+        uint64_t    m_rules_id;
         std::string m_ruleLeft;
         std::string m_ruleRight;
         std::string m_charset1;
@@ -136,7 +148,12 @@ class CJob {
         uint32_t m_minElemInChain;
         uint32_t m_maxElemInChain;
         uint32_t m_generateRandomRules;
+        uint64_t m_splitDictId;
+        uint64_t m_splitDictIndex;
+        uint64_t m_splitDictPos;
+        uint64_t m_splitRuleIndex;
         bool m_optimized;
+        bool m_slowCandidates;
         bool m_killFlag;
 
         /**
@@ -177,6 +194,7 @@ class CJob {
         const std::string & getName() const;
         uint64_t getSecondsPerWorkunit() const;
         const std::string & getRules() const;
+        uint64_t getRulesId() const;
         const std::string & getRuleLeft() const;
         const std::string & getRuleRight() const;
         const std::string & getCharset1() const;
@@ -193,7 +211,17 @@ class CJob {
         uint32_t getMinElemInChain() const;
         uint32_t getMaxElemInChain() const;
         uint32_t getRandomRulesCount() const;
+
+        void createRuleSplit(uint64_t dictId, uint64_t dictIndex, uint64_t dictPos, uint64_t ruleIndex);
+        void removeRuleSplit();
+        void updateRuleIndex(uint64_t newRuleIndex);
+        uint64_t getSplitDictId() const;
+        uint64_t getSplitDictIndex() const;
+        uint64_t getSplitDictPos() const;
+        uint64_t getSplitRuleIndex() const;
+
         bool getOptimizedFlag() const;
+        bool getSlowCandidatesFlag() const;
         bool getKillFlag() const;
 
         void setGrammar(const std::string & grammar);

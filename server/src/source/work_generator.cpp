@@ -4,6 +4,7 @@
  * It loads arguments and runs selected generator
  *
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
+ * @authors Radek Hranicky (hranicky(at)fit.vut.cz)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
@@ -243,6 +244,13 @@ void parseArguments(int argc, char * argv[])
 
     std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileAssocNoRuleAlt.c_str());
     if (read_file_malloc(config.project_path(buf), Config::inTemplatePathAssocNoRuleAlt))
+    {
+        log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
+        exit(1);
+    }
+  
+    std::snprintf(buf, sizeof(buf), "templates/%s", Config::inTemplateFileRuleSplit.c_str());
+    if (read_file_malloc(config.project_path(buf), Config::inTemplatePathRuleSplit))
     {
         log_messages.printf(MSG_CRITICAL, "can't read input template %s\n", buf);
         exit(1);

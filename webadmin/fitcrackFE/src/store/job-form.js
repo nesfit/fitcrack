@@ -7,14 +7,10 @@ import { supermutator9000 } from '@/store'
 const base = {
   selectedTemplate: 0, // empty
   step: 1, // Form stepper step
-  validatedHashes: [],
   // info
   name: '',
   // input
-  inputMethod: 'multipleHashes',
-  hashList: '',
-  hashType: null,
-  ignoreHashes: false,
+  hashListId: null,
   // hosts
   hosts: [],
   // other
@@ -51,6 +47,8 @@ export const empty = {
   minElemInChain: 1,
   maxElemInChain: 8,
   generateRandomRules: 0,
+  // rules
+  slowCandidates: false,
   // other
   optimized: true,
   startNow: true,
@@ -93,6 +91,8 @@ export default {
         'min_elem_in_chain': parseInt(state.minElemInChain),
         'max_elem_in_chain': parseInt(state.maxElemInChain),
         'generate_random_rules': parseInt(state.generateRandomRules),
+        // rules
+        'slow_candidates': state.slowCandidates,
          // other
         'optimized': Vue.prototype.$optimizedOnly ? true : state.optimized,
       }
@@ -106,11 +106,7 @@ export default {
         "time_start": (state.startNow ? '' : state.startDate),
         "time_end": (state.endNever ? '' : state.endDate),
         'attack_settings': attackSettings,
-        "hash_settings": {
-          "hash_type": state.hashType ? state.hashType.code : null,
-          "hash_list": state.validatedHashes,
-          "valid_only": !state.ignoreHashes
-        }
+        'hash_list_id': state.hashListId,
       }
     },
     validAttackSpecificSettings (state) {
@@ -168,8 +164,7 @@ export default {
       if (
         !state.attackSettingsTab ||
         !attackSettings ||
-        state.hashType == null ||
-        state.validatedHashes.length == 0 ||
+        state.hashListId == null ||
         state.timeForJob < 10 ||
         state.name === ''
       ) {

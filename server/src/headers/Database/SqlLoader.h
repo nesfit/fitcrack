@@ -2,6 +2,7 @@
  * @file SqlLoader.h
  * @brief Header file for common MySQL access
  * @authors Lukas Zobal (zobal.lukas(at)gmail.com)
+ * @authors Radek Hranicky (hranicky(at)fit.vut.cz)
  * @date 12. 12. 2018
  * @license MIT, see LICENSE
  */
@@ -106,6 +107,36 @@ class CSqlLoader {
         Config::Ptr<CWorkunit> getEasiestRetry(uint64_t jobId);
 
         /**
+         * @brief Return number of rules in a rule file
+         * @param rulesId [in] id of the rule file
+         * @return Number of rules in the specified file
+         */
+        uint64_t getRuleCount(uint64_t rulesId);
+
+        /**
+         * @brief Start splitting rules for a single password in a job
+         * @param jobId [in] id of the job
+         * @param dictId [in] id of the password dictionary
+         * @param dictIndex [in] password index in the dictionary
+         * @param dictPos [in] password position in the dictionary
+         * @param ruleIndex [in] current rule index
+         */
+        void createRuleSplit(uint64_t jobId, uint64_t dictId, uint64_t dictIndex, uint64_t dictPos, uint64_t ruleIndex);
+
+        /**
+         * @brief Stop splitting rules in a job
+         * @param jobId [in] id of the job
+         */
+        void removeRuleSplit(uint64_t jobId);
+
+        /**
+         * @brief Update rule index in a job
+         * @param jobId [in] id of the job
+         * @param newRuleIndex [in] New rule index of this job
+         */
+        void updateRuleIndex(uint64_t jobId, uint64_t newRuleIndex);
+
+        /**
          * @brief Updates status of a host in fc_host table
          * @param hostId [in] Host ID which status we are updating
          * @param newStatus [in] New status of this host
@@ -118,6 +149,30 @@ class CSqlLoader {
          * @param newIndex [in] New index value
          */
         void updateMaskIndex(uint64_t maskId, uint64_t newIndex);
+
+        /**
+         * @brief Creates new fc_mask entry
+         * @param jobId [in] ID of fc_job entry
+         * @param newMask [in] New mask string
+         * @param newKeyspace [in] New real keyspace
+         * @param newHcKeyspace [in] New hashcat keyspace
+         * @param incrementMin [in] New increment min size
+         * @param incrementMax [in] New increment max size
+         * @return ID of the new fc_mask entry
+         */
+        uint64_t createMask(uint64_t jobId, std::string newMask, uint64_t newKeyspace, uint64_t newHcKeyspace, uint64_t incrementMin, uint64_t incrementMax);
+
+        /**
+         * @brief Flag fc_mask entry as merged
+         * @param maskID [in] ID of fc_mask entry
+         */
+        void maskSetMerged(uint64_t maskId);
+
+        /**
+         * @brief Get current mask merge setting
+         * @return True if mask merging is enabled, False otherwise
+         */
+        bool getEnableMergeMasks();
 
         /**
          * @brief Updates current_index of fc_job_dictionary entry
@@ -240,6 +295,14 @@ class CSqlLoader {
          */
         std::vector<Config::Ptr<CDictionary>> loadJobDictionaries(uint64_t jobId);
 
+
+        /**
+         * @brief Returns ID of the hashlist associated with the job
+         * @param jobId Job ID
+         * @return Hashlist ID
+         */
+        uint64_t getHashlistId(uint64_t jobId);
+
         /**
          * @brief Returns vector of hashes as strings, possibly even binary ones
          * @param jobId Job ID which hashes we search for
@@ -315,6 +378,22 @@ class CSqlLoader {
         * @param job Pointer to the job
         */
         void killJob(Config::Ptr<CJob> &job);
+
+        /**
+         * @brief Return power of the last benchmark of a specified host, attack mode and hash type
+         * @param hostId [in] host ID used for filtering
+         * @param attack_mode [in] attack mode code used for filtering
+         * @param hash_type [in] hash type used for filtering
+         * @return Benchmarked power
+         */
+        uint64_t getLatestBenchmarkPower(uint64_t hostId, uint32_t attack_mode, uint32_t hash_type);
+
+        /**
+         * @brief Updates power of a host in fc_host table
+         * @param hostId [in] Host ID which power we are updating
+         * @param newPower [in] New power of this host
+         */
+        void updateHostPower(uint64_t hostId, uint64_t newPower);
 
 private:
 

@@ -2562,15 +2562,16 @@ def find_rc4_passinfo_doc(filename, stream):
             second_block_extra = "*%s" % binascii.hexlify(second_block_bytes).decode("ascii")
 
         summary_extra = ""
-        if have_summary:
-            summary_extra = ":::%s::%s" % (summary, filename)
+        #if have_summary:
+        #    summary_extra = ":::%s::%s" % (summary, filename)
 
         sys.stdout.write("$oldoffice$%s*%s*%s*%s%s%s\n" % (
             typ, binascii.hexlify(salt).decode("ascii"),
             binascii.hexlify(encryptedVerifier).decode("ascii"),
             binascii.hexlify(encryptedVerifierHash).decode("ascii"),
             second_block_extra,
-            summary_extra))
+            summary_extra
+            ))
 
     else:
         sys.stderr.write("%s : Cannot find RC4 pass info, is the document encrypted?\n" % filename)
@@ -3123,8 +3124,8 @@ def process_file(filename):
     (salt, verifier, verifierHash) = passinfo
 
     summary_extra = ""
-    if have_summary:
-        summary_extra = ":::%s::%s" % (summary, filename)
+    #if have_summary:
+    #    summary_extra = ":::%s::%s" % (summary, filename)
 
     sys.stdout.write("$oldoffice$%s*%s*%s*%s%s\n" % (
         typ, binascii.hexlify(salt).decode("ascii"),

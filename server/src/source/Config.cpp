@@ -33,6 +33,7 @@ namespace Config {
     std::string tableNameJobDictionary = "fc_job_dictionary";
     std::string tableNameHash =         "fc_hash";
     std::string tableNamePcfgGrammar =  "fc_pcfg_grammar";
+    std::string tableNameRule =         "fc_rule";
 
     /** Path to dictionaries */
     std::string dictDir = "/usr/share/collections/dictionaries/";
@@ -52,6 +53,7 @@ namespace Config {
     std::string inTemplateFileHybridMaskDict = "hybrid_mask_dict_in";
     std::string inTemplateFileRule =           "rule_in";
     std::string inTemplateFileRuleAlt =        "rule_alt_in";
+    std::string inTemplateFileRuleSplit =      "rule_split_in";
     std::string inTemplateFilePrince =         "prince_in";
     std::string inTemplateFilePrinceRules =    "prince_rules_in";
     std::string inTemplateFilePcfg =           "pcfg_in";
@@ -83,6 +85,7 @@ namespace Config {
     char * inTemplatePathAssocRuleSplit = nullptr;
     char * inTemplatePathAssocNoRule = nullptr;
     char * inTemplatePathAssocNoRuleAlt = nullptr;
+    char * inTemplatePathRuleSplit = nullptr;
     DB_APP * app = nullptr;
     int startTime = 0;
     int seqNo = 0;

@@ -18,4 +18,8 @@ settings_model = api.model('Settings', {
     'ramp_down_coefficient': fields.Float(),
     'verify_hash_format': fields.Boolean(),
     'auto_add_hosts_to_running_jobs': fields.Boolean(),
+    'skip_benchmark': fields.Boolean(),
+    'merge_masks': fields.Boolean(),
+    'update_hashes': fields.Boolean(),
+    'max_mangled_passwords_in_preview': fields.Integer()
 })

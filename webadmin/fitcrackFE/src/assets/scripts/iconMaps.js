@@ -22,7 +22,7 @@ export function typeIcon (type) {
 export function attackIcon (handler) {
   switch (handler) {
     case 'dictionary':
-      return 'mdi-dictionary'
+      return 'mdi-book-alphabet'
     case 'combinator':
       return 'mdi-vector-combine'
     case 'maskattack':

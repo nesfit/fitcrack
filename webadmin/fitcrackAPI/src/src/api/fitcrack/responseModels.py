@@ -106,6 +106,36 @@ boincHost_model = api.model('Host boinc', {
     'jobs': fields.Nested(job_nano_model)
 })
 
+boincResult_model = api.model('boinc result', {
+    'id': fields.String(),
+    'stderr_out_text': fields.String(),
+})
+
+workunit_model = api.model('Workunit', {
+    'id': fields.String(),
+    'job_id': fields.Integer(),
+    'workunit_id': fields.Integer(),
+    'host_id': fields.Integer(),
+    'boinc_host_id': fields.Integer(),
+    'start_index': fields.Integer(),
+    'start_index_2': fields.Integer(),
+    'start_index_real': fields.Integer(),
+    'hc_keyspace': fields.Integer(),
+    'keyspace': fields.Integer(),
+    'mask_id': fields.Integer(),
+    'duplicated': fields.Boolean(),
+    'duplicate': fields.Integer(),
+    'time': fields.DateTime(),
+    'cracking_time': fields.Integer(),
+    'cracking_time_str': fields.String(),
+    'retry': fields.Boolean(),
+    'finished': fields.Boolean(),
+    'host': fields.Nested(boincHost_model),
+    'result': fields.Nested(boincResult_model),
+    'progress': fields.Integer(),
+    'speed': fields.Integer()
+})
+
 job_short_model = api.model('Job short', {
     'id': fields.Integer(readOnly=True, required=False, description='id job'),
     'name': fields.String(required=True, description='name of the job'),
@@ -128,7 +158,8 @@ job_short_model = api.model('Job short', {
     'hash_type': fields.String(required=True),
     'time_start': fields.DateTime(required=True),
     'time_end': fields.DateTime(required=True),
-    'deleted': fields.Boolean()
+    'deleted': fields.Boolean(),
+    'hash_list_id': fields.Integer()
 })
 
 job_micro_model = api.model('Job micro', {
@@ -142,4 +173,5 @@ job_micro_model = api.model('Job micro', {
     'status_tooltip': fields.String(required=False),
     'status_type': fields.String(),
     'progress': fields.Float(required=False),
+    'hash_list_id': fields.Integer()
 })

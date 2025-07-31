@@ -6,7 +6,7 @@
 # using several open-source scripts.
 # For more info see --help and README
 
-# Author: Lukas Zobal (izobal@fit.vutbr.cz)
+# Authors: Lukas Zobal (izobal@fit.vutbr.cz), Viktor Rucky (xrucky01@stud.fit.vutbr.cz)
 
 # Modifications:
 # @date 30.5.2017 Tool created
@@ -14,6 +14,7 @@
 # @date 28.7.2017 Format numbers in -f are same as hashcat's --hash-type
 # @date 06.7.2018 Added check for pkzip and special return code, new RAR/ZIP john2hashcat parsing
 # @date 06.10.2020 Added support for PKZIP, SecureZIP, new RAR3-p. Refactorization.
+# @date 18.03.2024 Added support for extracting "easy" hashes; see help entry for more info.
 
 # RETURN CODES:
 #  * 0 = Everything OK
@@ -26,7 +27,7 @@ import binascii
 import subprocess
 
 from sys import exit, stderr, argv
-from typing import List
+from typing import List, Optional
 
 
 class StaticHelper:
@@ -37,12 +38,12 @@ class StaticHelper:
         'MS_OFFICE': [9400, 9500, 9600, 9700, 9800],
         'PDF': [10400, 10500, 10600, 10700],
         'RAR': [12500, 13000, 23700, 23800],
-        'ZIP': [13600, 17200, 17210, 17225, 23001, 23002, 23003],
+        'ZIP': [13600, 17200, 17210, 17225, 17230, 23001, 23002, 23003],
         '7-ZIP': [11600]
     }
 
     @staticmethod
-    def getHashType(hashStr: str, formatId: int) -> str:
+    def getHashType(hashStr: str, formatId: int, extract_easy_hash:bool) -> str:
         """Chooses the hash mode according to format and extracted hash.
 
         :param hashStr: Extracted hash, input for hashcat
@@ -115,6 +116,12 @@ class StaticHelper:
                     return '-1'
             elif hashStr[1:6] == 'pkzip':
                 hashCount = hashStr[hashStr.find('*') - 1]
+                if extract_easy_hash:
+                    if int(hashCount) < 3:
+                        print(
+                            'Warning: You have requested to create an easy hash from a ZIP file that contains fewer than three files. ' +
+                            'The output hash is correct and well formed, but Hashcat does not support it and will reject it.', file=stderr)
+                    return '17230'      # PKZIP (Mixed Multi-File Checksum-Only)
                 if hashCount == '1':
                     compression_type = hashStr[hashStr.replace('*', 'X', 8).find('*') + 1]
                     if compression_type == '8':
@@ -123,6 +130,7 @@ class StaticHelper:
                         return '17210'  # PKZIP uncompressed
                 else:
                     return '17225'      # PKZIP Multifile Mixed
+                    
         elif formatId == 4:
             # 7-Zip
             return '11600'              # 7-Zip
@@ -134,11 +142,12 @@ class StaticHelper:
 # ------------ Format class ------------
 class Format:
     """Class that represents a single extraction format"""
-    def __init__(self, id: int, extensions: List[str], signatures: List[bytes], scriptPath: str, compiler: str):
+    def __init__(self, id: int, extensions: List[str], signatures: List[bytes], standardScriptPathAndArgs: List[str], easyScriptPathAndArgs: Optional[List[str]], compiler: str):
         self.id = id
         self.extensions = extensions
         self.signatures = signatures
-        self.scriptPath = scriptPath
+        self.standardScriptPathAndArgs = standardScriptPathAndArgs
+        self.easyScriptPathAndArgs = easyScriptPathAndArgs
         self.compiler = compiler
 
     def checkSignature(self, signature: bytes) -> bool:
@@ -155,13 +164,19 @@ class Format:
                 return True
         return False
 
-    def checkHash(self, path: str) -> int:
+    def checkHash(self, path: str, extract_easy_hash:bool) -> int:
         """Extracts the hash from the file.
 
         :param path: Path to the file.
         """
+        
+        if extract_easy_hash and self.easyScriptPathAndArgs is None:
+            print('File type of input does not support extraction with easy hash mode.', file=stderr)
+            exit(1)
+        
         # Call extraction script
-        process = subprocess.Popen([self.scriptPath, path], stdout=subprocess.PIPE)
+        scriptPathAndArgs = self.easyScriptPathAndArgs if extract_easy_hash else self.standardScriptPathAndArgs
+        process = subprocess.Popen(scriptPathAndArgs + [path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = process.communicate()
 
         # Check output
@@ -169,10 +184,10 @@ class Format:
             if err is None or len(err) == 0:
                 print('Empty output. Is the file encrypted?', file=stderr)
             else:
-                print(err.decode('utf-8'), file=stderr)
+                print(err.decode('unicode_escape'), file=stderr)
             exit(1)
         else:
-            hashStr = out.decode('utf-8')
+            hashStr = out.decode('unicode_escape')
 
             # ZIP/RAR john2hashcat
             if self.extensions[0] == '.rar' or self.extensions[0] == '.zip':
@@ -190,7 +205,7 @@ class Format:
                 hashStr = hashStr[:prefixIndex] + hashStr[suffixIndex:]
 
             # Print hash '\n' hash-type
-            print(hashStr.strip(' \t\n\r') + '\n' + StaticHelper.getHashType(hashStr, self.id))
+            print(hashStr.strip(' \t\n\r') + '\n' + StaticHelper.getHashType(hashStr, self.id, extract_easy_hash))
             return 0
 
 
@@ -198,17 +213,18 @@ class Format:
 class Extractor:
     """Class for extracting a hash from the file."""
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, extract_easy_hash:bool=False):
         self.path = path
         self.activeFormat = -1
+        self.extractEasyHash = extract_easy_hash
 
         # Create Formats dynamically
         self.extractorFormats = []
-        self.extractorFormats.append(Format(0, ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'], [b'd0cf11e0a1b11ae1'], 'scripts/office2hashcat.py', 'python3'))
-        self.extractorFormats.append(Format(1, ['.pdf'], [b'25504446'], 'scripts/pdf2hashcat.py', 'python3'))
-        self.extractorFormats.append(Format(2, ['.rar'], [b'526172211a07'], 'scripts/rar2john', ''))
-        self.extractorFormats.append(Format(3, ['.zip'], [b'504b0304'], 'scripts/zip2john', ''))
-        self.extractorFormats.append(Format(4, ['.7z'], [b'377abcaf271c'], 'scripts/7z2hashcat.pl', 'perl'))
+        self.extractorFormats.append(Format(0, ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'], [b'd0cf11e0a1b11ae1'], ['scripts/office2hashcat.py'], None, 'python3'))
+        self.extractorFormats.append(Format(1, ['.pdf'], [b'25504446'], ['scripts/pdf2hashcat.py'], None,  'python3'))
+        self.extractorFormats.append(Format(2, ['.rar'], [b'526172211a07'], ['scripts/rar2john'], None, ''))
+        self.extractorFormats.append(Format(3, ['.zip'], [b'504b0304'], ['scripts/zip2john'], ['scripts/zip2john', '-c'], ''))
+        self.extractorFormats.append(Format(4, ['.7z'], [b'377abcaf271c'], ['scripts/7z2hashcat.pl'], None, 'perl'))
 
     def checkFormat(self) -> bool:
         """Attempts to recognize the file format.
@@ -261,7 +277,7 @@ class Extractor:
 
     def extract(self):
         """Extracts and prints out the hash and hash mode."""
-        return self.extractorFormats[self.activeFormat].checkHash(self.path)
+        return self.extractorFormats[self.activeFormat].checkHash(self.path,self.extractEasyHash)
 
 
 # ---------- Argument parsing ----------
@@ -275,7 +291,7 @@ class ArgumentParser(object):
     help_program = 'This program extracts hash from number of formats + prints hashcat --hash-type on the last line'
     help_help = 'Output this message'
     help_file = 'Path to file from which hash is extracted'
-    help_format = 'If this argument is set, program will NOT try to determine format automatically but will use supplied format instead.\
+    help_format = 'If this argument is set, program will NOT try to determine format automatically but will use supplied format instead. \
 Supported set is a sub-set of hashcat supported --hash-types:\n\
 \tMicrosoft Office Documents (-f 9400-9800)\n\
 \tPDF documents (-f 10400-10700)\n\
@@ -283,6 +299,11 @@ Supported set is a sub-set of hashcat supported --hash-types:\n\
 \tZIP archive (-f 13600)\n\
 \t7-Zip archive (-f 11600)\n\n\
 Note: Setting different types of the same document (e.g. 9400 or 9800) makes no difference.'
+    help_easy = 'When this option is set, it makes the extractor try to attempt to extract an "easier" version of the hash. \
+This is such a hash that is shorter but may lead to false positives when cracking. \
+This is useful because regular hashes are sometimes too large to be accepted by Hashcat but the easy variants may be OK. \
+If a format does not support extracting and easy hash, then the option does nothing.\
+As of now, only ZIP has support for easy hashes.'
 
     parser = argparse.ArgumentParser(description=help_program, formatter_class=argparse.RawTextHelpFormatter)
 
@@ -291,6 +312,7 @@ Note: Setting different types of the same document (e.g. 9400 or 9800) makes no 
         """Parses program arguments."""
         self.parser.add_argument('filePath', type=str, help=self.help_file)
         self.parser.add_argument('-f', type=int, help=self.help_format)
+        self.parser.add_argument('-e', '--easy-hash', action='store_true', help=self.help_easy)
 
         try:
             args = self.parser.parse_args()
@@ -312,7 +334,7 @@ def main():
     args = argParser.loadArguments()
 
     # Create extractor
-    extractor = Extractor(args.filePath)
+    extractor = Extractor(args.filePath,args.easy_hash)
 
     if args.f or args.f == 0:
         if not extractor.setFormat(args.f):    # set format manually
