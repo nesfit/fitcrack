@@ -14,6 +14,26 @@
 #include M2S(INCLUDE_PATH/inc_hash_sha256.cl)
 #endif
 
+CONSTANT_VK u32a k_sha256[64] =
+{
+  SHA256C00, SHA256C01, SHA256C02, SHA256C03,
+  SHA256C04, SHA256C05, SHA256C06, SHA256C07,
+  SHA256C08, SHA256C09, SHA256C0a, SHA256C0b,
+  SHA256C0c, SHA256C0d, SHA256C0e, SHA256C0f,
+  SHA256C10, SHA256C11, SHA256C12, SHA256C13,
+  SHA256C14, SHA256C15, SHA256C16, SHA256C17,
+  SHA256C18, SHA256C19, SHA256C1a, SHA256C1b,
+  SHA256C1c, SHA256C1d, SHA256C1e, SHA256C1f,
+  SHA256C20, SHA256C21, SHA256C22, SHA256C23,
+  SHA256C24, SHA256C25, SHA256C26, SHA256C27,
+  SHA256C28, SHA256C29, SHA256C2a, SHA256C2b,
+  SHA256C2c, SHA256C2d, SHA256C2e, SHA256C2f,
+  SHA256C30, SHA256C31, SHA256C32, SHA256C33,
+  SHA256C34, SHA256C35, SHA256C36, SHA256C37,
+  SHA256C38, SHA256C39, SHA256C3a, SHA256C3b,
+  SHA256C3c, SHA256C3d, SHA256C3e, SHA256C3f,
+};
+
 DECLSPEC void sha256_transform_m (PRIVATE_AS u32x *digest, PRIVATE_AS const u32x *w)
 {
   u32x a = digest[0];
@@ -464,7 +484,7 @@ DECLSPEC void m08000s (LOCAL_AS u32 *w_s1, LOCAL_AS u32 *w_s2, PRIVATE_AS u32 *w
   }
 }
 
-KERNEL_FQ void m08000_m04 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m08000_m04 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -505,7 +525,7 @@ KERNEL_FQ void m08000_m04 (KERN_ATTR_VECTOR ())
   m08000m (w_s1, w_s2, w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m08000_m08 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m08000_m08 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -546,7 +566,7 @@ KERNEL_FQ void m08000_m08 (KERN_ATTR_VECTOR ())
   m08000m (w_s1, w_s2, w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m08000_m16 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m08000_m16 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -587,7 +607,7 @@ KERNEL_FQ void m08000_m16 (KERN_ATTR_VECTOR ())
   m08000m (w_s1, w_s2, w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m08000_s04 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m08000_s04 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -628,7 +648,7 @@ KERNEL_FQ void m08000_s04 (KERN_ATTR_VECTOR ())
   m08000s (w_s1, w_s2, w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m08000_s08 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m08000_s08 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -669,7 +689,7 @@ KERNEL_FQ void m08000_s08 (KERN_ATTR_VECTOR ())
   m08000s (w_s1, w_s2, w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m08000_s16 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m08000_s16 (KERN_ATTR_VECTOR ())
 {
   /**
    * base

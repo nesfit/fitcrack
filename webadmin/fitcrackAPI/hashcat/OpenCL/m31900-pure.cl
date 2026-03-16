@@ -33,7 +33,7 @@ typedef struct pbkdf2_sha512_aes_cbc
   u32 salt_buf[64];
   u32 iv_buf[4];
   u32 iv_len;
-  u32 ct_buf[4];
+  u32 ct_buf[8];
   u32 ct_len;
 
 } pbkdf2_sha512_aes_cbc_t;
@@ -96,7 +96,7 @@ DECLSPEC void hmac_sha512_run_V (PRIVATE_AS u32x *w0, PRIVATE_AS u32x *w1, PRIVA
   sha512_transform_vector (w0, w1, w2, w3, w4, w5, w6, w7, digest);
 }
 
-KERNEL_FQ void m31900_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sha512_aes_cbc_t))
+KERNEL_FQ KERNEL_FA void m31900_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sha512_aes_cbc_t))
 {
   /**
    * base
@@ -200,7 +200,7 @@ KERNEL_FQ void m31900_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sh
   }
 }
 
-KERNEL_FQ void m31900_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sha512_aes_cbc_t))
+KERNEL_FQ KERNEL_FA void m31900_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sha512_aes_cbc_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -326,7 +326,7 @@ KERNEL_FQ void m31900_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sh
   }
 }
 
-KERNEL_FQ void m31900_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sha512_aes_cbc_t))
+KERNEL_FQ KERNEL_FA void m31900_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sha512_aes_cbc_t))
 {
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);
@@ -413,16 +413,20 @@ KERNEL_FQ void m31900_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sh
 
   // ct
 
-  u32 ct_buf[4];
+  u32 ct_buf[8];
 
   ct_buf[0] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[0];
   ct_buf[1] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[1];
   ct_buf[2] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[2];
   ct_buf[3] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[3];
+  ct_buf[4] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[4];
+  ct_buf[5] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[5];
+  ct_buf[6] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[6];
+  ct_buf[7] = esalt_bufs[DIGESTS_OFFSET_HOST].ct_buf[7];
 
   // decrypt first block
 
-  u32 pt_buf[4] = { 0 };
+  u32 pt_buf[8] = { 0 };
 
   AES256_decrypt (ks, ct_buf, pt_buf, s_td0, s_td1, s_td2, s_td3, s_td4);
 
@@ -431,12 +435,28 @@ KERNEL_FQ void m31900_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha512_tmp_t, pbkdf2_sh
   pt_buf[2] ^= iv_buf[2];
   pt_buf[3] ^= iv_buf[3];
 
-  const int correct = is_valid_printable_32 (pt_buf[0])
-                    + is_valid_printable_32 (pt_buf[1])
-                    + is_valid_printable_32 (pt_buf[2])
-                    + is_valid_printable_32 (pt_buf[3]);
+  const int correct_b1 = is_valid_printable_32 (pt_buf[0])
+                       + is_valid_printable_32 (pt_buf[1])
+                       + is_valid_printable_32 (pt_buf[2])
+                       + is_valid_printable_32 (pt_buf[3]);
 
-  if (correct != 4) return;
+  if (correct_b1 != 4) return;
+
+  // proceed with second block to further reduce false-positives
+
+  AES256_decrypt (ks, ct_buf+4, pt_buf+4, s_td0, s_td1, s_td2, s_td3, s_td4);
+
+  pt_buf[4] ^= ct_buf[0];
+  pt_buf[5] ^= ct_buf[1];
+  pt_buf[6] ^= ct_buf[2];
+  pt_buf[7] ^= ct_buf[3];
+
+  const int correct_b2 = is_valid_printable_32 (pt_buf[4])
+                       + is_valid_printable_32 (pt_buf[5])
+                       + is_valid_printable_32 (pt_buf[6])
+                       + is_valid_printable_32 (pt_buf[7]);
+
+  if (correct_b2 != 4) return;
 
   const u32 r0 = ct_buf[0];
   const u32 r1 = ct_buf[1];

@@ -42,7 +42,7 @@ DECLSPEC u32 hex_u32_to_u32 (PRIVATE_AS const u32 hex0, PRIVATE_AS const u32 hex
   return (v);
 }
 
-KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m30905_mxx (KERN_ATTR_RULES ())
 {
   /**
    * modifier
@@ -51,7 +51,6 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
   const u64 gid = get_global_id (0);
 
   if (gid >= GID_CNT) return;
-
 
   /**
    * base
@@ -62,7 +61,6 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
   set_precomputed_basepoint_g (&preG);
 
   COPY_PW (pws[gid]);
-
 
   /**
    * loop
@@ -76,11 +74,18 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
 
     if (p.pw_len != 64) continue;
 
+    u32 e = 0;
+
     for (u32 i = 0; i < 16; i++)
     {
-      if (is_valid_hex_32 (p.i[i]) == 0) continue;
+      if (is_valid_hex_32 (p.i[i]) != 0) continue;
+
+      e = 1;
+
+      break;
     }
 
+    if (e == 1) continue; // not a valid hex
 
     // convert password from hex to binary
 
@@ -91,7 +96,7 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
       tmp[i] = hex_u32_to_u32 (p.i[j + 0], p.i[j + 1]);
     }
 
-    u32 prv_key[9];
+    u32 prv_key[9] = { 0 };
 
     prv_key[0] = tmp[7];
     prv_key[1] = tmp[6];
@@ -102,14 +107,12 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
     prv_key[6] = tmp[1];
     prv_key[7] = tmp[0];
 
-
     // convert: pub_key = G * prv_key
 
-    u32 x[8];
-    u32 y[8];
+    u32 x[8] = { 0 };
+    u32 y[8] = { 0 };
 
     point_mul_xy (x, y, prv_key, &preG);
-
 
     // to public key:
 
@@ -127,7 +130,6 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
     pub_key[1] = (x[6] >> 8) | (x[7] << 24);
     pub_key[0] = (x[7] >> 8) | (type << 24);
 
-
     // calculate HASH160 for pub key
 
     sha256_ctx_t ctx;
@@ -143,7 +145,6 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
 
     for (u32 i = 8; i < 16; i++) tmp[i] = 0;
 
-
     // now let's do RIPEMD-160 on the sha256sum
 
     ripemd160_ctx_t rctx;
@@ -151,7 +152,6 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
     ripemd160_init        (&rctx);
     ripemd160_update_swap (&rctx, tmp, 32);
     ripemd160_final       (&rctx);
-
 
     /*
      * 2nd RIPEMD160 (SHA256 ()):
@@ -185,7 +185,7 @@ KERNEL_FQ void m30905_mxx (KERN_ATTR_RULES ())
   }
 }
 
-KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m30905_sxx (KERN_ATTR_RULES ())
 {
   /**
    * modifier
@@ -194,7 +194,6 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
   const u64 gid = get_global_id (0);
 
   if (gid >= GID_CNT) return;
-
 
   /**
    * digest
@@ -208,7 +207,6 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
     digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R3]
   };
 
-
   /**
    * base
    */
@@ -218,7 +216,6 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
   set_precomputed_basepoint_g (&preG);
 
   COPY_PW (pws[gid]);
-
 
   /**
    * loop
@@ -232,11 +229,18 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
 
     if (p.pw_len != 64) continue;
 
+    u32 e = 0;
+
     for (u32 i = 0; i < 16; i++)
     {
-      if (is_valid_hex_32 (p.i[i]) == 0) continue;
+      if (is_valid_hex_32 (p.i[i]) != 0) continue;
+
+      e = 1;
+
+      break;
     }
 
+    if (e == 1) continue; // not a valid hex
 
     // convert password from hex to binary
 
@@ -247,7 +251,7 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
       tmp[i] = hex_u32_to_u32 (p.i[j + 0], p.i[j + 1]);
     }
 
-    u32 prv_key[9];
+    u32 prv_key[9] = { 0 };
 
     prv_key[0] = tmp[7];
     prv_key[1] = tmp[6];
@@ -258,14 +262,12 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
     prv_key[6] = tmp[1];
     prv_key[7] = tmp[0];
 
-
     // convert: pub_key = G * prv_key
 
-    u32 x[8];
-    u32 y[8];
+    u32 x[8] = { 0 };
+    u32 y[8] = { 0 };
 
     point_mul_xy (x, y, prv_key, &preG);
-
 
     // to public key:
 
@@ -283,7 +285,6 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
     pub_key[1] = (x[6] >> 8) | (x[7] << 24);
     pub_key[0] = (x[7] >> 8) | (type << 24);
 
-
     // calculate HASH160 for pub key
 
     sha256_ctx_t ctx;
@@ -299,7 +300,6 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
 
     for (u32 i = 8; i < 16; i++) tmp[i] = 0;
 
-
     // now let's do RIPEMD-160 on the sha256sum
 
     ripemd160_ctx_t rctx;
@@ -307,7 +307,6 @@ KERNEL_FQ void m30905_sxx (KERN_ATTR_RULES ())
     ripemd160_init        (&rctx);
     ripemd160_update_swap (&rctx, tmp, 32);
     ripemd160_final       (&rctx);
-
 
     /*
      * 2nd RIPEMD160 (SHA256 ()):

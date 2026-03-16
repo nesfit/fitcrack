@@ -43,31 +43,6 @@ typedef struct gpg_tmp
 
 } gpg_tmp_t;
 
-
-DECLSPEC u32 hc_bytealign_le_S (const u32 a, const u32 b, const int c)
-{
-  const int c_mod_4 = c & 3;
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
-  const u32 r = l32_from_64_S ((v64_from_v32ab_S (b, a) >> (c_mod_4 * 8)));
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> (c_mod_4 * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S (0x0706050403020100UL >> (c_mod_4 * 8));
-  #endif
-
-  const u32 r = hc_byte_perm (b, a, selector);
-  #endif
-
-  return r;
-}
-
 DECLSPEC void memcat_le_S (PRIVATE_AS u32 *block, const u32 offset, PRIVATE_AS const u32 *append, u32 len)
 {
   const u32 start_index = (offset - 1) >> 2;
@@ -75,11 +50,11 @@ DECLSPEC void memcat_le_S (PRIVATE_AS u32 *block, const u32 offset, PRIVATE_AS c
   const int off_mod_4 = offset & 3;
   const int off_minus_4 = 4 - off_mod_4;
 
-  block[start_index] |= hc_bytealign_le_S (append[0], 0, off_minus_4);
+  block[start_index] |= hc_bytealign_be_S (append[0], 0, off_minus_4);
 
   for (u32 idx = 1; idx < count; idx++)
   {
-    block[start_index + idx] = hc_bytealign_le_S (append[idx], append[idx - 1], off_minus_4);
+    block[start_index + idx] = hc_bytealign_be_S (append[idx], append[idx - 1], off_minus_4);
   }
 }
 
@@ -189,11 +164,11 @@ DECLSPEC int check_decoded_data (PRIVATE_AS u32 *decoded_data, const u32 decoded
 
   u32 expected_sha1[5];
 
-  expected_sha1[0] = hc_bytealign_le_S (decoded_data[sha1_u32_off + 1], decoded_data[sha1_u32_off + 0], sha1_byte_off);
-  expected_sha1[1] = hc_bytealign_le_S (decoded_data[sha1_u32_off + 2], decoded_data[sha1_u32_off + 1], sha1_byte_off);
-  expected_sha1[2] = hc_bytealign_le_S (decoded_data[sha1_u32_off + 3], decoded_data[sha1_u32_off + 2], sha1_byte_off);
-  expected_sha1[3] = hc_bytealign_le_S (decoded_data[sha1_u32_off + 4], decoded_data[sha1_u32_off + 3], sha1_byte_off);
-  expected_sha1[4] = hc_bytealign_le_S (decoded_data[sha1_u32_off + 5], decoded_data[sha1_u32_off + 4], sha1_byte_off);
+  expected_sha1[0] = hc_bytealign_be_S (decoded_data[sha1_u32_off + 1], decoded_data[sha1_u32_off + 0], sha1_byte_off);
+  expected_sha1[1] = hc_bytealign_be_S (decoded_data[sha1_u32_off + 2], decoded_data[sha1_u32_off + 1], sha1_byte_off);
+  expected_sha1[2] = hc_bytealign_be_S (decoded_data[sha1_u32_off + 3], decoded_data[sha1_u32_off + 2], sha1_byte_off);
+  expected_sha1[3] = hc_bytealign_be_S (decoded_data[sha1_u32_off + 4], decoded_data[sha1_u32_off + 3], sha1_byte_off);
+  expected_sha1[4] = hc_bytealign_be_S (decoded_data[sha1_u32_off + 5], decoded_data[sha1_u32_off + 4], sha1_byte_off);
 
   memzero_le_S (decoded_data, sha1_byte_off, 384 * sizeof(u32));
 
@@ -212,7 +187,7 @@ DECLSPEC int check_decoded_data (PRIVATE_AS u32 *decoded_data, const u32 decoded
       && (expected_sha1[4] == hc_swap32_S (ctx.h[4]));
 }
 
-KERNEL_FQ void m17030_init (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
+KERNEL_FQ KERNEL_FA void m17030_init (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -262,7 +237,7 @@ KERNEL_FQ void m17030_init (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
   tmps[gid].len = 0;
 }
 
-KERNEL_FQ void m17030_loop_prepare (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
+KERNEL_FQ KERNEL_FA void m17030_loop_prepare (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -288,7 +263,7 @@ KERNEL_FQ void m17030_loop_prepare (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
   tmps[gid].len = 0;
 }
 
-KERNEL_FQ void m17030_loop (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
+KERNEL_FQ KERNEL_FA void m17030_loop (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -358,12 +333,12 @@ KERNEL_FQ void m17030_loop (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
   tmps[gid].len = ctx.len;
 }
 
-KERNEL_FQ void m17030_comp (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
+KERNEL_FQ KERNEL_FA void m17030_comp (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
 {
   // not in use here, special case...
 }
 
-KERNEL_FQ void m17030_aux1 (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
+KERNEL_FQ KERNEL_FA void m17030_aux1 (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
 {
   /**
    * modifier
@@ -436,7 +411,7 @@ KERNEL_FQ void m17030_aux1 (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
   }
 }
 
-KERNEL_FQ void m17030_aux2 (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
+KERNEL_FQ KERNEL_FA void m17030_aux2 (KERN_ATTR_TMPS_ESALT (gpg_tmp_t, gpg_t))
 {
   /**
    * modifier

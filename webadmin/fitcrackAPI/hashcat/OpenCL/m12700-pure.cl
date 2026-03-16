@@ -28,20 +28,6 @@ typedef struct mywallet_tmp
 
 } mywallet_tmp_t;
 
-DECLSPEC int is_valid_char (const u32 v)
-{
-  if ((v & 0xff000000) < 0x09000000) return 0;
-  if ((v & 0xff000000) > 0x7e000000) return 0;
-  if ((v & 0x00ff0000) < 0x00090000) return 0;
-  if ((v & 0x00ff0000) > 0x007e0000) return 0;
-  if ((v & 0x0000ff00) < 0x00000900) return 0;
-  if ((v & 0x0000ff00) > 0x00007e00) return 0;
-  if ((v & 0x000000ff) < 0x00000009) return 0;
-  if ((v & 0x000000ff) > 0x0000007e) return 0;
-
-  return 1;
-}
-
 DECLSPEC void hmac_sha1_run_V (PRIVATE_AS u32x *w0, PRIVATE_AS u32x *w1, PRIVATE_AS u32x *w2, PRIVATE_AS u32x *w3, PRIVATE_AS u32x *ipad, PRIVATE_AS u32x *opad, PRIVATE_AS u32x *digest)
 {
   digest[0] = ipad[0];
@@ -78,7 +64,7 @@ DECLSPEC void hmac_sha1_run_V (PRIVATE_AS u32x *w0, PRIVATE_AS u32x *w1, PRIVATE
   sha1_transform_vector (w0, w1, w2, w3, digest);
 }
 
-KERNEL_FQ void m12700_init (KERN_ATTR_TMPS (mywallet_tmp_t))
+KERNEL_FQ KERNEL_FA void m12700_init (KERN_ATTR_TMPS (mywallet_tmp_t))
 {
   /**
    * base
@@ -167,7 +153,7 @@ KERNEL_FQ void m12700_init (KERN_ATTR_TMPS (mywallet_tmp_t))
   }
 }
 
-KERNEL_FQ void m12700_loop (KERN_ATTR_TMPS (mywallet_tmp_t))
+KERNEL_FQ KERNEL_FA void m12700_loop (KERN_ATTR_TMPS (mywallet_tmp_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -252,7 +238,7 @@ KERNEL_FQ void m12700_loop (KERN_ATTR_TMPS (mywallet_tmp_t))
   }
 }
 
-KERNEL_FQ void m12700_comp (KERN_ATTR_TMPS (mywallet_tmp_t))
+KERNEL_FQ KERNEL_FA void m12700_comp (KERN_ATTR_TMPS (mywallet_tmp_t))
 {
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);
@@ -339,8 +325,6 @@ KERNEL_FQ void m12700_comp (KERN_ATTR_TMPS (mywallet_tmp_t))
   iv[2] = salt_bufs[SALT_POS_HOST].salt_buf[2];
   iv[3] = salt_bufs[SALT_POS_HOST].salt_buf[3];
 
-  // decrypted data should be a JSON string consisting only of ASCII chars (0x09-0x7e)
-
   for (u32 i = 4; i < 16; i += 4)
   {
     u32 data[4];
@@ -359,10 +343,11 @@ KERNEL_FQ void m12700_comp (KERN_ATTR_TMPS (mywallet_tmp_t))
     out[2] ^= iv[2];
     out[3] ^= iv[3];
 
-    if (is_valid_char (out[0]) == 0) return;
-    if (is_valid_char (out[1]) == 0) return;
-    if (is_valid_char (out[2]) == 0) return;
-    if (is_valid_char (out[3]) == 0) return;
+    // decrypted data should be a JSON string consisting only of ASCII chars (including newlines)
+    if (is_valid_printable_32_incl_common_control (out[0]) == 0) return;
+    if (is_valid_printable_32_incl_common_control (out[1]) == 0) return;
+    if (is_valid_printable_32_incl_common_control (out[2]) == 0) return;
+    if (is_valid_printable_32_incl_common_control (out[3]) == 0) return;
 
     iv[0] = data[0];
     iv[1] = data[1];

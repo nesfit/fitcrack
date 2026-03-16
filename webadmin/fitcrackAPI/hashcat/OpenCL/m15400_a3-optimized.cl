@@ -236,17 +236,7 @@ DECLSPEC void chacha20_transform (PRIVATE_AS const u32x *w0, PRIVATE_AS const u3
   }
 }
 
-KERNEL_FQ void m15400_m04 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
-{
-  // fixed size 32
-}
-
-KERNEL_FQ void m15400_m08 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
-{
-  // fixed size 32
-}
-
-KERNEL_FQ void m15400_m16 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
+KERNEL_FQ KERNEL_FA void m15400_m04 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
 {
   /**
    * modifier
@@ -326,17 +316,352 @@ KERNEL_FQ void m15400_m16 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
   }
 }
 
-KERNEL_FQ void m15400_s04 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
+KERNEL_FQ KERNEL_FA void m15400_m08 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
 {
-  // fixed size 32
+  /**
+   * modifier
+   */
+
+  const u64 gid = get_global_id (0);
+  const u64 lid = get_local_id (0);
+
+  if (gid >= GID_CNT) return;
+
+  u32 w0[4];
+  u32 w1[4];
+
+  w0[0] = pws[gid].i[0];
+  w0[1] = pws[gid].i[1];
+  w0[2] = pws[gid].i[2];
+  w0[3] = pws[gid].i[3];
+  w1[0] = pws[gid].i[4];
+  w1[1] = pws[gid].i[5];
+  w1[2] = pws[gid].i[6];
+  w1[3] = pws[gid].i[7];
+
+  /**
+   * Salt prep
+   */
+
+  u32 iv[2];
+
+  iv[0] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[0];
+  iv[1] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[1];
+
+  u32 plain[2];
+
+  plain[0] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[0];
+  plain[1] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[1];
+
+  u32 position[2];
+
+  position[0] = esalt_bufs[DIGESTS_OFFSET_HOST].position[0];
+  position[1] = esalt_bufs[DIGESTS_OFFSET_HOST].position[1];
+
+  u32 offset = esalt_bufs[DIGESTS_OFFSET_HOST].offset;
+
+  /**
+   * loop
+   */
+
+  u32 w0l = pws[gid].i[0];
+
+  for (u32 il_pos = 0; il_pos < IL_CNT; il_pos += VECT_SIZE)
+  {
+    const u32x w0r = words_buf_r[il_pos / VECT_SIZE];
+    const u32x w0x = w0l | w0r;
+
+    u32x w0_t[4];
+    u32x w1_t[4];
+
+    w0_t[0] = w0x;
+    w0_t[1] = w0[1];
+    w0_t[2] = w0[2];
+    w0_t[3] = w0[3];
+    w1_t[0] = w1[0];
+    w1_t[1] = w1[1];
+    w1_t[2] = w1[2];
+    w1_t[3] = w1[3];
+
+    u32x digest[4] = { 0 };
+
+    chacha20_transform (w0_t, w1_t, position, offset, iv, plain, digest);
+
+    const u32x r0 = digest[0];
+    const u32x r1 = digest[1];
+    const u32x r2 = digest[2];
+    const u32x r3 = digest[3];
+
+    COMPARE_M_SIMD (r0, r1, r2, r3);
+  }
 }
 
-KERNEL_FQ void m15400_s08 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
+KERNEL_FQ KERNEL_FA void m15400_m16 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
 {
-  // fixed size 32
+  /**
+   * modifier
+   */
+
+  const u64 gid = get_global_id (0);
+  const u64 lid = get_local_id (0);
+
+  if (gid >= GID_CNT) return;
+
+  u32 w0[4];
+  u32 w1[4];
+
+  w0[0] = pws[gid].i[0];
+  w0[1] = pws[gid].i[1];
+  w0[2] = pws[gid].i[2];
+  w0[3] = pws[gid].i[3];
+  w1[0] = pws[gid].i[4];
+  w1[1] = pws[gid].i[5];
+  w1[2] = pws[gid].i[6];
+  w1[3] = pws[gid].i[7];
+
+  /**
+   * Salt prep
+   */
+
+  u32 iv[2];
+
+  iv[0] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[0];
+  iv[1] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[1];
+
+  u32 plain[2];
+
+  plain[0] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[0];
+  plain[1] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[1];
+
+  u32 position[2];
+
+  position[0] = esalt_bufs[DIGESTS_OFFSET_HOST].position[0];
+  position[1] = esalt_bufs[DIGESTS_OFFSET_HOST].position[1];
+
+  u32 offset = esalt_bufs[DIGESTS_OFFSET_HOST].offset;
+
+  /**
+   * loop
+   */
+
+  u32 w0l = pws[gid].i[0];
+
+  for (u32 il_pos = 0; il_pos < IL_CNT; il_pos += VECT_SIZE)
+  {
+    const u32x w0r = words_buf_r[il_pos / VECT_SIZE];
+    const u32x w0x = w0l | w0r;
+
+    u32x w0_t[4];
+    u32x w1_t[4];
+
+    w0_t[0] = w0x;
+    w0_t[1] = w0[1];
+    w0_t[2] = w0[2];
+    w0_t[3] = w0[3];
+    w1_t[0] = w1[0];
+    w1_t[1] = w1[1];
+    w1_t[2] = w1[2];
+    w1_t[3] = w1[3];
+
+    u32x digest[4] = { 0 };
+
+    chacha20_transform (w0_t, w1_t, position, offset, iv, plain, digest);
+
+    const u32x r0 = digest[0];
+    const u32x r1 = digest[1];
+    const u32x r2 = digest[2];
+    const u32x r3 = digest[3];
+
+    COMPARE_M_SIMD (r0, r1, r2, r3);
+  }
 }
 
-KERNEL_FQ void m15400_s16 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
+KERNEL_FQ KERNEL_FA void m15400_s04 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
+{
+  /**
+   * modifier
+   */
+
+  const u64 gid = get_global_id (0);
+  const u64 lid = get_local_id (0);
+
+  if (gid >= GID_CNT) return;
+
+  u32 w0[4];
+  u32 w1[4];
+
+  w0[0] = pws[gid].i[0];
+  w0[1] = pws[gid].i[1];
+  w0[2] = pws[gid].i[2];
+  w0[3] = pws[gid].i[3];
+  w1[0] = pws[gid].i[4];
+  w1[1] = pws[gid].i[5];
+  w1[2] = pws[gid].i[6];
+  w1[3] = pws[gid].i[7];
+
+  /**
+   * Salt prep
+   */
+
+  u32 iv[2];
+
+  iv[0] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[0];
+  iv[1] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[1];
+
+  u32 plain[2];
+
+  plain[0] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[0];
+  plain[1] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[1];
+
+  u32 position[2];
+
+  position[0] = esalt_bufs[DIGESTS_OFFSET_HOST].position[0];
+  position[1] = esalt_bufs[DIGESTS_OFFSET_HOST].position[1];
+
+  u32 offset = esalt_bufs[DIGESTS_OFFSET_HOST].offset;
+
+  /**
+   * digest
+   */
+
+  const u32 search[4] =
+  {
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R0],
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R1],
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R2],
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R3]
+  };
+
+  /**
+   * loop
+   */
+
+  u32 w0l = pws[gid].i[0];
+
+  for (u32 il_pos = 0; il_pos < IL_CNT; il_pos += VECT_SIZE)
+  {
+    const u32x w0r = words_buf_r[il_pos / VECT_SIZE];
+    const u32x w0x = w0l | w0r;
+
+    u32x w0_t[4];
+    u32x w1_t[4];
+
+    w0_t[0] = w0x;
+    w0_t[1] = w0[1];
+    w0_t[2] = w0[2];
+    w0_t[3] = w0[3];
+    w1_t[0] = w1[0];
+    w1_t[1] = w1[1];
+    w1_t[2] = w1[2];
+    w1_t[3] = w1[3];
+
+    u32x digest[4] = { 0 };
+
+    chacha20_transform (w0_t, w1_t, position, offset, iv, plain, digest);
+
+    const u32x r0 = digest[0];
+    const u32x r1 = digest[1];
+    const u32x r2 = digest[2];
+    const u32x r3 = digest[3];
+
+    COMPARE_S_SIMD (r0, r1, r2, r3);
+  }
+}
+
+
+KERNEL_FQ KERNEL_FA void m15400_s08 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
+{
+  /**
+   * modifier
+   */
+
+  const u64 gid = get_global_id (0);
+  const u64 lid = get_local_id (0);
+
+  if (gid >= GID_CNT) return;
+
+  u32 w0[4];
+  u32 w1[4];
+
+  w0[0] = pws[gid].i[0];
+  w0[1] = pws[gid].i[1];
+  w0[2] = pws[gid].i[2];
+  w0[3] = pws[gid].i[3];
+  w1[0] = pws[gid].i[4];
+  w1[1] = pws[gid].i[5];
+  w1[2] = pws[gid].i[6];
+  w1[3] = pws[gid].i[7];
+
+  /**
+   * Salt prep
+   */
+
+  u32 iv[2];
+
+  iv[0] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[0];
+  iv[1] = esalt_bufs[DIGESTS_OFFSET_HOST].iv[1];
+
+  u32 plain[2];
+
+  plain[0] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[0];
+  plain[1] = esalt_bufs[DIGESTS_OFFSET_HOST].plain[1];
+
+  u32 position[2];
+
+  position[0] = esalt_bufs[DIGESTS_OFFSET_HOST].position[0];
+  position[1] = esalt_bufs[DIGESTS_OFFSET_HOST].position[1];
+
+  u32 offset = esalt_bufs[DIGESTS_OFFSET_HOST].offset;
+
+  /**
+   * digest
+   */
+
+  const u32 search[4] =
+  {
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R0],
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R1],
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R2],
+    digests_buf[DIGESTS_OFFSET_HOST].digest_buf[DGST_R3]
+  };
+
+  /**
+   * loop
+   */
+
+  u32 w0l = pws[gid].i[0];
+
+  for (u32 il_pos = 0; il_pos < IL_CNT; il_pos += VECT_SIZE)
+  {
+    const u32x w0r = words_buf_r[il_pos / VECT_SIZE];
+    const u32x w0x = w0l | w0r;
+
+    u32x w0_t[4];
+    u32x w1_t[4];
+
+    w0_t[0] = w0x;
+    w0_t[1] = w0[1];
+    w0_t[2] = w0[2];
+    w0_t[3] = w0[3];
+    w1_t[0] = w1[0];
+    w1_t[1] = w1[1];
+    w1_t[2] = w1[2];
+    w1_t[3] = w1[3];
+
+    u32x digest[4] = { 0 };
+
+    chacha20_transform (w0_t, w1_t, position, offset, iv, plain, digest);
+
+    const u32x r0 = digest[0];
+    const u32x r1 = digest[1];
+    const u32x r2 = digest[2];
+    const u32x r3 = digest[3];
+
+    COMPARE_S_SIMD (r0, r1, r2, r3);
+  }
+}
+
+KERNEL_FQ KERNEL_FA void m15400_s16 (KERN_ATTR_VECTOR_ESALT (chacha20_t))
 {
   /**
    * modifier

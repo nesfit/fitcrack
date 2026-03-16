@@ -990,6 +990,63 @@ DECLSPEC void streebog512_update_swap (PRIVATE_AS streebog512_ctx_t *ctx, PRIVAT
   }
 }
 
+DECLSPEC void streebog512_update_global (PRIVATE_AS streebog512_ctx_t *ctx, GLOBAL_AS const u32 *w, int len)
+{
+  u32 w0[4];
+  u32 w1[4];
+  u32 w2[4];
+  u32 w3[4];
+
+  int off = 0;
+
+  while (len > 63)
+  {
+    w0[0] = w[off +  0];
+    w0[1] = w[off +  1];
+    w0[2] = w[off +  2];
+    w0[3] = w[off +  3];
+    w1[0] = w[off +  4];
+    w1[1] = w[off +  5];
+    w1[2] = w[off +  6];
+    w1[3] = w[off +  7];
+    w2[0] = w[off +  8];
+    w2[1] = w[off +  9];
+    w2[2] = w[off + 10];
+    w2[3] = w[off + 11];
+    w3[0] = w[off + 12];
+    w3[1] = w[off + 13];
+    w3[2] = w[off + 14];
+    w3[3] = w[off + 15];
+
+    off += 16;
+    len -= 64;
+
+    streebog512_update_64 (ctx, w0, w1, w2, w3, 64);
+  }
+
+  if (len > 0)
+  {
+    w0[0] = w[off +  0];
+    w0[1] = w[off +  1];
+    w0[2] = w[off +  2];
+    w0[3] = w[off +  3];
+    w1[0] = w[off +  4];
+    w1[1] = w[off +  5];
+    w1[2] = w[off +  6];
+    w1[3] = w[off +  7];
+    w2[0] = w[off +  8];
+    w2[1] = w[off +  9];
+    w2[2] = w[off + 10];
+    w2[3] = w[off + 11];
+    w3[0] = w[off + 12];
+    w3[1] = w[off + 13];
+    w3[2] = w[off + 14];
+    w3[3] = w[off + 15];
+
+    streebog512_update_64 (ctx, w0, w1, w2, w3, len);
+  }
+}
+
 DECLSPEC void streebog512_update_global_swap (PRIVATE_AS streebog512_ctx_t *ctx, GLOBAL_AS const u32 *w, int len)
 {
   u32 w0[4];

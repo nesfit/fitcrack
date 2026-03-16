@@ -166,10 +166,10 @@ DECLSPEC void m31300m (PRIVATE_AS u32 *w, const u32 pw_len, KERN_ATTR_FUNC_VECTO
     u32x w2[4];
     u32x w3[4];
 
-    w0[0] = a + MD4M_A;
-    w0[1] = b + MD4M_B;
-    w0[2] = c + MD4M_C;
-    w0[3] = d + MD4M_D;
+    w0[0] = a + make_u32x (MD4M_A);
+    w0[1] = b + make_u32x (MD4M_B);
+    w0[2] = c + make_u32x (MD4M_C);
+    w0[3] = d + make_u32x (MD4M_D);
     w1[0] = salt_buf[ 0];
     w1[1] = salt_buf[ 1];
     w1[2] = salt_buf[ 2];
@@ -258,10 +258,10 @@ DECLSPEC void m31300m (PRIVATE_AS u32 *w, const u32 pw_len, KERN_ATTR_FUNC_VECTO
     MD5_STEP (MD5_I , c, d, a, b, w0[2], MD5C3e, MD5S32);
     MD5_STEP (MD5_I , b, c, d, a, w2[1], MD5C3f, MD5S33);
 
-    a = a + MD5M_A;
-    b = b + MD5M_B;
-    c = c + MD5M_C;
-    d = d + MD5M_D;
+    a = a + make_u32x (MD5M_A);
+    b = b + make_u32x (MD5M_B);
+    c = c + make_u32x (MD5M_C);
+    d = d + make_u32x (MD5M_D);
 
     const u32x a1 = a;
     const u32x b1 = b;
@@ -527,10 +527,10 @@ DECLSPEC void m31300s (PRIVATE_AS u32 *w, const u32 pw_len, KERN_ATTR_FUNC_VECTO
     u32x w2[4];
     u32x w3[4];
 
-    w0[0] = a + MD4M_A;
-    w0[1] = b + MD4M_B;
-    w0[2] = c + MD4M_C;
-    w0[3] = d + MD4M_D;
+    w0[0] = a + make_u32x (MD4M_A);
+    w0[1] = b + make_u32x (MD4M_B);
+    w0[2] = c + make_u32x (MD4M_C);
+    w0[3] = d + make_u32x (MD4M_D);
     w1[0] = salt_buf[ 0];
     w1[1] = salt_buf[ 1];
     w1[2] = salt_buf[ 2];
@@ -619,10 +619,10 @@ DECLSPEC void m31300s (PRIVATE_AS u32 *w, const u32 pw_len, KERN_ATTR_FUNC_VECTO
     MD5_STEP (MD5_I , c, d, a, b, w0[2], MD5C3e, MD5S32);
     MD5_STEP (MD5_I , b, c, d, a, w2[1], MD5C3f, MD5S33);
 
-    a = a + MD5M_A;
-    b = b + MD5M_B;
-    c = c + MD5M_C;
-    d = d + MD5M_D;
+    a = a + make_u32x (MD5M_A);
+    b = b + make_u32x (MD5M_B);
+    c = c + make_u32x (MD5M_C);
+    d = d + make_u32x (MD5M_D);
 
     const u32x a1 = a;
     const u32x b1 = b;
@@ -725,7 +725,7 @@ DECLSPEC void m31300s (PRIVATE_AS u32 *w, const u32 pw_len, KERN_ATTR_FUNC_VECTO
   }
 }
 
-KERNEL_FQ void m31300_m04 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m31300_m04 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -765,7 +765,7 @@ KERNEL_FQ void m31300_m04 (KERN_ATTR_VECTOR ())
   m31300m (w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m31300_m08 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m31300_m08 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -805,7 +805,7 @@ KERNEL_FQ void m31300_m08 (KERN_ATTR_VECTOR ())
   m31300m (w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m31300_m16 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m31300_m16 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -845,7 +845,7 @@ KERNEL_FQ void m31300_m16 (KERN_ATTR_VECTOR ())
   m31300m (w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m31300_s04 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m31300_s04 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -885,7 +885,7 @@ KERNEL_FQ void m31300_s04 (KERN_ATTR_VECTOR ())
   m31300s (w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m31300_s08 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m31300_s08 (KERN_ATTR_VECTOR ())
 {
   /**
    * base
@@ -925,7 +925,7 @@ KERNEL_FQ void m31300_s08 (KERN_ATTR_VECTOR ())
   m31300s (w, pw_len, pws, rules_buf, combs_buf, words_buf_r, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m31300_s16 (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m31300_s16 (KERN_ATTR_VECTOR ())
 {
   /**
    * base

@@ -32,43 +32,16 @@ DECLSPEC void memcat16 (PRIVATE_AS u32 *block0, PRIVATE_AS u32 *block1, PRIVATE_
   u32 tmp3;
   u32 tmp4;
 
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
   u32 in0 = append[0];
   u32 in1 = append[1];
   u32 in2 = append[2];
   u32 in3 = append[3];
 
-  tmp0 = hc_bytealign (  0, in0, offset);
-  tmp1 = hc_bytealign (in0, in1, offset);
-  tmp2 = hc_bytealign (in1, in2, offset);
-  tmp3 = hc_bytealign (in2, in3, offset);
-  tmp4 = hc_bytealign (in3,   0, offset);
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-  const int offset_mod_4 = offset & 3;
-
-  const int offset_minus_4 = 4 - offset_mod_4;
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S (0x0706050403020100UL >> (offset_minus_4 * 8));
-  #endif
-
-  u32 in0 = append[0];
-  u32 in1 = append[1];
-  u32 in2 = append[2];
-  u32 in3 = append[3];
-
-  tmp0 = hc_byte_perm (  0, in0, selector);
-  tmp1 = hc_byte_perm (in0, in1, selector);
-  tmp2 = hc_byte_perm (in1, in2, selector);
-  tmp3 = hc_byte_perm (in2, in3, selector);
-  tmp4 = hc_byte_perm (in3,   0, selector);
-  #endif
+  tmp0 = hc_bytealign_S (  0, in0, offset);
+  tmp1 = hc_bytealign_S (in0, in1, offset);
+  tmp2 = hc_bytealign_S (in1, in2, offset);
+  tmp3 = hc_bytealign_S (in2, in3, offset);
+  tmp4 = hc_bytealign_S (in3,   0, offset);
 
   const u32 div = offset / 4;
 
@@ -145,45 +118,17 @@ DECLSPEC void memcat16_x80 (PRIVATE_AS u32 *block0, PRIVATE_AS u32 *block1, PRIV
   u32 tmp3;
   u32 tmp4;
 
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
   u32 in0 = append[0];
   u32 in1 = append[1];
   u32 in2 = append[2];
   u32 in3 = append[3];
   u32 in4 = 0x80;
 
-  tmp0 = hc_bytealign (  0, in0, offset);
-  tmp1 = hc_bytealign (in0, in1, offset);
-  tmp2 = hc_bytealign (in1, in2, offset);
-  tmp3 = hc_bytealign (in2, in3, offset);
-  tmp4 = hc_bytealign (in3, in4, offset);
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-  const int offset_mod_4 = offset & 3;
-
-  const int offset_minus_4 = 4 - offset_mod_4;
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S (0x0706050403020100UL >> (offset_minus_4 * 8));
-  #endif
-
-  u32 in0 = append[0];
-  u32 in1 = append[1];
-  u32 in2 = append[2];
-  u32 in3 = append[3];
-  u32 in4 = 0x80;
-
-  tmp0 = hc_byte_perm (  0, in0, selector);
-  tmp1 = hc_byte_perm (in0, in1, selector);
-  tmp2 = hc_byte_perm (in1, in2, selector);
-  tmp3 = hc_byte_perm (in2, in3, selector);
-  tmp4 = hc_byte_perm (in3, in4, selector);
-  #endif
+  tmp0 = hc_bytealign_S (  0, in0, offset);
+  tmp1 = hc_bytealign_S (in0, in1, offset);
+  tmp2 = hc_bytealign_S (in1, in2, offset);
+  tmp3 = hc_bytealign_S (in2, in3, offset);
+  tmp4 = hc_bytealign_S (in3, in4, offset);
 
   const u32 div = offset / 4;
 
@@ -258,35 +203,12 @@ DECLSPEC void memcat8 (PRIVATE_AS u32 *block0, PRIVATE_AS u32 *block1, PRIVATE_A
   u32 tmp1;
   u32 tmp2;
 
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
   u32 in0 = append[0];
   u32 in1 = append[1];
 
-  tmp0 = hc_bytealign (  0, in0, offset);
-  tmp1 = hc_bytealign (in0, in1, offset);
-  tmp2 = hc_bytealign (in1,   0, offset);
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-  const int offset_mod_4 = offset & 3;
-
-  const int offset_minus_4 = 4 - offset_mod_4;
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S (0x0706050403020100UL >> (offset_minus_4 * 8));
-  #endif
-
-  u32 in0 = append[0];
-  u32 in1 = append[1];
-
-  tmp0 = hc_byte_perm (  0, in0, selector);
-  tmp1 = hc_byte_perm (in0, in1, selector);
-  tmp2 = hc_byte_perm (in1,   0, selector);
-  #endif
+  tmp0 = hc_bytealign_S (  0, in0, offset);
+  tmp1 = hc_bytealign_S (in0, in1, offset);
+  tmp2 = hc_bytealign_S (in1,   0, offset);
 
   const u32 div = offset / 4;
 
@@ -659,7 +581,7 @@ DECLSPEC void append_1st (PRIVATE_AS u32 *block0, PRIVATE_AS u32 *block1, PRIVAT
   }
 }
 
-KERNEL_FQ void m00500_init (KERN_ATTR_TMPS (md5crypt_tmp_t))
+KERNEL_FQ KERNEL_FA void m00500_init (KERN_ATTR_TMPS (md5crypt_tmp_t))
 {
   /**
    * base
@@ -822,7 +744,7 @@ KERNEL_FQ void m00500_init (KERN_ATTR_TMPS (md5crypt_tmp_t))
   tmps[gid].digest_buf[3] = digest[3];
 }
 
-KERNEL_FQ void m00500_loop (KERN_ATTR_TMPS (md5crypt_tmp_t))
+KERNEL_FQ KERNEL_FA void m00500_loop (KERN_ATTR_TMPS (md5crypt_tmp_t))
 {
   /**
    * base
@@ -1010,7 +932,7 @@ KERNEL_FQ void m00500_loop (KERN_ATTR_TMPS (md5crypt_tmp_t))
   tmps[gid].digest_buf[3] = digest[3];
 }
 
-KERNEL_FQ void m00500_comp (KERN_ATTR_TMPS (md5crypt_tmp_t))
+KERNEL_FQ KERNEL_FA void m00500_comp (KERN_ATTR_TMPS (md5crypt_tmp_t))
 {
   /**
    * modifier

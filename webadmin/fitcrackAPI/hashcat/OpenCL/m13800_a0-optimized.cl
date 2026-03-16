@@ -51,7 +51,6 @@ DECLSPEC void memcat64c_be (PRIVATE_AS u32x *block, const u32 offset, PRIVATE_AS
   u32x tmp15;
   u32x tmp16;
 
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
   tmp00 = hc_bytealign_be (        0, carry[ 0], offset);
   tmp01 = hc_bytealign_be (carry[ 0], carry[ 1], offset);
   tmp02 = hc_bytealign_be (carry[ 1], carry[ 2], offset);
@@ -69,36 +68,6 @@ DECLSPEC void memcat64c_be (PRIVATE_AS u32x *block, const u32 offset, PRIVATE_AS
   tmp14 = hc_bytealign_be (carry[13], carry[14], offset);
   tmp15 = hc_bytealign_be (carry[14], carry[15], offset);
   tmp16 = hc_bytealign_be (carry[15],         0, offset);
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S (0x0706050403020100UL >> ((offset & 3) * 8));
-  #endif
-
-  tmp00 = hc_byte_perm (carry[ 0],         0, selector);
-  tmp01 = hc_byte_perm (carry[ 1], carry[ 0], selector);
-  tmp02 = hc_byte_perm (carry[ 2], carry[ 1], selector);
-  tmp03 = hc_byte_perm (carry[ 3], carry[ 2], selector);
-  tmp04 = hc_byte_perm (carry[ 4], carry[ 3], selector);
-  tmp05 = hc_byte_perm (carry[ 5], carry[ 4], selector);
-  tmp06 = hc_byte_perm (carry[ 6], carry[ 5], selector);
-  tmp07 = hc_byte_perm (carry[ 7], carry[ 6], selector);
-  tmp08 = hc_byte_perm (carry[ 8], carry[ 7], selector);
-  tmp09 = hc_byte_perm (carry[ 9], carry[ 8], selector);
-  tmp10 = hc_byte_perm (carry[10], carry[ 9], selector);
-  tmp11 = hc_byte_perm (carry[11], carry[10], selector);
-  tmp12 = hc_byte_perm (carry[12], carry[11], selector);
-  tmp13 = hc_byte_perm (carry[13], carry[12], selector);
-  tmp14 = hc_byte_perm (carry[14], carry[13], selector);
-  tmp15 = hc_byte_perm (carry[15], carry[14], selector);
-  tmp16 = hc_byte_perm (        0, carry[15], selector);
-  #endif
 
   carry[ 0] = 0;
   carry[ 1] = 0;
@@ -410,7 +379,7 @@ DECLSPEC void memcat64c_be (PRIVATE_AS u32x *block, const u32 offset, PRIVATE_AS
   }
 }
 
-KERNEL_FQ void m13800_m04 (KERN_ATTR_RULES_ESALT (win8phone_t))
+KERNEL_FQ KERNEL_FA void m13800_m04 (KERN_ATTR_RULES_ESALT (win8phone_t))
 {
   /**
    * modifier
@@ -598,15 +567,15 @@ KERNEL_FQ void m13800_m04 (KERN_ATTR_RULES_ESALT (win8phone_t))
   }
 }
 
-KERNEL_FQ void m13800_m08 (KERN_ATTR_RULES_ESALT (win8phone_t))
+KERNEL_FQ KERNEL_FA void m13800_m08 (KERN_ATTR_RULES_ESALT (win8phone_t))
 {
 }
 
-KERNEL_FQ void m13800_m16 (KERN_ATTR_RULES_ESALT (win8phone_t))
+KERNEL_FQ KERNEL_FA void m13800_m16 (KERN_ATTR_RULES_ESALT (win8phone_t))
 {
 }
 
-KERNEL_FQ void m13800_s04 (KERN_ATTR_RULES_ESALT (win8phone_t))
+KERNEL_FQ KERNEL_FA void m13800_s04 (KERN_ATTR_RULES_ESALT (win8phone_t))
 {
   /**
    * modifier
@@ -806,10 +775,10 @@ KERNEL_FQ void m13800_s04 (KERN_ATTR_RULES_ESALT (win8phone_t))
   }
 }
 
-KERNEL_FQ void m13800_s08 (KERN_ATTR_RULES_ESALT (win8phone_t))
+KERNEL_FQ KERNEL_FA void m13800_s08 (KERN_ATTR_RULES_ESALT (win8phone_t))
 {
 }
 
-KERNEL_FQ void m13800_s16 (KERN_ATTR_RULES_ESALT (win8phone_t))
+KERNEL_FQ KERNEL_FA void m13800_s16 (KERN_ATTR_RULES_ESALT (win8phone_t))
 {
 }

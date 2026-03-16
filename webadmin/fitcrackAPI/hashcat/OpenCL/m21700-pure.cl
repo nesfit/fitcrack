@@ -95,7 +95,7 @@ DECLSPEC void hmac_sha512_run_V (PRIVATE_AS u32x *w0, PRIVATE_AS u32x *w1, PRIVA
   sha512_transform_vector (w0, w1, w2, w3, w4, w5, w6, w7, digest);
 }
 
-KERNEL_FQ void m21700_init (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
+KERNEL_FQ KERNEL_FA void m21700_init (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
 {
   /**
    * base
@@ -192,7 +192,7 @@ KERNEL_FQ void m21700_init (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
   tmps[gid].out[7] = tmps[gid].dgst[7];
 }
 
-KERNEL_FQ void m21700_loop (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
+KERNEL_FQ KERNEL_FA void m21700_loop (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -315,7 +315,7 @@ KERNEL_FQ void m21700_loop (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
   unpack64v (tmps, out, gid, 7, out[7]);
 }
 
-KERNEL_FQ void m21700_comp (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
+KERNEL_FQ KERNEL_FA void m21700_comp (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
 {
   /**
    * base
@@ -324,6 +324,12 @@ KERNEL_FQ void m21700_comp (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
   const u64 gid = get_global_id (0);
 
   if (gid >= GID_CNT) return;
+
+  const u32 digest_pos = LOOP_POS;
+
+  const u32 digest_cur = DIGESTS_OFFSET_HOST + digest_pos;
+
+  GLOBAL_AS const electrum_t *electrum = &esalt_bufs[digest_cur];
 
   u64 out[8];
 
@@ -379,12 +385,11 @@ KERNEL_FQ void m21700_comp (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
    * the main secp256k1 point multiplication by a scalar/tweak:
    */
 
-  GLOBAL_AS secp256k1_t *coords = (GLOBAL_AS secp256k1_t *) &esalt_bufs[DIGESTS_OFFSET_HOST].coords;
+  GLOBAL_AS const secp256k1_t *coords = (GLOBAL_AS const secp256k1_t *) &electrum->coords;
 
   u32 pubkey[64] = { 0 }; // for point_mul () we need: 1 + 32 bytes (for sha512 () we need more)
 
   point_mul (pubkey, tweak, coords);
-
 
   /*
    * sha512 () of the pubkey:
@@ -396,14 +401,13 @@ KERNEL_FQ void m21700_comp (KERN_ATTR_TMPS_ESALT (electrum_tmp_t, electrum_t))
   sha512_update (&sha512_ctx, pubkey, 33); // 33 because of 32 byte curve point + sign
   sha512_final  (&sha512_ctx);
 
-
   /*
    * sha256-hmac () of the data_buf
    */
 
-  GLOBAL_AS u32 *data_buf = (GLOBAL_AS u32 *) esalt_bufs[DIGESTS_OFFSET_HOST].data_buf;
+  GLOBAL_AS const u32 *data_buf = (GLOBAL_AS const u32 *) electrum->data_buf;
 
-  u32 data_len = esalt_bufs[DIGESTS_OFFSET_HOST].data_len;
+  u32 data_len = electrum->data_len;
 
   u32 key[16] = { 0 };
 

@@ -3,7 +3,7 @@
  * License.....: MIT
  */
 
-#define NEW_SIMD_CODE
+//#define NEW_SIMD_CODE
 
 #ifdef KERNEL_STATIC
 #include M2S(INCLUDE_PATH/inc_vendor.h)
@@ -31,7 +31,6 @@ DECLSPEC void shift_buffer_by_offset (PRIVATE_AS u32 *w0, const u32 offset)
 {
   const int offset_switch = offset / 4;
 
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
   switch (offset_switch)
   {
     case 0:
@@ -69,56 +68,6 @@ DECLSPEC void shift_buffer_by_offset (PRIVATE_AS u32 *w0, const u32 offset)
       w0[0] = 0;
       break;
   }
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S(0x0706050403020100UL >> ((offset & 3) * 8));
-  #endif
-
-  switch (offset_switch)
-  {
-    case 0:
-      w0[3] = hc_byte_perm_S (w0[3], w0[2], selector);
-      w0[2] = hc_byte_perm_S (w0[2], w0[1], selector);
-      w0[1] = hc_byte_perm_S (w0[1], w0[0], selector);
-      w0[0] = hc_byte_perm_S (w0[0],     0, selector);
-      break;
-
-    case 1:
-      w0[3] = hc_byte_perm_S (w0[2], w0[1], selector);
-      w0[2] = hc_byte_perm_S (w0[1], w0[0], selector);
-      w0[1] = hc_byte_perm_S (w0[0],     0, selector);
-      w0[0] = 0;
-      break;
-
-    case 2:
-      w0[3] = hc_byte_perm_S (w0[1], w0[0], selector);
-      w0[2] = hc_byte_perm_S (w0[0],     0, selector);
-      w0[1] = 0;
-      w0[0] = 0;
-      break;
-
-    case 3:
-      w0[3] = hc_byte_perm_S (w0[0],     0, selector);
-      w0[2] = 0;
-      w0[1] = 0;
-      w0[0] = 0;
-      break;
-
-    default:
-      w0[3] = 0;
-      w0[2] = 0;
-      w0[1] = 0;
-      w0[0] = 0;
-      break;
-  }
-  #endif
 }
 
 DECLSPEC void aes256_scrt_format (PRIVATE_AS u32 *aes_ks, PRIVATE_AS u32 *pw, const u32 pw_len, PRIVATE_AS u32 *hash, PRIVATE_AS u32 *out, SHM_TYPE u32 *s_te0, SHM_TYPE u32 *s_te1, SHM_TYPE u32 *s_te2, SHM_TYPE u32 *s_te3, SHM_TYPE u32 *s_te4)
@@ -135,7 +84,7 @@ DECLSPEC void aes256_scrt_format (PRIVATE_AS u32 *aes_ks, PRIVATE_AS u32 *pw, co
   AES256_encrypt (aes_ks, hash, out, s_te0, s_te1, s_te2, s_te3, s_te4);
 }
 
-KERNEL_FQ void m31400_mxx (KERN_ATTR_ESALT (scrtv2_t))
+KERNEL_FQ KERNEL_FA void m31400_mxx (KERN_ATTR_ESALT (scrtv2_t))
 {
   /**
    * modifier
@@ -184,13 +133,15 @@ KERNEL_FQ void m31400_mxx (KERN_ATTR_ESALT (scrtv2_t))
    * base
    */
 
+  u32 wt[3];
+
+  u32 ks[60];
+
   sha256_ctx_t ctx0;
 
   sha256_init (&ctx0);
 
   sha256_update_global_swap (&ctx0, pws[gid].i, pws[gid].pw_len);
-
-  u32 ks[60];
 
   /**
    * loop
@@ -202,19 +153,17 @@ KERNEL_FQ void m31400_mxx (KERN_ATTR_ESALT (scrtv2_t))
 
     sha256_update_global_swap (&ctx, combs_buf[il_pos].i, combs_buf[il_pos].pw_len);
 
-    u32 pw_candidate[3];
+    wt[0] = hc_swap32_S (ctx.w0[0]);
+    wt[1] = hc_swap32_S (ctx.w0[1]);
+    wt[2] = hc_swap32_S (ctx.w0[2]);
 
-    pw_candidate[0] = hc_swap32_S (ctx.w0[0]);
-    pw_candidate[1] = hc_swap32_S (ctx.w0[1]);
-    pw_candidate[2] = hc_swap32_S (ctx.w0[2]);
-
-    u32 pw_len=ctx.len;
+    u32 pw_len = ctx.len;
 
     sha256_final (&ctx);
 
     u32 out[4] = { 0 };
 
-    aes256_scrt_format (ks, pw_candidate, pw_len, ctx.h, out, s_te0, s_te1, s_te2, s_te3, s_te4);
+    aes256_scrt_format (ks, wt, pw_len, ctx.h, out, s_te0, s_te1, s_te2, s_te3, s_te4);
 
     const u32 r0 = out[DGST_R0];
     const u32 r1 = out[DGST_R1];
@@ -225,7 +174,7 @@ KERNEL_FQ void m31400_mxx (KERN_ATTR_ESALT (scrtv2_t))
   }
 }
 
-KERNEL_FQ void m31400_sxx (KERN_ATTR_ESALT (scrtv2_t))
+KERNEL_FQ KERNEL_FA void m31400_sxx (KERN_ATTR_ESALT (scrtv2_t))
 {
   /**
    * modifier
@@ -286,13 +235,15 @@ KERNEL_FQ void m31400_sxx (KERN_ATTR_ESALT (scrtv2_t))
    * base
    */
 
+  u32 wt[3];
+
+  u32 ks[60];
+
   sha256_ctx_t ctx0;
 
   sha256_init (&ctx0);
 
   sha256_update_global_swap (&ctx0, pws[gid].i, pws[gid].pw_len);
-
-  u32 ks[60];
 
   /**
    * loop
@@ -304,19 +255,17 @@ KERNEL_FQ void m31400_sxx (KERN_ATTR_ESALT (scrtv2_t))
 
     sha256_update_global_swap (&ctx, combs_buf[il_pos].i, combs_buf[il_pos].pw_len);
 
-    u32 pw_candidate[3];
+    wt[0] = hc_swap32_S (ctx.w0[0]);
+    wt[1] = hc_swap32_S (ctx.w0[1]);
+    wt[2] = hc_swap32_S (ctx.w0[2]);
 
-    pw_candidate[0] = hc_swap32_S (ctx.w0[0]);
-    pw_candidate[1] = hc_swap32_S (ctx.w0[1]);
-    pw_candidate[2] = hc_swap32_S (ctx.w0[2]);
-
-    u32 pw_len=ctx.len;
+    u32 pw_len = ctx.len;
 
     sha256_final (&ctx);
 
     u32 out[4] = { 0 };
 
-    aes256_scrt_format (ks, pw_candidate, pw_len, ctx.h, out, s_te0, s_te1, s_te2, s_te3, s_te4);
+    aes256_scrt_format (ks, wt, pw_len, ctx.h, out, s_te0, s_te1, s_te2, s_te3, s_te4);
 
     const u32 r0 = out[DGST_R0];
     const u32 r1 = out[DGST_R1];

@@ -42,24 +42,8 @@ DECLSPEC void memcat8c_be (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u3
   u32 tmp0;
   u32 tmp1;
 
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
-  tmp0 = hc_bytealign_be (0, append, func_len);
-  tmp1 = hc_bytealign_be (append, 0, func_len);
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> ((func_len & 3) * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S (0x0706050403020100UL >> ((func_len & 3) * 8));
-  #endif
-
-  tmp0 = hc_byte_perm (append, 0, selector);
-  tmp1 = hc_byte_perm (0, append, selector);
-  #endif
+  tmp0 = hc_bytealign_be_S (0, append, func_len);
+  tmp1 = hc_bytealign_be_S (append, 0, func_len);
 
   u32 carry = 0;
 
@@ -140,7 +124,7 @@ DECLSPEC void memcat8c_be (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u3
   }
 }
 
-KERNEL_FQ void m11600_init (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
+KERNEL_FQ KERNEL_FA void m11600_init (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
 {
   /**
    * base
@@ -187,7 +171,7 @@ KERNEL_FQ void m11600_init (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hoo
   tmps[gid].len = ctx.len;
 }
 
-KERNEL_FQ void m11600_loop (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
+KERNEL_FQ KERNEL_FA void m11600_loop (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
 {
   /**
    * base
@@ -286,7 +270,7 @@ KERNEL_FQ void m11600_loop (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hoo
   tmps[gid].len = ctx.len;
 }
 
-KERNEL_FQ void m11600_hook23 (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
+KERNEL_FQ KERNEL_FA void m11600_hook23 (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -341,7 +325,7 @@ KERNEL_FQ void m11600_hook23 (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_h
   hooks[gid].ukey[7] = hc_swap32_S (h[7]);
 }
 
-KERNEL_FQ void m11600_comp (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
+KERNEL_FQ KERNEL_FA void m11600_comp (KERN_ATTR_TMPS_HOOKS (seven_zip_tmp_t, seven_zip_hook_t))
 {
   /**
    * base

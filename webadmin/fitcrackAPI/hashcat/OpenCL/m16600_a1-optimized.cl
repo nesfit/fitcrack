@@ -17,13 +17,13 @@
 
 typedef struct electrum_wallet
 {
-  u32 salt_type;
   u32 iv[4];
   u32 encrypted[4];
+  u32 salt_type;
 
 } electrum_wallet_t;
 
-KERNEL_FQ void m16600_m04 (KERN_ATTR_ESALT (electrum_wallet_t))
+KERNEL_FQ KERNEL_FA void m16600_m04 (KERN_ATTR_ESALT (electrum_wallet_t))
 {
   /**
    * base
@@ -448,7 +448,15 @@ KERNEL_FQ void m16600_m04 (KERN_ATTR_ESALT (electrum_wallet_t))
 
     if (salt_type == 2)
     {
-      if ((u8) (out[0] >> 0) != 'x') continue;
+      u8 version = (u8) (out[0] >> 0);
+
+      // https://github.com/spesmilo/electrum-docs/blob/master/xpub_version_bytes.rst
+      // Does not include testnet addresses
+      if (version != 'x' &&
+          version != 'y' &&
+          version != 'Y' &&
+          version != 'z' &&
+          version != 'Z' ) continue;
       if ((u8) (out[0] >> 8) != 'p') continue;
       if ((u8) (out[0] >> 16) != 'r') continue;
       if ((u8) (out[0] >> 24) != 'v') continue;
@@ -485,15 +493,15 @@ KERNEL_FQ void m16600_m04 (KERN_ATTR_ESALT (electrum_wallet_t))
   }
 }
 
-KERNEL_FQ void m16600_m08 (KERN_ATTR_ESALT (electrum_wallet_t))
+KERNEL_FQ KERNEL_FA void m16600_m08 (KERN_ATTR_ESALT (electrum_wallet_t))
 {
 }
 
-KERNEL_FQ void m16600_m16 (KERN_ATTR_ESALT (electrum_wallet_t))
+KERNEL_FQ KERNEL_FA void m16600_m16 (KERN_ATTR_ESALT (electrum_wallet_t))
 {
 }
 
-KERNEL_FQ void m16600_s04 (KERN_ATTR_ESALT (electrum_wallet_t))
+KERNEL_FQ KERNEL_FA void m16600_s04 (KERN_ATTR_ESALT (electrum_wallet_t))
 {
   /**
    * base
@@ -918,7 +926,15 @@ KERNEL_FQ void m16600_s04 (KERN_ATTR_ESALT (electrum_wallet_t))
 
     if (salt_type == 2)
     {
-      if ((u8) (out[0] >> 0) != 'x') continue;
+      u8 version = (u8) (out[0] >> 0);
+
+      // https://github.com/spesmilo/electrum-docs/blob/master/xpub_version_bytes.rst
+      // Does not include testnet addresses
+      if (version != 'x' &&
+          version != 'y' &&
+          version != 'Y' &&
+          version != 'z' &&
+          version != 'Z' ) continue;
       if ((u8) (out[0] >> 8) != 'p') continue;
       if ((u8) (out[0] >> 16) != 'r') continue;
       if ((u8) (out[0] >> 24) != 'v') continue;
@@ -955,10 +971,10 @@ KERNEL_FQ void m16600_s04 (KERN_ATTR_ESALT (electrum_wallet_t))
   }
 }
 
-KERNEL_FQ void m16600_s08 (KERN_ATTR_ESALT (electrum_wallet_t))
+KERNEL_FQ KERNEL_FA void m16600_s08 (KERN_ATTR_ESALT (electrum_wallet_t))
 {
 }
 
-KERNEL_FQ void m16600_s16 (KERN_ATTR_ESALT (electrum_wallet_t))
+KERNEL_FQ KERNEL_FA void m16600_s16 (KERN_ATTR_ESALT (electrum_wallet_t))
 {
 }

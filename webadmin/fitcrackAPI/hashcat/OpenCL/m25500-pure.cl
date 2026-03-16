@@ -81,7 +81,7 @@ DECLSPEC void hmac_sha256_run_V (PRIVATE_AS u32x *w0, PRIVATE_AS u32x *w1, PRIVA
   sha256_transform_vector (w0, w1, w2, w3, digest);
 }
 
-KERNEL_FQ void m25500_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
+KERNEL_FQ KERNEL_FA void m25500_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
 {
   /**
    * base
@@ -165,7 +165,7 @@ KERNEL_FQ void m25500_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
   }
 }
 
-KERNEL_FQ void m25500_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
+KERNEL_FQ KERNEL_FA void m25500_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -271,7 +271,7 @@ KERNEL_FQ void m25500_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
   }
 }
 
-KERNEL_FQ void m25500_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
+KERNEL_FQ KERNEL_FA void m25500_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
 {
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);
@@ -371,7 +371,7 @@ KERNEL_FQ void m25500_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
   */
 
   /*
-  // decrypt buffer is not usefull here, skip
+  // decrypt buffer is not useful here, skip
   u32 dec[14] = { 0 };
 
   AES_GCM_GCTR (key, J0, enc, enc_len, dec, s_te0, s_te1, s_te2, s_te3, s_te4);
@@ -407,7 +407,7 @@ KERNEL_FQ void m25500_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
 /*
 Optimized GCM: No real speed benefit. For documentation purpose
 
-KERNEL_FQ void m25500_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
+KERNEL_FQ KERNEL_FA void m25500_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
 {
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);

@@ -40,7 +40,7 @@ DECLSPEC u32 hex_u32_to_u32 (PRIVATE_AS const u32 hex0, PRIVATE_AS const u32 hex
   return (v);
 }
 
-KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m30902_mxx (KERN_ATTR_VECTOR ())
 {
   /**
    * modifier
@@ -50,7 +50,6 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
 
   if (gid >= GID_CNT) return;
 
-
   /**
    * base
    */
@@ -59,12 +58,11 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
 
   if (pw_len != 64) return;
 
-
   // copy password to w
 
-  u32 w[16];
+  u32 w[16] = { 0 };
 
-  for (u32 i = 0; i < 16; i++) // pw_len / 4
+  for (u32 i = 0; i < 16; i++)
   {
     w[i] = pws[gid].i[i];
   }
@@ -77,7 +75,6 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
   secp256k1_t preG; // need to change SECP256K1_TMPS_TYPE above to: PRIVATE_AS
 
   set_precomputed_basepoint_g (&preG);
-
 
   /**
    * loop
@@ -95,7 +92,6 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
 
     if (is_valid_hex_32 (w[0]) == 0) continue;
 
-
     // convert password from hex to binary
 
     u32 tmp[16] = { 0 };
@@ -105,7 +101,7 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
       tmp[i] = hex_u32_to_u32 (w[j + 0], w[j + 1]);
     }
 
-    u32 prv_key[9];
+    u32 prv_key[9] = { 0 };
 
     prv_key[0] = tmp[7];
     prv_key[1] = tmp[6];
@@ -116,14 +112,12 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
     prv_key[6] = tmp[1];
     prv_key[7] = tmp[0];
 
-
     // convert: pub_key = G * prv_key
 
-    u32 x[8];
-    u32 y[8];
+    u32 x[8] = { 0 };
+    u32 y[8] = { 0 };
 
     point_mul_xy (x, y, prv_key, &preG);
-
 
     // to public key:
 
@@ -147,7 +141,6 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
     pub_key[ 1] = (x[6] >> 8) | (x[7] << 24);
     pub_key[ 0] = (x[7] >> 8) | (0x04000000);
 
-
     // calculate HASH160 for pub key
 
     sha256_ctx_t ctx;
@@ -162,7 +155,6 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
     // tmp[12] = 0; tmp[13] = 0; tmp[14] = 0; tmp[15] = 0;
 
     for (u32 i = 8; i < 16; i++) tmp[i] = 0;
-
 
     // now let's do RIPEMD-160 on the sha256sum
 
@@ -181,7 +173,7 @@ KERNEL_FQ void m30902_mxx (KERN_ATTR_VECTOR ())
   }
 }
 
-KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
+KERNEL_FQ KERNEL_FA void m30902_sxx (KERN_ATTR_VECTOR ())
 {
   /**
    * modifier
@@ -190,7 +182,6 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
   const u64 gid = get_global_id (0);
 
   if (gid >= GID_CNT) return;
-
 
   /**
    * digest
@@ -212,12 +203,11 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
 
   if (pw_len != 64) return;
 
-
   // copy password to w
 
-  u32 w[16];
+  u32 w[16] = { 0 };
 
-  for (u32 i = 0; i < 16; i++) // pw_len / 4
+  for (u32 i = 0; i < 16; i++)
   {
     w[i] = pws[gid].i[i];
   }
@@ -230,7 +220,6 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
   secp256k1_t preG; // need to change SECP256K1_TMPS_TYPE above to: PRIVATE_AS
 
   set_precomputed_basepoint_g (&preG);
-
 
   /**
    * loop
@@ -248,7 +237,6 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
 
     if (is_valid_hex_32 (w[0]) == 0) continue;
 
-
     // convert password from hex to binary
 
     u32 tmp[16] = { 0 };
@@ -258,7 +246,7 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
       tmp[i] = hex_u32_to_u32 (w[j + 0], w[j + 1]);
     }
 
-    u32 prv_key[9];
+    u32 prv_key[9] = { 0 };
 
     prv_key[0] = tmp[7];
     prv_key[1] = tmp[6];
@@ -269,14 +257,12 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
     prv_key[6] = tmp[1];
     prv_key[7] = tmp[0];
 
-
     // convert: pub_key = G * prv_key
 
-    u32 x[8];
-    u32 y[8];
+    u32 x[8] = { 0 };
+    u32 y[8] = { 0 };
 
     point_mul_xy (x, y, prv_key, &preG);
-
 
     // to public key:
 
@@ -300,7 +286,6 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
     pub_key[ 1] = (x[6] >> 8) | (x[7] << 24);
     pub_key[ 0] = (x[7] >> 8) | (0x04000000);
 
-
     // calculate HASH160 for pub key
 
     sha256_ctx_t ctx;
@@ -315,7 +300,6 @@ KERNEL_FQ void m30902_sxx (KERN_ATTR_VECTOR ())
     // tmp[12] = 0; tmp[13] = 0; tmp[14] = 0; tmp[15] = 0;
 
     for (u32 i = 8; i < 16; i++) tmp[i] = 0;
-
 
     // now let's do RIPEMD-160 on the sha256sum
 

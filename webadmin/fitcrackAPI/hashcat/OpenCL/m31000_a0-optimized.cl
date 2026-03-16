@@ -16,7 +16,7 @@
 #include M2S(INCLUDE_PATH/inc_hash_blake2s.cl)
 #endif
 
-KERNEL_FQ void m31000_m04 (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m31000_m04 (KERN_ATTR_RULES ())
 {
   /**
    * base
@@ -48,8 +48,6 @@ KERNEL_FQ void m31000_m04 (KERN_ATTR_RULES ())
   {
     u32x w0[4] = { 0 };
     u32x w1[4] = { 0 };
-    u32x w2[4] = { 0 };
-    u32x w3[4] = { 0 };
 
     const u32x out_len = apply_rules_vect_optimized (pw_buf0, pw_buf1, pw_len, rules_buf, il_pos, w0, w1);
 
@@ -94,15 +92,15 @@ KERNEL_FQ void m31000_m04 (KERN_ATTR_RULES ())
   }
 }
 
-KERNEL_FQ void m31000_m08 (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m31000_m08 (KERN_ATTR_RULES ())
 {
 }
 
-KERNEL_FQ void m31000_m16 (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m31000_m16 (KERN_ATTR_RULES ())
 {
 }
 
-KERNEL_FQ void m31000_s04 (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m31000_s04 (KERN_ATTR_RULES ())
 {
   /**
    * base
@@ -190,10 +188,10 @@ KERNEL_FQ void m31000_s04 (KERN_ATTR_RULES ())
   }
 }
 
-KERNEL_FQ void m31000_s08 (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m31000_s08 (KERN_ATTR_RULES ())
 {
 }
 
-KERNEL_FQ void m31000_s16 (KERN_ATTR_RULES ())
+KERNEL_FQ KERNEL_FA void m31000_s16 (KERN_ATTR_RULES ())
 {
 }

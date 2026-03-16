@@ -234,34 +234,13 @@ DECLSPEC void make_sc (LOCAL_AS u32 *sc, PRIVATE_AS const u32 *pw, const u32 pw_
 
     u32 i;
 
-    #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
     for (i = 0; i < pd; i++) sc[idx++] = pw[i];
                              sc[idx++] = pw[i]
-                                       | hc_bytealign_be (bl[0],         0, pm4);
-    for (i = 1; i < bd; i++) sc[idx++] = hc_bytealign_be (bl[i], bl[i - 1], pm4);
-                             sc[idx++] = hc_bytealign_be (sc[0], bl[i - 1], pm4);
-    for (i = 1; i <  4; i++) sc[idx++] = hc_bytealign_be (sc[i], sc[i - 1], pm4);
-                             sc[idx++] = hc_bytealign_be (    0, sc[i - 1], pm4);
-    #endif
-
-    #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-
-    #if defined IS_NV
-    const int selector = (0x76543210 >> ((pm4 & 3) * 4)) & 0xffff;
-    #endif
-
-    #if (defined IS_AMD || defined IS_HIP)
-    const int selector = l32_from_64_S (0x0706050403020100UL >> ((pm4 & 3) * 8));
-    #endif
-
-    for (i = 0; i < pd; i++) sc[idx++] = pw[i];
-                             sc[idx++] = pw[i]
-                                       | hc_byte_perm (        0, bl[0], selector);
-    for (i = 1; i < bd; i++) sc[idx++] = hc_byte_perm (bl[i - 1], bl[i], selector);
-                             sc[idx++] = hc_byte_perm (bl[i - 1], sc[0], selector);
-    for (i = 1; i <  4; i++) sc[idx++] = hc_byte_perm (sc[i - 1], sc[i], selector);
-                             sc[idx++] = hc_byte_perm (sc[i - 1],     0, selector);
-    #endif
+                                       | hc_bytealign_be_S (bl[0],         0, pm4);
+    for (i = 1; i < bd; i++) sc[idx++] = hc_bytealign_be_S (bl[i], bl[i - 1], pm4);
+                             sc[idx++] = hc_bytealign_be_S (sc[0], bl[i - 1], pm4);
+    for (i = 1; i <  4; i++) sc[idx++] = hc_bytealign_be_S (sc[i], sc[i - 1], pm4);
+                             sc[idx++] = hc_bytealign_be_S (    0, sc[i - 1], pm4);
   }
 }
 
@@ -272,27 +251,10 @@ DECLSPEC void make_pt_with_offset (PRIVATE_AS u32 *pt, const u32 offset, LOCAL_A
   const u32 om = m % 4;
   const u32 od = m / 4;
 
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 0) || defined IS_GENERIC
-  pt[0] = hc_bytealign_be (sc[od + 1], sc[od + 0], om);
-  pt[1] = hc_bytealign_be (sc[od + 2], sc[od + 1], om);
-  pt[2] = hc_bytealign_be (sc[od + 3], sc[od + 2], om);
-  pt[3] = hc_bytealign_be (sc[od + 4], sc[od + 3], om);
-  #endif
-
-  #if ((defined IS_AMD || defined IS_HIP) && HAS_VPERM == 1) || defined IS_NV
-
-  #if defined IS_NV
-  const int selector = (0x76543210 >> ((om & 3) * 4)) & 0xffff;
-  #endif
-
-  #if (defined IS_AMD || defined IS_HIP)
-  const int selector = l32_from_64_S (0x0706050403020100UL >> ((om & 3) * 8));
-  #endif
-  pt[0] = hc_byte_perm (sc[od + 0], sc[od + 1], selector);
-  pt[1] = hc_byte_perm (sc[od + 1], sc[od + 2], selector);
-  pt[2] = hc_byte_perm (sc[od + 2], sc[od + 3], selector);
-  pt[3] = hc_byte_perm (sc[od + 3], sc[od + 4], selector);
-  #endif
+  pt[0] = hc_bytealign_be_S (sc[od + 1], sc[od + 0], om);
+  pt[1] = hc_bytealign_be_S (sc[od + 2], sc[od + 1], om);
+  pt[2] = hc_bytealign_be_S (sc[od + 3], sc[od + 2], om);
+  pt[3] = hc_bytealign_be_S (sc[od + 4], sc[od + 3], om);
 }
 
 DECLSPEC void make_w_with_offset (PRIVATE_AS ctx_t *ctx, const u32 W_len, const u32 offset, LOCAL_AS const u32 *sc, const u32 pwbl_len, PRIVATE_AS u32 *iv, PRIVATE_AS const u32 *ks, SHM_TYPE u32 *s_te0, SHM_TYPE u32 *s_te1, SHM_TYPE u32 *s_te2, SHM_TYPE u32 *s_te3, SHM_TYPE u32 *s_te4)
@@ -323,7 +285,7 @@ DECLSPEC u32 do_round (LOCAL_AS u32 *sc, PRIVATE_AS const u32 *pw, const u32 pw_
 
   make_sc (sc, pw, pw_len, ctx->dgst32, ctx->dgst_len);
 
-  // make sure pwbl_len is calculcated before it gets changed
+  // make sure pwbl_len is calculated before it gets changed
 
   const u32 pwbl_len = pw_len + ctx->dgst_len;
 
@@ -563,7 +525,7 @@ DECLSPEC u32 do_round (LOCAL_AS u32 *sc, PRIVATE_AS const u32 *pw, const u32 pw_
   return ex;
 }
 
-KERNEL_FQ void m10700_init (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
+KERNEL_FQ KERNEL_FA void m10700_init (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
 {
   /**
    * base
@@ -595,7 +557,7 @@ KERNEL_FQ void m10700_init (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
   tmps[gid].W_len     = WORDSZ256;
 }
 
-KERNEL_FQ void m10700_loop (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
+KERNEL_FQ KERNEL_FA void m10700_loop (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
 {
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);
@@ -666,7 +628,7 @@ KERNEL_FQ void m10700_loop (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
   ctx.dgst_len  = tmps[gid].dgst_len;
   ctx.W_len     = tmps[gid].W_len;
 
-  LOCAL_VK u32 s_sc[256][PWMAXSZ4 + BLMAXSZ4 + AESSZ4];
+  LOCAL_VK u32 s_sc[FIXED_LOCAL_SIZE][PWMAXSZ4 + BLMAXSZ4 + AESSZ4];
 
   u32 ex = 0;
 
@@ -695,7 +657,7 @@ KERNEL_FQ void m10700_loop (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
   tmps[gid].W_len     = ctx.W_len;
 }
 
-KERNEL_FQ void m10700_comp (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
+KERNEL_FQ KERNEL_FA void m10700_comp (KERN_ATTR_TMPS_ESALT (pdf17l8_tmp_t, pdf_t))
 {
   /**
    * modifier

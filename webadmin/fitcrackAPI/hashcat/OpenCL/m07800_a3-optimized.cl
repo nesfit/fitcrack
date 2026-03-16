@@ -62,16 +62,12 @@ DECLSPEC void m07800m (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u32 *w
    * salt
    */
 
-  u32 salt_buf[8];
+  u32 salt_buf[4];
 
   salt_buf[0] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[0]);
   salt_buf[1] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[1]);
   salt_buf[2] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[2]);
   salt_buf[3] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[3]);
-  salt_buf[4] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[4]);
-  salt_buf[5] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[5]);
-  salt_buf[6] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[6]);
-  salt_buf[7] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[7]);
 
   const u32 salt_len = salt_bufs[SALT_POS_HOST].salt_len;
 
@@ -84,10 +80,10 @@ DECLSPEC void m07800m (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u32 *w
   s0[1] = salt_buf[1];
   s0[2] = salt_buf[2];
   s0[3] = salt_buf[3];
-  s1[0] = salt_buf[4];
-  s1[1] = salt_buf[5];
-  s1[2] = salt_buf[6];
-  s1[3] = salt_buf[7];
+  s1[0] = 0;
+  s1[1] = 0;
+  s1[2] = 0;
+  s1[3] = 0;
   s2[0] = 0;
   s2[1] = 0;
   s2[2] = 0;
@@ -206,8 +202,8 @@ DECLSPEC void m07800m (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u32 *w
     final[ 5] = w1[1];
     final[ 6] = w1[2];
     final[ 7] = w1[3];
-    final[ 8] = 0;
-    final[ 9] = 0;
+    final[ 8] = w2[0];
+    final[ 9] = w2[1];
     final[10] = 0;
     final[11] = 0;
     final[12] = 0;
@@ -279,16 +275,12 @@ DECLSPEC void m07800s (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u32 *w
    * salt
    */
 
-  u32 salt_buf[8];
+  u32 salt_buf[4];
 
   salt_buf[0] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[0]);
   salt_buf[1] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[1]);
   salt_buf[2] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[2]);
   salt_buf[3] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[3]);
-  salt_buf[4] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[4]);
-  salt_buf[5] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[5]);
-  salt_buf[6] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[6]);
-  salt_buf[7] = hc_swap32_S (salt_bufs[SALT_POS_HOST].salt_buf[7]);
 
   const u32 salt_len = salt_bufs[SALT_POS_HOST].salt_len;
 
@@ -301,10 +293,10 @@ DECLSPEC void m07800s (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u32 *w
   s0[1] = salt_buf[1];
   s0[2] = salt_buf[2];
   s0[3] = salt_buf[3];
-  s1[0] = salt_buf[4];
-  s1[1] = salt_buf[5];
-  s1[2] = salt_buf[6];
-  s1[3] = salt_buf[7];
+  s1[0] = 0;
+  s1[1] = 0;
+  s1[2] = 0;
+  s1[3] = 0;
   s2[0] = 0;
   s2[1] = 0;
   s2[2] = 0;
@@ -435,8 +427,8 @@ DECLSPEC void m07800s (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u32 *w
     final[ 5] = w1[1];
     final[ 6] = w1[2];
     final[ 7] = w1[3];
-    final[ 8] = 0;
-    final[ 9] = 0;
+    final[ 8] = w2[0];
+    final[ 9] = w2[1];
     final[10] = 0;
     final[11] = 0;
     final[12] = 0;
@@ -498,7 +490,7 @@ DECLSPEC void m07800s (PRIVATE_AS u32 *w0, PRIVATE_AS u32 *w1, PRIVATE_AS u32 *w
   }
 }
 
-KERNEL_FQ void m07800_m04 (KERN_ATTR_BASIC ())
+KERNEL_FQ KERNEL_FA void m07800_m04 (KERN_ATTR_BASIC ())
 {
   /**
    * base
@@ -513,8 +505,6 @@ KERNEL_FQ void m07800_m04 (KERN_ATTR_BASIC ())
   /**
    * modifier
    */
-
-  //const u64 lid = get_local_id (0);
 
   u32 w0[4];
 
@@ -553,7 +543,7 @@ KERNEL_FQ void m07800_m04 (KERN_ATTR_BASIC ())
   m07800m (w0, w1, w2, w3, pw_len, pws, rules_buf, combs_buf, bfs_buf, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m07800_m08 (KERN_ATTR_BASIC ())
+KERNEL_FQ KERNEL_FA void m07800_m08 (KERN_ATTR_BASIC ())
 {
   /**
    * base
@@ -568,8 +558,6 @@ KERNEL_FQ void m07800_m08 (KERN_ATTR_BASIC ())
   /**
    * modifier
    */
-
-  //const u64 lid = get_local_id (0);
 
   u32 w0[4];
 
@@ -608,11 +596,7 @@ KERNEL_FQ void m07800_m08 (KERN_ATTR_BASIC ())
   m07800m (w0, w1, w2, w3, pw_len, pws, rules_buf, combs_buf, bfs_buf, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m07800_m16 (KERN_ATTR_BASIC ())
-{
-}
-
-KERNEL_FQ void m07800_s04 (KERN_ATTR_BASIC ())
+KERNEL_FQ KERNEL_FA void m07800_m16 (KERN_ATTR_BASIC ())
 {
   /**
    * base
@@ -628,7 +612,58 @@ KERNEL_FQ void m07800_s04 (KERN_ATTR_BASIC ())
    * modifier
    */
 
-  //const u64 lid = get_local_id (0);
+  u32 w0[4];
+
+  w0[0] = pws[gid].i[ 0];
+  w0[1] = pws[gid].i[ 1];
+  w0[2] = pws[gid].i[ 2];
+  w0[3] = pws[gid].i[ 3];
+
+  u32 w1[4];
+
+  w1[0] = pws[gid].i[ 4];
+  w1[1] = pws[gid].i[ 5];
+  w1[2] = pws[gid].i[ 6];
+  w1[3] = pws[gid].i[ 7];
+
+  u32 w2[4];
+
+  w2[0] = pws[gid].i[ 8];
+  w2[1] = pws[gid].i[ 9];
+  w2[2] = pws[gid].i[10];
+  w2[3] = pws[gid].i[11];
+
+  u32 w3[4];
+
+  w3[0] = pws[gid].i[12];
+  w3[1] = pws[gid].i[13];
+  w3[2] = 0;
+  w3[3] = 0;
+
+  const u32 pw_len = pws[gid].pw_len & 63;
+
+  /**
+   * main
+   */
+
+  m07800m (w0, w1, w2, w3, pw_len, pws, rules_buf, combs_buf, bfs_buf, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
+}
+
+KERNEL_FQ KERNEL_FA void m07800_s04 (KERN_ATTR_BASIC ())
+{
+  /**
+   * base
+   */
+
+  const u64 lid = get_local_id (0);
+  const u64 gid = get_global_id (0);
+  const u64 lsz = get_local_size (0);
+
+  if (gid >= GID_CNT) return;
+
+  /**
+   * modifier
+   */
 
   u32 w0[4];
 
@@ -667,7 +702,7 @@ KERNEL_FQ void m07800_s04 (KERN_ATTR_BASIC ())
   m07800s (w0, w1, w2, w3, pw_len, pws, rules_buf, combs_buf, bfs_buf, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m07800_s08 (KERN_ATTR_BASIC ())
+KERNEL_FQ KERNEL_FA void m07800_s08 (KERN_ATTR_BASIC ())
 {
   /**
    * base
@@ -682,8 +717,6 @@ KERNEL_FQ void m07800_s08 (KERN_ATTR_BASIC ())
   /**
    * modifier
    */
-
-  //const u64 lid = get_local_id (0);
 
   u32 w0[4];
 
@@ -722,6 +755,55 @@ KERNEL_FQ void m07800_s08 (KERN_ATTR_BASIC ())
   m07800s (w0, w1, w2, w3, pw_len, pws, rules_buf, combs_buf, bfs_buf, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }
 
-KERNEL_FQ void m07800_s16 (KERN_ATTR_BASIC ())
+KERNEL_FQ KERNEL_FA void m07800_s16 (KERN_ATTR_BASIC ())
 {
+  /**
+   * base
+   */
+
+  const u64 lid = get_local_id (0);
+  const u64 gid = get_global_id (0);
+  const u64 lsz = get_local_size (0);
+
+  if (gid >= GID_CNT) return;
+
+  /**
+   * modifier
+   */
+
+  u32 w0[4];
+
+  w0[0] = pws[gid].i[ 0];
+  w0[1] = pws[gid].i[ 1];
+  w0[2] = pws[gid].i[ 2];
+  w0[3] = pws[gid].i[ 3];
+
+  u32 w1[4];
+
+  w1[0] = pws[gid].i[ 4];
+  w1[1] = pws[gid].i[ 5];
+  w1[2] = pws[gid].i[ 6];
+  w1[3] = pws[gid].i[ 7];
+
+  u32 w2[4];
+
+  w2[0] = pws[gid].i[ 8];
+  w2[1] = pws[gid].i[ 9];
+  w2[2] = pws[gid].i[10];
+  w2[3] = pws[gid].i[11];
+
+  u32 w3[4];
+
+  w3[0] = pws[gid].i[12];
+  w3[1] = pws[gid].i[13];
+  w3[2] = 0;
+  w3[3] = 0;
+
+  const u32 pw_len = pws[gid].pw_len & 63;
+
+  /**
+   * main
+   */
+
+  m07800s (w0, w1, w2, w3, pw_len, pws, rules_buf, combs_buf, bfs_buf, tmps, hooks, bitmaps_buf_s1_a, bitmaps_buf_s1_b, bitmaps_buf_s1_c, bitmaps_buf_s1_d, bitmaps_buf_s2_a, bitmaps_buf_s2_b, bitmaps_buf_s2_c, bitmaps_buf_s2_d, plains_buf, digests_buf, hashes_shown, salt_bufs, esalt_bufs, d_return_buf, d_extra0_buf, d_extra1_buf, d_extra2_buf, d_extra3_buf, kernel_param, gid, lid, lsz);
 }

@@ -21,11 +21,11 @@
 
 typedef struct pbkdf2_sha256_tmp
 {
-  u32  ipad[8];
-  u32  opad[8];
+  u32 ipad[8];
+  u32 opad[8];
 
-  u32  dgst[32];
-  u32  out[32];
+  u32 dgst[32];
+  u32 out[32];
 
 } pbkdf2_sha256_tmp_t;
 
@@ -34,7 +34,7 @@ typedef struct pbkdf2_sha256_aes_gcm
   u32 salt_buf[64];
   u32 iv_buf[4];
   u32 iv_len;
-  u32 ct_buf[784]; // TODO this can be smaller and would speedup the attack, only 64 bytes of ciphertext are allowed
+  u32 ct_buf[16];
   u32 ct_len;
 
 } pbkdf2_sha256_aes_gcm_t;
@@ -81,7 +81,7 @@ DECLSPEC void hmac_sha256_run_V (PRIVATE_AS u32x *w0, PRIVATE_AS u32x *w1, PRIVA
   sha256_transform_vector (w0, w1, w2, w3, digest);
 }
 
-KERNEL_FQ void m26610_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
+KERNEL_FQ KERNEL_FA void m26610_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
 {
   /**
    * base
@@ -165,7 +165,7 @@ KERNEL_FQ void m26610_init (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
   }
 }
 
-KERNEL_FQ void m26610_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
+KERNEL_FQ KERNEL_FA void m26610_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
 {
   const u64 gid = get_global_id (0);
 
@@ -271,7 +271,7 @@ KERNEL_FQ void m26610_loop (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
   }
 }
 
-KERNEL_FQ void m26610_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
+KERNEL_FQ KERNEL_FA void m26610_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sha256_aes_gcm_t))
 {
   const u64 gid = get_global_id (0);
   const u64 lid = get_local_id (0);
@@ -368,8 +368,7 @@ KERNEL_FQ void m26610_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
 
   AES_GCM_decrypt (key, J0, ct, 32, pt, s_te0, s_te1, s_te2, s_te3, s_te4);
 
-
-  const int correct = is_valid_printable_32 (pt[0])
+  int correct = is_valid_printable_32 (pt[0])
                     + is_valid_printable_32 (pt[1])
                     + is_valid_printable_32 (pt[2])
                     + is_valid_printable_32 (pt[3])
@@ -380,9 +379,40 @@ KERNEL_FQ void m26610_comp (KERN_ATTR_TMPS_ESALT (pbkdf2_sha256_tmp_t, pbkdf2_sh
 
   if (correct != 8) return;
 
+  u32 ct2[8];
+
+  ct2[0] = pbkdf2_sha256_aes_gcm->ct_buf[8]; // third block of ciphertext
+  ct2[1] = pbkdf2_sha256_aes_gcm->ct_buf[9];
+  ct2[2] = pbkdf2_sha256_aes_gcm->ct_buf[10];
+  ct2[3] = pbkdf2_sha256_aes_gcm->ct_buf[11];
+  ct2[4] = pbkdf2_sha256_aes_gcm->ct_buf[12]; // fourth block of ciphertext
+  ct2[5] = pbkdf2_sha256_aes_gcm->ct_buf[13];
+  ct2[6] = pbkdf2_sha256_aes_gcm->ct_buf[14];
+  ct2[7] = pbkdf2_sha256_aes_gcm->ct_buf[15];
+
+  // Only a single increment as the previous AES_GCM_DECRYPT already does one for us
+  J0[3]++;
+
+  u32 pt2[8] = { 0 };
+
+  AES_GCM_decrypt (key, J0, ct2, 32, pt2, s_te0, s_te1, s_te2, s_te3, s_te4);
+
+  correct = is_valid_printable_32 (pt2[0])
+                    + is_valid_printable_32 (pt2[1])
+                    + is_valid_printable_32 (pt2[2])
+                    + is_valid_printable_32 (pt2[3])
+                    + is_valid_printable_32 (pt2[4])
+                    + is_valid_printable_32 (pt2[5])
+                    + is_valid_printable_32 (pt2[6])
+                    + is_valid_printable_32 (pt2[7]);
+
+  // We need to check a third and fourth block to avoid extremely rare false-positives. See:
+  // https://github.com/hashcat/hashcat/issues/4121
+  if (correct != 8) return;
+
   /*
   const int pt_len = 28; // not using 32 byte but 28 because our UTF8 allows up to 4 byte per character and since we decrypt 32 byte
-                         // only we can't garantee it is not in the middle of a UTF8 byte stream at that point
+                         // only we can't guarantee it is not in the middle of a UTF8 byte stream at that point
 
   if (hc_enc_scan (pt, pt_len))
   {
