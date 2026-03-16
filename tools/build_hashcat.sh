@@ -2,16 +2,16 @@ git clone https://github.com/hashcat/hashcat
 cd hashcat
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-make linux -j
+make linux -j$(nproc)
 
 # Needs win-iconv
 # https://github.com/hashcat/hashcat/blob/master/BUILD_WSL.md
-make win -j
+make win -j$(nproc)
 
 chmod +x hashcat
 else
 patch -p1 < ../hashcat.patch
-make -j
+make -j$(nproc)
 fi
 
 chmod +x hashcat
