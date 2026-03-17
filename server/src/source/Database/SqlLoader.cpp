@@ -421,7 +421,7 @@ std::vector<std::string> CSqlLoader::loadJobHashes(uint64_t jobId)
         if (row[0])
         {
             std::string input(row[0]);
-            CodeTools::Base64::Decode(input, output);
+            macaron::Base64::Decode(input, output);
             result.emplace_back(output);
         }
     }
