@@ -10,8 +10,8 @@ make win -j$(nproc)
 
 chmod +x hashcat
 else
-patch -p1 < ../hashcat.patch
-make -j$(nproc)
+patch -p1 < ./hashcat.patch
+make -j$(ssysctl -n hw.ncpu)
 fi
 
 chmod +x hashcat
