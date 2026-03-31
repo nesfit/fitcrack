@@ -1,4 +1,4 @@
-flask-restx
+flask-restx==1.3.0
 Flask-SQLAlchemy==2.5.0
 flask-cors
 flask-login
