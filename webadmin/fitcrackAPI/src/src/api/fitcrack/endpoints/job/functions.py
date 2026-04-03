@@ -63,8 +63,8 @@ def kill_job(job:FcJob, db):
             mask.current_index = 0
             mask.merged = False
             if mask.increment_min > 0:
-                db.session.delete(mask)                       
-    elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)']]:
+                db.session.delete(mask)
+    elif job.attack_mode in [attack_modes[modeStr] for modeStr in ['dictionary', 'combinator', 'hybrid (mask + wordlist)', 'association']]:                                   
         dictionaries = FcJobDictionary.query.filter(FcJobDictionary.job_id == id).all()
         for dictionary in dictionaries:
             dictionary.current_index = 0
@@ -412,6 +412,17 @@ def computeCrackingTime(data):
 
         if int(keyspace) >= INT_MAX:
             keyspace = INT_MAX
+            
+    elif attackSettings['attack_mode'] == 10:
+        dictsKeyspace = 0
+        for dict in attackSettings['left_dictionaries']:
+            dictsKeyspace += dict['keyspace']
+        rulesKeyspace = 1
+        if attackSettings['rules']:
+            rules = FcRule.query.filter(FcRule.id == attackSettings['rules']['id']).first()
+            rulesKeyspace = rules.count
+
+        keyspace = dictsKeyspace * rulesKeyspace
 
     settings = FcSetting.query.first()
     ramp_down_coefficient = settings.ramp_down_coefficient

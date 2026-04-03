@@ -5,7 +5,8 @@ services:
       image: fitcrack_server
       
       hostname: fitcrack
-
+      cap_add:
+        - SYS_NICE
       # Configuration of the build context
       build:
         context: .
@@ -13,7 +14,6 @@ services:
         args:
            - COMPILER_THREADS=1  # Higher values may cause linker race conditions
 
-      command: ./entrypoint-fitcrack.sh
       restart: always
       ports:
           - ${BACKEND_PORT}:${BACKEND_PORT}         # Mapping of WebAdmin backend

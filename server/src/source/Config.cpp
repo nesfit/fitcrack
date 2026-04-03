@@ -58,6 +58,11 @@ namespace Config {
     std::string inTemplateFilePrinceRules =    "prince_rules_in";
     std::string inTemplateFilePcfg =           "pcfg_in";
     std::string inTemplateFilePcfgRules =      "pcfg_rules_in";
+    std::string inTemplateFileAssocDictSplit = "assoc_dict_split_in";
+    std::string inTemplateFileAssocDictAlt =   "assoc_dict_alt_in";
+    std::string inTemplateFileAssocRuleSplit = "assoc_rule_split_in";
+    std::string inTemplateFileAssocNoRule =    "assoc_no_rule_in";
+    std::string inTemplateFileAssocNoRuleAlt = "assoc_no_rule_alt_in";
     std::string outTemplateFile =              "app_out";
 
     /** Some default values */
@@ -75,6 +80,11 @@ namespace Config {
     char * inTemplatePathHybridMaskDict = nullptr;
     char * inTemplatePathRule = nullptr;
     char * inTemplatePathRuleAlt = nullptr;
+    char * inTemplatePathAssocDictSplit = nullptr;
+    char * inTemplatePathAssocDictAlt = nullptr;
+    char * inTemplatePathAssocRuleSplit = nullptr;
+    char * inTemplatePathAssocNoRule = nullptr;
+    char * inTemplatePathAssocNoRuleAlt = nullptr;
     char * inTemplatePathRuleSplit = nullptr;
     DB_APP * app = nullptr;
     int startTime = 0;

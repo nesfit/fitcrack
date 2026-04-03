@@ -401,6 +401,7 @@
   import combinator from '@/components/job/attacks/combinator.vue'
   import mask from '@/components/job/attacks/mask.vue'
   import dictionary from '@/components/job/attacks/dictionary.vue'
+  import association from '@/components/job/attacks/association.vue'
   import hybridMaskWordlist from '@/components/job/attacks/hybridMaskWordlist.vue'
   import hybridWordlistMask from '@/components/job/attacks/hybridWordlistMask.vue'
   import pcfgAttack from '@/components/job/attacks/pcfg.vue'
@@ -422,20 +423,21 @@
   export default {
     name: 'AddJob',
     components: {
-    FileUploader,
-    'combinator': combinator,
-    'maskattack': mask,
-    'dictionary': dictionary,
-    'hybridMaskWordlist': hybridMaskWordlist,
-    'hybridWordlistMask': hybridWordlistMask,
-    'pcfgAttack': pcfgAttack,
-    'princeAttack': princeAttack,
-    'fc-textarea': fcTextarea,
-    'host-selector': hostSelector,
-    'template-modal': templateModal,
-    dtPicker,
-    HashlistCreator,
-    HashlistSelector
+      FileUploader,
+      'combinator': combinator,
+      'maskattack': mask,
+      'dictionary': dictionary,
+      'association': association,
+      'hybridMaskWordlist': hybridMaskWordlist,
+      'hybridWordlistMask': hybridWordlistMask,
+      'pcfgAttack': pcfgAttack,
+      'princeAttack': princeAttack,
+      'fc-textarea': fcTextarea,
+      'host-selector': hostSelector,
+      'template-modal': templateModal,
+      dtPicker,
+      HashlistCreator,
+      HashlistSelector
 },
     data: function () {
       return {

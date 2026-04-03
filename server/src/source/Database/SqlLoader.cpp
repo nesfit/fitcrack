@@ -433,6 +433,40 @@ std::vector<std::string> CSqlLoader::loadJobHashes(uint64_t jobId)
     return result;
 }
 
+std::vector<std::string> CSqlLoader::loadJobAllHashes(uint64_t jobId)
+{
+    std::vector<std::string> result;
+    updateSql(formatQuery("SELECT REPLACE(TO_BASE64(`hash`), '\n', '') FROM `%s` WHERE `job_id` = %" PRIu64 " ;",
+                          Config::tableNameHash.c_str(), jobId));
+
+    MYSQL_RES* sqlResult;
+    sqlResult = mysql_store_result(boinc_db.mysql);
+    if (!sqlResult)
+    {
+        Tools::printDebugTimestamp("Problem with DB query.\nShutting down now.\n");
+        boinc_db.close();
+        exit(1);
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(sqlResult)))
+    {
+        std::string output;
+        if (row[0])
+        {
+            std::string input(row[0]);
+            CodeTools::Base64::Decode(input, output);
+            result.emplace_back(output);
+        }
+    }
+
+    mysql_free_result(sqlResult);
+    Tools::printDebugJob(Config::DebugType::Log, jobId,
+                         "Number of loaded hashes: %d\n", result.size());
+
+    return result;
+}
+
 
 Config::Ptr<CMask> CSqlLoader::loadMask(uint64_t maskId)
 {
