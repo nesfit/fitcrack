@@ -42,7 +42,16 @@ def upload_hash_list(new_hashes:list[str|bytes],hash_list:FcHashList,hash_type:i
 
 
     if hash_list.is_locked:
-        abort(400,'Hash list is locked for editing.')
+        abort(400,'Hash list is locked for editing. This hash list is either attached to jobs or this hash list contains a binary hash.')
+    
+    old_hash_count = hash_list.hash_count
+    new_hash_count = len(new_hashes)
+    new_binary_hash_count = sum(1 for x in new_hashes if x.startswith('BASE64:'))
+    if new_binary_hash_count > 1 or (new_binary_hash_count == 1 and (new_hash_count > 1 or old_hash_count > 0)):
+        abort(400,'A binary hash must be in its own hash list, which may not contain more than one hash.')
+    
+    if new_binary_hash_count == 1:
+        binary_hash = True
 
     new_hashes_bin_list = list(map(hash_to_bytes, new_hashes))
 

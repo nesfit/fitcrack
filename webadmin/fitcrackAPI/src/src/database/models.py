@@ -1017,7 +1017,17 @@ class FcHashList(Base):
     
     @hybrid_property
     def is_locked(self):
-        return self.job_count != 0
+        '''
+        We can't modify a hash list when 
+        (1) it's attached to (possibly running) jobs (rather obviously why),
+        or (2) when it contains a "binary hash" (this is due to horrible tech debt).
+        '''
+        if self.job_count != 0:
+            return True
+        for hash_obj in self.hashes:
+            if hash_obj.hashText.startswith('BASE64<'):
+                return True
+        return False
     
     @hybrid_property
     def cracked_hash_count(self):
