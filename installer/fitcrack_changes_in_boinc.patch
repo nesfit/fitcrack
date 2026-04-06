@@ -1,6 +1,13 @@
+diff -ruN boinc_org/db/schema.sql boinc/db/schema.sql
+--- boinc_org/db/schema.sql	2026-04-06 12:19:59.600000000 +0000
++++ boinc/db/schema.sql	2026-04-06 12:20:01.025000000 +0000
+@@ -219,1 +219,1 @@
+-    misc                    text            not null default '',
++    misc                    text            not null,
+
 diff -ruN boinc_org/html/project.sample/project.inc boinc/html/project.sample/project.inc
---- boinc_org/html/project.sample/project.inc	2022-11-19 00:14:19.825528941 +0100
-+++ boinc/html/project.sample/project.inc	2022-11-19 00:23:40.304317833 +0100
+--- boinc_org/html/project.sample/project.inc	2026-04-06 12:19:59.610218023 +0000
++++ boinc/html/project.sample/project.inc	2026-04-06 12:20:01.026000239 +0000
 @@ -12,8 +12,8 @@
  
  //-------------- Project name and owner
@@ -13,26 +20,25 @@ diff -ruN boinc_org/html/project.sample/project.inc boinc/html/project.sample/pr
  //-------------- URLs and directories
  
 diff -ruN boinc_org/py/Boinc/database.py boinc/py/Boinc/database.py
---- boinc_org/py/Boinc/database.py	2022-11-19 00:14:20.045529464 +0100
-+++ boinc/py/Boinc/database.py	2022-11-19 00:23:16.808191126 +0100
-@@ -283,9 +283,10 @@
+--- boinc_org/py/Boinc/database.py	2026-04-06 12:19:59.618903313 +0000
++++ boinc/py/Boinc/database.py	2026-04-06 12:20:01.026436145 +0000
+@@ -284,9 +284,11 @@
      connect(config, nodb=True)
      dbcon = get_dbconnection()
      cursor = dbcon.cursor()
--    if drop_first:
--        cursor.execute("drop database if exists %s"%config.db_name)
--    cursor.execute("create database %s"%config.db_name)
-+    # Commented (Radek), since we expect an empty database
-+    # if drop_first:
-+    #     cursor.execute("drop database if exists %s"%config.db_name)
-+    # cursor.execute("create database %s"%config.db_name)
++    # Fitcrack expects the database to be created earlier by the installer.
++    # Only recreate it when drop_first=True.
+     if drop_first:
+         cursor.execute("drop database if exists %s"%config.db_name)
+-    cursor.execute("create database %s character set utf8mb4 collate utf8mb4_unicode_ci"%config.db_name)
++        cursor.execute("create database %s character set utf8mb4 collate utf8mb4_unicode_ci"%config.db_name)
      cursor.execute("use %s"%config.db_name)
      for file in ['schema.sql', 'constraints.sql', 'content.sql']:
          _execute_sql_script(cursor, os.path.join(srcdir, 'db', file))
 diff -ruN boinc_org/py/Boinc/setup_project.py boinc/py/Boinc/setup_project.py
---- boinc_org/py/Boinc/setup_project.py	2022-11-19 00:14:20.045529464 +0100
-+++ boinc/py/Boinc/setup_project.py	2022-11-19 00:24:27.756566567 +0100
-@@ -520,6 +520,15 @@
+--- boinc_org/py/Boinc/setup_project.py	2026-04-06 12:19:59.630347643 +0000
++++ boinc/py/Boinc/setup_project.py	2026-04-06 12:20:01.026950546 +0000
+@@ -525,6 +525,15 @@
              config.min_sendwork_interval = 6
          self.scheduler_url = os.path.join(cgi_url     , 'cgi')
  
@@ -48,36 +54,9 @@ diff -ruN boinc_org/py/Boinc/setup_project.py boinc/py/Boinc/setup_project.py
      def dest(self, *dirs):
          location = self.project_dir
          for x in dirs:
-diff -ruN boinc_org/sched/handle_request.cpp boinc/sched/handle_request.cpp
---- boinc_org/sched/handle_request.cpp	2022-11-19 00:14:19.877529065 +0100
-+++ boinc/sched/handle_request.cpp	2022-11-19 00:26:13.273089005 +0100
-@@ -1139,6 +1139,15 @@
-     log_messages.set_indent_level(2);
- }
- 
-+static void notify_status() {
-+    char buf[256];
-+    snprintf(buf, 256, "UPDATE fc_host_status SET last_seen = UTC_TIMESTAMP() WHERE boinc_host_id = %lu ;", g_reply->host.id);
-+
-+    int retval = boinc_db.do_query(buf);
-+    if (retval)
-+        log_messages.printf(MSG_DEBUG, "Failed to update host status!\n");
-+}
-+
- bool bad_install_type() {
-     if (config.no_vista_sandbox) {
-         if (!strcmp(g_request->host.os_name, "Microsoft Windows Vista")) {
-@@ -1264,6 +1273,7 @@
-     g_reply->nucleus_only = false;
- 
-     log_request();
-+    notify_status();
- 
- #if 0
-     // if you need to debug a problem w/ a particular host or user,
 diff -ruN boinc_org/sched/Makefile.am boinc/sched/Makefile.am
---- boinc_org/sched/Makefile.am	2022-11-19 00:14:19.877529065 +0100
-+++ boinc/sched/Makefile.am	2022-11-19 00:25:23.252846268 +0100
+--- boinc_org/sched/Makefile.am	2026-04-06 12:19:59.673069190 +0000
++++ boinc/sched/Makefile.am	2026-04-06 12:20:01.028051287 +0000
 @@ -124,7 +124,11 @@
      trickle_credit \
      trickle_deadline \
@@ -91,12 +70,12 @@ diff -ruN boinc_org/sched/Makefile.am boinc/sched/Makefile.am
  
  schedcgi_PROGRAMS= \
      cgi \
-@@ -307,6 +311,82 @@
+@@ -309,6 +313,82 @@
  sched_driver_SOURCES = sched_driver.cpp
  sched_driver_LDADD = $(SERVERLIBS)
  
-+# find . -name '*.h'
-+# find . -name '*.cpp'
++# Fitcrack-specific scheduler targets; the corresponding sources are copied
++# into boinc/sched/ before BOINC is built in the Fitcrack Docker image.
 +fitcrack_sources = \
 +    AttackBenchAll.h \
 +    AttackBench.h \
@@ -174,9 +153,37 @@ diff -ruN boinc_org/sched/Makefile.am boinc/sched/Makefile.am
  if ENABLE_FCGI
  
  schedcgi_PROGRAMS += fcgi fcgi_file_upload_handler
+diff -ruN boinc_org/sched/handle_request.cpp boinc/sched/handle_request.cpp
+--- boinc_org/sched/handle_request.cpp	2026-04-06 12:19:59.640085783 +0000
++++ boinc/sched/handle_request.cpp	2026-04-06 12:20:01.027647250 +0000
+@@ -1177,6 +1177,16 @@
+     log_messages.set_indent_level(2);
+ }
+ 
++static void notify_status() {
++    char buf[256];
++    snprintf(buf, sizeof(buf), "UPDATE fc_host_status SET last_seen = UTC_TIMESTAMP() WHERE boinc_host_id = %lu ;", g_reply->host.id);
++
++    int retval = boinc_db.do_query(buf);
++    if (retval) {
++        log_messages.printf(MSG_DEBUG, "Failed to update host status!\n");
++    }
++}
++
+ bool bad_install_type() {
+     if (config.no_vista_sandbox) {
+         if (!strcmp(g_request->host.os_name, "Microsoft Windows Vista")) {
+@@ -1302,6 +1312,7 @@
+     g_reply->nucleus_only = false;
+ 
+     log_request();
++    notify_status();
+ 
+ #if 0
+     // if you need to debug a problem w/ a particular host or user,
 diff -ruN boinc_org/tools/make_project boinc/tools/make_project
---- boinc_org/tools/make_project	2022-11-19 00:14:20.057529493 +0100
-+++ boinc/tools/make_project	2022-11-19 00:22:32.383944637 +0100
+--- boinc_org/tools/make_project	2026-04-06 12:19:59.681401176 +0000
++++ boinc/tools/make_project	2026-04-06 12:20:01.028327120 +0000
 @@ -1,5 +1,8 @@
  #!/usr/bin/env python
  
@@ -186,7 +193,7 @@ diff -ruN boinc_org/tools/make_project boinc/tools/make_project
  # Creates a new BOINC project.
  
  from __future__ import print_function
-@@ -238,10 +241,13 @@
+@@ -238,10 +241,12 @@
  project.sched_install('feeder')
  project.sched_install('transitioner')
  project.sched_install('file_deleter')
@@ -194,7 +201,6 @@ diff -ruN boinc_org/tools/make_project boinc/tools/make_project
 -    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_work_generator -d 3 --app example_app'
 -    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_bitwise_validator -d 3 --app example_app'
 -    project.config.daemons.make_node_and_append("daemon").cmd = 'sample_assimilator -d 3 --app example_app'
-+
 +project.config.daemons.make_node_and_append("daemon").cmd = 'work_generator -d 3 --app fitcrack'
 +project.config.daemons.make_node_and_append("daemon").cmd = 'bitwise_validator -d 3 --app fitcrack'
 +project.config.daemons.make_node_and_append("daemon").cmd = 'assimilator -d 3 --app fitcrack'
@@ -204,7 +210,7 @@ diff -ruN boinc_org/tools/make_project boinc/tools/make_project
  
  # set up default tasks
  
-@@ -326,22 +332,12 @@
+@@ -326,21 +331,12 @@
  
  print ('''Done installing default daemons.''')
  
@@ -223,7 +229,6 @@ diff -ruN boinc_org/tools/make_project boinc/tools/make_project
 -    a.name = 'example_app'
 -    a.user_friendly_name = 'Example Application'
 -    pf.write()
--
 +# Add Fitcrack app
 +pf = projectxml.ProjectFile(os.path.join(proot,'project.xml')).read()
 +a = pf.elements.make_node_and_append('app')
@@ -231,31 +236,17 @@ diff -ruN boinc_org/tools/make_project boinc/tools/make_project
 +a.user_friendly_name = 'Fitcrack'
 +pf.write()
  
- httpd_conf_template_filename = os.path.join(
-     options.project_root,
-diff -ruN boinc_org/tools/project.xml boinc/tools/project.xml
---- boinc_org/tools/project.xml	2022-11-19 00:14:20.057529493 +0100
-+++ boinc/tools/project.xml	2022-11-19 00:16:39.929860132 +0100
-@@ -28,6 +28,10 @@
-         <user_friendly_name>Intel 64-bit Mac OS 10.5 or later</user_friendly_name>
-     </platform>
-     <platform>
-+        <name>arm64-apple-darwin</name>
-+        <user_friendly_name>Mac OS running on ARM</user_friendly_name>
-+    </platform>
-+    <platform>
-         <name>sparc-sun-solaris2.7</name>
-         <user_friendly_name>Solaris 2.7 running on a SPARC-compatible CPU</user_friendly_name>
-     </platform>
+ 
+ httpd_conf_template_filename = project_shortname+'.httpd.conf'
 diff -ruN boinc_org/tools/update_versions boinc/tools/update_versions
---- boinc_org/tools/update_versions	2022-11-19 00:14:20.057529493 +0100
-+++ boinc/tools/update_versions	2022-11-19 01:20:18.482266394 +0100
-@@ -224,14 +224,8 @@
+--- boinc_org/tools/update_versions	2026-04-06 12:19:59.689921781 +0000
++++ boinc/tools/update_versions	2026-04-06 12:20:01.028558031 +0000
+@@ -233,14 +233,8 @@
  
      IF YOUR PROJECT IS PUBLICLY ACCESSIBLE, THIS IS A SECURITY VULNERABILITY.
      PLEASE STOP YOUR PROJECT IMMEDIATELY AND READ:
--    https://boinc.berkeley.edu/trac/wiki/CodeSigning
-+    https://boinc.berkeley.edu/trac/wiki/CodeSigning";
+-    https://github.com/BOINC/boinc/wiki/CodeSigning
++    https://github.com/BOINC/boinc/wiki/CodeSigning";
  
 -    Continue (y/n)? ";
 -
@@ -265,4 +256,3 @@ diff -ruN boinc_org/tools/update_versions boinc/tools/update_versions
 -    }
      $sig_gen_confirmed = true;
  }
- 

@@ -3,14 +3,10 @@
 This document describes how to install Fitcrack server using a pre-built Docker image.
 
 ### Requirements
-Install **Docker Engine 20.10.x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+Install **Docker Engine 20.10 or higher**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
-Install **docker-compose 1.29.x**. You can use the following command:
-```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-```
+Install **docker compose 2.x**. See [https://docs.docker.com/desktop/setup/install/linux/](https://docs.docker.com/desktop/setup/install/linux/)
 
-**NOTE:** Stick with the recommended versions if possible. Older versions may not work. Newer releases were not tested.
 
 ### Preparing the .env configuration file
 Create a new **.env** config file from the example attached:

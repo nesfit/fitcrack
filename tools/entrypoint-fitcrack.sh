@@ -31,7 +31,16 @@ echo "============================================================"
 ##############################################
 # Check if project exists. If not, create it.
 if [ -d "$BOINC_PROJECT_DIR" ]; then
-  echo "Project already exists."
+  echo "Fitcrack is already installed in this container."
+  echo "Reviving daemons from the past. Please wait..."
+
+  service mysql restart
+  service apache2 restart
+  service fitcrack restart
+
+  # All done
+  echo "All done."
+  echo "FITCRACK server is ready to use."
 else # Create Fitcrack project
 
   # Setup Fitcrack logging directory
@@ -96,8 +105,8 @@ else # Create Fitcrack project
   cp -f server/server_bin/pcfg_monitor.py $BOINC_PROJECT_DIR/bin/
 
   # Copy client binaries
-  mkdir $BOINC_PROJECT_DIR/apps/fitcrack
-  mkdir $BOINC_PROJECT_DIR/apps/fitcrack/1
+  mkdir -p $BOINC_PROJECT_DIR/apps/fitcrack
+  mkdir -p $BOINC_PROJECT_DIR/apps/fitcrack/1
   cp -Rf server/client_bin/* $BOINC_PROJECT_DIR/apps/fitcrack/1/
 
   # Install server daemons
@@ -219,7 +228,7 @@ else # Create Fitcrack project
   ##############################################
   # Configure webadmin backend
 
-  if [ $SSL_WEBADMIN = "y" ]; then
+  if [ "$SSL_WEBADMIN" = "y" ]; then
     a2enmod ssl
     chown -R www-data:www-data /srv/certificates
   fi
@@ -302,11 +311,11 @@ else # Create Fitcrack project
   echo "  </Directory>" >> $FE_CONFIG_FILE
 
   # In case BOINC uses the same port, include it here
-  if [ $FRONTEND_PORT == $BOINC_PORT ]; then
+  if [ "$FRONTEND_PORT" == "$BOINC_PORT" ]; then
     echo "  IncludeOptional $PROJECT_HTTPD_CONF" >> $FE_CONFIG_FILE
   fi
 
-  if [ $SSL_WEBADMIN = "y" ]; then
+  if [ "$SSL_WEBADMIN" = "y" ]; then
     echo "  SSLEngine on" >> $FE_CONFIG_FILE
     echo "  SSLCertificateFile /srv/certificates/$SSL_CERTIFICATE_FILE" >> $FE_CONFIG_FILE
     echo "  SSLCertificateKeyFile /srv/certificates/$SSL_CERTIFICATE_KEYFILE" >> $FE_CONFIG_FILE
@@ -323,13 +332,13 @@ else # Create Fitcrack project
 
   # Create frontend Apache config
   # In case BOINC uses the same port, include it here
-  if [ $FRONTEND_PORT != $BOINC_PORT ]; then
+  if [ "$FRONTEND_PORT" != "$BOINC_PORT" ]; then
     BOINC_APACHE_CONFIG=$APACHE_CONFIG_DIR/sites-available/02-fitcrackBOINC.conf
     echo "# Fitcrack BOINC Apache config" > $BOINC_APACHE_CONFIG
     echo "<VirtualHost *:$BOINC_PORT>" >> $BOINC_APACHE_CONFIG
     echo "  IncludeOptional $PROJECT_HTTPD_CONF" >> $BOINC_APACHE_CONFIG
 
-    if [ $SSL_BOINC = "y" ]; then
+    if [ "$SSL_BOINC" = "y" ]; then
       echo "  SSLEngine on" >> $BOINC_APACHE_CONFIG
       echo "  SSLCertificateFile /srv/certificates/$SSL_CERTIFICATE_FILE" >> $BOINC_APACHE_CONFIG
       echo "  SSLCertificateKeyFile /srv/certificates/$SSL_CERTIFICATE_KEYFILE" >> $BOINC_APACHE_CONFIG
@@ -363,7 +372,7 @@ else # Create Fitcrack project
   fi
   echo "Done"
 
-  if [ $DYNAMIC_BACKEND_URL = "y" ]; then
+  if [ "$DYNAMIC_BACKEND_URL" = "y" ]; then
     sed -i "s@serverAddress.*@serverAddress = \"$WEBADMIN_PROTO://\"+window.location.hostname+\":${BACKEND_PORT}\"@g" /var/www/html/fitcrackFE/static/configuration.js
   else
     BACKEND_URL="${WEBADMIN_PROTO}://${WEBADMIN_HOST}:${BACKEND_PORT}"
@@ -380,16 +389,5 @@ fi
 
 #
 ##############################################
-
-echo "Fitcrack is already installed in this container."
-echo "Reviving daemons from the past. Please wait..."
-
-service mysql restart
-service apache2 restart
-service fitcrack restart
-
-# All done
-echo "All done."
-echo "FITCRACK server is ready to use."
 
 sleep infinity

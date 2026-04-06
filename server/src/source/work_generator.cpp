@@ -14,6 +14,7 @@
 
 /** BOINC includes */
 #include <util.h>
+#include <filesys.h>
 #include <sched_util_basic.h>
 
 

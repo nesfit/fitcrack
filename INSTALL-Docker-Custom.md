@@ -3,14 +3,10 @@
 This document describes how to prepare and run a custom Docker build of Fitcrack server.
 
 ### Requirements
-Install **Docker Engine 20.10.x**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+Install **Docker Engine 20.10 or higher**. See instructions for you distro here: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
-Install **docker-compose 1.29.x**. You can use the following command:
-```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-```
+Install **docker compose 2.x**. See [https://docs.docker.com/desktop/setup/install/linux/](https://docs.docker.com/desktop/setup/install/linux/)
 
-**NOTE:** Stick with the recommended versions if possible. Older versions may not work. Newer releases were not tested.
 
 ### Checking if you have BOINC submodule
 Fitcrack relies on [BOINC](https://boinc.berkeley.edu), which is used as a submodule. Therefore, it is recommended to clone Fitcrack with the `--recursive` option:
@@ -69,7 +65,7 @@ docker-compose -f docker-compose-custom-build.yml up
 This is fine for debugging. For serious use, you may want the container to run on background.
 This can be dome by starting the container in the detached mode:
 ```
-docker-compose up -d
+docker-compose -f docker-compose-custom-build.yml up -d
 ```
 
 For the very first run, the entrypoint will install the Fitcrack project which may take a couple of minutes.

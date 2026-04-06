@@ -18,11 +18,7 @@
 // Handle a scheduling server RPC
 
 #include "config.h"
-#ifdef _USING_FCGI_
-#include "boinc_fcgi.h"
-#else
-#include <cstdio>
-#endif
+#include "boinc_stdio.h"
 #include <cassert>
 #include <cstdlib>
 #include <vector>
@@ -543,7 +539,13 @@ static int modify_host_struct(HOST& host) {
         strcat(buf, g_request->client_brand);
     }
     strcat(buf, "]");
-    g_request->coprocs.summary_string(buf2, sizeof(buf2));
+    //g_request->coprocs.summary_string(buf2, sizeof(buf2)); <- older BOINC call 
+    
+    // Newer BOINC call that returns a JSON string with the coprocs summary
+    std::string coprocs_json;
+    g_request->coprocs.summary_string_json(coprocs_json);
+    strlcpy(buf2, coprocs_json.c_str(), sizeof(buf2));
+
     strlcpy(host.serialnum, buf, sizeof(host.serialnum));
     strlcat(host.serialnum, buf2, sizeof(host.serialnum));
     if (strlen(g_request->host.virtualbox_version)) {
