@@ -8,25 +8,23 @@ It contains cookbooks for various popular Linux distros + general installation
 instructions.
 
 Table of Contents:
-* [Step-by-step guide for Ubuntu 22.04 LTS](#instubu22)
+* [Step-by-step guide for Ubuntu 24.04 LTS](#instubu24)
 * [Step-by-step guide for Debian 11](#instdeb11)
 * [Step-by-step guide for CentOS Stream 9](#instcentos9)
-* [Step-by-step guide for Ubuntu 20.04 LTS](#instubu20)
-* [Step-by-step guide for Debian 9 / Ubuntu 18.04 LTS](#instdeb9)
 * [Step-by-step guide for CentOS / RHEL 8](#instcentos8)
 * [General installation instructions (for Other Linux distros)](#instgen)
 * [Debugging your Fitcrack server installation](#debugging)
 * [Removing an existing installation](#removal)
 
 
-<a name="instubu22"></a>
-## Step-by-step: Install on Ubuntu 22.04 LTS
+<a name="instubu24"></a>
+## Step-by-step: Install on Ubuntu 24.04 LTS
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
 ### Install prerequisities
 ```
-apt install -y m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
+apt install -y m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl nlohmann-json3-dev libzip-dev
 ```
 
 ### Setup the MySQL Database
@@ -215,82 +213,6 @@ If you installed Fitcrack as a system service you may enable it:
 /usr/lib/systemd/systemd-sysv-install enable fitcrack
 ```
 This will make Fitcrack start automatically on future boots.
-
-
-<a name="instubu20"></a>
-## Step-by-step: Install on Ubuntu 20.04 LTS
-
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
-
-### Install prerequisities
-```
-apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
-
-mysql_secure_installation # Set MySQL root password
-
-a2enmod cgi       # enable mod CGI
-a2enmod rewrite   # enable mod rewrite
-a2enmod wsgi      # enable mod wsgi
-systemctl restart apache2
-```
-### Setup user and Database
-```
-useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
-mysql -u root -p
-mysql> create database fitcrack;
-mysql> CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
-mysql> GRANT ALL ON fitcrack.* TO 'fitcrack'@'localhost';
-mysql> SET PERSIST log_bin_trust_function_creators = 1;
-mysql> SET PERSIST time_zone = '+00:00';
-mysql> exit
-```
-
-### Add Apache user to the boincadm group
-```
-usermod -a -G boincadm www-data
-reboot
-```
-
-### Install Fitcrack
-```
-./install_fitcrack.sh
-```
-
-
-<a name="instdeb9"></a>
-## Step-by-step: Install on Debian 9 / Ubuntu 18.04 LTS
-
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
-
-### Install prerequisities
-```
-apt-get install m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-server mysql-common libmysqlclient-dev zlibc zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python python python3 python-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils libboost1.62-all-dev pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
-
-mysql_secure_installation # Set MySQL root password
-
-a2enmod cgi       # enable mod CGI
-a2enmod rewrite   # enable mod rewrite
-a2enmod wsgi      # enable mod wsgi
-systemctl restart apache2
-```
-### Setup user and Database
-```
-useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
-mysql -u root -p
-mysql> create database fitcrack;
-mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
-```
-
-### Add Apache user to the boincadm group
-```
-usermod -a -G boincadm www-data
-reboot
-```
-
-### Install Fitcrack
-```
-./install_fitcrack.sh
-```
 
 
 <a name="instcentos8"></a>
