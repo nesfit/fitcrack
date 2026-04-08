@@ -125,10 +125,21 @@ echo "=============================================================="
 # Configure and build server
 ########################################
 
+mkdir -p tmp
+
 # Apply fitcrack specific changes to boinc
-if [ ! -f "tmp/fc_boinc_patched" ]; then
-  patch -p0 < installer/fitcrack_changes_in_boinc.patch > /dev/null
-  touch tmp/fc_boinc_patched
+echo "Checking BOINC patch..."
+if patch --dry-run -p0 < installer/fitcrack_changes_in_boinc.patch >/dev/null 2>&1; then
+  echo "Applying BOINC patch..."
+  patch -p0 < installer/fitcrack_changes_in_boinc.patch || {
+    echo "ERROR: failed to apply BOINC patch"
+    exit 1
+  }
+elif grep -q "Only recreate it when drop_first=True" boinc/py/Boinc/database.py 2>/dev/null; then
+  echo "BOINC patch already applied."
+else
+  echo "ERROR: BOINC patch does not apply cleanly and target files do not look patched."
+  exit 1
 fi
 
 if [ -f "tmp/built" ]; then
