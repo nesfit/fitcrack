@@ -17,6 +17,32 @@ echo "                                                            "
 echo "    (C)  2017-2026 Fitcrack team - www.fitcrack.cz          "
 echo "============================================================"
 
+# Check that BOINC submodule is present and initialized
+check_boinc_submodule() {
+  if [ ! -d "boinc" ]; then
+    echo "Error: BOINC submodule directory './boinc' is missing."
+    echo "Initialize it with:"
+    echo "  git submodule update --init --recursive"
+    exit 1
+  fi
+
+  # Reject an empty directory
+  if [ -z "$(find boinc -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+    echo "Error: './boinc' exists but is empty."
+    echo "Initialize the BOINC submodule with:"
+    echo "  git submodule update --init --recursive"
+    exit 1
+  fi
+
+  # Also verify that it really looks like a BOINC source tree
+  if [ ! -f "boinc/configure.ac" ] || [ ! -f "boinc/tools/make_project" ]; then
+    echo "Error: './boinc' does not contain a valid BOINC source tree."
+    echo "Initialize or refresh the submodule with:"
+    echo "  git submodule update --init --recursive"
+    exit 1
+  fi
+}
+
 # Root check
 if [ "$EUID" -ne 0 ]
   then echo "Please run the installer as root."
