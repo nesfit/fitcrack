@@ -9,9 +9,8 @@ instructions.
 
 Table of Contents:
 * [Step-by-step guide for Ubuntu 24.04 LTS](#instubu24)
-* [Step-by-step guide for Debian 11](#instdeb11)
+* [Step-by-step guide for Debian 13](#instdeb13)
 * [Step-by-step guide for CentOS Stream 9](#instcentos9)
-* [Step-by-step guide for CentOS / RHEL 8](#instcentos8)
 * [General installation instructions (for Other Linux distros)](#instgen)
 * [Debugging your Fitcrack server installation](#debugging)
 * [Removing an existing installation](#removal)
@@ -20,7 +19,7 @@ Table of Contents:
 <a name="instubu24"></a>
 ## Step-by-step: Install on Ubuntu 24.04 LTS
 
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
+Open a **root** terminal, go to the directory with Fitcrack sources (with BOINC submodule) and proceed as follows.
 
 ### Install prerequisities
 ```
@@ -74,49 +73,60 @@ And proceed according to your preferences...
 
 
 
-<a name="instdeb11"></a>
-## Step-by-step: Install on Debian 11
+<a name="instdeb13"></a>
+## Step-by-step: Install on Debian 13
 
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
+Open a **root** terminal, go to the directory with Fitcrack sources (with BOINC submodule) and proceed as follows.
 
-### Install and configure the MySQL server
-
-Download the newest **mysql-apt-config** from https://dev.mysql.com/downloads/repo/apt/ and type:
-```
-apt install ./mysql-apt-config_*_all.deb
-dpkg-reconfigure mysql-apt-config
-```
-
-Proceed with default settings:
-* MySQL Server & Cluster: **mysql-8**
-* MySQL Tools & Connectors: **Enabled**
-* MySQL Preview Packages: **Disabled**
-
-Finally, install the mySQL server:
-```
-apt install mysql-server
-```
-You will be prompted to choose the MySQL root user password
-
-### Install other prerequisities
-```
-apt install -y m4 make dh-autoreconf pkg-config git vim apache2 libapache2-mod-php mysql-common libmysqlclient-dev zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd python-is-python3 python3 python3-mysqldb python3-pymysql python3-pip libapache2-mod-wsgi-py3 libssl-dev libcurl4-openssl-dev apache2-utils pkg-config libnotify-dev curl perl libcompress-raw-lzma-perl
+### Install prerequisities
+```bash
+apt update
+apt install -y \
+  build-essential m4 make libtool autoconf automake dh-autoreconf pkg-config git vim \
+  apache2 apache2-utils libapache2-mod-php libapache2-mod-wsgi-py3 \
+  default-mysql-server default-mysql-client default-libmysqlclient-dev mysql-common \
+  zlib1g zlib1g-dev php php-xml php-mysql php-cli php-gd \
+  python-is-python3 python3 python3-pip python3-mysqldb python3-pymysql \
+  libssl-dev libcurl4-openssl-dev libnotify-dev curl perl \
+  libcompress-raw-lzma-perl g++-mingw-w64-x86-64 \
+  wget xz-utils nlohmann-json3-dev libzip-dev python3-setuptools
 ```
 
-### Setup the MySQL Database
-Type `mysql -u root -p` and login with your MySQL root user password.
-Then create a database and user for Fitcrack. For example:
+### Install Node.js
+```bash
+mkdir -p /usr/local/lib/nodejs
+cd /usr/local/lib/nodejs
+wget -q https://nodejs.org/dist/v16.15.0/node-v16.15.0-linux-x64.tar.xz
+tar -xJf node-v16.15.0-linux-x64.tar.xz
+ln -sf /usr/local/lib/nodejs/node-v16.15.0-linux-x64/bin/node /usr/local/bin/node
+ln -sf /usr/local/lib/nodejs/node-v16.15.0-linux-x64/bin/npm /usr/local/bin/npm
+ln -sf /usr/local/lib/nodejs/node-v16.15.0-linux-x64/bin/npx /usr/local/bin/npx
+
+node -v  # Should print v16.15.0
+npm -v
 ```
-mysql> create database fitcrack;
-mysql> CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
-mysql> GRANT ALL ON fitcrack.* TO 'fitcrack'@'localhost';
-mysql> SET PERSIST log_bin_trust_function_creators = 1;
-mysql> SET PERSIST time_zone = '+00:00';
-mysql> exit
+
+### Install Python packages
+```bash
+python3 -m pip install --break-system-packages --ignore-installed urllib3==1.26.15 mysqlclient
 ```
+
+### Setup the MariaDB server
+```bash
+systemctl enable --now mariadb || systemctl enable --now mysql
+
+mysql -u root <<'EOF'
+CREATE DATABASE fitcrack;
+CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost';
+SET GLOBAL log_bin_trust_function_creators = 1;
+FLUSH PRIVILEGES;
+EOF
+```
+
 
 ### Setup the Apache web server
-```
+```bash
 a2enmod cgi       # enable mod CGI
 a2enmod rewrite   # enable mod rewrite
 a2enmod wsgi      # enable mod wsgi
@@ -124,25 +134,26 @@ systemctl restart apache2
 ```
 
 ### Setup BOINC server user
-```
+```bash
 useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
 passwd boincadm   # choose some password to login later
 ```
 
 ### Add Apache user to the boincadm group
-```
+```bash
 usermod -a -G boincadm www-data
 reboot
 ```
 
 ### Install Fitcrack
-```
+```bash
 ./install_fitcrack.sh
 ```
 
 
 <a name="instcentos9"></a>
 ## Step-by-step: Install on CentOS Stream 9
+** TODO FIXME and UPDATE to 10 **
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
@@ -215,112 +226,41 @@ If you installed Fitcrack as a system service you may enable it:
 This will make Fitcrack start automatically on future boots.
 
 
-<a name="instcentos8"></a>
-## Step-by-step: Install on CentOS/RHEL 8
-
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
-
-### SELINUX
-The following tutorial assumes **SELINUX** in permissive or disabled mode.
-If you wish to use SELINUX enforcing mode on Fitcrack server machine, you have to configure policies to allow apache access to project directory and others.
-```
-sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
-reboot
-```
-
-### Install prerequisities
-```
-yum install -y dnf-plugins-core
-```
-
-On CentOS 8, type:
-```
-yum config-manager --set-enabled powertools
-```
-
-On RHEL 8, type:
-```
-subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-```
-
-Then:
-```
-yum install -y m4 gcc gcc-c++ glibc-static libstdc++-static make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python3-devel python3 python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel
-
-pip3 install mysqlclient
-
-alternatives --set python /usr/bin/python3
-```
-
-### Configure exceptions for firewalld:
-```
-firewall-cmd --zone=public --add-service=http --permanent
-firewall-cmd --zone=public --add-service=https --permanent
-firewall-cmd --zone=public --add-port=5000/tcp --permanent
-firewall-cmd --reload
-```
-
-### Configure services
-```
-systemctl start httpd.service
-systemctl enable httpd.service
-systemctl start mariadb
-mysql_secure_installation # Set MariaDB root password
-systemctl enable mariadb.service
-```
-
-### Setup user and Database
-```
-useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
-mysql -u root -p
-mysql> create database fitcrack;
-mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
-```
-
-### Add Apache user to the boincadm group
-```
-usermod -a -G boincadm apache
-reboot
-```
-
-### Install Fitcrack
-```
-./install_fitcrack.sh
-```
-
-### Enable Fitcrack service
-If you installed Fitcrack as a system service you may enable it:
-```
-/usr/lib/systemd/systemd-sysv-install enable fitcrack
-```
-This will make Fitcrack start automatically on future boots.
-
 
 <a name="instgen"></a>
 ## General installation instructions (Linux-wide)
 
-### Software prerequisities
+### Software prerequisites
 * make (3.79+)
 * m4 (1.4+)
 * libtool (1.5+)
 * autoconf (2.58+)
 * automake (1.8+)
-* GCC (6.3.0+)
+* GCC / G++ (6.3.0+)
 * pkg-config (0.15+)
-* Perl + libcompress with LZMA
+* Perl with LZMA support (`libcompress-raw-lzma-perl` or equivalent)
 * Python 3
 * pip for Python 3
+* setuptools for Python 3
+  * needed especially on Python 3.12+, where `distutils` was removed
 * MySQL (4.0.9+) or MariaDB (10.0+)
-* libnotify-dev
+* MySQL/MariaDB client development libraries and headers
+* Python MySQL bindings (`mysqlclient` / MySQLdb, or distro equivalent)
+* libnotify development files
+* libzip development files (`zip.h`)
+* nlohmann::json headers (`nlohmann/json.hpp`)
 * Apache with the following modules:
-  * PHP (5+) with XML and MySQL modules
+  * PHP with CLI support
+  * PHP XML module
+  * PHP MySQL module
+  * PHP GD module
   * CGI
   * WSGI
   * rewrite
-* PHP5 with cli support and the GD and MySQL modules
 * OpenSSL (0.98+)
-* Curl
-* Gtest (only if you intend to build the tests in `server/src/tests`)
+* Curl / libcurl development files
+* GTest (only if you intend to build the tests in `server/src/tests`)
+
 
 ### Installation
 Create a user for running BOINC server
