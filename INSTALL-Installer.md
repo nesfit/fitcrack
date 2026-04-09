@@ -152,8 +152,7 @@ reboot
 
 
 <a name="instcentos9"></a>
-## Step-by-step: Install on CentOS Stream 9
-** TODO FIXME and UPDATE to 10 **
+## Step-by-step: Install on CentOS Stream 10
 
 Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
 
@@ -165,62 +164,92 @@ sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
 reboot
 ```
 
-### Install prerequisities
-Prepare the CodeReady Linux Builder:
-```
+### Enable required repositories
+```bash
 dnf install -y dnf-plugins-core
 dnf config-manager --set-enabled crb
+dnf install -y epel-release
+dnf clean all
+dnf makecache
 ```
 
-Then install the following:
-```
-dnf install -y m4 gcc gcc-c++ glibc-static libstdc++-static make libtool autoconf automake git vim httpd php php-xml php-mysqlnd python3-devel python3 python3-pip python3-mod_wsgi  redhat-rpm-config python3-setuptools mariadb-server mariadb-devel pkgconfig libnotify zlib libcurl-devel openssl-libs openssl-devel initscripts
+### Install prerequisities
+```bash
+dnf install -y \
+  m4 make libtool autoconf automake pkgconf-pkg-config \
+  gcc gcc-c++ redhat-rpm-config \
+  git vim wget xz curl perl perl-Compress-Raw-Lzma \
+  httpd httpd-tools \
+  php php-cli php-xml php-mysqlnd php-gd \
+  python3 python3-devel python3-pip python3-setuptools python3-PyMySQL python3-mod_wsgi \
+  mariadb-server mariadb mariadb-devel \
+  zlib zlib-devel libcurl-devel openssl-devel libnotify-devel \
+  libzip-devel json-devel initscripts
 ```
 
-Install mySQL client for Python 3:
+### Install Python packages for Fitcrack
+```bash
+python3 -m pip install mysqlclient urllib3==1.26.15
 ```
-pip3 install mysqlclient
+
+### Install Node 16.15
+
+```bash
+mkdir -p /usr/local/lib/nodejs
+cd /usr/local/lib/nodejs
+wget -q https://nodejs.org/dist/v16.15.0/node-v16.15.0-linux-x64.tar.xz
+tar -xJf node-v16.15.0-linux-x64.tar.xz
+ln -sf /usr/local/lib/nodejs/node-v16.15.0-linux-x64/bin/node /usr/local/bin/node
+ln -sf /usr/local/lib/nodejs/node-v16.15.0-linux-x64/bin/npm /usr/local/bin/npm
+ln -sf /usr/local/lib/nodejs/node-v16.15.0-linux-x64/bin/npx /usr/local/bin/npx
+```
+
+### Configure services
+```bash
+systemctl enable --now mariadb
+systemctl enable --now httpd
+```
+
+### Create database and user
+```bash
+mysql -u root <<'EOF'
+CREATE DATABASE fitcrack;
+CREATE USER 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
+GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost';
+SET GLOBAL log_bin_trust_function_creators = 1;
+FLUSH PRIVILEGES;
+EOF
+```
+
+### Create BOINC server user
+```bash
+useradd -m -c "BOINC Administrator" boincadm -s /bin/bash
+passwd boincadm
+```
+
+
+### Add Apache user to the boincadm group
+```bash
+usermod -a -G boincadm apache
+reboot
 ```
 
 ### Configure exceptions for firewalld:
-```
+```bash
 firewall-cmd --zone=public --add-service=http --permanent
 firewall-cmd --zone=public --add-service=https --permanent
 firewall-cmd --zone=public --add-port=5000/tcp --permanent
 firewall-cmd --reload
 ```
 
-### Configure services
-```
-systemctl start httpd.service
-systemctl enable httpd.service
-systemctl start mariadb
-mysql_secure_installation # Set MariaDB root password
-systemctl enable mariadb.service
-```
-
-### Setup user and Database
-```
-useradd -m -c "BOINC Administrator" boincadm  -s /bin/bash
-mysql -u root -p
-mysql> create database fitcrack;
-mysql> GRANT ALL PRIVILEGES ON fitcrack.* TO 'fitcrack'@'localhost' IDENTIFIED BY 'mypassword';
-```
-
-### Add Apache user to the boincadm group
-```
-usermod -a -G boincadm apache
-reboot
-```
-
 ### Install Fitcrack
-```
+```bash
 ./install_fitcrack.sh
 ```
 
 ### Enable Fitcrack service
 If you installed Fitcrack as a system service you may enable it:
-```
+```bash
 /usr/lib/systemd/systemd-sysv-install enable fitcrack
 ```
 This will make Fitcrack start automatically on future boots.
