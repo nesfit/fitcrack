@@ -47,6 +47,7 @@ FRONTEND_PORT=${FRONTEND_PORT:-80}
 # Get front-end TCP port #
 #########################
 
+
 if lsof -Pi :$FRONTEND_PORT -sTCP:LISTEN -t >/dev/null ; then
   FRONTEND_PORT_FREE="N"
 else
@@ -75,6 +76,7 @@ if [ $FRONTEND_PORT_FREE = "N" ]; then
     fi
   fi
 fi
+
 
 ###########################
 # Front-end Apache config #
