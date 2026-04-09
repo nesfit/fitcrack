@@ -47,31 +47,32 @@ FRONTEND_PORT=${FRONTEND_PORT:-80}
 # Get front-end TCP port #
 #########################
 
-
-if lsof -Pi :$FRONTEND_PORT -sTCP:LISTEN -t >/dev/null ; then
+if lsof -Pi :"$FRONTEND_PORT" -sTCP:LISTEN -t >/dev/null ; then
   FRONTEND_PORT_FREE="N"
 else
   FRONTEND_PORT_FREE="y"
 fi
 
-if [ $FRONTEND_PORT_FREE = "N" ]; then
+if [ "$FRONTEND_PORT_FREE" = "N" ]; then
   echo "Port $FRONTEND_PORT is already used."
 
-  if [ $FRONTEND_PORT -eq 80 ] && [ -f "$APACHE_CONFIG_DIR/sites-available/000-default.conf" ] && [ -f "$APACHE_CONFIG_DIR/sites-enabled/000-default.conf" ]; then
-    echo "Probably caused by: $APACHE_CONFIG_DIR/sites-available/000-default.conf"
-    read -e -p "Replace default site? [y/N] (default: N): " REPLACE_DEFAULT
-    REPLACE_DEFAULT=${REPLACE_DEFAULT:-N}
+  if [ "$FRONTEND_PORT" -eq 80 ] \
+    && [ -f "$APACHE_CONFIG_DIR/sites-available/000-default.conf" ] \
+    && [ -e "$APACHE_CONFIG_DIR/sites-enabled/000-default.conf" ]; then
 
-    if [ $REPLACE_DEFAULT = "y" ]; then
-      rm -f $APACHE_CONFIG_DIR/sites-enabled/000-default.conf
-      rm -f $APACHE_CONFIG_DIR/sites-available/000-default.conf
+    echo "Probably caused by: $APACHE_CONFIG_DIR/sites-available/000-default.conf"
+    read -e -p "Disable default site? [Y/n] (default: Y): " REPLACE_DEFAULT
+    REPLACE_DEFAULT=${REPLACE_DEFAULT:-Y}
+
+    if [ "$REPLACE_DEFAULT" = "y" ] || [ "$REPLACE_DEFAULT" = "Y" ]; then
+      a2dissite 000-default.conf
       FRONTEND_PORT_FREE="y"
     fi
   else
-    read -e -p "Ignore and configure anyway? [y/N] (default: N) " FORCE_CONFIGURE
+    read -e -p "Ignore and configure anyway? [y/N] (default: N): " FORCE_CONFIGURE
     FORCE_CONFIGURE=${FORCE_CONFIGURE:-N}
 
-    if [ $FORCE_CONFIGURE = "y" ]; then
+    if [ "$FORCE_CONFIGURE" = "y" ] || [ "$FORCE_CONFIGURE" = "Y" ]; then
       FRONTEND_PORT_FREE="y"
     fi
   fi
