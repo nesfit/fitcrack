@@ -9,7 +9,7 @@
 ##################################
 
 echo "Installing back-end requirements..."
-pip3 install --break-system-packages -r webadmin/fitcrackAPI/src/requirements.txt
+python3 -m pip install --break-system-packages --ignore-installed -r webadmin/fitcrackAPI/src/requirements.txt
 echo "Done."
 
 ####################################
