@@ -184,7 +184,7 @@ dnf install -y \
   python3 python3-devel python3-pip python3-setuptools python3-PyMySQL python3-mod_wsgi \
   mariadb-server mariadb mariadb-devel \
   zlib zlib-devel libcurl-devel openssl-devel libnotify-devel \
-  libzip-devel json-devel initscripts
+  libzip-devel json-devel initscripts patch
 ```
 
 ### Install Python packages for Fitcrack
