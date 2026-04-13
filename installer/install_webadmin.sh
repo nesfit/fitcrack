@@ -43,9 +43,9 @@ read -e -p "Enter a port for front-end to listen on (default: 80): " FRONTEND_PO
 FRONTEND_PORT=${FRONTEND_PORT:-80}
 
 
-#########################
+##########################
 # Get front-end TCP port #
-#########################
+##########################
 
 if lsof -Pi :"$FRONTEND_PORT" -sTCP:LISTEN -t >/dev/null ; then
   FRONTEND_PORT_FREE="N"
@@ -65,7 +65,11 @@ if [ "$FRONTEND_PORT_FREE" = "N" ]; then
     REPLACE_DEFAULT=${REPLACE_DEFAULT:-Y}
 
     if [ "$REPLACE_DEFAULT" = "y" ] || [ "$REPLACE_DEFAULT" = "Y" ]; then
-      a2dissite 000-default.conf
+      if command -v a2dissite >/dev/null 2>&1; then
+        a2dissite 000-default.conf
+      else
+        rm -f "$APACHE_CONFIG_DIR/sites-enabled/000-default.conf"
+      fi
       FRONTEND_PORT_FREE="y"
     fi
   else
