@@ -249,14 +249,6 @@ firewall-cmd --reload
 ./install_fitcrack.sh
 ```
 
-### Enable Fitcrack service
-If you installed Fitcrack as a system service you may enable it:
-```bash
-/usr/lib/systemd/systemd-sysv-install enable fitcrack
-```
-This will make Fitcrack start automatically on future boots.
-
-
 
 <a name="instgen"></a>
 ## General installation instructions (Linux-wide)
