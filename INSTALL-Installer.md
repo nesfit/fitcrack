@@ -10,7 +10,7 @@ instructions.
 Table of Contents:
 * [Step-by-step guide for Ubuntu 24.04 LTS](#instubu24)
 * [Step-by-step guide for Debian 13](#instdeb13)
-* [Step-by-step guide for CentOS Stream 9](#instcentos9)
+* [Step-by-step guide for CentOS Stream 10](#instcentos10)
 * [General installation instructions (for Other Linux distros)](#instgen)
 * [Debugging your Fitcrack server installation](#debugging)
 * [Removing an existing installation](#removal)
@@ -151,10 +151,10 @@ reboot
 ```
 
 
-<a name="instcentos9"></a>
+<a name="instcentos10"></a>
 ## Step-by-step: Install on CentOS Stream 10
 
-Open a **root** terminal, go to the directory with Fitcrack sources and proceed as follows.
+Open a **root** terminal, go to the directory with Fitcrack sources (with BOINC submodule) and proceed as follows.
 
 ### SELINUX
 The following tutorial assumes **SELINUX** in permissive or disabled mode.
@@ -184,12 +184,13 @@ dnf install -y \
   python3 python3-devel python3-pip python3-setuptools python3-PyMySQL python3-mod_wsgi \
   mariadb-server mariadb mariadb-devel \
   zlib zlib-devel libcurl-devel openssl-devel libnotify-devel \
-  libzip-devel json-devel initscripts patch
+  libzip-devel json-devel initscripts patch \
+  glibc-static libstdc++-static
 ```
 
 ### Install Python packages for Fitcrack
 ```bash
-python3 -m pip install mysqlclient urllib3==1.26.15
+python3 -m pip install --ignore-installed mysqlclient urllib3==1.26.15
 ```
 
 ### Install Node 16.15
@@ -208,6 +209,7 @@ ln -sf /usr/local/lib/nodejs/node-v16.15.0-linux-x64/bin/npx /usr/local/bin/npx
 ```bash
 systemctl enable --now mariadb
 systemctl enable --now httpd
+systemctl enable --now php-fpm
 ```
 
 ### Create database and user
