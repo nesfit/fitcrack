@@ -69,8 +69,8 @@ if [ "$FRONTEND_PORT_FREE" = "N" ]; then
       FRONTEND_PORT_FREE="y"
     fi
   else
-    read -e -p "Ignore and configure anyway? [y/N] (default: N): " FORCE_CONFIGURE
-    FORCE_CONFIGURE=${FORCE_CONFIGURE:-N}
+    read -e -p "Ignore and configure anyway? [Y/n] (default: Y): " FORCE_CONFIGURE
+    FORCE_CONFIGURE=${FORCE_CONFIGURE:-y}
 
     if [ "$FORCE_CONFIGURE" = "y" ] || [ "$FORCE_CONFIGURE" = "Y" ]; then
       FRONTEND_PORT_FREE="y"
