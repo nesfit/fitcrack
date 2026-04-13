@@ -127,6 +127,9 @@ echo "=============================================================="
 
 mkdir -p tmp
 
+# Check that BOINC submodule is present and initialized
+check_boinc_submodule
+
 # Apply fitcrack specific changes to boinc
 echo "Checking BOINC patch..."
 if patch --dry-run -p0 < installer/fitcrack_changes_in_boinc.patch >/dev/null 2>&1; then
