@@ -236,6 +236,20 @@ usermod -a -G boincadm apache
 reboot
 ```
 
+### Allow Apache to access the BOINC project in /home
+```bash
+mkdir -p /etc/systemd/system/httpd.service.d
+
+cat > /etc/systemd/system/httpd.service.d/fitcrack.conf <<'EOF'
+[Service]
+ProtectHome=false
+ReadWritePaths=/home/boincadm
+EOF
+
+systemctl daemon-reload
+systemctl restart httpd
+```
+
 ### Configure exceptions for firewalld:
 ```bash
 firewall-cmd --zone=public --add-service=http --permanent
