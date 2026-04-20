@@ -9,7 +9,8 @@
 ##################################
 
 echo "Installing back-end requirements..."
-python3 -m pip install --break-system-packages --ignore-installed -r webadmin/fitcrackAPI/src/requirements.txt
+WEBADMIN_VENV_PATH="$APACHE_DOCUMENT_ROOT/fitcrackAPI/.venv"
+echo "Back-end dependencies will be installed into a dedicated virtualenv: $WEBADMIN_VENV_PATH"
 echo "Done."
 
 ####################################
@@ -191,7 +192,7 @@ else
   fi
 
   echo "<VirtualHost *:$BACKEND_PORT>" >> $BE_CONFIG_FILE
-  echo "  WSGIDaemonProcess fitcrack user=$APACHE_USER group=$APACHE_USER threads=5" >> $BE_CONFIG_FILE
+  echo "  WSGIDaemonProcess fitcrack user=$APACHE_USER group=$APACHE_USER threads=5 python-home=$WEBADMIN_VENV_PATH" >> $BE_CONFIG_FILE
   echo "  WSGIScriptAlias / $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/wsgi.py" >> $BE_CONFIG_FILE
   echo "  WSGIPassAuthorization On" >> $BE_CONFIG_FILE
   echo "  <Directory $APACHE_DOCUMENT_ROOT/fitcrackAPI/src/>" >> $BE_CONFIG_FILE
@@ -293,6 +294,29 @@ if [ $INSTALL_BACKEND = "y" ]; then
   chown -R $APACHE_USER:$APACHE_GROUP $APACHE_DOCUMENT_ROOT/fitcrackAPI
 
   echo "Installed to $APACHE_DOCUMENT_ROOT/fitcrackAPI."
+fi
+
+if [ -d "$APACHE_DOCUMENT_ROOT/fitcrackAPI/src" ]; then
+  echo "Installing Python dependencies into WebAdmin virtualenv..."
+
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "Python3 is not available. Install python3 and python3-venv first."
+    exit 1
+  fi
+
+  python3 -m venv "$WEBADMIN_VENV_PATH"
+  if [ $? -ne 0 ]; then
+    echo "Failed to create virtualenv at $WEBADMIN_VENV_PATH."
+    echo "Make sure python3-venv (or equivalent) is installed."
+    exit 1
+  fi
+
+  "$WEBADMIN_VENV_PATH/bin/python3" -m pip install --upgrade pip
+  "$WEBADMIN_VENV_PATH/bin/python3" -m pip install --ignore-installed -r "$APACHE_DOCUMENT_ROOT/fitcrackAPI/src/requirements.txt"
+
+  chmod -R 775 "$WEBADMIN_VENV_PATH"
+  chown -R $APACHE_USER:$APACHE_GROUP "$WEBADMIN_VENV_PATH"
+  echo "Back-end Python dependencies installed in virtualenv."
 fi
 
 sed -i "s|http://localhost:5000|$BACKEND_URI:$BACKEND_PORT|g" $BOINC_PROJECT_DIR/bin/measureUsage.py
