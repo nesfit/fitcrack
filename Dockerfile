@@ -96,6 +96,15 @@ RUN useradd -m -c "BOINC Administrator" boincadm -s /bin/bash \
 COPY . /srv/fitcrack/
 WORKDIR /srv/fitcrack
 
+# Merge zip parts
+RUN cd /srv/fitcrack/server/client_bin/arm64-apple-darwin \
+    && cat hashcat_files_mac1.zip.part-aa \
+           hashcat_files_mac1.zip.part-ab > hashcat_files_mac1.zip \
+    && sha256sum -c hashcat_files_mac1.zip.sha256 \
+    && rm hashcat_files_mac1.zip.part-aa \
+          hashcat_files_mac1.zip.part-ab \
+          hashcat_files_mac1.zip.sha256
+
 # Apply Fitcrack BOINC patch and copy Fitcrack scheduler sources into BOINC
 RUN patch -p0 < installer/fitcrack_changes_in_boinc.patch \
     && cp -f server/src/headers/*.h boinc/sched/ \

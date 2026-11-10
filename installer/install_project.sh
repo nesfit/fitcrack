@@ -4,6 +4,20 @@
 # This file is part of Fitcrack installer
 # Author: Radek Hranicky (ihranicky@fit.vutbr.cz)
 
+# Merge zip parts
+(
+    cd server/client_bin/arm64-apple-darwin || exit 1
+
+    cat hashcat_files_mac1.zip.part-aa \
+        hashcat_files_mac1.zip.part-ab \
+        > hashcat_files_mac1.zip || exit 1
+
+    sha256sum -c hashcat_files_mac1.zip.sha256 || exit 1
+) || {
+    echo "ERROR: Failed to merge or verify macOS hashcat zip files. DIY in server/client_bin/arm64-apple-darwin"
+    exit 1
+}
+
 # Adding apache user to BOINC user Group
 echo "Adding user $APACHE_USER to $BOINC_GROUP group..."
 usermod -a -G $BOINC_GROUP $APACHE_USER
@@ -60,6 +74,12 @@ cp -f server/server_bin/pcfg_monitor.py $BOINC_PROJECT_DIR/bin/
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack
 mkdir $BOINC_PROJECT_DIR/apps/fitcrack/1
 cp -Rf server/client_bin/* $BOINC_PROJECT_DIR/apps/fitcrack/1/
+
+# Remove part zip files nad sha
+find "$BOINC_PROJECT_DIR/apps/fitcrack/1" -type f \
+    \( -name 'hashcat_files*.zip.part-*' \
+       -o -name 'hashcat_files*.zip.sha256' \) \
+    -delete || exit 1
 
 # Install server daemons
 source installer/install_daemons.sh

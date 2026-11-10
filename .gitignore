@@ -1,2 +1,3 @@
 .env
 fitcrack-data/*
+/server/client_bin/arm64-apple-darwin/hashcat_files_mac1.zip

@@ -30,7 +30,7 @@ windows: CXX=x86_64-w64-mingw32-g++
 windows: LDXXFLAGS+=-lpthread --static -L'./lib/windows_x86_64/'
 windows: $(OBJDIR) $(BINDIR) runner
 
-mac: TARGET=runner.app
+mac: TARGET=runner.bin
 mac: CXX=clang++
 mac: LDXXFLAGS+=-lpthread -L'./lib/darwin_arm64/'
 mac: $(OBJDIR) $(BINDIR) runner
