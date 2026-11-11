@@ -1,4 +1,4 @@
-## Makefile for Linux and Windows
+## Makefile for Linux, Windows and macOS
 
 SRCDIR=./src/
 OBJDIR=./obj/
@@ -18,6 +18,15 @@ LDXXFLAGS=-lboinc_api -lboinc -lzip -lz
 SRCS=$(shell find $(SRCDIR) -name *.cpp)
 OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,.o,$(SRCS)))
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+DEFAULT_TARGET := mac
+else
+DEFAULT_TARGET := linux
+endif
+
+.DEFAULT_GOAL := $(DEFAULT_TARGET)
+
 linux: TARGET=runner.bin
 linux: CXX=g++
 linux: LDXXFLAGS+=-Wl,--whole-archive -lpthread -Wl,--no-whole-archive --static -L'./lib/x86_64_linux'
@@ -30,8 +39,9 @@ windows: CXX=x86_64-w64-mingw32-g++
 windows: LDXXFLAGS+=-lpthread --static -L'./lib/windows_x86_64/'
 windows: $(OBJDIR) $(BINDIR) runner
 
-mac: TARGET=runner.bin
+mac: TARGET=runner.macos
 mac: CXX=clang++
+mac: CXXFLAGS+=-Wno-unknown-warning-option -Wno-deprecated-literal-operator
 mac: LDXXFLAGS+=-lpthread -L'./lib/darwin_arm64/'
 mac: $(OBJDIR) $(BINDIR) runner
 
@@ -64,7 +74,7 @@ cleanobj:
 
 cleanbin:
 	rm -f $(TESTDIR)runner.*
-	rm -f $(BINDIR)*.exe $(BINDIR)*.bin 
+	rm -f $(BINDIR)*.exe $(BINDIR)*.bin $(BINDIR)*.macos
 
 cleandoc:
 	rm -rf $(DOCDIR)*

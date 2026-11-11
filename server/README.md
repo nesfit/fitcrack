@@ -239,18 +239,19 @@ As described [here](https://boinc.berkeley.edu/trac/wiki/AppVersionNew),
 you need to create directories for client platforms you want to support, e.g.:
 * `windows_x86_64`
 * `x86_64-pc-linux-gnu`
+* `arm64-apple-darwin` (macOS)
 
 What is needed inside?
-* `hashcat1.bin` or `hashcat1.exe` - hashcat compiled for the platform's architecture
+* `hashcat1.bin`, `hashcat1.exe` or `hashcat1.macos` - hashcat compiled for the platform's architecture
 * `hashcat_files1.zip` - A ZIP archive with the following (for the corresponding version of hashcat):
   * `modules` - hashcat app's modules
   * `OpenCL` - hashcat's OpenCL cracking kernels
   * `hashcat.hcstat2` - Markov hcstat2 file
   * `hashcat.hctune` - hashcat's hctune settings
   * `hash_info.json` - info about the supported hash algorithms
-* `runner1.bin` or `runner1.exe` - Fitcrack runner comppiled for the platform's architecture (See `runner/README.md`)
-* `princeprocessor1.bin` or `princeprocessor1.exe` - the [princeprocessor](https://github.com/hashcat/princeprocessor) app for PRINCE attacks compile for the platform's architecture.
-* `pcfg-manager1.bin` or `pcfg-manager1.exe` - NESatFIT [PCFG Manager](https://github.com/nesfit/pcfg-manager) compiled for the platform's architecture.
+* `runner1.bin`, `runner1.exe` or `runner1.macos` - Fitcrack runner comppiled for the platform's architecture (See `runner/README.md`)
+* `princeprocessor1.bin`, `princeprocessor1.exe` or `princeprocessor1.macos` - the [princeprocessor](https://github.com/hashcat/princeprocessor) app for PRINCE attacks compile for the platform's architecture.
+* `pcfg-manager1.bin`, `pcfg-manager1.exe` or `pcfg-manager1.macos` - NESatFIT [PCFG Manager](https://github.com/nesfit/pcfg-manager) compiled for the platform's architecture.
 * `version.xml` - version file with the definition of all the above-shown files that should be transferred to the host cracking stations. See example below:
 ```
 <version>

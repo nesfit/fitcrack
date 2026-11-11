@@ -32,7 +32,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 mv hashcat.bin ../hashcat.bin
 mv hashcat.exe ../hashcat.exe
 else
-mv hashcat ../hashcat.app
+mv hashcat ../hashcat.macos
 fi
 
 cd ..
@@ -41,5 +41,5 @@ rm -rf hashcat
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 echo "Created: hashcat_files_linux.zip, hashcat_files_windows, hashcat_files_windows.zip, hashcat.bin, hashcat.exe"
 else
-echo "Created: hashcat_files_mac.zip, hashcat.app"
+echo "Created: hashcat_files_mac.zip, hashcat.macos"
 fi

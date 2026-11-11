@@ -135,11 +135,19 @@ Windows compilation:
 
 `$ make windows`
 
+macOS compilation (Apple Silicon):
+
+`$ make mac`
+
+Running plain `make` builds for the host platform (Linux or macOS).
+
 If you would want to compile both by "one" command you can do it like this:
 
 `$ make linux && make cleanobj && make windows`
 
-Binaries are then stored in the *./bin* directory.
+Binaries are then stored in the *./bin* directory. On macOS the binary is
+named `runner.macos`; on Linux and Windows it is `runner.bin` and `runner.exe`
+respectively.
 
 The default binaries are build on Ubuntu 14.04 64-bit machine with g++4.8 and
 Ubuntu 14.04 default MinGW g++ which is also 4.8 and are targeted for Linux

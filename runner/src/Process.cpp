@@ -27,8 +27,8 @@ ProcessBase* Process::create(std::string prefix, const std::vector<std::string>&
   directory.findVersionedFile(prefix, "exe", executable);
   return new ProcessWindows(executable.getRelativePath(), arguments, false);
   #elif defined (__APPLE__)
-  if (!directory.findVersionedFile(prefix, "bin", executable)) {
-    RunnerUtils::runtimeException("Couldn't find: " + prefix + ".bin");
+  if (!directory.findVersionedFile(prefix, "macos", executable)) {
+    RunnerUtils::runtimeException("Couldn't find: " + prefix + ".macos");
   }
   executable.setExecutableMode();
   return new ProcessLinux(executable.getRelativePath(), arguments, false);
