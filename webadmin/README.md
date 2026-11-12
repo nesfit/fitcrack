@@ -13,7 +13,6 @@ systemctl restart apache2
 On Centos/RHEL:
 ```
 yum install -y python3-devel python3 python3-pip python3-mod_wsgi
-pip3 install mysqlclient
 ```
 
 
@@ -22,7 +21,9 @@ pip3 install mysqlclient
 Install backend dependencies
 ```  
 cd /var/www/fitcrackAPI/src
-sudo pip3 install -r requirements.txt
+python3 -m venv /var/www/fitcrackAPI/.venv
+/var/www/fitcrackAPI/.venv/bin/python3 -m pip install --upgrade pip
+/var/www/fitcrackAPI/.venv/bin/python3 -m pip install -r requirements.txt
 ```
 
 
@@ -80,7 +81,7 @@ Change `/etc/apache2/sites-available/000-default.conf` to:
 Listen 5000
 <VirtualHost *:5000>
 
-	 WSGIDaemonProcess fitcrack user=boincadm group=boincadm threads=5
+	 WSGIDaemonProcess fitcrack user=boincadm group=boincadm threads=5 python-home=/var/www/fitcrackAPI/.venv
 	 WSGIScriptAlias / /var/www/fitcrackAPI/src/wsgi.py
 
 	<Directory /var/www/fitcrackAPI/src/>

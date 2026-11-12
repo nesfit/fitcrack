@@ -108,7 +108,9 @@ npm -v
 
 ### Install Python packages
 ```bash
-python3 -m pip install --break-system-packages --ignore-installed urllib3==1.26.15 mysqlclient
+python3 -m venv /opt/fitcrack-webadmin-venv
+/opt/fitcrack-webadmin-venv/bin/python3 -m pip install --upgrade pip
+/opt/fitcrack-webadmin-venv/bin/python3 -m pip install --ignore-installed urllib3==1.26.15 mysqlclient
 ```
 
 ### Setup the MariaDB server
@@ -190,7 +192,9 @@ dnf install -y \
 
 ### Install Python packages for Fitcrack
 ```bash
-python3 -m pip install --ignore-installed mysqlclient urllib3==1.26.15
+python3 -m venv /opt/fitcrack-webadmin-venv
+/opt/fitcrack-webadmin-venv/bin/python3 -m pip install --upgrade pip
+/opt/fitcrack-webadmin-venv/bin/python3 -m pip install --ignore-installed mysqlclient urllib3==1.26.15
 ```
 
 ### Install Node 16.15
